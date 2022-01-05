@@ -1,0 +1,123 @@
+@import "./variables.scss";
+
+@function contrast($color, $threshold: 50%, $light: #FFF, $dark: #000) {
+    @if (lightness($color) < $threshold) {
+        @return $light;
+    }
+    @else {
+        @return $dark;
+    }
+}
+
+@mixin button($bg, $hoverBg: darken($bg, 5%)) {
+    $paddingTop    : round($font-size * 0.5) + 1px;
+    $paddingRight  : $font-size;
+    $paddingBottom : round($font-size * 0.5) + 1px;
+    $paddingLeft   : $font-size;
+    $contrast      : 85;
+    $color         : contrast($bg, 60%, lighten($bg, $contrast), darken($bg, $contrast));
+
+    // background     : $bg linear-gradient(lighten($bg, 5%), darken($bg, 5%));
+    background     : $bg;
+    border         : none;
+    line-height    : $line-height;//$font-size - ($paddingTop + $paddingBottom);
+    // vertical-align: middle;
+    // line-height: inherit;
+    // font           : inherit;
+    font-size      : inherit;
+    color          : $color;
+    border-radius  : $border-radius;
+    vertical-align : top;
+    text-align     : center;
+    text-decoration: none;
+    cursor         : default;
+    display        : inline-flex;
+    align-items    : center;
+    justify-content: center;
+    // min-height     : 4.4ex;
+    outline        : 0;
+    padding        : $paddingTop $paddingRight $paddingBottom $paddingLeft;
+    white-space: nowrap;// normal;
+    // overflow       : hidden;
+    // text-overflow  : ellipsis;
+    // text-shadow    : contrast-text-shadow($color);
+    // box-shadow     : 0 0 1px lighten($bg, 10%) inset,
+    //                  0 2px 0 -1px lighten($bg, 10%) inset;
+  
+    &:hover:not(:disabled, .disabled) {
+        background: $hoverBg;
+        color     : contrast($hoverBg, 60%, lighten($hoverBg, $contrast), darken($hoverBg, $contrast));;
+    }
+
+    &:active:not(:disabled, .disabled), &.active:not(:disabled, .disabled) {
+        $color    : contrast($hoverBg, 60, lighten($hoverBg, $contrast), darken($hoverBg, $contrast));
+        background: darken($hoverBg, 5);
+        color     : $color;
+        padding   : ($paddingTop + 1) ($paddingRight - 1) ($paddingBottom - 1) ($paddingLeft + 1);
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 0 3px fade-out($bg, 0.7);
+    }
+
+    &:disabled, &.disabled {
+        opacity       : 0.5;
+        filter        : grayscale(1);
+        pointer-events: none;
+    }
+}
+
+@mixin form-control() {
+    background   : #FFF;
+    border       : 1px solid $color-grey;
+    border-radius: $border-radius;
+    padding      : round($font-size * 0.5) 1em;
+    outline      : none;
+    font         : inherit;
+    width        : 100%;
+    line-height: $line-height;
+  
+    &:focus {
+        border-color: rgb(37, 139, 255);
+        box-shadow: 0 0 0 3px rgba(37, 139, 255, 0.3);
+    }
+  
+    &:invalid, &.invalid {
+        border-color: rgb(204, 41, 0);  
+        &:focus {
+            box-shadow: 0 0 0 3px rgba(204, 41, 0, 0.3);
+        }
+    }
+
+    &[readonly] {
+        color: #777;
+        border-color: #CCC;
+    }
+
+    &:disabled {
+        background  : #EEE;
+        border-color: #CCC;
+        color       : #888;
+        text-shadow : 0 1px 0 #FFF;
+        box-shadow  : 0 0 0 1px #FFF inset;
+        opacity     : 1;
+    }
+}
+
+
+input[type="text"],
+input[type="url"],
+input[type="password"],
+input[type="email"],
+input[type="search"],
+input[type="file"],
+input[type="phone"],
+select,
+textarea,
+.form-control {
+    @include form-control();
+}
+
+.btn-blue {
+    @include button($color-blue);
+}
