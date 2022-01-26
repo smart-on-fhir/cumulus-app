@@ -13,12 +13,24 @@
     flex-wrap     : wrap;
     // margin        : 0 -1rem;
 
-    &.center { justify-content: center;         }
-    &.left   { justify-content: flex-start;     }
-    &.right  { justify-content: flex-end;       }
-    &.top    { align-items: flex-start; }
-    &.middle { align-items: center;     }
-    &.bottom { align-items: flex-end;   }
+    &.center { justify-content: center;     }
+    &.left   { justify-content: flex-start; }
+    &.right  { justify-content: flex-end;   }
+    &.top    { align-items: flex-start;     }
+    &.middle { align-items: center;         }
+    &.bottom { align-items: flex-end;       }
+
+    &.gap {
+        margin-left: -$gap;
+        margin-right: -$gap;
+        // justify-content: space-between;
+        // flex-wrap: nowrap;
+
+        > .col {
+            padding-right: $gap;
+            padding-left: $gap;
+        }
+    }
 }
 
 .col {
