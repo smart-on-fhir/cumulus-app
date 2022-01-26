@@ -1,3 +1,4 @@
+import { AuthStatus } from "../../auth";
 import "./Header.scss";
 import logo from "./logo.png";
 
@@ -12,8 +13,7 @@ export default function Header() {
                 <div className="col middle center"/>
                 <div className="col pl-1 middle right">
                     <div className="nowrap">
-                        <i className="fas fa-user-circle" style={{ fontSize: "200%", verticalAlign: "middle" }} /> <b>Full Name</b>
-                        <a className="ml-1" href="#"><b>SIGN OUT</b></a>
+                        <AuthStatus/>
                     </div>
                 </div>
             </div>
