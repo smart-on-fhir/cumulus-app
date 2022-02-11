@@ -10,26 +10,26 @@
 }
 
 @mixin button($bg, $hoverBg: darken($bg, 5%)) {
-    $paddingTop    : round($font-size * 0.5) + 1px;
-    $paddingRight  : $font-size;
-    $paddingBottom : round($font-size * 0.5) + 1px;
-    $paddingLeft   : $font-size;
-    $contrast      : 85;
+    $paddingTop    : 0.4em;
+    $paddingRight  : 0.8em;
+    $paddingBottom : 0.4em;
+    $paddingLeft   : 0.8em;
+    $contrast      : 60;
     $color         : contrast($bg, 60%, lighten($bg, $contrast), darken($bg, $contrast));
 
     // background     : $bg linear-gradient(lighten($bg, 5%), darken($bg, 5%));
     background     : $bg;
-    border         : none;
-    line-height    : $line-height;//$font-size - ($paddingTop + $paddingBottom);
+    border         : 1px solid fade-out($color: $color, $amount: 0.85);
+    // line-height    : normal;//$line-height;//$font-size - ($paddingTop + $paddingBottom);
     // vertical-align: middle;
-    // line-height: inherit;
+    line-height: inherit;
     // font           : inherit;
-    font-size      : inherit;
+    font-size      : $font-size;
     color          : $color;
     border-radius  : $border-radius;
     vertical-align : top;
     text-align     : center;
-    text-decoration: none;
+    text-decoration: none !important;
     cursor         : default;
     display        : inline-flex;
     align-items    : center;
@@ -37,12 +37,20 @@
     // min-height     : 4.4ex;
     outline        : 0;
     padding        : $paddingTop $paddingRight $paddingBottom $paddingLeft;
-    white-space: nowrap;// normal;
+    white-space    : pre;// normal;
     // overflow       : hidden;
     // text-overflow  : ellipsis;
     // text-shadow    : contrast-text-shadow($color);
     // box-shadow     : 0 0 1px lighten($bg, 10%) inset,
     //                  0 2px 0 -1px lighten($bg, 10%) inset;
+    // height       : 2em;
+    user-select  : none;
+    min-width    : 2em;
+
+    * {
+        line-height    : inherit;
+        font-size      : $font-size;
+    }
   
     &:hover:not(:disabled, .disabled) {
         background: $hoverBg;
@@ -53,7 +61,7 @@
         $color    : contrast($hoverBg, 60, lighten($hoverBg, $contrast), darken($hoverBg, $contrast));
         background: darken($hoverBg, 5);
         color     : $color;
-        padding   : ($paddingTop + 1) ($paddingRight - 1) ($paddingBottom - 1) ($paddingLeft + 1);
+        padding   : ($paddingTop + 0.05) ($paddingRight - 0.05) ($paddingBottom - 0.05) ($paddingLeft + 0.05);
     }
 
     &:focus {
@@ -71,11 +79,12 @@
     background   : #FFF;
     border       : 1px solid $color-grey;
     border-radius: $border-radius;
-    padding      : round($font-size * 0.5) 1em;
+    padding      : 0.4em 0.8em;
     outline      : none;
     font         : inherit;
     width        : 100%;
-    line-height: $line-height;
+    line-height  : $line-height;
+    // height   : ($font-size * $line-height) + round($font-size * 0.8);
   
     &:focus {
         border-color: rgb(37, 139, 255);
@@ -112,12 +121,146 @@ input[type="email"],
 input[type="search"],
 input[type="file"],
 input[type="phone"],
+input[type="number"],
+input[type="date"],
 select,
 textarea,
 .form-control {
     @include form-control();
 }
 
+textarea {
+    height: auto;
+    resize: vertical;
+    min-height: 2.1em;
+}
+
+select:not([size]) {
+    background: #FFF url(caret-down.svg) 100% center no-repeat;
+    background-size: auto;
+    padding-right: 22px;
+    background-size: 22px 14px;
+    appearance: none;
+}
+
+select[size] {
+    padding: 1px;
+    height: 100%;
+}
+
+select option.empty-option {
+    color: #888;
+}
+
+.btn {
+    @include button(#FFF);
+}
+
 .btn-blue {
     @include button($color-blue);
 }
+.btn-green {
+    @include button($color-green);
+}
+
+.toolbar {
+    background: $color-grey;
+    border-radius: $border-radius + 1px;
+    white-space: nowrap;
+    
+    > .btn {
+        border: 1px solid rgba(0, 0, 0, 0);
+        border-radius: 0;
+        margin: 1px 1px 1px 0;
+        // color: $color-grey-dark;
+        padding: (round($font-size * 0.4) + 2px)
+                 (round($font-size * 0.4) + 4px)
+                 (round($font-size * 0.4) + 2px)
+                 (round($font-size * 0.4) + 4px);
+        
+        &:active:not(:disabled, .disabled), &.active:not(:disabled, .disabled) {
+            padding: (round($font-size * 0.4) + 3px)
+                     (round($font-size * 0.4) + 3px)
+                     (round($font-size * 0.4) + 1px)
+                     (round($font-size * 0.4) + 5px);
+        }
+
+        &:active, &:focus {
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 1px 0 #FFF;
+        }
+
+        &:focus-visible {
+            outline: 1px dotted;
+            outline-offset: -3px;
+        }
+
+        &.active:not(:disabled, .disabled) {
+            background: fade-out($color: mix($color-blue, #FFF, 25%), $amount: 0.5);
+            // color: #FFF;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 1px 0 #ffffff88;
+            color: mix($color-blue, #000, 50%)
+        }
+
+        &:first-of-type {
+            border-top-left-radius: $border-radius;
+            border-bottom-left-radius: $border-radius;
+            margin-left: 1px;
+        }
+
+        &:last-of-type {
+            border-top-right-radius: $border-radius;
+            border-bottom-right-radius: $border-radius;
+        }
+
+        &.disabled {
+            background: #FFF;
+            opacity: 1;
+            color: #CCC;
+        }
+    }
+}
+
+label {
+    padding: round($font-size * 0.4) 0;
+
+    + hr {
+        margin-top: 0.4ex;
+    }
+}
+
+label.checkbox-label {
+    display: inline-block;
+    padding: 0 0 0 1.5em;
+
+    > input[type="checkbox"] {
+        font-size:  inherit;
+        margin: 0 0 0 -1.5em;
+        width: 1.5em;
+    }
+
+    .checkbox-label-description {
+        font-weight: normal;
+        font-size: 85%;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

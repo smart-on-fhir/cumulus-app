@@ -1,0 +1,16 @@
+@import "../../styles/variables.scss";
+
+
+
+
+.highcharts-menu {
+    
+    .highcharts-menu-item {
+        margin: 0;
+        font-size: $font-size !important;
+    }
+
+    hr {
+        margin: 0.25em 0;
+    }
+}
