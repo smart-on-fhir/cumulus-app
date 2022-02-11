@@ -1,12 +1,13 @@
 $color-blue      : #4a90e2;
 $color-orange    : #f37820;
+$color-red       : #d41c1c;
 $color-grey-light: #f8f8f8;
 $color-grey      : #d1dae2;
 $color-grey-dark : #414e5c;
 $color-green     : #6bba43;
 
-$gap: 1rem;
 
 $border-radius: 4px;
-$font-size: 18px;
-$line-height: 1.4;
+$font-size: 17px;
+$line-height: 1.2;
+$gap: $font-size;

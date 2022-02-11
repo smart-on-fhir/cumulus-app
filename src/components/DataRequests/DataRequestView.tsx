@@ -1,0 +1,93 @@
+import { useCallback } from "react"
+import { useParams }  from "react-router"
+import { Link } from "react-router-dom"
+import { requests }   from "../../backend"
+import { useBackend } from "../../hooks"
+import Breadcrumbs from "../Breadcrumbs"
+import { Format } from "../Format"
+import map from "../Home/map.png"
+import ViewsBrowser from "../Views/ViewsBrowser"
+
+
+export default function DataRequestView(): JSX.Element
+{
+    const { id } = useParams()
+    const { loading, error, result } = useBackend<app.DataRequest>(
+        useCallback(() => requests.getOne(id + "", "?include=group:name"), [id]),
+        true
+    )
+
+    if (loading) {
+        return <b>Loading...</b>
+    }
+
+    if (error) {
+        return <b>{ error + "" }</b>
+    }
+
+    if (!result) {
+        return <b>Failed to load DataRequest</b>
+    }
+
+    return (
+        <div>
+            <Breadcrumbs links={[
+                { name: "Home", href: "/" },
+                { name: "Requests & Subscriptions", href: "/requests" },
+                { name: result.name }
+            ]}/>
+            <h3><i className="fas fa-database" /> { result.name }</h3>
+            <p className="color-muted">{ result.description }</p>
+            <br/>
+            <div className="row gap">
+                <div className="col col-6">
+                    <h5>Status</h5>
+                    <hr className="mb-1"/>
+                    <div className="mb-1"><b>Group</b>: { result.group?.name || "GENERAL" }</div>
+                    <div className="mb-1"><b>Type</b>: { result.refresh ? "SUBSCRIPTION" : "REQUEST" }</div>
+                    <div className="mb-1">
+                        <b>Status</b>: {
+                            result.completed ?
+                            <>completed <Format value={ result.completed } format="date-time" /></> :
+                            "Pending"
+                        }
+                    </div>
+                    <div className="mb-1"><b>Created</b>: <Format value={ result.createdAt } format="date-time" /></div>
+                    {/* <div className="mb-1"><b>Completed</b>: <Format value={ result.completed } format="date-time" /></div> */}
+                    <h5 className="mt-3">Included Fields</h5>
+                    <hr/>
+                    { result.data ? result.data.cols.map((col, i) => (
+                        <div className="mb-1 mt-1" key={i}>
+                            <label>{ col.label || col.name }</label> <span className="small color-muted">(<span className={col.dataType}>{ col.dataType }</span>)</span>
+                            {/* <div className="small color-muted">
+                                <i>Label: </i>{ col.label }                    
+                            </div> */}
+                            { col.label !== col.name && <div className="small color-muted">
+                                <i>Column name: </i><b>{ col.name }</b>
+                            </div> }
+                            <div className="small color-muted">
+                                <i>Description: </i>{ col.description || "No description provided"}
+                            </div>
+                        </div>
+                    )) : <p>No data available yet</p> }
+                    <br/>
+                </div>
+                <div className="col col-4">
+                    { result.completed && <><h5>Dependent Views</h5>
+                    <hr/>
+                    <ViewsBrowser layout="column" requestId={ result.id } />
+                    <br/>
+                    </> }
+                    <h5 className="grey-out">Data Sites</h5>
+                    <img src={ map } alt="Sites Map" className="grey-out" />
+                </div>
+            </div>
+            <hr className="center mt-1"/>
+            <div className="center mt-1 mb-2">
+                <button className="btn btn-blue"><b> Export Data </b></button>
+                <Link className="btn btn-blue ml-1 mr-1" to={`/requests/${result.id}/import`}><b> Import Data </b></Link>
+                <Link className="btn btn-blue" to={`/requests/${result.id}/edit`}><b> Edit this Data Request </b></Link>
+            </div>
+        </div>
+    )
+}

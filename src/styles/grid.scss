@@ -21,16 +21,40 @@
     &.bottom { align-items: flex-end;       }
 
     &.gap {
-        margin-left: -$gap;
-        margin-right: -$gap;
+        margin-left: -0.5em;
+        margin-right: -0.5em;
         // justify-content: space-between;
         // flex-wrap: nowrap;
 
         > .col {
-            padding-right: $gap;
-            padding-left: $gap;
+            padding-right: 0.5em;
+            padding-left: 0.5em;
         }
     }
+
+    &.half-gap {
+        margin-left: -0.25em;
+        margin-right: -0.25em;
+        // justify-content: space-between;
+        // flex-wrap: nowrap;
+
+        > .col {
+            padding: 0.25em;
+        }
+    }
+
+    &.row-0  { flex-grow: 0 ; flex-basis: 0%; }
+    &.row-1  { flex-grow: 1 ; flex-basis: 10% ; max-height: 10%; }
+    &.row-2  { flex-grow: 2 ; flex-basis: 20% ; max-height: 20%; }
+    &.row-3  { flex-grow: 3 ; flex-basis: 30% ; max-height: 30%; }
+    &.row-4  { flex-grow: 4 ; flex-basis: 40% ; max-height: 40%; }
+    &.row-5  { flex-grow: 5 ; flex-basis: 50% ; max-height: 50%; }
+    &.row-6  { flex-grow: 6 ; flex-basis: 60% ; max-height: 60%; }
+    &.row-7  { flex-grow: 7 ; flex-basis: 70% ; max-height: 70%; }
+    &.row-8  { flex-grow: 8 ; flex-basis: 80% ; max-height: 80%; }
+    &.row-9  { flex-grow: 9 ; flex-basis: 90% ; max-height: 90%; }
+    &.row-9  { flex-grow: 9 ; flex-basis: 90% ; max-height: 90%; }
+    &.row-10 { flex-grow: 10; flex-basis: 100%; max-height: 100%;}
 }
 
 .col {
@@ -39,6 +63,7 @@
     // padding       : 0 1rem;
     flex          : 1 1 0;
     // box-shadow  : 0 0 1px 0 #000;
+    max-width: 100%;
     
     &.center { align-items: center;         }
     &.left   { align-items: flex-start;     }
@@ -47,16 +72,18 @@
     &.middle { justify-content: center;     }
     &.bottom { justify-content: flex-end;   }
 
-    &.col-0  { flex-grow: 1 ; flex-basis: 100%; }
-    &.col-1  { flex-grow: 1 ; flex-basis: 10% ; max-width: 10%; }
-    &.col-2  { flex-grow: 2 ; flex-basis: 20% ; max-width: 20%; }
-    &.col-3  { flex-grow: 3 ; flex-basis: 30% ; max-width: 30%; }
-    &.col-4  { flex-grow: 4 ; flex-basis: 40% ; max-width: 40%; }
-    &.col-5  { flex-grow: 5 ; flex-basis: 50% ; max-width: 50%; }
-    &.col-6  { flex-grow: 6 ; flex-basis: 60% ; max-width: 60%; }
-    &.col-7  { flex-grow: 7 ; flex-basis: 70% ; max-width: 70%; }
-    &.col-8  { flex-grow: 8 ; flex-basis: 80% ; max-width: 80%; }
-    &.col-9  { flex-grow: 9 ; flex-basis: 90% ; max-width: 90%; }
-    &.col-9  { flex-grow: 9 ; flex-basis: 90% ; max-width: 90%; }
-    &.col-10 { flex-grow: 10; flex-basis: 100%; max-width: 100%;}
+    &.col-0  { flex-grow: 0 ; flex-basis: 0%; min-width: fit-content;}
+    &.col-1  { flex-grow: 1 ; flex-basis: 10% ; max-width: 10%;  }
+    &.col-2  { flex-grow: 2 ; flex-basis: 20% ; max-width: 20%;  }
+    &.col-3  { flex-grow: 3 ; flex-basis: 30% ; max-width: 30%;  }
+    &.col-4  { flex-grow: 4 ; flex-basis: 40% ; max-width: 40%;  }
+    &.col-5  { flex-grow: 5 ; flex-basis: 50% ; max-width: 50%;  }
+    &.col-6  { flex-grow: 6 ; flex-basis: 60% ; max-width: 60%;  }
+    &.col-7  { flex-grow: 7 ; flex-basis: 70% ; max-width: 70%;  }
+    &.col-8  { flex-grow: 8 ; flex-basis: 80% ; max-width: 80%;  }
+    &.col-9  { flex-grow: 9 ; flex-basis: 90% ; max-width: 90%;  }
+    &.col-9  { flex-grow: 9 ; flex-basis: 90% ; max-width: 90%;  }
+    &.col-10 { flex-grow: 10; flex-basis: 100%; max-width: 100%; }
+
+    // &.col-min-4 {  }
 }

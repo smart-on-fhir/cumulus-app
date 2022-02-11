@@ -4,39 +4,48 @@ import {
   useLocation,
   Navigate
 } from "react-router-dom";
+import { auth } from "./backend" 
 
 
 interface AuthContextType {
     user: app.User | null;
-    login: (username: string, password: string, remember?: boolean) => void;
-    logout: () => void;
+    login: (username: string, password: string, remember?: boolean) => Promise<void>;
+    logout: () => Promise<void>;
+    error: Error | null;
 }
 
 let AuthContext = React.createContext<AuthContextType>(null!);
 
 export function AuthProvider({ children }: { children: React.ReactNode })
 {
-    const storedUser = JSON.parse(sessionStorage.getItem("user") || "null") as app.User | null;
+    const storedUser = JSON.parse(localStorage.getItem("user") || "null") as app.User | null;
 
-    let [user, setUser] = React.useState<app.User|null>(storedUser);
+    let [user , setUser ] = React.useState<app.User|null>(storedUser);
+    let [error, setError] = React.useState<Error|null>(null);
   
-    function login(username: string, password: string, remember = false) {
-        setUser({ username });
+    async function login(username: string, password: string, remember = false) {
 
-        if (remember) {
-            sessionStorage.setItem("user", JSON.stringify({ username }));
-        } else {
-            sessionStorage.removeItem("user");
-        }
+        return auth.login(username, password, remember).then(
+            user => {
+                localStorage.setItem("user", JSON.stringify(user));
+                setUser(user)
+                setError(null)
+            },
+            error => {
+                localStorage.removeItem("user");
+                setUser(null)
+                setError(error)
+            });
     };
 
-    function logout() {
-        sessionStorage.removeItem("user");
+    async function logout() {
+        localStorage.removeItem("user");
         setUser(null);
+        await auth.logout();
     }
   
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout, error }}>
             {children}
         </AuthContext.Provider>
     );
@@ -69,7 +78,7 @@ export function LoginPage() {
     // @ts-ignore
     let from = location.state?.from?.pathname || "/";
   
-    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
     
         const formData = new FormData(event.currentTarget);
@@ -77,7 +86,7 @@ export function LoginPage() {
         const password = formData.get("password") as string;
         const remember = formData.get("remember") as string;
     
-        auth.login(username, password, remember === "true");
+        await auth.login(username, password, remember === "true");
         
         // Send them back to the page they tried to visit when they were
         // redirected to the login page. Use { replace: true } so we don't create
@@ -94,12 +103,15 @@ export function LoginPage() {
                 <h3>Boston Children's Hospital</h3>
                 <hr/>
                 <br/>
-                <div className="row center">
+                { auth.error && <p className="color-red">
+                    <i className="fas fa-exclamation-circle" /> { auth.error.message }
+                </p> }
+                <div className="row left">
                     <div className="col">
                         <label>Email</label>
-                        <input type="text" name="username" autoComplete="username" />
+                        <input type="text" name="username" autoComplete="username" required />
                         <label className="mt-1">Password</label>
-                        <input type="password" name="password" autoComplete="current-password" />
+                        <input type="password" name="password" autoComplete="current-password" required />
                         <label className="mt-1">
                             <input type="checkbox" name="remember" value="true"/> Remember Me
                         </label>
@@ -121,8 +133,8 @@ export function AuthStatus() {
 
     return (
         <>
-            <i className="fas fa-user-circle" style={{ fontSize: "200%", verticalAlign: "middle" }}/> <b>{auth.user.username}</b>
-            <a className="ml-1 underline" href="#" onClick={() => {auth.logout();navigate("/");}}><b>SIGN OUT</b></a>
+            <i className="fas fa-user-circle" style={{ fontSize: "200%", verticalAlign: "middle" }}/> <b>{auth.user.username || "Anonymous"}</b>
+            <span className="ml-1 underline" style={{ cursor: "pointer" }} onClick={() => { auth.logout().then(() => navigate("/")); }}><b>SIGN OUT</b></span>
         </>
     )
 }

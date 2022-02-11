@@ -1,0 +1,90 @@
+@import "../../styles/variables.scss";
+
+
+.data-grid {
+    border: 2px solid $color-grey;
+    font-size: $font-size * 0.8;
+    
+    // padding: 5px;
+    max-height: 404px;//calc(100vh - 340px);
+    min-height: 200px;
+    overflow: auto;
+    position: relative;
+    border-radius: 5px;
+
+    > table {
+        min-width: 100%;
+        table-layout: fixed;
+        border-spacing: 0;
+        border-collapse: collapse;
+        background: #FFF;
+        
+
+        tbody {
+            background: #FFF;
+
+            tr:hover {
+                background: rgba(0, 0, 0, 0.05);
+            }
+        }
+
+        thead {
+            font-weight: bold;
+
+            th {
+                // bo   rder-bottom: 2px solid $color-grey;
+                // border-top: 1px solid #FFF;
+                color: $color-blue;
+                background: linear-gradient(#F9F9F9, #EEE);
+                text-shadow: 0 1px 0 #FFF;
+                position: sticky;
+                top: 0;
+                z-index: 2;
+                box-shadow: 0 0 0 0.5px #CCC inset, 0 0.5px 0 0 #DDD;
+
+                &:first-child {
+                    border-radius: 3px 0 0 0;
+                }
+
+                // &:last-child {
+                //     border-radius: 0 3px 0 0;
+                // }
+
+                .fa-caret-down, .fa-caret-up {
+                    position: absolute;
+                    right: 4px;
+                    top: 50%;
+                    margin-top: -0.5em;
+                    z-index: 2;
+                }
+            }
+        }
+        
+
+        th, td {
+            // border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 0.25em 1em;
+            max-width: 12em;
+            white-space: pre;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: default;
+            text-align: left;
+            box-shadow: 0 0 0 0.5px #DDD inset;
+
+            &.selected {
+                background: rgb(218, 233, 250);
+            }
+        }
+
+        td {
+            font-family: monospace;
+        }
+    }
+
+    &.condensed {
+        td, th {
+            padding: 0.1em 0.4em;
+        }
+    }
+}
