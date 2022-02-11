@@ -1,3 +1,4 @@
+@use "sass:math";
 @import "./variables.scss";
 @import "./grid.scss";
 @import "./forms.scss";
@@ -104,22 +105,22 @@ a {
 .m-2  { margin: $gap * 2;         }
 .m-3  { margin: $gap * 3;         }
 .mt-0 { margin-top: 0;            }
-.mt-05{ margin-top: $gap/2;       }
+.mt-05{ margin-top: math.div($gap, 2); }
 .mt-1 { margin-top: $gap;         }
 .mt-2 { margin-top: $gap * 2;     }
 .mt-3 { margin-top: $gap * 3;     }
 .mr-0 { margin-right: 0;          }
-.mr-05{ margin-right: $gap/2;     }
+.mr-05{ margin-right: math.div($gap, 2); }
 .mr-1 { margin-right: $gap;       }
 .mr-2 { margin-right: $gap * 2;   }
 .mr-3 { margin-right: $gap * 3;   }
 .mb-0 { margin-bottom: 0;         }
-.mb-05{ margin-bottom: $gap/2;    }
+.mb-05{ margin-bottom: math.div($gap, 2); }
 .mb-1 { margin-bottom: $gap;      }
 .mb-2 { margin-bottom: $gap * 2;  }
 .mb-3 { margin-bottom: $gap * 3;  }
 .ml-0 { margin-left: 0;           }
-.ml-05{ margin-left: $gap/2;      }
+.ml-05{ margin-left: math.div($gap, 2); }
 .ml-1 { margin-left: $gap;        }
 .ml-2 { margin-left: $gap * 2;    }
 .ml-3 { margin-left: $gap * 3;    }
