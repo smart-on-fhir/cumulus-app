@@ -30,7 +30,7 @@
   },
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
-    "start:prod": "react-scripts build && cd backend && node .",
+    "start:prod": "cd backend && node .",
     "start:dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

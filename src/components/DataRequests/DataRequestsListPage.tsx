@@ -3,6 +3,7 @@ import DataRequestLink   from "./DataRequestLink";
 import { useBackend }    from "../../hooks";
 import { requestGroups } from "../../backend";
 import Breadcrumbs       from "../Breadcrumbs";
+import { Link } from "react-router-dom";
 
 
 function List({
@@ -47,7 +48,14 @@ export default function DataRequestsListPage()
                 { name: "Home", href: "/" },
                 { name: "Requests & Subscriptions" }
             ]} />
-            <h3>Data Requests and Subscriptions</h3>
+            <div className="row gap">
+                <div className="col middle">
+                    <h3>Data Subscriptions & Requests</h3>
+                </div>
+                <div className="col col-0 middle">
+                    <Link className="btn color-blue" to="/requests/new"><b>New Data Request</b></Link>
+                </div>
+            </div>
             <hr/>
             <div className="row gap mt-2">
                 { groups?.filter(g => g.requests.length > 0).map((group, i) => (
