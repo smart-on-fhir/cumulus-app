@@ -7,7 +7,6 @@ const { getFindOptions } = require("../lib");
 const router = module.exports = express.Router({ mergeParams: true });
 
 
-
 // get all ---------------------------------------------------------------------
 router.get("/", (req, res) => {
     Model.findAll(getFindOptions(req))
@@ -59,3 +58,70 @@ router.get("/:id/views", (req, res) => {
     .then(data  => res.json(data))
     .catch(error => res.status(400).end(error.message))
 });
+
+// Export Data endpoint --------------------------------------------------------
+router.get("/:id/data", (req, res) => {
+    Model.findByPk(req.params.id, getFindOptions(req))
+    // @ts-ignore
+    .then(model => model.get("data"))
+    .then(data  => {
+        // @ts-ignore
+        exportData(data, req, res)
+    })
+    .catch(error => res.status(400).end(error.message))
+});
+
+/**
+ * @param {{ cols: { name: string }[], rows: any[][] }} data 
+ * @param {express.Request} req
+ * @param {express.Response} res
+ */
+function exportData(data, req, res)
+{
+    // format ------------------------------------------------------------------
+    const format = req.query.format || "json"
+    
+    // cols --------------------------------------------------------------------
+    let colNames = String(req.query.cols || "").split(",").map(s => s.trim()).filter(Boolean);
+    if (!colNames.length) {
+        colNames = data.cols.map(c => c.name);
+    } else {
+        colNames = colNames.filter(x => data.cols.find(c => c.name === x));
+    }
+
+    const indexes = colNames.map(name => data.cols.findIndex(c => c.name === name));
+
+    // Delimited ---------------------------------------------------------------
+    if (format === "csv" || format === "tsv") {
+
+        const delimiter = format === "tsv" ? "\t" : ",";
+        
+        let out = [colNames.join(delimiter)];
+
+        data.rows.forEach(row => out.push(
+            indexes.map(i => row[i] === null ? "" : JSON.stringify(row[i])).join(delimiter)
+        ));
+
+        res.status(200);
+
+        if (req.query.inline) {
+            res.set("Content-Type", "text/plain").send(out.join("\n"));    
+        } else {
+            res.setHeader("Content-disposition", "attachment; filename=data." + format);
+            res.setHeader("Content-Type", "text/" + format);
+        }
+
+        return res.send(out.join("\n"));
+    }
+
+    // JSON --------------------------------------------------------------------
+    if (format === "json") {
+        return res.json({
+            cols: colNames.map(name => data.cols.find(x => x.name === name)),
+            rows: data.rows.map(row => indexes.map(i => row[i]))
+        })
+    }
+
+    throw new Error(`Unsupported format "${format}"`);
+}
+
