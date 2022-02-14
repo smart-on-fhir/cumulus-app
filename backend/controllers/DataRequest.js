@@ -105,7 +105,7 @@ function exportData(data, req, res)
         res.status(200);
 
         if (req.query.inline) {
-            res.set("Content-Type", "text/plain").send(out.join("\n"));    
+            res.set("Content-Type", "text/plain");    
         } else {
             res.setHeader("Content-disposition", "attachment; filename=data." + format);
             res.setHeader("Content-Type", "text/" + format);
