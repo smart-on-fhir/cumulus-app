@@ -66,7 +66,7 @@ router.get("/:id/data", (req, res) => {
     .then(model => model.get("data"))
     .then(data  => {
         // @ts-ignore
-        exportData(data, req, res)
+        exportData(data || { cols: [], rows: [] }, req, res)
     })
     .catch(error => res.status(400).end(error.message))
 });
