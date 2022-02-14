@@ -148,24 +148,19 @@ export default function FilterUI({
     }
 
     return (
-        <div className="mt-1 mb-3">
+        <div className="mt-1 mb-1">
             <div className="row middle">
-                <div className="col color-blue">
-                    <label><i className="fas fa-filter"/> Filters</label>
+                <div className="col">
+                    <label>
+                        Filters
+                        <span className="color-muted small" style={{ fontWeight: 400 }}> - conditions used to exclude data rows</span>
+                    </label>
                 </div>
-                <div className="col right" style={{ paddingBottom: "4px" }}>
-                    <button className="btn color-green small" onClick={add}>Add Filter</button>
+                <div className="col col-0" style={{ paddingBottom: "4px" }}>
+                    <button className="btn color-blue small" onClick={add}>Add Filter</button>
                 </div>
             </div>
             <hr/>
-            <div className="row middle">
-                <div className="col">
-                    <p className="small color-muted">
-                    <i className="fas fa-info-circle"/> Filters are used to exclude data rows using the given
-                        column condition. Click on "Add Filter" to get started.
-                    </p>
-                </div>
-            </div>
             { current.map((f, i) => (
                 <Filter
                     key={i}
@@ -178,13 +173,6 @@ export default function FilterUI({
                     }}
                 />    
             )) }
-            {/* <br/> */}
-            {/* <hr/> */}
-            {/* <div className="row half-gap">
-                <div className="col center">
-                    <button className="btn btn-green small" onClick={add}>Add Filter</button>
-                </div>
-            </div> */}
         </div>
     )
 }

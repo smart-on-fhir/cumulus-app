@@ -8,7 +8,7 @@ export default function SPLineChart({
     dataSet
 }: {
     column: app.DataRequestDataColumn
-    dataSet: PowerSet<any>
+    dataSet: PowerSet
     groupBy?: app.DataRequestDataColumn | null
 })
 {
@@ -49,6 +49,6 @@ export default function SPLineChart({
                 }
             }
         },
-        series: generateSeries("spline", groups, groupBy)
+        series: generateSeries("spline", column, groups, groupBy)
     }} />
 }

@@ -2,15 +2,14 @@ import { Routes, Route, BrowserRouter }         from "react-router-dom";
 import { AuthProvider, RequireAuth, LoginPage } from "../auth";
 import Header                                   from "./Header";
 import Home                                     from "./Home";
-import Dashboard, { CreateView }                                from "./Dashboard";
+import Dashboard, { CreateView }                from "./Dashboard";
 import DataUploader                             from "./DataRequests/DataUploader";
 import DataRequestView                          from "./DataRequests/DataRequestView";
-import EditDataRequestForm                          from "./DataRequests/UpdateForm";
+import EditDataRequestForm                      from "./DataRequests/UpdateForm";
+import DataRequestsListPage                     from "./DataRequests/DataRequestsListPage";
+import CreateDataRequestForm                    from "./DataRequests/CreateForm";
 
 import "../styles/main.scss";
-import DataRequestsListPage from "./DataRequests/DataRequestsListPage";
-import CreateDataRequestForm from "./DataRequests/CreateForm";
-
 
 export default function App()
 {

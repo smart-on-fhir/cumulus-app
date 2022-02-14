@@ -1,51 +1,85 @@
+/**
+ * The row objects that can be handled by this class
+ */
 interface Row {
-    "<sum>": number
+
+    /**
+     * Rows must have a "cnt" property representing the aggregate count
+     */
+    cnt: number
+    
+    /**
+     * Rows may have a "queryid" which can be used to request back the
+     * line-level data
+     */
+    queryid: string
+
+    /**
+     * Anything else is the actual data values
+     */
     [key: string]: string | boolean | number | null
 }
 
-interface InputData<RowType = Row> {
-    cols: app.DataRequestDataColumn[]
-    rows: RowType[][]
-}
-
-export default class PowerSet<RowType extends Row>
+export default class PowerSet
 {
-    cols: app.DataRequestDataColumn[] = []
+    public readonly cols: app.DataRequestDataColumn[] = [];
 
-    rows: RowType[] = []
+    public readonly rows: Row[] = [];
 
-    countColumn: keyof RowType
-
-    constructor(cols: app.DataRequestDataColumn[], rows: RowType[], countColumn: keyof RowType = "cnt")
+    protected constructor(cols: app.DataRequestDataColumn[], rows: Row[])
     {
-        this.cols = cols
-        this.rows = rows
-        this.countColumn = countColumn
+        this.cols = cols;
+        this.rows = rows;
     }
 
-    static from<RowType extends Row>(data: InputData, countColumn: string = "cnt")
+    static from<RowType extends Row>(data: { cols: app.DataRequestDataColumn[], rows: Row[][] })
     {
-        const cols = data.cols
-        const rows: RowType[] = []
+        const cols = data.cols;
+        const rows: RowType[] = [];
         
-        data.rows.forEach(row => {
+        data.rows.forEach((row, i) => {
             const rowObject: any = {}
+            
+            Object.defineProperty(rowObject, "__row_id__", {
+                configurable: false,
+                enumerable  : false,
+                writable    : false,
+                value       : i
+            })
+
             data.cols.forEach((col, colIndex) => {
                 rowObject[col.name] = row[colIndex]
             })
             rows.push(rowObject)
         })
 
-        return new PowerSet(cols, rows, countColumn)
+        return new PowerSet(cols, rows)
     }
 
-    filter(filter: (row: RowType, rowIndex: number) => boolean)
+    filter(filter: (row: Row, rowIndex: number) => boolean)
     {
-        const rows: RowType[] = this.rows.filter((row, index) => filter(row, index))
-        return new PowerSet(this.cols, rows, this.countColumn)
+        const rows: Row[] = this.rows.filter((row, index) => filter(row, index))
+        return new PowerSet(this.cols, rows)
     }
 
-    sort(by: keyof RowType, dir: "asc"|"desc" = "asc")
+    removeTotal()
+    {
+        const filter = (row: Row) => {
+            if (!row.cnt) {
+                throw new Error(`No "cnt" found in row ${JSON.stringify(row)}`)
+            }
+            const nulls = Object.values(row).filter(x => x === null).length
+            if (nulls === this.cols.length - 2) { // queryid & cnt
+                // console.log("Filtered out the row: ", row)
+                return false
+            }
+            return true
+        }
+        const rows: Row[] = this.rows.filter(filter)
+        return new PowerSet(this.cols, rows)
+    }
+
+    sort(by: keyof Row, dir: "asc"|"desc" = "asc")
     {
         const index = this.cols.findIndex(col => col.name === by)
         const type  = this.cols.find(col => col.name === by)?.dataType
@@ -65,7 +99,7 @@ export default class PowerSet<RowType extends Row>
         return this;//new PowerSet(this.cols, rows, this.countColumn)
     }
 
-    count(filter: (row: RowType, rowIndex: number) => boolean = () => true)
+    count(filter: (row: Row, rowIndex: number) => boolean = () => true)
     {
         let rows = this.filter(filter).rows
 
@@ -73,16 +107,16 @@ export default class PowerSet<RowType extends Row>
             return -1;
         }
 
-        return rows.reduce((prev, curr) => prev + (+curr[this.countColumn]), 0)
+        return rows.reduce((prev, curr) => prev + curr.cnt, 0)
     }
 
-    group(by: keyof RowType, postProcess?: (groups: Record<string, number>) => Record<string, number>)
+    group(by: keyof Row, postProcess?: (groups: Record<string, number>) => Record<string, number>)
     {
         const groups: Record<string, number> = {}
         
         this.rows.forEach(row => {
             const value = row[by]
-            const count = row[this.countColumn]
+            const count = row.cnt
 
             if (!groups.hasOwnProperty(String(value))) {
                 groups[value + ""] = 0
@@ -101,21 +135,10 @@ export default class PowerSet<RowType extends Row>
     /**
      * If rows is { age: Number, gender: stringify, cnt: number }[]
      * 
-     * group2("age") -> {
-     *     age: {
-     *         <sum>: number
-     *     }
-     * }[]
-     * 
-     * group2("age", "gender") -> {
-     *     age: {
-     *         male: number,
-     *         female: number,
-     *         null: number
-     *     }
-     * }[]
+     * group2("age")           => { age: { <sum>: 5 } }[]
+     * group2("age", "gender") => { age: { male: 6, female: 2, null: 7 } }[]
      */
-    group2(by: keyof RowType, stratify: keyof RowType = "")
+    group2(by: keyof Row, stratify: keyof Row = "")
     {
         return groupCountsBy(this.rows, by + "", stratify + "")
         // // { [age: Number]: { gender: number }}[]

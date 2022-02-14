@@ -1,5 +1,6 @@
 import React from "react"
 import { Options } from "highcharts"
+import { defer } from "../../../utils";
 
 declare var Highcharts: any
 
@@ -9,9 +10,26 @@ interface ChartProps {
 }
 
 
+
 export class Chart extends React.Component<ChartProps>
 {
     chart: any;
+
+    constructor(props: ChartProps)
+    {
+        super(props);
+        this.updateChart = this.updateChart.bind(this);
+    }
+
+    // shouldComponentUpdate(nextProps: ChartProps)
+    // {
+    //     return JSON.stringify(nextProps) !== JSON.stringify(this.props)
+    // }
+
+    updateChart()
+    {
+        this.chart.update(this.props.chartOptions, true, true, false)
+    }
 
     componentDidMount()
     {
@@ -23,10 +41,8 @@ export class Chart extends React.Component<ChartProps>
 
     componentDidUpdate()
     {
-        this.chart.update({
-            credits: { enabled: false },
-            ...this.props.chartOptions
-        }, true, true, true);
+        // this.chart.series.forEach((s: any) => s.remove(false, false, false))
+        defer(this.updateChart);
     }
 
     render()

@@ -7,30 +7,43 @@ export default function BaseChart({ options }: { options: Highcharts.Options })
         title: {
             text: "",
         },
-        colors: [
-            "#058DC7",
-            "#50B432",
-            "#ED561B",
-            "#c2c508",
-            "#24CBE5",
-            "#38c548",
-            "#FF9655",
-            // "#eede2e",
-            // "#3cebaa",
-            // "#235bf7",
-            // "#329614",
-            // "#c93e07",
-            // "#81830b",
-            // "#0d96ac",
-            // "#008610",
-            // "#df6e29",
-            // "#c5b500",
-            // "#2daf80",
-        ],
+        legend: {
+            enabled: true
+        },
+        // colors: [
+        //     "#058DC7",
+        //     "#50B432",
+        //     "#ED561B",
+        //     "#c2c508",
+        //     "#24CBE5",
+        //     "#38c548",
+        //     "#FF9655",
+        //     // "#eede2e",
+        //     // "#3cebaa",
+        //     // "#235bf7",
+        //     // "#329614",
+        //     // "#c93e07",
+        //     // "#81830b",
+        //     // "#0d96ac",
+        //     // "#008610",
+        //     // "#df6e29",
+        //     // "#c5b500",
+        //     // "#2daf80",
+        // ],
         ...options,
         chart: {
             height: "60%",
             ...options.chart
-        }
+        },
+        tooltip: {
+        //     shared: false,
+            useHTML: true,
+            // headerFormat: '<table><tr><th colspan="2">{point.name}: {point.key}</th></tr>',
+            // pointFormat: '<tr><td style="color: {series.color}">{series.name} </td>' +
+                // '<td style="text-align: right"><b>{point.y} EUR</b></td></tr>',
+            // footerFormat: '</table>',
+            // valueDecimals: 2,
+            ...options.tooltip
+        },
     }} />
 }

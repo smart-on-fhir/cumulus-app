@@ -4,6 +4,7 @@ import { useNavigate, useParams }               from "react-router-dom";
 import PowerSet                                 from "../../PowerSet";
 import { useBackend }                           from "../../hooks";
 import { views, requests }                      from "../../backend"
+import { useAuth }                              from "../../auth";
 import DataRequestLink                          from "../DataRequests/DataRequestLink";
 import DataGrid                                 from "../DataGrid";
 import Breadcrumbs                              from "../Breadcrumbs";
@@ -51,103 +52,108 @@ interface ChartConfigPanelState {
 function ConfigPanel({
     dataRequest,
     state,
-    onChange
+    onChange,
+    viewType
 } : {
     dataRequest: app.DataRequest
     state: ChartConfigPanelState
+    viewType: "overview" | "data"
     onChange: (state: ChartConfigPanelState) => void
 }) {
+    let auth = useAuth();
     return (
         <div>
-            <hr />
-            <div className="row half-gap">
-                <div className="col">
-                    <label>Title</label>
-                    <input type="text" value={state.viewName} onChange={ e => onChange({ ...state, viewName: e.target.value })} required />
-                </div>
-                <div className="col col-0">
-                    <label>Chart Type</label>
-                    <select value={ state.chartType } onChange={ e => onChange({ ...state, chartType: e.target.value as SupportedChartType })}>
-                    { Object.keys(SupportedChartTypes).map((type, i) => (
-                        <option key={i} value={type}>{SupportedChartTypes[type as SupportedChartType]}</option>
-                    )) }
-                    </select>
-                </div>
-            </div>
-            <div className="row half-gap">
-                <div className="col">
-                    <label>Short Description</label>
-                    <textarea rows={2} value={state.viewDescription} onChange={ e => onChange({ ...state, viewDescription: e.target.value })}></textarea>
-                </div>
-            </div>
-            <div className="row half-gap">
-                <div className="col">
-                    <label>Visualize Column</label>
-                    <ColumnSelector
-                        cols={ dataRequest.data.cols }
-                        value={ state.groupBy }
-                        filter={col => {
-                            if (col.name === "cnt") return false
-                            if (SingleDimensionChartTypes.includes(state.chartType)) {
-                                return true
-                            }
-                            return col.name !== state.stratifyBy
-                        } }
-                        onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                            state.groupBy = e.target.value
-                            onChange(state)
-                        }}
-                    />
-                </div>
-                { 
-                    !SingleDimensionChartTypes.includes(state.chartType) && (
-                    <>
-                        <div className="col bottom col-0">
-                            <button className="btn" disabled={!state.stratifyBy} onClick={() => {
-                                onChange({
-                                    ...state,
-                                    groupBy: state.stratifyBy,
-                                    stratifyBy: state.groupBy
-                                })
-                            }}>
-                                <i className="fas fa-exchange-alt"></i>
-                            </button>
-                        </div>
+            { viewType === "overview" && (<>
+                <hr />
+                { auth.user?.role === "admin" && (
+                    <div className="row half-gap">
                         <div className="col">
-                            <label>Group By</label>
-                            <ColumnSelector
-                                addEmptyOption="start"
-                                cols={ dataRequest.data.cols }
-                                value={ state.stratifyBy }
-                                filter={col => {
-                                    if (col.name === "cnt") return false
-                                    if (SingleDimensionChartTypes.includes(state.chartType)) {
-                                        return true
-                                    }
-                                    return col.name !== state.groupBy
-                                }}
-                                onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                                    state.stratifyBy = e.target.value
-                                    onChange(state)
-                                }}
-                            />
+                            <label>Title</label>
+                            <input type="text" value={state.viewName} onChange={ e => onChange({ ...state, viewName: e.target.value })} required />
                         </div>
-                    </>
-                ) }
-                {/* <div className="col">
-                    <label>Sort By</label>
-                    <ColumnSelector
-                        addEmptyOption="start"
-                        emptyLabel="None"
-                        cols={ dataRequest.data.cols }
-                        value={ state.sortBy }
-                        onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                            state.sortBy = e.target.value
-                            onChange(state)
-                        }}
-                    />
-                </div> */}
-            </div>
+                    </div>
+                )}
+                { auth.user?.role === "admin" && (
+                    <div className="row half-gap">
+                        <div className="col">
+                            <label>Short Description</label>
+                            <textarea rows={2} value={state.viewDescription} onChange={ e => onChange({ ...state, viewDescription: e.target.value })}></textarea>
+                        </div>
+                    </div>
+                )}
+                <div className="row half-gap">
+                    <div className="col col-3">
+                        <label>Chart Type</label>
+                        <select value={ state.chartType } onChange={ e => onChange({ ...state, chartType: e.target.value as SupportedChartType })}>
+                        { Object.keys(SupportedChartTypes).map((type, i) => (
+                            <option key={i} value={type}>{SupportedChartTypes[type as SupportedChartType]}</option>
+                        )) }
+                        </select>
+                    </div>
+                    <div className="col nowrap">
+                        <div className="row nowrap">
+                            <div className="col">
+                                <label>Visualize&nbsp;Column</label>
+                                <ColumnSelector
+                                    cols={ dataRequest.data.cols }
+                                    value={ state.groupBy }
+                                    filter={col => {
+                                        if (col.name === "cnt") return false
+                                        if (SingleDimensionChartTypes.includes(state.chartType)) {
+                                            return true
+                                        }
+                                        return col.name !== state.stratifyBy
+                                    } }
+                                    onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                                        state.groupBy = e.target.value
+                                        onChange(state)
+                                    }}
+                                />
+                            </div>
+                            { 
+                                !SingleDimensionChartTypes.includes(state.chartType) && (
+                                <>
+                                    <div className="col bottom col-0">
+                                        <button
+                                            className="btn"
+                                            disabled={!state.stratifyBy}
+                                            onClick={() => {
+                                                onChange({
+                                                    ...state,
+                                                    groupBy: state.stratifyBy,
+                                                    stratifyBy: state.groupBy
+                                                })
+                                            }}
+                                            style={{ margin: "0 2px" }}
+                                        >
+                                            <i className="fas fa-exchange-alt"></i>
+                                        </button>
+                                    </div>
+                                    <div className="col">
+                                        <label>Group&nbsp;By</label>
+                                        <ColumnSelector
+                                            addEmptyOption="start"
+                                            cols={ dataRequest.data.cols }
+                                            value={ state.stratifyBy }
+                                            filter={col => {
+                                                if (col.name === "cnt") return false
+                                                if (SingleDimensionChartTypes.includes(state.chartType)) {
+                                                    return true
+                                                }
+                                                return col.name !== state.groupBy
+                                            }}
+                                            onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                                                state.stratifyBy = e.target.value
+                                                onChange(state)
+                                            }}
+                                        />
+                                    </div>
+                                </>
+                            ) }
+                        </div>
+                    </div>
+                </div>
+            </>)}
             <FilterUI
                 onChange={filters => onChange({ ...state, filters })}
                 current={ state.filters }
@@ -341,6 +347,7 @@ export function Dashboard({
     } = view.settings || {}
 
     const navigate = useNavigate();
+    const auth     = useAuth();
     
     const [ state, dispatch ] = useReducer(viewReducer, {
         viewType       : "overview",
@@ -365,6 +372,8 @@ export function Dashboard({
         filters,
         isDirty
     } = state;
+
+    const isAdmin = auth.user?.role === "admin"
 
     async function getScreenShot()
     {
@@ -494,12 +503,10 @@ export function Dashboard({
         
     })
     
-    
-
     return (
         <div>
             <h2>{viewName}</h2>
-            <div className="color-muted mb-2">{viewDescription}</div>
+            <div className="color-muted mb-1">{viewDescription}</div>
             <div className="row mb-1">
                 <div className="col col-6">
                     <div className="row">
@@ -512,7 +519,7 @@ export function Dashboard({
                 <div className="col col-4 right">
                     <div className="row">
                         <div className="toolbar">
-                            { showOptions && (
+                            { showOptions && isAdmin && (
                                 <>
                                 <button className="btn color-green" onClick={save} disabled={ !isDirty }><i className="fas fa-save" /> Save</button>
                                 {/* <button className="btn"><i className="fas fa-file-download" /></button> */}
@@ -526,6 +533,7 @@ export function Dashboard({
             </div>
             { showOptions && <ConfigPanel
                 dataRequest={dataRequest}
+                viewType={viewType}
                 state={{
                     groupBy: viewColumn,
                     stratifyBy: viewGroupBy,
@@ -548,7 +556,7 @@ export function Dashboard({
                 }}
             /> }
 
-            { viewType === "data" && <DataGrid cols={ dataRequest.data.cols } rows={ dataRequest.data.rows } /> }
+            { viewType === "data" && <DataGrid cols={ powerSet.cols } rows={ powerSet.rows } offset={0} limit={20} /> }
             
             { viewType === "overview" && chartType === "pie"        && <PieChart        column={ col1 } dataSet={ powerSet } /> }
             { viewType === "overview" && chartType === "pie3d"      && <PieChart        column={ col1 } dataSet={ powerSet } use3d /> }

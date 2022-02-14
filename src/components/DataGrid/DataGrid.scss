@@ -2,15 +2,10 @@
 
 
 .data-grid {
-    border: 2px solid $color-grey;
     font-size: $font-size * 0.8;
-    
-    // padding: 5px;
-    max-height: 404px;//calc(100vh - 340px);
-    min-height: 200px;
+    min-height: 4em;
     overflow: auto;
     position: relative;
-    border-radius: 5px;
 
     > table {
         min-width: 100%;
@@ -21,10 +16,12 @@
         
 
         tbody {
-            background: #FFF;
-
             tr:hover {
                 background: rgba(0, 0, 0, 0.05);
+            }
+
+            tr.selected {
+                background: rgba(51, 102, 153, 0.2);
             }
         }
 
@@ -32,23 +29,11 @@
             font-weight: bold;
 
             th {
-                // bo   rder-bottom: 2px solid $color-grey;
-                // border-top: 1px solid #FFF;
-                color: $color-blue;
                 background: linear-gradient(#F9F9F9, #EEE);
                 text-shadow: 0 1px 0 #FFF;
-                position: sticky;
-                top: 0;
-                z-index: 2;
-                box-shadow: 0 0 0 0.5px #CCC inset, 0 0.5px 0 0 #DDD;
-
-                &:first-child {
-                    border-radius: 3px 0 0 0;
-                }
-
-                // &:last-child {
-                //     border-radius: 0 3px 0 0;
-                // }
+                position: relative;
+                box-shadow: 0 0 0 0.5px #BBB inset;
+                padding: 0.35em 1em 0.35em 0.5em;
 
                 .fa-caret-down, .fa-caret-up {
                     position: absolute;
@@ -62,15 +47,16 @@
         
 
         th, td {
-            // border: 1px solid rgba(0, 0, 0, 0.1);
-            padding: 0.25em 1em;
-            max-width: 12em;
+            padding: 0.25em 0.5em;
+            // max-width: 16em;
+            // min-width: 10em;
+            // width: auto;
             white-space: pre;
             overflow: hidden;
             text-overflow: ellipsis;
             cursor: default;
             text-align: left;
-            box-shadow: 0 0 0 0.5px #DDD inset;
+            box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.1) inset;
 
             &.selected {
                 background: rgb(218, 233, 250);
@@ -86,5 +72,59 @@
         td, th {
             padding: 0.1em 0.4em;
         }
+    }
+
+    col.private {
+        background: rgb(255, 248, 227);
+    }
+}
+
+.data-grid-wrap {
+    position: relative;
+    border: 2px solid $color-grey;
+}
+
+.scrollbar {
+    $size: 10px;
+
+    width     : 4px;
+    height    : auto;
+    right     : 1px;
+    left      : auto;
+    top       : 1.55em;
+    bottom    : 17px;
+    overflow  : hidden;
+    transition: all 0.2s linear 1s;
+    position  : absolute;
+    z-index   : 100;
+    
+
+    .scrollbar-btn {
+        background   : rgba(0, 0, 0, 0.2);
+        position     : absolute;
+        box-shadow   : 0 0 0 1px rgba(100, 100, 100, 0.1) inset;
+        height       : auto;
+        left         : 0;
+        right        : 0;
+        bottom       : auto;
+        border-radius: 2px;
+        transition   : all 0.1s;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 0 1px rgba(100, 100, 100, 0.1) inset;
+            width     : $size;
+        }
+
+        &:active {
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 0.5px rgba(100, 100, 100, 0.2) inset;
+            width     : $size;
+        }
+    }
+
+    &:hover, &:active {
+        width     : $size;
+        transition: all 0.2s;
     }
 }

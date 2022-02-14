@@ -1,7 +1,7 @@
 @import "../../styles/variables.scss";
 
 .breadcrumbs {
-    margin-bottom: 2rem;
+    margin-bottom: $font-size;
     a {
         color: $color-blue;
         white-space: nowrap;
