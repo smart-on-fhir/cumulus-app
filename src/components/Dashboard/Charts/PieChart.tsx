@@ -9,8 +9,8 @@ export default function PieChart({
     use3d,
     donut
 }: {
-    column: app.DataRequestDataColumn,
-    dataSet: PowerSet<any>
+    column: app.DataRequestDataColumn
+    dataSet: PowerSet
     use3d?: boolean
     donut?: boolean
 })
@@ -30,33 +30,38 @@ export default function PieChart({
         title: {
             text: column.label
         },
-        yAxis: {
-            visible: false
+
+        legend: {
+            enabled: true//!!groupBy && !use3d
         },
-        xAxis: {
-            visible: false
-        },
+        // yAxis: {
+        //     visible: false
+        // },
+        // xAxis: {
+        //     visible: false
+        // },
         plotOptions: {
             pie: {
                 // depth: 50,
                 innerSize  : donut ? "50%" : 0,
                 depth      : 50,
+
                 // startAngle : 20,
-                // borderColor: "rgba(0, 0, 0, 0.5)",
-                // borderWidth: 0.5,
+                borderColor: "rgba(0, 0, 0, 0.5)",
+                borderWidth: 0.25,
                 
                 // opacity: 0.9,
-                // shadow: {
-                //     // opacity: 0.5,
-                //     width: 10,
-                //     offsetY: 30,
-                //     offsetX: 3,
-                //     color: "#000",
-                // },
-                // slicedOffset: -100,
+                shadow: {
+                    opacity: 0.05,
+                    width: 3,
+                    offsetY: 1,
+                    offsetX: 2,
+                    color: "#000",
+                },
+                // slicedOffset: 50,
 
             }
         },
-        series: generateSeries("pie", groups)
+        series: generateSeries("pie", column, groups)
     }} />
 }

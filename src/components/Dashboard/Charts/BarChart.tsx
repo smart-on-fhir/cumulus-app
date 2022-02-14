@@ -9,9 +9,9 @@ export default function BarChart({
     groupBy,
     use3d
 }: {
-    column: app.DataRequestDataColumn,
-    groupBy?: app.DataRequestDataColumn | null, 
-    dataSet: PowerSet<any>
+    column: app.DataRequestDataColumn
+    groupBy?: app.DataRequestDataColumn | null
+    dataSet: PowerSet
     use3d?: boolean
 })
 {
@@ -51,6 +51,13 @@ export default function BarChart({
             alignTicks: false,
             crosshair: !use3d
         },
-        series: generateSeries("bar", groups, groupBy)
+        plotOptions: {
+            bar: {
+                borderColor: "rgba(0, 0, 0, 0.5)",
+                borderRadius: 2,
+                borderWidth: 0.5,
+            }
+        },
+        series: generateSeries("bar", column, groups, groupBy)
     }} />
 }

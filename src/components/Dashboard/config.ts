@@ -13,3 +13,9 @@ export const SupportedChartTypes = {
     bar         : "Bar Chart",
     bar3d       : "Bar Chart 3D"
 }
+
+/**
+ * Charts that can only have one dimension plus count. They DO NOT support
+ * grouping!
+ */
+export const SimpleCharts = [ "pie", "pie3d", "donut", "donut3d" ]

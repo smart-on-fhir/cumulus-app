@@ -8,7 +8,7 @@ export default function AreaSPLineChart({
     dataSet
 }: {
     column: app.DataRequestDataColumn,
-    dataSet: PowerSet<any>,
+    dataSet: PowerSet,
     groupBy?: app.DataRequestDataColumn | null
 })
 {
@@ -50,6 +50,6 @@ export default function AreaSPLineChart({
                 }
             }
         },
-        series: generateSeries("areaspline", groups, groupBy)
+        series: generateSeries("areaspline", column, groups, groupBy)
     }} />
 }
