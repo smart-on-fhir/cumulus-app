@@ -1,10 +1,28 @@
+import HttpError from "./HttpError";
+
 
 export async function request<T=any>(path: string, options: RequestInit = {}): Promise<T> {
-    return fetch(path, {
+    const res = await fetch(path, {
         mode: "cors",
         credentials: "include",
         ...options
-    }).then(res => res.json());
+    });
+    
+    let type = res.headers.get("Content-Type") + "";
+
+    let body = await res.text();
+
+    if (!res.ok) {
+        throw new HttpError(res.status, body || res.statusText)
+        // throw new Error(body || res.statusText)
+    }
+
+    if (body.length && type.match(/\bjson\b/i)) {
+        body = JSON.parse(body);
+    }
+
+    // @ts-ignore
+    return body;
 }
 
 

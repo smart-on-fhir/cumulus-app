@@ -21,7 +21,7 @@ app.use(cookieParser(), Auth.authenticate);
 app.use(express.static(Path.join(__dirname, "../build/")));
 app.use("/api/screenshot", express.static(Path.join(__dirname, "screenShots")));
 
-// app.use((rec, res, next) => setTimeout(next, 2000))
+// app.use((rec, res, next) => setTimeout(next, 1000))
 
 app.use("/api/auth"          , Auth.router);
 app.use("/api/request-groups", require("./controllers/RequestGroup"));
@@ -38,11 +38,14 @@ app.get("*", (req, res) => res.sendFile("index.html", { root: "../build" }));
 
 // Global error 404 handler
 app.use((_, res) => {
-    res.sendStatus(404).end();
+    res.sendStatus(404).end("Not Found");
 });
 
 // Global error 500 handler
 app.use((error, req, res, next) => {
+    if (error.http) {
+        return res.status(error.status).send(error.message);
+    }
     res.status(500).json(error);
 });
 
