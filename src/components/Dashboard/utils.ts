@@ -168,6 +168,8 @@ export function generateSeries(
                 footerFormat: '</table>',
             },
             color: COLORS[4],
+            // @ts-ignore
+            edgeColor: "rgba(0, 0, 0, 0.1)",
             // showInLegend: false,
             data: Object.keys(data).sort().map((groupName, i) => {
                 let label = groupName === "null" ? "Unknown" : groupName

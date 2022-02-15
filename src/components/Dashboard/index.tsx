@@ -388,6 +388,10 @@ export function Dashboard({
 
     const { execute: save, loading: saving } = useBackend(async () => {
         
+        if (!isAdmin) {
+            return alert("You don't have permission to save views")
+        }
+
         const screenShot = viewType === "overview" ?
             await getScreenShot() :
             undefined;
@@ -524,7 +528,7 @@ export function Dashboard({
                     <div className="row">
                         <div className="toolbar">
                             { showOptions && (
-                                <button className="btn color-green" onClick={save} disabled={ !isDirty }>
+                                <button className="btn color-green" onClick={save} disabled={ !!view.id && !isDirty }>
                                     <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
                                 </button>
                             )}

@@ -1,6 +1,7 @@
 import { useCallback } from "react"
 import { useParams }  from "react-router"
 import { Link } from "react-router-dom"
+import { useAuth } from "../../auth"
 import { requests }   from "../../backend"
 import { useBackend } from "../../hooks"
 import Breadcrumbs from "../Breadcrumbs"
@@ -12,6 +13,7 @@ import ViewsBrowser from "../Views/ViewsBrowser"
 export default function DataRequestView(): JSX.Element
 {
     const { id } = useParams()
+    const { user } = useAuth();
     const { loading, error, result } = useBackend<app.DataRequest>(
         useCallback(() => requests.getOne(id + "", "?include=group:name"), [id]),
         true
@@ -84,9 +86,9 @@ export default function DataRequestView(): JSX.Element
             </div>
             <hr className="center mt-1"/>
             <div className="center mt-1 mb-2">
-                <button className="btn btn-blue"><b> Export Data </b></button>
-                <Link className="btn btn-blue ml-1 mr-1" to={`/requests/${result.id}/import`}><b> Import Data </b></Link>
-                <Link className="btn btn-blue" to={`/requests/${result.id}/edit`}><b> Edit this Data Request </b></Link>
+                <a className="btn btn-blue" href={`${process.env.REACT_APP_BACKEND_HOST}/api/requests/${id}/data?format=csv`}><b> Export Data </b></a>
+                { user?.role === "admin" && <Link className="btn btn-blue ml-1 mr-1" to={`/requests/${result.id}/import`}><b> Import Data </b></Link> }
+                { user?.role === "admin" && <Link className="btn btn-blue" to={`/requests/${result.id}/edit`}><b> Edit this Data Request </b></Link> }
             </div>
         </div>
     )

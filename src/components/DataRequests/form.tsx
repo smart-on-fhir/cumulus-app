@@ -7,138 +7,255 @@ import { Format }                       from "../Format"
 import "./form.scss";
 
 interface Field {
+
     name: string
     description: string
 }
 
-// interface FieldsState {
-//     [name: string]: Field[]
-// }
+// FieldEditor =================================================================
 
-function FieldEditor({
-    label
-}: {
-    label: string
-}) {
+interface FieldEditorProps {
+    field: Field
+    namePlaceHolder?: string
+    descriptionPlaceHolder?: string
+    onChange: (f: Partial<Field>) => void
+}
 
-    const [state, setState] = useState<Field[]>([]);
-
-    function add() {
-        setState([ ...state, { name: "", description: ""}])
-    }
-
-    function remove(index: number) {
-        const nextState = [...state];
-        nextState.splice(index, 1)
-        setState(nextState)
-    }
-
+function FieldEditor({ field, namePlaceHolder, descriptionPlaceHolder, onChange }: FieldEditorProps)
+{
     return (
-        <div>
-            <div className="row">
-                <div className="col middle">
-                    <label>{ label } {  state.length > 0 && <b className="badge">{ state.length }</b> }</label>
-                </div>
-                <div className="col col-0 middle">
-                    <span className="btn small color-green" onClick={ add }>Add</span>
-                </div>
+        <div className="row">
+            <div className="col col-3" style={{ paddingRight: "0.5em" }}>
+                <input
+                    type="text"
+                    placeholder={ namePlaceHolder || "Name or code" }
+                    value={ field.name }
+                    onChange={ e => onChange({ name: e.target.value }) }
+                />
             </div>
-            <hr/>
-            { state.map((field, i) => (
-                <div key={i} className="row half-gap">
-                    <div className="col col-3">
-                        <input type="text" placeholder="Name" value={ field.name } />
-                    </div>
-                    <div className="col">
-                        <input type="text" placeholder="Description" value={ field.description } />
-                    </div>
-                    <div className="col col-0 middle">
-                        <span className="btn color-red" onClick={() => remove(i)}>
-                            <i className="fas fa-trash-alt"/>    
-                        </span>    
-                    </div>
-                </div>
-            ))}
-            <div className={ state.length > 0 ? "mb-3" : "mb-2" } />
+            <div className="col">
+                <input
+                    type="text"
+                    placeholder={ descriptionPlaceHolder || "Description" }
+                    value={ field.description }
+                    onChange={ e => onChange({ description: e.target.value }) }
+                />
+            </div>
         </div>
     )
 }
 
-function FieldsEditor()
+
+// FieldEditorList =============================================================
+
+interface FieldEditorListProps {
+    label: string
+    namePlaceHolder?: string
+    descriptionPlaceHolder?: string
+    list: Field[]
+    onChange: (list: Field[]) => void
+}
+
+class FieldEditorList extends React.Component<FieldEditorListProps>
 {
-    // const [state, setState] = useState<FieldsState>({
-    //     labs: []
-    // });
+    add()
+    {
+        this.props.onChange([
+            ...this.props.list,
+            {
+                name: "",
+                description: ""
+            }
+        ]);
+    }
 
-    return (
-        <div>
-            <br/>
-            <FieldEditor label="Labs" />
-            <FieldEditor label="Diagnoses" />
-            <FieldEditor label="Immunizations" />
-            <FieldEditor label="Medications" />
-            <FieldEditor label="Procedures" />
-            <FieldEditor label="Computable Phenotypes" />
+    remove(index: number)
+    {
+        const list = [ ...this.props.list ];
+        list.splice(index, 1)
+        this.props.onChange(list)
+    }
 
-            <div className="row">
-                <div className="col middle">
-                    <label>Demographics</label>
+    update(index: number, payload: Partial<Field>)
+    {
+        const list    = [ ...this.props.list ]
+        const oldItem = list[index]
+        const newItem = { ...oldItem, ...payload }
+        list.splice(index, 1, newItem)
+        this.props.onChange(list)
+    }
+
+    render()
+    {
+        const { label, namePlaceHolder, descriptionPlaceHolder, list } = this.props
+
+        return (
+            <div>
+                <div className="row">
+                    <div className="col middle">
+                        <label>{ label } {  list.length > 0 && <b className="badge">{ list.length }</b> }</label>
+                    </div>
+                    <div className="col col-0 middle">
+                        <span className="btn small color-green" onClick={() => this.add()}>Add</span>
+                    </div>
+                </div>
+                <hr/>
+                { list.map((field, i) => (
+                    <div key={i} className="row half-gap">
+                        {/* <div className="col col-3">
+                            <input type="text" placeholder="Name" value={ field.name } onChange={e => {
+                                this.update(i, { name: e.target.value })
+                            }} />
+                        </div>
+                        <div className="col">
+                            <input type="text" placeholder="Description" value={ field.description } onChange={e => {
+                                this.update(i, { description: e.target.value })
+                            }} />
+                        </div> */}
+                        <div className="col">
+                            <FieldEditor
+                                field={field}
+                                onChange={x => this.update(i, x)}
+                                namePlaceHolder={namePlaceHolder}
+                                descriptionPlaceHolder={descriptionPlaceHolder}
+                            />
+                        </div>
+                        <div className="col col-0 middle">
+                            <span className="btn color-red" onClick={() => this.remove(i)}>
+                                <i className="fas fa-trash-alt"/>    
+                            </span>    
+                        </div>
+                    </div>
+                ))}
+                <div className={ list.length > 0 ? "mb-3" : "mb-2" } />
+            </div>
+        )
+    }
+}
+
+
+// FieldsEditor ================================================================
+interface FieldsEditorState {
+    labs         : Field[]
+    diagnoses    : Field[]
+    immunizations: Field[]
+    medications  : Field[]
+    procedures   : Field[]
+    phenotypes   : Field[]
+    age          : boolean
+    cdcAgeGroup  : boolean
+    race         : boolean
+    ethnicity    : boolean
+    deceased     : boolean
+    zip          : boolean
+    gender       : boolean
+} 
+class FieldsEditor extends React.Component<any, FieldsEditorState>
+{
+    state: FieldsEditorState = {
+        labs         : [],
+        diagnoses    : [],
+        immunizations: [],
+        medications  : [],
+        procedures   : [],
+        phenotypes   : [],
+        age          : false,
+        cdcAgeGroup  : false,
+        race         : false,
+        ethnicity    : false,
+        deceased     : false,
+        zip          : false,
+        gender       : false
+    };
+    
+    render()
+    {
+        const {
+            labs,
+            diagnoses,
+            immunizations,
+            medications,
+            procedures,
+            phenotypes,
+            age,
+            cdcAgeGroup,
+            race,
+            ethnicity,
+            deceased,
+            zip,
+            gender
+        } = this.state;
+
+        return (
+            <div>
+                <br/>
+                <FieldEditorList list={ labs          } onChange={ list => this.setState({ labs         : list }) } label="Labs" />
+                <FieldEditorList list={ diagnoses     } onChange={ list => this.setState({ diagnoses    : list }) } label="Diagnoses" />
+                <FieldEditorList list={ immunizations } onChange={ list => this.setState({ immunizations: list }) } label="Immunizations" />
+                <FieldEditorList list={ medications   } onChange={ list => this.setState({ medications  : list }) } label="Medications" />
+                <FieldEditorList list={ procedures    } onChange={ list => this.setState({ procedures   : list }) } label="Procedures" />
+                <FieldEditorList list={ phenotypes    } onChange={ list => this.setState({ phenotypes   : list }) } label="Computable Phenotypes" />
+
+                <div className="row">
+                    <div className="col middle">
+                        <label>Demographics</label>
+                    </div>
+                </div>
+                <hr/>
+                <div className="row">
+                    <div className="col col-0 col-5">
+                        <label className="checkbox-label mt-1">
+                            <input type="checkbox" checked={ age } onChange={e => this.setState({ age: e.target.checked })} />
+                            Age
+                            <div className="checkbox-label-description color-muted">Short description of the field</div>
+                        </label>
+                    </div>
+                    <div className="col col-0 col-5">
+                        <label className="checkbox-label mt-1">
+                            <input type="checkbox" checked={ cdcAgeGroup } onChange={e => this.setState({ cdcAgeGroup: e.target.checked })} />
+                            CDC Age Group
+                            <div className="checkbox-label-description color-muted">Short description of the field</div>
+                        </label>
+                    </div>
+                    <div className="col col-0 col-5">
+                        <label className="checkbox-label mt-1">
+                            <input type="checkbox" checked={ race } onChange={e => this.setState({ race: e.target.checked })} />
+                            Race
+                            <div className="checkbox-label-description color-muted">Short description of the field</div>
+                        </label>
+                    </div>
+                    <div className="col col-0 col-5">
+                        <label className="checkbox-label mt-1">
+                            <input type="checkbox" checked={ ethnicity } onChange={e => this.setState({ ethnicity: e.target.checked })} />
+                            Ethnicity
+                            <div className="checkbox-label-description color-muted">Short description of the field</div>
+                        </label>
+                    </div>
+                    <div className="col col-0 col-5">
+                        <label className="checkbox-label mt-1">
+                            <input type="checkbox" checked={ deceased } onChange={e => this.setState({ deceased: e.target.checked })} />
+                            Deceased
+                            <div className="checkbox-label-description color-muted">Short description of the field</div>
+                        </label>
+                    </div>
+                    <div className="col col-0 col-5">
+                        <label className="checkbox-label mt-1">
+                            <input type="checkbox" checked={ zip } onChange={e => this.setState({ zip: e.target.checked })} />
+                            ZIP Code
+                            <div className="checkbox-label-description color-muted">Short description of the field</div>
+                        </label>
+                    </div>
+                    <div className="col col-0 col-5">
+                        <label className="checkbox-label mt-1">
+                            <input type="checkbox" checked={ gender } onChange={e => this.setState({ gender: e.target.checked })} />
+                            Gender
+                            <div className="checkbox-label-description color-muted">Short description of the field</div>
+                        </label>
+                    </div>
                 </div>
             </div>
-            <hr/>
-            <div className="row">
-                <div className="col col-0 col-5">
-                    <label className="checkbox-label mt-1">
-                        <input type="checkbox" />
-                        Age
-                        <div className="checkbox-label-description color-muted">Short description of the field</div>
-                    </label>
-                </div>
-                <div className="col col-0 col-5">
-                    <label className="checkbox-label mt-1">
-                        <input type="checkbox" />
-                        CDC Age Group
-                        <div className="checkbox-label-description color-muted">Short description of the field</div>
-                    </label>
-                </div>
-                <div className="col col-0 col-5">
-                    <label className="checkbox-label mt-1">
-                        <input type="checkbox" />
-                        Race
-                        <div className="checkbox-label-description color-muted">Short description of the field</div>
-                    </label>
-                </div>
-                <div className="col col-0 col-5">
-                    <label className="checkbox-label mt-1">
-                        <input type="checkbox" />
-                        Ethnicity
-                        <div className="checkbox-label-description color-muted">Short description of the field</div>
-                    </label>
-                </div>
-                <div className="col col-0 col-5">
-                    <label className="checkbox-label mt-1">
-                        <input type="checkbox" />
-                        Deceased
-                        <div className="checkbox-label-description color-muted">Short description of the field</div>
-                    </label>
-                </div>
-                <div className="col col-0 col-5">
-                    <label className="checkbox-label mt-1">
-                        <input type="checkbox" />
-                        ZIP Code
-                        <div className="checkbox-label-description color-muted">Short description of the field</div>
-                    </label>
-                </div>
-                <div className="col col-0 col-5">
-                    <label className="checkbox-label mt-1">
-                        <input type="checkbox" />
-                        Gender
-                        <div className="checkbox-label-description color-muted">Short description of the field</div>
-                    </label>
-                </div>
-            </div>
-        </div>
-    )
+        )
+    }
 }
 
 
