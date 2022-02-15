@@ -1,4 +1,5 @@
 const express            = require("express");
+const slug               = require("slug");
 const Model              = require("../db/models/DataRequest");
 const { requireAuth }    = require("./Auth");
 const { getFindOptions } = require("../lib");
@@ -63,20 +64,22 @@ router.get("/:id/views", (req, res) => {
 router.get("/:id/data", (req, res) => {
     Model.findByPk(req.params.id, getFindOptions(req))
     // @ts-ignore
-    .then(model => model.get("data"))
-    .then(data  => {
+    .then(model => {
+        const data = model?.get("data")
+        const name = model?.get("name")
         // @ts-ignore
-        exportData(data || { cols: [], rows: [] }, req, res)
+        exportData(data || { cols: [], rows: [] }, name, req, res)
     })
     .catch(error => res.status(400).end(error.message))
 });
 
 /**
  * @param {{ cols: { name: string }[], rows: any[][] }} data 
+ * @param {string} name
  * @param {express.Request} req
  * @param {express.Response} res
  */
-function exportData(data, req, res)
+function exportData(data, name, req, res)
 {
     // format ------------------------------------------------------------------
     const format = req.query.format || "json"
@@ -107,7 +110,7 @@ function exportData(data, req, res)
         if (req.query.inline) {
             res.set("Content-Type", "text/plain");    
         } else {
-            res.setHeader("Content-disposition", "attachment; filename=data." + format);
+            res.setHeader("Content-disposition", `attachment; filename=${slug(name)}.${format}`);
             res.setHeader("Content-Type", "text/" + format);
         }
 

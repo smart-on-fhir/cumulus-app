@@ -4,6 +4,7 @@ import { useBackend }    from "../../hooks";
 import { requestGroups } from "../../backend";
 import Breadcrumbs       from "../Breadcrumbs";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../auth";
 
 
 function List({
@@ -29,6 +30,8 @@ function List({
 
 export default function DataRequestsListPage()
 {
+    const { user } = useAuth();
+
     const { loading, error, result: groups } = useBackend(
         useCallback(() => requestGroups.getAll("?include=requests:id|name|description|refresh|completed"), []),
         true
@@ -52,9 +55,9 @@ export default function DataRequestsListPage()
                 <div className="col middle">
                     <h3>Data Subscriptions & Requests</h3>
                 </div>
-                <div className="col col-0 middle">
+                { user?.role === "admin" && (<div className="col col-0 middle">
                     <Link className="btn color-blue" to="/requests/new"><b>New Data Request</b></Link>
-                </div>
+                </div>) }
             </div>
             <hr/>
             <div className="row gap mt-2">

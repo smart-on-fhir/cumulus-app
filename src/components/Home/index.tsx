@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { useAuth } from "../../auth";
 import DataRequestsList from "../DataRequests/DataRequestsList"
 import ViewsBrowser from "../Views/ViewsBrowser"
 import map from "./map.png"
@@ -6,6 +7,7 @@ import map from "./map.png"
 
 
 export default function Home() {
+    const { user } = useAuth();
     return (
         <>
             <h4>Browse Views</h4>
@@ -19,9 +21,9 @@ export default function Home() {
                         <div className="col middle">
                             <h4>Data Subscriptions & Requests</h4>
                         </div>
-                        <div className="col col-0 middle">
+                        { user?.role === "admin" && (<div className="col col-0 middle">
                             <Link className="btn color-blue" to="/requests/new"><b>New Data Request</b></Link>
-                        </div>
+                        </div>) }
                     </div>
                     <hr/>
                     <DataRequestsList />
