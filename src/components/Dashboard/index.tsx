@@ -386,9 +386,11 @@ export function Dashboard({
         return canvas.toDataURL();
     }
 
-    const { execute: save } = useBackend(async () => {
+    const { execute: save, loading: saving } = useBackend(async () => {
         
-        const screenShot = await getScreenShot()
+        const screenShot = viewType === "overview" ?
+            await getScreenShot() :
+            undefined;
 
         // Update
         if (view.id) {
@@ -404,14 +406,15 @@ export function Dashboard({
                     filters,
                     viewType: chartType
                 }
-            })
-
-            dispatch({ type: "CLEAN" })
+            }).then(
+                () => dispatch({ type: "CLEAN" }),
+                e  => alert(e.message)
+            );
         }
 
         // Create
         else {
-            const v = await views.create({
+            await views.create({
                 ...view,
                 name: viewName,
                 description: viewDescription,
@@ -424,13 +427,14 @@ export function Dashboard({
                     filters,
                     viewType: chartType
                 }
-            });
-
-            navigate("/views/" + v.id)
+            }).then(
+                v => navigate("/views/" + v.id),
+                e => alert(e.message)
+            );
         }
     })
 
-    const { execute: destroy } = useBackend(() => {
+    const { execute: destroy, loading: deleting } = useBackend(() => {
         if (window.confirm("Yre you sure you want to delete this view?")) {
             return views.delete(view.id + "").then(() => navigate("/"))
         }
@@ -504,7 +508,7 @@ export function Dashboard({
     })
     
     return (
-        <div>
+        <div className={ saving || deleting ? "grey-out" : undefined }>
             <h2>{viewName}</h2>
             <div className="color-muted mb-1">{viewDescription}</div>
             <div className="row mb-1">
@@ -519,12 +523,15 @@ export function Dashboard({
                 <div className="col col-4 right">
                     <div className="row">
                         <div className="toolbar">
-                            { showOptions && isAdmin && (
-                                <>
-                                <button className="btn color-green" onClick={save} disabled={ !isDirty }><i className="fas fa-save" /> Save</button>
-                                {/* <button className="btn"><i className="fas fa-file-download" /></button> */}
-                                { view.id && <button className="btn color-red" onClick={ destroy }><i className="fas fa-trash-alt" /> Delete</button> }
-                                </>
+                            { showOptions && (
+                                <button className="btn color-green" onClick={save} disabled={ !isDirty }>
+                                    <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
+                                </button>
+                            )}
+                            { showOptions && isAdmin && view.id && (
+                                <button className="btn color-red" onClick={ destroy }>
+                                    <i className={ deleting ? "fas fa-circle-notch fa-spin" : "fas fa-trash-alt" } /> Delete
+                                </button>
                             )}
                             <button className={ "btn" + (showOptions ? " active" : "")} onClick={() => dispatch({ type: "TOGGLE_OPTIONS" })}><i className="fas fa-cog" /></button>
                         </div>

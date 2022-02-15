@@ -1,6 +1,8 @@
-const express = require("express")
-const Crypto  = require("crypto")
-const User    = require("../db/models/User");
+const express   = require("express")
+const Crypto    = require("crypto")
+const HttpError = require("httperrors")
+const User      = require("../db/models/User")
+
 
 const router = express.Router({ mergeParams: true });
 
@@ -45,11 +47,11 @@ function requireAuth(...roles) {
     return function(req, res, next) {
         
         if (!req.user) {
-            return res.status(401).json({ error: "Authorization required" });
+            return next(new HttpError.Unauthorized("Authorization required"));
         }
 
         if (!roles.includes(req.user.role)) {
-            return res.status(403).json({ error: "Permission denied" });
+            return next(new HttpError.Forbidden("Permission denied"))//.json({ error: "Permission denied" });
         }
 
         next();
