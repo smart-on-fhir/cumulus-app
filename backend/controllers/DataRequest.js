@@ -1,81 +1,71 @@
-const express            = require("express");
-const slug               = require("slug");
-const Model              = require("../db/models/DataRequest");
-const { requireAuth }    = require("./Auth");
-const { getFindOptions, rw } = require("../lib");
+const express         = require("express");
+const slug            = require("slug");
+const { HttpError }   = require("httperrors");
+const Model           = require("../db/models/DataRequest");
+const { requireAuth } = require("./Auth");
+const {
+    getFindOptions,
+    assert,
+    rw
+} = require("../lib");
 
 
 const router = module.exports = express.Router({ mergeParams: true });
 
 
 // get all ---------------------------------------------------------------------
-router.get("/", (req, res) => {
-    Model.findAll(getFindOptions(req))
-    .then(data  => res.json(data))
-    .catch(error => res.status(400).end(error.message));
-});
+router.get("/", rw(async (req, res) => {
+    const models = await Model.findAll(getFindOptions(req));
+    res.json(models);
+}));
 
 // get one ---------------------------------------------------------------------
-router.get("/:id", (req, res) => {
-    Model.findByPk(req.params.id, getFindOptions(req))
-    .then(model => {
-        if (!model) {
-            return res.status(404).end("Model not found")
-        }
-        res.json(model)
-    })
-    .catch(error => res.status(400).end(error.message))
-});
+router.get("/:id", rw(async (req, res) => {
+    const model = await Model.findByPk(req.params.id, getFindOptions(req))
+    assert(model, HttpError.NotFound("Model not found"))
+    res.json(model)
+}));
 
 // Create ----------------------------------------------------------------------
-router.post("/", requireAuth("admin"), express.json(), (req, res) => {
-    Model.create(req.body)
-    .then(data  => res.json(data))
-    .catch(error => res.status(400).end(error.message))
-});
+router.post("/", requireAuth("admin"), express.json(), rw(async (req, res) => {
+    const model = await Model.create(req.body);
+    res.json(model)
+}));
 
 // Update ----------------------------------------------------------------------
 router.put("/:id", requireAuth("admin"), express.json(), rw(async (req, res) => {
     const model = await Model.findByPk(req.params.id);
-    if (!model) {
-        return res.sendStatus(404).end(`${Model.name} not found`);
-    }
+    assert(model, HttpError.NotFound("Model not found"))
     await model.update(req.body);
     res.json(model);
 }));
 
 // Delete ----------------------------------------------------------------------
-router.delete("/:id", requireAuth("admin"), async (req, res) => {
+router.delete("/:id", requireAuth("admin"), rw(async (req, res) => {
     const model = await Model.findByPk(req.params.id);
-    if (!model) {
-        res.sendStatus(404).end(`${Model.name} not found`);
-    } else {
-        await model.destroy();
-        res.json(model);
-    }
-});
+    assert(model, HttpError.NotFound("Model not found"))
+    await model.destroy();
+    res.json(model);
+}));
 
 // Views -----------------------------------------------------------------------
-router.get("/:id/views", (req, res) => {
-    Model.findByPk(req.params.id, getFindOptions(req))
+router.get("/:id/views", rw(async (req, res) => {
+    const model = await Model.findByPk(req.params.id, getFindOptions(req))
+    assert(model, HttpError.NotFound("Model not found"))
     // @ts-ignore
-    .then(data  => data.getViews())
-    .then(data  => res.json(data))
-    .catch(error => res.status(400).end(error.message))
-});
+    const views = await model.getViews()
+    res.json(views)
+}));
 
 // Export Data endpoint --------------------------------------------------------
-router.get("/:id/data", (req, res) => {
-    Model.findByPk(req.params.id, getFindOptions(req))
+router.get("/:id/data", rw(async (req, res) => {
+    const model = await Model.findByPk(req.params.id, getFindOptions(req))
+    assert(model, HttpError.NotFound("Model not found"))
+    const data = model.get("data")
+    const name = model.get("name")
     // @ts-ignore
-    .then(model => {
-        const data = model?.get("data")
-        const name = model?.get("name")
-        // @ts-ignore
-        exportData(data || { cols: [], rows: [] }, name, req, res)
-    })
-    .catch(error => res.status(400).end(error.message))
-});
+    exportData(data || { cols: [], rows: [] }, name, req, res)
+}));
 
 /**
  * @param {{ cols: { name: string }[], rows: any[][] }} data 
