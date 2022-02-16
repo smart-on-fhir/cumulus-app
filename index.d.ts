@@ -2,6 +2,8 @@ import { Request } from "express";
 
 declare module app {
 
+    function assert(condition: any, error: Error | string): asserts condition;
+
     interface UserRequest extends Request {
         user?: User
     }

@@ -153,10 +153,22 @@ function rw(fn) {
     return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 }
 
+/**
+ * @param {any} condition 
+ * @param {Error | string} error
+ * @type {import("../index").app.assert}
+ */
+function assert(condition, error) {
+    if (!(condition)) {
+        throw error || "Assertion failed"
+    }
+}
+
 module.exports = {
     bool,
     uInt,
     rw,
+    assert,
     // wait,
     // getBaseUrl,
     // makeArray,
