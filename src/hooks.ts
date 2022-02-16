@@ -1,27 +1,29 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useReducer } from "react"
 
+interface State<T = any> {
+    loading: boolean
+    error  : Error | null
+    result : T | null
+}
+
+function reducer(state: State, payload: Partial<State>): State {
+    return { ...state, ...payload };
+}
 
 export function useBackend<T=any>(fn: () => Promise<T>, immediate = false)
 {
-    const [loading, setLoading] = useState<true|false>(false);
-    const [result , setResult ] = useState<T | null>(null);
-    const [error  , setError  ] = useState<Error | null>(null);
+    const [state, dispatch] = useReducer(reducer, {
+        loading: false,
+        error: null,
+        result: null
+    });
 
     const execute = useCallback(() => {
-        setLoading(true);
-        setResult(null);
-        setError(null);
-
-        return fn()
-            .then((result: T) => {
-                setResult(result)
-                setLoading(false)
-            })
-            .catch((error: Error) => {
-                setError(error);
-                setLoading(false)
-            });
-
+        dispatch({ loading: true });
+        return fn().then(
+            (result: T) => dispatch({ loading: false, result, error: null }),
+            (error: Error) => dispatch({ loading: false, error, result: null })
+        );
     }, [fn]);
     
     useEffect(() => {
@@ -30,6 +32,11 @@ export function useBackend<T=any>(fn: () => Promise<T>, immediate = false)
         }
     }, [execute, immediate]);
 
-    return { execute, loading, result, error };
+    return {
+        execute,
+        loading: state.loading,
+        result: state.result as (T | null),
+        error: state.error
+    };
 }
 
