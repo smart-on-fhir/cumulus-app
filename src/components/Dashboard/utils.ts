@@ -101,7 +101,7 @@ export function generateSeries(
             // Add group data
             walk(group, (y, dimension2, index2) => {
                 _data.push({
-                    name: dimension2, // === "null" ? '<b>Null ❎</b>' : dimension2,
+                    name: dimension2 || "Unknown",
                     // id: `${type}-${dimension1}-${dimension2}`,
                     // id: `group-${index}-${index2}`,
                     type,
@@ -121,7 +121,7 @@ export function generateSeries(
                 // id: `group-${index}`,//`${type}-${dimension1}`,
                 // @ts-ignore
                 depth: 50,
-                name: dimension1,// === "null" ? "Unknown " + column.label : dimension1,
+                name: dimension1 || "Unknown",
                 
                 // When true, the columns will center in the category, ignoring
                 // null or missing points. When false, space will be reserved
@@ -134,7 +134,7 @@ export function generateSeries(
                 dataSorting: {
                     enabled: groupBy.dataType === "string",
                     matchByName: false,
-                    sortKey: "name"
+                    // sortKey: "name"
                 },
                 // showCheckbox: true,
                 // showInLegend: false,
@@ -171,8 +171,13 @@ export function generateSeries(
             // @ts-ignore
             edgeColor: "rgba(0, 0, 0, 0.1)",
             // showInLegend: false,
-            data: Object.keys(data).sort().map((groupName, i) => {
-                let label = groupName === "null" ? "Unknown" : groupName
+            dataSorting: {
+                enabled: column.dataType === "string",
+                matchByName: false,
+                // sortKey: "name"
+            },
+            data: Object.keys(data).map((groupName, i) => {
+                let label = groupName === "null" || groupName === "" ? "Unknown" : groupName
                 return {
                     name: label,
                     color: SimpleCharts.includes(type) ? COLORS[i] : COLORS[4],
