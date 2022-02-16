@@ -40,8 +40,9 @@ h6 { font-size: $font-size;       font-family: "Open Sans"; margin: 1ex 0 0.5ex 
   font-size: 85%;
 }
 
-code {
+code, pre {
     font-family: source-code-pro, Menlo, Monaco, Consolas, monospace;
+    font-size: $font-size - 3;
 }
 
 label {
