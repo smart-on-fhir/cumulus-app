@@ -322,6 +322,7 @@ interface State {
     startRow           : number
     endRow             : number | null
     loading            : boolean
+    errorMessage       : string | null 
 }
 
 interface Action {
@@ -343,7 +344,8 @@ const INITIAL_STATE: State = {
     trimSpaces         : false,
     startRow           : 1,
     endRow             : null,
-    loading            : false
+    loading            : false,
+    errorMessage       : null
 }
 
 function reducer(state: State, action: Action): State
@@ -406,19 +408,38 @@ function reducer(state: State, action: Action): State
         }
     }
 
+    function validate(newState: State) {
+        if (!newState.rows || !newState.rows.length) {
+            newState.errorMessage = "No data rows included"
+        }
+        else if (!newState.cols || !newState.cols.length) {
+            newState.errorMessage = "No data columns included"
+        }
+        else if (!newState.cols.find(c => c.dataType !== "hidden")) {
+            newState.errorMessage = "All columns are excluded"
+        }
+        else if (!newState.cols.find(c => c.name === "cnt")) {
+            newState.errorMessage = "Input files must have a 'cnt' column for aggregate counts"
+        }
+        else {
+            newState.errorMessage = null
+        }
+        return newState
+    }
+
     if (action.type === "MERGE") {
         const needsParsing = Object.keys(action.payload).some(key => requireParse.includes(key));
         if (needsParsing) {
-            return {
+            return validate({
                 ...state,
                 ...action.payload,
                 ...parse(action.payload)
-            }
+            })
         } else {
-            return {
+            return validate({
                 ...state,
                 ...action.payload
-            }
+            })
         }
     }
 
@@ -431,10 +452,10 @@ function reducer(state: State, action: Action): State
     }
 
     if (action.type === "SET_COLS") {
-        return {
+        return validate({
             ...state,
             cols: action.payload
-        }
+        })
     }
 
     if (action.type === "SET_SEPARATE_BY_COMMA") {
@@ -500,19 +521,23 @@ function reducer(state: State, action: Action): State
     }
 
     if (action.type === "SET_START_ROW") {
-        return {
+        const endRow = state.endRow ? Math.max(state.endRow, action.payload + 1) : null;
+        return validate({
             ...state,
             startRow: action.payload,
-            ...parse({startRow: action.payload})
-        }
+            endRow,
+            ...parse({startRow: action.payload, endRow})
+        })
     }
 
     if (action.type === "SET_END_ROW") {
-        return {
+        // const startRow = Math.max(Math.min(action.payload - 1, state.startRow), 1);
+        return validate({
             ...state,
             endRow: action.payload,
-            ...parse({endRow: action.payload})
-        }
+            // startRow,
+            ...parse({endRow: action.payload/*, startRow*/})
+        })
     }
 
     if (action.type === "SET_LOADING") {
@@ -530,11 +555,20 @@ export default function DataUploader()
     const { id: requestID } = useParams();
     const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
+
     const {
         loading: requestLoading,
         error  : requestError,
         result : requestResult
-    } = useBackend(useCallback(() => requests.getOne(requestID + ""), [requestID]), true);
+    } = useBackend(
+        useCallback(
+            () => requests.getOne(requestID + ""),
+            [requestID]
+        ),
+        true
+    );
+
+    const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
     const {
         // input,
@@ -550,7 +584,8 @@ export default function DataUploader()
         trimSpaces,
         startRow,
         endRow,
-        loading
+        loading,
+        errorMessage
     } = state;
 
     
@@ -611,14 +646,41 @@ export default function DataUploader()
         ...TSV_MIME_TYPES
     ];
 
+    if (requestLoading) {
+        return <Loader/>
+    }
+
+    if (requestError) {
+        return (
+            <AlertError>
+                <b>Error Loading Data Request</b> - { requestError + "" }
+            </AlertError>
+        )
+    }
+
+    if (!requestResult) {
+        return (
+            <AlertError>
+                <b>Error Loading Data Request</b> - Failed to fetch data
+            </AlertError>
+        )
+    }
     return (
         <div className={ loading ? "grey-out" : undefined }>
             <Helmet>
                 <title>Import Data</title>
             </Helmet>
-            }
+            <Breadcrumbs links={[
+                { name: "Home", href: "/" },
+                { name: "Requests & Subscriptions", href: "/requests" },
+                { name: requestResult.name, href: `/requests/${requestID}` },
+                { name: "Edit Request", href: `/requests/${requestID}/edit` },
+                { name: "Import Data" }
+            ]}/>
+
             <h3>Import Data</h3>
             <hr />
+            { errorMessage && <AlertError><b>Input data error</b> - {errorMessage}</AlertError> }
             <div className="row gap mt-1 mb-1">
                 <div className="col">
                     <label>Select File</label>
@@ -636,7 +698,7 @@ export default function DataUploader()
             <div className="row gap mt-1 mb-1">
                 <div className="col nowrap">
                     <label>From row</label>
-                    <input type="number" min={1} step={1} value={startRow + 1} onChange={e => dispatch({ type: "SET_START_ROW", payload: e.target.valueAsNumber - 1 })} />
+                    <input type="number" min={1} step={1} value={startRow} onChange={e => dispatch({ type: "SET_START_ROW", payload: e.target.valueAsNumber })} />
                 </div>
                 <div className="col nowrap" title="Use empty value to include all rows until the end of the input file">
                     <label>To row</label>
