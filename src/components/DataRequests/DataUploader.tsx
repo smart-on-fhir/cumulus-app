@@ -1,10 +1,12 @@
-import moment         from "moment"
+import moment                      from "moment"
 import { useCallback, useReducer } from "react"
-import { Helmet }                 from "react-helmet"
-import { useBackend } from "../../hooks"
-import { requests }   from "../../backend"
-import { useParams } from "react-router"
-import Breadcrumbs from "../Breadcrumbs"
+import { useNavigate, useParams }  from "react-router"
+import { Helmet }                  from "react-helmet"
+import Breadcrumbs                 from "../Breadcrumbs"
+import Alert, { AlertError }       from "../Alert"
+import Loader                      from "../Loader"
+import { useBackend }              from "../../hooks"
+import { requests }                from "../../backend"
 import "./DataUploader.scss"
 
 
@@ -553,7 +555,7 @@ function reducer(state: State, action: Action): State
 export default function DataUploader()
 {
     const { id: requestID } = useParams();
-    const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+    const navigate = useNavigate()
 
 
     const {
@@ -589,16 +591,25 @@ export default function DataUploader()
     } = state;
 
     
-    function onSubmit()
-    {
+
+    const {
+        execute: doImport,
+        loading: importing,
+        error  : importingError,
+        result : importingResult
+    } = useBackend(useCallback(() => {
         let _cols = cols.filter(col => col.dataType !== "hidden")
         let _rows = rows.map(row => row.filter((_, i) => cols[i].dataType !== "hidden").map((r, y) => {
             return format(r, _cols[y].dataType, trimSpaces)
         }));
+        return requests.update(requestID + "", {
+            data: {
+                cols: _cols as app.DataRequestDataColumn[],
+                rows: _rows
+            }
+        })
+    }, [requestID, cols, rows, trimSpaces]));
 
-        console.log({ cols: _cols, rows: _rows })
-    }
-    
     function onFileSelected(e: React.ChangeEvent<HTMLInputElement>)
     {
         dispatch({ type: "SET_LOADING", payload: true })
@@ -665,6 +676,19 @@ export default function DataUploader()
             </AlertError>
         )
     }
+
+    if (importingResult) {
+        setTimeout(() => navigate(`/requests/${requestID}`), 1000)
+        return (
+            <Alert color="green">
+                <div className="center">
+                    <b>Data imported successfully!</b><br/>Redirecting...
+                </div>
+            </Alert>
+        )
+    }
+
+
     return (
         <div className={ loading ? "grey-out" : undefined }>
             <Helmet>
@@ -680,7 +704,9 @@ export default function DataUploader()
 
             <h3>Import Data</h3>
             <hr />
+            { importing && <Loader msg="Importing Data..." /> }
             { errorMessage && <AlertError><b>Input data error</b> - {errorMessage}</AlertError> }
+            { importingError && <AlertError><b>Error importing data</b> - {importingError + ""}</AlertError> }
             <div className="row gap mt-1 mb-1">
                 <div className="col">
                     <label>Select File</label>
@@ -776,7 +802,7 @@ export default function DataUploader()
             />
             <hr className="mt-1"/>
             <div className="col center mt-1 mb-2">
-                <button className="btn btn-blue big" onClick={onSubmit}> <b> IMPORT </b> </button>
+                <button className="btn btn-blue big" onClick={doImport}> <b> IMPORT </b> </button>
             </div>
         </div>
     )
