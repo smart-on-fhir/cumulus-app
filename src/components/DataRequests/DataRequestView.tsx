@@ -9,7 +9,41 @@ import Breadcrumbs from "../Breadcrumbs"
 import { Format } from "../Format"
 import map from "../Home/map.png"
 import ViewsBrowser from "../Views/ViewsBrowser"
+// import GoogleMapReact from "google-map-react"
 
+// interface SimpleMapProps {
+//     center: {
+//         lat: number
+//         lng: number
+//     },
+//     zoom: number
+// }
+// class SimpleMap extends Component<SimpleMapProps> {
+  
+//     render() {
+//       return (
+//         // Important! Always set the container height explicitly
+//         <div style={{ height: '300px', width: '100%' }}>
+//           <GoogleMapReact
+//             bootstrapURLKeys={{ key: "AIzaSyAoE75RGPdm1LApIAkCTXtBx6rjsOVaqNA" }}
+//             defaultCenter={this.props.center}
+//             defaultZoom={this.props.zoom}
+//           >
+//             <i className="fas fa-map-marker"
+//                 style={{
+//                     color: "#C00",
+//                     fontSize: "30px",
+//                     textShadow: "1px 1px 2px #000"
+//                 }}
+//                 // @ts-ignore
+//               lat={42.33732992698751}
+//               lng={-71.10595995789029}
+//             />
+//           </GoogleMapReact>
+//         </div>
+//       );
+//     }
+// }
 
 export default function DataRequestView(): JSX.Element
 {
@@ -85,6 +119,7 @@ export default function DataRequestView(): JSX.Element
                     <br/>
                     </> }
                     <h5 className="grey-out">Data Sites</h5>
+                    {/* <SimpleMap center={{ lat: 42.346710208505826, lng: -71.08435192324642 }} zoom={10} /> */}
                     <img src={ map } alt="Sites Map" className="grey-out" />
                 </div>
             </div>
