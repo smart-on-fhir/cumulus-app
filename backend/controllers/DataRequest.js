@@ -2,7 +2,7 @@ const express            = require("express");
 const slug               = require("slug");
 const Model              = require("../db/models/DataRequest");
 const { requireAuth }    = require("./Auth");
-const { getFindOptions } = require("../lib");
+const { getFindOptions, rw } = require("../lib");
 
 
 const router = module.exports = express.Router({ mergeParams: true });
@@ -18,7 +18,12 @@ router.get("/", (req, res) => {
 // get one ---------------------------------------------------------------------
 router.get("/:id", (req, res) => {
     Model.findByPk(req.params.id, getFindOptions(req))
-    .then(data  => res.json(data))
+    .then(model => {
+        if (!model) {
+            return res.status(404).end("Model not found")
+        }
+        res.json(model)
+    })
     .catch(error => res.status(400).end(error.message))
 });
 
@@ -30,15 +35,14 @@ router.post("/", requireAuth("admin"), express.json(), (req, res) => {
 });
 
 // Update ----------------------------------------------------------------------
-router.put("/:id", requireAuth("admin"), express.json(), async (req, res) => {
+router.put("/:id", requireAuth("admin"), express.json(), rw(async (req, res) => {
     const model = await Model.findByPk(req.params.id);
     if (!model) {
-        res.sendStatus(404).end(`${Model.name} not found`);
-    } else {
-        await model.update(req.body);
-        res.json(model);
+        return res.sendStatus(404).end(`${Model.name} not found`);
     }
-});
+    await model.update(req.body);
+    res.json(model);
+}));
 
 // Delete ----------------------------------------------------------------------
 router.delete("/:id", requireAuth("admin"), async (req, res) => {

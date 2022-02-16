@@ -43,9 +43,20 @@ app.use((_, res) => {
 
 // Global error 500 handler
 app.use((error, req, res, next) => {
+    
+    // HTTP Errors
     if (error.http) {
         return res.status(error.status).send(error.message);
     }
+
+    // Sequelize Validation Errors
+    if (error.name === "SequelizeValidationError") {
+        return res.status(400).send(error.errors.map(e => (
+            `${e.type || "Error"} while validating ${e.path || "data"}: ${e.message}`
+        )).join("\n"));
+    }
+
+    // Other Errors
     res.status(500).json(error);
 });
 

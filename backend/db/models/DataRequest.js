@@ -48,11 +48,52 @@ module.exports = class DataRequest extends Model
             },
             
             data: {
-                type: DataTypes.JSON
+                type: DataTypes.JSON,
+                validate: {
+                    /**
+                     * 
+                     * @param {import("../../../index").app.DataRequestData} data 
+                     */
+                    isValidData(data) {
+                        const cntColumn = data.cols.find(c => c.name === "cnt");
+                        const colsLength = data.cols.length;
+                        if (!cntColumn) {
+                            throw new Error('Data must have "cnt" column for aggregate counts');
+                        }
+                        if (cntColumn.dataType !== "integer") {
+                            throw new Error('The dataType of the "cnt" column must be "integer');
+                        }
+
+                        data.rows.forEach((row, rowIndex) => {
+                            const rowLength = row.length
+                            if (rowLength !== colsLength) {
+                                throw new Error(`Invalid data at row ${rowIndex}. Expected ${colsLength} columns but found ${rowLength}`);
+                            }
+
+                            // TODO: Validate data types
+                            // row.forEach(cell => {
+
+                            // })
+                        })
+                    }
+                }
             }
         }, {
             sequelize,
-            modelName: "DataRequest"
+            modelName: "DataRequest",
+            hooks: {
+
+                /**
+                 * When data is imported, make sure we update the "completed"
+                 * column to the current date.
+                 * @param {DataRequest} instance 
+                 */
+                beforeUpdate(instance) {
+                    if (instance.getDataValue("data")) {
+                        instance.set("completed", new Date())
+                    }
+                }
+            }
         });
     }
 
