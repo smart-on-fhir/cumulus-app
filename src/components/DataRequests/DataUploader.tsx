@@ -1,5 +1,6 @@
 import moment         from "moment"
 import { useCallback, useReducer } from "react"
+import { Helmet }                 from "react-helmet"
 import { useBackend } from "../../hooks"
 import { requests }   from "../../backend"
 import { useParams } from "react-router"
@@ -612,16 +613,9 @@ export default function DataUploader()
 
     return (
         <div className={ loading ? "grey-out" : undefined }>
-            {
-                requestLoading ? "Loading request..." :
-                    requestError ? <div><b>Error Loading request: </b>{ requestError + "" }</div> :
-                    requestResult &&  <Breadcrumbs links={[
-                        { name: "Home", href: "/" },
-                        { name: "Requests & Subscriptions", href: "/requests" },
-                        { name: requestResult.name, href: `/requests/${requestID}` },
-                        { name: "Edit Request", href: `/requests/${requestID}/edit` },
-                        { name: "Import Data" }
-                    ]}/>
+            <Helmet>
+                <title>Import Data</title>
+            </Helmet>
             }
             <h3>Import Data</h3>
             <hr />

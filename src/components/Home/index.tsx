@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import Helmet from "react-helmet"
 import { useAuth } from "../../auth";
 import DataRequestsList from "../DataRequests/DataRequestsList"
 import ViewsBrowser from "../Views/ViewsBrowser"
@@ -10,6 +11,9 @@ export default function Home() {
     const { user } = useAuth();
     return (
         <>
+            <Helmet>
+                <title>Cumulus</title>
+            </Helmet>
             <h4>Browse Views</h4>
             <hr/>
             <ViewsBrowser />
