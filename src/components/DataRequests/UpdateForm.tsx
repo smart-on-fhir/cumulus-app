@@ -1,5 +1,6 @@
 import { useCallback, useState }  from "react"
 import { useNavigate, useParams } from "react-router"
+import { Helmet }                 from "react-helmet"
 import { requests }               from "../../backend"
 import { useBackend }             from "../../hooks"
 import Breadcrumbs                from "../Breadcrumbs"
@@ -42,6 +43,9 @@ export default function EditDataRequestForm()
 
     return (
         <div>
+            <Helmet>
+                <title>Edit Data Request</title>
+            </Helmet>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
                 { name: "Requests & Subscriptions", href: "/requests" },

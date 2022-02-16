@@ -1,5 +1,6 @@
 import { useCallback }   from "react";
 import DataRequestLink   from "./DataRequestLink";
+import Helmet from "react-helmet"
 import { useBackend }    from "../../hooks";
 import { requestGroups } from "../../backend";
 import Breadcrumbs       from "../Breadcrumbs";
@@ -47,6 +48,9 @@ export default function DataRequestsListPage()
 
     return (
         <div>
+            <Helmet>
+                <title>Requests & Subscriptions</title>
+            </Helmet>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
                 { name: "Requests & Subscriptions" }

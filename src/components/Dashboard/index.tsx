@@ -1,6 +1,7 @@
 import { ChangeEvent, useCallback, useReducer } from "react";
 import html2canvas                              from "html2canvas";
 import { useNavigate, useParams }               from "react-router-dom";
+import { Helmet }                               from "react-helmet";
 import PowerSet                                 from "../../PowerSet";
 import { useBackend }                           from "../../hooks";
 import { views, requests }                      from "../../backend"
@@ -513,6 +514,10 @@ export function Dashboard({
     
     return (
         <div className={ saving || deleting ? "grey-out" : undefined }>
+            <Helmet>
+                <title>{viewName}</title>
+                {viewDescription && <meta name="description" content="Helmet application" />}
+            </Helmet>
             <h2>{viewName}</h2>
             <div className="color-muted mb-1">{viewDescription}</div>
             <div className="row mb-1">
