@@ -14,3 +14,19 @@
         margin: 0.25em 0;
     }
 }
+
+.main-chart {
+    position: relative;
+    padding: 60% 0 0 0;
+    width: 100%;
+    max-width: 100%;
+    background: #FFF;
+
+    > .highcharts-container {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+}
