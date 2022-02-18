@@ -1,7 +1,7 @@
 import moment                      from "moment"
 import { useCallback, useReducer } from "react"
 import { useNavigate, useParams }  from "react-router"
-import { Helmet }                  from "react-helmet"
+import { HelmetProvider, Helmet }  from "react-helmet-async"
 import Breadcrumbs                 from "../Breadcrumbs"
 import Alert, { AlertError }       from "../Alert"
 import Loader                      from "../Loader"
@@ -691,9 +691,11 @@ export default function DataUploader()
 
     return (
         <div className={ loading ? "grey-out" : undefined }>
-            <Helmet>
-                <title>Import Data</title>
-            </Helmet>
+            <HelmetProvider>
+                <Helmet>
+                    <title>Import Data</title>
+                </Helmet>
+            </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
                 { name: "Requests & Subscriptions", href: "/requests" },

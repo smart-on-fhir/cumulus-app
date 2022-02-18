@@ -1,10 +1,9 @@
-import { useCallback, useState } from "react"
-// import { useNavigate, useParams }       from "react-router"
-import Helmet                           from "react-helmet"
-import { requests }                     from "../../backend"
-import { useBackend }                   from "../../hooks"
-import Breadcrumbs                      from "../Breadcrumbs"
-import DataRequestForm                  from "./form"
+import { useCallback, useState }  from "react"
+import { HelmetProvider, Helmet } from "react-helmet-async"
+import { requests }               from "../../backend"
+import { useBackend }             from "../../hooks"
+import Breadcrumbs                from "../Breadcrumbs"
+import DataRequestForm            from "./form"
 
 import "./form.scss";
 
@@ -25,9 +24,11 @@ export default function CreateDataRequestForm()
 
     return (
         <div>
-            <Helmet>
-                <title>Create Data Request</title>
-            </Helmet>
+            <HelmetProvider>
+                <Helmet>
+                    <title>Create Data Request</title>
+                </Helmet>
+            </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
                 { name: "Requests & Subscriptions", href: "/requests" },
