@@ -8,6 +8,11 @@ const SCREENSHOT_DIR = Path.join(__dirname, "/../../screenShots/")
 class View extends Model
 {
     /**
+     * @type {string | undefined}
+     */
+    _screenShot;
+
+    /**
      * @param {import("sequelize").Sequelize} sequelize
      */
     static associate(sequelize) {
@@ -40,7 +45,7 @@ class View extends Model
             },
             
             screenShot: {
-                type: DataTypes.STRING
+                type: DataTypes.STRING(1024*1024*2)
             },
 
             settings: {
@@ -52,14 +57,35 @@ class View extends Model
             hooks: {
 
                 /**
-                 * When new View is created, if a screenShot is present (should
-                 * be a DataURL string) generate an image file and update the
-                 * record so that "screenShot" is the file name.
+                 * Before a View is created, if a screenShot is present (should
+                 * be a DataURL string), make sure it is removed form the model
+                 * dataValues because the database can't handle it. In this case
+                 * we remove the "screenShot" attribute and move it to custom
+                 * property _screenShot
+                 * @param {View} instance 
+                 */
+                async beforeCreate(instance) {
+                    const newValue = String(instance.get("screenShot") || "")
+                    if (newValue) {
+                        instance._screenShot = newValue
+                        instance.setDataValue("screenShot", null)
+                    }
+                },
+
+                /**
+                 * After new View is created, if a _screenShot is present (set
+                 * by the beforeCreate hook above), take that and move it back
+                 * to the model dataValues. It should then be detected by the
+                 * updateScreenshot function and written to file.
                  * @param {View} instance 
                  */
                 async afterCreate(instance) {
-                    await updateScreenshot(instance)
-                    await instance.save({ hooks: false })
+                    if (instance._screenShot) {
+                        instance.set("screenShot", instance._screenShot)
+                        delete instance._screenShot
+                        await updateScreenshot(instance)
+                        await instance.save({ hooks: false })
+                    }
                 },
                 
                 /**

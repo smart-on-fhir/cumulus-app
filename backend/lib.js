@@ -1,4 +1,6 @@
-const { Op } = require("sequelize");
+const Path            = require("path");
+const { readdirSync, statSync } = require("fs");
+const { Op }          = require("sequelize");
 
 const RE_FALSE = /^(0|no|false|off|null|undefined|NaN|)$/i;
 
@@ -164,11 +166,52 @@ function assert(condition, error) {
     }
 }
 
+/**
+ * Walk a directory recursively and find files that match the @filter if its a
+ * RegExp, or for which @filter returns true if its a function.
+ * @param {string} dir Path to directory
+ * @param {RegExp|Function} [filter]
+ * @returns {IterableIterator<String>}
+ */
+function* filterFiles(dir, filter) {
+    const files = walkSync(dir);
+    for (const file of files) {
+        if (filter instanceof RegExp && !filter.test(file)) {
+            continue;
+        }
+        if (typeof filter == "function" && !filter(file)) {
+            continue;
+        }
+        yield file;
+    }
+}
+
+/**
+ * List all files in a directory recursively in a synchronous fashion.
+ * @param {String} dir
+ * @returns {IterableIterator<String>}
+ */
+function* walkSync(dir) {
+    const files = readdirSync(dir);
+
+    for (const file of files) {
+        const pathToFile = Path.join(dir, file);
+        const isDirectory = statSync(pathToFile).isDirectory();
+        if (isDirectory) {
+            yield *walkSync(pathToFile);
+        } else {
+            yield pathToFile;
+        }
+    }
+}
+
 module.exports = {
     bool,
     uInt,
     rw,
     assert,
+    walkSync,
+    filterFiles,
     // wait,
     // getBaseUrl,
     // makeArray,
