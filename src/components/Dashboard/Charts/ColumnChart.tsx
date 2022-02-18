@@ -1,6 +1,5 @@
 import PowerSet from "../../../PowerSet";
 import BaseChart from "./BaseChart";
-import { generateSeries } from "../utils";
 
 
 export default function ColumnChart({
@@ -15,8 +14,7 @@ export default function ColumnChart({
     use3d?: boolean
 })
 {
-
-    const groups = dataSet.removeTotal().group2(column.name, groupBy?.name);
+    const { series, categories } = dataSet.getChartData("column", column, groupBy)
 
     return <BaseChart key={[column.name, groupBy?.name].filter(Boolean).join("-")} options={{
         chart: {
@@ -58,9 +56,9 @@ export default function ColumnChart({
         },
         xAxis: {
             // title: {
-            //     text: column.label,
+            //     text: groupBy ? column.label || column.name : "",
             // },
-            type: "category",
+            type: column.dataType === "string" ? "category" : "linear",
             // groupBy ? (groupBy.dataType === "string" ? "category" : "linear") :
             //     (column.dataType === "string" ? "category" : "linear"),
             // categories: Object.keys(groups),
@@ -69,9 +67,10 @@ export default function ColumnChart({
             //     column.dataType === "string" ? "category" : "linear",
             // showEmpty: false,
             // alignTicks: false,
-            crosshair: !use3d,
-            lineColor: "rgba(0, 0, 0, 0.2)",
+            categories,
+            // crosshair: !use3d,
+            // lineColor: "rgba(0, 0, 0, 0.2)",
         },
-        series: generateSeries("column", column, groups, groupBy)
+        series
     }} />
 }

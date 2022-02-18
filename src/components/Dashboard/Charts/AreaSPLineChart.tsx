@@ -1,6 +1,6 @@
 import PowerSet from "../../../PowerSet";
 import BaseChart from "./BaseChart";
-import { generateSeries } from "../utils";
+
 
 export default function AreaSPLineChart({
     column,
@@ -12,7 +12,8 @@ export default function AreaSPLineChart({
     groupBy?: app.DataRequestDataColumn | null
 })
 {
-    const groups = dataSet.group2(column.name, groupBy?.name || "");
+
+    const { series, categories } = dataSet.getChartData("areaspline", column, groupBy)
 
     return <BaseChart options={{
         chart: {
@@ -36,20 +37,16 @@ export default function AreaSPLineChart({
         xAxis: {
             type: groupBy ? groupBy.dataType === "string" ? "category" : "linear" :
             column.dataType === "string" ? "category" : "linear",
-            showEmpty: false,
-            alignTicks: false,
-            crosshair: true
+            // showEmpty: false,
+            // alignTicks: false,
+            // crosshair: true
+            categories,
         },
         plotOptions: {
             areaspline: {
-                fillOpacity: 0.1,
-                dataSorting: {
-                    enabled: true,
-                    matchByName: false,
-                    sortKey: "z"
-                }
+                fillOpacity: 0.1
             }
         },
-        series: generateSeries("areaspline", column, groups, groupBy)
+        series
     }} />
 }

@@ -21,11 +21,6 @@ export class Chart extends React.Component<ChartProps>
         this.updateChart = this.updateChart.bind(this);
     }
 
-    // shouldComponentUpdate(nextProps: ChartProps)
-    // {
-    //     return JSON.stringify(nextProps) !== JSON.stringify(this.props)
-    // }
-
     updateChart()
     {
         this.chart.update(this.props.chartOptions, true, true, false)
@@ -41,12 +36,11 @@ export class Chart extends React.Component<ChartProps>
 
     componentDidUpdate()
     {
-        // this.chart.series.forEach((s: any) => s.remove(false, false, false))
         defer(this.updateChart);
     }
 
     render()
     {
-        return <div id={this.props.id} />
+        return <div id={this.props.id} className="main-chart" />
     }
 }
