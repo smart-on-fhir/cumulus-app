@@ -368,7 +368,7 @@ function reducer(state: State, action: Action): State
 
         const input = newState.input as string;
 
-        let rows: any[] = input.split("\n")
+        let rows: any[] = input.split("\n").map(s => s.trim()).filter(Boolean)
         let cols = []
 
         const separators: string[] = []
