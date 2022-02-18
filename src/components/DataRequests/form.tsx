@@ -315,9 +315,9 @@ export default function DataRequestForm({
             <div className="row gap mt-1">
                 <div className="col">
                     <label>Name</label>
-                    <input type="text" value={ name } onChange={e => onChange({ ...record, name: e.target.value })} />
+                    <input type="text" value={ name || "" } onChange={e => onChange({ ...record, name: e.target.value })} />
                     <label className="mt-1">Description</label>
-                    <textarea value={ description } onChange={e => onChange({ ...record, description: e.target.value })} />
+                    <textarea value={ description || "" } onChange={e => onChange({ ...record, description: e.target.value })} />
                 </div>
             </div>
             <div className="row gap mt-1 mb-2">
