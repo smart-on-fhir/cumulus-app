@@ -1,7 +1,9 @@
+const Path = require("path")
 const { Sequelize } = require("sequelize");
 const { debuglog }  = require("util");
 const colors        = require("colors")
 const config        = require("../config");
+const { walkSync } = require("../lib");
 const debugDB       = debuglog("app:db");
 
 // @ts-ignore
@@ -12,26 +14,34 @@ const DB = new Sequelize({
     logging: false
 });
 
-require("./models/User"        ).initialize(DB);
-require("./models/RequestGroup").initialize(DB);
-require("./models/View"        ).initialize(DB);
-require("./models/DataRequest" ).initialize(DB);
-
-debugDB(colors.bold("Activating associations..."));
-
-Object.keys(DB.models).forEach(modelName => {
-
-    // @ts-ignore
-    const associate = DB.models[modelName].associate;
-    if (associate) {
-        try {
-            associate(DB);
-        } catch (e) {
-            console.log(`Activating the associations of model "${modelName}" FAILED!`)
-            throw e
-        }
+/**
+ * @param {Sequelize} connection 
+ */
+function initModels(connection, verbose = false) {
+    for (let path of walkSync(Path.join(__dirname, "./models"))) {
+        verbose && console.log(`  - Initializing model from ${path.replace(__dirname, "backend/db")}`)
+        require(path).initialize(connection);
     }
-});
+
+    verbose && console.log(colors.bold("  Activating associations..."));
+
+    Object.keys(connection.models).forEach(modelName => {
+
+        // @ts-ignore
+        const associate = connection.models[modelName].associate;
+        if (associate) {
+            try {
+                associate(connection);
+            } catch (e) {
+                console.log(`Activating the associations of model "${modelName}" FAILED!`)
+                throw e
+            }
+        }
+    });
+}
+
+// initModels(DB, true)
+
 
 module.exports = DB;
 
@@ -39,6 +49,7 @@ module.exports.init = async () => {
 
     // test connection
     await DB.authenticate();
+    config.verbose && console.log("✔ Connected to the database");
 
     // This creates the table if it doesn't exist (and does nothing if it already
     // exists)
