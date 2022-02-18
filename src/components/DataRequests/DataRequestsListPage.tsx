@@ -1,11 +1,11 @@
-import { useCallback }   from "react";
-import DataRequestLink   from "./DataRequestLink";
-import Helmet from "react-helmet"
-import { useBackend }    from "../../hooks";
-import { requestGroups } from "../../backend";
-import Breadcrumbs       from "../Breadcrumbs";
-import { Link } from "react-router-dom";
-import { useAuth } from "../../auth";
+import { useCallback }            from "react";
+import { HelmetProvider, Helmet } from "react-helmet-async"
+import { Link }                   from "react-router-dom";
+import DataRequestLink            from "./DataRequestLink";
+import { useBackend }             from "../../hooks";
+import { requestGroups }          from "../../backend";
+import Breadcrumbs                from "../Breadcrumbs";
+import { useAuth }                from "../../auth";
 
 
 function List({
@@ -48,9 +48,11 @@ export default function DataRequestsListPage()
 
     return (
         <div>
-            <Helmet>
-                <title>Requests & Subscriptions</title>
-            </Helmet>
+            <HelmetProvider>
+                <Helmet>
+                    <title>Requests & Subscriptions</title>
+                </Helmet>
+            </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
                 { name: "Requests & Subscriptions" }

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import Helmet from "react-helmet"
+import { HelmetProvider, Helmet } from "react-helmet-async"
 import { useAuth } from "../../auth";
 import DataRequestsList from "../DataRequests/DataRequestsList"
 import ViewsBrowser from "../Views/ViewsBrowser"
@@ -11,9 +11,11 @@ export default function Home() {
     const { user } = useAuth();
     return (
         <>
-            <Helmet>
-                <title>Cumulus</title>
-            </Helmet>
+            <HelmetProvider>
+                <Helmet>
+                    <title>Cumulus</title>
+                </Helmet>
+            </HelmetProvider>
             <h4>Browse Views</h4>
             <hr/>
             <ViewsBrowser />

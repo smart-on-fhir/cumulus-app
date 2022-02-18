@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 import { useParams }  from "react-router"
 import { Link } from "react-router-dom"
-import Helmet from "react-helmet"
+import { HelmetProvider, Helmet } from "react-helmet-async"
 import { useAuth } from "../../auth"
 import { requests }   from "../../backend"
 import { useBackend } from "../../hooks"
@@ -68,9 +68,11 @@ export default function DataRequestView(): JSX.Element
 
     return (
         <div>
-            <Helmet>
-                <title>Data Request: {result.name}</title>
-            </Helmet>
+            <HelmetProvider>
+                <Helmet>
+                    <title>Data Request: {result.name}</title>
+                </Helmet>
+            </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
                 { name: "Requests & Subscriptions", href: "/requests" },
