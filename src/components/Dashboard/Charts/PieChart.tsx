@@ -1,6 +1,5 @@
-import PowerSet from "../../../PowerSet";
+import PowerSet  from "../../../PowerSet";
 import BaseChart from "./BaseChart";
-import { generateSeries } from "../utils";
 
 
 export default function PieChart({
@@ -15,7 +14,7 @@ export default function PieChart({
     donut?: boolean
 })
 {
-    const groups = dataSet.group2(column.name);
+    const { series } = dataSet.getChartData("pie", column)
 
     return <BaseChart options={{
         chart: {
@@ -30,38 +29,26 @@ export default function PieChart({
         title: {
             text: column.label
         },
-
         legend: {
-            enabled: true//!!groupBy && !use3d
+            enabled: true
         },
-        // yAxis: {
-        //     visible: false
-        // },
-        // xAxis: {
-        //     visible: false
-        // },
         plotOptions: {
             pie: {
-                // depth: 50,
                 innerSize  : donut ? "50%" : 0,
                 depth      : 50,
-
                 // startAngle : 20,
                 borderColor: "rgba(0, 0, 0, 0.5)",
                 borderWidth: 0.25,
-                
-                // opacity: 0.9,
-                shadow: {
-                    opacity: 0.05,
-                    width: 3,
-                    offsetY: 1,
-                    offsetX: 2,
-                    color: "#000",
-                },
-                // slicedOffset: 50,
+                slicedOffset: use3d ? 20 : 10,
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b><span style="opacity:0.5;font-weight:400"> - {point.percentage:.1f} %</span>'
+                }
 
             }
         },
-        series: generateSeries("pie", column, groups)
+        series
     }} />
 }

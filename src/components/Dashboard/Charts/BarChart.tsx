@@ -1,6 +1,5 @@
 import PowerSet from "../../../PowerSet";
 import BaseChart from "./BaseChart";
-import { generateSeries } from "../utils";
 
 
 export default function BarChart({
@@ -15,8 +14,8 @@ export default function BarChart({
     use3d?: boolean
 })
 {
-    const groups = dataSet.group2(column.name, groupBy?.name);
-
+    const { series, categories } = dataSet.getChartData("bar", column, groupBy)
+    
     return <BaseChart options={{
         chart: {
             type: "bar",
@@ -32,9 +31,6 @@ export default function BarChart({
         title: {
             text: column.label + (groupBy ? ` by ${groupBy.label}` : "")
         },
-        legend: {
-            enabled: false
-        },
         yAxis: {
             crosshair: true,
             title: {
@@ -49,15 +45,16 @@ export default function BarChart({
             type: column.dataType === "string" ? "category" : "linear",
             showEmpty: false,
             alignTicks: false,
-            crosshair: !use3d
+            crosshair: !use3d,
+            categories
         },
         plotOptions: {
             bar: {
-                borderColor: "rgba(0, 0, 0, 0.5)",
-                borderRadius: 2,
+                borderColor: "rgba(0, 0, 0, 0.25)",
+                borderRadius: 1,
                 borderWidth: 0.5,
             }
         },
-        series: generateSeries("bar", column, groups, groupBy)
+        series
     }} />
 }

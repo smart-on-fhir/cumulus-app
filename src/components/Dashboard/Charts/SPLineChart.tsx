@@ -1,6 +1,5 @@
-import PowerSet from "../../../PowerSet";
+import PowerSet  from "../../../PowerSet";
 import BaseChart from "./BaseChart";
-import { generateSeries } from "../utils";
 
 export default function SPLineChart({
     column,
@@ -12,7 +11,7 @@ export default function SPLineChart({
     groupBy?: app.DataRequestDataColumn | null
 })
 {
-    const groups = dataSet.group2(column.name, groupBy?.name || "");
+    const { series, categories } = dataSet.getChartData("spline", column, groupBy)
     
     return <BaseChart options={{
         chart: {
@@ -36,9 +35,10 @@ export default function SPLineChart({
         xAxis: {
             type: groupBy ? groupBy.dataType === "string" ? "category" : "linear" :
             column.dataType === "string" ? "category" : "linear",
-            showEmpty: false,
-            alignTicks: false,
-            crosshair: true
+            // showEmpty: false,
+            // alignTicks: false,
+            // crosshair: true
+            categories
         },
         plotOptions: {
             spline: {
@@ -49,6 +49,6 @@ export default function SPLineChart({
                 }
             }
         },
-        series: generateSeries("spline", column, groups, groupBy)
+        series
     }} />
 }
