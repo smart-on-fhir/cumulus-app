@@ -64,6 +64,7 @@
     flex          : 1 1 0;
     // box-shadow  : 0 0 1px 0 #000;
     max-width: 100%;
+    min-width: 0;
     
     &.center { align-items: center;         }
     &.left   { align-items: flex-start;     }
