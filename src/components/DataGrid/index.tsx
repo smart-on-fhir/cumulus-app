@@ -50,7 +50,42 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
 
         this.onWheel = this.onWheel.bind(this)
         this.onClick = this.onClick.bind(this)
+        this.onTouchStart = this.onTouchStart.bind(this)
     }
+
+    onTouchStart(e: TouchEvent) {
+        
+        if (e.touches.length < 2) return;
+        
+        let { screenX, screenY } = e.touches.item(0) as Touch
+
+        e.preventDefault()
+        
+        const onTouchMove = (e2: TouchEvent) => {
+            const t = e2.touches.item(0) as Touch
+            const x = t.screenX || screenX
+            const y = t.screenY || screenY
+            const deltaX = screenX - x
+            const deltaY = screenY - y
+            
+            screenX = x
+            screenY = y
+
+            this.onWheel({
+                deltaX,
+                deltaY,
+                preventDefault() {
+                    e2.preventDefault()
+                }
+            } as WheelEvent)
+        };
+
+        document.addEventListener("touchmove", onTouchMove);
+        document.addEventListener("touchend", function() {
+            this.removeEventListener("touchmove", onTouchMove);
+        }, { once: true });
+    }
+
 
     onWheel(e: WheelEvent)
     {
@@ -95,33 +130,44 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
     {
         let td = e.target as any;
         
-        while (td.nodeName && td.nodeName !== "TD") {
+        while (td && td.nodeName && td.nodeName !== "TD") {
             td = td.parentElement
         }
 
-        let colIndex = 0, cur: any = td
-        while (cur.previousElementSibling && cur.previousElementSibling.nodeName === "TD") {
-            cur = cur.previousElementSibling
-            colIndex += 1
-        }
-
-        this.setState({
-            selection: {
-                colIndex,
-                rowIndex: +td.parentElement.getAttribute("data-row-id") // rowIndex + this.state.offset
+        if (td) {
+            let colIndex = 0, cur: any = td
+            while (cur.previousElementSibling && cur.previousElementSibling.nodeName === "TD") {
+                cur = cur.previousElementSibling
+                colIndex += 1
             }
-        })
+
+            this.setState({
+                selection: {
+                    colIndex,
+                    rowIndex: +td.parentElement.getAttribute("data-row-id") // rowIndex + this.state.offset
+                }
+            })
+        }
     }
 
     componentDidMount()
     {
         if (this.gridWrapper.current) {
             this.gridWrapper.current.addEventListener("wheel", this.onWheel, { passive: false });
+            this.gridWrapper.current.addEventListener("touchstart", this.onTouchStart);
 
             this.gridWrapper.current.querySelectorAll("th").forEach(th => {
                 th.style.minWidth = th.offsetWidth + 5 + "px"
                 th.style.maxWidth = th.offsetWidth + 5 + "px"
             })
+        }
+    }
+
+    componentWillUnmount()
+    {
+        if (this.gridWrapper.current) {
+            this.gridWrapper.current.removeEventListener("wheel", this.onWheel);
+            this.gridWrapper.current.removeEventListener("touchstart", this.onTouchStart);
         }
     }
 
