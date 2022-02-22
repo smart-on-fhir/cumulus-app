@@ -6,7 +6,7 @@ import "./DataGrid.scss"
 interface Column {
     name    : string
     label  ?: string
-    dataType: "boolean" | "float" | "integer" | "string"
+    dataType: "boolean" | "float" | "integer" | "string" | "date:YYYY-MM-DD" | "date:YYYY-MM" | "date:YYYY"
 }
 
 interface DataGridProps {

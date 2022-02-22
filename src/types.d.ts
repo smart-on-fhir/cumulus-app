@@ -114,7 +114,7 @@ declare module app {
          * The type of data this column is supposed to contain. Used for
          * formatting in the UI
          */
-        dataType: "string" | "integer" | "float" | "boolean"
+        dataType: "string" | "integer" | "float" | "boolean" | "date:YYYY-MM-DD" | "date:YYYY-MM" | "date:YYYY"
 
     }
 

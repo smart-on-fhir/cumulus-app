@@ -1,9 +1,9 @@
-import { SupportedChartTypes } from "./components/Dashboard/config";
+
 
 /**
  * The row objects that can be handled by this class
  */
-interface Row {
+interface Row extends Record<string, any> {
 
     /**
      * Rows must have a "cnt" property representing the aggregate count
@@ -34,7 +34,7 @@ export default class PowerSet
         this.rows = rows;
     }
 
-    static from<RowType extends Row>(data: { cols: app.DataRequestDataColumn[], rows: Row[][] })
+    static from<RowType extends Row>(data: { cols: app.DataRequestDataColumn[], rows: RowType[][] })
     {
         const cols = data.cols;
         const rows: RowType[] = [];
@@ -119,87 +119,6 @@ export default class PowerSet
         })
 
         return set
-    }
-
-    public getChartData(chartType: keyof typeof SupportedChartTypes, column: app.DataRequestDataColumn, groupBy?: app.DataRequestDataColumn | null) {
-        
-        // Categories used as X axis labels
-        let categories = Array.from(this.getUniqueValuesFromColumn(column.name))//.map(String)
-        
-            // Sort categories by length so that the longest appear last. This is because of
-            // the angle that is sometimes used to render axis labels which could result in
-            // truncating the first label if it is too long.
-            // .sort((a, b) => a.length - b.length);
-        // console.log(categories)
-
-        let series: Highcharts.SeriesOptionsType[] = [];
-
-        // Simple case: Y = count; X = column.name
-        if (!groupBy) {
-            const rows = this.pick([ column.name ]).rows
-            series = [{
-                // @ts-ignore
-                type: chartType,
-                name: column.label,
-                showInLegend: true,
-                // @ts-ignore
-                edgeColor: "rgba(0, 0, 0, 0.1)",
-                tooltip: {
-                    headerFormat: `<table><tr><td style="text-align: right">{series.name}:</td><td><b>{point.key}</b></td></tr>`,
-                    pointFormat : `<tr><td style="text-align: right">Count:</td><td><b>{point.y}</b></td></tr>`,
-                    footerFormat: '</table>',
-                },
-                data: rows
-                    
-                    // Sort rows so that they appear in the categories order
-                    .sort((a, b) => categories.indexOf(a[column.name] + "") - categories.indexOf(b[column.name] + ""))
-                    .map(row => ({ y: row.cnt, name: row[column.name] + "" }))
-            }];
-        }
-
-        // Complex case: Y = count; X = column.name, groupBy
-        else {
-            let groups = Array.from(this.getUniqueValuesFromColumn(groupBy.name))//.map(String)
-
-            
-            // @ts-ignore
-            series = groups.map(groupName => ({
-                type: chartType,
-                name: groupName,
-                // @ts-ignore
-                edgeColor: "rgba(0, 0, 0, 0.1)",
-                tooltip: {
-                    headerFormat: `<table><tr><td style="text-align: right">${column.label || column.name}:</td><td><b>{point.key}</b></td></tr>`,
-                    pointFormat : `<tr><td style="text-align: right">${groupBy.label || groupBy.name}:</td><td><b>{series.name}</b></td></tr>` +
-                                  `<tr><td style="text-align: right">Count:</td><td><b>{point.y}</b></td></tr>`,
-                    footerFormat: '</table>',
-                },
-                data: categories.map((category, index) => {
-                    const row = this.rows.filter(r => {
-                        for (let key in r) {
-                            if (key === "cnt" || key === "queryid") continue
-                            if (key !== column.name && key !== groupBy.name && !PowerSet.isEmpty(r[key])) {
-                                return false
-                            }
-                        }
-                        return (
-                            r[column.name ] === category &&
-                            r[groupBy.name] === groupName
-                        )
-                    })[0];
-                        
-                    if (row) {
-                        return { y: row.cnt, name: row[column.name] + "" }
-                    }
-                    return { y: 0, name: category }
-                })
-            }))
-        }
-
-        return {
-            categories: categories.map(String),
-            series
-        };
     }
 
     // Iterators
@@ -306,8 +225,8 @@ export default class PowerSet
         return new PowerSet(cols, rows);
     }
 
-    public filter(filter: (row: Row, rowIndex: number) => boolean): PowerSet {
-        const rows: Row[] = this.rows.filter((row, index) => filter(row, index))
+    public filter(filter: (row: Row, rowIndex: number) => boolean, thisArg?: any): PowerSet {
+        const rows: Row[] = this.rows.filter((row, index) => filter(row, index), thisArg)
         return new PowerSet(this.cols, rows)
     }
 
@@ -346,7 +265,7 @@ export default class PowerSet
         const index = this.cols.findIndex(col => col.name === by)
         const type  = this.cols.find(col => col.name === by)?.dataType
 
-        this.rows.sort((a, b) => {
+        const rows = this.rows.sort((a, b) => {
             let _a = a[index]
             let _b = b[index]
             if (type === "integer" || type === "float") {
@@ -358,7 +277,8 @@ export default class PowerSet
             return String(_b || "").localeCompare(String(_a || "")) * (dir === "asc" ? 1 : -1)
         })
 
-        return this;//new PowerSet(this.cols, rows, this.countColumn)
+        return new PowerSet(this.cols, rows)
+        // return this;//new PowerSet(this.cols, rows, this.countColumn)
     }
 
     count(filter: (row: Row, rowIndex: number) => boolean = () => true)
