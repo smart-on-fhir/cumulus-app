@@ -1,25 +1,9 @@
-import { ChangeEvent } from "react"
+import moment         from "moment"
+import { classList }  from "../../utils"
+import Select         from "../Select"
 import ColumnSelector from "./ColumnSelector"
+import { operators }  from "./config"
 
-
-
-
-const DATA_TYPES = {
-    column: "Column",
-    string: "String",
-    number: "Number",
-    date  : "Date"
-}
-
-
-interface iFilter {
-    left: string
-    operator: string
-    right: {
-        type : keyof typeof DATA_TYPES
-        value: string | number | Date | null
-    }
-}
 
 function Filter({
     cols,
@@ -28,89 +12,89 @@ function Filter({
     onRemove
 }: {
     cols: app.DataRequestDataColumn[]
-    filter: iFilter
-    onChange: (f: iFilter) => void
+    filter: app.Filter
+    onChange: (f: app.Filter) => void
     onRemove: () => void
 })
 {
+    const leftColumn   = filter.left ? cols.find(c => c.name === filter.left) : null;
+    const leftDataType = leftColumn ? leftColumn.dataType : "";
+
     return (
         <div className="row half-gap">
             <div className="col">
                 <ColumnSelector
                     cols={cols}
                     value={filter.left}
-                    onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                        filter.left = e.target.value
-                        onChange(filter)
-                    }}
-                    filter={column => {
-                        return !(filter.right.type === "column" && column.name === filter.right.value)
-                    }}
-                    addEmptyOption="start"
-                    emptyLabel="--- Select Column ---"
+                    onChange={(value: string) => onChange({ ...filter, left: value })}
+                    disabled={ filter.right.type === "column" ? [filter.right.value + ""] : undefined }
+                    placeholder="Select Column"
                 />
             </div>
-            <div className="col col-2">
-                <select value={filter.operator} onChange={e => {
-                    filter.operator = e.target.value
-                    onChange(filter)
-                }}>
-                    <option value="==">==</option>
-                    <option value="===">===</option>
-                    <option value="!=">!=</option>
-                    <option value="!==">!==</option>
-                    <option value=">">&gt;</option>
-                    <option value=">=">&gt;=</option>
-                    <option value="<">&lt;</option>
-                    <option value="<=">&lt;=</option>
-                </select>
+
+            <div className="col col-0">
+                { filter.left && <button
+                    style={{ paddingLeft: "0.5em", paddingRight: "0.5em" }}
+                    className={classList({ btn: true, "color-red": filter.negated, "string": !filter.negated })}
+                    title={ filter.negated ? "Filter negated. Click to reset." : "Filter not negated. Click to negate." }
+                    onClick={() => onChange({ ...filter, negated: !filter.negated })}>
+                    <i className={ "fa-solid fa-thumbs-" + (filter.negated ? "down" : "up") } />
+                </button> }
             </div>
-            <div className="col col-2">
-                <select value={filter.right.type} onChange={e => {
-                    filter.right.type = e.target.value as any
-                    onChange(filter)
-                }}>
-                    <option value="column">column:</option>
-                    <option value="string">string:</option>
-                    <option value="number">number:</option>
-                    <option value="date">date:</option>
-                    <option value="null">null</option>
-                    <option value="true">true</option>
-                    <option value="false">false</option>
-                </select>
-            </div>
+
             <div className="col">
-                { filter.right.type === "column" && <ColumnSelector
-                    cols={cols}
-                    // filter={column => !((filter.left as Column).name === column)}
-                    onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-                        filter.right.value = e.target.value
-                        onChange(filter)
-                    }}
-                    addEmptyOption="start"
-                /> }
-                { filter.right.type === "number" && <input type="number"
-                    value={filter.right.value as number}
-                    onChange={e => {
-                        filter.right.value = e.target.valueAsNumber
-                        onChange(filter)
-                    }}
-                /> }
-                { filter.right.type === "date" && <input type="date"
-                    value={filter.right.value as string}
-                    onChange={e => {
-                        filter.right.value = e.target.valueAsDate
-                        onChange(filter)
-                    }}
-                /> }
-                { filter.right.type === "string" && <input type="text"
-                    value={filter.right.value as string}
-                    onChange={e => {
-                        filter.right.value = e.target.value
-                        onChange(filter)
-                    }}
+                { filter.left && <Select
+                    value={ filter.operator }
+                    onChange={ operator => onChange({ ...filter, operator }) }
+                    placeholder="Select Operator"
+                    options={operators.filter(o => filter.left && (o.type.includes("*") || o.type.includes(leftDataType))).map(o => ({
+                        value: o.id,
+                        label: o.label || o.op
+                    }))}
                 /> }
             </div>
+
+            <div className="col">
+                { filter.left && filter.operator && filter.operator !== "isNull" && (
+                    <Select
+                        value={ filter.right.type }
+                        onChange={ type => onChange({ ...filter, right: { type, value: null }})}
+                        placeholder="Please Select"
+                        options={[
+                            { value: "value", label: "Value:" },
+                            { value: "column", label: "Column:" },
+                        ]}
+                    />
+                )}
+            </div>
+
+            <div className="col">
+                { filter.left && filter.operator && filter.operator !== "isNull" && filter.right.type === "column" && <ColumnSelector
+                    cols={cols}
+                    value={filter.right.value}
+                    disabled={[ filter.left as any ]}
+                    filter={column => column.dataType === leftDataType}
+                    onChange={(value: string) => onChange({ ...filter, right: { ...filter.right, value } })}
+                    placeholder="Select Column"
+                    right
+                /> }
+
+                { filter.left && filter.operator && filter.operator !== "isNull" && filter.right.type === "value" && (leftDataType === "integer" || leftDataType === "float") && <input type="number"
+                    value={filter.right.value as number || 0}
+                    onChange={e => onChange({ ...filter, right: { ...filter.right, value: e.target.valueAsNumber } })}
+                /> }
+
+                { filter.operator && filter.operator !== "isNull" && filter.right.type === "value" && leftDataType.startsWith("date") && <input type="date"
+                    value={ moment(filter.right.value).utc().format("YYYY-MM-DD") }
+                    onChange={e => onChange({ ...filter, right: { ...filter.right, value: moment(e.target.valueAsDate).valueOf() } })}
+                /> }
+
+                { filter.left && filter.operator && filter.operator !== "isNull" && filter.right.type === "value" && leftDataType === "string" && <input type="text"
+                    value={filter.right.value as string || ""}
+                    onChange={e => onChange({ ...filter, right: { ...filter.right, value: e.target.value } })}
+                /> }
+            </div>
+
             <div className="col col-0">
                 <button className="btn color-red" onClick={onRemove}><i className="fas fa-trash-alt" /></button>
             </div>
@@ -118,14 +102,15 @@ function Filter({
     )
 }
 
+
 export default function FilterUI({
     current = [],
     onChange,
     cols
 }: {
     cols: app.DataRequestDataColumn[]
-    current: iFilter[]
-    onChange: (current: iFilter[]) => void
+    current: app.Filter[]
+    onChange: (current: app.Filter[]) => void
 })
 {
     function add() {
@@ -133,9 +118,10 @@ export default function FilterUI({
             ...current,
             {
                 left: "",
-                operator: ">",
+                operator: "",
+                negated: false,
                 right: {
-                    type: "column",
+                    type: "value",
                     value: ""
                 }
             }
@@ -171,7 +157,7 @@ export default function FilterUI({
                         current[i] = { ...filter }
                         onChange(current)
                     }}
-                />    
+                />
             )) }
         </div>
     )

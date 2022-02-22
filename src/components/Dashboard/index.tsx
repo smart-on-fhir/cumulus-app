@@ -456,61 +456,37 @@ export function Dashboard({
 
     // FILTERS
     // -------------------------------------------------------------------------
-    filters.forEach(({ left, operator, right }) => {
+    filters.forEach(({ left, operator, negated, right }) => {
 
-        // Skip filters that are not yet fully configured in the UI
-        if (
-            !left ||
-            (right.type === "column" && !right.value) ||
-            (right.type === "date" && !right.value) ||
-            (right.type === "number" && !right.value)
-        ) { 
-            return
-        }
+        // Skip filters for which left column is not selected in the UI
+        if (!left) return;
 
-        function createFilter() {
-            if (right.type === "column") {
-                // eslint-disable-next-line
-                return new Function(
-                    'col',
-                    `return col["${left}"] ${operator} col["${right.value}"]`
-                )
-            }
-            if (right.type === "string") {
-                // eslint-disable-next-line
-                return new Function(
-                    'col',
-                    `return col["${left}"] ${operator} ${JSON.stringify(right.value)}`
-                )
-            }
-            if (right.type === "number") {
-                // eslint-disable-next-line
-                return new Function(
-                    'col',
-                    // @ts-ignore
-                    `return col["${left}"] ${operator} ${+right.value}`
-                )
-            }
-            if (right.type === "date") {
-                // eslint-disable-next-line
-                return new Function(
-                    'col',
-                    // @ts-ignore
-                    `return col["${left}"] ${operator} new Date("${right.value}")`
-                )
-            }
-            if (right.type === "null" || right.type === "true" || right.type ===  "false") {
-                // eslint-disable-next-line
-                return new Function('col', `return col["${left}"] ${operator} ${right.type}`)
-            }
+        // Skip filters for which light column or value is not set in the UI
+        if (operator !== "isNull" && !right.value) return;
 
-            throw new Error(`Unsupported right type of filer condition "${right.type}"`)
-        }
+        const fn = operators.find(x => x.id === operator)?.fn || (() => true) as any;
 
-        // @ts-ignore
-        powerSet = powerSet.filter(createFilter())
-        
+        const filterFn = (row: any) => {
+            // if (powerSet.getNullColumnNames(row, ["cnt", left, right.type === "column" ? right.value as string : ""]).length) {
+            //     return false
+            // }
+            let result = !!fn(row[left], right.type === "column" ? row[right.value + ""] : right.value);
+            if (negated) return !result;
+            return result
+        };
+
+        powerSet = powerSet.filter(filterFn)
+
     })
+
+    // M 583
+    // F 568 (+31)
+    // - 1151 (+39)
+    const chartPowerSet = powerSet.getChartData({
+        column : viewColumn,
+        groupBy: col2?.name
+    })
+    // console.log("getChartData ==>", powerSet)
     
     return (
         <div className={ saving || deleting ? "grey-out" : undefined }>
