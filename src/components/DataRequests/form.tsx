@@ -3,6 +3,7 @@ import { Link }               from "react-router-dom"
 import { requestGroups }      from "../../backend"
 import { useBackend }         from "../../hooks"
 import { Format }             from "../Format"
+import Select                 from "../Select"
 
 import "./form.scss";
 
@@ -339,13 +340,20 @@ export default function DataRequestForm({
                 </div>
                 <div className="col">
                     <label>Refresh</label>
-                    <select>
-                        <option>Manually</option>
-                        <option disabled>Yearly</option>
-                        <option disabled>Monthly</option>
-                        <option disabled>Weekly</option>
-                        <option disabled>Daily</option>
-                    </select>
+                    <Select 
+                        placeholder="Please select"
+                        value={ record.refresh || null }
+                        options={[
+                            { value: null, label: "Manually", icon: "fas fa-envelope" },
+                            { value: "y" , label: "Yearly" , disabled: true, icon: "fas fa-ban" },
+                            { value: "m" , label: "Monthly", disabled: true, icon: "fas fa-ban" },
+                            { value: "w" , label: "Weekly" , disabled: true, icon: "fas fa-ban" },
+                            { value: "d" , label: "Daily"  , disabled: true, icon: "fas fa-ban" }
+                        ]}
+                        onChange={value => {
+                            onChange({ ...record, refresh: value })
+                        }}
+                    />
                 </div>
             </div>
             <div className="row gap mt-1 mb-2">
