@@ -11,7 +11,7 @@ export default function Alert({
     color?: "blue"|"red"|"orange"|"grey"|"grey-dark"|"green",
     className?: string
     icon?: string
-    children: (JSX.Element | string)|(JSX.Element | string)[]
+    children: JSX.Element | string | (JSX.Element | string)[]
 }) {
     return (
         <div className={ classList({
@@ -25,7 +25,7 @@ export default function Alert({
     )
 }
 
-export function AlertError({ children }: { children: (JSX.Element | string)|(JSX.Element | string)[] }) {
+export function AlertError({ children = "Unknown error" }: { children?: JSX.Element | string | (JSX.Element | string)[] }) {
     return (
         <Alert className="mt-1 mb-1" color="red" icon="fas fa-exclamation-circle">
             {children}
