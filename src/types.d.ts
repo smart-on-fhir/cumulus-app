@@ -127,8 +127,9 @@ declare module app {
     interface Filter {
         left: string
         operator: string
+        negated: boolean
         right: {
-            type : "column" | "string" | "number" | "date" | "null" | "true" | "false"
+            type : "column" | "value"
             value: string | number | Date | null
         }
     }
