@@ -84,6 +84,8 @@
     font         : inherit;
     width        : 100%;
     line-height  : $line-height;
+    color        : inherit;
+    max-height   : ($font-size * ($line-height + 0.8)) + 2;
     // height   : ($font-size * $line-height) + round($font-size * 0.8);
   
     &:focus {
@@ -133,9 +135,10 @@ textarea {
     height: auto;
     resize: vertical;
     min-height: 2.1em;
+    max-height: none;
 }
 
-select:not([size]) {
+select:not([size]), .select-component {
     background: #FFF url(caret-down.svg) 100% center no-repeat;
     background-size: auto;
     padding-right: 22px;
@@ -146,6 +149,7 @@ select:not([size]) {
 select[size] {
     padding: 1px;
     height: 100%;
+    min-height: 100%;
 }
 
 select option.empty-option {
@@ -218,6 +222,19 @@ select option.empty-option {
             background: #FFF;
             opacity: 1;
             color: #CCC;
+        }
+    }
+
+    &.flex {
+        display: flex;
+        flex: 1 1 100%;
+
+        .btn {
+            display: flex;
+            flex: 1 1 0;
+            white-space: pre;
+            // flex-wrap: wrap;
+            min-width: auto;
         }
     }
 }

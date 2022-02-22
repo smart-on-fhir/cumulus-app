@@ -7,7 +7,8 @@
     
     .highcharts-menu-item {
         margin: 0;
-        font-size: $font-size !important;
+        font-family: inherit;
+        font-size: $font-size * 0.86 !important;
     }
 
     hr {
@@ -16,17 +17,39 @@
 }
 
 .main-chart {
-    position: relative;
-    padding: 60% 0 0 0;
-    width: 100%;
-    max-width: 100%;
-    background: #FFF;
+    aspect-ratio: 100/60;
+}
 
-    > .highcharts-container {
-        position: absolute !important;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+.highcharts-data-table {
+    font-size: 80%;
+    max-width: 100%;
+    overflow: auto;
+    margin: 1.2em 0;
+
+    caption {
+        margin: 2em 0 1em;
+        font-size: 1.2rem;
+        display: none;
+    }
+
+    table {
+        min-width: 100%;
+        border-spacing: 0;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #DDD;
+        text-align: center;
+        vertical-align: middle;
+        padding: 0.25em 0.5em;
+    }
+    td {
+        background: #FFF;
+    }
+    tr:hover {
+        th, td {
+            background: #EEE;
+        }
     }
 }
+
