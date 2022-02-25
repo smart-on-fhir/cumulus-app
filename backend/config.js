@@ -14,6 +14,7 @@ const {
     DB_DATABASE = "cumulus",
     VERBOSE     = "false",
     THROTTLE    = "0",
+    DB_SSL      = "true",
     DB_DOCKER_CONTAINER = ""
 } = process.env;
 
@@ -33,7 +34,7 @@ module.exports = {
             // dialectOptions: {
                 ssl: {
                     // require: true,
-                    rejectUnauthorized: false
+                    rejectUnauthorized: bool(DB_SSL)
                 },
             // },
             dialect : "postgres",
