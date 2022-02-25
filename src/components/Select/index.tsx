@@ -1,5 +1,4 @@
 import { KeyboardEvent, useState } from "react";
-import { JsxElement } from "typescript";
 import { classList } from "../../utils"
 import "./Select.scss"
 
