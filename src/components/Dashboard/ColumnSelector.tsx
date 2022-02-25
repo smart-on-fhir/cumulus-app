@@ -1,3 +1,4 @@
+import Select from "../Select";
 
 
 export default function ColumnSelector({
@@ -6,7 +7,7 @@ export default function ColumnSelector({
     comparator = (a, b) => a.name.localeCompare(b.name),
     addEmptyOption = "none",
     filter = () => true,
-    emptyLabel = "",
+    placeholder,
     ...props
 }: {
 
@@ -37,20 +38,24 @@ export default function ColumnSelector({
      */
     [key: string]: any
 
-    emptyLabel?: string
+    placeholder?: string
 })
 {
     return (
-        <select { ...props }>
-            { addEmptyOption === "start" && <option className="empty-option">{emptyLabel}</option> }
-            { cols.filter(filter).sort(comparator).map((col, i) => (
-                <option
-                    key={i}
-                    value={ col.name }
-                    disabled={ disabled.includes(col.name) }
-                >{ col.label || col.name }</option>
-            )) }
-            { addEmptyOption === "end" && <option className="empty-option">{emptyLabel}</option> }
-        </select>
+        <Select
+            options={
+                cols.filter(filter).sort(comparator).map((col, i) => ({
+                    value   : col.name,
+                    disabled: disabled.includes(col.name),
+                    icon    : "/icons/column.png",
+                    label   : col.label || col.name,
+                    right   : <span className={ col.dataType + " color-muted small right" }> {col.dataType}</span>
+                }))
+            }
+            placeholder={ placeholder }
+            value={ props.value }
+            onChange={ props.onChange }
+            right={ !!props.right }
+        />
     )
 }

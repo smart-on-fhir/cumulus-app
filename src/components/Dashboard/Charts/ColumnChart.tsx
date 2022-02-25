@@ -1,76 +1,50 @@
 import PowerSet from "../../../PowerSet";
-import BaseChart from "./BaseChart";
+import Chart    from "./Chart";
 
 
 export default function ColumnChart({
     column,
     dataSet,
     groupBy,
-    use3d
+    use3d,
+    stack
 }: {
     column: app.DataRequestDataColumn,
     groupBy?: app.DataRequestDataColumn | null, 
     dataSet: PowerSet
     use3d?: boolean
+    stack?: boolean
 })
 {
-    const { series, categories } = dataSet.getChartData("column", column, groupBy)
-
-    return <BaseChart key={[column.name, groupBy?.name].filter(Boolean).join("-")} options={{
-        chart: {
-            type: "column",
-            options3d: {
-                enabled: !!use3d,
-                alpha: 5,
-                beta: 10,
-                depth: 50,
-                fitToPlot: true,
-                viewDistance: 15
+    return <Chart
+        column={column}
+        groupBy={groupBy}
+        dataSet={dataSet}
+        type="column"
+        key={ [column.name, groupBy?.name || ""].join("-") }
+        options={{
+            chart: {
+                type: "column",
+                options3d: {
+                    enabled: !!use3d,
+                    alpha: 15,
+                    beta: 15,
+                    depth: 50,
+                    fitToPlot: true,
+                    viewDistance: 15,
+                    axisLabelPosition: "auto"
+                }
             },
-            zoomType: "xy"
-        },
-        title: {
-            text: column.label + (groupBy ? ` by ${groupBy.label}` : "")
-        },
-        legend: {
-            enabled: !!groupBy //&& !use3d
-        },
-        yAxis: {
-            // visible: false,
-            // width: 0,
-            crosshair: false,
-            title: {
-                text: use3d ? "" : "Count",
-                style: {
-                    fontWeight: "bold",
-                    fontSize: "120%"
+            plotOptions: {
+                column: {
+                    stacking: stack ? "normal" : undefined
+                }
+            },
+            yAxis: {
+                title: {
+                    text: use3d ? "" : "Count"
                 }
             }
-        },
-        plotOptions: {
-            column: {
-                borderColor: "rgba(0, 0, 0, 0.5)",
-                borderRadius: 2,
-                borderWidth: 0.25,
-            }
-        },
-        xAxis: {
-            // title: {
-            //     text: groupBy ? column.label || column.name : "",
-            // },
-            type: column.dataType === "string" ? "category" : "linear",
-            // groupBy ? (groupBy.dataType === "string" ? "category" : "linear") :
-            //     (column.dataType === "string" ? "category" : "linear"),
-            // categories: Object.keys(groups),
-            // type: groupBy ?
-            //     groupBy.dataType === "string" ? "category" : "linear" :
-            //     column.dataType === "string" ? "category" : "linear",
-            // showEmpty: false,
-            // alignTicks: false,
-            categories,
-            // crosshair: !use3d,
-            // lineColor: "rgba(0, 0, 0, 0.2)",
-        },
-        series
-    }} />
+        }}
+    />
 }
