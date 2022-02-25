@@ -25,9 +25,15 @@ export default function Alert({
     )
 }
 
-export function AlertError({ children = "Unknown error" }: { children?: JSX.Element | string | (JSX.Element | string)[] }) {
+export function AlertError({ className, children = "Unknown error" }: {
+    children?: JSX.Element | string | (JSX.Element | string)[],
+    className?: string
+}) {
     return (
-        <Alert className="mt-1 mb-1" color="red" icon="fas fa-exclamation-circle">
+        <Alert className={ classList({
+            [className || ""]: !!className,
+            " mt-1 mb-1": true
+        })} color="red" icon="fas fa-exclamation-circle">
             {children}
         </Alert>
     )
