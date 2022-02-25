@@ -33,7 +33,7 @@ module.exports = {
         options: {
             // dialectOptions: {
                 ssl: {
-                    // require: true,
+                    require: bool(DB_SSL),
                     rejectUnauthorized: bool(DB_SSL)
                 },
             // },
