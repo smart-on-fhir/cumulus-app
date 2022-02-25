@@ -118,6 +118,8 @@ declare module app {
 
     }
 
+    type supportedDataType = "string" | "integer" | "float" | "boolean" | "date:YYYY-MM-DD" | "date:YYYY-MM" | "date:YYYY"
+
     interface RequestGroup {
         id  : string
         name: string
@@ -130,7 +132,7 @@ declare module app {
         negated: boolean
         right: {
             type : "column" | "value"
-            value: string | number | Date | null
+            value?: string | number | Date | null
         }
     }
 }

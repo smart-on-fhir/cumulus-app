@@ -14,7 +14,7 @@ interface Row extends Record<string, any> {
      * Rows may have a "queryid" which can be used to request back the
      * line-level data
      */
-    queryid: string
+    // queryid: string | undefined
 
     /**
      * Anything else is the actual data values
@@ -50,7 +50,9 @@ export default class PowerSet
             })
 
             data.cols.forEach((col, colIndex) => {
-                rowObject[col.name] = row[colIndex]
+                // rowObject[col.name] = row[colIndex]
+                // @ts-ignore
+                rowObject[col.name] = col.dataType === "string" && row[colIndex] === "" ? null : row[colIndex]
             })
             rows.push(rowObject)
         })
@@ -106,6 +108,11 @@ export default class PowerSet
         return this.cols[index];
     }
 
+    public getLabelForColumnName(name: string) {
+        const col = this.getColumnByName(name)
+        return col ? col.label || col.name : name
+    }
+
     public getUniqueValuesFromColumn(colName: keyof Row, includeEmpty = false) {
         const set = new Set()
         // const colIndex = this.cols.findIndex(c => c.name === colName)
@@ -143,6 +150,252 @@ export default class PowerSet
     // ------------------------------------------------------------------------
 
     /**
+     * We have to consider two use cases:
+     * 1. No filters are applied - in this case the counts are already in the
+     *    power set rows. We just have to filter the rows that have non-null
+     *    value for every listed column.
+     * 2. If any filters have been applied, the counts are not to be trusted!
+     *    In this case we need to manually group by every listed column and
+     *    compute the totals for each combination.
+     * `
+     * Consider the following super set:
+     * 
+     * |  A  |  B  |  C  | cnt |
+     * |:---:|:---:|:---:|:---:|
+     * |  2  |  F  |  2  |  N  |
+     * |  2  |  F  |  3  |  N  |
+     * |  2  |  F  |  -  | 113 |
+     * |  2  |  M  |  4  |  5  |
+     * |  2  |  M  |  4  |  6  |
+     * |  2  |  M  |  -  | 100 |
+     * |  2  |  -  |  6  |  N  |
+     * |  2  |  -  |  7  |  N  |
+     * |  2  |  -  |     | 213 |
+     * |  -  |  F  |  8  |  N  |
+     * |  -  |  F  |  4  |  N  |
+     * |  -  |  F  |  -  |  N  |
+     * |  -  |  M  |  5  |  N  |
+     * |  -  |  M  |  2  |  N  |
+     * |  -  |  M  |  -  |  N  |
+     * |  -  |     |  7  |  N  |
+     * |  -  |     |  7  |  N  |
+     * |  -  |     |  -  | 432 |
+     * 
+     * **1 dimension:**
+     *   
+     *     col=A -> (A !== null && rest === null)
+     * 
+     * |  A  | cnt |
+     * |:---:|:---:|
+     * |  2  | 213 |
+     * 
+     * **2 dimensions:**
+     * 
+     *     col=A, group=B -> (A !== null && B !== null && rest === null)
+     * 
+     * |  A  |  B  | cnt |
+     * |:---:|:---:|:---:|
+     * |  2  |  F  | 113 |
+     * |  2  |  M  | 100 |
+     * 
+     * After filter(C > 5) some rows are removed, thus even though the total rows remain,
+     * their "cnt" values no longer represent the correct total.
+     * 
+     * |  A  |  B  |  C  | cnt |   
+     * |:---:|:---:|:---:|:---:| 
+     * |  2  |  F  |  -  | 113 |
+     * |  2  |  M  |  -  | 100 |
+     * |  2  |  -  |  6  |  N  |
+     * |  2  |  -  |  7  |  N  |   
+     * |  2  |  -  |     | 213 |   
+     * |  -  |  F  |  8  |  N  |   
+     * |  -  |  F  |  -  |  N  |
+     * |  -  |  M  |  -  |  N  | 
+     * |  -  |     |  7  |  N  | 
+     * |  -  |     |  7  |  N  | 
+     * |  -  |     |  -  | 432 | 
+     * 
+     * **1 dimension:**
+     *   
+     *     col=A -> (A !== null && rest === null)
+     * 
+     * |  A  | cnt |                   |
+     * |:---:|:---:|-------------------|
+     * |  2  | 213 | -> **INCORRECT!** |
+     * 
+     * **2 dimensions:**
+     * 
+     *     col=A, group=B -> (A !== null && B !== null && rest === null)
+     * 
+     * |  A  |  B  | cnt |                   |
+     * |:---:|:---:|:---:|-------------------|
+     * |  2  |  F  | 113 | -> **INCORRECT!** |
+     * |  2  |  M  | 100 | -> **INCORRECT!** |
+     * 
+     * `
+     */
+    public getChartData({ column, groupBy = "", filters = [] }: { column: string, groupBy?: string, filters?: app.Filter[] }) {
+
+        const groups: Record<string, Row> = {};
+
+        
+        // const col1 = this.getColumnByName(column);
+        // const col2 = this.getColumnByName(groupBy);
+        // const col3 = this.getColumnByName("cnt");
+        
+        // if (!col1) {
+        //     throw new Error(`No such column "${column}"`);
+        // }
+        
+        // cols.push(col1)
+        
+        // if (col2) {
+        //     cols.push(col2);
+        // }
+        
+        // if (col3) {
+        //     cols.push(col3);
+        // }
+        
+        let preservedColumns = ["cnt", "queryid", column];
+        
+        if (groupBy) {
+            preservedColumns.push(groupBy)
+        }
+        
+        const cols = preservedColumns.map(name => this.getColumnByName(name)).filter(Boolean) as app.DataRequestDataColumn[];
+        const col1 = cols.find(c => c.name === column);
+
+        if (!col1) {
+            throw new Error(`No such column "${column}"`);
+        }
+        
+        preservedColumns = filters.reduce((prev, cur) => {
+            if (!prev.includes(cur.left)) {
+                prev.push(cur.left)
+            }
+            return prev
+        }, preservedColumns);
+        
+        this.rows.filter(row => {
+            for (let key in row) {
+                const value = row[key];
+
+                // The primary visualized column CANNOT BE NULL
+                if (key === column) {
+                    if (value === null) {
+                        return false
+                    }
+                    continue
+                }
+
+                // If group-by column is used it CANNOT BE NULL
+                if (groupBy && key === groupBy) {
+                    if (value === null) {
+                        return false
+                    }
+                    continue
+                }
+
+                // The "cnt" column is ALWAYS included
+                if (key === "cnt") {
+                    continue
+                }
+
+                // The "queryid" column is ALWAYS included
+                if (key === "queryid") {
+                    continue
+                }
+
+                // Any column that is used in filter conditions MUST be included
+                const isInFilters = filters.some(f => f.operator && key === f.left); 
+                if (isInFilters) {
+                    continue
+                }
+                
+                // Anything else should be an "additional data" column. These columns
+                // are included but their "cnt" must be reset to zero so that they
+                // don't influence the total count calculations.
+                if (!isInFilters) {
+                    // if (value === null) {
+                    //     console.log(key, JSON.stringify(value))
+                    // }
+                    // if (value === undefined) {
+                    //     console.log(key, JSON.stringify(value))
+                    // }
+                    if (value !== null) {
+                        row.cnt = 0
+                    }
+                }
+            }
+            return true;
+        }).forEach(row => {
+
+            let groupKey = row[column] + "";
+            if (groupBy) {
+                groupKey += "|" + row[groupBy];
+            }
+
+            let group: Row = groups[groupKey];
+
+            // Create the group on the first occurrence
+            if (!group) {
+                group = groups[groupKey] = { cnt: 0 };
+            }
+
+            // Merge new values into the existing group row
+            for (let key in row) {
+                if (key === "cnt") {
+                    group.cnt += row.cnt
+                }
+                else {
+                    let groupedValue = group[key];
+                    let rowValue     = row[key];
+
+                    
+                    if (Array.isArray(groupedValue)) {
+                        if (rowValue !== null) {
+                            if (!groupedValue.includes(rowValue)) {
+                                groupedValue.push(rowValue)
+                            }
+                        }
+                    } else {
+                        if (key in group) {
+                            if (groupedValue !== rowValue) {
+                                // @ts-ignore
+                                group[key] = [groupedValue, rowValue]
+                            }
+                        } else {
+                            group[key] = rowValue
+                        }
+                    }
+                }
+            }
+        });
+
+        // console.log(groups)
+
+        const rows = Object.values(groups).sort((a, b) => {
+            if (col1.dataType === "integer" || col1.dataType === "float") {
+                return (a[column] as number) - (b[column] as number)
+            }
+            return String(a[column] + "").localeCompare(b[column] + "")
+        }).map((row, i) => {
+            Object.defineProperty(row, "__row_id__", {
+                configurable: false,
+                enumerable  : false,
+                writable    : false,
+                value       : i
+            })
+            return row
+        });
+
+        return new PowerSet(this.cols, rows)
+    }
+
+
+
+    /** 
      * Returns new PowerSet with all the rows having not-listed and not empty
      * columns removed.
      * @example
@@ -187,10 +440,12 @@ export default class PowerSet
                 dataType: "integer"
             })
         }
-        
+
         // Need to verify that ONLY the columns listed in conditions have some
         // value. Everything else in the row must be empty
         const rows = this.rows.filter(row => {
+            // const nulls = this.getNullColumnNames(row)
+            // return columns.every(col => !nulls.includes(col))
             for (let key in row) {
                 
                 // Ignore private key "queryid"
@@ -223,6 +478,18 @@ export default class PowerSet
         })
 
         return new PowerSet(cols, rows);
+    }
+
+    public getNullColumnNames(row: Row, except?: string[]): string[] {
+        return Object.keys(row).reduce((prev, cur, index) => {
+            if (row[cur] === null) {
+                const name = this.cols[index].name
+                if (!except || !except.includes(name)) {
+                    prev.push(this.cols[index].name)
+                }
+            }
+            return prev
+        }, [] as string[]);
     }
 
     public filter(filter: (row: Row, rowIndex: number) => boolean, thisArg?: any): PowerSet {

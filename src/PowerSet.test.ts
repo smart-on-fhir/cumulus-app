@@ -171,5 +171,82 @@ describe("PowerSet", () => {
 
     //     console.log(rows)
     // })
+    it ("getChartData", () => {
+        const src = PowerSet.from(SAMPLE_DATASET);
+        
+        const set1 = src.getChartData({ column: "gender" })
+        expect(set1.cols.map(c => c.name)).toEqual(["gender", "cnt"]);
+        // console.log(set1)
+        expect(set1.rows).toEqual([
+            { gender: "female", cnt: 568 },
+            { gender: "male"  , cnt: 583 },
+        ]);
+        
 
+        const set2 = src.getChartData({ column: "age", groupBy: "gender" })
+        expect(set2.cols.map(c => c.name)).toEqual(["age", "gender", "cnt"]);
+        // console.log(set2.rows)
+        expect(set2.rows).toEqual([
+            { age: 16  , gender: "male"  , cnt: 17  },
+            { age: 17  , gender: "female", cnt: 15  },
+            { age: 23  , gender: "female", cnt: 12  },
+            { age: 24  , gender: "female", cnt: 12  },
+            { age: 27  , gender: "male"  , cnt: 13  },
+            { age: 28  , gender: "male"  , cnt: 13  },
+            { age: 30  , gender: "male"  , cnt: 12  },
+            { age: 35  , gender: "male"  , cnt: 15  },
+            { age: 36  , gender: "female", cnt: 13  },
+            { age: 38  , gender: "female", cnt: 15  },
+            { age: 46  , gender: "male"  , cnt: 12  },
+            { age: 50  , gender: "female", cnt: 11  },
+            { age: 52  , gender: "female", cnt: 12  },
+            { age: 52  , gender: "male"  , cnt: 11  },
+            { age: 60  , gender: "female", cnt: 12  },
+            { age: 60  , gender: "male"  , cnt: 18  },
+            { age: 62  , gender: "female", cnt: 11  },
+            { age: 63  , gender: "female", cnt: 11  },
+            { age: 64  , gender: "male"  , cnt: 13  },
+            { age: 68  , gender: "female", cnt: 11  },
+            { age: 70  , gender: "male"  , cnt: 15  },
+        ]);
+
+
+        const src2 = PowerSet.from({
+            cols: [
+                { name: "a"  , dataType: "integer", label: "", description: "" },
+                { name: "b"  , dataType: "integer", label: "", description: "" },
+                { name: "c"  , dataType: "integer", label: "", description: "" },
+                { name: "cnt", dataType: "integer", label: "", description: "" }
+            ],
+            rows: [
+                [ 0, 1   , 1   , 1 ],
+                [ 0, 2   , null, 5 ],
+                [ 0, null, 1   , 2 ],
+                [ 0, 1   , null, 3 ],
+                [ 0, null, null, 4 ],
+
+                [ 1, null, null, 1 ],
+                [ 1, 1   , null, 2 ],
+                [ 1, null, 1   , 3 ],
+                [ 1, 1   , 1   , 4 ],
+            ]
+        } as app.DataRequestData);
+
+        const set21 = src2.getChartData({ column: "a" })
+        expect(set21.cols.map(c => c.name)).toEqual(["a", "cnt"]);
+        expect(set21.rows).toEqual([
+            { a: 0, cnt: 4 },
+            { a: 1, cnt: 1 },
+        ]);
+
+        const set22 = src2.getChartData({ column: "a", groupBy: "b" })
+        expect(set22.cols.map(c => c.name)).toEqual(["a", "b", "cnt"]);
+        expect(set22.rows).toEqual([
+            { a: 0, b: 2   , cnt: 5 },
+            { a: 0, b: 1   , cnt: 3 },
+            // { a: 0, b: null, cnt: 4 },
+            // { a: 1, b: 0, cnt: 2 },
+            { a: 1, b: 1, cnt: 2 },
+        ]);
+    })
 })
