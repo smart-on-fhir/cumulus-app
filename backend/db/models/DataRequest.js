@@ -48,7 +48,7 @@ module.exports = class DataRequest extends Model
             },
             
             data: {
-                type: DataTypes.JSON,
+                type: DataTypes.JSONB,
                 validate: {
                     /**
                      * 

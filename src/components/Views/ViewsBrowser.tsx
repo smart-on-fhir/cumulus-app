@@ -1,5 +1,4 @@
 import { Link }        from "react-router-dom"
-import viewIcon        from "./view.png"
 import { useBackend }  from "../../hooks"
 import { request }     from "../../backend"
 import { useCallback } from "react"
@@ -17,7 +16,11 @@ export default function ViewsBrowser({
 
     const { result, loading, error } = useBackend(
         useCallback(
-            () => request<app.View[]>(requestId ? `/api/requests/${requestId}/views` : "/api/views"),
+            () => request<app.View[]>(
+                requestId ?
+                `/api/requests/${requestId}/views?order=id:asc` :
+                "/api/views?order=id:asc"
+            ),
             [requestId]
         ),
         true
@@ -52,7 +55,7 @@ function ViewThumbnail({ view }: { view: app.View }) {
     return (
         <Link to={ "/views/" + view.id } className="view-thumbnail" title={ view.description || undefined }>
             <div className="view-thumbnail-image" style={{
-                backgroundImage: `url('${view.screenShot ? "/api/screenshot/" + view.screenShot : viewIcon}')`
+                backgroundImage: `url('${view.screenShot ? `/api/views/${ view.id }/screenshot` : "/view.png"}')`
             }}/>
             <div className="view-thumbnail-title">
                 { view.name }

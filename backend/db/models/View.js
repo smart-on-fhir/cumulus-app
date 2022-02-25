@@ -1,8 +1,4 @@
-const { DataTypes, Model }  = require("sequelize")
-const { unlink, writeFile } = require("fs").promises
-const Path                  = require("path");
-
-const SCREENSHOT_DIR = Path.join(__dirname, "/../../screenShots/")
+const { DataTypes, Model } = require("sequelize")
 
 
 class View extends Model
@@ -43,132 +39,28 @@ class View extends Model
             dataSourceId: {
                 type: DataTypes.INTEGER
             },
-            
+
             screenShot: {
-                type: DataTypes.STRING(1024*1024*2)
+                type: DataTypes.TEXT,
+                get() {
+                    const screenShot = this.getDataValue("screenShot");
+                    const match = (/^data:image\/(.+?);base64,(.+)$/).exec(screenShot || "");
+
+                    if (!match || match.length < 3) {
+                        return null
+                    }
+
+                    return `/api/views/${this.getDataValue("id")}/screenshot.${match[1]}`
+                }
             },
 
             settings: {
-                type: DataTypes.JSON
+                type: DataTypes.JSONB
             }
         }, {
             sequelize,
-            modelName: "View",
-            hooks: {
-
-                /**
-                 * Before a View is created, if a screenShot is present (should
-                 * be a DataURL string), make sure it is removed form the model
-                 * dataValues because the database can't handle it. In this case
-                 * we remove the "screenShot" attribute and move it to custom
-                 * property _screenShot
-                 * @param {View} instance 
-                 */
-                async beforeCreate(instance) {
-                    const newValue = String(instance.get("screenShot") || "")
-                    if (newValue) {
-                        instance._screenShot = newValue
-                        instance.setDataValue("screenShot", null)
-                    }
-                },
-
-                /**
-                 * After new View is created, if a _screenShot is present (set
-                 * by the beforeCreate hook above), take that and move it back
-                 * to the model dataValues. It should then be detected by the
-                 * updateScreenshot function and written to file.
-                 * @param {View} instance 
-                 */
-                async afterCreate(instance) {
-                    if (instance._screenShot) {
-                        instance.set("screenShot", instance._screenShot)
-                        delete instance._screenShot
-                        await updateScreenshot(instance)
-                        await instance.save({ hooks: false })
-                    }
-                },
-                
-                /**
-                 * When new View is updated, if a screenShot is present (should
-                 * be a DataURL string) generate an image file and update the
-                 * record so that "screenShot" is the file name. If "screenShot"
-                 * is empty delete the file and set "screenShot" to null.
-                 * @param {View} instance 
-                 */
-                async beforeUpdate(instance) {
-                    await updateScreenshot(instance)
-                },
-
-                /**
-                 * When a View is deleted, if it has a screenShot delete its
-                 * corresponding image file.
-                 * @param {View} instance 
-                 */
-                async afterDestroy(instance) {
-                    const newValue = String(instance.get("screenShot") || "")
-                    if (newValue) {
-                        await deleteScreenShot(newValue)
-                    }
-                }
-            }
+            modelName: "View"
         });
-    }
-}
-
-
-/**
- * Delete a screenshot file
- * @param {string} fileName
- */
-async function deleteScreenShot(fileName) {
-    return unlink(Path.join(SCREENSHOT_DIR, fileName));
-}
-
-/**
- * Write a screenshot file
- * @param {string} id
- * @param {string} data
- */
-async function writeScreenShot(id, data) {
-    const matches = data.match(/^data:.+\/(.+);base64,(.*)$/);
-
-    if (matches) {
-        const ext      = matches[1];
-        const data     = matches[2];
-        const buffer   = Buffer.from(data, "base64");
-        const fileName = id + "." + ext;
-        const filePath = Path.join(SCREENSHOT_DIR, fileName);
-        await writeFile(filePath, buffer);
-        return fileName
-    }
-
-    return ""
-}
-
-/**
- * When new View is created, if a screenShot is present (should
- * be a DataURL string) generate an image file and update the
- * record so that "screenShot" is the file name.
- * @param {View} instance 
- */
-async function updateScreenshot(instance) {
-    const oldValue = String(instance.previous("screenShot") || "");
-    const newValue = String(instance.get("screenShot") || "");
-    const id       = String(instance.get("id") || "");
-
-    if (oldValue !== newValue) {
-        
-        // Remove image
-        if (!newValue) {
-            await deleteScreenShot(oldValue)
-            instance.set("screenShot", null)
-        }
-
-        // Add or Update an image
-        else {
-            const fileName = await writeScreenShot(id, newValue)
-            instance.set("screenShot", fileName || null)
-        }
     }
 }
 
