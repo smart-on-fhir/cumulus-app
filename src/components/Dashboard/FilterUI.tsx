@@ -5,6 +5,16 @@ import ColumnSelector from "./ColumnSelector"
 import { operators }  from "./config"
 
 
+const emptyFilter: app.Filter = {
+    left: "",
+    operator: "",
+    negated: false,
+    right: {
+        type: "value",
+        // value: undefined
+    }
+};
+
 function Filter({
     cols,
     filter,
@@ -26,7 +36,7 @@ function Filter({
                 <ColumnSelector
                     cols={cols}
                     value={filter.left}
-                    onChange={(value: string) => onChange({ ...filter, left: value })}
+                    onChange={(value: string) => onChange({ ...emptyFilter, left: value })}
                     disabled={ filter.right.type === "column" ? [filter.right.value + ""] : undefined }
                     placeholder="Select Column"
                 />
@@ -35,26 +45,39 @@ function Filter({
             <div className="col col-0">
                 { filter.left && <button
                     style={{ paddingLeft: "0.5em", paddingRight: "0.5em" }}
-                    className={classList({ btn: true, "color-red": filter.negated, "string": !filter.negated })}
+                    className={classList({
+                        btn: true,
+                        "color-red": filter.negated,
+                        "string": !filter.negated,
+                        "grey-out color-muted": filter.right.value === undefined
+                    })}
                     title={ filter.negated ? "Filter negated. Click to reset." : "Filter not negated. Click to negate." }
-                    onClick={() => onChange({ ...filter, negated: !filter.negated })}>
+                    onClick={() => onChange({ ...filter, negated: !filter.negated })}
+                    disabled={ filter.right.value === undefined }>
                     <i className={ "fa-solid fa-thumbs-" + (filter.negated ? "down" : "up") } />
                 </button> }
             </div>
 
             <div className="col">
                 { filter.left && <Select
-                    value={ filter.operator }
-                    onChange={ operator => onChange({ ...filter, operator }) }
+                    value={ operators.find(op => op.id === filter.operator) }
+                    onChange={ operator => onChange({
+                        ...filter,
+                        operator: operator.id,
+                        right: {
+                            type: filter.right.type || "value",
+                            value: filter.right.value === undefined ? operator.defaultValue : filter.right.value
+                        }
+                    }) }
                     placeholder="Select Operator"
                     options={operators.filter(o => filter.left && (o.type.includes("*") || o.type.includes(leftDataType))).map(o => ({
-                        value: o.id,
-                        label: o.label || o.op
+                        value: o,
+                        label: o.label
                     }))}
                 /> }
             </div>
 
-            <div className="col">
+            <div className="col" style={{ maxWidth: "7em" }}>
                 { filter.left && filter.operator && filter.operator !== "isNull" && (
                     <Select
                         value={ filter.right.type }
@@ -79,8 +102,9 @@ function Filter({
                     right
                 /> }
 
-                { filter.left && filter.operator && filter.operator !== "isNull" && filter.right.type === "value" && (leftDataType === "integer" || leftDataType === "float") && <input type="number"
-                    value={filter.right.value as number || 0}
+                { filter.left && filter.operator && filter.operator !== "isNull" && filter.right.type === "value" && (leftDataType === "integer" || leftDataType === "float") && <input
+                    type="number"
+                    value={isNaN(filter.right.value as number) ? "" : filter.right.value + ""}
                     onChange={e => onChange({ ...filter, right: { ...filter.right, value: e.target.valueAsNumber } })}
                 /> }
 
@@ -92,6 +116,7 @@ function Filter({
                 { filter.left && filter.operator && filter.operator !== "isNull" && filter.right.type === "value" && leftDataType === "string" && <input type="text"
                     value={filter.right.value as string || ""}
                     onChange={e => onChange({ ...filter, right: { ...filter.right, value: e.target.value } })}
+                    style={ filter.operator === "matches" || filter.operator === "matchesCI" ? { fontFamily: "monospace" } : undefined }
                 /> }
             </div>
 
@@ -114,18 +139,7 @@ export default function FilterUI({
 })
 {
     function add() {
-        onChange([
-            ...current,
-            {
-                left: "",
-                operator: "",
-                negated: false,
-                right: {
-                    type: "value",
-                    value: ""
-                }
-            }
-        ])
+        onChange([ ...current, emptyFilter ])
     }
 
     function remove(index: number) {
