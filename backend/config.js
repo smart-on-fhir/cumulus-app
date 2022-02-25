@@ -31,12 +31,11 @@ module.exports = {
         sync: DB_SYNC,
         seed: bool(DB_SEED) ? Path.join(__dirname, DB_SEED) : "",
         options: {
-            // dialectOptions: {
-                ssl: {
-                    require: false, //bool(DB_SSL),
-                    rejectUnauthorized: bool(DB_SSL)
-                },
-            // },
+            dialectOptions: {
+                ssl: bool(DB_SSL) ? {
+                    rejectUnauthorized: false
+                } : false
+            },
             dialect : "postgres",
             schema  : "public",
             database: DB_DATABASE,
