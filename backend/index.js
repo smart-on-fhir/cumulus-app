@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const HTTP             = require("http")
 const Path             = require("path")
 const express          = require("express")
@@ -5,7 +7,6 @@ const cors             = require("cors")
 const cookieParser     = require("cookie-parser")
 const { Sequelize }    = require("sequelize")
 const Auth             = require("./controllers/Auth")
-const { init: initDB } = require("./db")
 const { getDockerContainer } = require("./Docker")
 const { walkSync } = require("./lib")
 

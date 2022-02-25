@@ -5,15 +5,16 @@ const {
     NODE_ENV    = "production",
     HOST        = "0.0.0.0",
     PORT        = "4000",
-    DB_SEED     = "",//"db/seeds.js",
+    DB_SEED     = "",
     DB_SYNC     = "alter", // normal|force|alter|none
     DB_HOST     = "localhost",
     DB_PORT     = "5432",
     DB_USER     = "postgres",
-    DB_PASS     = "cumulus-db-password",
+    DB_PASS     = "",
     DB_DATABASE = "cumulus",
-    VERBOSE     = "true",
-    THROTTLE    = "0"
+    VERBOSE     = "false",
+    THROTTLE    = "0",
+    DB_DOCKER_CONTAINER = ""
 } = process.env;
 
 
@@ -23,11 +24,11 @@ module.exports = {
     verbose : bool(VERBOSE),
     throttle: uInt(THROTTLE),
     docker: {
-        containerName: "cumulus"
+        containerName: DB_DOCKER_CONTAINER
     },
     db: {
-        sync     : DB_SYNC,
-        seed     : bool(DB_SEED) ? Path.join(__dirname, DB_SEED) : "",
+        sync: DB_SYNC,
+        seed: bool(DB_SEED) ? Path.join(__dirname, DB_SEED) : "",
         options: {
             // dialectOptions: {
                 ssl: {
