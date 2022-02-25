@@ -1,5 +1,5 @@
 import { Component, createRef, MouseEvent } from "react"
-import { classList } from "../../utils";
+import { classList, format } from "../../utils";
 import "./DataGrid.scss"
 
 
@@ -16,6 +16,7 @@ interface DataGridProps {
     sortBy? : string | null
     offset? : number
     limit?  : number
+    colClassName?: (col: Column) => string | undefined
 }
 
 interface DataGridState {
@@ -208,7 +209,7 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
                     return (
                         b[index] === null ? -1 : a[index] === null ? 1 :
                         b[index] - a[index]
-                    ) * (sortDir === "asc" ? 1 : -1)
+                    ) * (sortDir === "asc" ? -1 : 1)
                 return String(b[index] || "").localeCompare(String(a[index] || "")) * (sortDir === "asc" ? 1 : -1)
             }
         )
@@ -216,7 +217,7 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
 
     render()
     {
-        const { cols, rows } = this.props;
+        const { cols, rows, colClassName = () => undefined } = this.props;
 
         const { sortBy, sortDir, limit, selection: { rowIndex } } = this.state;
         
@@ -232,7 +233,7 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
                     <table>
                         <colgroup>
                             { cols.map((col, i) => (
-                                <col key={i} className={ col.name === "cnt" || col.name === "queryid" ? "private" : undefined } />
+                                <col key={i} className={ colClassName(col) } />
                             )) }
                         </colgroup>
                         <thead>
@@ -276,21 +277,13 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
                                 >
                                     {
                                         row.map((value, i) => {
-                                            if (value === null) {
-                                                return <td key={i}><span className="color-muted">null</span></td>
-                                            }
-                                            switch (cols[i].dataType) {
-                                                case "boolean":
-                                                    return <td key={i}>{ value ? <span className="boolean-true">true</span> : <span className="boolean-false">false</span> }</td>
-                                                case "float":
-                                                    return <td key={i}><span className="float">{ +value }</span></td>
-                                                case "integer":
-                                                    return <td key={i} className="color-red">{ +value }</td>
-                                                case "string":
-                                                    return <td key={i}><span className="string">{ value }</span></td>
-                                                default:
-                                                    return <td key={i}>{ value }</td>
-                                            }
+                                            return <td key={i} dangerouslySetInnerHTML={{
+                                                __html: format(value, cols[i].dataType, {
+                                                    html: true,
+                                                    skipNull: true,
+                                                    maxLength: 100
+                                                })
+                                            }} />
                                         })
                                     }
                                 </tr>
