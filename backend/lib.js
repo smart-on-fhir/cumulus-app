@@ -138,6 +138,14 @@ function getFindOptions(req)
         })
     }
 
+    // order ------------------------------------------------------------------
+    if (req.query.order) {
+        options.order = [];
+        String(req.query.order).split(",").forEach(x => {
+            options.order.push(x.split(":"))
+        });
+    }
+
     return options;
 }
 

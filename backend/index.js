@@ -19,6 +19,8 @@ function createServer(config)
     const app    = express();
     const server = new HTTP.Server(app);
 
+    app.set('etag', 'weak');  
+
     app.use(cors({ origin: true, credentials: true }));
 
     config.verbose && console.log("✔ Created a server");

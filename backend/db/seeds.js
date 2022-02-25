@@ -538,7 +538,7 @@ module.exports = async ({ models }) => {
             name: "Patients by Gender",
             description: "Shows the number of patients by gender",
             dataSourceId: 6,
-            screenShot: "1.png",
+            // screenShot: "1.png",
             settings: {
                 groupBy: "",
                 column: "gender",
@@ -551,7 +551,7 @@ module.exports = async ({ models }) => {
             name: "Number of Patients by Age",
             description: "Shows the number of patients for each age in years that is found within the data",
             dataSourceId: 6,
-            screenShot: "2.png",
+            // screenShot: "2.png",
             settings: {
                 viewType: "column3d",
                 column : "age",
@@ -573,7 +573,7 @@ module.exports = async ({ models }) => {
             name: "Newborns Ethnicity by CDC Age Group",
             description: "Shows the ethnicity of newborns grouped by CDC age group",
             dataSourceId: 7,
-            screenShot: "3.png",
+            // screenShot: "3.png",
             settings: {
                 viewType: "column3d",
                 column: "ethnicity",
@@ -586,7 +586,7 @@ module.exports = async ({ models }) => {
             name: "0 to 18 Year Old Patient Gender by Age Group",
             description: "0 to 18 year old patients genders grouped by age groups",
             dataSourceId: 7,
-            screenShot: "4.png",
+            // screenShot: "4.png",
             settings: {
                 groupBy: "age_group",
                 column: "gender",
