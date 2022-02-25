@@ -27,7 +27,7 @@
     font-size      : $font-size;
     color          : $color;
     border-radius  : $border-radius;
-    vertical-align : top;
+    // vertical-align : top;
     text-align     : center;
     text-decoration: none !important;
     cursor         : default;
@@ -264,7 +264,49 @@ label.checkbox-label {
 }
 
 
+.tab-panel {
 
+    position: relative;
+    z-index: 2;
+
+    .tab {
+        border-color : transparent;
+        border-style : solid;
+        border-width : 1px 1px 0 1px;
+        border-radius: $border-radius $border-radius 0 0;
+        padding: 0.2em 1em;
+        margin: 0 0 0 6px;
+        background: transparent;
+        font-family: inherit;
+        color: inherit;
+        opacity: 0.65;
+        cursor: pointer;
+        font-weight: bold;
+
+        &.active {
+            background: #FFF;
+            border-color : $color-grey;
+            opacity: 1;
+        }
+
+        &:focus-visible {
+            outline: 1px dotted;
+            outline-offset: -0.3em;
+        }
+    }
+
+    &.bottom {
+
+        box-shadow: 0 1px 0 0 $color-grey inset;
+        margin: -1px 0 0 0;
+
+        .tab {
+            border-width : 0 1px 1px 1px;
+            border-radius: 0 0 $border-radius $border-radius;
+            padding: 0.3em 1em 0.2em 1em;
+        }
+    }
+}
 
 
 
