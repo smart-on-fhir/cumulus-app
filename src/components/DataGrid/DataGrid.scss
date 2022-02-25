@@ -81,50 +81,53 @@
 
 .data-grid-wrap {
     position: relative;
-    border: 2px solid $color-grey;
+    border: 1px solid $color-grey;
+    padding: 4px;
+    background: #FFF;
+    box-shadow: 0 0 0 3.5px #fff inset, 0 0 0 4px $color-grey inset;//rgba(0, 0, 0, 0.2) inset;
 }
 
 .scrollbar {
-    $size: 10px;
+    $size: 12px;
 
-    width     : 4px;
+    width     : 5px;
     height    : auto;
-    right     : 1px;
+    right     : -1px;
     left      : auto;
-    top       : 1.55em;
-    bottom    : 17px;
+    top       : $font-size * ($line-height + 0.5) + 1;
+    bottom    : 3.5px;
     overflow  : hidden;
     transition: all 0.2s linear 1s;
     position  : absolute;
     z-index   : 100;
+    transition: width 0.2s linear 1s;
     
 
     .scrollbar-btn {
-        background   : rgba(0, 0, 0, 0.2);
+        background   : #CCC;
         position     : absolute;
-        box-shadow   : 0 0 0 1px rgba(100, 100, 100, 0.1) inset;
+        box-shadow   : 0 0 0 1px #BBB inset;
         height       : auto;
         left         : 0;
         right        : 0;
         bottom       : auto;
-        border-radius: 2px;
         transition   : all 0.1s;
 
         &:hover {
-            background: rgba(0, 0, 0, 0.3);
-            box-shadow: 0 0 0 1px rgba(100, 100, 100, 0.1) inset;
+            background: #BBB;
+            box-shadow: 0 0 0 1px #AAA inset;
             width     : $size;
         }
 
         &:active {
-            background: rgba(0, 0, 0, 0.4);
-            box-shadow: 0 0 0 0.5px rgba(100, 100, 100, 0.2) inset;
+            background: #AAA;
+            box-shadow: 0 0 0 1px #888 inset;
             width     : $size;
         }
     }
 
     &:hover, &:active {
         width     : $size;
-        transition: all 0.2s;
+        transition: top 0.2s, width 0.2s;
     }
 }
