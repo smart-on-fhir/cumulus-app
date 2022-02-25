@@ -63,6 +63,22 @@ a {
   }
 }
 
+.link {
+  color: #36C;
+  text-decoration: underline;
+  cursor: pointer;
+  appearance: none;
+  background: initial;
+  margin: initial;
+  padding: initial;
+  border: 0;
+  font: inherit;
+
+  &:hover {
+    box-shadow: 0 -1px 0 0 currentColor inset;
+  }
+}
+
 .underline {
   text-decoration: underline;
 }
@@ -77,6 +93,14 @@ a {
 .color-green      { color: $color-green      }
 .color-muted      { opacity: 0.65 } 
 
+.bg-blue       { background-color: fade-out($color: $color-blue      , $amount: 0.9) }
+.bg-orange     { background-color: fade-out($color: $color-orange    , $amount: 0.9) }
+.bg-red        { background-color: fade-out($color: $color-red       , $amount: 0.9) }
+.bg-grey-light { background-color: fade-in( $color: $color-grey-light, $amount: 0.1) }
+.bg-grey       { background-color: fade-in( $color: $color-grey      , $amount: 0.1) }
+.bg-grey-dark  { background-color: fade-out($color: $color-grey-dark , $amount: 0.9) }
+.bg-green      { background-color: fade-out($color: $color-green     , $amount: 0.9) }
+// .bg-muted      { background-color; 0.65 } 
 
 // Paddings --------------------------------------------------------------------
 .p-0  { padding: 0;               }
@@ -248,7 +272,7 @@ ul {
   color: #D00
 }
 .boolean {
-  color: #006
+  color: #009
 }
 .boolean-true {
   color: #00b300
@@ -256,8 +280,12 @@ ul {
 .boolean-false {
   color: #C00
 }
-.date {
-  color: #606
+.date, .date\:YYYY-MM-DD, .date\:YYYY-MM, .date\:YYYY {
+  color: #609
+}
+.null {
+  font-weight: bold;
+  color: #888;
 }
 
 
