@@ -75,6 +75,38 @@
     }
 }
 
+@mixin file-selector-button {
+    // line-height       : 1;
+    -webkit-appearance: none;
+    display           : inline-block;
+    border            : none;
+    border-radius     : $border-radius - 1;
+    // padding           : round($font-size * 0.5);
+    // pointer-events    : none;
+    background        : $color-grey;
+    color             : $color-grey-dark;
+    padding           : round($font-size * 0.2)
+                        round($font-size * 0.5);
+    // margin: 0;
+    margin            : round($font-size * -0.2)
+                        0.5em
+                        round($font-size * -0.2)
+                        round($font-size * -0.5);
+    // vertical-align    : middle;
+    vertical-align    : top;
+    line-height: $font-size * $line-height;
+    // position: absolute;
+}
+
+@mixin disabled-file-selector-button {
+    @include file-selector-button();
+    background  : #DDD;
+    color       : #888;
+    text-shadow : 0 1px 0 #EEE;
+    box-shadow  : 0 0 1px 0 #666 inset;
+    opacity     : 1;
+}
+
 @mixin form-control() {
     background   : #FFF;
     border       : 1px solid $color-grey;
@@ -129,6 +161,25 @@ select,
 textarea,
 .form-control {
     @include form-control();
+}
+
+::-webkit-file-upload-button {
+    @include file-selector-button();
+}
+::-ms-browse {
+    @include file-selector-button();
+}
+::file-selector-button {
+    @include file-selector-button();
+}
+:disabled::-webkit-file-upload-button {
+    @include disabled-file-selector-button();
+}
+:disabled::-ms-browse {
+    @include disabled-file-selector-button();
+}
+:disabled::file-selector-button {
+    @include disabled-file-selector-button();
 }
 
 textarea {
