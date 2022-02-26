@@ -149,3 +149,10 @@ export function formatArray(
         ""
     )
 }
+
+export function toTitleCase(str: string) {
+    return str.replace(/([A-Z])/g, " $1")
+        .replace(/[^a-zA-Z0-9]+/g, " ")
+        .replace(/\b[a-z]/g, x => x.toUpperCase())
+        .trim();
+}
