@@ -7,6 +7,7 @@ import Alert, { AlertError }       from "../Alert"
 import Loader                      from "../Loader"
 import { useBackend }              from "../../hooks"
 import { requests }                from "../../backend"
+import { toTitleCase }             from "../../utils"
 import "./DataUploader.scss"
 
 
@@ -40,6 +41,54 @@ interface Col
     dataType: string
 }
 
+function detectDataTypeAt(i: number, rows: string[][]) {
+    let type = "", rowIndex = 0;
+
+    function getType(x: string) {
+        if (!x) {
+            return ""
+        }
+        if ((/^\-?[0-9]+$/).test(x)) {
+            return "integer"
+        }
+        if ((/^\-?[0-9]*\.[0-9]+$/).test(x)) {
+            return "float"
+        }
+        if ((/^\d{4}-\d{2}-\d{2}/).test(x)) {
+            return "date:YYYY-MM-DD"
+        }
+        return "string"
+    }
+
+    for (let row of rows) {
+
+        // if (++rowIndex > 20) {
+        //     break;
+        // }
+
+        let col = String(row[i] || "").trim()
+        let t = getType(col)
+
+        if (t === "") {
+            continue
+        }
+
+        if (type === "") {
+            type = t
+        }
+        else {
+            if (type && type !== t) {
+                return "string"
+            }
+            // continue;
+        }
+    }
+
+    // hidden
+
+    return type || "hidden"
+}
+
 /**
  * Splits the line into cells using the provided delimiter (or by comma by
  * default) and returns the cells array. supports quoted strings and escape
@@ -53,7 +102,7 @@ export function parseDelimitedLine(
     delimiters: string[] = [","],
     stringDelimiter: string = '"'
 ): string[]
-{
+{   
     const out: string[] = [];
     const len: number   = line.length;
 
@@ -366,10 +415,10 @@ function reducer(state: State, action: Action): State
 
         newState = { ...state, ...newState }
 
-        const input = newState.input as string;
+        const input = newState.input || "\n" as string;
 
         let rows: any[] = input.split("\n").map(s => s.trim()).filter(Boolean)
-        let cols = []
+        let cols: Col[] = []
 
         const separators: string[] = []
         if (newState.separateByComma    ) separators.push(",")
@@ -379,30 +428,44 @@ function reducer(state: State, action: Action): State
         if (newState.customSeparator    ) separators.push(newState.customSeparator)
 
         const header = rows.shift() as string;
-        if (separators.length) {
-            cols = parseDelimitedLine(header, separators, newState.stringDelimiter).map(
-                col => ({
-                    name: col,
-                    label: col,
-                    description: "",
-                    dataType: "string"
-                })
-            )
-        } else {
-            cols = [{
-                name: header,
-                label: header,
-                description: "",
-                dataType: "string"
-            }]
-        }
 
-        rows = rows.slice(newState.startRow, newState.endRow || undefined).map(row => {
+        // console.assert(
+        //     rows.length >= newState.startRow!,
+        //     "Start row set to %s but the total rows are %s",
+        //     newState.startRow,
+        //     rows.length
+        // )
+        
+        if (rows.length >= newState.startRow!) {
+            rows = rows.slice(newState.startRow, newState.endRow || undefined).map(row => {
+                if (separators.length) {
+                    return parseDelimitedLine(row, separators, newState.stringDelimiter)
+                }
+                return [row]
+            })
+
             if (separators.length) {
-                return parseDelimitedLine(row, separators, newState.stringDelimiter)
+                cols = parseDelimitedLine(header, separators, newState.stringDelimiter).map(
+                    (col, i) => {
+                        const title = toTitleCase(col)
+                        return {
+                            name : col,
+                            label: title,
+                            description: title.charAt(0) + title.substr(1).toLowerCase(),
+                            dataType: detectDataTypeAt(i, rows)
+                        }
+                    }
+                )
+            } else {
+                const title = toTitleCase(header)
+                cols = [{
+                    name: header,
+                    label: title,
+                    description: title.charAt(0) + title.substr(1).toLowerCase(),
+                    dataType: "string"
+                }]
             }
-            return [row]
-        })
+        }
 
         return {
             rows,
@@ -621,25 +684,31 @@ export default function DataUploader()
             const re = /^\s*data:.*?;base64,\s*(77u\/)?/
             const data = String(reader.result).replace(re, "")
             // console.log(String(reader.result))
-            // console.log(window.atob(data))
+            // console.log("data: '%s'", data, reader.result)
             
-            if (file.name.toLocaleLowerCase().endsWith(".tsv") || TSV_MIME_TYPES.includes(file.type)) {
-                dispatch({ type: "MERGE", payload: {
-                    separateByTab: true,
-                    separateByComma: false,
-                    separateBySpace: false,
-                    separateBySemicolon: false,
-                    customSeparator: null,
-                    input: window.atob(data)
-                }})
+            if (data !== "data:") {
+                if (file.name.toLocaleLowerCase().endsWith(".tsv") || TSV_MIME_TYPES.includes(file.type)) {
+                    dispatch({ type: "MERGE", payload: {
+                        separateByTab: true,
+                        separateByComma: false,
+                        separateBySpace: false,
+                        separateBySemicolon: false,
+                        customSeparator: null,
+                        input: window.atob(data)
+                    }})
+                } else {
+                    dispatch({ type: "MERGE", payload: {
+                        separateByTab: false,
+                        separateByComma: true,
+                        separateBySpace: false,
+                        separateBySemicolon: false,
+                        customSeparator: null,
+                        input: window.atob(data)
+                    }})
+                }
             } else {
                 dispatch({ type: "MERGE", payload: {
-                    separateByTab: false,
-                    separateByComma: true,
-                    separateBySpace: false,
-                    separateBySemicolon: false,
-                    customSeparator: null,
-                    input: window.atob(data)
+                    input: ""
                 }})
             }
             
