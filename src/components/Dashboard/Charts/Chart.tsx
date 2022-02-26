@@ -121,7 +121,7 @@ export function getSeries({
         // const rows = dataSet.pick([ column.name ]).rows;
         const rows = dataSet.rows;
         // console.log("pick ===>", rows)
-        const data = rows.map(row => pointFromRow(row, column)).sort((a, b) => a.name!.localeCompare(b.name || ""));
+        const data = rows.map(row => pointFromRow(row, column))//.sort((a, b) => a.name!.localeCompare(b.name || ""));
 
         series.push({
             type,
@@ -251,6 +251,7 @@ export function buildChartOptions({
             // },
             // reflow: false,
             marginRight: type === "pie" ? undefined : 40,
+            marginTop: type === "pie" ? undefined : 40,
             spacingBottom: 20,
             zoomType: type === "spline" ||
                       type === "areaspline" ||
@@ -283,6 +284,13 @@ export function buildChartOptions({
             },
             useHTML: true
         },
+        exporting: {
+            buttons: {
+                contextButton: {
+                    menuItems: ["viewFullscreen", "printChart", "separator", "downloadPNG", "downloadJPEG", "downloadPDF", "downloadSVG", "separator", "downloadCSV", "downloadXLS"]
+                }
+            }
+        }, 
         credits: {
             enabled: true,
             href: "https://smarthealthit.org/",
@@ -299,7 +307,7 @@ export function buildChartOptions({
             text: "SMART®"
         },
         title: {
-            text: series.length ? getChartTitleText(column, groupBy) : "",
+            text: "",//series.length ? getChartTitleText(column, groupBy) : "",
             ...options.title,
         },
         legend: {

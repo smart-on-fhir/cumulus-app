@@ -16,8 +16,10 @@ import ColumnChart                 from "./Charts/ColumnChart";
 import AreaSPLineChart             from "./Charts/AreaSPLineChart";
 import SPLineChart                 from "./Charts/SPLineChart";
 import PieChart                    from "./Charts/PieChart";
-import Alert, { AlertError }              from "../Alert";
+import Alert, { AlertError }       from "../Alert";
 import Select                      from "../Select";
+import Loader                      from "../Loader";
+import { classList }               from "../../utils";
 import {
     ChartIcons,
     operators,
@@ -25,7 +27,6 @@ import {
     SupportedChartTypes
 } from "./config";
 import "./Dashboard.scss";
-import { classList } from "../../utils";
 
 
 
@@ -220,11 +221,11 @@ export default function ViewWrapper()
         true
     );
 
-    if (loading) return <div>Loading...</div>
-    if (error) return <pre>{`Error fetching view with id "${id}": ${error}`}</pre>
+    if (loading) return <Loader/>
+    if (error) return <AlertError>{`Error fetching view with id "${id}": ${error}`}</AlertError>
 
     if (!result) {
-        return <pre>{`Error fetching request with id "${id}": ${error}`}</pre>
+        return <AlertError>{`Error fetching request with id "${id}": ${error}`}</AlertError>
     }
 
     // const { status, viewData, requestData, error } = useDataLoader(id + "");

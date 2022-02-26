@@ -345,8 +345,8 @@ function Scrollbar({
         <div className="scrollbar">
             <div className="scrollbar-btn" style={
                 {
-                    top    : btnStart + "%",
-                    height : btnSize + "%",
+                    top    : Math.min(btnStart, 90) + "%",
+                    height : Math.max(btnSize, 10) + "%",
                     display: btnSize >= 100 ? "none" : "block"
                 }
             } onMouseDown={onBtnDown} />

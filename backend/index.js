@@ -19,7 +19,7 @@ function createServer(config)
     const app    = express();
     const server = new HTTP.Server(app);
 
-    app.set('etag', 'weak');  
+    app.set('etag', false);  
 
     app.use(cors({ origin: true, credentials: true }));
 
@@ -184,10 +184,12 @@ function setUpErrorHandlers(app, { verbose })
 
     // Global error 500 handler
     app.use((error, req, res, next) => {
+
+        const msg = error.message.replace(/^\s*\w*Error\:\s+/, "")
         
         // HTTP Errors
         if (error.http) {
-            return res.status(error.status).send(error.message);
+            return res.status(error.status).json(error);
         }
 
         // Sequelize Validation Errors
@@ -198,7 +200,7 @@ function setUpErrorHandlers(app, { verbose })
         }
 
         // Other Errors
-        res.status(500).json(error);
+        res.status(500).json({ error: msg });
     });
 
     verbose && console.log("✔ Error handlers activated");

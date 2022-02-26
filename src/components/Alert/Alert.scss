@@ -8,6 +8,13 @@
     white-space: pre-wrap;
     position: relative;
     text-shadow: 0 1px 0 #fff;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 85%;
+
+    &.small {
+        font-size: 75%;
+    }
   
     > .icon {
         position: absolute;

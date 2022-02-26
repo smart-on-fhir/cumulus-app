@@ -27,13 +27,13 @@ router.get("/:id", rw(async (req, res) => {
 }));
 
 // Create ----------------------------------------------------------------------
-router.post("/", requireAuth("admin"), express.json(), rw(async (req, res) => {
+router.post("/", requireAuth("admin"), express.json({ limit: "10MB" }), rw(async (req, res) => {
     const model = await Model.create(req.body);
     res.json(model)
 }));
 
 // Update ----------------------------------------------------------------------
-router.put("/:id", requireAuth("admin"), express.json(), rw(async (req, res) => {
+router.put("/:id", requireAuth("admin"), express.json({ limit: "10MB" }), rw(async (req, res) => {
     const model = await Model.findByPk(req.params.id);
     assert(model, HttpError.NotFound("Model not found"))
     await model.update(req.body);

@@ -2,6 +2,7 @@ const express         = require("express");
 const Model           = require("../db/models/View");
 const { requireAuth } = require("./Auth");
 const { getFindOptions, rw } = require("../lib");
+const { HttpError } = require("httperrors");
 
 
 const router = module.exports = express.Router({ mergeParams: true });
@@ -15,11 +16,14 @@ router.get("/", (req, res) => {
 });
 
 // get one --------------------------------------------------------------------
-router.get("/:id", (req, res) => {
-    Model.findByPk(req.params.id, getFindOptions(req))
-    .then(data  => res.json(data))
-    .catch(error => res.status(400).end(error.message))
-});
+router.get("/:id", rw(async (req, res) => {
+    const model = await Model.findByPk(req.params.id, getFindOptions(req));
+    if (!model) {
+        throw HttpError.NotFound(`${Model.name} not found`);
+    } else {
+        res.json(model)
+    }
+}));
 
 // Create ---------------------------------------------------------------------
 router.post("/", requireAuth("admin"), express.json({ limit: "2MB" }), (req, res) => {

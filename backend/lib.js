@@ -95,7 +95,32 @@ function uInt(x, defaultValue = 0) {
  */
 function getFindOptions(req)
 {
-    const options = {}
+    /**
+     * @type {any} //{import("sequelize").FindOptions}
+     */
+    const options = {
+        where: {},
+        attributes: {
+
+            // Select all the attributes of the model, plus some additional ones.
+            // Useful for aggregations, e.g.
+            // { attributes: { include: [[sequelize.fn('COUNT', sequelize.col('id')), 'total']] }
+            include: [],
+
+            // Select all the attributes of the model, except some few.
+            // Useful for security purposes e.g. { attributes: { exclude: ['password'] } }
+            exclude: []
+        },
+
+        // A list of associations to eagerly load using a left join.
+        // Supported is either
+        // { include: [ Model1, Model2, ...]} or
+        // { include: [{ model: Model1, as: 'Alias' }]} or
+        // { include: ['Alias']}.
+        // If your association are set up with an as (eg. X.hasMany(Y, { as: 'Z },
+        // you need to specify Z in the as attribute when eager loading Y).
+        include: []
+    }
 
     // where -------------------------------------------------------------------
     if (req.query.where) {
@@ -110,29 +135,42 @@ function getFindOptions(req)
                 }
             };
         }
-        console.log(options.where)
+        // console.log(options.where)
     }
 
     // pick & omit -------------------------------------------------------------
     if (req.query.pick || req.query.omit) {
-        options.attributes = {}
+        
+        /**
+         * @type {import("sequelize").FindAttributeOptions}
+         */
+        const attributes = {
+            include: []
+        };
+
         if (req.query.pick) {
-            options.attributes.include = String(req.query.pick).split(",")
+            attributes.include = String(req.query.pick).split(",")
         }
         if (req.query.omit) {
-            options.attributes.exclude = String(req.query.omit).split(",")
+            attributes.exclude = String(req.query.omit).split(",")
         }
+
+        options.attributes = attributes
     }
 
     // include -----------------------------------------------------------------
     if (req.query.include) { // table:col|col,table:col|col...
-        options.include = []
         String(req.query.include).split(",").forEach(x => {
             const include = {}
-            const [l, r] = x.split(":")
-            include.association = l
-            if (r) {
-                include.attributes = r.split("|")
+            let [association, alias, attrs] = x.split(":")
+            include.association = association
+            if (!attrs) {
+                attrs = alias
+            } else {
+                include.as = alias
+            }
+            if (attrs) {
+                include.attributes = attrs.split("|")
             }
             options.include.push(include)
         })
@@ -144,6 +182,30 @@ function getFindOptions(req)
         String(req.query.order).split(",").forEach(x => {
             options.order.push(x.split(":"))
         });
+    }
+
+    // limit ------------------------------------------------------------------
+    if (req.query.limit) {
+        options.limit = uInt(req.query.limit)
+
+        String(req.query.limit).split(",").forEach(x => {
+            const tokens = x.trim().split(":")
+            if (tokens.length === 1) {
+                options.limit = uInt(tokens[0])
+            }
+            else if (tokens.length === 2) {
+                const model = options.include.find(o => o.association === tokens[0])
+                if (model) {
+                    model.separate = true
+                    model.limit = uInt(tokens[1])
+                }
+            }
+        });
+    }
+
+    // offset -----------------------------------------------------------------
+    if (req.query.offset) {
+        options.offset = uInt(req.query.offset)
     }
 
     return options;
