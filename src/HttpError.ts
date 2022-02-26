@@ -8,4 +8,8 @@ export default class HttpError extends Error
         super(message);
         this.code = code;
     }
+
+    toString() {
+        return this.message.replace(/^\s*\w*Error\:\s+/, "")
+    }
 }

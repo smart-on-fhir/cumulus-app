@@ -2,6 +2,8 @@ import { useCallback }   from "react";
 import DataRequestLink   from "./DataRequestLink";
 import { useBackend }    from "../../hooks";
 import { requestGroups } from "../../backend";
+import { AlertError } from "../Alert";
+import Loader from "../Loader";
 
 
 function List({
@@ -28,16 +30,19 @@ function List({
 export default function DataRequestsList()
 {
     const { loading, error, result: groups } = useBackend(
-        useCallback(() => requestGroups.getAll("?include=requests:id|name|description|refresh|completed"), []),
+        useCallback(() => requestGroups.getAll(
+            "?include=requests:id|name|description|refresh|completed"
+            + "&order=name:asc&limit=4,requests:2"
+        ), []),
         true
     );
 
     if (loading) {
-        return <span>Loading Data Requests...</span>
+        return <Loader msg="Loading Data Requests..." />
     }
 
     if (error) {
-        return <span><b>Error Loading Data Requests: </b>{ error + "" }</span>
+        return <AlertError><b>Error Loading Data Requests: </b>{ error + "" }</AlertError>
     }
 
     return (

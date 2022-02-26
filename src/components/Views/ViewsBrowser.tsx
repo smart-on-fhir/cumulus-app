@@ -1,7 +1,9 @@
+import { useCallback } from "react"
 import { Link }        from "react-router-dom"
 import { useBackend }  from "../../hooks"
 import { request }     from "../../backend"
-import { useCallback } from "react"
+import Loader          from "../Loader"
+import { AlertError }  from "../Alert"
 
 import "./ViewsBrowser.scss"
 
@@ -27,11 +29,11 @@ export default function ViewsBrowser({
     );
 
     if (loading) {
-        return <span>Loading views...</span>
+        return <Loader msg="Loading views..." />
     }
 
     if (error) {
-        return <span><b>Error loading views</b>: { error + "" }</span>
+        return <AlertError><b>Error loading views</b>: { error + "" }</AlertError>
     }
 
     return (
