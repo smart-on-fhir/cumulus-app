@@ -19,7 +19,8 @@
 
     // background     : $bg linear-gradient(lighten($bg, 5%), darken($bg, 5%));
     background     : $bg;
-    border         : 1px solid fade-out($color: $color, $amount: 0.85);
+    border         : 1px solid darken($bg, 10%);
+    text-shadow    : 0 1px 1px darken($bg, 10%);
     // line-height    : normal;//$line-height;//$font-size - ($paddingTop + $paddingBottom);
     // vertical-align: middle;
     line-height: inherit;
@@ -46,6 +47,8 @@
     // height       : 2em;
     user-select  : none;
     min-width    : 2em;
+    margin       : 0;
+    vertical-align: middle;
 
     * {
         line-height    : inherit;
@@ -118,6 +121,7 @@
     line-height  : $line-height;
     color        : inherit;
     max-height   : ($font-size * ($line-height + 0.8)) + 2;
+    margin: 0;
     // height   : ($font-size * $line-height) + round($font-size * 0.8);
   
     &:focus {
