@@ -185,8 +185,6 @@ export function CreateView()
                 { name: "Home" , href: "/" },
                 { name: "Create New View" }
             ]}/>
-            {/* <pre>{JSON.stringify(result, null, 4)}</pre> */}
-            {/* <pre>{JSON.stringify(requestData, null, 4)}</pre> */}
             <Dashboard view={{}} dataRequest={result as app.DataRequest} />
         </>
     )
@@ -195,26 +193,6 @@ export function CreateView()
 export default function ViewWrapper()
 {
     const { id } = useParams()
-
-    // console.log("ID:", id)
-
-    // if (id === "new") {
-    //     return <Dashboard view={{
-    //         dataSourceId: "",
-    //         description: "",
-    //         id: "",
-    //         name: "",
-    //         settings: undefined
-    //     }} dataRequest={{
-    //         completed: null,
-    //         created: "",
-    //         data: { cols: [], rows: []},
-    //         id: "",
-    //         name: "",
-    //         status: "pending",
-    //         type: "REQUEST"
-    //     }} />
-    // }
 
     const { loading, error, result } = useBackend(
         useCallback(() => views.getOne(id + "", true), [id]),
@@ -228,10 +206,6 @@ export default function ViewWrapper()
         return <AlertError>{`Error fetching request with id "${id}": ${error}`}</AlertError>
     }
 
-    // const { status, viewData, requestData, error } = useDataLoader(id + "");
-
-    // if (status === "pending") return <div>Loading...</div>
-    // if (status === "error") return <pre>{JSON.stringify(error, null, 4)}</pre>
     if (!result) {
         return <b>Failed to fetch data!</b>
     }
@@ -242,8 +216,6 @@ export default function ViewWrapper()
                 { name: "Home" , href: "/" },
                 { name: result.view.name }
             ]}/>
-            {/* <pre>{JSON.stringify(viewData, null, 4)}</pre> */}
-            {/* <pre>{JSON.stringify(requestData, null, 4)}</pre> */}
             <Dashboard view={ result.view } dataRequest={result.request} />
         </>
     )
@@ -424,7 +396,7 @@ export function Dashboard({
                 ...view,
                 name: viewName,
                 description: viewDescription,
-                dataSourceId: dataRequest.id,
+                DataRequestId: dataRequest.id,
                 screenShot,
                 settings: {
                     ...view.settings,

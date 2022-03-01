@@ -113,7 +113,7 @@ module.exports = class DataRequest extends Model
      */
     static associate(sequelize) {
         sequelize.models.DataRequest.belongsTo(sequelize.models.RequestGroup, { as: "group" })
-        sequelize.models.DataRequest.hasMany(sequelize.models.View, { foreignKey: "dataSourceId" })
+        sequelize.models.DataRequest.hasMany(sequelize.models.View)
     }
 };
 
