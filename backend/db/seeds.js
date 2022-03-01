@@ -9,22 +9,22 @@ module.exports = async (connection) => {
         {
             role    : "user",
             username: "user1",
-            password: "user1password"
+            password: "$2a$10$iqEw.w1rPqXwn9mEin9rg.hYLbbxdDKCrQrOnIMJHd7RL4ledplWi"
         },
         {
             role    : "user",
             username: "user2",
-            password: "user2password"
+            password: "$2a$10$iqEw.w1rPqXwn9mEin9rg.XTLbZKCT7AjwGXQKqmP7xRe3wciFfOG"
         },
         {
             role    : "admin",
             username: "admin1",
-            password: "admin1password"
+            password: "$2a$10$iqEw.w1rPqXwn9mEin9rg.KNO.6C1rOHAxpvnk2JD66.labiZnyy6"
         },
         {
             role    : "admin",
             username: "admin2",
-            password: "admin2password"
+            password: "$2a$10$iqEw.w1rPqXwn9mEin9rg.XCcMZCyFKXGKkAqsUAn.7ux7ZVYRSB2"
         }
     ]);
 

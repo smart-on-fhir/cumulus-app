@@ -4,11 +4,11 @@ const { Op }          = require("sequelize");
 
 const RE_FALSE = /^(0|no|false|off|null|undefined|NaN|)$/i;
 
-// function wait(ms) {
-//     return new Promise(resolve => {
-//         setTimeout(resolve, ms);
-//     });
-// }
+function wait(ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
+}
 
 function bool(x) {
     return !RE_FALSE.test(String(x).trim());
@@ -282,7 +282,7 @@ module.exports = {
     assert,
     walkSync,
     filterFiles,
-    // wait,
+    wait,
     // getBaseUrl,
     // makeArray,
     getFindOptions
