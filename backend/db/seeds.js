@@ -1,30 +1,29 @@
+const { QueryTypes } = require("sequelize")
 
 /**
- * @param {import("sequelize").Sequelize} DB
+ * @param {import("sequelize").Sequelize} connection
  */
-module.exports = async ({ models }) => {
+module.exports = async (connection) => {
+
+    const { models } = connection
 
     await models.User.bulkCreate([
         {
-            id      : 1,
             role    : "user",
             username: "user1",
             password: "user1password"
         },
         {
-            id      : 2,
             role    : "user",
             username: "user2",
             password: "user2password"
         },
         {
-            id      : 3,
             role    : "admin",
             username: "admin1",
             password: "admin1password"
         },
         {
-            id      : 4,
             role    : "admin",
             username: "admin2",
             password: "admin2password"
@@ -37,6 +36,7 @@ module.exports = async ({ models }) => {
         { id: 3, name: "INFLUENZA" },
         { id: 4, name: "HIV"       },
     ]);
+    await fixAutoIncrement(connection, models.RequestGroup.tableName, "id");
 
     await models.DataRequest.bulkCreate([
 
@@ -192,7 +192,6 @@ module.exports = async ({ models }) => {
             id: 7,
             name: "Data for Newborns",
             groupId: 1,
-            refresh: null,
             completed: "2022-02-02",
             data: {
                 cols: [
@@ -531,6 +530,7 @@ module.exports = async ({ models }) => {
             }
         }
     ]);
+    await fixAutoIncrement(connection, models.DataRequest.tableName, "id");
 
     await models.View.bulkCreate([
         {
@@ -595,4 +595,21 @@ module.exports = async ({ models }) => {
             }
         }
     ]);
+    await fixAutoIncrement(connection, models.View.tableName, "id");
 };
+
+/**
+ * @param {import("sequelize").Sequelize} connection
+ * @param {string} tableName
+ * @param {string} incrementColumnName
+ */
+async function fixAutoIncrement(connection, tableName, incrementColumnName) {
+    await connection.query(
+        `select setval(
+            '"${tableName}_${incrementColumnName}_seq"',
+            (select max("${incrementColumnName}") from "${tableName}"),
+            true
+        )`
+    );
+}
+

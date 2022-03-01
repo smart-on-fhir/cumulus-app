@@ -185,11 +185,13 @@ function setUpErrorHandlers(app, { verbose })
     // Global error 500 handler
     app.use((error, req, res, next) => {
 
-        const msg = error.message.replace(/^\s*\w*Error\:\s+/, "")
+        console.error(error)
+
+        const msg = error.message.replace(/^\s*\w*Error:\s+/, "")
         
         // HTTP Errors
         if (error.http) {
-            return res.status(error.status).json(error);
+            return res.status(error.status).end(msg);
         }
 
         // Sequelize Validation Errors
@@ -200,7 +202,7 @@ function setUpErrorHandlers(app, { verbose })
         }
 
         // Other Errors
-        res.status(500).json({ error: msg });
+        res.status(500).end(msg);
     });
 
     verbose && console.log("✔ Error handlers activated");
