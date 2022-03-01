@@ -9,6 +9,8 @@ import Breadcrumbs from "../Breadcrumbs"
 import { Format } from "../Format"
 import map from "../Home/map.png"
 import ViewsBrowser from "../Views/ViewsBrowser"
+import Loader from "../Loader"
+import { AlertError } from "../Alert"
 // import GoogleMapReact from "google-map-react"
 
 // interface SimpleMapProps {
@@ -55,16 +57,39 @@ export default function DataRequestView(): JSX.Element
     )
 
     if (loading) {
-        return <b>Loading...</b>
+        return <Loader/>
     }
 
     if (error) {
-        return <b>{ error + "" }</b>
+        return <AlertError>{ error + "" }</AlertError>
     }
 
     if (!result) {
-        return <b>Failed to load DataRequest</b>
+        return <AlertError>Failed to load DataRequest</AlertError>
     }
+
+    const requestedData = result.requestedData || {
+        dataSites: [],
+        fields: {
+            demographics : [],
+            diagnoses    : [],
+            immunizations: [],
+            labs         : [],
+            medications  : [],
+            phenotypes   : [],
+            procedures   : []
+        }
+    };
+    
+    const {
+        demographics,
+        diagnoses,
+        immunizations,
+        labs,
+        medications,
+        phenotypes,
+        procedures
+    } = requestedData.fields;
 
     return (
         <div>
@@ -84,18 +109,56 @@ export default function DataRequestView(): JSX.Element
             <div className="row gap">
                 <div className="col col-6">
                     <h5>Status</h5>
-                    <hr className="mb-1"/>
-                    <div className="mb-1"><b>Group</b>: { result.group?.name || "GENERAL" }</div>
-                    <div className="mb-1"><b>Type</b>: { result.refresh ? "SUBSCRIPTION" : "REQUEST" }</div>
-                    <div className="mb-1">
-                        <b>Status</b>: {
-                            result.completed ?
-                            <>completed <Format value={ result.completed } format="date-time" /></> :
-                            "Pending"
-                        }
+                    <hr/>
+                    <div className="left">
+                        <table>
+                            <tbody>
+                                <tr><th className="right pr-1">Group:</th><td>{ result.group?.name || "GENERAL" }</td></tr>
+                                <tr><th className="right pr-1">Type:</th><td>{ result.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION" }</td></tr>
+                                <tr><th className="right pr-1">Status:</th><td>{
+                                        result.completed ?
+                                        <>completed <Format value={ result.completed } format="date-time" /></> :
+                                        "Pending"
+                                    }
+                                </td></tr>
+                                <tr><th className="right pr-1">Refresh:</th><td>{ result.refresh }</td></tr>
+                                <tr><th className="right pr-1">Created:</th><td><Format value={ result.createdAt } format="date-time" /></td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div className="mb-1"><b>Created</b>: <Format value={ result.createdAt } format="date-time" /></div>
-                    {/* <div className="mb-1"><b>Completed</b>: <Format value={ result.completed } format="date-time" /></div> */}
+                    { result.requestedData && <>
+                        <h5 className="mt-3">Requested Data</h5>
+                        <hr/>
+                        <div className="row mt-1">
+                            <div className="col">
+                                <label>Demographics</label>
+                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "age"        ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Age</div>
+                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "cdcAgeGroup") ? " fa-square-check color-blue" : " fa-square grey-out") } /> CDC Age Group</div>
+                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "race"       ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Race</div>
+                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "ethnicity"  ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Ethnicity</div>
+                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "deceased"   ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Deceased</div>
+                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "zip"        ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> ZIP Code</div>
+                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "gender"     ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Gender</div>
+                            </div>
+                            <div className="col">
+                                <label>Other</label>
+                                <div><b className={ "badge" + (labs.length          ? " bg-blue" : " grey-out") }>{ labs.length          }</b> Labs</div>
+                                <div><b className={ "badge" + (diagnoses.length     ? " bg-blue" : " grey-out") }>{ diagnoses.length     }</b> Diagnoses</div>
+                                <div><b className={ "badge" + (immunizations.length ? " bg-blue" : " grey-out") }>{ immunizations.length }</b> Immunizations</div>
+                                <div><b className={ "badge" + (medications.length   ? " bg-blue" : " grey-out") }>{ medications.length   }</b> Medications</div>
+                                <div><b className={ "badge" + (procedures.length    ? " bg-blue" : " grey-out") }>{ procedures.length    }</b> Procedures</div>
+                                <div><b className={ "badge" + (phenotypes.length    ? " bg-blue" : " grey-out") }>{ phenotypes.length    }</b> Computable Phenotypes</div>
+                            </div>
+                        </div>
+                        {/* <div className="row mt-1">
+                            <div className="col">
+                                <label>Data Sites</label>
+                                { requestedData.dataSites.map((item, i) => (
+                                    <div key={i}><i className="fa-regular fa-square-check color-blue icon" /> { item.name || item.label }</div>
+                                )) }
+                            </div>
+                        </div> */}
+                    </> }
                     <h5 className="mt-3">Included Fields</h5>
                     <hr/>
                     { result.data ? result.data.cols.map((col, i) => (
@@ -111,7 +174,7 @@ export default function DataRequestView(): JSX.Element
                                 <i>Description: </i>{ col.description || "No description provided"}
                             </div>
                         </div>
-                    )) : <p>No data available yet</p> }
+                    )) : <p className="color-muted">No data available yet</p> }
                     <br/>
                 </div>
                 <div className="col col-4">
@@ -126,10 +189,23 @@ export default function DataRequestView(): JSX.Element
                 </div>
             </div>
             <hr className="center mt-1"/>
-            <div className="center mt-1 mb-2">
-                <a className="btn btn-blue" href={`${process.env.REACT_APP_BACKEND_HOST}/api/requests/${id}/data?format=csv`}><b> Export Data </b></a>
-                { user?.role === "admin" && <Link className="btn btn-blue ml-1 mr-1" to={`/requests/${result.id}/import`}><b> Import Data </b></Link> }
-                { user?.role === "admin" && <Link className="btn btn-blue" to={`/requests/${result.id}/edit`}><b> Edit this Data Request </b></Link> }
+            <div className="center mt-1 mb-1">
+                <a
+                    aria-disabled={!result.data}
+                    className="btn btn-blue pl-1 pr-1 mt-1 mb-1"
+                    href={`${process.env.REACT_APP_BACKEND_HOST}/api/requests/${id}/data?format=csv`}>
+                    <b> Export Data </b>
+                </a>
+                { user?.role === "admin" && <Link
+                    className="btn btn-blue pl-1 pr-1 m-1"
+                    to={`/requests/${result.id}/import`}
+                    ><b> Import Data </b></Link>
+                }
+                { user?.role === "admin" && <Link
+                    className="btn btn-blue pl-1 pr-1 mt-1 mb-1"
+                    to={`/requests/${result.id}/edit`}
+                    ><b> Edit this Data Request </b></Link>
+                }
             </div>
         </div>
     )

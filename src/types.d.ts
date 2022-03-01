@@ -18,10 +18,10 @@ declare module app {
     }
 
     interface View {
-        id: string
+        id: number
         name: string
         description: string
-        dataSourceId: string
+        dataSourceId: number
         screenShot?: string
         settings?: {
             viewType?: string
@@ -37,7 +37,7 @@ declare module app {
         /**
          * Unique ID for this request
          */
-        id: string
+        id: number
 
         /**
          * Human-friendly name
@@ -48,6 +48,8 @@ declare module app {
          * Short description
          */
         description?: string
+
+        groupId: number
 
         /**
          * Optional group (used by the UI to render requests in groups)
@@ -61,7 +63,7 @@ declare module app {
 
         updatedAt: string | null
 
-        refresh: null | "daily" | "weekly" | "monthly" | "yearly"
+        refresh: "manually" | "daily" | "weekly" | "monthly" | "yearly"
 
         /**
          * Subscriptions are like normal requests but are refreshed automatically
@@ -84,6 +86,29 @@ declare module app {
         completed: string | null
         
         data: DataRequestData
+
+        requestedData: RequestedData | null
+    }
+
+    interface RequestedData {
+        fields: RequestedDataFields
+        dataSites: DataListItem[]
+    }
+
+    interface RequestedDataFields {
+        labs         : DataListItem[]
+        diagnoses    : DataListItem[]
+        immunizations: DataListItem[]
+        medications  : DataListItem[]
+        procedures   : DataListItem[]
+        phenotypes   : DataListItem[]
+        demographics : DataListItem[]
+    }
+
+    interface DataListItem {
+        name: string
+        description: string
+        label?: string
     }
 
     interface DataRequestData {
@@ -121,7 +146,7 @@ declare module app {
     type supportedDataType = "string" | "integer" | "float" | "boolean" | "date:YYYY-MM-DD" | "date:YYYY-MM" | "date:YYYY"
 
     interface RequestGroup {
-        id  : string
+        id  : number
         name: string
         requests: DataRequest[]
     }

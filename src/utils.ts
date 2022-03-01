@@ -24,7 +24,7 @@ export function defer(fn: () => void)
 export function classList(map: Record<string, boolean>): string | undefined {
     let cls: string[] = [];
     for (let name in map) {
-        if (map[name]) {
+        if (name && name !== "undefined" && map[name]) {
             cls.push(name)
         }
     }

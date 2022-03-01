@@ -6,6 +6,8 @@ import { useBackend }             from "../../hooks";
 import { requestGroups }          from "../../backend";
 import Breadcrumbs                from "../Breadcrumbs";
 import { useAuth }                from "../../auth";
+import Loader from "../Loader";
+import { AlertError } from "../Alert";
 
 
 function List({
@@ -39,11 +41,11 @@ export default function DataRequestsListPage()
     );
 
     if (loading) {
-        return <span>Loading Data Requests...</span>
+        return <Loader msg="Loading Data Requests..."/>
     }
 
     if (error) {
-        return <span><b>Error Loading Data Requests: </b>{ error + "" }</span>
+        return <AlertError><b>Error Loading Data Requests: </b>{ error + "" }</AlertError>
     }
 
     return (
@@ -68,8 +70,8 @@ export default function DataRequestsListPage()
             <hr/>
             <div className="row gap mt-2">
                 { groups?.filter(g => g.requests.length > 0).map((group, i) => (
-                    <div key={i} className="col col-0 col-5 pb-1">
-                        <h5>{ group.name }</h5>
+                    <div key={i} className="col pb-1" style={{ flex: "1 1 50%", minWidth: "20em" }}>
+                        <h5 className="color-brand-2"><i className="fa-regular fa-folder"/> { group.name }</h5>
                         <List items={ group.requests }/>
                     </div>
                 )) }

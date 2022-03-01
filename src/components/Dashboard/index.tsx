@@ -168,15 +168,15 @@ export function CreateView()
     );
 
     if (loading) {
-        return <div>Loading Request...</div>
+        return <Loader msg="Loading Request..." />
     }
 
     if (error) {
-        return <pre>{`Error fetching request with id "${id}": ${error}`}</pre>
+        return <AlertError>{`Error fetching request with id "${id}": ${error}`}</AlertError>
     }
 
     if (!result) {
-        return <pre>{`Error fetching request with id "${id}": ${error}`}</pre>
+        return <AlertError>{`Error fetching request with id "${id}"`}</AlertError>
     }
 
     return (
@@ -641,7 +641,7 @@ export function Dashboard({
         
             <br/>
             <br/>
-            <h5>SOURCE DATA { dataRequest.refresh ? "SUBSCRIPTION" : "REFRESH" }</h5>
+            <h5>SOURCE DATA { dataRequest.refresh ? "SUBSCRIPTION" : "REQUEST" }</h5>
             <DataRequestLink request={ dataRequest } />
             <br/>
             <button className="btn btn-blue mt-1 mb-2 grey-out"> <b> Request Data </b> </button>

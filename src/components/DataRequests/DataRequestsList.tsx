@@ -49,7 +49,7 @@ export default function DataRequestsList()
         <div>
             { groups?.filter(g => g.requests.length > 0).map((group, i) => (
                 <div key={i}>
-                    <h6>{ group.name }</h6>
+                    <h6 className="color-brand-2"><i className="fa-regular fa-folder"/> { group.name }</h6>
                     <List items={ group.requests }/>
                 </div>
             )) }
