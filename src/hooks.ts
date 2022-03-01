@@ -13,7 +13,7 @@ function reducer(state: State, payload: Partial<State>): State {
 export function useBackend<T=any>(fn: () => Promise<T>, immediate = false)
 {
     const [state, dispatch] = useReducer(reducer, {
-        loading: false,
+        loading: immediate,
         error: null,
         result: null
     });

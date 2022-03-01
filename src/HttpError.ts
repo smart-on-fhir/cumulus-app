@@ -10,6 +10,6 @@ export default class HttpError extends Error
     }
 
     toString() {
-        return this.message.replace(/^\s*\w*Error\:\s+/, "")
+        return this.message.replace(/^\s*\w*Error:\s+/, "")
     }
 }
