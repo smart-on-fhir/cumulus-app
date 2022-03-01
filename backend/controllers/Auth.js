@@ -1,8 +1,11 @@
 const express   = require("express")
 const Crypto    = require("crypto")
+const Bcrypt    = require("bcryptjs")
 const HttpError = require("httperrors")
 const User      = require("../db/models/User")
+const { wait } = require("../lib")
 
+const AUTH_DELAY = process.env.NODE_ENV === "production" ? 1000 : 1000;
 
 const router = express.Router({ mergeParams: true });
 
@@ -66,6 +69,11 @@ function requireAuth(...roles) {
  * @param {express.Response} res 
  */
 async function login(req, res) {
+    
+    // Introduce 1 second artificial delay to protect against automated
+    // brute-force attacks
+    await wait(AUTH_DELAY);
+
     try {
 
         const { username, password, remember } = req.body;
@@ -79,9 +87,8 @@ async function login(req, res) {
             throw new Error("Invalid username or password");
         }
 
-        // Wrong password
-        // Do NOT specify what is wrong in the error message!
-        if (password !== user.get("password")) {
+        // Wrong password (Do NOT specify what is wrong in the error message!)
+        if (!Bcrypt.compareSync(password, user.get("password") + "")) {
             throw new Error("Invalid username or password");
         }
 
@@ -119,6 +126,9 @@ async function login(req, res) {
  * @param {express.Response} res 
  */
 async function logout(req, res) {
+
+    await wait(AUTH_DELAY);
+
     const { user } = req;
     if (user && user.sid) {
         try {

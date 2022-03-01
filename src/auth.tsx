@@ -5,6 +5,7 @@ import {
   Navigate
 } from "react-router-dom";
 import { auth } from "./backend" 
+import { AlertError } from "./components/Alert";
 
 
 interface AuthContextType {
@@ -75,11 +76,14 @@ export function LoginPage() {
     let location = useLocation();
     let auth     = useAuth();
   
+    const [loading, setLoading] = React.useState(false);
+
     // @ts-ignore
     let from = location.state?.from?.pathname || "/";
   
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        setLoading(true);
     
         const formData = new FormData(event.currentTarget);
         const username = formData.get("username") as string;
@@ -87,6 +91,8 @@ export function LoginPage() {
         const remember = formData.get("remember") as string;
     
         await auth.login(username, password, remember === "true");
+
+        setLoading(false);
         
         // Send them back to the page they tried to visit when they were
         // redirected to the login page. Use { replace: true } so we don't create
@@ -100,12 +106,17 @@ export function LoginPage() {
     return (
         <form className="container row p-1 center" onSubmit={handleSubmit}>
             <div className="col" style={{ maxWidth: "28rem"}}>
-                <h3>Boston Children's Hospital</h3>
-                <hr/>
-                <br/>
-                { auth.error && <p className="color-red">
-                    <i className="fas fa-exclamation-circle" /> { auth.error.message }
-                </p> }
+                <div className="row">
+                    <div className="col center">
+                        <h3>Boston Children's Hospital</h3>
+                    </div>
+                </div>
+                <hr className="mt-1 mb-1" />
+                <div className="row">
+                    <div className="col col-10">
+                        { auth.error && <AlertError className="left">{ auth.error.message }</AlertError> }
+                    </div>
+                </div>
                 <div className="row left">
                     <div className="col">
                         <label>Email</label>
@@ -115,7 +126,17 @@ export function LoginPage() {
                         <label className="mt-1">
                             <input type="checkbox" name="remember" value="true"/> Remember Me
                         </label>
-                        <button type="submit" className="btn-blue mt-2 mb-2">Login</button>
+                        <hr className="mt-1 mb-2" />
+                        <div className="row">
+                            <div className="col"/>
+                            <div className="col">
+                                <button type="submit" className="btn-blue mb-2">
+                                    { loading && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
+                                    Login
+                                </button>
+                            </div>
+                            <div className="col"/>
+                        </div>
                     </div>
                 </div>
             </div>
