@@ -29,7 +29,7 @@ declare module app {
         id: string
         name: string
         description: string
-        dataSourceId: string
+        DataRequestId: number | null
         settings?: {
             viewType?: string
             showOptions?: boolean

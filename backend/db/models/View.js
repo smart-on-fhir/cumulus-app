@@ -36,10 +36,6 @@ class View extends Model
                 type: DataTypes.STRING(500)
             },
             
-            dataSourceId: {
-                type: DataTypes.INTEGER
-            },
-
             screenShot: {
                 type: DataTypes.TEXT,
                 get() {

@@ -1,5 +1,3 @@
-const { QueryTypes } = require("sequelize")
-
 /**
  * @param {import("sequelize").Sequelize} connection
  */
@@ -38,46 +36,79 @@ module.exports = async (connection) => {
     ]);
     await fixAutoIncrement(connection, models.RequestGroup.tableName, "id");
 
+    // Requests ----------------------------------------------------------------
     await models.DataRequest.bulkCreate([
 
         {
             id: 1,
             name: "COVID Dataset 1",
-            // description: "",
+            description: "This is a short description for COVID Dataset 1",
             groupId: 2,
-            refresh: "monthly"
+            refresh: "monthly",
+            requestedData: {
+                fields: {
+                    labs: [
+                        {"name": "COVID-19", "description": "COVID-19 PCR Test Results"},
+                        {"name": "Flu", "description": ""}
+                    ],
+                    diagnoses: [
+                        {"name": "COVID-19", "description": "Have the patients been diagnosed with COVID"}
+                    ],
+                    phenotypes: [],
+                    procedures: [],
+                    medications: [],
+                    demographics: [
+                        {"name": "age", "label": "Age", "description": "Short description of the field"},
+                        {"name": "cdcAgeGroup", "label": "CDC Age Group", "description": "Short description of the field"},
+                        {"name": "race", "label": "Race", "description": "Short description of the field"},
+                        {"name": "ethnicity", "label": "Ethnicity", "description": "Short description of the field"},
+                        {"name": "deceased", "label": "Deceased", "description": "Short description of the field"},
+                        {"name": "gender", "label": "Gender", "description": "Short description of the field"}
+                    ],
+                    immunizations: [
+                        {"name": "COVID-19 #1", "description": "COVID-19 Vaccine - dose 1"},
+                        {"name": "COVID-19 #2", "description": "COVID-19 Vaccine - dose 2"},
+                        {"name": "COVID-19 #3", "description": "COVID-19 Vaccine - dose 3 (booster)"}
+                    ]
+                },
+                dataSites: [
+                    {"name": "Boston Children's Hospital", "description": "Short description of the Boston Children's Hospital data site"},
+                    {"name": "Massachusetts General Hospital", "description": "Short description of the Massachusetts General Hospital data site"}
+                ]
+            }
         },
         {
             id: 2,
             name: "COVID Dataset 2",
+            description: "This is a short description for COVID Dataset 2",
             groupId: 2,
             refresh: "weekly",
-            // completed: null,
         },
         {
             id: 3,
             name: "COVID Dataset 3",
+            description: "This is a short description for COVID Dataset 3",
             groupId: 2,
-            // refresh: "manually",
-            // completed: "2022-02-01",
+            refresh: "manually",
         },
         {
             id: 4,
             name: "INFLUENZA Dataset 1",
+            description: "This is a short description for INFLUENZA Dataset 1",
             groupId: 3,
-            // refresh: "daily",
-            // completed: "2022-02-01",
+            refresh: "manually",
         },
         {
             id: 5,
             name: "HIV Dataset 1",
+            description: "This is a short description for HIV Dataset 1",
             groupId: 4,
             refresh: "weekly",
-            // completed: null,
         },
         {
             id: 6,
             name: "Patient Age and Gender",
+            description: "This is a short description for the Patient Age and Gender Dataset",
             groupId: 1,
             refresh: "monthly",
             completed: "2022-02-02",
@@ -191,7 +222,9 @@ module.exports = async (connection) => {
         {
             id: 7,
             name: "Data for Newborns",
+            description: "This is a short description for the Data for Newborns Dataset",
             groupId: 1,
+            refresh: "manually",
             completed: "2022-02-02",
             data: {
                 cols: [
@@ -532,66 +565,54 @@ module.exports = async (connection) => {
     ]);
     await fixAutoIncrement(connection, models.DataRequest.tableName, "id");
 
+    // Views -------------------------------------------------------------------
     await models.View.bulkCreate([
         {
-            id: 1,
-            name: "Patients by Gender",
-            description: "Shows the number of patients by gender",
-            dataSourceId: 6,
-            // screenShot: "1.png",
+            id           : 1,
+            name         : "Patients by Gender",
+            description  : "Shows the number of patients by gender",
+            DataRequestId: 6,
             settings: {
-                groupBy: "",
-                column: "gender",
-                filters: [],
+                groupBy : "",
+                column  : "gender",
+                filters : [],
                 viewType: "donut3d"
             }
         },
         {
-            id: 2,
-            name: "Number of Patients by Age",
-            description: "Shows the number of patients for each age in years that is found within the data",
-            dataSourceId: 6,
-            // screenShot: "2.png",
+            id           : 2,
+            name         : "Number of Patients by Age",
+            description  : "Shows the number of patients for each age in years that is found within the data",
+            DataRequestId: 6,
             settings: {
                 viewType: "column3d",
-                column : "age",
-                groupBy: "",
-                filters: [
-                    {
-                        left: "age",
-                        operator: "!==",
-                        right: {
-                            type: "null",
-                            value: ""
-                        }
-                    }
-                ],
+                column  : "age",
+                groupBy : "",
+                filters : [],
             }
         },
         {
-            id: 3,
-            name: "Newborns Ethnicity by CDC Age Group",
-            description: "Shows the ethnicity of newborns grouped by CDC age group",
-            dataSourceId: 7,
-            // screenShot: "3.png",
+            id           : 3,
+            name         : "Newborns Ethnicity by CDC Age Group",
+            description  : "Shows the ethnicity of newborns grouped by CDC age group",
+            DataRequestId: 7,
             settings: {
-                viewType: "column3d",
-                column: "ethnicity",
-                groupBy: "age_group",
-                filters: []
+                viewType: "barStack3d",
+                column  : "age_group",
+                groupBy : "ethnicity",
+                filters : []
             }
         },
         {
-            id: 4,
-            name: "0 to 18 Year Old Patient Gender by Age Group",
-            description: "0 to 18 year old patients genders grouped by age groups",
-            dataSourceId: 7,
-            // screenShot: "4.png",
+            id           : 4,
+            name         : "0 to 18 Year Old Patient Gender by Age Group",
+            description  : "0 to 18 year old patients genders grouped by age groups",
+            DataRequestId: 7,
             settings: {
-                groupBy: "age_group",
-                column: "gender",
-                filters: [],
-                viewType: "column"
+                column  : "ethnicity",
+                filters : [],
+                groupBy : "",
+                viewType: "donut3d"
             }
         }
     ]);

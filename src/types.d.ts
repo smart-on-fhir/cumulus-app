@@ -21,7 +21,7 @@ declare module app {
         id: number
         name: string
         description: string
-        dataSourceId: number
+        DataRequestId: number | null
         screenShot?: string
         settings?: {
             viewType?: string

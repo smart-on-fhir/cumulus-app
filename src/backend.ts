@@ -70,7 +70,7 @@ async function getOneView(id: string | number, includeRequest?: false): Promise<
 async function getOneView(id: string | number, includeRequest:boolean = false) {
     return getOne("views", id).then(view => {
         if (includeRequest) {
-            return requests.getOne(view.dataSourceId).then(request => {
+            return requests.getOne(view.DataRequestId).then(request => {
                 return {
                     request,
                     view
