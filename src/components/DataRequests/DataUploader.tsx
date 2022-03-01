@@ -42,16 +42,16 @@ interface Col
 }
 
 function detectDataTypeAt(i: number, rows: string[][]) {
-    let type = "", rowIndex = 0;
+    let type = "";
 
     function getType(x: string) {
         if (!x) {
             return ""
         }
-        if ((/^\-?[0-9]+$/).test(x)) {
+        if ((/^-?[0-9]+$/).test(x)) {
             return "integer"
         }
-        if ((/^\-?[0-9]*\.[0-9]+$/).test(x)) {
+        if ((/^-?[0-9]*\.[0-9]+$/).test(x)) {
             return "float"
         }
         if ((/^\d{4}-\d{2}-\d{2}/).test(x)) {
@@ -61,11 +61,6 @@ function detectDataTypeAt(i: number, rows: string[][]) {
     }
 
     for (let row of rows) {
-
-        // if (++rowIndex > 20) {
-        //     break;
-        // }
-
         let col = String(row[i] || "").trim()
         let t = getType(col)
 
@@ -80,11 +75,8 @@ function detectDataTypeAt(i: number, rows: string[][]) {
             if (type && type !== t) {
                 return "string"
             }
-            // continue;
         }
     }
-
-    // hidden
 
     return type || "hidden"
 }
@@ -819,36 +811,46 @@ export default function DataUploader()
                 <div className="col">
                     <label>Separator</label>
                     <hr/>
-                    <div className="row half-gap">
-                        <div className="col col-2 nowrap">
-                            <label>
+                    <div className="row half-gap middle">
+                        <div className="col col-0 nowrap mr-1">
+                            <label className="inline">
                                 <input type="checkbox" checked={separateByComma} onChange={e => dispatch({ type: "SET_SEPARATE_BY_COMMA", payload: e.target.checked })} /> Comma
                             </label>
                         </div>
-                        <div className="col col-2 nowrap">
-                            <label>
+                        <div className="col col-0 nowrap mr-1">
+                            <label className="inline">
                                 <input type="checkbox" checked={separateByTab} onChange={e => dispatch({ type: "SET_SEPARATE_BY_TAB", payload: e.target.checked })} /> Tab
                             </label>
                         </div>
-                        <div className="col col-2 nowrap">
-                            <label>
+                        <div className="col col-0 nowrap mr-1">
+                            <label className="inline">
                                 <input type="checkbox" checked={separateBySemicolon} onChange={e => dispatch({ type: "SET_SEPARATE_BY_SEMICOLON", payload: e.target.checked })} /> Semicolon
                             </label>
                         </div>
-                        <div className="col col-2 nowrap">
-                            <label>
+                        <div className="col col-0 nowrap mr-1">
+                            <label className="inline">
                                 <input type="checkbox" checked={separateBySpace} onChange={e => dispatch({ type: "SET_SEPARATE_BY_SPACE", payload: e.target.checked })} /> Space
                             </label>
                         </div>
-                        <div className="col col-2 nowrap">
-                            <div className="row">
-                                <div className="col">
-                                    <label>
-                                        <input type="checkbox" checked={customSeparator !== null} onChange={e => dispatch({ type: "SET_CUSTOM_SEPARATOR", payload: e.target.checked ? "" : null })} /> Other:&nbsp;
+                        <div className="col col-0 nowrap">
+                            <div className="row middle">
+                                <div className="col pr-1">
+                                    <label className="inline">
+                                        <input
+                                            type="checkbox"
+                                            checked={customSeparator !== null}
+                                            onChange={e => dispatch({ type: "SET_CUSTOM_SEPARATOR", payload: e.target.checked ? "" : null })}
+                                        /> Other:
                                     </label>
                                 </div>
                                 <div className="col">
-                                    <input type="text" disabled={customSeparator === null} value={customSeparator || ""} onChange={e => dispatch({ type: "SET_CUSTOM_SEPARATOR", payload: e.target.value })} />
+                                    <input
+                                        type="text"
+                                        disabled={customSeparator === null}
+                                        value={customSeparator || ""}
+                                        onChange={e => dispatch({ type: "SET_CUSTOM_SEPARATOR", payload: e.target.value })}
+                                        size={2}
+                                    />
                                 </div>
                             </div>
                         </div>

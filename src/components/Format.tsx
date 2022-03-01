@@ -9,14 +9,14 @@ export function Format({ value, format }: {
         if (!value) {
             return <span className="color-muted">No Data</span>
         }
-        return <span>{ moment(value).format("LL") }</span>
+        return <span>{ moment(value).format("ll") }</span>
     }
     
     if (format === "date-time") {
         if (!value) {
             return <span className="color-muted">No Data</span>
         }
-        return <span>{ moment(value).format("LLLL") }</span>
+        return <span>{ moment(value).format("llll") }</span>
     }
 
     return <span>{ value + "" }</span>

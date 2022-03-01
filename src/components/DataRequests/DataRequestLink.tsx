@@ -4,7 +4,7 @@ import { Format } from "../Format"
 function Icon(props: { type: "ok"|"pending"|"working" }) {
     return (
         <div className="icon">
-            <i className="fas fa-database"/>
+            <i className="fa-solid fa-database"/>
             { props.type === "pending" && <i className="fas fa-clock"/> }
             { props.type === "working" && <i className="fas fa-sync-alt"/> }
             { props.type === "ok" && <i className="fas fa-check-circle"/> }
@@ -20,7 +20,7 @@ export default function DataRequestLink({
     href?: string
 }) {
 
-    let type = request.refresh ? "SUBSCRIPTION" : "REQUEST"
+    let type = request.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION"
     let info = null
     let iconType: "ok"|"pending"|"working" = "ok"
     if (!request.completed) {
@@ -41,9 +41,9 @@ export default function DataRequestLink({
     }
 
     return (
-        <Link to={ href.replace(":id", request.id) } className="icon-item">
+        <Link to={ href.replace(":id", request.id + "") } className="icon-item" title={ request.description }>
             <Icon type={iconType} />
-            { request.name }
+            { request.name }&nbsp;
             {info}
         </Link>
     )

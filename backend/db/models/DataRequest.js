@@ -35,48 +35,59 @@ module.exports = class DataRequest extends Model
                 type: DataTypes.STRING(500)
             },
             
-            // groupID: {
-            //     type: DataTypes.INTEGER
-            // },
-
             refresh: {
-                type: DataTypes.TEXT
+                type: DataTypes.ENUM('manually', 'yearly', 'monthly', 'weekly', 'daily'),
+                defaultValue: "manually",
+                allowNull: false
             },
 
             completed: {
                 type: DataTypes.DATE
             },
+
+            requestedData: {
+                type: DataTypes.JSONB
+            },
             
             data: {
                 type: DataTypes.JSONB,
+                defaultValue: null,
                 validate: {
                     /**
                      * 
                      * @param {import("../../../index").app.DataRequestData} data 
                      */
                     isValidData(data) {
-                        const cntColumn = data.cols.find(c => c.name === "cnt");
-                        const colsLength = data.cols.length;
-                        if (!cntColumn) {
-                            throw new Error('Data must have "cnt" column for aggregate counts');
-                        }
-                        if (cntColumn.dataType !== "integer") {
-                            throw new Error('The dataType of the "cnt" column must be "integer');
-                        }
-
-                        data.rows.forEach((row, rowIndex) => {
-                            const rowLength = row.length
-                            if (rowLength !== colsLength) {
-                                throw new Error(`Invalid data at row ${rowIndex}. Expected ${colsLength} columns but found ${rowLength}`);
+                        if (data !== null)  {
+                            const cntColumn = data.cols.find(c => c.name === "cnt");
+                            const colsLength = data.cols.length;
+                            if (!cntColumn) {
+                                throw new Error('Data must have "cnt" column for aggregate counts');
+                            }
+                            if (cntColumn.dataType !== "integer") {
+                                throw new Error('The dataType of the "cnt" column must be "integer');
                             }
 
-                            // TODO: Validate data types
-                            // row.forEach(cell => {
+                            data.rows.forEach((row, rowIndex) => {
+                                const rowLength = row.length
+                                if (rowLength !== colsLength) {
+                                    throw new Error(`Invalid data at row ${rowIndex}. Expected ${colsLength} columns but found ${rowLength}`);
+                                }
 
-                            // })
-                        })
+                                // TODO: Validate data types
+                                // row.forEach(cell => {
+
+                                // })
+                            })
+                        }
                     }
                 }
+            },
+
+            groupId: {
+                type        : DataTypes.INTEGER,
+                allowNull   : false,
+                defaultValue: 1
             }
         }, {
             sequelize,

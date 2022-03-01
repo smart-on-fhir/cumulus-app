@@ -1,35 +1,87 @@
-import React, { useCallback } from "react"
-import { Link }               from "react-router-dom"
-import { requestGroups }      from "../../backend"
-import { useBackend }         from "../../hooks"
-import { Format }             from "../Format"
-import Select                 from "../Select"
+import React      from "react"
+import { Link }   from "react-router-dom"
+import Checkbox from "../Checkbox";
+import { Format } from "../Format"
+import Select     from "../Select"
 
 import "./form.scss";
 
-interface Field {
+const AVAILABLE_DATA_SITES = [
+    {
+        name: "Boston Children's Hospital",
+        description: "Short description of the Boston Children's Hospital data site"
+    },
+    {
+        name: "Massachusetts General Hospital",
+        description: "Short description of the Massachusetts General Hospital data site"
+    },
+    {
+        name: "RUSH",
+        description: "Short description of the RUSH data site"
+    }
+];
 
-    name: string
-    description: string
-}
+const AVAILABLE_DEMOGRAPHICS = [
+    {
+        name: "age",
+        label: "Age",
+        description: "Short description of the field"
+    },
+    {
+        name: "cdcAgeGroup",
+        label: "CDC Age Group",
+        description: "Short description of the field"
+    },
+    {
+        name: "race",
+        label: "Race",
+        description: "Short description of the field"
+    },
+    {
+        name: "ethnicity",
+        label: "Ethnicity",
+        description: "Short description of the field"
+    },
+    {
+        name: "deceased",
+        label: "Deceased",
+        description: "Short description of the field"
+    },
+    {
+        name: "zip",
+        label: "ZIP Code",
+        description: "Short description of the field"
+    },
+    {
+        name: "gender",
+        label: "Gender",
+        description: "Short description of the field"
+    }
+];
+
+
+
 
 // FieldEditor =================================================================
 
-interface FieldEditorProps {
-    field: Field
+function FieldEditor({
+    field,
+    namePlaceHolder = "Name or code",
+    descriptionPlaceHolder = "Description",
+    onChange
+}: {
+    field: app.DataListItem
     namePlaceHolder?: string
     descriptionPlaceHolder?: string
-    onChange: (f: Partial<Field>) => void
-}
-
-function FieldEditor({ field, namePlaceHolder, descriptionPlaceHolder, onChange }: FieldEditorProps)
+    onChange: (f: Partial<app.DataListItem>) => void
+})
 {
     return (
         <div className="row">
             <div className="col col-3" style={{ paddingRight: "0.5em" }}>
                 <input
                     type="text"
-                    placeholder={ namePlaceHolder || "Name or code" }
+                    placeholder={ namePlaceHolder }
                     value={ field.name }
                     onChange={ e => onChange({ name: e.target.value }) }
                 />
@@ -37,7 +89,7 @@ function FieldEditor({ field, namePlaceHolder, descriptionPlaceHolder, onChange 
             <div className="col">
                 <input
                     type="text"
-                    placeholder={ descriptionPlaceHolder || "Description" }
+                    placeholder={ descriptionPlaceHolder }
                     value={ field.description }
                     onChange={ e => onChange({ description: e.target.value }) }
                 />
@@ -50,35 +102,29 @@ function FieldEditor({ field, namePlaceHolder, descriptionPlaceHolder, onChange 
 // FieldEditorList =============================================================
 
 interface FieldEditorListProps {
-    label: string
-    namePlaceHolder?: string
+    label                  : string
+    namePlaceHolder       ?: string
     descriptionPlaceHolder?: string
-    list: Field[]
-    onChange: (list: Field[]) => void
+    list                   : app.DataListItem[]
+    onChange               : (list: app.DataListItem[]) => void
 }
 
 class FieldEditorList extends React.Component<FieldEditorListProps>
 {
-    add()
-    {
-        this.props.onChange([
-            ...this.props.list,
-            {
-                name: "",
-                description: ""
-            }
-        ]);
+    add() {
+        this.props.onChange([ ...this.props.list, {
+            name: "",
+            description: ""
+        }]);
     }
 
-    remove(index: number)
-    {
+    remove(index: number) {
         const list = [ ...this.props.list ];
         list.splice(index, 1)
         this.props.onChange(list)
     }
 
-    update(index: number, payload: Partial<Field>)
-    {
+    update(index: number, payload: Partial<app.DataListItem>) {
         const list    = [ ...this.props.list ]
         const oldItem = list[index]
         const newItem = { ...oldItem, ...payload }
@@ -86,8 +132,7 @@ class FieldEditorList extends React.Component<FieldEditorListProps>
         this.props.onChange(list)
     }
 
-    render()
-    {
+    render() {
         const { label, namePlaceHolder, descriptionPlaceHolder, list } = this.props
 
         return (
@@ -103,16 +148,6 @@ class FieldEditorList extends React.Component<FieldEditorListProps>
                 <hr/>
                 { list.map((field, i) => (
                     <div key={i} className="row half-gap">
-                        {/* <div className="col col-3">
-                            <input type="text" placeholder="Name" value={ field.name } onChange={e => {
-                                this.update(i, { name: e.target.value })
-                            }} />
-                        </div>
-                        <div className="col">
-                            <input type="text" placeholder="Description" value={ field.description } onChange={e => {
-                                this.update(i, { description: e.target.value })
-                            }} />
-                        </div> */}
                         <div className="col">
                             <FieldEditor
                                 field={field}
@@ -136,38 +171,32 @@ class FieldEditorList extends React.Component<FieldEditorListProps>
 
 
 // FieldsEditor ================================================================
-interface FieldsEditorState {
-    labs         : Field[]
-    diagnoses    : Field[]
-    immunizations: Field[]
-    medications  : Field[]
-    procedures   : Field[]
-    phenotypes   : Field[]
-    age          : boolean
-    cdcAgeGroup  : boolean
-    race         : boolean
-    ethnicity    : boolean
-    deceased     : boolean
-    zip          : boolean
-    gender       : boolean
-} 
-class FieldsEditor extends React.Component<any, FieldsEditorState>
+interface FieldsEditorProps {
+    fields: {
+        labs         : app.DataListItem[]
+        diagnoses    : app.DataListItem[]
+        immunizations: app.DataListItem[]
+        medications  : app.DataListItem[]
+        procedures   : app.DataListItem[]
+        phenotypes   : app.DataListItem[]
+        demographics : app.DataListItem[]
+    },
+    onChange: (state: app.RequestedDataFields) => void
+}
+
+class FieldsEditor extends React.Component<FieldsEditorProps>
 {
-    state: FieldsEditorState = {
-        labs         : [],
-        diagnoses    : [],
-        immunizations: [],
-        medications  : [],
-        procedures   : [],
-        phenotypes   : [],
-        age          : false,
-        cdcAgeGroup  : false,
-        race         : false,
-        ethnicity    : false,
-        deceased     : false,
-        zip          : false,
-        gender       : false
-    };
+    constructor(props: FieldsEditorProps) {
+        super(props)
+        this.onChange = this.onChange.bind(this)
+    }
+
+    onChange(type: keyof app.RequestedDataFields, list: app.DataListItem[]) {
+        this.props.onChange({
+            ...this.props.fields,
+            [type]: list
+        })
+    }
     
     render()
     {
@@ -178,24 +207,18 @@ class FieldsEditor extends React.Component<any, FieldsEditorState>
             medications,
             procedures,
             phenotypes,
-            age,
-            cdcAgeGroup,
-            race,
-            ethnicity,
-            deceased,
-            zip,
-            gender
-        } = this.state;
+            demographics
+        } = this.props.fields
 
         return (
             <div>
                 <br/>
-                <FieldEditorList list={ labs          } onChange={ list => this.setState({ labs         : list }) } label="Labs" />
-                <FieldEditorList list={ diagnoses     } onChange={ list => this.setState({ diagnoses    : list }) } label="Diagnoses" />
-                <FieldEditorList list={ immunizations } onChange={ list => this.setState({ immunizations: list }) } label="Immunizations" />
-                <FieldEditorList list={ medications   } onChange={ list => this.setState({ medications  : list }) } label="Medications" />
-                <FieldEditorList list={ procedures    } onChange={ list => this.setState({ procedures   : list }) } label="Procedures" />
-                <FieldEditorList list={ phenotypes    } onChange={ list => this.setState({ phenotypes   : list }) } label="Computable Phenotypes" />
+                <FieldEditorList list={ labs          } onChange={ list => this.onChange("labs"         , list) } label="Labs" />
+                <FieldEditorList list={ diagnoses     } onChange={ list => this.onChange("diagnoses"    , list) } label="Diagnoses" />
+                <FieldEditorList list={ immunizations } onChange={ list => this.onChange("immunizations", list) } label="Immunizations" />
+                <FieldEditorList list={ medications   } onChange={ list => this.onChange("medications"  , list) } label="Medications" />
+                <FieldEditorList list={ procedures    } onChange={ list => this.onChange("procedures"   , list) } label="Procedures" />
+                <FieldEditorList list={ phenotypes    } onChange={ list => this.onChange("phenotypes"   , list) } label="Computable Phenotypes" />
 
                 <div className="row">
                     <div className="col middle">
@@ -203,87 +226,64 @@ class FieldsEditor extends React.Component<any, FieldsEditorState>
                     </div>
                 </div>
                 <hr/>
-                <div className="row">
-                    <div className="col col-0 col-5">
-                        <label className="checkbox-label mt-1">
-                            <input type="checkbox" checked={ age } onChange={e => this.setState({ age: e.target.checked })} />
-                            Age
-                            <div className="checkbox-label-description color-muted">Short description of the field</div>
-                        </label>
-                    </div>
-                    <div className="col col-0 col-5">
-                        <label className="checkbox-label mt-1">
-                            <input type="checkbox" checked={ cdcAgeGroup } onChange={e => this.setState({ cdcAgeGroup: e.target.checked })} />
-                            CDC Age Group
-                            <div className="checkbox-label-description color-muted">Short description of the field</div>
-                        </label>
-                    </div>
-                    <div className="col col-0 col-5">
-                        <label className="checkbox-label mt-1">
-                            <input type="checkbox" checked={ race } onChange={e => this.setState({ race: e.target.checked })} />
-                            Race
-                            <div className="checkbox-label-description color-muted">Short description of the field</div>
-                        </label>
-                    </div>
-                    <div className="col col-0 col-5">
-                        <label className="checkbox-label mt-1">
-                            <input type="checkbox" checked={ ethnicity } onChange={e => this.setState({ ethnicity: e.target.checked })} />
-                            Ethnicity
-                            <div className="checkbox-label-description color-muted">Short description of the field</div>
-                        </label>
-                    </div>
-                    <div className="col col-0 col-5">
-                        <label className="checkbox-label mt-1">
-                            <input type="checkbox" checked={ deceased } onChange={e => this.setState({ deceased: e.target.checked })} />
-                            Deceased
-                            <div className="checkbox-label-description color-muted">Short description of the field</div>
-                        </label>
-                    </div>
-                    <div className="col col-0 col-5">
-                        <label className="checkbox-label mt-1">
-                            <input type="checkbox" checked={ zip } onChange={e => this.setState({ zip: e.target.checked })} />
-                            ZIP Code
-                            <div className="checkbox-label-description color-muted">Short description of the field</div>
-                        </label>
-                    </div>
-                    <div className="col col-0 col-5">
-                        <label className="checkbox-label mt-1">
-                            <input type="checkbox" checked={ gender } onChange={e => this.setState({ gender: e.target.checked })} />
-                            Gender
-                            <div className="checkbox-label-description color-muted">Short description of the field</div>
-                        </label>
-                    </div>
+                <div className="row gap">
+                    { AVAILABLE_DEMOGRAPHICS.map((item, i) => (
+                        <div key={i} className="col col-0 col-5">
+                            <DataListItemCheckbox
+                                checked={!!demographics.find(x => x.name === item.name)}
+                                item={item}
+                                onChange={on => this.onChange(
+                                    "demographics",
+                                    AVAILABLE_DEMOGRAPHICS.filter(
+                                        d => d.name === item.name ?
+                                            on :
+                                            !!demographics.find(x => x.name === d.name)
+                                        )
+                                )}
+                            />
+                        </div>    
+                    ))}
                 </div>
             </div>
         )
     }
 }
 
+function DataListItemCheckbox({ item, checked, onChange }: {
+    item    : app.DataListItem
+    checked : boolean
+    onChange: (checked: boolean) => void
+}) {
+    return (
+        <Checkbox
+            checked={checked}
+            onChange={onChange}
+            name={item.name}
+            label={item.label}
+            description={item.description}
+            className="mt-1"
+        />
+    )
+}
+
+
 
 export default function DataRequestForm({
     saveRequest,
     deleteRequest,
     record = {},
-    onChange
+    onChange,
+    requestGroups,
+    working
 }: {
     saveRequest: () => void
     deleteRequest?: () => void
     record?: Partial<app.DataRequest>
     onChange: (state: Partial<app.DataRequest>) => void
+    requestGroups: app.RequestGroup[]
+    working?: "deleting" | "saving"
 })
 {
-    const {
-        loading: loadingRequestGroups,
-        error: loadingRequestGroupsError,
-        result: availableRequestGroups
-    } = useBackend<app.RequestGroup[]>(
-        useCallback(
-            () => requestGroups.getAll(),
-            []
-        ),
-        true
-    );
-
     function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         saveRequest()
@@ -295,30 +295,78 @@ export default function DataRequestForm({
         updatedAt,
         completed,
         name = "",
-        description = ""
+        description = "",
+        groupId = 1
     } = record
+
+    let requestedData = record.requestedData || {
+        dataSites: [AVAILABLE_DATA_SITES[0]] as app.DataListItem[],
+        fields: {
+            labs         : [] as app.DataListItem[],
+            diagnoses    : [] as app.DataListItem[],
+            immunizations: [] as app.DataListItem[],
+            medications  : [] as app.DataListItem[],
+            procedures   : [] as app.DataListItem[],
+            phenotypes   : [] as app.DataListItem[],
+            demographics : [] as app.DataListItem[],
+        }
+    } as app.RequestedData;
+
+    function toggleDataSite(site: app.DataListItem) {
+        const sites = [...requestedData.dataSites];
+        const siteIndex = sites.findIndex(x => x.name === site.name)
+        if (siteIndex < 0) {
+            sites.push(site)
+        } else {
+            sites.splice(siteIndex, 1)
+        }
+
+        onChange({
+            ...record,
+            requestedData: {
+                ...requestedData,
+                dataSites: sites
+            }
+        })
+    }
 
     return (
         <form onSubmit={ onSubmit }>
-            <div className="row gap color-muted small">
-                <div className="col">
-                    { loadingRequestGroupsError && <div><b>Error loading request groups:</b> { loadingRequestGroupsError + "" }</div> }
-                    { loadingRequestGroups && <div><b>Loading Request Groups...</b></div> }
+            { id && <div className="row gap color-muted small mt-1">
+                <div className="col mb-1">
+                    <b className="nowrap">Created</b> <Format value={ createdAt } format="date-time" />
                 </div>
-            </div>
-            { id && <div className="row color-muted small mt-1">
-                <div className="col col-0 nowrap mb-1"><b>Created:</b> <Format value={ createdAt } format="date-time" /></div>
-                <div className="col"/>
-                <div className="col nowrap mb-1"><b>Updated:</b> <Format value={ updatedAt } format="date-time" /></div>
-                <div className="col"/>
-                <div className="col col-0 nowrap mb-1"><b>Fetched:</b> <Format value={ completed } format="date-time" /></div>
+                <div className="col mb-1 center">
+                    <b className="nowrap">Updated</b> <Format value={ updatedAt } format="date-time" />
+                </div>
+                <div className="col mb-1 right">
+                    <b className="nowrap">Data Inserted</b> <Format value={ completed } format="date-time" />
+                </div>
             </div> }
             <div className="row gap mt-1">
                 <div className="col">
-                    <label>Name</label>
-                    <input type="text" value={ name || "" } onChange={e => onChange({ ...record, name: e.target.value })} />
-                    <label className="mt-1">Description</label>
-                    <textarea value={ description || "" } onChange={e => onChange({ ...record, description: e.target.value })} />
+                    <div className="row gap middle">
+                        <label className="col">Name</label>
+                        <span className="col right color-muted small">Up to 100 characters</span>
+                    </div>
+                    <input
+                        type="text"
+                        value={ name || "" }
+                        onChange={e => onChange({ ...record, name: e.target.value })}
+                        name="DataRequestName"
+                        placeholder="Data Request Name"
+                        required
+                    />
+
+                    <div className="row gap middle mt-1">
+                        <label className="col">Description</label>
+                        <span className="col right color-muted small">Up to 500 characters</span>
+                    </div>
+                    <textarea
+                        value={ description || "" }
+                        onChange={e => onChange({ ...record, description: e.target.value })}
+                        placeholder="Data Request Description"
+                    />
                 </div>
             </div>
             <div className="row gap mt-1 mb-2">
@@ -331,9 +379,8 @@ export default function DataRequestForm({
                             <Link to="/groups">Manage Groups</Link>
                         </div>
                     </div>
-                    <select>
-                        {/* <option>None</option> */}
-                        {(availableRequestGroups || []).map((g, i) => (
+                    <select value={groupId} onChange={e => onChange({ ...record, groupId: +e.target.value })}>
+                        {requestGroups.map((g, i) => (
                             <option key={i} value={g.id}>{g.name}</option>
                         ))}
                     </select>
@@ -342,13 +389,13 @@ export default function DataRequestForm({
                     <label>Refresh</label>
                     <Select 
                         placeholder="Please select"
-                        value={ record.refresh || null }
+                        value={ record.refresh || "manually" }
                         options={[
-                            { value: null, label: "Manually", icon: "fas fa-envelope" },
-                            { value: "y" , label: "Yearly" , disabled: true, icon: "fas fa-ban" },
-                            { value: "m" , label: "Monthly", disabled: true, icon: "fas fa-ban" },
-                            { value: "w" , label: "Weekly" , disabled: true, icon: "fas fa-ban" },
-                            { value: "d" , label: "Daily"  , disabled: true, icon: "fas fa-ban" }
+                            { value: "manually", label: "Manually", icon: "fas fa-envelope" },
+                            { value: "yearly"  , label: "Yearly"  , icon: "fas fa-ban", disabled: true },
+                            { value: "monthly" , label: "Monthly" , icon: "fas fa-ban", disabled: true },
+                            { value: "weekly"  , label: "Weekly"  , icon: "fas fa-ban", disabled: true },
+                            { value: "daily"   , label: "Daily"   , icon: "fas fa-ban", disabled: true }
                         ]}
                         onChange={value => {
                             onChange({ ...record, refresh: value })
@@ -360,50 +407,55 @@ export default function DataRequestForm({
                 <div className="col col-6">
                     <h4>Included Fields</h4>
                     <hr/>
-                    <FieldsEditor/>
+                    <FieldsEditor fields={requestedData.fields} onChange={ fields => onChange({
+                        ...record,
+                        requestedData: {
+                            ...requestedData,
+                            fields
+                        }
+                    }) }/>
                 </div>
-                <div className="col col-4 grey-out">
+                <div className="col col-4">
                     <h4>Included Data Sites</h4>
                     <hr/>
-                    <label className="checkbox-label mt-1">
-                        <input type="checkbox" defaultChecked />
-                        Boston Children's Hospital
-                        <div className="checkbox-label-description color-muted">Short description of the Boston Children's Hospital data site</div>
-                    </label>
-                    <label className="checkbox-label mt-1">
-                        <input type="checkbox" />
-                        Massachusetts General Hospital
-                        <div className="checkbox-label-description color-muted">Short description of the Massachusetts General Hospital data site</div>
-                    </label>
-                    <label className="checkbox-label mt-1">
-                        <input type="checkbox" />
-                        RUSH
-                        <div className="checkbox-label-description color-muted">Short description of the RUSH data site</div>
-                    </label>
+                    { AVAILABLE_DATA_SITES.map((site, i) => (
+                        <DataListItemCheckbox
+                            key={i}
+                            item={site}
+                            checked={!!requestedData.dataSites.find(x => x.name === site.name)}
+                            onChange={() => toggleDataSite(site)}
+                        />
+                    ))}
                 </div>
             </div>
 
             <hr/>
+
             <div className="row gap">
-                <div className="col col-6">
-                    <div className="row gap">
-                        { completed && <div className="col mt-1 mb-1">
-                            <button className="btn btn-blue grey-out">Export Data</button>
-                        </div> }
-                        { id && <div className="col mt-1 mb-1">
-                            <Link className="btn btn-blue" to={`/requests/${id}/import`}>Import Data</Link>
-                        </div> }
-                        { deleteRequest &&
-                            <div className="col mt-1 mb-1">
-                                <button className="btn color-red grey-out" type="button" onClick={deleteRequest}>Delete Request</button>
-                            </div>
-                        }
+                { id && <>
+                    <div className="col">
+                        <div className="row gap">
+                            { deleteRequest &&
+                                <div className="col mt-1 mb-1">
+                                    <button className="btn color-red" type="button" onClick={deleteRequest}>
+                                        { working === "deleting" && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
+                                        Delete Request
+                                    </button>
+                                </div>
+                            }
+                        </div>
                     </div>
-                </div>
-                <div className="col mt-1 mb-1"></div>
+                    <div className="col"/>
+                </> }
+
+                { !id && <div className="col"/> }
                 <div className="col mt-1 mb-1">
-                    <button className="btn btn-green" type="submit">{ id ? "Save Changes" : "Create Request" }</button>
+                    <button className="btn btn-green" type="submit">
+                        { working === "saving" && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
+                        { id ? "Save Changes" : "Create Request" }
+                    </button>
                 </div>
+                { !id && <div className="col"/> }
             </div>
             
         </form>
