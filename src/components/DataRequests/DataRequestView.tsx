@@ -113,16 +113,16 @@ export default function DataRequestView(): JSX.Element
                     <div className="left">
                         <table>
                             <tbody>
-                                <tr><th className="right pr-1">Group:</th><td>{ result.group?.name || "GENERAL" }</td></tr>
-                                <tr><th className="right pr-1">Type:</th><td>{ result.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION" }</td></tr>
-                                <tr><th className="right pr-1">Status:</th><td>{
+                                <tr><th className="right pr-1 pl-1">Group:</th><td>{ result.group?.name || "GENERAL" }</td></tr>
+                                <tr><th className="right pr-1 pl-1">Type:</th><td>{ result.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION" }</td></tr>
+                                <tr><th className="right pr-1 pl-1">Status:</th><td>{
                                         result.completed ?
                                         <>completed <Format value={ result.completed } format="date-time" /></> :
                                         "Pending"
                                     }
                                 </td></tr>
-                                <tr><th className="right pr-1">Refresh:</th><td>{ result.refresh }</td></tr>
-                                <tr><th className="right pr-1">Created:</th><td><Format value={ result.createdAt } format="date-time" /></td></tr>
+                                <tr><th className="right pr-1 pl-1">Refresh:</th><td>{ result.refresh }</td></tr>
+                                <tr><th className="right pr-1 pl-1">Created:</th><td><Format value={ result.createdAt } format="date-time" /></td></tr>
                             </tbody>
                         </table>
                     </div>
