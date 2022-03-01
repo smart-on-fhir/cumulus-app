@@ -27,6 +27,9 @@ body {
   flex-wrap: nowrap;
 }
 
+.pull-right { float: right; }
+.pull-left { float: left; }
+
 
 // Typography ------------------------------------------------------------------
 h1 { font-size: $font-size * 2;   font-family: "Open Sans"; margin: 1ex 0 0.5ex 0; }
@@ -36,8 +39,12 @@ h4 { font-size: $font-size * 1.4; font-family: "Open Sans"; margin: 1ex 0 0.5ex 
 h5 { font-size: $font-size * 1.2; font-family: "Open Sans"; margin: 1ex 0 0.5ex 0; }
 h6 { font-size: $font-size;       font-family: "Open Sans"; margin: 1ex 0 0.5ex 0; }
 
+p {
+  margin: 0.5em 0 0;
+}
+
 .small {
-  font-size: 85%;
+  font-size: 80%;
 }
 
 code, pre {
@@ -91,6 +98,7 @@ a {
 .color-grey       { color: $color-grey       }
 .color-grey-dark  { color: $color-grey-dark  }
 .color-green      { color: $color-green      }
+.color-brand-2    { color: $color-brand-2    }
 .color-muted      { opacity: 0.65 } 
 
 .bg-blue       { background-color: fade-out($color: $color-blue      , $amount: 0.9) }
@@ -100,6 +108,7 @@ a {
 .bg-grey       { background-color: fade-in( $color: $color-grey      , $amount: 0.1) }
 .bg-grey-dark  { background-color: fade-out($color: $color-grey-dark , $amount: 0.9) }
 .bg-green      { background-color: fade-out($color: $color-green     , $amount: 0.9) }
+.bg-brand-2    { background-color: fade-out($color: $color-brand-2   , $amount: 0.9) }
 // .bg-muted      { background-color; 0.65 } 
 
 // Paddings --------------------------------------------------------------------
@@ -177,11 +186,13 @@ ul {
 
 .icon-list {
   padding: 0;
+  margin : 0 0 2em 0;
 
   li {
     list-style: none;
-    position: relative;
-    margin: 1em 0;
+    position  : relative;
+    margin    : 0;
+    padding   : 0 1em;
   }
 }
 
@@ -189,19 +200,20 @@ ul {
 
 .icon-item {
     position: relative;
-    padding: 0 0 0 $font-size * 2;
+    padding: 0.5em 0.5em 0.5em 2.75em;
+    margin: 0 -1em;
     display: inline-block;
 
     .icon {
-        position: absolute;
-        left: 0;
-        font-size: $font-size * 1.4;
-        color: #888;
+        position  : absolute;
+        left      : 0.5em;
+        font-size : $font-size * 1.4;
+        color     : #999;
         margin-top: 0.1em;
 
         .fa-check-circle {
-            position: relative;
-            z-index: 2;
+            position : relative;
+            z-index  : 2;
             font-size: $font-size;
             top: 0.6em;
             left: -0.6em;
@@ -212,28 +224,28 @@ ul {
         }
 
         .fa-clock {
-            position: relative;
-            z-index: 2;
-            font-size: $font-size;
-            top: 0.6em;
-            left: -0.6em;
-            color: $color-orange;
+            position  : relative;
+            z-index   : 2;
+            font-size : $font-size;
+            top       : 0.6em;
+            left      : -0.6em;
+            color     : $color-orange;
             background: #FFF;
             border-radius: 100%;
-            padding: 1px;
+            padding   : 1px;
         }
 
         .fa-sync-alt {
-            position: relative;
-            z-index: 2;
-            font-size: $font-size * 0.78;
-            top: 0.5em;
-            left: -0.7em;
-            color: #FFF;
+            position  : relative;
+            z-index   : 2;
+            font-size : $font-size * 0.78;
+            top       : 0.5em;
+            left      : -1em;
+            color     : #FFF;
             background: $color-green;
             border-radius: 100%;
-            padding: 3px;
-            border: 1px solid #FFF;
+            padding   : 3px;
+            border    : 1px solid #FFF;
         }
     }
 }
@@ -241,10 +253,12 @@ ul {
 .link-list {
   a.icon-item {
     display: block;
+    border-radius: 4px;
+    // padding: ;
     &:hover {
       background: lighten($color: $color-blue, $amount: 36%);
-      box-shadow: 0 0 0 5px lighten($color: $color-blue, $amount: 36%), 0 0 0 6px lighten($color: $color-blue, $amount: 30%);
-      border-radius: 1px;
+      box-shadow: 0 0 0 1px lighten($color: $color-blue, $amount: 30%) inset;
+      // border-radius: 1px;
     }
   }
 }
@@ -255,7 +269,7 @@ ul {
   width: 100%;
 }
 
-.grey-out {
+.grey-out, [aria-disabled="true"] {
   pointer-events: none;
   filter: grayscale(1) opacity(0.6);
   // cursor: not-allowed;
@@ -288,19 +302,31 @@ ul {
   color: #888;
 }
 
-
 .badge {
-  background: rgba(0, 0, 0, 0.4);
-  color: #FFF;
-  border-radius: 100px;
-  padding: 0.15em 0.4em 0.1em;
-  line-height: 1;
-  display: inline-block;
-  font-weight: normal;
-  min-width: 1.4em;
-  text-align: center;
-  font-size: 80%;
+  background    : rgba(0, 0, 0, 0.4);
+  color         : #FFF;
+  border-radius : 100px;
+  padding       : 0.15em 0.4em 0.1em;
+  line-height   : 1;
+  display       : inline-block;
+  font-weight   : normal;
+  min-width     : 1.4em;
+  text-align    : center;
+  font-size     : 76%;
+  vertical-align: middle;
+  margin        : -0.2em 0 0 0;
+  font-weight   : bold;
+
+  &.bg-blue       { background-color: $color-blue       }
+  &.bg-orange     { background-color: $color-orange     }
+  &.bg-red        { background-color: $color-red        }
+  &.bg-grey-light { background-color: $color-grey-light }
+  &.bg-grey       { background-color: $color-grey       }
+  &.bg-grey-dark  { background-color: $color-grey-dark  }
+  &.bg-green      { background-color: $color-green      }
+  &.bg-brand-2    { background-color: $color-brand-2    }
 }
+
 
 img {
   max-width: 100%;

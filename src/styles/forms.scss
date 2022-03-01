@@ -58,7 +58,7 @@
   
     &:hover:not(:disabled, .disabled) {
         background: $hoverBg;
-        color     : contrast($hoverBg, 60%, lighten($hoverBg, $contrast), darken($hoverBg, $contrast));;
+        color     : contrast($hoverBg, 60%, lighten($hoverBg, $contrast), darken($hoverBg, $contrast));
     }
 
     &:active:not(:disabled, .disabled), &.active:not(:disabled, .disabled) {
@@ -69,7 +69,9 @@
     }
 
     &:focus {
-        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 0 3px fade-out($bg, 0.7);
+        // box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.99), 0 0 0 3px fade-out($color-blue, 0.25);
+        border-color: rgba(0, 99, 212, 0.746);
+        box-shadow: 0 0 0 3px rgba(37, 139, 255, 0.3);
     }
 
     &:disabled, &.disabled {
@@ -185,6 +187,11 @@ textarea,
 }
 :disabled::file-selector-button {
     @include disabled-file-selector-button();
+}
+
+::placeholder,
+::-webkit-input-placeholder {
+    color: #999;
 }
 
 textarea {
@@ -303,24 +310,11 @@ label {
     + hr {
         margin-top: 0.4ex;
     }
-}
 
-label.checkbox-label {
-    display: inline-block;
-    padding: 0 0 0 1.5em;
-
-    > input[type="checkbox"] {
-        font-size:  inherit;
-        margin: 0 0 0 -1.5em;
-        width: 1.5em;
-    }
-
-    .checkbox-label-description {
-        font-weight: normal;
-        font-size: 85%;
+    &.inline {
+        padding: 0
     }
 }
-
 
 .tab-panel {
 
