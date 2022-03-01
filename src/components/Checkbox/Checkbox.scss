@@ -1,0 +1,36 @@
+@import "../../styles/variables.scss";
+
+
+label.checkbox-label {
+    display: inline-block;
+    padding: 0.25em 0.25em 0.25em 1.5em;
+    border-radius: 4px;
+    position: relative;
+
+    > input[type="checkbox"], > input[type="radio"] {
+        font-size:  inherit;
+        margin: 0 0 0 -1.5em;
+        width: 1.5em;
+        outline: 0;
+
+        &:focus-visible + .checkbox-label-focus-highlight {
+            box-shadow: 0 0 0 1px lighten($color: $color-blue, $amount: 10%) inset;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            border-radius: 4px;
+        }
+    }
+
+    .checkbox-label-description {
+        font-weight: normal;
+        font-size: 85%;
+    }
+
+    &:hover {
+        background: lighten($color: $color-blue, $amount: 36%);
+        box-shadow: 0 0 0 1px lighten($color: $color-blue, $amount: 30%) inset;
+    }
+}
