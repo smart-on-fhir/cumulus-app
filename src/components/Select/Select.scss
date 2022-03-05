@@ -16,10 +16,10 @@
         // position: relative;
         // min-width: 100%;
         display: flex;
-        // max-width: 60%;
+        max-height: 1.4em;
         flex: 1 1 0;
         // width: 100%;
-        align-items: center;
+        align-items: baseline;
         // justify-content: center;
         // justify-content: space-between;
         // flex-wrap: nowrap;
@@ -37,15 +37,29 @@
             max-width: 1.2em;
             // top: 50%;
             margin: 0 0.2em 0 0;
-            overflow: hidden;
-            font-size: inherit;
-            line-height: inherit;
+            overflow: visible;
+            font-size: 1.2em;
+            line-height: 1.2em;
             // background: rgba(128, 255, 0, 0.5);
             text-align: center;
             vertical-align: middle;
             display: flex;
             flex: 0 0 1.2em;
+            align-self: center;
             // background: skyblue;
+        }
+
+        img.select-component-option-icon {
+            width    : 0.55em;
+            height   : 0.55em;
+            min-width: 0.55em;
+            max-width: 0.55em;
+            margin   : 0 1em 0 0;
+            line-height: 0;
+            vertical-align: top;
+            transform-origin: 0 50%;
+            transform: scale((100/55));
+            overflow: visible;
         }
 
         span {
@@ -134,25 +148,34 @@
             width: 1.2em;
             height: 1.2em;
             min-width: 1.2em;
-            top: 50%;
-            margin: -0.6em 0 0 -1.5em;
-            overflow: hidden;
+            top: 0.2em;
+            margin: -0em 0 0 -1.6em;
+            // overflow: hidden;
             font-size: inherit;
             line-height: 1.2em;
             // background: rgba(128, 255, 0, 0.5);
             text-align: center;
         }
 
-        &.selected {
-            background: linear-gradient(90deg, #EEE, #DDD);
-            box-shadow: 0 0 0 0.75px #BBB inset;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
-        }
-
         &.highlighted {
             background: linear-gradient(90deg, rgba(129, 171, 214, 0.3), rgb(186, 206, 224));
             box-shadow: 0 0 0 0.75px rgb(154, 178, 201) inset;
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        &.selected {
+            // background: linear-gradient(90deg, #EEE, #DDD);
+            // box-shadow: 0 0 0 0.75px #BBB inset;
+            // text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+
+            background: linear-gradient(90deg, #369, rgb(28, 79, 129));
+            box-shadow: 0 0 0 0.75px #036 inset;
+            color: #FFF;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+
+            .select-component-option-icon {
+                color: #FFF;
+            }
         }
 
         &.disabled {

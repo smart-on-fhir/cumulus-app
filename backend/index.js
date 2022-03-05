@@ -50,6 +50,7 @@ function setupAPI(app, { verbose })
     app.use("/api/requests"      , require("./controllers/DataRequest" ));
     app.use("/api/views"         , require("./controllers/View"        ));
     app.use("/api/users"         , require("./controllers/User"        ));
+    app.use("/api/activity"      , require("./controllers/Activity"    ));
     verbose && console.log("✔ REST API set up");
 }
 

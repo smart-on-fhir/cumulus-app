@@ -1,19 +1,14 @@
-const { DataTypes, Model } = require("sequelize")
+const { DataTypes, Model } = require("sequelize");
+const Activity = require("./Activity");
 
-// CREATE TABLE "data_requests"(
-// 	"id"          Integer  NOT NULL PRIMARY KEY AUTOINCREMENT,
-// 	"name"        Text     NOT NULL,
-// 	"description" Text,
-// 	"groupID"     Integer,
-// 	"refresh"     Text,  -- null | daily | weekly | monthly | yearly
-// 	"created"     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-// 	"completed"   TIMESTAMP,
-// 	"cols"        Text,  -- JSON
-// 	"rows"        Text   -- JSON
-// );
+
 
 module.exports = class DataRequest extends Model
 {
+    toString() {
+        return `DataRequest #${this.get("id")} ("${this.get("name")}")`;
+    }
+
     /**
      * @param {import("sequelize").Sequelize} sequelize
      */
@@ -88,6 +83,10 @@ module.exports = class DataRequest extends Model
                 type        : DataTypes.INTEGER,
                 allowNull   : false,
                 defaultValue: 1
+            },
+
+            dataURL: {
+                type: DataTypes.STRING(500)
             }
         }, {
             sequelize,
@@ -97,12 +96,33 @@ module.exports = class DataRequest extends Model
                 /**
                  * When data is imported, make sure we update the "completed"
                  * column to the current date.
-                 * @param {DataRequest} instance 
+                 * @param {DataRequest} model 
                  */
-                beforeUpdate(instance) {
-                    if (instance.getDataValue("data")) {
-                        instance.set("completed", new Date())
+                async beforeUpdate(model) {
+                    if (model.getDataValue("data")) {
+                        model.set("completed", new Date())
                     }
+                },
+
+                async afterCreate(model, { user }) {
+                    await Activity.create({
+                        message: `${model} created by ${user ? user.username : "system"}`,
+                        tags   : "requests"
+                    });
+                },
+
+                async afterUpdate(model, { user }) {
+                    await Activity.create({
+                        message: `${model} updated by ${user ? user.username : "system"}`,
+                        tags   : "requests"
+                    });
+                },
+
+                async afterDestroy(model, { user }) {
+                    await Activity.create({
+                        message: `${model} deleted by ${user ? user.username : "system"}`,
+                        tags   : "requests"
+                    });
                 }
             }
         });

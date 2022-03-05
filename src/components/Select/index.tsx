@@ -110,7 +110,7 @@ export default function Select({
             onKeyDown={ onKeyDown }
             onBlur={ closeMenu }
             onMouseDown={ toggleMenu }
-            title={ title || (selectedOption ? "Selected: " + JSON.stringify(selectedOption.label || selectedOption.value) : undefined) }
+            title={ title || (selectedOption ? "Selected: " + JSON.stringify(selectedOption.value) : undefined) }
         >
             <div className="select-component-value">{
                 selectedOption ?

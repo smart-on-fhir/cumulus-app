@@ -1,6 +1,6 @@
 import React      from "react"
 import { Link }   from "react-router-dom"
-import Checkbox from "../Checkbox";
+import Checkbox   from "../Checkbox";
 import { Format } from "../Format"
 import Select     from "../Select"
 
@@ -59,7 +59,7 @@ const AVAILABLE_DEMOGRAPHICS = [
     }
 ];
 
-
+// const RE_URL = /^(http|https):\/\/[^ "]+$/;
 
 
 // FieldEditor =================================================================
@@ -296,7 +296,10 @@ export default function DataRequestForm({
         completed,
         name = "",
         description = "",
-        groupId = 1
+        groupId = 1,
+        refresh = "manually",
+        dataURL = "",
+        dataSourceType = record.dataURL ? "url" : "file"
     } = record
 
     let requestedData = record.requestedData || {
@@ -344,10 +347,11 @@ export default function DataRequestForm({
                 </div>
             </div> }
             <div className="row gap mt-1">
-                <div className="col">
+                
+                <div className="col col-6">
                     <div className="row gap middle">
                         <label className="col">Name</label>
-                        <span className="col right color-muted small">Up to 100 characters</span>
+                        <span className="col right color-muted small">Up to 100 characters&nbsp;</span>
                     </div>
                     <input
                         type="text"
@@ -357,26 +361,14 @@ export default function DataRequestForm({
                         placeholder="Data Request Name"
                         required
                     />
-
-                    <div className="row gap middle mt-1">
-                        <label className="col">Description</label>
-                        <span className="col right color-muted small">Up to 500 characters</span>
-                    </div>
-                    <textarea
-                        value={ description || "" }
-                        onChange={e => onChange({ ...record, description: e.target.value })}
-                        placeholder="Data Request Description"
-                    />
-                </div>
-            </div>
-            <div className="row gap mt-1 mb-2">
-                <div className="col col-6">
-                    <div className="row gap">
+                    <div className="row gap mt-1">
                         <div className="col middle">
                             <label>Group</label>
                         </div>
                         <div className="col right middle color-blue">
-                            <Link to="/groups">Manage Groups</Link>
+                            <Link to="/groups">
+                                Manage Groups <i className="fa-solid fa-up-right-from-square" />
+                            </Link>
                         </div>
                     </div>
                     <select value={groupId} onChange={e => onChange({ ...record, groupId: +e.target.value })}>
@@ -385,25 +377,128 @@ export default function DataRequestForm({
                         ))}
                     </select>
                 </div>
+                
                 <div className="col">
-                    <label>Refresh</label>
-                    <Select 
-                        placeholder="Please select"
-                        value={ record.refresh || "manually" }
-                        options={[
-                            { value: "manually", label: "Manually", icon: "fas fa-envelope" },
-                            { value: "yearly"  , label: "Yearly"  , icon: "fas fa-ban", disabled: true },
-                            { value: "monthly" , label: "Monthly" , icon: "fas fa-ban", disabled: true },
-                            { value: "weekly"  , label: "Weekly"  , icon: "fas fa-ban", disabled: true },
-                            { value: "daily"   , label: "Daily"   , icon: "fas fa-ban", disabled: true }
-                        ]}
-                        onChange={value => {
-                            onChange({ ...record, refresh: value })
-                        }}
-                    />
+                    <div className="row gap middle">
+                        <label className="col">Description</label>
+                        <span className="col right color-muted small">Up to 500 characters</span>
+                    </div>
+                    <div className="row row-10 stretch">
+                        <div className="col stretch">
+                            <textarea
+                                value={ description || "" }
+                                onChange={e => onChange({ ...record, description: e.target.value })}
+                                placeholder="Data Request Description"
+                                style={{ height: "100%" }}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div className="row gap mt-1 mb-2">
+
+            <label className="row mt-2">Data Source</label>
+            <hr />
+
+            <div className="row gap mt-1 baseline">
+                
+                <div className="col col-2">
+                    <Select
+                        options={[
+                            {
+                                value: "file",
+                                icon: "fa-regular fa-file color-blue",
+                                label: (
+                                    <div>
+                                        <div>File</div>
+                                        <div className="color-muted small">Data is inserted by manually uploading a CSV or TSV file</div>
+                                    </div>
+                                )
+                            },
+                            {
+                                value: "url",
+                                icon: "fa-solid fa-earth-americas color-blue",
+                                label: (
+                                    <div>
+                                        <div>URL</div>
+                                        <div className="color-muted small">The application pulls the data from the provided URL</div>
+                                    </div>
+                                )
+                            }
+                        ]}
+                        value={dataSourceType}
+                        onChange={dataSourceType => onChange({ ...record, dataSourceType })}
+                    />
+                </div>
+
+                {
+                    dataSourceType === "file" ?
+                        id ?
+                            <>
+                                <div className="col col-0">
+                                    <Link to={`/requests/${id}/import`} className="btn color-blue">Upload Data</Link>
+                                </div>
+                                <div className="col"/>
+                            </> :
+                            <div className="col">
+                                You can upload data once this data request is saved 
+                            </div> :
+                        null
+                }
+
+                { dataSourceType === "url" && <div className="col col-4">
+                    <input type="url" placeholder="Data URL" required value={dataURL || ""} onChange={e => {
+                        onChange({ ...record, dataURL: e.target.value })
+                    }} />
+                </div> }
+                
+                { dataSourceType === "url" && 
+                    <div className="col">
+                        <Select
+                            right
+                            placeholder="Please select"
+                            value={ refresh }
+                            options={[
+                                {
+                                    value: "manually",
+                                    label: <div>
+                                        Refresh Manually
+                                        <div className="color-muted small">
+                                            Refresh on demand by clicking on dedicated
+                                            button in the request page
+                                        </div>
+                                    </div>,
+                                    icon : "fa-solid fa-user-gear color-blue"
+                                },
+                                {
+                                    value: "yearly",
+                                    label: <div>Refresh Yearly<div className="color-muted small">1 year after the last refresh</div></div>,
+                                    icon: "/icons/date_3.png"
+                                },
+                                {
+                                    value: "monthly",
+                                    label: <div>Refresh Monthly<div className="color-muted small">1 month after the last refresh</div></div>,
+                                    icon : "/icons/date_3.png"
+                                },
+                                {
+                                    value: "weekly",
+                                    label: <div>Refresh Weekly<div className="color-muted small">7 days after the last refresh</div></div>,
+                                    icon : "/icons/date_3.png"
+                                },
+                                {
+                                    value: "daily",
+                                    label: <div>Refresh Daily<div className="color-muted small">24 hours after the last refresh</div></div>,
+                                    icon : "/icons/date_3.png"
+                                }
+                            ]}
+                            onChange={value => {
+                                onChange({ ...record, refresh: value })
+                            }}
+                        />
+                    </div>
+                }
+            </div>
+
+            <div className="row gap mt-2 mb-2">
                 <div className="col col-6">
                     <h4>Included Fields</h4>
                     <hr/>

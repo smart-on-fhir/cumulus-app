@@ -113,6 +113,9 @@ export const requests = {
     },
     delete(id: string | number) {
         return deleteOne("requests", id)
+    },
+    refresh(id: string | number) {
+        return request<app.DataRequest>(`/api/requests/${id}/refresh`)
     }
 };
 

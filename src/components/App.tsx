@@ -8,6 +8,7 @@ import DataRequestView                          from "./DataRequests/DataRequest
 import EditDataRequestForm                      from "./DataRequests/UpdateForm";
 import DataRequestsListPage                     from "./DataRequests/DataRequestsListPage";
 import CreateDataRequestForm                    from "./DataRequests/CreateForm";
+import ActivityPage                             from "./Activity/Page";
 
 import "../styles/main.scss";
 
@@ -31,6 +32,8 @@ export default function App()
                             <Route path="/requests/:id/import" element={ <RequireAuth><DataUploader /></RequireAuth> } />
                             <Route path="/requests/:id/create-view" element={ <RequireAuth><CreateView /></RequireAuth> } />
                             
+                            <Route path="/activity" element={<RequireAuth><ActivityPage /></RequireAuth>} />
+
                             <Route path="/login" element={ <LoginPage /> } />
                             
                             <Route path="*" element="Page Not Found" />

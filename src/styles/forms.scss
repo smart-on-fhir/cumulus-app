@@ -53,7 +53,7 @@
 
     * {
         line-height    : inherit;
-        font-size      : $font-size;
+        font-size      : inherit;
     }
   
     &:hover:not(:disabled, .disabled) {
@@ -65,7 +65,7 @@
         $color    : contrast($hoverBg, 60, lighten($hoverBg, $contrast), darken($hoverBg, $contrast));
         background: darken($hoverBg, 5);
         color     : $color;
-        padding   : ($paddingTop + 0.05) ($paddingRight - 0.05) ($paddingBottom - 0.05) ($paddingLeft + 0.05);
+        // padding   : ($paddingTop + 0.05) ($paddingRight - 0.05) ($paddingBottom - 0.05) ($paddingLeft + 0.05);
     }
 
     &:focus {

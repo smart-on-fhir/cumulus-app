@@ -275,6 +275,267 @@ function* walkSync(dir) {
     }
 }
 
+/**
+ * Splits the line into cells using the provided delimiter (or by comma by
+ * default) and returns the cells array. supports quoted strings and escape
+ * sequences.
+ * @param {string} line The line to parse
+ * @param {string[]} [delimiters=[","]] The delimiter to use (defaults to ",")
+ * @param {string} [stringDelimiter='"']
+ * @returns {string[]} The cells as array of strings
+ */
+function parseDelimitedLine(line, delimiters = [","], stringDelimiter = '"')
+{   
+    /**
+     * @type {string[]}
+     */
+    const out = [];
+    
+    const len = line.length;
+
+    let idx    = 0,
+        char   = "",
+        expect = null,
+        buffer = "";
+
+    while (idx < len) {
+        char = line[idx++];
+        
+        // String
+        if (char === stringDelimiter) {
+
+            // begin string
+            if (!expect) {
+                expect = char;
+            }
+
+            // Escaped quote - continue string
+            else if (line[idx] === char) {
+                buffer += char;
+                idx++;
+            }
+
+            // Close string
+            else {
+                expect = null;
+                out.push(buffer);
+                buffer = "";
+                idx++;
+            }
+        }
+
+        // delimiter
+        else if (delimiters.includes(char)) {
+            if (!expect) {
+                out.push(buffer);
+                buffer = "";
+            }
+            else {
+                buffer += char;
+            }
+        }
+
+        // default
+        else {
+            buffer += char;
+        }
+    }
+
+    if (buffer) {
+        out.push(buffer);
+        buffer = "";
+    }
+
+    if (expect) {
+        throw new SyntaxError(`Syntax error - unterminated string. Expecting '"'`);
+    }
+
+    return out//.map(s => s.trim());
+}
+
+/**
+ * 
+ * @param {string}   input 
+ * @param {object}   [options = {}]
+ * @param {string[]} options.separators = [","]
+ * @param {string}   options.stringDelimiter Defaults to '"'
+ * @returns {import("../index").app.DataRequestData}
+ */
+function parseDelimitedString(input, options = {
+    separators     : [","],
+    stringDelimiter: '"'
+}) {
+    /**
+     * @type {any[][]}
+     */
+    let rows = []
+
+    /**
+     * @type {import("../index").app.DataRequestDataColumn[]}
+     */
+    let cols = []
+    
+    /**
+     * @type {string[]}
+     */
+    const unParsedRows = input.split("\n").map(s => s.trim()).filter(Boolean);
+    
+    const { separators, stringDelimiter } = options;
+    
+    if (unParsedRows.length > 1) {
+
+        const headerRow = String(unParsedRows.shift());
+
+        rows = unParsedRows.map(row => {
+            if (separators.length) {
+                return parseDelimitedLine(row, separators, stringDelimiter)
+            }
+            return [row]
+        });
+
+        cols = parseDelimitedLine(headerRow, separators, stringDelimiter).map(
+            (col, i) => {
+                if (col === "cnt") {
+                    return {
+                        name       : "cnt",
+                        label      : "Count",
+                        description: "Count",
+                        dataType   : "integer"
+                    }
+                }
+
+                const title = toTitleCase(col)
+                return {
+                    name       : col,
+                    label      : title,
+                    description: title.charAt(0) + title.substr(1).toLowerCase(),
+                    dataType   : detectDataTypeAt(i, rows)
+                }
+            }
+        );
+
+        rows = rows.map(row => {
+            cols.forEach((col, i) => {
+                const type = col.dataType;
+                
+                let value = row[i];
+                
+                if (type === "integer") {
+                    
+                    /**
+                     * @type {number|null}
+                     */
+                    value = parseInt(value, 10);
+                    if (isNaN(value) || !isFinite(value)) {
+                        value = null
+                    }
+
+                    row[i] = value
+                }
+
+                else if (type === "float") {
+                    
+                    /**
+                     * @type {number|null}
+                     */
+                    value = parseFloat(value);
+                    if (isNaN(value) || !isFinite(value)) {
+                        value = null
+                    }
+
+                    row[i] = value
+                }
+
+                else if (!value) {
+                    row[i] = null
+                }
+            })
+
+            return row
+        })
+    }
+
+    return {
+        cols,
+        rows
+    }
+}
+
+/**
+ * @param {string} str 
+ * @returns {string}
+ */
+function toTitleCase(str) {
+    return str.replace(/([A-Z])/g, " $1")
+        .replace(/[^a-zA-Z0-9]+/g, " ")
+        .replace(/\b[a-z]/g, x => x.toUpperCase())
+        .trim();
+}
+
+/**
+ * 
+ * @param {number} i 
+ * @param {string[][]} rows 
+ * @returns {}
+ */
+function detectDataTypeAt(i, rows) {
+    let type = "";
+
+    for (let row of rows) {
+        let col = String(row[i] || "").trim()
+        let t = valueToDataType(col)
+
+        if (t === "") {
+            continue
+        }
+
+        if (type === "") {
+            type = t
+        }
+        else {
+            if (type && type !== t) {
+                return "string"
+            }
+        }
+    }
+
+    return type || "hidden"
+}
+
+/**
+ * Given a string representation of a value, parses it and returns the best
+ * guess for its data type.
+ * - If the value is empty returns ""
+ * - If the value is number returns "integer" or "float"
+ * - If the value starts with NNNN-NN-NN returns "date:YYYY-MM-DD" 
+ * - If the value starts with NNNN-NN-01 returns "date:YYYY-MM" 
+ * - If the value starts with NNNN-01-01 returns "date:YYYY" 
+ * - Otherwise returns "string"
+ * @param {string} x 
+ * @returns {""|"integer"|"float"|"string"|"date:YYYY-MM-DD"|"date:YYYY-MM"|"date:YYYY"}
+ */
+function valueToDataType(x) {
+    if (!x) {
+        return ""
+    }
+    if ((/^-?[0-9]+$/).test(x)) {
+        return "integer"
+    }
+    if ((/^-?[0-9]*\.[0-9]+$/).test(x)) {
+        return "float"
+    }
+    if ((/^\d{4}-01-01/).test(x)) {
+        return "date:YYYY"
+    }
+    if ((/^\d{4}-\d{2}-01/).test(x)) {
+        return "date:YYYY-MM"
+    }
+    if ((/^\d{4}-\d{2}-\d{2}/).test(x)) {
+        return "date:YYYY-MM-DD"
+    }
+    return "string"
+}
+
 module.exports = {
     bool,
     uInt,
@@ -285,5 +546,7 @@ module.exports = {
     wait,
     // getBaseUrl,
     // makeArray,
+    parseDelimitedString,
+    toTitleCase,
     getFindOptions
 };

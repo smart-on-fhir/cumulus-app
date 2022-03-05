@@ -63,14 +63,8 @@ declare module app {
 
         updatedAt: string | null
 
-        refresh: "manually" | "daily" | "weekly" | "monthly" | "yearly"
+        refresh: "none" | "manually" | "daily" | "weekly" | "monthly" | "yearly"
 
-        /**
-         * Subscriptions are like normal requests but are refreshed automatically
-         * based on pre-defined schedule
-         */
-        // type: "SUBSCRIPTION" | "REQUEST"
-        
         /**
          * - `pending`   - Created but not resolved yet
          * - `loading`   - Currently waiting for response
@@ -88,6 +82,10 @@ declare module app {
         data: DataRequestData
 
         requestedData: RequestedData | null
+
+        dataURL: string | null
+
+        dataSourceType: "file" | "url"
     }
 
     interface RequestedData {
@@ -159,5 +157,10 @@ declare module app {
             type : "column" | "value"
             value?: string | number | Date | null
         }
+    }
+
+    interface Activity {
+        message: string
+        createdAt: string
     }
 }
