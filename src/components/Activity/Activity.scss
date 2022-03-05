@@ -1,0 +1,35 @@
+@import "../../styles/variables.scss";
+
+.activity-panel {
+    // max-height: 350px;
+    // overflow: auto;
+    padding: 0.5em 0;
+
+    > div {
+        padding: 2px 5px;
+        border-left: 3px solid rgba(0, 0, 0, 0.05);
+        margin: 0 0 5px;
+        cursor: default;
+        align-items: baseline;
+        line-height: 1;
+
+        &:hover {
+            background: #EEE;
+            border-left: 3px solid $color-blue;
+            background-color: fade-out($color: $color-blue      , $amount: 0.9)
+        }
+
+        &.small {
+            line-height: 1.5;
+        }
+    }
+}
+
+.log-line {
+    padding: 0px 2px;
+
+    &:hover {
+        box-shadow: 0 0 0 0.5px fade-out($color-blue, 0.8);
+        background-color: fade-out($color-blue, 0.9);
+    }
+}

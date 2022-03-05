@@ -45,6 +45,7 @@ module.exports = async (connection) => {
             description: "This is a short description for COVID Dataset 1",
             groupId: 2,
             refresh: "monthly",
+            dataURL: "https://raw.githubusercontent.com/comorbidity/workspace/main/cumulus/examples/example6.csv",
             requestedData: {
                 fields: {
                     labs: [

@@ -4,6 +4,7 @@ import { useAuth } from "../../auth";
 import DataRequestsList from "../DataRequests/DataRequestsList"
 import ViewsBrowser from "../Views/ViewsBrowser"
 import map from "./map.png"
+import ActivityPanel from "../Activity/Panel";
 
 
 
@@ -23,12 +24,12 @@ export default function Home() {
             <br/>
             <div className="row gap">
                 <div className="col col-6">
-                    <div className="row gap">
-                        <div className="col middle">
+                    <div className="row gap baseline">
+                        <div className="col">
                             <h4>Data Subscriptions & Requests</h4>
                         </div>
-                        { user?.role === "admin" && (<div className="col col-0 middle">
-                            <Link className="btn color-blue" to="/requests/new"><b>New Data Request</b></Link>
+                        { user?.role === "admin" && (<div className="col col-0">
+                            <Link className="btn color-blue small" to="/requests/new"><b>New Data Request</b></Link>
                         </div>) }
                     </div>
                     <hr/>
@@ -38,35 +39,11 @@ export default function Home() {
                         View All Data Requests & Subscriptions
                     </Link>
                 </div>
-                <div className="col col-4 grey-out">
-                    <h4>Recent Activity</h4>
-                    <hr/>
-                    <ul>
-                        <li>
-                            Data request approved
-                            <div className="color-muted">4:47 PM December 9, 2021</div>
-                        </li>
-                        <li>
-                            Data subscription error: [no response]
-                            <div className="color-muted">12:01 PM December 7, 2021</div>
-                        </li>
-                        <li>
-                            Data subscription scheduled update succeeded
-                            <div className="color-muted">6:05 PM December 6, 2021</div>
-                        </li>
-                        <li>
-                            Data subscription scheduled update succeeded
-                            <div className="color-muted">6:03 PM December 6, 2021</div>
-                        </li>
-                        <li>
-                            Data subscription scheduled update succeeded
-                            <div className="color-muted">6:00 PM December 6, 2021</div>
-                        </li>
-                    </ul>
-                    <Link to="#" className="color-blue underline">View All Activity</Link>
+                <div className="col col-4">
+                    <ActivityPanel />
                     <br/>
                     <h5>Data Sites</h5>
-                    <img src={ map } alt="Sites Map" />
+                    <img src={ map } alt="Sites Map" className="grey-out" />
                 </div>
             </div>
             <br/>

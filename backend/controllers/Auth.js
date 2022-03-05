@@ -3,7 +3,7 @@ const Crypto    = require("crypto")
 const Bcrypt    = require("bcryptjs")
 const HttpError = require("httperrors")
 const User      = require("../db/models/User")
-const { wait } = require("../lib")
+const { wait }  = require("../lib")
 
 const AUTH_DELAY = process.env.NODE_ENV === "production" ? 1000 : 1000;
 

@@ -1,4 +1,5 @@
-const { DataTypes, Model } = require("sequelize")
+const { DataTypes, Model } = require("sequelize");
+const Activity = require("./Activity");
 
 
 class View extends Model
@@ -7,6 +8,10 @@ class View extends Model
      * @type {string | undefined}
      */
     _screenShot;
+
+    toString() {
+        return `View #${this.get("id")} ("${this.get("name")}")`;
+    }
 
     /**
      * @param {import("sequelize").Sequelize} sequelize
@@ -55,7 +60,29 @@ class View extends Model
             }
         }, {
             sequelize,
-            modelName: "View"
+            modelName: "View",
+            hooks: {
+                async afterCreate(model, { user }) {
+                    await Activity.create({
+                        message: `${model} created by ${user ? user.username : "system"}`,
+                        tags   : "views"
+                    });
+                },
+
+                async afterUpdate(model, { user }) {
+                    await Activity.create({
+                        message: `${model} updated by ${user ? user.username : "system"}`,
+                        tags   : "views"
+                    });
+                },
+
+                async afterDestroy(model, { user }) {
+                    await Activity.create({
+                        message: `${model} deleted by ${user ? user.username : "system"}`,
+                        tags   : "views"
+                    });
+                }
+            }
         });
     }
 }

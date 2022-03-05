@@ -1,52 +1,22 @@
+const http            = require("http");
+const https           = require("https");
+const { URL }         = require("url");
 const express         = require("express");
 const slug            = require("slug");
 const { HttpError }   = require("httperrors");
 const Model           = require("../db/models/DataRequest");
 const { requireAuth } = require("./Auth");
+const createRestRouter = require("./BaseController") 
 const {
     getFindOptions,
     assert,
-    rw
+    rw,
+    parseDelimitedString
 } = require("../lib");
 
 
-const router = module.exports = express.Router({ mergeParams: true });
+const router = module.exports = createRestRouter(Model);
 
-
-// get all ---------------------------------------------------------------------
-router.get("/", rw(async (req, res) => {
-    const models = await Model.findAll(getFindOptions(req));
-    res.json(models);
-}));
-
-// get one ---------------------------------------------------------------------
-router.get("/:id", rw(async (req, res) => {
-    const model = await Model.findByPk(req.params.id, getFindOptions(req))
-    assert(model, HttpError.NotFound("Model not found"))
-    res.json(model)
-}));
-
-// Create ----------------------------------------------------------------------
-router.post("/", requireAuth("admin"), express.json({ limit: "10MB" }), rw(async (req, res) => {
-    const model = await Model.create(req.body);
-    res.json(model)
-}));
-
-// Update ----------------------------------------------------------------------
-router.put("/:id", requireAuth("admin"), express.json({ limit: "10MB" }), rw(async (req, res) => {
-    const model = await Model.findByPk(req.params.id);
-    assert(model, HttpError.NotFound("Model not found"))
-    await model.update(req.body);
-    res.json(model);
-}));
-
-// Delete ----------------------------------------------------------------------
-router.delete("/:id", requireAuth("admin"), rw(async (req, res) => {
-    const model = await Model.findByPk(req.params.id);
-    assert(model, HttpError.NotFound("Model not found"))
-    await model.destroy();
-    res.json(model);
-}));
 
 // Views -----------------------------------------------------------------------
 router.get("/:id/views", rw(async (req, res) => {
@@ -66,6 +36,16 @@ router.get("/:id/data", rw(async (req, res) => {
     // @ts-ignore
     exportData(data || { cols: [], rows: [] }, name, req, res)
 }));
+
+// Refresh Data endpoint -------------------------------------------------------
+router.get("/:id/refresh", requireAuth("admin"), rw(async (req, res) => {
+    const model = await Model.findByPk(req.params.id, getFindOptions(req))
+    assert(model, HttpError.NotFound("Model not found"))
+    const data = await fetchData(model)
+    await model.set({ data, completed: new Date() }).save({ user: req.user })
+    res.json(model)
+}));
+
 
 /**
  * @param {{ cols: { name: string }[], rows: any[][] }} data 
@@ -122,3 +102,89 @@ function exportData(data, name, req, res)
     throw new Error(`Unsupported format "${format}"`);
 }
 
+/**
+ * @param {Model} model
+ */
+async function fetchData(model) {
+
+    // Will throw if model.dataURL is not valid URL
+    const url = new URL(model.getDataValue("dataURL"))
+
+    const { result, response } = await request(url)
+    
+    const type = response.headers["content-type"];
+
+    if (!type) {
+        throw new Error("The data url endpoint does reply with Content-Type header")
+    }
+
+    if ((/\bjson\b/i).test(type)) {
+        return JSON.parse(result)
+    }
+    else if ((/\btext\/csv\b/i).test(type)) {
+        return parseDelimitedString(result, { separators: [","], stringDelimiter: '"' })
+    }
+    else if ((/\btext\/tsv\b/i).test(type)) {
+        return parseDelimitedString(result, { separators: ["\t"], stringDelimiter: '"' })
+    }
+    else if ((/\btext\b/i).test(type)) {
+        return parseDelimitedString(result, { separators: [",", "\t"], stringDelimiter: '"' })
+    }
+    
+    throw new Error(`Unsupported content type "${type}"`)
+}
+
+/**
+ * 
+ * @param {URL} url 
+ * @returns {Promise<{
+ *   request : http.ClientRequest
+ *   response: http.IncomingMessage
+ *   result  : string
+ * }>}
+ */
+async function request(url) {
+
+    return new Promise((resolve, reject) => {
+
+        const requestFn = url.protocol === "https:" ? https.request : http.request;
+
+        const req = requestFn(url, {
+            headers: {
+                "user-agent": "CumulusApp/0.0.1"
+            }
+        });
+
+        req.once("error", e => {
+            console.error(`problem with request: ${e.message}`);
+            reject(e)
+        });
+
+        req.once("response", res => {
+            // console.log(`STATUS: ${res.statusCode}`);
+            // console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+
+            req.once("error", e => {
+                console.error(`problem with response: ${e.message}`);
+                reject(e)
+            });
+
+            res.setEncoding('utf8');
+            
+            let data = "";
+            
+            res.on("data", (chunk) => {
+                data += chunk;
+            });
+
+            res.on("end", () => {
+                console.log("No more data in response.");
+                resolve({ request: req, response: res, result: data })
+            });
+        });
+
+        req.end();
+
+        // Check if it is JSON or Delimited
+    })
+}

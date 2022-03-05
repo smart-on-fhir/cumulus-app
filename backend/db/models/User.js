@@ -1,7 +1,11 @@
 const { DataTypes, Model } = require("sequelize");
+const Activity = require("./Activity");
 
 module.exports = class User extends Model
 {
+    toString() {
+        return `User "${this.get("username")}"`;
+    }
 
     /**
      * @param {import("sequelize").Sequelize} sequelize
@@ -35,7 +39,19 @@ module.exports = class User extends Model
             }
         }, {
             sequelize,
-            modelName: "User"
+            modelName: "User",
+            hooks: {
+                async afterUpdate(model) {
+                    // @ts-ignore
+                    if (model.changed("sid")) {
+                        await Activity.create({
+                            message: `User "${model.get("username")}" ` +
+                            `${model.get("sid") ? "logged in" : "logged out"}`,
+                            tags: "auth"
+                        })
+                    }
+                }
+            }
         });
     };
 }
