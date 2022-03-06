@@ -3,8 +3,9 @@
 .activity-panel {
     padding: 0.5em 0;
     > div {
-        padding: 2px;
+        padding: 4px 2px;
         cursor: default;
+        line-height: 1.1;
         
         + div {
             border-top: 1px solid #DDD;
@@ -16,8 +17,8 @@
 
         }
 
-        &.small {
-            line-height: 1.5;
+        .small {
+            margin-top: 0.25em;
         }
     }
 }

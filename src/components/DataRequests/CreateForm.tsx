@@ -1,12 +1,12 @@
-import { useCallback, useState }   from "react"
-import { HelmetProvider, Helmet }  from "react-helmet-async"
-import { Navigate }                from "react-router"
-import { requests, requestGroups } from "../../backend"
-import { useBackend }              from "../../hooks"
-import { AlertError }              from "../Alert"
-import Breadcrumbs                 from "../Breadcrumbs"
-import Loader                      from "../Loader"
-import DataRequestForm             from "./form"
+import { useCallback, useState }  from "react"
+import { HelmetProvider, Helmet } from "react-helmet-async"
+import { Navigate }               from "react-router"
+import { request, createOne }     from "../../backend"
+import { useBackend }             from "../../hooks"
+import { AlertError }             from "../Alert"
+import Breadcrumbs                from "../Breadcrumbs"
+import Loader                     from "../Loader"
+import DataRequestForm            from "./form"
 
 import "./form.scss";
 
@@ -19,7 +19,7 @@ export default function CreateDataRequestForm()
     // onSubmit create new DataRequest and redirect to its edit page
     const { execute: save, loading: saving, error: savingError } = useBackend(
         useCallback(async () => {
-            await requests.create(state as app.DataRequest).then(setSavedRecord);
+            await createOne("requests", state as app.DataRequest).then(setSavedRecord);
         }, [state])
     );
 
@@ -30,7 +30,7 @@ export default function CreateDataRequestForm()
         result: availableRequestGroups
     } = useBackend<app.RequestGroup[]>(
         useCallback(
-            () => requestGroups.getAll(),
+            () => request<app.RequestGroup[]>("/api/request-groups"),
             []
         ),
         true

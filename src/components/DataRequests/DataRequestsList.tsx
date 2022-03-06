@@ -1,9 +1,9 @@
-import { useCallback }   from "react";
-import DataRequestLink   from "./DataRequestLink";
-import { useBackend }    from "../../hooks";
-import { requestGroups } from "../../backend";
-import { AlertError } from "../Alert";
-import Loader from "../Loader";
+import { useCallback } from "react";
+import DataRequestLink from "./DataRequestLink";
+import { useBackend }  from "../../hooks";
+import { request }     from "../../backend";
+import { AlertError }  from "../Alert";
+import Loader          from "../Loader";
 
 
 function List({
@@ -30,8 +30,8 @@ function List({
 export default function DataRequestsList()
 {
     const { loading, error, result: groups } = useBackend(
-        useCallback(() => requestGroups.getAll(
-            "?include=requests:id|name|description|refresh|completed"
+        useCallback(() => request<app.RequestGroup[]>(
+            "/api/request-groups?include=requests:id|name|description|refresh|completed"
             + "&order=name:asc&limit=4,requests:3"
         ), []),
         true

@@ -25,16 +25,7 @@ export async function request<T=any>(path: string, options: RequestInit = {}): P
     return body;
 }
 
-
-async function getAll<T=any[]>(table: string, query = "") {
-    return request<T>(`/api/${table}${query}`);
-}
-
-async function getOne<T=any>(table: string, id: string | number, query = "") {
-    return request<T>(`/api/${table}/${id}${query}`);
-}
-
-async function createOne<T=any>(table: string, payload: Record<string, any>) {
+export async function createOne<T=Record<string, any>>(table: string, payload: Partial<T>) {
     return request<T>(`/api/${table}`, {
         method : "POST",
         body   : JSON.stringify(payload),
@@ -44,7 +35,7 @@ async function createOne<T=any>(table: string, payload: Record<string, any>) {
     });
 }
 
-async function updateOne<T=Record<string, any>>(table: string, id: string | number, payload: Partial<T>): Promise<T> {
+export async function updateOne<T=Record<string, any>>(table: string, id: string | number, payload: Partial<T>): Promise<T> {
     const data = { ...payload }
     if ("id" in data) {
         // @ts-ignore
@@ -59,70 +50,8 @@ async function updateOne<T=Record<string, any>>(table: string, id: string | numb
     });
 }
 
-async function deleteOne<T=any>(table: string, id: string | number) {
+export async function deleteOne<T=any>(table: string, id: string | number) {
     return request<T>(`/api/${table}/${id}`, { method: "DELETE" });
-}
-
-// VIEWS
-// -----------------------------------------------------------------------------
-async function getOneView(id: string | number, includeRequest : true ): Promise<{ request: app.DataRequest; view: app.View }>;
-async function getOneView(id: string | number, includeRequest?: false): Promise<app.View>;
-async function getOneView(id: string | number, includeRequest:boolean = false) {
-    return getOne("views", id).then(view => {
-        if (includeRequest) {
-            return requests.getOne(view.DataRequestId).then(request => {
-                return {
-                    request,
-                    view
-                }
-            })
-        }
-        return view
-    })
-}
-
-export const views = {
-    getAll(query?: string) {
-        return getAll("views", query)
-    },
-
-    getOne: getOneView,
-    create(payload: Partial<app.View>) {
-        return createOne("views", payload)
-    },
-    update(id: string | number, payload: Partial<app.View>) {
-        return updateOne("views", id, payload)
-    },
-    delete(id: string | number) {
-        return deleteOne("views", id)
-    }
-};
-
-export const requests = {
-    getAll(query?: string) {
-        return getAll<app.DataRequest[]>("requests", query)
-    },
-    getOne(id: string | number, query?: string): Promise<app.DataRequest> {
-        return getOne("requests", id, query)
-    },
-    create(payload: app.DataRequest) {
-        return createOne("requests", payload)
-    },
-    async update(id: string | number, payload: Partial<app.DataRequest>) {
-        return updateOne("requests", id, payload)
-    },
-    delete(id: string | number) {
-        return deleteOne("requests", id)
-    },
-    refresh(id: string | number) {
-        return request<app.DataRequest>(`/api/requests/${id}/refresh`)
-    }
-};
-
-export const requestGroups = {
-    async getAll(query?: string): Promise<app.RequestGroup[]> {
-        return getAll<app.RequestGroup[]>("request-groups", query)
-    }
 }
 
 export const auth = {

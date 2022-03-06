@@ -1,17 +1,18 @@
-import { useCallback } from "react"
-import { useParams }  from "react-router"
-import { Link } from "react-router-dom"
+import { useCallback }            from "react"
+import { useParams }              from "react-router"
+import { Link }                   from "react-router-dom"
 import { HelmetProvider, Helmet } from "react-helmet-async"
-import { useAuth } from "../../auth"
-import { requests }   from "../../backend"
-import { useBackend } from "../../hooks"
-import Breadcrumbs from "../Breadcrumbs"
-import { Format } from "../Format"
-import map from "../Home/map.png"
-import ViewsBrowser from "../Views/ViewsBrowser"
-import Loader from "../Loader"
-import { AlertError } from "../Alert"
-import { classList } from "../../utils"
+import { useAuth }                from "../../auth"
+import { request }                from "../../backend"
+import { useBackend }             from "../../hooks"
+import Breadcrumbs                from "../Breadcrumbs"
+import { Format }                 from "../Format"
+import map                        from "../Home/map.png"
+import ViewsBrowser               from "../Views/ViewsBrowser"
+import Loader                     from "../Loader"
+import { AlertError }             from "../Alert"
+import { classList }              from "../../utils"
+
 // import GoogleMapReact from "google-map-react"
 
 // interface SimpleMapProps {
@@ -54,7 +55,7 @@ export default function DataRequestView(): JSX.Element
     const { user } = useAuth();
 
     const { loading, error, result: model, execute: fetch } = useBackend<app.DataRequest>(
-        useCallback(() => requests.getOne(id + "", "?include=group:name"), [id]),
+        useCallback(() => request("/api/requests/" + id + "?include=group:name"), [id]),
         true
     )
 
@@ -63,7 +64,7 @@ export default function DataRequestView(): JSX.Element
         error  : refreshError,
         execute: refresh
     } = useBackend(
-        useCallback(() => requests.refresh(id + "").then(fetch), [id, fetch])
+        useCallback(() => request<app.DataRequest>(`/api/requests/${id}/refresh`).then(fetch), [id, fetch])
     );
 
     if (loading && !model) {
