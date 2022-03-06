@@ -99,7 +99,7 @@ module.exports = class DataRequest extends Model
                  * @param {DataRequest} model 
                  */
                 async beforeUpdate(model) {
-                    if (model.getDataValue("data")) {
+                    if (model.changed("data")) {
                         model.set("completed", new Date())
                     }
                 },

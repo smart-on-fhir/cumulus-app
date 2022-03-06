@@ -46,7 +46,6 @@ router.get("/:id/refresh", requireAuth("admin"), rw(async (req, res) => {
     res.json(model)
 }));
 
-
 /**
  * @param {{ cols: { name: string }[], rows: any[][] }} data 
  * @param {string} name
@@ -188,3 +187,5 @@ async function request(url) {
         // Check if it is JSON or Delimited
     })
 }
+
+module.exports.fetchData = fetchData;

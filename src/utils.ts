@@ -156,3 +156,11 @@ export function toTitleCase(str: string) {
         .replace(/\b[a-z]/g, x => x.toUpperCase())
         .trim();
 }
+
+export function ellipsis(str: string, maxLength: number) {
+    let out = str.substr(0, maxLength).trim();
+    if (out.length < str.length) {
+        return out + "..."
+    }
+    return out
+}
