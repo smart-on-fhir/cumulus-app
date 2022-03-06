@@ -6,7 +6,7 @@ import Breadcrumbs                 from "../Breadcrumbs"
 import Alert, { AlertError }       from "../Alert"
 import Loader                      from "../Loader"
 import { useBackend }              from "../../hooks"
-import { requests }                from "../../backend"
+import { request, updateOne }      from "../../backend"
 import { toTitleCase }             from "../../utils"
 import "./DataUploader.scss"
 
@@ -619,7 +619,7 @@ export default function DataUploader()
         result : requestResult
     } = useBackend(
         useCallback(
-            () => requests.getOne(requestID + ""),
+            () => request("api/requests/" + requestID),
             [requestID]
         ),
         true
@@ -657,7 +657,7 @@ export default function DataUploader()
         let _rows = rows.map(row => row.filter((_, i) => cols[i].dataType !== "hidden").map((r, y) => {
             return format(r, _cols[y].dataType, trimSpaces)
         }));
-        return requests.update(requestID + "", {
+        return updateOne("requests", requestID + "", {
             data: {
                 cols: _cols as app.DataRequestDataColumn[],
                 rows: _rows

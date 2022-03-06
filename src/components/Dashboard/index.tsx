@@ -4,7 +4,7 @@ import { useNavigate, useParams }  from "react-router-dom";
 import { HelmetProvider, Helmet }  from "react-helmet-async";
 import PowerSet                    from "../../PowerSet";
 import { useBackend }              from "../../hooks";
-import { views, requests }         from "../../backend"
+import { request, createOne, updateOne, deleteOne } from "../../backend"
 import { useAuth }                 from "../../auth";
 import DataRequestLink             from "../DataRequests/DataRequestLink";
 import DataGrid                    from "../DataGrid";
@@ -163,7 +163,7 @@ export function CreateView()
     const { id } = useParams();
 
     const { loading, error, result } = useBackend(
-        useCallback(() => requests.getOne(id + ""), [id]),
+        useCallback(() => request("/api/requests/" + id), [id]),
         true
     );
 
@@ -195,7 +195,14 @@ export default function ViewWrapper()
     const { id } = useParams()
 
     const { loading, error, result } = useBackend(
-        useCallback(() => views.getOne(id + "", true), [id]),
+        useCallback(() => {
+            return request("/api/views/" + id).then(view => {
+                return request("/api/requests/" + view.DataRequestId).then(request => ({
+                    request,
+                    view
+                }));
+            })
+        }, [id]),
         true
     );
 
@@ -372,7 +379,7 @@ export function Dashboard({
 
         // Update
         if (view.id) {
-            await views.update(view.id, {
+            await updateOne("views", view.id, {
                 ...view,
                 name: viewName,
                 description: viewDescription,
@@ -392,7 +399,7 @@ export function Dashboard({
 
         // Create
         else {
-            await views.create({
+            await createOne("views", {
                 ...view,
                 name: viewName,
                 description: viewDescription,
@@ -414,7 +421,7 @@ export function Dashboard({
 
     const { execute: destroy, loading: deleting } = useBackend(() => {
         if (window.confirm("Yre you sure you want to delete this view?")) {
-            return views.delete(view.id + "").then(() => navigate("/"))
+            return deleteOne("views", view.id + "").then(() => navigate("/"))
         }
         return Promise.resolve()
     })

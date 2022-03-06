@@ -1,12 +1,12 @@
-import { useCallback, useState }   from "react"
-import { Navigate, useParams }     from "react-router"
-import { HelmetProvider, Helmet }  from "react-helmet-async"
-import { requests, requestGroups } from "../../backend"
-import { useBackend }              from "../../hooks"
-import Breadcrumbs                 from "../Breadcrumbs"
-import Loader                      from "../Loader"
-import { AlertError }              from "../Alert"
-import DataRequestForm             from "./form"
+import { useCallback, useState }  from "react"
+import { Navigate, useParams }    from "react-router"
+import { HelmetProvider, Helmet } from "react-helmet-async"
+import { request, updateOne, deleteOne } from "../../backend"
+import { useBackend }             from "../../hooks"
+import Breadcrumbs                from "../Breadcrumbs"
+import Loader                     from "../Loader"
+import { AlertError }             from "../Alert"
+import DataRequestForm            from "./form"
 
 import "./form.scss";
 
@@ -25,7 +25,7 @@ export default function EditDataRequestForm()
         result : availableRequestGroups
     } = useBackend<app.RequestGroup[]>(
         useCallback(
-            () => requestGroups.getAll(),
+            () => request<app.RequestGroup[]>("/api/request-groups"),
             []
         ),
         true
@@ -37,7 +37,7 @@ export default function EditDataRequestForm()
         error
     } = useBackend<app.DataRequest>(
         useCallback(
-            () => requests.getOne(id + "").then(x => {
+            () => request("/api/requests/" + id).then(x => {
                 setState(x);
                 return x;
             }),
@@ -49,7 +49,7 @@ export default function EditDataRequestForm()
     // Save (update) DataRequest -----------------------------------------------
     const { execute: save, loading: saving, error: savingError } = useBackend(
         useCallback(
-            () => requests.update(id + "", state).then(setState),
+            () => updateOne("requests", id + "", state).then(setState),
             [id, state]
         )
     );
@@ -61,7 +61,7 @@ export default function EditDataRequestForm()
                 if (window.confirm(
                     "Deleting this request will also delete all the views " +
                     "associated with it! Are you sure?")) {
-                    requests.delete(id + "").then(() => setDeleted(true))
+                    deleteOne("requests", id + "").then(() => setDeleted(true))
                 }
             },
             [id]

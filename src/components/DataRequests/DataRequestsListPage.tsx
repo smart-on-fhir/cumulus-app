@@ -3,11 +3,11 @@ import { HelmetProvider, Helmet } from "react-helmet-async"
 import { Link }                   from "react-router-dom";
 import DataRequestLink            from "./DataRequestLink";
 import { useBackend }             from "../../hooks";
-import { requestGroups }          from "../../backend";
+import { request }                from "../../backend";
 import Breadcrumbs                from "../Breadcrumbs";
 import { useAuth }                from "../../auth";
-import Loader from "../Loader";
-import { AlertError } from "../Alert";
+import Loader                     from "../Loader";
+import { AlertError }             from "../Alert";
 
 
 function List({
@@ -36,7 +36,7 @@ export default function DataRequestsListPage()
     const { user } = useAuth();
 
     const { loading, error, result: groups } = useBackend(
-        useCallback(() => requestGroups.getAll("?include=requests:id|name|description|refresh|completed"), []),
+        useCallback(() => request<app.RequestGroup[]>("/api/request-groups?include=requests:id|name|description|refresh|completed"), []),
         true
     );
 
