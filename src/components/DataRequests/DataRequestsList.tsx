@@ -32,7 +32,7 @@ export default function DataRequestsList()
     const { loading, error, result: groups } = useBackend(
         useCallback(() => requestGroups.getAll(
             "?include=requests:id|name|description|refresh|completed"
-            + "&order=name:asc&limit=4,requests:2"
+            + "&order=name:asc&limit=4,requests:3"
         ), []),
         true
     );

@@ -4,7 +4,7 @@ import { Link }                   from "react-router-dom"
 import { request }                from "../../backend"
 import { useBackend }             from "../../hooks"
 import { AlertError }             from "../Alert"
-import { classList }              from "../../utils"
+import { classList, ellipsis }    from "../../utils"
 import "./Activity.scss"
 
 
@@ -43,7 +43,7 @@ export default function ActivityPanel({ limit }: { limit?: number }) {
                 { (!result || !result.length) && <span className="color-muted">No activity found</span> }
                 { result && result.map((rec, i) => {
                     const created = moment(rec.createdAt);
-                    const now     = moment(rec.createdAt);
+                    const now     = moment();
 
                     let formatted = ""
 
@@ -54,9 +54,9 @@ export default function ActivityPanel({ limit }: { limit?: number }) {
                     }
 
                     return (
-                        <div className="row" key={i}>
-                            <div className="col">{ rec.message }</div>
-                            <div className="col col-0 color-muted right small">
+                        <div key={i} title={rec.message}>
+                            <div>{ ellipsis(rec.message, 150) }</div>
+                            <div className="color-muted small">
                                 { formatted }
                             </div>
                         </div>

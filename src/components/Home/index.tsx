@@ -24,12 +24,12 @@ export default function Home() {
             <br/>
             <div className="row gap">
                 <div className="col col-6">
-                    <div className="row gap baseline">
+                    <div className="row gap middle">
                         <div className="col">
                             <h4>Data Subscriptions & Requests</h4>
                         </div>
                         { user?.role === "admin" && (<div className="col col-0">
-                            <Link className="btn color-blue small" to="/requests/new"><b>New Data Request</b></Link>
+                            <Link className="btn color-blue" to="/requests/new"><b>New Data Request</b></Link>
                         </div>) }
                     </div>
                     <hr/>
@@ -40,10 +40,11 @@ export default function Home() {
                     </Link>
                 </div>
                 <div className="col col-4">
-                    <ActivityPanel />
-                    <br/>
-                    <h5>Data Sites</h5>
+                    <h4>Data Sites</h4>
+                    <hr/>
                     <img src={ map } alt="Sites Map" className="grey-out" />
+                    <br/>
+                    <ActivityPanel limit={10} />
                 </div>
             </div>
             <br/>

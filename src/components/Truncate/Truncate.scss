@@ -1,0 +1,20 @@
+
+/* omit characters from middle of long lines that do not wrap, e.g. URLs */
+.truncated::before, .truncated::after {
+    display: inline-block;
+    max-width: 50%;
+    overflow: hidden;
+    white-space: pre;
+}
+
+.truncated::before {
+    content: attr(data-content-start);
+    text-overflow: ellipsis;
+}
+
+.truncated::after {
+    content: attr(data-content-end);
+    direction: rtl;
+    text-overflow: ellipsis;
+    margin-inline-end: -0.25em;
+}

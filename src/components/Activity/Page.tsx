@@ -70,14 +70,14 @@ export default function ActivityPage()
 
     function tag(name: keyof typeof state.tags | "all") {
         if (name === "all") {
-            return fetch(state.offset, state.limit, {
+            return fetch(0, state.limit, {
                 requests: false,
                 views   : false,
                 auth    : false
             })
         }
         const current = state.tags[name];
-        fetch(state.offset, state.limit, { ...state.tags, [name]: !current })
+        fetch(0, state.limit, { ...state.tags, [name]: !current })
     }
 
     useEffect(() => { fetch() }, []);
@@ -89,7 +89,7 @@ export default function ActivityPage()
                 <div className="col col-0">
                     <div className="toolbar">
                         <button className={"btn"+(state.tags.requests ? " active" : "")} onClick={() => tag("requests")}>
-                            <i className="fa-solid fa-database"/> Requests
+                            <i className="fa-solid fa-database"/> Data Requests
                         </button>
                         <button className={"btn"+(state.tags.views ? " active" : "")} onClick={() => tag("views")}>
                             <i className="fa-solid fa-chart-pie" /> Views
@@ -111,7 +111,7 @@ export default function ActivityPage()
                 </div>
             </div>
             <hr className="mb-1"/>
-            <div>
+            <div className="log">
                 { error && <AlertError>{ error + "" }</AlertError> }
                 { !rows.length && !loading && <span className="color-muted">No activity logs found</span> }
                 { rows.map((rec, i) => {

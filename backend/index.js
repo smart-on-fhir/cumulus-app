@@ -131,6 +131,8 @@ async function setupDB({ db, docker, verbose })
         await connection.sync({ alter: true })
         verbose && console.log(`✔ Updated tables to match model structures`)
     }
+
+    require("./Scheduler");
     
     return connection;
 }
