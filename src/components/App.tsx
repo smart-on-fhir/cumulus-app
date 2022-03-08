@@ -9,6 +9,9 @@ import EditDataRequestForm                      from "./DataRequests/UpdateForm"
 import DataRequestsListPage                     from "./DataRequests/DataRequestsListPage";
 import CreateDataRequestForm                    from "./DataRequests/CreateForm";
 import ActivityPage                             from "./Activity/Page";
+import RequestGroupList                         from "./RequestGroups";
+import RequestGroupEditForm                     from "./RequestGroups/EditForm";
+import RequestGroupCreateForm                   from "./RequestGroups/CreateForm";
 
 import "../styles/main.scss";
 
@@ -33,6 +36,10 @@ export default function App()
                             <Route path="/requests/:id/create-view" element={ <RequireAuth><CreateView /></RequireAuth> } />
                             
                             <Route path="/activity" element={<RequireAuth><ActivityPage /></RequireAuth>} />
+
+                            <Route path="/groups" element={<RequireAuth><RequestGroupList /></RequireAuth>} />
+                            <Route path="/groups/new" element={<RequireAuth><RequestGroupCreateForm /></RequireAuth>} />
+                            <Route path="/groups/:id/edit" element={<RequireAuth><RequestGroupEditForm /></RequireAuth>} />
 
                             <Route path="/login" element={ <LoginPage /> } />
                             

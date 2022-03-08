@@ -64,6 +64,11 @@ module.exports = class DataRequest extends Model
                             }
 
                             data.rows.forEach((row, rowIndex) => {
+
+                                for (let i = row.length; i < colsLength; i++) {
+                                    row.push(null)
+                                }
+
                                 const rowLength = row.length
                                 if (rowLength !== colsLength) {
                                     throw new Error(`Invalid data at row ${rowIndex}. Expected ${colsLength} columns but found ${rowLength}`);
@@ -81,8 +86,8 @@ module.exports = class DataRequest extends Model
 
             groupId: {
                 type        : DataTypes.INTEGER,
-                allowNull   : false,
-                defaultValue: 1
+                // allowNull   : false,
+                // defaultValue: 1
             },
 
             dataURL: {
@@ -132,7 +137,7 @@ module.exports = class DataRequest extends Model
      * @param {import("sequelize").Sequelize} sequelize
      */
     static associate(sequelize) {
-        sequelize.models.DataRequest.belongsTo(sequelize.models.RequestGroup, { as: "group" })
+        sequelize.models.DataRequest.belongsTo(sequelize.models.RequestGroup, { as: "group", onDelete: "SET NULL" })
         sequelize.models.DataRequest.hasMany(sequelize.models.View)
     }
 };

@@ -22,6 +22,9 @@ module.exports = class RequestGroup extends Model
                 type: DataTypes.STRING,
                 allowNull: false,
                 unique: true
+            },
+            description: {
+                type: DataTypes.STRING
             }
         }, {
             sequelize,
@@ -45,7 +48,8 @@ module.exports = class RequestGroup extends Model
             sequelize.models.DataRequest,
             {
                 as: "requests",
-                foreignKey: "groupId"
+                foreignKey: "groupId",
+                onDelete: "SET NULL"
             }
         );
     }

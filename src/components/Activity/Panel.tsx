@@ -3,8 +3,9 @@ import moment                     from "moment"
 import { Link }                   from "react-router-dom"
 import { request }                from "../../backend"
 import { useBackend }             from "../../hooks"
+import { ellipsis }               from "../../utils"
 import { AlertError }             from "../Alert"
-import { classList, ellipsis }    from "../../utils"
+import Panel                      from "../Panel"
 import "./Activity.scss"
 
 
@@ -20,24 +21,10 @@ export default function ActivityPanel({ limit }: { limit?: number }) {
     useEffect(() => { execute() }, [execute]);
 
     return (
-        <>
-            <div className="row gap baseline">
-                <div className="col">
-                    <h4>Recent Activity</h4>
-                </div>
-                <div className="col col-0">
-                    <i
-                        title="Refresh Activity"
-                        className={ classList({
-                            "fa-solid fa-rotate color-muted": true,
-                            "fa-spin grey-out fa-spin": loading
-                        })}
-                        style={{ cursor: "pointer" }}
-                        onClick={ () => execute() }
-                    />
-                </div>
-            </div>
-            <hr/>
+        <Panel title="Recent Activity" loading={loading} menu={[
+            <div title="Refresh Activity" onMouseDown={() => execute()}>Refresh</div>,
+            <Link to="/activity">View All Activity</Link>
+        ]}>
             <div className="activity-panel">
                 { error && <AlertError>{ error + "" }</AlertError> }
                 { (!result || !result.length) && <span className="color-muted">No activity found</span> }
@@ -63,7 +50,6 @@ export default function ActivityPanel({ limit }: { limit?: number }) {
                     )
                 })}
             </div>
-            <Link to="/activity" className="color-blue underline">View All Activity</Link>
-        </>
+        </Panel>
     )
 }
