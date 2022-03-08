@@ -1,0 +1,103 @@
+@import "../../styles/variables.scss";
+
+.menu-button {
+    position: relative;
+    display: inline-block;
+
+    > button {
+        // padding: 0.3em 0.6em;
+        // font-size : 120%;
+        background : transparent;
+        color      : inherit;
+        border     : 0;
+        line-height: 2;
+        min-width  : 2em;
+        text-align : center;
+        // height    : 1.5em;
+        // border-radius: 2em;
+        appearance : none;
+        cursor     : pointer;
+        // background : #FCC;
+        border-radius: 4px;
+        // box-shadow: 0 0 0 1px currentColor inset;
+
+        i {
+            vertical-align: middle;
+        }
+
+        .default-icon {
+            color: rgba(0, 0, 0, 0.4);
+        }
+    }
+
+    .menu {
+        position        : absolute;
+        z-index         : 100;
+        top             : 100%;
+        left            : 0;
+        background      : #FFF;
+        box-shadow      : 0 0 0 1px rgba(0, 0, 0, 0.2), 0 2px 5px -1px rgba(0, 0, 0, 0.3);
+        color           : $color-grey-dark;
+        text-align      : left;
+        padding         : 2px;
+        border-radius   : 2px;
+        margin-top      : 2px;
+        transform-origin: 100% 0;
+        transform       : scale(0.9, 0);
+        opacity         : 0;
+        transition      : transform 0.4s ease-out, opacity 0.1s ease-out;
+        white-space     : pre;
+
+        > hr {
+            background: #DDD;
+            height: 1px;
+            padding: 0;
+            margin: 2px 0;
+        }
+    }
+
+    &:hover > button {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    &:focus-within {
+        > button {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2) inset;
+            background: rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+            outline: none;
+            border-radius: 3px;
+        }
+
+        .menu {
+            transform: scale(1, 1);
+            opacity: 1;
+            transition: transform 0.1s ease-out, opacity 0.4s ease-out;
+        }
+
+        .default-icon {
+            color: currentColor;
+        }
+    }
+
+    .menu-item {
+        
+        > * {
+            display: block;
+            padding: 0.4em 1.2em;
+            cursor: default;
+            outline: 0 none;
+        }
+
+        &:hover, &:focus, &:focus-within {
+            background: $color-blue;
+            color: #FFF;
+        }
+    }
+
+    &.menu-right .menu {
+        left: auto;
+        right: 0;
+    }
+
+}

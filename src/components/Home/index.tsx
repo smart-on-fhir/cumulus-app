@@ -1,10 +1,11 @@
-import { Link } from "react-router-dom"
+import { Link }                   from "react-router-dom"
 import { HelmetProvider, Helmet } from "react-helmet-async"
-import { useAuth } from "../../auth";
-import DataRequestsList from "../DataRequests/DataRequestsList"
-import ViewsBrowser from "../Views/ViewsBrowser"
-import map from "./map.png"
-import ActivityPanel from "../Activity/Panel";
+import { useAuth }                from "../../auth";
+import DataRequestsList           from "../DataRequests/DataRequestsList"
+import ViewsBrowser               from "../Views/ViewsBrowser"
+import map                        from "./map.png"
+import ActivityPanel              from "../Activity/Panel";
+import Panel                      from "../Panel";
 
 
 
@@ -24,25 +25,21 @@ export default function Home() {
             <br/>
             <div className="row gap">
                 <div className="col col-6">
-                    <div className="row gap middle">
-                        <div className="col">
-                            <h4>Data Subscriptions & Requests</h4>
-                        </div>
-                        { user?.role === "admin" && (<div className="col col-0">
-                            <Link className="btn color-blue" to="/requests/new"><b>New Data Request</b></Link>
-                        </div>) }
-                    </div>
-                    <hr/>
-                    <DataRequestsList />
-                    <br/>
-                    <Link to="/requests" className="color-blue underline">
-                        View All Data Requests & Subscriptions
-                    </Link>
+                    <Panel title="Data Subscriptions & Requests" menu={[
+                        <Link to="/requests">View All Data Requests</Link>,
+                        (user?.role === "admin" ? "separator" : null),
+                        (user?.role === "admin" ? <Link to="/requests/new">Create New Data Request</Link> : null),
+                        (user?.role === "admin" ? <Link to="/groups">Manage Request Groups</Link> : null)
+                    ]}>
+                        <DataRequestsList />
+                    </Panel>
                 </div>
                 <div className="col col-4">
-                    <h4>Data Sites</h4>
-                    <hr/>
-                    <img src={ map } alt="Sites Map" className="grey-out" />
+                    <Panel title="Data Sites" menu={[
+                        <Link to="/sites">Manage Data Sites</Link>
+                    ]}>
+                        <img src={ map } alt="Sites Map" className="grey-out" />
+                    </Panel>
                     <br/>
                     <ActivityPanel limit={10} />
                 </div>

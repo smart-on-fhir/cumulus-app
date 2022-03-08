@@ -1,7 +1,9 @@
 import { Component }  from "react";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import { request }    from "../../backend";
 import { classList }  from "../../utils";
 import { AlertError } from "../Alert";
+import Breadcrumbs from "../Breadcrumbs";
 import "./Activity.scss"
 
 interface State {
@@ -85,6 +87,15 @@ export default class ActivityPage extends Component<any, State>
         
         return (
             <div className={ loading ? "grey-out" : undefined }>
+                <HelmetProvider>
+                    <Helmet>
+                        <title>Activity Logs</title>
+                    </Helmet>
+                </HelmetProvider>
+                <Breadcrumbs links={[
+                    { name: "Home", href: "/" },
+                    { name: "Activity Logs" }
+                ]} />
                 <div className="row mb-1 middle">
                     <div className="col col-0">
                         <div className="toolbar">

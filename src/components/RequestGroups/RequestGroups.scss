@@ -1,0 +1,29 @@
+@import "../../styles/variables.scss";
+
+
+.request-groups-list {
+
+    table {
+        border-collapse: collapse;
+    }
+
+    th {
+        border-bottom: 1px solid #CCC;
+    }
+
+    tbody td {
+        border-bottom: 1px solid #DDD;
+    }
+
+    td, th {
+        padding: 0.2em 0.4em;
+    }
+
+    thead {
+        background: #EEE;
+    }
+
+    tbody tr:hover {
+        background-color: fade-out($color-blue, 0.9);
+    }
+}

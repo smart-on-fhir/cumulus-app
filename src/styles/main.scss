@@ -337,3 +337,11 @@ ul {
 img {
   max-width: 100%;
 }
+
+table {
+  width: 100%;
+  td, th {
+    text-align: initial;
+    vertical-align: baseline;
+  }
+}
