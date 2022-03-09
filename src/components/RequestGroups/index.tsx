@@ -98,6 +98,8 @@ export default function RequestGroupList()
                     ))}
                 </tbody>
             </table> }
+            <br/>
+            <br/>
         </div>
     )
 }
