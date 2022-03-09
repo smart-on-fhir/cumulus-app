@@ -29,6 +29,7 @@
     "react-helmet-async": "^1.2.3",
     "react-router-dom": "^6.2.1",
     "react-scripts": "5.0.0",
+    "run-container": "^1.2.3",
     "sass": "^1.45.1",
     "sequelize": "^6.16.0",
     "slug": "^5.2.0",
