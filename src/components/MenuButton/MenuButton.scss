@@ -2,24 +2,21 @@
 
 .menu-button {
     position: relative;
-    display: inline-block;
+    display : inline-block;
+    outline : 0;
 
-    > button {
-        // padding: 0.3em 0.6em;
-        // font-size : 120%;
-        background : transparent;
-        color      : inherit;
-        border     : 0;
-        line-height: 2;
-        min-width  : 2em;
-        text-align : center;
-        // height    : 1.5em;
-        // border-radius: 2em;
-        appearance : none;
-        cursor     : pointer;
-        // background : #FCC;
+    > .menu-button-btn {
+        background   : transparent;
+        color        : inherit;
+        border       : 0;
+        line-height  : 2;
+        min-width    : 2em;
+        text-align   : center;
+        appearance   : none;
+        cursor       : pointer;
         border-radius: 4px;
-        // box-shadow: 0 0 0 1px currentColor inset;
+        padding      : 0.2em 1em;
+        box-shadow   : none;
 
         i {
             vertical-align: middle;
@@ -42,11 +39,13 @@
         padding         : 2px;
         border-radius   : 2px;
         margin-top      : 2px;
+        // display: none;
         transform-origin: 100% 0;
         transform       : scale(0.9, 0);
         opacity         : 0;
         transition      : transform 0.4s ease-out, opacity 0.1s ease-out;
         white-space     : pre;
+        // pointer-events: none;
 
         > hr {
             background: #DDD;
@@ -56,12 +55,21 @@
         }
     }
 
-    &:hover > button {
+    &:hover > .menu-button-btn {
         background: rgba(0, 0, 0, 0.05);
+        color: currentColor;
     }
 
-    &:focus-within {
-        > button {
+    // &:focus {
+    //     pointer-events: none;
+    //     > .menu-button-btn {
+    //         background: rgba(0, 0, 0, 0.05);
+    //         color: currentColor;
+    //     }    
+    // }
+
+    &:focus, &:focus-within {
+        > .menu-button-btn {
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2) inset;
             background: rgba(0, 0, 0, 0.1);
             pointer-events: none;
@@ -73,11 +81,20 @@
             transform: scale(1, 1);
             opacity: 1;
             transition: transform 0.1s ease-out, opacity 0.4s ease-out;
+            // display: block;
+            // pointer-events: auto;
         }
 
         .default-icon {
             color: currentColor;
         }
+    }
+
+    > .menu-button-btn:focus + .menu {
+        transform: scale(1, 1);
+        opacity: 1;
+        transition: transform 0.1s ease-out, opacity 0.4s ease-out;
+        // display: block;
     }
 
     .menu-item {
@@ -89,9 +106,15 @@
             outline: 0 none;
         }
 
+        > a.active {
+            background: #DDD;
+        }
+
         &:hover, &:focus, &:focus-within {
-            background: $color-blue;
-            color: #FFF;
+            &, & > * {
+                background: $color-blue !important;
+                color: #FFF !important;
+            }
         }
     }
 
