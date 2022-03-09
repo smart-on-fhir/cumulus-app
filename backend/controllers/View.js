@@ -1,10 +1,12 @@
+const express = require("express")
 const { HttpError }    = require("httperrors");
 const Model            = require("../db/models/View");
 const { rw, assert }   = require("../lib");
-const createRestRouter = require("./BaseController");
+const createRestRoutes = require("./BaseController");
 
+const router = module.exports = express.Router({ mergeParams: true });
 
-const router = module.exports = createRestRouter(Model);
+createRestRoutes(router, Model);
 
 
 router.get("/:id/screenshot", rw(async (req, res) => {

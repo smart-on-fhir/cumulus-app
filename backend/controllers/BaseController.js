@@ -4,6 +4,7 @@ const { requireAuth }                = require("./Auth");
 const { getFindOptions, assert, rw } = require("../lib");
 
 /**
+ * @param {express.Router} router
  * @param {import("sequelize").ModelStatic<any>} modelConstructor
  * @param {Object} options
  * @param {boolean} [options.getAll = true] 
@@ -12,16 +13,14 @@ const { getFindOptions, assert, rw } = require("../lib");
  * @param {boolean} [options.update = true] 
  * @param {boolean} [options.destroy = true] 
  */
-module.exports = function createRestRouter(modelConstructor, {
-    getAll = true,
-    getOne = true,
-    create = true,
-    update = true,
+module.exports = function createRestRoutes(router, modelConstructor, {
+    getAll  = true,
+    getOne  = true,
+    create  = true,
+    update  = true,
     destroy = true
 } = {})
 {
-    const router = express.Router({ mergeParams: true });
-
     // get all -----------------------------------------------------------------
     if (getAll) {
         router.get("/", rw(async (req, res) => {
@@ -66,7 +65,5 @@ module.exports = function createRestRouter(modelConstructor, {
             res.json(model);
         }));
     }
-
-    return router;
 }
 
