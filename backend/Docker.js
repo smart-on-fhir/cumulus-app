@@ -1,33 +1,35 @@
-const Docker       = require("dockerode")
-const config       = require("./config")
-const { debuglog } = require("util")
-const debug        = debuglog('app:db')
+const Docker        = require("dockerode")
+const { runSimple } = require("run-container")
+const config        = require("./config")
+const { debuglog }  = require("util")
+const debug         = debuglog('app:db')
 
 const POSTGRES_READY_LOG = /database system is ready to accept connections/;
 
 
-async function getDockerContainer(name = config.docker.containerName, restart = false)
+async function getDockerContainer(name = config.docker.containerName)
 {
-    const docker = new Docker();
+    var container;
 
-    let container;
     try {
-        container = await createContainer(docker, name)
-        await container.start()
-        
-    } catch (e) {
-        // Docker returns a 409 when the container is already running.
-        // This happens if the test suite exits before cleanup.
-        if (e.statusCode === 409) {
+        container = await createContainer(name)
+    }
+    catch(error) {
+
+        // Error: (HTTP code 409) unexpected - Conflict. The container name
+        // "/cumulus" is already in use by container "...". You have to remove
+        // (or rename) that container to be able to reuse that name. 
+        // Happens after unexpected exit!
+        if (error.statusCode === 409) {
+            const docker = new Docker({ socketPath: '/var/run/docker.sock' })
             container = docker.getContainer(name)
-            if (restart) {
-                await container.restart()
-            }
-        } else {
-            throw e
+            await container.restart()
+        }
+        else {
+            throw error;
         }
     }
-
+    
     await waitForReady(container)
     return () => container.stop()
 }
@@ -51,16 +53,16 @@ function waitForReady(container) {
                         debug("Timeout")
                         stream.push(Buffer.from('!stop!'))
                         reject(new Error('Docker startup timed out'))
-                    }, 50000)
+                    }, 50000).unref()
                 })
                 .on('data', function (data) {
                     const text = data.toString('utf8')
 
                     if (POSTGRES_READY_LOG.test(text)) {
                         logCount++
-                        if (logCount == 2) {
+                        if (logCount === 2) {
                             clearTimeout(this.timer)
-                            this.timer = null;
+                            // this.timer = null;
                             // Stops following logs.
                             // @ see https://github.com/apocas/dockerode/blob/master/examples/logs.js#L29
                             stream.push(Buffer.from('!stop!'))
@@ -76,20 +78,16 @@ function waitForReady(container) {
     })
 }
 
-function createContainer(docker, name = config.docker.containerName) {
-    return docker.createContainer({
+async function createContainer(name) {
+    return runSimple({
         name,
-        Image: 'postgres',
-        Env: [
-            `POSTGRES_PASSWORD='${config.db.options.password}'`,
-            `POSTGRES_USERNAME='${config.db.options.username}'`,
-            `POSTGRES_DB='${config.db.options.database}'`,
-        ],
-        HostConfig: {
-            AutoRemove: true,
-            PortBindings: {
-                "5432/tcp": [{ HostPort: `${config.db.options.port}` }],
-            }
+        image: "postgres",
+        autoRemove: true,
+        ports: { "5432": "5432" },
+        env: {
+            POSTGRES_PASSWORD: config.db.options.password,
+            POSTGRES_USER    : config.db.options.username,
+            POSTGRES_DB      : config.db.options.database
         }
     });
 }

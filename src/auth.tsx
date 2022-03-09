@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
   useNavigate,
   useLocation,
@@ -157,15 +157,15 @@ export function AuthStatus() {
     return (
         <>
             <MenuButton right items={[
-                <Link to="/requests">Data Requests</Link>,
-                <Link to="/groups">Data Request Groups</Link>,
-                <Link to="/sites">Data Sites</Link>,
-                <Link to="/activity">Activity Log</Link>,
+                <NavLink to="/requests">Data Requests</NavLink>,
+                <NavLink to="/groups">Data Request Groups</NavLink>,
+                <NavLink to="/sites">Data Sites</NavLink>,
+                <NavLink to="/activity">Activity Log</NavLink>,
                 "separator",
                 <span onMouseDown={() => { auth.logout().then(() => navigate("/")); }}><b>SIGN OUT</b></span>
             ]}>
                 <span style={{ fontSize: "120%" }}> 
-                    <i className="fas fa-user-circle" style={{ fontSize: "200%", margin: 5 }}/>
+                    <i className="fas fa-user-circle" style={{ fontSize: "200%", margin: 5, lineHeight: 1 }}/>
                     <b>{auth.user.username || "Anonymous"} &nbsp;<i className="fa-solid fa-caret-down"/></b>
                 </span>
                 {/* <span className="ml-1 underline" style={{ cursor: "pointer" }} onClick={() => { auth.logout().then(() => navigate("/")); }}><b>SIGN OUT</b></span> */}
