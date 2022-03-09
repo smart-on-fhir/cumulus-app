@@ -5,17 +5,20 @@ const express         = require("express");
 const slug            = require("slug");
 const { HttpError }   = require("httperrors");
 const Model           = require("../db/models/DataRequest");
+const GroupModel      = require("../db/models/RequestGroup")
 const { requireAuth } = require("./Auth");
-const createRestRouter = require("./BaseController") 
+const createRestRoutes = require("./BaseController") 
 const {
     getFindOptions,
     assert,
     rw,
-    parseDelimitedString
+    parseDelimitedString,
+    uInt
 } = require("../lib");
 
 
-const router = module.exports = createRestRouter(Model);
+const router = module.exports = express.Router({ mergeParams: true });
+
 
 
 // Views -----------------------------------------------------------------------
@@ -45,6 +48,38 @@ router.get("/:id/refresh", requireAuth("admin"), rw(async (req, res) => {
     await model.set({ data, completed: new Date() }).save({ user: req.user })
     res.json(model)
 }));
+
+// By Group -------------------------------------------------------------------
+router.get("/by-group", rw(async (req, res) => {
+    
+    const groupLimit   = uInt(req.query.groupLimit); // >= 2!
+    const requestLimit = uInt(req.query.requestLimit);
+    
+    const test = await GroupModel.findAll({
+        attributes: ["id", "name", "description", "createdAt"],
+        include: {
+            association: "requests",
+            attributes : ["id", "name", "description", "refresh", "completed"],
+            right      : true
+        },
+        order: [["name", "asc"]],
+        limit: groupLimit ? Math.max(groupLimit, 2) : undefined
+    });
+    
+    res.json(test.map(rec => {
+        const out = rec.toJSON();
+        if (requestLimit > 0) {
+            out.requests = out.requests.slice(0, requestLimit)
+        }
+        if (out.id === null) {
+            out.name = "GENERAL"
+            out.description = "Contains reqyests that are not assigned to any specific group"
+        }
+        return out
+    }));
+}));
+
+createRestRoutes(router, Model);
 
 /**
  * @param {{ cols: { name: string }[], rows: any[][] }} data 

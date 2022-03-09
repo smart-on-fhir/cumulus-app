@@ -29,7 +29,7 @@ module.exports = async (connection) => {
     ]);
 
     await models.RequestGroup.bulkCreate([
-        { id: 1, name: "GENERAL"   },
+        // { id: 1, name: "GENERAL"   },
         { id: 2, name: "COVID-19"  },
         { id: 3, name: "INFLUENZA" },
         { id: 4, name: "HIV"       },
@@ -110,7 +110,7 @@ module.exports = async (connection) => {
             id: 6,
             name: "Patient Age and Gender",
             description: "This is a short description for the Patient Age and Gender Dataset",
-            groupId: 1,
+            groupId: null,
             refresh: "monthly",
             completed: "2022-02-02",
             data: {
@@ -224,7 +224,7 @@ module.exports = async (connection) => {
             id: 7,
             name: "Data for Newborns",
             description: "This is a short description for the Data for Newborns Dataset",
-            groupId: 1,
+            groupId: null,
             refresh: "manually",
             completed: "2022-02-02",
             data: {

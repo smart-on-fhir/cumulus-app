@@ -31,8 +31,7 @@ export default function DataRequestsList()
 {
     const { loading, error, result: groups } = useBackend(
         useCallback(() => request<app.RequestGroup[]>(
-            "/api/request-groups?include=requests:id|name|description|refresh|completed"
-            + "&order=name:asc&limit=4,requests:3"
+            "/api/requests/by-group?groupLimit=4&requestLimit=3"
         ), []),
         true
     );

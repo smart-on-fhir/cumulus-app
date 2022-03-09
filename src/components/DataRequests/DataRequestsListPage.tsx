@@ -36,7 +36,7 @@ export default function DataRequestsListPage()
     const { user } = useAuth();
 
     const { loading, error, result: groups } = useBackend(
-        useCallback(() => request<app.RequestGroup[]>("/api/request-groups?include=requests:id|name|description|refresh|completed"), []),
+        useCallback(() => request<app.RequestGroup[]>("/api/requests/by-group"), []),
         true
     );
 
