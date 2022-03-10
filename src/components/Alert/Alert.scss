@@ -11,6 +11,7 @@
     word-break: break-all;
     font-family: monospace;
     font-size: 85%;
+    line-height: 1.2;
 
     &.small {
         font-size: 75%;
@@ -20,7 +21,7 @@
         position: absolute;
         width: 1em;
         text-align: center;
-        top: 0.65em;
+        top: 0.5em;
         left: 0.65em;
     }
   
