@@ -169,9 +169,13 @@ export function getSeries({
                 }: undefined
             };
 
-            let rows = dataSet.pick([ column.name, groupBy.name ]).where({
+            let rows = dataSet.where({
                 [groupBy.name]: groupName
             }).rows;
+
+            // let rows = dataSet.pick([ column.name, groupBy.name ]).where({
+            //     [groupBy.name]: groupName
+            // }).rows;
 
             // If this is a categories chart
             if (xType === "category") {
@@ -316,15 +320,19 @@ export function buildChartOptions({
         },
         colors: CHART_COLORS,
         yAxis: {
+            ...options.yAxis,
             // lineColor: "rgba(0, 0, 0, 0.2)",
             // lineWidth: 1,
             title: {
                 text: "Count",
-                // style: {
-                //     fontWeight: "bold",
-                //     // fontSize: "120%"
-                // }
+                skew3d: true,
+                margin: 15,
+                style: {
+                    fontWeight: "bold",
+                    fontSize: "120%"
+                }
             },
+            allowDecimals: false,
             
             // Up to 10X Zoom
             softMax: series.reduce((prev, cur) => {
@@ -333,7 +341,6 @@ export function buildChartOptions({
                     prev;
                 return Math.max(prev, max)
             }, 0) / 10,
-            ...options.yAxis,
         },
         plotOptions: {
             series: {
@@ -411,12 +418,12 @@ export function buildChartOptions({
                 ...options.plotOptions?.bar,
             },
             areaspline: {
-                // fillOpacity: 0.1,
+                allowPointSelect: false,
                 marker: {
-                    radius: 2.5,
+                    radius: 0,
                     enabled: true,
                     states: {
-                        select: {
+                        hover: {
                             radius: 4
                         }
                     }
@@ -429,18 +436,21 @@ export function buildChartOptions({
                         shadow: true, // show them even on datetime charts
                     }
                 },
+                cursor: "default",
                 connectNulls: false,
                 getExtremesFromAll: true,
                 ...options.plotOptions?.areaspline
             },
             area: {
                 fillOpacity: 0.2,
+                allowPointSelect: false,
+                cursor: "default",
                 marker: {
-                    radius: 2.5,
+                    radius: 0,
                     enabled: true,
                     states: {
-                        select: {
-                            radius: 4,
+                        hover: {
+                            radius: 4
                         }
                     }
                 },
@@ -459,11 +469,13 @@ export function buildChartOptions({
                 depth: Math.min(options.plotOptions?.areaspline?.depth || 10,  100/(series.length || 1)),
             },
             spline: {
+                allowPointSelect: false,
+                cursor: "default",
                 marker: {
-                    radius: 2.5,
+                    radius: 0,
                     enabled: true,
                     states: {
-                        select: {
+                        hover: {
                             radius: 4
                         }
                     }
@@ -562,6 +574,17 @@ export function buildChartOptions({
                 // position3d: "ortho",
                 // skew3d: true
 
+            },
+            title: {
+                text: column.label || column.name,
+                // position3d: "ortho",
+                skew3d: true,
+                margin: 15,
+                style: {
+                    fontWeight: "bold",
+
+                    fontSize: "120%"
+                }
             },
             ...options.xAxis
         },

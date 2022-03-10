@@ -19,7 +19,7 @@ import PieChart                    from "./Charts/PieChart";
 import Alert, { AlertError }       from "../Alert";
 import Select                      from "../Select";
 import Loader                      from "../Loader";
-import { classList }               from "../../utils";
+import { classList, defer }               from "../../utils";
 import {
     ChartIcons,
     operators,
@@ -320,7 +320,7 @@ export function Dashboard({
 
     const {
         viewType: serverViewType = "column",
-        column = dataRequest.data.cols[0].name,
+        column = dataRequest.data.cols[0].name === "cnt" ? dataRequest.data.cols[1].name : dataRequest.data.cols[0].name,
         groupBy: serverGroupBy = "",
         filters: serverFilters = []
     } = view.settings || {}
@@ -413,7 +413,7 @@ export function Dashboard({
                     viewType: chartType
                 }
             }).then(
-                v => navigate("/views/" + v.id),
+                v => defer(() => navigate("/views/" + v.id)),
                 e => alert(e.message)
             );
         }
