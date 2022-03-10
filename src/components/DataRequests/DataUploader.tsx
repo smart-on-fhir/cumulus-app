@@ -619,7 +619,7 @@ export default function DataUploader()
         result : requestResult
     } = useBackend(
         useCallback(
-            () => request("api/requests/" + requestID),
+            () => request("/api/requests/" + requestID),
             [requestID]
         ),
         true
