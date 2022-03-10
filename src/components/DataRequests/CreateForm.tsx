@@ -36,6 +36,45 @@ export default function CreateDataRequestForm()
         true
     );
 
+    function prefillDemoData() {
+        setState({
+            groupId: 1, // COVID
+            name: "Demo Data Requests",
+            description: "This data requests has been created for demo purposes",
+            requestedData: {
+                dataSites: [
+                    { name: "Boston Children's Hospital", description: "Short description of the Boston Children's Hospital data site" },
+                    { name: "Massachusetts General Hospital", description: "Short description of the Massachusetts General Hospital data site" }
+                ],
+                fields: {
+                    demographics: [
+                        { name: "gender"     , description: "Short description of the Gender demographics" },
+                        { name: "age"        , description: "Short description of the field" },
+                        { name: "cdcAgeGroup", description: "Short description of the field" },
+                        { name: "race"       , description: "Short description of the field" },
+                        { name: "ethnicity"  , description: "Short description of the field" },
+                        { name: "deceased"   , description: "Short description of the field" }
+                    ],
+                    labs: [
+                        { name: "COVID-19", description: "COVID-19 PCR Test Results" },
+                        { name: "Flu", description: "" }
+                    ],
+                    immunizations: [
+                        { name: "COVID-19 #1", description: "COVID-19 Vaccine - dose 1" },
+                        { name: "COVID-19 #2", description: "COVID-19 Vaccine - dose 2" },
+                        { name: "COVID-19 #3", description: "COVID-19 Vaccine - booster" }
+                    ],
+                    medications: [],
+                    phenotypes: [],
+                    procedures: [],
+                    diagnoses: [
+                        { name: "COVID-19", description: "Have the patients been diagnosed with COVID" }
+                    ]
+                }
+            }
+        })
+    }
+
     if (savedRecord) {
         return <Navigate to={ "/requests/" + savedRecord.id } />
     }
@@ -60,7 +99,7 @@ export default function CreateDataRequestForm()
                 { name: "Requests & Subscriptions", href: "/requests" },
                 { name: "Create Data Request" }
             ]} />
-            <h3>Create Data Request</h3>
+            <h3> <i className="fa-solid fa-wand-magic-sparkles color-muted pull-right" style={{ cursor: "pointer" }} onClick={prefillDemoData} />Create Data Request</h3>
             <hr/>
             <div className="row gap color-muted small">
                 <div className="col">
