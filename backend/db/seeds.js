@@ -29,10 +29,9 @@ module.exports = async (connection) => {
     ]);
 
     await models.RequestGroup.bulkCreate([
-        // { id: 1, name: "GENERAL"   },
-        { id: 2, name: "COVID-19"  },
-        { id: 3, name: "INFLUENZA" },
-        { id: 4, name: "HIV"       },
+        { id: 1, name: "COVID-19"  },
+        { id: 2, name: "INFLUENZA" },
+        { id: 3, name: "HIV"       },
     ]);
     await fixAutoIncrement(connection, models.RequestGroup.tableName, "id");
 
@@ -43,7 +42,7 @@ module.exports = async (connection) => {
             id: 1,
             name: "COVID Dataset 1",
             description: "This is a short description for COVID Dataset 1",
-            groupId: 2,
+            groupId: 1,
             refresh: "monthly",
             dataURL: "https://raw.githubusercontent.com/comorbidity/workspace/main/cumulus/examples/example6.csv",
             requestedData: {
@@ -82,21 +81,21 @@ module.exports = async (connection) => {
             id: 2,
             name: "COVID Dataset 2",
             description: "This is a short description for COVID Dataset 2",
-            groupId: 2,
+            groupId: 1,
             refresh: "weekly",
         },
         {
             id: 3,
             name: "COVID Dataset 3",
             description: "This is a short description for COVID Dataset 3",
-            groupId: 2,
+            groupId: 1,
             refresh: "manually",
         },
         {
             id: 4,
             name: "INFLUENZA Dataset 1",
             description: "This is a short description for INFLUENZA Dataset 1",
-            groupId: 3,
+            groupId: 2,
             refresh: "manually",
             completed: "2022-03-02",
             data: {
@@ -2824,7 +2823,7 @@ module.exports = async (connection) => {
             id: 5,
             name: "HIV Dataset 1",
             description: "This is a short description for HIV Dataset 1",
-            groupId: 4,
+            groupId: 3,
             refresh: "weekly",
         },
         {

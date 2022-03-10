@@ -129,7 +129,7 @@ export default function DataRequestView(): JSX.Element
                                 <tr><th className="right pr-1 pl-1">Status:</th><td>{
                                         model.completed ?
                                         <>completed <Format value={ model.completed } format="date-time" /></> :
-                                        "Pending"
+                                        <span className="color-red">Pending</span>
                                     }
                                 </td></tr>
                                 <tr>
