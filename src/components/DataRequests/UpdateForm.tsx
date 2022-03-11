@@ -20,12 +20,15 @@ export default function EditDataRequestForm()
 
     // Fetch DataRequestGroups -------------------------------------------------
     const {
-        loading: loadingRequestGroups,
+        loading: loadingData,
         error  : loadingRequestGroupsError,
-        result : availableRequestGroups
-    } = useBackend<app.RequestGroup[]>(
+        result : data
+    } = useBackend<{ groups: app.RequestGroup[], sites: app.DataSite[] }>(
         useCallback(
-            () => request<app.RequestGroup[]>("/api/request-groups"),
+            () => Promise.all([
+                request<app.RequestGroup[]>("/api/request-groups"),
+                request<app.DataSite[]>("/api/data-sites")
+            ]).then(([groups, sites]) => ({ groups, sites })),
             []
         ),
         true
@@ -72,7 +75,7 @@ export default function EditDataRequestForm()
         return <Navigate to="/requests" />
     }
 
-    if (loadingRequestGroups) {
+    if (loadingData) {
         return <Loader msg="Loading Request Groups..." />
     }
 
@@ -83,6 +86,12 @@ export default function EditDataRequestForm()
             </AlertError>
         );
     }
+
+    if (!data) {
+        return <AlertError><b>Error loading data</b></AlertError>;
+    }
+
+    const { groups, sites } = data
 
     return (
         <div>
@@ -120,7 +129,8 @@ export default function EditDataRequestForm()
                 deleteRequest={deleteRequest}
                 onChange={setState}
                 record={state}
-                requestGroups={availableRequestGroups as app.RequestGroup[]}
+                requestGroups={groups}
+                sites={sites}
                 working={ saving ? "saving" : deleting ? "deleting" : undefined }
             />
         </div>
