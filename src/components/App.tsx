@@ -24,26 +24,33 @@ export default function App()
                 <div className="container row p-1">
                     <div id="main" className="col">
                         <Routes>
-                            <Route path="/" element={ <RequireAuth><Home /></RequireAuth> } />
+                            <Route path="/">
+                                <Route index element={ <RequireAuth><Home /></RequireAuth> } />
 
-                            <Route path="/views/:id" element={ <RequireAuth><Dashboard /></RequireAuth> } />
+                                <Route path="views/:id" element={ <RequireAuth><Dashboard /></RequireAuth> } />
 
-                            <Route path="/requests" element={ <RequireAuth><DataRequestsListPage /></RequireAuth> } />
-                            <Route path="/requests/new" element={ <RequireAuth><CreateDataRequestForm /></RequireAuth> } />
-                            <Route path="/requests/:id" element={ <RequireAuth><DataRequestView /></RequireAuth> } />
-                            <Route path="/requests/:id/edit" element={ <RequireAuth><EditDataRequestForm /></RequireAuth> } />
-                            <Route path="/requests/:id/import" element={ <RequireAuth><DataUploader /></RequireAuth> } />
-                            <Route path="/requests/:id/create-view" element={ <RequireAuth><CreateView /></RequireAuth> } />
-                            
-                            <Route path="/activity" element={<RequireAuth><ActivityPage /></RequireAuth>} />
+                                <Route path="requests">
+                                    <Route index element={ <RequireAuth><DataRequestsListPage /></RequireAuth> } />
+                                    <Route path="new" element={ <RequireAuth><CreateDataRequestForm /></RequireAuth> } />
+                                    <Route path=":id">
+                                        <Route index element={ <RequireAuth><DataRequestView /></RequireAuth> } />
+                                        <Route path="edit" element={ <RequireAuth><EditDataRequestForm /></RequireAuth> } />
+                                        <Route path="import" element={ <RequireAuth><DataUploader /></RequireAuth> } />
+                                        <Route path="create-view" element={ <RequireAuth><CreateView /></RequireAuth> } />
+                                    </Route>
+                                </Route>
 
-                            <Route path="/groups" element={<RequireAuth><RequestGroupList /></RequireAuth>} />
-                            <Route path="/groups/new" element={<RequireAuth><RequestGroupCreateForm /></RequireAuth>} />
-                            <Route path="/groups/:id/edit" element={<RequireAuth><RequestGroupEditForm /></RequireAuth>} />
+                                <Route path="activity" element={<RequireAuth><ActivityPage /></RequireAuth>} />
 
-                            <Route path="/login" element={ <LoginPage /> } />
-                            
-                            <Route path="*" element="Page Not Found" />
+                                <Route path="groups">
+                                    <Route index element={<RequireAuth><RequestGroupList /></RequireAuth>}/>
+                                    <Route path="new" element={<RequireAuth><RequestGroupCreateForm /></RequireAuth>} />
+                                    <Route path=":id/edit" element={<RequireAuth><RequestGroupEditForm /></RequireAuth>} />
+                                </Route>
+                                <Route path="/login" element={ <LoginPage /> } />
+                                
+                                <Route path="*" element="Page Not Found" />
+                            </Route>
                         </Routes>
                     </div>
                 </div>
