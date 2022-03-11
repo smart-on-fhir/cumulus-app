@@ -2,24 +2,11 @@ import React      from "react"
 import { Link }   from "react-router-dom"
 import Checkbox   from "../Checkbox";
 import { Format } from "../Format"
+import Panel      from "../Panel";
 import Select     from "../Select"
 
 import "./form.scss";
 
-const AVAILABLE_DATA_SITES = [
-    {
-        name: "Boston Children's Hospital",
-        description: "Short description of the Boston Children's Hospital data site"
-    },
-    {
-        name: "Massachusetts General Hospital",
-        description: "Short description of the Massachusetts General Hospital data site"
-    },
-    {
-        name: "RUSH",
-        description: "Short description of the RUSH data site"
-    }
-];
 
 const AVAILABLE_DEMOGRAPHICS = [
     {
@@ -226,7 +213,7 @@ class FieldsEditor extends React.Component<FieldsEditorProps>
                     </div>
                 </div>
                 <hr/>
-                <div className="row gap">
+                <div className="row gap mt-1">
                     { AVAILABLE_DEMOGRAPHICS.map((item, i) => (
                         <div key={i} className="col col-0 col-5">
                             <DataListItemCheckbox
@@ -261,7 +248,7 @@ function DataListItemCheckbox({ item, checked, onChange }: {
             name={item.name}
             label={item.label}
             description={item.description}
-            className="mt-1"
+            className="mb-1"
         />
     )
 }
@@ -274,6 +261,7 @@ export default function DataRequestForm({
     record = {},
     onChange,
     requestGroups,
+    sites,
     working
 }: {
     saveRequest: () => void
@@ -281,6 +269,7 @@ export default function DataRequestForm({
     record?: Partial<app.DataRequest>
     onChange: (state: Partial<app.DataRequest>) => void
     requestGroups: app.RequestGroup[]
+    sites: app.DataSite[]
     working?: "deleting" | "saving"
 })
 {
@@ -303,7 +292,7 @@ export default function DataRequestForm({
     } = record
 
     let requestedData = record.requestedData || {
-        dataSites: [AVAILABLE_DATA_SITES[0]] as app.DataListItem[],
+        dataSites: [sites[0]] as app.DataListItem[],
         fields: {
             labs         : [] as app.DataListItem[],
             diagnoses    : [] as app.DataListItem[],
@@ -511,16 +500,18 @@ export default function DataRequestForm({
                     }) }/>
                 </div>
                 <div className="col col-4">
-                    <h4>Included Data Sites</h4>
-                    <hr/>
-                    { AVAILABLE_DATA_SITES.map((site, i) => (
+                    <Panel title="Included Data Sites" menu={[
+                        <Link to="/sites">Manage Data Sites</Link>
+                    ]}>
+                    { sites.map((site, i) => (
                         <DataListItemCheckbox
                             key={i}
-                            item={site}
+                            item={site as app.DataListItem}
                             checked={!!requestedData.dataSites.find(x => x.name === site.name)}
-                            onChange={() => toggleDataSite(site)}
+                            onChange={() => toggleDataSite(site as app.DataListItem)}
                         />
                     ))}
+                    </Panel>
                 </div>
             </div>
 

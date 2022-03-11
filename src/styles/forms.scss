@@ -75,7 +75,7 @@
     }
 
     &:disabled, &.disabled {
-        // opacity       : 0.5;
+        color         : #CCC;
         filter        : grayscale(1);
         pointer-events: none;
     }

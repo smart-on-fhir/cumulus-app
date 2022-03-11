@@ -49,6 +49,18 @@ module.exports = class DataSite extends Model
                         tags   : "requests"
                     });
                 },
+                async afterUpdate(model, { user }) {
+                    await Activity.create({
+                        message: `${model} updated by ${user ? user.username : "system"}`,
+                        tags   : "requests"
+                    });
+                },
+                async afterDestroy(model, { user }) {
+                    await Activity.create({
+                        message: `${model} deleted by ${user ? user.username : "system"}`,
+                        tags   : "requests"
+                    });
+                }
             }
         });
     };

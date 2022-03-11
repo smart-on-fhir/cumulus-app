@@ -51,6 +51,7 @@ function setupAPI(app, { verbose })
     app.use("/api/views"         , require("./controllers/View"        ));
     app.use("/api/users"         , require("./controllers/User"        ));
     app.use("/api/activity"      , require("./controllers/Activity"    ));
+    app.use("/api/data-sites"    , require("./controllers/DataSites"   ));
     verbose && console.log("✔ REST API set up");
 }
 

@@ -144,12 +144,22 @@ declare module app {
     type supportedDataType = "string" | "integer" | "float" | "boolean" | "date:YYYY-MM-DD" | "date:YYYY-MM" | "date:YYYY"
 
     interface RequestGroup {
-        id       : number
-        name     : string
-        updatedAt: string
-        createdAt: string
+        id         : number
+        name       : string
+        updatedAt  : string
+        createdAt  : string
         description: string
-        requests : DataRequest[]
+        requests   : DataRequest[]
+    }
+
+    interface DataSite {
+        id         : number
+        name       : string
+        description: string | null
+        lat        : number | null // 0° to 90°
+        long       : number | null // -180° to 180°
+        updatedAt  : string | null
+        createdAt  : string
     }
 
     interface Filter {

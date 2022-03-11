@@ -5,6 +5,7 @@ module.exports = async (connection) => {
 
     const { models } = connection
 
+    // Users ------------------------------------------------------------------
     await models.User.bulkCreate([
         {
             role    : "user",
@@ -28,6 +29,7 @@ module.exports = async (connection) => {
         }
     ]);
 
+    // Request Groups ---------------------------------------------------------
     await models.RequestGroup.bulkCreate([
         { id: 1, name: "COVID-19"  },
         { id: 2, name: "INFLUENZA" },
@@ -35,7 +37,7 @@ module.exports = async (connection) => {
     ]);
     await fixAutoIncrement(connection, models.RequestGroup.tableName, "id");
 
-    // Requests ----------------------------------------------------------------
+    // Requests ---------------------------------------------------------------
     await models.DataRequest.bulkCreate([
 
         {
@@ -3286,7 +3288,7 @@ module.exports = async (connection) => {
     ]);
     await fixAutoIncrement(connection, models.DataRequest.tableName, "id");
 
-    // Views -------------------------------------------------------------------
+    // Views ------------------------------------------------------------------
     await models.View.bulkCreate([
         {
             id           : 1,
@@ -3338,6 +3340,26 @@ module.exports = async (connection) => {
         }
     ]);
     await fixAutoIncrement(connection, models.View.tableName, "id");
+
+    // Data Sites -------------------------------------------------------------
+    await models.DataSite.bulkCreate([
+        {
+            id: 1,
+            name: "Boston Children's Hospital",
+            description: "Short description of the Boston Children's Hospital data site"
+        },
+        {
+            id: 2,
+            name: "Massachusetts General Hospital",
+            description: "Short description of the Massachusetts General Hospital data site"
+        },
+        {
+            id: 3,
+            name: "RUSH",
+            description: "Short description of the RUSH data site"
+        }
+    ]);
+    await fixAutoIncrement(connection, models.DataSite.tableName, "id");
 };
 
 /**

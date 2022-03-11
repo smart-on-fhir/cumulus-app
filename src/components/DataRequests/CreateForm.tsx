@@ -27,10 +27,13 @@ export default function CreateDataRequestForm()
     const {
         loading: loadingRequestGroups,
         error: loadingRequestGroupsError,
-        result: availableRequestGroups
-    } = useBackend<app.RequestGroup[]>(
+        result: data
+    } = useBackend<{ groups: app.RequestGroup[], sites: app.DataSite[] }>(
         useCallback(
-            () => request<app.RequestGroup[]>("/api/request-groups"),
+            () => Promise.all([
+                request<app.RequestGroup[]>("/api/request-groups"),
+                request<app.DataSite[]>("/api/data-sites")
+            ]).then(([groups, sites]) => ({ groups, sites })),
             []
         ),
         true
@@ -87,6 +90,12 @@ export default function CreateDataRequestForm()
         return <AlertError><b>Error loading request groups:</b> { loadingRequestGroupsError + "" }</AlertError>
     }
 
+    if (!data) {
+        return <AlertError><b>Failed loading data</b></AlertError>
+    }
+
+    const { groups, sites } = data;
+
     return (
         <div>
             <HelmetProvider>
@@ -111,7 +120,8 @@ export default function CreateDataRequestForm()
                 saveRequest={save}
                 onChange={setState}
                 record={state}
-                requestGroups={availableRequestGroups as app.RequestGroup[]}
+                requestGroups={groups}
+                sites={sites}
                 working={ saving ? "saving" : undefined }
             />
         </div>

@@ -12,8 +12,11 @@ import ActivityPage                             from "./Activity/Page";
 import RequestGroupList                         from "./RequestGroups";
 import RequestGroupEditForm                     from "./RequestGroups/EditForm";
 import RequestGroupCreateForm                   from "./RequestGroups/CreateForm";
+import DataSiteList                             from "./DataSites";
+import DataSiteEditForm                         from "./DataSites/EditForm";
 
 import "../styles/main.scss";
+import DataSiteCreateForm from "./DataSites/CreateForm";
 
 export default function App()
 {
@@ -40,6 +43,12 @@ export default function App()
                                     </Route>
                                 </Route>
 
+                                <Route path="sites">
+                                    <Route index element={<RequireAuth><DataSiteList/></RequireAuth>} />
+                                    <Route path="new" element={ <RequireAuth><DataSiteCreateForm /></RequireAuth> } />
+                                    <Route path=":id/edit" element={ <RequireAuth><DataSiteEditForm/></RequireAuth> } />
+                                </Route>
+
                                 <Route path="activity" element={<RequireAuth><ActivityPage /></RequireAuth>} />
 
                                 <Route path="groups">
@@ -47,6 +56,7 @@ export default function App()
                                     <Route path="new" element={<RequireAuth><RequestGroupCreateForm /></RequireAuth>} />
                                     <Route path=":id/edit" element={<RequireAuth><RequestGroupEditForm /></RequireAuth>} />
                                 </Route>
+
                                 <Route path="/login" element={ <LoginPage /> } />
                                 
                                 <Route path="*" element="Page Not Found" />

@@ -83,8 +83,8 @@ export default function RequestGroupEditForm()
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
-                { name: "Home"              , href: "/" },
-                { name: "Request Groups"    , href: "/groups" },
+                { name: "Home", href: "/" },
+                { name: "Request Groups", href: "/groups" },
                 { name: "Edit Request Group" }
             ]} />
             <h4><i className="fa-solid fa-pen-to-square" /> Edit Data Request Group</h4>
@@ -119,7 +119,6 @@ export default function RequestGroupEditForm()
                     <div className="center mt-1 mb-2">
                         <button
                             className="btn btn-green"
-                            name="requestGroupDescription"
                             type="submit"
                             style={{ minWidth: "8em" }}
                         >
