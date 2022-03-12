@@ -1,5 +1,6 @@
 const { DataTypes, Model } = require("sequelize");
-const Activity = require("./Activity");
+const { sendDataRequest }  = require("../../mail");
+const Activity             = require("./Activity");
 
 
 
@@ -114,6 +115,9 @@ module.exports = class DataRequest extends Model
                         message: `${model} created by ${user ? user.username : "system"}`,
                         tags   : "requests"
                     });
+                    // Note that we don't really wait for this to complete
+                    sendDataRequest(model.toJSON()).catch(console.error);
+
                 },
 
                 async afterUpdate(model, { user }) {

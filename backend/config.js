@@ -1,21 +1,26 @@
-const Path     = require("path");
+const Path           = require("path");
 const { bool, uInt } = require("./lib");
 
 const {
-    NODE_ENV    = "production",
-    HOST        = "0.0.0.0",
-    PORT        = "4000",
-    DB_SEED     = "",
-    DB_SYNC     = "none", // normal|force|alter|none
-    DB_HOST     = "localhost",
-    DB_PORT     = "5432",
-    DB_USER     = "postgres",
-    DB_PASS     = "",
-    DB_DATABASE = "cumulus",
-    VERBOSE     = "false",
-    THROTTLE    = "0",
-    DB_SSL      = "true",
-    DB_DOCKER_CONTAINER = ""
+    NODE_ENV            = "production",
+    HOST                = "0.0.0.0",
+    PORT                = "4000",
+    DB_SEED             = "",
+    DB_SYNC             = "none", // normal|force|alter|none
+    DB_HOST             = "localhost",
+    DB_PORT             = "5432",
+    DB_USER             = "postgres",
+    DB_PASS             = "",
+    DB_DATABASE         = "cumulus",
+    VERBOSE             = "false",
+    THROTTLE            = "0",
+    DB_SSL              = "true",
+    DB_DOCKER_CONTAINER = "",
+    MAILGUN_API_KEY     = "",
+    MAILGUN_DOMAIN      = "smarthealthit.org",
+    APP_EMAIL_FROM      = "admin@cumulus.org",
+    CUMULUS_ADMIN_EMAIL = "vlad.ignatov@gmail.com",
+
 } = process.env;
 
 
@@ -24,6 +29,8 @@ module.exports = {
     host    : HOST,
     verbose : bool(VERBOSE),
     throttle: uInt(THROTTLE),
+    appEmail: APP_EMAIL_FROM,
+    cumulusAdminEmail: CUMULUS_ADMIN_EMAIL,
     docker: {
         containerName: DB_DOCKER_CONTAINER
     },
@@ -45,5 +52,43 @@ module.exports = {
             port    : DB_PORT,
             host    : DB_HOST
         }
+    },
+    mailGun: {
+        // Your Mailgun API KEY
+        apiKey: MAILGUN_API_KEY,
+
+        // Your public Mailgun API KEY
+        publicApiKey: "",
+
+        // Your Mailgun Domain (Please note: domain field is MY-DOMAIN-NAME.com,
+        // not https://api.mailgun.net/v3/MY-DOMAIN-NAME.com)
+        domain: MAILGUN_DOMAIN,
+
+        // Set to true if you wish to mute the console error logs in
+        // validateWebhook() function
+        mute: false,
+
+        // The proxy URI in format http[s]://[auth@]host:port. ex:
+        // 'http://proxy.example.com:8080'
+        // proxy: ""
+
+        // Request timeout in milliseconds
+        timeout: 10000,
+
+        // the mailgun host (default: 'api.mailgun.net')
+        // host:
+
+        // the mailgun protocol (default: 'https:', possible values: 'http:' or 'https:')
+        // protocol:
+
+        // the mailgun port (default: '443')
+        // port:
+
+        // the mailgun host (default: '/v3')
+        // endpoint:
+
+        // the number of total attempts to do when performing requests. Default is 1.
+        // That is, we will try an operation only once with no retries on error.
+        retry: 2
     }
 };
