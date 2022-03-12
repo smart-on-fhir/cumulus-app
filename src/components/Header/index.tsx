@@ -8,7 +8,7 @@ export default function Header() {
     return (
         <header id="app-header">
             <div className="container row p-1">
-                <div className="col pr-1 middle left">
+                <div className="col col-0 pr-1 middle left">
                     <Link to="/"><img src={ logo } alt="Cumulus Logo" width="268"/></Link>
                 </div>
                 <div className="col middle center"/>

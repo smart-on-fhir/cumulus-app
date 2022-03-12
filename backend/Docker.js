@@ -66,14 +66,14 @@ function waitForReady(container) {
                             // Stops following logs.
                             // @ see https://github.com/apocas/dockerode/blob/master/examples/logs.js#L29
                             stream.push(Buffer.from('!stop!'))
-                            resolve(true)
+                            setTimeout(() => resolve(true), 100);
                         }
                     }
                 })
-                .on('error', function (e) {
-                    this.timer && clearTimeout(this.timer)
-                    reject(e)
-                })
+                // .on('error', function (e) {
+                //     this.timer && clearTimeout(this.timer)
+                //     reject(e)
+                // })
         })
     })
 }
