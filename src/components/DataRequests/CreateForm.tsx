@@ -13,7 +13,7 @@ import "./form.scss";
 
 export default function CreateDataRequestForm()
 {
-    const [ state, setState ] = useState<Partial<app.DataRequest>>({ groupId: 1 })
+    const [ state, setState ] = useState<Partial<app.DataRequest>>({})
     const [ savedRecord, setSavedRecord ] = useState<app.DataRequest|null>(null)
 
     // onSubmit create new DataRequest and redirect to its edit page

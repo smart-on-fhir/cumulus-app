@@ -285,7 +285,7 @@ export default function DataRequestForm({
         completed,
         name = "",
         description = "",
-        groupId = 1,
+        groupId,
         refresh = "manually",
         dataURL = "",
         dataSourceType = record.dataURL ? "url" : "file"
@@ -361,6 +361,7 @@ export default function DataRequestForm({
                         </div>
                     </div>
                     <select value={groupId} onChange={e => onChange({ ...record, groupId: +e.target.value })}>
+                        <option>None (GENERAL)</option>
                         {requestGroups.map((g, i) => (
                             <option key={i} value={g.id}>{g.name}</option>
                         ))}

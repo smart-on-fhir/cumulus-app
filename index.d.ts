@@ -87,6 +87,33 @@ declare module app {
         completed: string | null
         
         data: DataRequestData
+
+        requestedData: RequestedData | null
+
+        dataURL: string | null
+
+        dataSourceType: "file" | "url"
+    }
+
+    interface RequestedData {
+        fields: RequestedDataFields
+        dataSites: DataListItem[]
+    }
+
+    interface RequestedDataFields {
+        labs         : DataListItem[]
+        diagnoses    : DataListItem[]
+        immunizations: DataListItem[]
+        medications  : DataListItem[]
+        procedures   : DataListItem[]
+        phenotypes   : DataListItem[]
+        demographics : DataListItem[]
+    }
+
+    interface DataListItem {
+        name: string
+        description: string
+        label?: string
     }
 
     interface DataRequestData {

@@ -9,6 +9,8 @@ import { useAuth }                from "../../auth";
 import Loader                     from "../Loader";
 import { AlertError }             from "../Alert";
 
+import "./DataRequestsListPage.scss";
+
 
 function List({
     items,
@@ -68,9 +70,9 @@ export default function DataRequestsListPage()
                 </div>) }
             </div>
             <hr/>
-            <div className="row gap mt-2">
+            <div className="requests-grid">
                 { groups?.filter(g => g.requests.length > 0).map((group, i) => (
-                    <div key={i} className="col pb-1" style={{ flex: "1 1 50%", minWidth: "20em" }}>
+                    <div key={i}>
                         <h5 className="color-brand-2"><i className="fa-regular fa-folder"/> { group.name }</h5>
                         <List items={ group.requests }/>
                     </div>

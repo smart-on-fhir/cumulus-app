@@ -1,0 +1,29 @@
+
+.requests-grid {
+    
+    grid-template-rows: 1fr auto;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    column-count: 3;
+    column-gap: 1em;
+    margin-top: 1em;
+
+    > div {
+        display: grid;
+        grid-row: 1/-1;
+        grid-column: 1;
+        break-inside: avoid;
+    }
+}
+
+@media (max-width: 50em) {
+    .requests-grid {
+        column-count: 2;
+    }
+}
+
+@media (max-width: 36em) {
+    .requests-grid {
+        column-count: 1;
+    }
+}
