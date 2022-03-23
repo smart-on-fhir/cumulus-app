@@ -3,7 +3,7 @@ import { Color } from "highcharts"
 import moment    from "moment";
 import PowerSet  from "../../../PowerSet";
 import { defer, format } from "../../../utils";
-import { CHART_COLORS, SupportedNativeChartTypes } from "../config";
+import { SupportedNativeChartTypes } from "../config";
 
 declare var Highcharts: any
 
@@ -18,7 +18,25 @@ type SeriesOptions = (
     // Highcharts.SeriesTimelineOptions
 );
 
+function hslToHex(h: number, s: number, l: number) {
+    l /= 100;
+    const a = s * Math.min(l, 1 - l) / 100;
+    const f = (n: number) => {
+      const k = (n + h / 30) % 12;
+      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+}
 
+function getColorAt(i: number) {
+    return hslToHex((i * 1.61803399 * 360) % 360 , 75, 60)
+}
+
+const COLORS: string[] = [];
+for (let i = 0; i < 100; i++) {
+    COLORS.push(getColorAt(i))
+}
 
 /**
  * Function from https://github.com/danro/easing-js/blob/master/easing.js
@@ -135,8 +153,8 @@ export function getSeries({
                     y2: 1
                 },
                 stops: [
-                    [0, new Color(CHART_COLORS[series.length % CHART_COLORS.length]).setOpacity(0.2).get('rgba') + ""],
-                    [1, new Color(CHART_COLORS[series.length % CHART_COLORS.length]).setOpacity(0.05).get('rgba') + ""]
+                    [0, new Color(getColorAt(series.length)).setOpacity(0.2 ).get('rgba') + ""],
+                    [1, new Color(getColorAt(series.length)).setOpacity(0.05).get('rgba') + ""]
                 ]
             }: undefined
         });
@@ -163,8 +181,8 @@ export function getSeries({
                         y2: 1
                     },
                     stops: [
-                        [0, new Color(CHART_COLORS[series.length % CHART_COLORS.length]).setOpacity(0.3).get('rgba') + ""],
-                        [1, new Color(CHART_COLORS[series.length % CHART_COLORS.length]).setOpacity(0.1).get('rgba') + ""]
+                        [0, new Color(getColorAt(i)).setOpacity(0.2 ).get('rgba') + ""],
+                        [1, new Color(getColorAt(i)).setOpacity(0.05).get('rgba') + ""]
                     ]
                 }: undefined
             };
@@ -318,7 +336,7 @@ export function buildChartOptions({
             enabled: series.length > 1 || type === "pie",
             ...options.legend,
         },
-        colors: CHART_COLORS,
+        colors: COLORS,
         yAxis: {
             ...options.yAxis,
             // lineColor: "rgba(0, 0, 0, 0.2)",
