@@ -353,12 +353,12 @@ export function buildChartOptions({
             allowDecimals: false,
             
             // Up to 10X Zoom
-            softMax: series.reduce((prev, cur) => {
-                const max = cur.data ?
-                    (cur.data as Highcharts.XrangePointOptionsObject[]).reduce((p: number, c) => Math.max(p, c.y || 0), 0) :
-                    prev;
-                return Math.max(prev, max)
-            }, 0) / 10,
+            // softMax: series.reduce((prev, cur) => {
+            //     const max = cur.data ?
+            //         (cur.data as Highcharts.XrangePointOptionsObject[]).reduce((p: number, c) => Math.max(p, c.y || 0), 0) :
+            //         prev;
+            //     return Math.max(prev, max)
+            // }, 0) / 10,
         },
         plotOptions: {
             series: {
