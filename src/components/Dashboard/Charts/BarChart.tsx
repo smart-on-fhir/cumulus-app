@@ -1,3 +1,4 @@
+import { merge } from "highcharts"
 import PowerSet from "../../../PowerSet";
 import Chart    from "./Chart";
 
@@ -5,33 +6,44 @@ import Chart    from "./Chart";
 export default function BarChart({
     column,
     dataSet,
+    fullDataSet,
     groupBy,
     use3d,
-    stack
+    stack,
+    options,
+    colorOptions,
+    denominator
 }: {
     column: app.DataRequestDataColumn
     groupBy?: app.DataRequestDataColumn | null
     dataSet: PowerSet
+    fullDataSet: PowerSet
     use3d?: boolean
     stack?: boolean
+    options?: Partial<Highcharts.Options>
+    colorOptions: app.ColorOptions
+    denominator?: string
 })
 {   
     return <Chart
         column={column}
         groupBy={groupBy}
         dataSet={dataSet}
+        fullDataSet={fullDataSet}
         type="bar"
         key={ [column.name, groupBy?.name || ""].join("-") }
-        options={{
+        colorOptions={colorOptions}
+        denominator={denominator}
+        options={merge({
             chart: {
                 options3d: {
                     enabled: !!use3d,
-                    alpha: 15,
+                    alpha: 10,
                     beta: 15,
-                    depth: 50,
+                    depth: 80,
                     fitToPlot: true,
-                    viewDistance: 15,
-                    axisLabelPosition: "auto"
+                    viewDistance: 100,
+                    axisLabelPosition: null
                 }
             },
             plotOptions: {
@@ -43,7 +55,10 @@ export default function BarChart({
                 title: {
                     text: use3d ? "" : "Count"
                 }
+            },
+            xAxis: {
+                offset: use3d ? 5 : 0
             }
-        }
-    } />
+        }, options)}
+    />
 }

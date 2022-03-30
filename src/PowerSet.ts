@@ -1,4 +1,4 @@
-
+// const CACHE: Record<string, any> = {};
 
 /**
  * The row objects that can be handled by this class
@@ -24,6 +24,8 @@ interface Row extends Record<string, any> {
 
 export default class PowerSet
 {
+    public cache: Record<string, any>;
+
     public readonly cols: app.DataRequestDataColumn[] = [];
 
     public readonly rows: Row[] = [];
@@ -32,32 +34,39 @@ export default class PowerSet
     {
         this.cols = cols;
         this.rows = rows;
+        this.cache = {};
     }
 
     static from<RowType extends Row>(data: { cols: app.DataRequestDataColumn[], rows: RowType[][] })
     {
+        // console.time("PowerSet.from")
         const cols = data.cols;
         const rows: RowType[] = [];
         
         data.rows.forEach((row, i) => {
             const rowObject: any = {}
             
-            Object.defineProperty(rowObject, "__row_id__", {
-                configurable: false,
-                enumerable  : false,
-                writable    : false,
-                value       : i
+            // Object.defineProperty(rowObject, "__row_id__", {
+            //     configurable: false,
+            //     enumerable  : false,
+            //     writable    : false,
+            //     value       : i
+            // })
+
+            cols.forEach((col, colIndex) => {
+                let value: any = row[colIndex];
+                if (value === "" && col.dataType === "string") {
+                    value = null
+                }
+                rowObject[col.name] = value
             })
 
-            data.cols.forEach((col, colIndex) => {
-                // rowObject[col.name] = row[colIndex]
-                // @ts-ignore
-                rowObject[col.name] = col.dataType === "string" && row[colIndex] === "" ? null : row[colIndex]
-            })
             rows.push(rowObject)
         })
 
-        return new PowerSet(cols, rows)
+        const result = new PowerSet(cols, rows)
+        // console.timeEnd("PowerSet.from")
+        return result 
     }
 
     // Static Utils
@@ -234,29 +243,11 @@ export default class PowerSet
      * 
      * `
      */
-    public getChartData({ column, groupBy = "", filters = [] }: { column: string, groupBy?: string, filters?: app.Filter[] }) {
+    public getChartData({ column, groupBy = "", filters = [] }: { column: string, groupBy?: string, filters?: app.Filter[] }): PowerSet {
+        // console.log("CALL PowerSet.getChartData")
 
-        const groups: Record<string, Row> = {};
+        // console.time("PowerSet.getChartData")
 
-        
-        // const col1 = this.getColumnByName(column);
-        // const col2 = this.getColumnByName(groupBy);
-        // const col3 = this.getColumnByName("cnt");
-        
-        // if (!col1) {
-        //     throw new Error(`No such column "${column}"`);
-        // }
-        
-        // cols.push(col1)
-        
-        // if (col2) {
-        //     cols.push(col2);
-        // }
-        
-        // if (col3) {
-        //     cols.push(col3);
-        // }
-        
         let preservedColumns = ["cnt", "queryid", column];
         
         if (groupBy) {
@@ -269,128 +260,157 @@ export default class PowerSet
         if (!col1) {
             throw new Error(`No such column "${column}"`);
         }
-        
+
         preservedColumns = filters.reduce((prev, cur) => {
             if (!prev.includes(cur.left)) {
                 prev.push(cur.left)
             }
             return prev
         }, preservedColumns);
-        
-        this.rows.filter(row => {
-            for (let key in row) {
-                const value = row[key];
 
-                // The primary visualized column CANNOT BE NULL
-                if (key === column) {
-                    if (value === null) {
-                        return false
+
+
+        const cacheKey = preservedColumns.join(",")
+
+        if (this.cache.chartDataKey !== cacheKey) {
+            // console.log("chartDataKey changed from '%s' to '%s'. Deleting cached data...", this.cache.chartDataKey, cacheKey)
+            delete this.cache.chartData;
+            // this.cache = {}
+        }
+
+        this.cache.chartDataKey = cacheKey;
+
+        let out = this.cache.chartData;
+
+        if (!out) {
+            
+
+            const groups: Record<string, Row> = {};
+
+            // Filter out unneeded rows
+            this.rows.filter(row => {
+                for (let key in row) {
+                    const value = row[key];
+
+                    // The primary visualized column CANNOT BE NULL
+                    if (key === column) {
+                        if (value === null) {
+                            return false
+                        }
+                        continue
                     }
-                    continue
-                }
 
-                // If group-by column is used it CANNOT BE NULL
-                if (groupBy && key === groupBy) {
-                    if (value === null) {
-                        return false
+                    // If group-by column is used it CANNOT BE NULL
+                    if (groupBy && key === groupBy) {
+                        if (value === null) {
+                            return false
+                        }
+                        continue
                     }
-                    continue
-                }
 
-                // The "cnt" column is ALWAYS included
-                if (key === "cnt") {
-                    continue
-                }
-
-                // The "queryid" column is ALWAYS included
-                if (key === "queryid") {
-                    continue
-                }
-
-                // Any column that is used in filter conditions MUST be included
-                const isInFilters = filters.some(f => f.operator && key === f.left); 
-                if (isInFilters) {
-                    continue
-                }
-                
-                // Anything else should be an "additional data" column. These columns
-                // are included but their "cnt" must be reset to zero so that they
-                // don't influence the total count calculations.
-                if (!isInFilters) {
-                    // if (value === null) {
-                    //     console.log(key, JSON.stringify(value))
-                    // }
-                    // if (value === undefined) {
-                    //     console.log(key, JSON.stringify(value))
-                    // }
-                    if (value !== null) {
-                        row.cnt = 0
+                    // The "cnt" column is ALWAYS included
+                    if (key === "cnt") {
+                        continue
                     }
-                }
-            }
-            return true;
-        }).forEach(row => {
 
-            let groupKey = row[column] + "";
-            if (groupBy) {
-                groupKey += "|" + row[groupBy];
-            }
+                    // The "queryid" column is ALWAYS included
+                    if (key === "queryid") {
+                        continue
+                    }
 
-            let group: Row = groups[groupKey];
-
-            // Create the group on the first occurrence
-            if (!group) {
-                group = groups[groupKey] = { cnt: 0 };
-            }
-
-            // Merge new values into the existing group row
-            for (let key in row) {
-                if (key === "cnt") {
-                    group.cnt += row.cnt
-                }
-                else {
-                    let groupedValue = group[key];
-                    let rowValue     = row[key];
-
+                    // Any column that is used in filter conditions MUST be included
+                    const isInFilters = filters.some(f => f.operator && key === f.left); 
+                    if (isInFilters) {
+                        continue
+                    }
                     
-                    if (Array.isArray(groupedValue)) {
-                        if (rowValue !== null) {
-                            if (!groupedValue.includes(rowValue)) {
-                                groupedValue.push(rowValue)
-                            }
-                        }
-                    } else {
-                        if (key in group) {
-                            if (groupedValue !== rowValue) {
-                                // @ts-ignore
-                                group[key] = [groupedValue, rowValue]
-                            }
-                        } else {
-                            group[key] = rowValue
+                    // Anything else should be an "additional data" column. These columns
+                    // are included but their "cnt" must be reset to zero so that they
+                    // don't influence the total count calculations.
+                    if (!isInFilters) {
+                        if (value !== null) {
+                            // row.cnt = 0
+                            return false
                         }
                     }
                 }
-            }
-        });
+                return true;
+            }).forEach(row => {
 
-        // console.log(groups)
+                let groupKey = row[column] + "";
+                if (groupBy) {
+                    groupKey += "|" + row[groupBy];
+                }
 
-        const rows = Object.values(groups).sort((a, b) => {
-            if (col1.dataType === "integer" || col1.dataType === "float") {
-                return (a[column] as number) - (b[column] as number)
-            }
-            return String(a[column] + "").localeCompare(b[column] + "")
-        }).map((row, i) => {
-            Object.defineProperty(row, "__row_id__", {
-                configurable: false,
-                enumerable  : false,
-                writable    : false,
-                value       : i
+                let group: Row = groups[groupKey];
+
+                // Create the group on the first occurrence
+                if (!group) {
+                    // @ts-ignore
+                    group = groups[groupKey] = {};
+                }
+
+                // Merge new values into the existing group row
+                for (let key in row) {
+                    if (preservedColumns.includes(key)) {
+                        if (key === "cnt") {
+                            group.cnt = group.cnt ? group.cnt + row.cnt : row.cnt
+                        }
+                        else {
+                            let groupedValue = group[key];
+                            let rowValue     = row[key];
+
+                            
+                            if (Array.isArray(groupedValue)) {
+                                if (rowValue !== null) {
+                                    if (!groupedValue.includes(rowValue)) {
+                                        groupedValue.push(rowValue)
+                                    }
+                                }
+                            } else {
+                                if (key in group) {
+                                    if (groupedValue !== rowValue) {
+                                        // @ts-ignore
+                                        group[key] = [groupedValue, rowValue]
+                                    }
+                                } else {
+                                    group[key] = rowValue
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // console.log(groups)
+
+            const rows = Object.values(groups)
+            
+            .sort((a, b) => {
+                if (col1.dataType === "integer" || col1.dataType === "float") {
+                    return (a[column] as number) - (b[column] as number)
+                }
+                return String(a[column] + "").localeCompare(b[column] + "")
             })
-            return row
-        });
+            .map((row, i) => {
+                Object.defineProperty(row, "__row_id__", {
+                    configurable: false,
+                    enumerable  : false,
+                    writable    : false,
+                    value       : i
+                })
+                return row
+            });
+            // console.log(rows)
 
-        return new PowerSet(this.cols, rows)
+            out = this.cache.chartData = new PowerSet(this.cols.filter(c => preservedColumns.includes(c.name)), rows);
+            // console.log(out)
+        }
+
+        // console.log("END PowerSet.getChartData")
+        // console.timeEnd("PowerSet.getChartData")
+
+        return out
     }
 
 
@@ -494,7 +514,7 @@ export default class PowerSet
 
     public filter(filter: (row: Row, rowIndex: number) => boolean, thisArg?: any): PowerSet {
         const rows: Row[] = this.rows.filter((row, index) => filter(row, index), thisArg)
-        return new PowerSet(this.cols, rows)
+        return new PowerSet(this.cols, rows);
     }
 
     public where(map: Record<keyof Row, any>) {
@@ -579,6 +599,73 @@ export default class PowerSet
         }
 
         return groups
+    }
+
+    /**
+     * Find the first row (it should be ONLY one anyway) that has a "cnt" value
+     * and everything else is empty. Ignores the "queryid" column (if any). If
+     * such row is not fount (shoukld not nappen) returns 0.
+     */
+    countAll(): number {
+        // console.time("PowerSet.countAll")
+
+        let out = this.cache.countAll
+
+        if (out === undefined) {
+
+            const row = this.rows.find(row => {
+                return this.cols.every(col => {
+                    if (col.name === "cnt" || col.name === "queryid") {
+                        return true
+                    } else {
+                        return row[col.name] === null || row[col.name] === ""
+                    }
+                })
+            });
+
+            out = this.cache.countAll = row ? row.cnt : 0;
+        }
+
+        // console.timeEnd("PowerSet.countAll")
+        
+        return out;
+    }
+
+    /**
+     * 
+     * @param map 
+     * @returns 
+     */
+    countWhere(map?: Record<keyof Row, any>): number {
+
+        const label = `PowerSet.countAll(${JSON.stringify(map)})`
+        // console.time(label)
+
+        let out = this.cache[label]
+
+        if (out === undefined) {
+
+            if (!map) {
+                return this.countAll();
+            }
+
+            const row = this.rows.find(row => {
+                return this.cols.every(col => {
+                    if (col.name === "cnt") {
+                        return true
+                    } else if (col.name in map) {
+                        return row[col.name] === map[col.name]
+                    } else {
+                        return row[col.name] === null || row[col.name] === "" || col.name === "queryid"
+                    }
+                })
+            });
+
+            out = this.cache[label] = row ? row.cnt : 0;
+        }
+        
+        // console.timeEnd(label)
+        return out;
     }
 
 }

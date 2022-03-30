@@ -29,8 +29,8 @@ interface SelectOption {
 }
 
 export default function Select({
-    tabIndex = 0,
-    options = [],
+    tabIndex    = 0,
+    options     = [],
     placeholder = "",
     value,
     onChange,

@@ -17,6 +17,14 @@ declare module app {
         columns: ColumnDescriptor[]
     }
 
+    interface ColorOptions {
+        saturation: number
+        brightness: number
+        variety   : number
+        opacity   : number
+        startColor: number
+    }
+
     interface View {
         id: number
         name: string
@@ -29,6 +37,9 @@ declare module app {
             column: string
             groupBy: string
             filters: Filter[]
+            chartOptions?: Partial<Highcharts.Options>
+            colorOptions?: ColorOptions
+            denominator ?: string
         }
     }
 
@@ -169,7 +180,8 @@ declare module app {
         right: {
             type : "column" | "value"
             value?: string | number | Date | null
-        }
+        },
+        join: "and" | "or"
     }
 
     interface Activity {

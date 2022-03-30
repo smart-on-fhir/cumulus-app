@@ -5,17 +5,29 @@ import Chart    from "./Chart";
 export default function AreaSPLineChart({
     column,
     groupBy,
-    dataSet
+    dataSet,
+    fullDataSet,
+    options,
+    colorOptions,
+    denominator
 }: {
-    column: app.DataRequestDataColumn,
-    dataSet: PowerSet,
+    column: app.DataRequestDataColumn
+    dataSet: PowerSet
+    fullDataSet: PowerSet
     groupBy?: app.DataRequestDataColumn | null
+    options?: Partial<Highcharts.Options>
+    colorOptions: app.ColorOptions,
+    denominator?: string
 })
 {
     return <Chart
         column={column}
         groupBy={groupBy}
         dataSet={dataSet}
+        fullDataSet={fullDataSet}
+        options ={options}
+        colorOptions={colorOptions}
+        denominator={denominator}
         type="areaspline"
         key={ [column.name, groupBy?.name || ""].join("-") }
     />

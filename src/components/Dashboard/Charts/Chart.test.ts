@@ -111,7 +111,7 @@ describe("Chart", () => {
                 ]
             });
 
-            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie" });
+            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie", fullDataSet: dataSet });
 
             expectInclude(series, [{
                 type: "pie",
@@ -137,7 +137,7 @@ describe("Chart", () => {
                 ]
             });
 
-            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie" });
+            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie", fullDataSet: dataSet });
 
             expectInclude(series, [{
                 type: "pie",
@@ -163,7 +163,7 @@ describe("Chart", () => {
                 ]
             });
 
-            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie" });
+            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie", fullDataSet: dataSet });
 
             expectInclude(series, [{
                 type: "pie",
@@ -189,7 +189,7 @@ describe("Chart", () => {
                 ]
             });
 
-            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie" });
+            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie", fullDataSet: dataSet });
 
             expectInclude(series, [{
                 type: "pie",
@@ -215,7 +215,7 @@ describe("Chart", () => {
                 ]
             });
 
-            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie" });
+            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie", fullDataSet: dataSet });
 
             expectInclude(series, [{
                 type: "pie",
@@ -241,7 +241,7 @@ describe("Chart", () => {
                 ]
             });
 
-            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie" });
+            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie", fullDataSet: dataSet });
 
             expectInclude(series, [{
                 type: "pie",
@@ -267,7 +267,7 @@ describe("Chart", () => {
                 ]
             });
 
-            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie" });
+            const series = getSeries({ column: dataSet.cols[0], dataSet, type: "pie", fullDataSet: dataSet });
 
             expectInclude(series, [{
                 type: "pie",
@@ -297,7 +297,7 @@ describe("Chart", () => {
                 ]
             });
 
-            const series = getSeries({ column: dataSet.cols[0], groupBy: dataSet.cols[1], dataSet, type: "spline" });
+            const series = getSeries({ column: dataSet.cols[0], groupBy: dataSet.cols[1], dataSet, type: "spline", fullDataSet: dataSet });
 
             expectInclude(series, [
                 {
@@ -351,7 +351,8 @@ describe("Chart", () => {
                 column : dataSet.cols[0],
                 groupBy: dataSet.cols[1],
                 dataSet,
-                type: "spline"
+                type: "spline",
+                fullDataSet: dataSet
             });
 
             
