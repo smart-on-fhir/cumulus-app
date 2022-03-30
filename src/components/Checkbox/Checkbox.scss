@@ -3,15 +3,21 @@
 
 label.checkbox-label {
     display: block;
-    padding: 0.25em 0.25em 0.25em 1.5em;
+    padding: 0.1em 0.5em 0.1em 1.5em;
     border-radius: 4px;
     position: relative;
+    font-weight: normal;
 
     > input[type="checkbox"], > input[type="radio"] {
         font-size:  inherit;
-        margin: 0 0 0 -1.5em;
-        width: 1.5em;
+        // margin: 0 0 0 -1.5em;
+        margin: 0em 0.2em 0em -1.2em;
+        width: 1em;
         outline: 0;
+        background: orange;
+        vertical-align: top;
+        position: relative;
+        top: 0.24em;
 
         &:focus-visible + .checkbox-label-focus-highlight {
             box-shadow: 0 0 0 1px lighten($color: $color-blue, $amount: 10%) inset;

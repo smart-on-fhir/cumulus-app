@@ -2,7 +2,8 @@ import { Routes, Route, BrowserRouter }         from "react-router-dom";
 import { AuthProvider, RequireAuth, LoginPage } from "../auth";
 import Header                                   from "./Header";
 import Home                                     from "./Home";
-import Dashboard, { CreateView }                from "./Dashboard";
+import EditView                                 from "./Dashboard/EditView";
+import CreateView                               from "./Dashboard/CreateView";
 import DataUploader                             from "./DataRequests/DataUploader";
 import DataRequestView                          from "./DataRequests/DataRequestView";
 import EditDataRequestForm                      from "./DataRequests/UpdateForm";
@@ -30,7 +31,7 @@ export default function App()
                             <Route path="/">
                                 <Route index element={ <RequireAuth><Home /></RequireAuth> } />
 
-                                <Route path="views/:id" element={ <RequireAuth><Dashboard /></RequireAuth> } />
+                                <Route path="views/:id" element={ <RequireAuth><EditView /></RequireAuth> } />
 
                                 <Route path="requests">
                                     <Route index element={ <RequireAuth><DataRequestsListPage /></RequireAuth> } />

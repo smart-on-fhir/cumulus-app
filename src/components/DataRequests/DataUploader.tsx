@@ -272,7 +272,7 @@ function format(data: string, type: string, trim = false): any {
             return m.format("YYYY-01-01")
         }
         default:
-            return trim ? data.trim() : data;
+            return (trim ? data.trim() : data) || null;
     }
 }
 
@@ -299,7 +299,7 @@ function Preview({
                         { payload.cols.map((col, i) => {
                             if (col.dataType === "hidden") return null;
                             return (
-                                <th key={i} title={ col.description || undefined }onClick={() => onSelectionChange(i)}>
+                                <th key={i} title={ col.description || undefined } onClick={() => onSelectionChange(i)}>
                                     { col.label }
                                 </th>
                             )
@@ -428,8 +428,8 @@ function reducer(state: State, action: Action): State
         //     rows.length
         // )
         
-        if (rows.length >= newState.startRow!) {
-            rows = rows.slice(newState.startRow, newState.endRow || undefined).map(row => {
+        if (rows.length >= newState.startRow! - 1) {
+            rows = rows.slice(newState.startRow! - 1, newState.endRow || undefined).map(row => {
                 if (separators.length) {
                     return parseDelimitedLine(row, separators, newState.stringDelimiter)
                 }
@@ -443,7 +443,7 @@ function reducer(state: State, action: Action): State
                         return {
                             name : col,
                             label: title,
-                            description: title.charAt(0) + title.substr(1).toLowerCase(),
+                            description: title.charAt(0) + title.substring(1).toLowerCase(),
                             dataType: detectDataTypeAt(i, rows)
                         }
                     }
@@ -453,7 +453,7 @@ function reducer(state: State, action: Action): State
                 cols = [{
                     name: header,
                     label: title,
-                    description: title.charAt(0) + title.substr(1).toLowerCase(),
+                    description: title.charAt(0) + title.substring(1).toLowerCase(),
                     dataType: "string"
                 }]
             }

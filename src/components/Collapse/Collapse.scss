@@ -1,0 +1,56 @@
+@import "../../styles/variables.scss";
+
+.collapse {
+    // border: 1px solid rgba(0, 0, 0, 0.15);
+    // overflow: hidden;
+
+    .collapse-header {
+        // border: 1px solid rgba(0, 0, 0, 0.15);
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.075) inset;
+        border-radius: 3px;
+        margin: 0;
+        // background-color: rgba(0, 0, 0, 0.089);
+        font-weight: bold;
+        color: mix($color-blue, #000, 50%);
+        cursor: pointer;
+        padding: 0.2em 0.4em;
+        text-shadow: 0 1px 0 #FFF;
+        user-select: none;
+        background: fade-out($color: mix($color-blue, #FFF, 50%), $amount: 0.5);
+
+        
+
+        .fa-solid {
+            width: 0.7em;
+            color: fade-out(mix($color-blue, #000, 50%), 0.5);
+        }
+    }
+
+    .collapse-body {
+        opacity: 1;
+        overflow: visible;
+        transform: none;
+        transform-origin: 50% 0;
+        transition: all .3s ease-in-out;
+
+        &.animating {
+            overflow: hidden !important;
+        }
+    }
+
+    &.collapsed {
+        .collapse-header {
+            background: fade-out($color: mix($color-blue, #FFF, 30%), $amount: 0.5);
+
+            &:hover {
+                background: fade-out($color: mix($color-blue, #FFF, 45%), $amount: 0.5);
+            }
+        }
+        .collapse-body {
+            transform: scaleY(0.8);
+            opacity: 0;
+            height: 2px;
+            overflow: hidden;
+        }
+    }
+}

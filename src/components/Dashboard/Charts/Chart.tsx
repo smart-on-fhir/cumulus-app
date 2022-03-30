@@ -1,5 +1,5 @@
 import React     from "react";
-import { Color } from "highcharts"
+import { Color, merge, XAxisOptions } from "highcharts"
 import moment    from "moment";
 import PowerSet  from "../../../PowerSet";
 import { defer, format } from "../../../utils";
@@ -18,6 +18,7 @@ type SeriesOptions = (
     // Highcharts.SeriesTimelineOptions
 );
 
+
 function hslToHex(h: number, s: number, l: number) {
     l /= 100;
     const a = s * Math.min(l, 1 - l) / 100;
@@ -29,13 +30,10 @@ function hslToHex(h: number, s: number, l: number) {
     return `#${f(0)}${f(8)}${f(4)}`;
 }
 
-function getColorAt(i: number) {
-    return hslToHex((i * 1.61803399 * 360) % 360 , 75, 60)
-}
-
-const COLORS: string[] = [];
-for (let i = 0; i < 100; i++) {
-    COLORS.push(getColorAt(i))
+function getColorAt(i: number, saturation = 75, lightness = 60, variety = 1, startColor = 0, opacity = 1) {
+    return new Color(hslToHex((startColor + (137.5 * i * variety)) % 360 , saturation, lightness))
+        .setOpacity(opacity).get('rgba') + ""
+    
 }
 
 /**
@@ -91,14 +89,20 @@ export function getSeries({
     column,
     groupBy,
     dataSet,
-    type
+    fullDataSet,
+    type,
+    colors = [],
+    denominator = ""
 }: {
     column: app.DataRequestDataColumn
     dataSet: PowerSet
+    fullDataSet: PowerSet
     groupBy?: app.DataRequestDataColumn | null
     type: SupportedNativeChartTypes 
+    colors?: string[]
+    denominator?: string
 }): SeriesOptions[]
-{    
+{
     let xType = getXType(column, groupBy);
 
     let series: SeriesOptions[] = []
@@ -106,15 +110,32 @@ export function getSeries({
     let dateFormat = getDateFormat(column, true)
 
     function pointFromRow(row: { cnt: number, [key: string]: any }, col: app.DataRequestDataColumn): Highcharts.XrangePointOptionsObject {
+        
+        let value = row.cnt;
+        let denominatorValue = 0;
+
+        
+        if (denominator === "local") {
+            denominatorValue = fullDataSet.countWhere({ [column.name]: row[col.name] });
+            value = value/denominatorValue * 100
+        }
+        
+        // Convert the count to % of the total count
+        else if (denominator === "global") {
+            denominatorValue = fullDataSet.countAll();
+            value = value/denominatorValue * 100
+        }
+
         const point: Highcharts.XrangePointOptionsObject = {
             // Y is always the patient count
-            y: row.cnt,
+            y: value,
 
             // The name of the point as shown in the legend, tooltip, dataLabels, etc.
             name: row[col.name] + "",
 
             custom: {
-                data: row
+                data: row,
+                denominator: denominatorValue
             }
         };
 
@@ -134,11 +155,14 @@ export function getSeries({
         return point
     }
 
-    // Simple case: Y = count; X = column.name ================================
+    // ========================================================================
+    // Simple case: Y = count; X = column.name
+    // This applis to pie charts or other charts with single series.
+    // Denominator is not applicable here as the value would have to be
+    // compared to itself, thus the result will always be 100%!
+    // ========================================================================
     if (!groupBy) {
-        // const rows = dataSet.pick([ column.name ]).rows;
         const rows = dataSet.rows;
-        // console.log("pick ===>", rows)
         const data = rows.map(row => pointFromRow(row, column))//.sort((a, b) => a.name!.localeCompare(b.name || ""));
 
         series.push({
@@ -146,67 +170,53 @@ export function getSeries({
             data,
             name: column.label || column.name,
             fillColor: type === "areaspline" ? {
-                linearGradient: {
-                    x1: 0,
-                    y1: 0,
-                    x2: 0,
-                    y2: 1
-                },
+                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                 stops: [
-                    [0, new Color(getColorAt(series.length)).setOpacity(0.2 ).get('rgba') + ""],
-                    [1, new Color(getColorAt(series.length)).setOpacity(0.05).get('rgba') + ""]
+                    [0, new Color(colors[series.length]).setOpacity(0.2 ).get('rgba') + ""],
+                    [1, new Color(colors[series.length]).setOpacity(0.05).get('rgba') + ""]
                 ]
             }: undefined
         });
     }
 
-    // Complex case: Y = count; X = column.name, groupBy
+    // ========================================================================
+    // Complex case:
+    //     Y = count or %
+    //     X = column.name
+    //     X.stratifier = groupBy
+    // ========================================================================
     else {
-        let groups     = Array.from(dataSet.getUniqueValuesFromColumn(groupBy.name))//.map(String)
-        let categories = Array.from(dataSet.getUniqueValuesFromColumn(column.name))//.map(String)
+        let groups = Array.from(dataSet.getUniqueValuesFromColumn(groupBy.name))//.map(String)
+        
 
+        // For each group
         groups.sort().forEach((groupName, i) => {
             let set: any = {
                 type,
-                name: groupBy.dataType.startsWith("date") ?
-                    moment(groupName + "", "YYYY-MM-DD").format(getDateFormat(groupBy, true)) :
-                    groupName + "",
+                name: groupBy.dataType.startsWith("date") ? moment(groupName + "", "YYYY-MM-DD").format(getDateFormat(groupBy, true)) : groupName + "",
                 data: [],
                 colorIndex: i,
                 fillColor: type === "areaspline" ? {
-                    linearGradient: {
-                        x1: 0,
-                        y1: 0,
-                        x2: 0,
-                        y2: 1
-                    },
+                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                     stops: [
-                        [0, new Color(getColorAt(i)).setOpacity(0.2 ).get('rgba') + ""],
-                        [1, new Color(getColorAt(i)).setOpacity(0.05).get('rgba') + ""]
+                        [0, new Color(colors[i]).setOpacity(0.2 ).get('rgba') + ""],
+                        [1, new Color(colors[i]).setOpacity(0.05).get('rgba') + ""]
                     ]
                 }: undefined
             };
 
-            let rows = dataSet.where({
-                [groupBy.name]: groupName
-            }).rows;
+            // All data rows in this group
+            let rows = dataSet.where({ [groupBy.name]: groupName }).rows;
 
-            // let rows = dataSet.pick([ column.name, groupBy.name ]).where({
-            //     [groupBy.name]: groupName
-            // }).rows;
-
-            // If this is a categories chart
+            // ================================================================
+            // Category charts
+            // ================================================================
             if (xType === "category") {
+                let categories = Array.from(dataSet.getUniqueValuesFromColumn(column.name))//.map(String)
                 rows = rows.sort((a, b) => categories.indexOf(a[column.name]) - categories.indexOf(b[column.name]));
 
                 categories.sort().forEach(category => {
                     let row = dataSet.rows.filter(r => {
-                        // for (let key in r) {
-                        //     if (key === "cnt" || key === "queryid") continue
-                        //     if (key !== column.name && key !== groupBy.name && !PowerSet.isEmpty(r[key])) {
-                        //         return false
-                        //     }
-                        // }
                         return (
                             r[column.name ] === category &&
                             r[groupBy.name] === groupName
@@ -216,8 +226,14 @@ export function getSeries({
                     set.data.push(row || { y: null, name: category })
                 })
             }
+
+            // ================================================================
+            // Linear or timeline charts
+            // ================================================================
             else {
-                rows.forEach(row => set.data.push(pointFromRow(row, column)));
+                rows.forEach(row => set.data.push(
+                    pointFromRow(row, column)
+                ));
             }
 
             series.push(set);
@@ -246,23 +262,38 @@ export function buildChartOptions({
     column,
     groupBy,
     dataSet,
+    fullDataSet,
+    colorOptions,
+    denominator = "",
     type
 }: {
     options?: Highcharts.Options
     column: app.DataRequestDataColumn
     dataSet: PowerSet
+    fullDataSet: PowerSet
     groupBy?: app.DataRequestDataColumn | null
     type: SupportedNativeChartTypes
+    colorOptions: app.ColorOptions
+    denominator?: string
 }): Highcharts.Options
 {
-    const series = getSeries({ dataSet, column, groupBy, type })
+    const COLORS: string[] = [];
+    for (let i = 0; i < 100; i++) {
+        COLORS.push(getColorAt(i, colorOptions.saturation, colorOptions.brightness, colorOptions.variety, colorOptions.startColor, colorOptions.opacity))
+    }
+
+    // console.log(colorOptions)
+    const series = getSeries({ dataSet, column, groupBy, type, fullDataSet, colors: COLORS, denominator })
 
     let xType = getXType(column, groupBy)
+
+    
     
     return {
         ...options,
         chart: {
             height: "60%",
+            width: null,
             type,
             panning: {
                 enabled: true
@@ -272,9 +303,12 @@ export function buildChartOptions({
             //     minWidth: 600
             // },
             // reflow: false,
-            marginRight: type === "pie" ? undefined : 40,
-            marginTop: type === "pie" ? undefined : 40,
-            spacingBottom: 20,
+            // marginRight: type === "pie" ? undefined : 40,
+            marginTop: type === "pie" || options.title?.text ? undefined : 40,
+            // marginLeft: 40,
+            // marginRight: 40,
+            spacingBottom: 25,
+            // spacingRight: 15,
             zoomType: type === "spline" ||
                       type === "areaspline" ||
                       type === "column" ||
@@ -292,6 +326,8 @@ export function buildChartOptions({
                 depth: Math.min(series.length * 10, 100),
                 ...options.chart?.options3d
             },
+            plotBorderColor: "rgba(0, 0, 0, 0.4)",
+            plotBorderWidth: options.chart?.options3d?.enabled ? 0 : options.chart?.plotBorderWidth
         },
         lang: {
             noData: `<div style="text-align:center;padding:10px;color:#900;font-size:15px">No data to display!</div>
@@ -330,27 +366,53 @@ export function buildChartOptions({
         },
         title: {
             text: "",//series.length ? getChartTitleText(column, groupBy) : "",
+            style: {
+                fontWeight: "bold",
+                fontSize: "20px"
+            },
             ...options.title,
         },
         legend: {
             enabled: series.length > 1 || type === "pie",
+            // margin: 0,
+            // padding: 0,
             ...options.legend,
         },
         colors: COLORS,
-        yAxis: {
-            ...options.yAxis,
+        yAxis: Highcharts.merge({
             // lineColor: "rgba(0, 0, 0, 0.2)",
             // lineWidth: 1,
             title: {
-                text: "Count",
+                text: "",
                 skew3d: true,
                 margin: 15,
                 style: {
                     fontWeight: "bold",
-                    fontSize: "120%"
+                    fontSize: "16px"
                 }
             },
-            allowDecimals: false,
+            allowDecimals: denominator ? true : false,
+            // maxPadding: 0,
+            // minPadding: 0,
+            endOnTick: false,
+            gridLineColor: "rgba(0, 0, 0, 0.1)",
+            // @ts-ignore
+            tickLength: options.yAxis?.lineWidth === 0 ? 0 : 10,
+            tickWidth: 1,
+            // gridZIndex: 1,
+            // endOnTick: true,
+            // startOnTick: true,
+            // floor: denominator ? 0 : undefined,
+            // ceiling: denominator ? 100 : undefined,
+            labels: {
+                format: denominator ? "{text}%" : "{text}",
+                style: {
+                    fontSize: "13px"
+                }
+            },
+            lineWidth: 1,
+            lineColor: "rgba(0, 0, 0, 0.4)",
+            // softMax: denominator ? 100 : undefined,            
             
             // Up to 10X Zoom
             // softMax: series.reduce((prev, cur) => {
@@ -359,7 +421,7 @@ export function buildChartOptions({
             //         prev;
             //     return Math.max(prev, max)
             // }, 0) / 10,
-        },
+        }, options.yAxis),
         plotOptions: {
             series: {
                 borderColor     : "rgba(0, 0, 0, 0.5)",
@@ -416,6 +478,13 @@ export function buildChartOptions({
             column: {
                 edgeColor: "rgba(0, 0, 0, 0.1)",
                 getExtremesFromAll: true,
+
+                borderColor: "rgba(1, 1, 1, 0.5)",
+                borderWidth: 0.25,
+                borderRadius: 0.5,
+                // pointPadding: 0.01,
+                // groupPadding: 0.2,
+                
                 states: {
                     select: {
                         borderWidth: 1,
@@ -427,6 +496,11 @@ export function buildChartOptions({
             bar: {
                 edgeColor: "rgba(0, 0, 0, 0.1)",
                 getExtremesFromAll: true,
+                borderColor: "rgba(0, 0, 0, 0.5)",
+                borderWidth: 0.25,
+                borderRadius: 0.5,
+                // pointPadding: 0.02,
+                // groupPadding: 0.1,
                 states: {
                     select: {
                         borderWidth: 1,
@@ -490,7 +564,7 @@ export function buildChartOptions({
                 allowPointSelect: false,
                 cursor: "default",
                 marker: {
-                    radius: 0,
+                    radius: 2,
                     enabled: true,
                     states: {
                         hover: {
@@ -528,9 +602,17 @@ export function buildChartOptions({
                 const rows = [
                     `<tr><td style="text-align:right">${column.label || column.name}:</td><td><b>${this.point.name}</b></td></tr>`, 
                     groupBy && `<tr><td style="text-align:right">${groupBy.label || groupBy.name}:</td><td><b>${this.series.name}</b></td></tr>`,
-                    `<tr><td style="text-align:right">Count:</td><td><b>${this.point.y}</b></td></tr>`,
+                    
+                    // @ts-ignore
+                    `<tr><td style="text-align:right">Count:</td><td><b>${this.point.custom.data.cnt}</b></td></tr>`,
+                    // `<tr><td style="text-align:right">Count:</td><td><b>${this.point.y}</b></td></tr>`,
                     // `<tr><td style="text-align:right">Other:</td><td><b>{point.custom}</b></td></tr>`
                 ];
+                
+                if (denominator) {
+                    // @ts-ignore
+                    rows.push(`<tr class="color-blue"><td style="text-align:right">Computed Value:</td><td><b>${this.point.y?.toPrecision(3)}% of ${this.point.custom.denominator}</b></td></tr>`)
+                }
                 
                 // @ts-ignore
                 let data = this.point.custom?.data as Record<string, any>
@@ -561,24 +643,33 @@ export function buildChartOptions({
             },
             ...options.tooltip
         },
-        xAxis: {
+        xAxis: merge({
             type: xType,
             crosshair: needsCrosshair(type, column, groupBy),
-            lineColor: "rgba(0, 0, 0, 0.2)",
+            // lineColor: "#CCC",
             currentDateIndicator: true,
             minRange: xType === "category" ? undefined : 1,
             maxRange: xType === "category" ? undefined : 2,
+
+            // @ts-ignore
+            tickLength: options.xAxis?.lineWidth === 0 ? 0 : 10,
             // minRange: 1,
             // maxRange: 2,
-            // startOnTick: false,
+            // startOnTick: true,
             // endOnTick: false,
-            // minPadding: 0,
+            minPadding: 0,
             // maxPadding: 0,
+            lineWidth: 0,
+            lineColor: "rgba(0, 0, 0, 0.4)",
+            maxPadding: 0,
             labels: {
                 // align: "center"
                 autoRotationLimit: 80,
                 overflow: "justify",
                 padding: 1,
+                style: {
+                    fontSize: "13px"
+                }
                 // staggerLines: 0,
 
                 // style: {
@@ -600,12 +691,10 @@ export function buildChartOptions({
                 margin: 15,
                 style: {
                     fontWeight: "bold",
-
-                    fontSize: "120%"
+                    fontSize: "16px"
                 }
-            },
-            ...options.xAxis
-        },
+            }
+        }, options.xAxis) as XAxisOptions,
         series
     }
 }
@@ -618,8 +707,11 @@ interface ChartProps {
     options?: Highcharts.Options
     column  : app.DataRequestDataColumn
     dataSet : PowerSet
+    fullDataSet: PowerSet
     groupBy?: app.DataRequestDataColumn | null
     type    : SupportedNativeChartTypes
+    colorOptions: app.ColorOptions
+    denominator?: string
 }
 export default class Chart extends React.Component<ChartProps>
 {
@@ -631,15 +723,15 @@ export default class Chart extends React.Component<ChartProps>
     }
 
     updateChart() {
-        const { options = {}, column, groupBy, dataSet, type } = this.props;
-        this.chart.update(buildChartOptions({ options, column, groupBy, dataSet, type }), true, true, false)
+        const { options = {}, column, groupBy, dataSet, type, fullDataSet, colorOptions, denominator } = this.props;
+        this.chart.update(buildChartOptions({ options, column, groupBy, dataSet, type, fullDataSet, colorOptions, denominator }), true, true, false)
         // console.log(this.props.chartOptions)
     }
 
     componentDidMount()
     {
-        const { options = {}, column, groupBy, dataSet, type } = this.props;
-        this.chart = Highcharts.chart("chart", buildChartOptions({ options, column, groupBy, dataSet, type }));
+        const { options = {}, column, groupBy, dataSet, type, fullDataSet, colorOptions, denominator } = this.props;
+        this.chart = Highcharts.chart("chart", buildChartOptions({ options, column, groupBy, dataSet, type, fullDataSet, colorOptions, denominator }));
         // console.log(this.props.chartOptions)
     }
 

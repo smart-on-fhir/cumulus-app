@@ -1,234 +1,33 @@
-import { useCallback, useReducer } from "react";
+import { useMemo, useReducer }     from "react";
 import html2canvas                 from "html2canvas";
-import { useNavigate, useParams }  from "react-router-dom";
+import { useNavigate }             from "react-router-dom";
 import { HelmetProvider, Helmet }  from "react-helmet-async";
+import Highcharts                  from "highcharts";
 import PowerSet                    from "../../PowerSet";
 import { useBackend }              from "../../hooks";
-import { request, createOne, updateOne, deleteOne } from "../../backend"
+import { createOne, updateOne, deleteOne } from "../../backend";
 import { useAuth }                 from "../../auth";
 import DataRequestLink             from "../DataRequests/DataRequestLink";
 import DataGrid                    from "../DataGrid";
-import Breadcrumbs                 from "../Breadcrumbs";
-import ColumnSelector              from "./ColumnSelector";
-import FilterUI                    from "./FilterUI";
 import BarChart                    from "./Charts/BarChart";
 import ColumnChart                 from "./Charts/ColumnChart";
 import AreaSPLineChart             from "./Charts/AreaSPLineChart";
 import SPLineChart                 from "./Charts/SPLineChart";
 import PieChart                    from "./Charts/PieChart";
 import Alert, { AlertError }       from "../Alert";
-import Select                      from "../Select";
-import Loader                      from "../Loader";
-import { classList, defer }               from "../../utils";
-import {
-    ChartIcons,
-    operators,
-    SingleDimensionChartTypes,
-    SupportedChartTypes
-} from "./config";
+import { classList, defer }        from "../../utils";
+import ConfigPanel                 from "./ConfigPanel"
+import { operators }               from "./config";
+
 import "./Dashboard.scss";
 
 
 
 
-type SupportedChartType = keyof typeof SupportedChartTypes
 
-interface ChartConfigPanelState {
-    groupBy        : string
-    stratifyBy     : string
-    sortBy         : string
-    filters        : any[]
-    chartType      : SupportedChartType
-    viewName       : string
-    viewDescription: string
-} 
-
-function ConfigPanel({
-    dataRequest,
-    state,
-    onChange,
-    viewType
-} : {
-    dataRequest: app.DataRequest
-    state: ChartConfigPanelState
-    viewType: "overview" | "data"
-    onChange: (state: ChartConfigPanelState) => void
-}) {
-    let auth = useAuth();
-    return (
-        <div>
-            { viewType === "overview" && (<>
-                <hr />
-                { auth.user?.role === "admin" && (
-                    <div className="row half-gap">
-                        <div className="col">
-                            <label>Title</label>
-                            <input type="text" value={state.viewName} onChange={ e => onChange({ ...state, viewName: e.target.value })} required />
-                        </div>
-                    </div>
-                )}
-                { auth.user?.role === "admin" && (
-                    <div className="row half-gap">
-                        <div className="col">
-                            <label>Short Description</label>
-                            <textarea rows={2} value={state.viewDescription} onChange={ e => onChange({ ...state, viewDescription: e.target.value })}></textarea>
-                        </div>
-                    </div>
-                )}
-                <div className="row half-gap">
-                    <div className="col col-3">
-                        <label>Chart Type</label>
-                        <Select
-                            value={ state.chartType }
-                            onChange={ chartType => onChange({ ...state, chartType })}
-                            options={Object.keys(SupportedChartTypes).map((type, i) => ({
-                                value: type,
-                                label: SupportedChartTypes[type as SupportedChartType],
-                                icon: ChartIcons[type as keyof typeof ChartIcons]
-                            }))}
-                        />
-                    </div>
-                    <div className="col nowrap">
-                        <div className="row nowrap">
-                            <div className="col">
-                                <label>Visualize&nbsp;Column</label>
-                                <ColumnSelector
-                                    cols={ dataRequest.data.cols }
-                                    value={ state.groupBy }
-                                    filter={col => {
-                                        if (col.name === "cnt") return false
-                                        if (SingleDimensionChartTypes.includes(state.chartType)) {
-                                            return true
-                                        }
-                                        return col.name !== state.stratifyBy
-                                    } }
-                                    onChange={(groupBy: string) => onChange({ ...state, groupBy })}
-                                />
-                            </div>
-                            { 
-                                !SingleDimensionChartTypes.includes(state.chartType) && (
-                                <>
-                                    <div className="col bottom col-0">
-                                        <button
-                                            className="btn"
-                                            disabled={!state.stratifyBy}
-                                            onClick={() => {
-                                                onChange({
-                                                    ...state,
-                                                    groupBy: state.stratifyBy,
-                                                    stratifyBy: state.groupBy
-                                                })
-                                            }}
-                                            style={{ margin: "0 2px" }}
-                                        >
-                                            <i className="fas fa-exchange-alt"></i>
-                                        </button>
-                                    </div>
-                                    <div className="col">
-                                        <label>Group&nbsp;By</label>
-                                        <Select
-                                            right
-                                            placeholder="Select Column"
-                                            value={ state.stratifyBy }
-                                            onChange={(stratifyBy: string) => onChange({ ...state, stratifyBy })}
-                                            options={[
-                                                { value: "", label: "NONE", icon: "fas fa-close color-red" },
-                                                ...dataRequest.data.cols.map(col => ({
-                                                    value   : col.name,
-                                                    label   : col.label || col.name,
-                                                    disabled: col.name === "cnt" || col.name === state.groupBy,
-                                                    icon    : "/icons/column.png",
-                                                    right   : <span className={ col.dataType + " color-muted small right" }> {col.dataType}</span>
-                                                }))
-                                            ]}
-                                        />
-                                    </div>
-                                </>
-                            ) }
-                        </div>
-                    </div>
-                </div>
-            </>)}
-            <FilterUI
-                onChange={filters => onChange({ ...state, filters })}
-                current={ state.filters }
-                cols={ dataRequest.data.cols }
-            />
-        </div>
-    )
-}
-
-export function CreateView()
-{
-    const { id } = useParams();
-
-    const { loading, error, result } = useBackend(
-        useCallback(() => request("/api/requests/" + id), [id]),
-        true
-    );
-
-    if (loading) {
-        return <Loader msg="Loading Request..." />
-    }
-
-    if (error) {
-        return <AlertError>{`Error fetching request with id "${id}": ${error}`}</AlertError>
-    }
-
-    if (!result) {
-        return <AlertError>{`Error fetching request with id "${id}"`}</AlertError>
-    }
-
-    return (
-        <>
-            <Breadcrumbs links={[
-                { name: "Home" , href: "/" },
-                { name: "Create New View" }
-            ]}/>
-            <Dashboard view={{}} dataRequest={result as app.DataRequest} />
-        </>
-    )
-}
-
-export default function ViewWrapper()
-{
-    const { id } = useParams()
-
-    const { loading, error, result } = useBackend(
-        useCallback(() => {
-            return request("/api/views/" + id).then(view => {
-                return request("/api/requests/" + view.DataRequestId).then(request => ({
-                    request,
-                    view
-                }));
-            })
-        }, [id]),
-        true
-    );
-
-    if (loading) return <Loader/>
-    if (error) return <AlertError>{`Error fetching view with id "${id}": ${error}`}</AlertError>
-
-    if (!result) {
-        return <AlertError>{`Error fetching request with id "${id}": ${error}`}</AlertError>
-    }
-
-    if (!result) {
-        return <b>Failed to fetch data!</b>
-    }
-
-    return (
-        <>
-            <Breadcrumbs links={[
-                { name: "Home" , href: "/" },
-                { name: result.view.name }
-            ]}/>
-            <Dashboard view={ result.view } dataRequest={result.request} />
-        </>
-    )
-}
 
 // =============================================================================
+
 interface ViewState
 {
     viewType       : "overview" | "data",
@@ -241,6 +40,9 @@ interface ViewState
     chartType      : string
     gridType       : string
     isDirty        : boolean
+    chartOptions   : Partial<Highcharts.Options>
+    colorOptions   : app.ColorOptions
+    denominator    : string
     cleanState    ?: ViewState
 }
 
@@ -263,7 +65,10 @@ function viewReducer(state: ViewState, action: ViewAction): ViewState
         "viewGroupBy",
         "viewColumn",
         "chartType",
-        "filters"
+        "filters",
+        "chartOptions",
+        "colorOptions",
+        "denominator"
     ];
 
     function checkDirty(nextState: ViewState) {
@@ -271,6 +76,13 @@ function viewReducer(state: ViewState, action: ViewAction): ViewState
             JSON.stringify(nextState[key]) !== JSON.stringify(state.cleanState?.[key])
         ));
         return nextState
+    }
+
+    if (action.type === "SET_CHART_OPTIONS") {
+        return {
+            ...state,
+            chartOptions: Highcharts.merge(state.chartOptions, action.payload)
+        };
     }
 
     if (action.type === "SET_VIEW_TYPE") {
@@ -288,10 +100,7 @@ function viewReducer(state: ViewState, action: ViewAction): ViewState
     }
 
     if (action.type === "UPDATE") {
-        const nextState = {
-            ...state,
-            ...action.payload
-        };
+        const nextState = Highcharts.merge(state, action.payload);
         if (nextState.chartType.startsWith("pie") || nextState.chartType.startsWith("donut")) {
             nextState.viewGroupBy = ""
         }
@@ -310,19 +119,27 @@ function viewReducer(state: ViewState, action: ViewAction): ViewState
 }
 // =============================================================================
 
-export function Dashboard({
+export default function Dashboard({
     view,
     dataRequest
 }: {
     view: Partial<app.View>
     dataRequest: app.DataRequest
 }) {
-
     const {
         viewType: serverViewType = "column",
         column = dataRequest.data.cols[0].name === "cnt" ? dataRequest.data.cols[1].name : dataRequest.data.cols[0].name,
         groupBy: serverGroupBy = "",
-        filters: serverFilters = []
+        filters: serverFilters = [],
+        chartOptions: serverChartOptions = {},
+        denominator: serverDenominator = "",
+        colorOptions: serverColorOptions = {
+            saturation: 75,
+            brightness: 60,
+            variety   : 1,
+            opacity   : 1,
+            startColor: 0
+        }
     } = view.settings || {}
 
     const navigate = useNavigate();
@@ -338,6 +155,9 @@ export function Dashboard({
         viewColumn     : column,
         viewGroupBy    : serverGroupBy,
         filters        : serverFilters,
+        chartOptions   : serverChartOptions,
+        colorOptions   : serverColorOptions,
+        denominator    : serverDenominator,
         isDirty        : false
     } as ViewState, initViewState);
 
@@ -351,7 +171,10 @@ export function Dashboard({
         viewGroupBy,
         filters,
         isDirty,
-        gridType
+        gridType,
+        chartOptions,
+        colorOptions,
+        denominator
     } = state;
 
     const isAdmin = auth.user?.role === "admin"
@@ -389,7 +212,10 @@ export function Dashboard({
                     groupBy: viewGroupBy,
                     column : viewColumn,
                     filters,
-                    viewType: chartType
+                    viewType: chartType,
+                    chartOptions,
+                    colorOptions,
+                    denominator
                 }
             }).then(
                 () => dispatch({ type: "CLEAN" }),
@@ -410,7 +236,10 @@ export function Dashboard({
                     groupBy: viewGroupBy,
                     column : viewColumn,
                     filters,
-                    viewType: chartType
+                    viewType: chartType,
+                    chartOptions,
+                    colorOptions,
+                    denominator
                 }
             }).then(
                 v => defer(() => navigate("/views/" + v.id)),
@@ -427,48 +256,133 @@ export function Dashboard({
     })
 
 
-    let powerSet = PowerSet.from(dataRequest.data)
-
-    const col1 = dataRequest.data.cols.find(col => col.name === viewColumn) as app.DataRequestDataColumn
-    const col2 = viewGroupBy ? dataRequest.data.cols.find(col => col.name === viewGroupBy) as app.DataRequestDataColumn : null
-
     
 
+    const col1 = dataRequest.data.cols.find(col => col.name === viewColumn) as app.DataRequestDataColumn;
+    const col2 = viewGroupBy ? dataRequest.data.cols.find(col => col.name === viewGroupBy) as app.DataRequestDataColumn : null;
+    
+    const groupBy = col2?.name;
+    const filterList = filters.map(f => JSON.stringify(f)).join(",");
+
+    let powerSet = useMemo(() => PowerSet.from(dataRequest.data), [dataRequest.data]);
+
+    let { chartPowerSet } = useMemo(function() {
+
+        // console.log("CREATE POWERSETS")
+
+        let powerSet = PowerSet.from(dataRequest.data);
+
+        // FILTERS
+        // -------------------------------------------------------------------------
+        // filters.forEach(({ left, operator, negated, right }) => {
+
+        //     // Skip filters for which left column is not selected in the UI
+        //     if (!left) return;
+
+        //     // Skip filters for which the right column or value is not set in the UI
+        //     if (operator !== "isNull" && right.value === undefined) return;
+
+        //     const fn = operators.find(x => x.id === operator)?.fn || (() => true) as any;
+
+        //     const filterFn = (row: any) => {
+        //         const l = row[left];
+        //         const r = right.type === "column" ? row[right.value + ""] : right.value;
+        //         if (operator !== "isNull" && l === null) return false;
+        //         if (operator === "isNull" && negated && l !== null) return true;
+        //         let result = !!fn(l, r);
+        //         if (negated) return !result;
+        //         return result
+        //     };
+
+        //     powerSet = powerSet.filter(filterFn)
+        // })
+
+        // --------------------------------------------------------------------
+        function createFilter(filter: app.Filter): false | ((row: any, index?: number) => boolean)
+        {
+            const { left, operator, negated, right } = filter;
+
+            const fn = operators.find(x => x.id === operator)!.fn;
+
+            return (row: any) => {
+                const l = row[left];
+                const r = right.type === "column" ? row[right.value + ""] : right.value;
+                if (operator !== "isNull" && l === null) return false;
+                if (operator === "isNull" && negated && l !== null) return true;
+                let result = !!fn(l, r);
+                if (negated) return !result;
+                return result
+            };
+        }
+
+        const usableFilters = filters.filter(f => {
+            // Skip filters for which left column is not selected in the UI
+            if (!f.left) return false;
+
+            // Skip filters for which the right column or value is not set in the UI
+            if (f.operator !== "isNull" && f.right.value === undefined) return false;
+
+            return true;
+        });
+
+        if (usableFilters.length) {
+            // @ts-ignore
+            const filter = usableFilters.reduce((prev: (row: any) => boolean, cur: app.Filter) => {
+                const next = createFilter(cur);
+                if (!next) {
+                    return prev;
+                }
+                return cur.join === "and" ?
+                    (row: any) => prev(row) && next(row) :
+                    (row: any) => prev(row) || next(row) ;
+            }, createFilter(usableFilters[0])) as (row: any, index?: number) => boolean;
+
+            powerSet = powerSet.filter(filter)
+        }
+        // --------------------------------------------------------------------
+
+        const chartPowerSet = powerSet.getChartData({
+            column : viewColumn,
+            groupBy,
+            filters: usableFilters
+        });
+        
+        return { powerSet, chartPowerSet }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ powerSet, groupBy, viewColumn, filterList ]);
+    
     // FILTERS
     // -------------------------------------------------------------------------
-    filters.forEach(({ left, operator, negated, right }) => {
+    // filters.forEach(({ left, operator, negated, right }) => {
 
-        // Skip filters for which left column is not selected in the UI
-        if (!left) return;
+    //     // Skip filters for which left column is not selected in the UI
+    //     if (!left) return;
 
-        // Skip filters for which the right column or value is not set in the UI
-        if (operator !== "isNull" && right.value === undefined) return;
+    //     // Skip filters for which the right column or value is not set in the UI
+    //     if (operator !== "isNull" && right.value === undefined) return;
 
-        const fn = operators.find(x => x.id === operator)?.fn || (() => true) as any;
+    //     const fn = operators.find(x => x.id === operator)?.fn || (() => true) as any;
 
-        const filterFn = (row: any) => {
-            const l = row[left];
-            const r = right.type === "column" ? row[right.value + ""] : right.value;
-            if (operator !== "isNull" && l === null) return false;
-            if (operator === "isNull" && negated && l !== null) return true;
-            let result = !!fn(l, r);
-            if (negated) return !result;
-            return result
-        };
+    //     const filterFn = (row: any) => {
+    //         const l = row[left];
+    //         const r = right.type === "column" ? row[right.value + ""] : right.value;
+    //         if (operator !== "isNull" && l === null) return false;
+    //         if (operator === "isNull" && negated && l !== null) return true;
+    //         let result = !!fn(l, r);
+    //         if (negated) return !result;
+    //         return result
+    //     };
 
-        powerSet = powerSet.filter(filterFn)
+    //     powerSet = powerSet.filter(filterFn)
 
-    })
+    // })
+    
 
-    // M 583
-    // F 568 (+31)
-    // - 1151 (+39)
-    const chartPowerSet = powerSet.getChartData({
-        column : viewColumn,
-        groupBy: col2?.name,
-        filters
-    })
-    // console.log("getChartData ==>", powerSet)
+    const onTransitionEnd = () => {
+        window.Highcharts.charts.forEach(c => c?.reflow())
+    }
+
+    
     
     return (
         <div className={ saving || deleting ? "grey-out" : undefined }>
@@ -478,153 +392,179 @@ export function Dashboard({
                     {viewDescription && <meta name="description" content="Helmet application" />}
                 </Helmet>
             </HelmetProvider>
-            <h2>{viewName}</h2>
-            <div className="color-muted mb-1">{viewDescription}</div>
-            <div className="row mb-1 half-gap">
-                <div className="col col-5">
-                    <div className="toolbar flex">
-                        <button
-                            className={"btn" + (viewType === "overview" ? " active" : "")}
-                            onClick={() => dispatch({ type: "SET_VIEW_TYPE", payload: "overview" })}
-                            title="Report View"
-                            >
-                            <i className="fas fa-chart-pie" /> Overview
-                        </button>
-                        <button
-                            className={"btn" + (viewType === "data"     ? " active" : "")}
-                            onClick={() => dispatch({ type: "SET_VIEW_TYPE", payload: "data"})}
-                            title="Data View"
-                            ><i className="fas fa-th" /> Data</button>
+            <div className="row">
+                <div className="col col-0">
+                    <div onTransitionEnd={onTransitionEnd} style={{
+                        position: "relative",
+                        width   : showOptions ? 330 : 0,
+                        // overflow: showOptions ? "auto" : "hidden",
+                        opacity : showOptions ? 1 : 0,
+                        pointerEvents: showOptions ? "all" : "none",
+                        zIndex: showOptions ? 1 : -1,
+                        transition: "all 0.2s ease-in-out"
+                    }}>
+                        <ConfigPanel
+                            dataRequest={dataRequest}
+                            viewType={viewType}
+                            state={{
+                                groupBy   : viewColumn,
+                                stratifyBy: col2?.name || "",
+                                filters   : [...filters],
+
+                                // @ts-ignore
+                                chartType,
+                                viewName,
+                                viewDescription,
+                                chartOptions,
+                                colorOptions,
+                                denominator
+                            }}
+                            onChange={state => {
+                                dispatch({ type: "UPDATE", payload: {
+                                    viewName       : state.viewName,
+                                    viewDescription: state.viewDescription,
+                                    chartType      : state.chartType,
+                                    viewColumn     : state.groupBy,
+                                    viewGroupBy    : state.stratifyBy,
+                                    filters        : [...state.filters],
+                                    chartOptions   : state.chartOptions,
+                                    colorOptions   : state.colorOptions,
+                                    denominator    : state.denominator
+                                }});
+                            }}
+                        />
                     </div>
                 </div>
-                <div className="col"></div>
-                <div className="col col-4 right">
-                    <div className="toolbar flex">
-                        { showOptions && (
-                            <button
-                                className="btn color-green"
-                                onClick={save}
-                                disabled={ !!view.id && !isDirty }
-                                title="Save Changes">
-                                <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
-                            </button>
-                        )}
-                        { showOptions && isAdmin && view.id && (
-                            <button
-                                className="btn color-red"
-                                onClick={ destroy }
-                                title="Delete this View">
-                                <i className={ deleting ? "fas fa-circle-notch fa-spin" : "fas fa-trash-alt" } /> Delete
-                            </button>
-                        )}
-                        <button
-                            className={ "btn" + (showOptions ? " active" : "")}
-                            onClick={() => dispatch({ type: "TOGGLE_OPTIONS" })}
-                            title="Options"
-                            ><i className="fas fa-cog" /></button>
+                <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start" }}>
+                    <div style={{ position: "sticky", top: 2 }}>
+                        <h2 style={{ marginTop: 0 }}>{viewName}</h2>
+                        <div className="color-muted mb-1">{viewDescription}</div>
+                        <div className="row mb-1 half-gap">
+                            <div className="col col-5">
+                                <div className="toolbar flex">
+                                    <button
+                                        className={"btn" + (viewType === "overview" ? " active" : "")}
+                                        onClick={() => dispatch({ type: "SET_VIEW_TYPE", payload: "overview" })}
+                                        title="Report View"
+                                        >
+                                        <i className="fas fa-chart-pie" /> Overview
+                                    </button>
+                                    <button
+                                        className={"btn" + (viewType === "data"     ? " active" : "")}
+                                        onClick={() => dispatch({ type: "SET_VIEW_TYPE", payload: "data"})}
+                                        title="Data View"
+                                        ><i className="fas fa-th" /> Data</button>
+                                </div>
+                            </div>
+                            <div className="col"></div>
+                            <div className="col col-4 right">
+                                <div className="toolbar flex">
+                                    { showOptions && (
+                                        <button
+                                            className="btn color-green"
+                                            onClick={save}
+                                            disabled={ !!view.id && !isDirty }
+                                            title="Save Changes">
+                                            <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
+                                        </button>
+                                    )}
+                                    { showOptions && isAdmin && view.id && (
+                                        <button
+                                            className="btn color-red"
+                                            onClick={ destroy }
+                                            title="Delete this View">
+                                            <i className={ deleting ? "fas fa-circle-notch fa-spin" : "fas fa-trash-alt" } /> Delete
+                                        </button>
+                                    )}
+                                    <button
+                                        className={ "btn" + (showOptions ? " active" : "")}
+                                        onClick={() => dispatch({ type: "TOGGLE_OPTIONS" })}
+                                        title="Options"
+                                        ><i className="fas fa-cog" /></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        { viewType === "data" && <>
+                            { gridType === "full" && filters.length > 0 && (
+                                <Alert className="small mt-1 mb-1" color="orange" icon="fa-solid fa-circle-info">
+                                    Filters are not applied to the data grid when it is in "Full Data" mode.
+                                    To view them <button
+                                    className="small link"
+                                    onClick={() => dispatch({ type: "UPDATE", payload: {gridType: "chart" }})}
+                                    >switch to Chart Data mode</button>. 
+                                </Alert>
+                            ) }
+                            <DataGrid
+                                cols={ gridType === "chart" ? chartPowerSet.cols : dataRequest.data.cols }
+                                rows={ gridType === "chart" ? chartPowerSet.rows : dataRequest.data.rows }
+                                offset={0}
+                                limit={20}
+                                key={gridType}
+                                colClassName={col => {
+                                    // col.name === "cnt" || col.name === "queryid" ? "private" : undefined
+                                    if (
+                                        col.name === "cnt" ||
+                                        (col.name === viewColumn || (col2 && col.name === col2.name)) ||
+                                        (filters && filters.find(f => f.left === col.name))
+                                        // chartPowerSet.getColumnByName(col.name) &&
+                                        // value !== null
+                                        // col.name
+                                    ) {
+                                        return "bg-blue"
+                                    }
+                                }}
+                            />
+                            <div className="tab-panel bottom">
+                                <button
+                                    className={ classList({ "small tab": true, active: gridType === "chart" }) }
+                                    onClick={() => dispatch({ type: "UPDATE", payload: {gridType: "chart" }})}
+                                >Chart Data</button>
+                                <button
+                                    className={ classList({ "small tab": true, active: gridType === "full" }) }
+                                    onClick={() => dispatch({ type: "UPDATE", payload: {gridType: "full" }})}
+                                >Full Data</button>
+                            </div>
+                        </>}
+                        
+                        { !col1 && viewType === "overview" && (
+                            <AlertError>
+                                It looks like the data source has been updated and this view is no longer compatible with the new data.
+                                Please create the view again.
+                            </AlertError>
+                        ) }
+                        
+                        { col1 && viewType === "overview" && chartType === "pie"           && <PieChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} /> }
+                        { col1 && viewType === "overview" && chartType === "pie3d"         && <PieChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} use3d /> }
+                        { col1 && viewType === "overview" && chartType === "donut"         && <PieChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} donut /> }
+                        { col1 && viewType === "overview" && chartType === "donut3d"       && <PieChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} donut use3d /> }
+                        
+                        { col1 && viewType === "overview" && chartType === "spline"        && <SPLineChart     column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } /> }
+                        { col1 && viewType === "overview" && chartType === "areaspline"    && <AreaSPLineChart column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } /> }
+
+                        { col1 && viewType === "overview" && chartType === "column"        && <ColumnChart     column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } /> }
+                        { col1 && viewType === "overview" && chartType === "column3d"      && <ColumnChart     column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } use3d /> }
+                        { col1 && viewType === "overview" && chartType === "columnStack"   && <ColumnChart     column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } stack /> }
+                        { col1 && viewType === "overview" && chartType === "columnStack3d" && <ColumnChart     column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } stack use3d /> }
+
+                        { col1 && viewType === "overview" && chartType === "bar"           && <BarChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } /> }
+                        { col1 && viewType === "overview" && chartType === "bar3d"         && <BarChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } use3d /> }
+                        { col1 && viewType === "overview" && chartType === "barStack"      && <BarChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } stack /> }
+                        { col1 && viewType === "overview" && chartType === "barStack3d"    && <BarChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } stack use3d /> }
+
+                        <br/>
+                        <div className="row mb-1">
+                            <div className="col top">
+                                {/* <h6>SOURCE DATA { dataRequest.refresh ? "SUBSCRIPTION" : "REQUEST" }</h6> */}
+                                <DataRequestLink request={ dataRequest } />
+                            </div>
+                            <div className="col col-0 top">
+                                <button className="btn btn-blue mt-1 small grey-out"> <b> Request Line-level Data </b> </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            { showOptions && <ConfigPanel
-                dataRequest={dataRequest}
-                viewType={viewType}
-                state={{
-                    groupBy: viewColumn,
-                    stratifyBy: col2?.name || "",
-                    filters: [...filters],
-
-                    // @ts-ignore
-                    chartType,
-                    viewName,
-                    viewDescription
-                }}
-                onChange={state => {
-                    dispatch({ type: "UPDATE", payload: {
-                        viewName       : state.viewName,
-                        viewDescription: state.viewDescription,
-                        chartType      : state.chartType,
-                        viewColumn     : state.groupBy,
-                        viewGroupBy    : state.stratifyBy,
-                        filters        : [...state.filters]
-                    }});
-                }}
-            /> }
-
-            { viewType === "data" && <>
-                { gridType === "full" && filters.length > 0 && (
-                    <Alert className="small mt-1 mb-1" color="orange" icon="fa-solid fa-circle-info">
-                        Filters are not applied to the data grid when it is in "Full Data" mode.
-                        To view them <button
-                        className="small link"
-                        onClick={() => dispatch({ type: "UPDATE", payload: {gridType: "chart" }})}
-                        >switch to Chart Data mode</button>. 
-                    </Alert>
-                ) }
-                <DataGrid
-                    // cols={ chartPowerSet.cols }
-                    // rows={ chartPowerSet.rows }
-                    cols={ gridType === "chart" ? chartPowerSet.cols : dataRequest.data.cols }
-                    rows={ gridType === "chart" ? chartPowerSet.rows : dataRequest.data.rows }
-                    offset={0}
-                    limit={20}
-                    key={gridType}
-                    colClassName={col => {
-                        // col.name === "cnt" || col.name === "queryid" ? "private" : undefined
-                        if (
-                            col.name === "cnt" ||
-                            (col.name === viewColumn || (col2 && col.name === col2.name)) ||
-                            (filters && filters.find(f => f.left === col.name))
-                            // chartPowerSet.getColumnByName(col.name) &&
-                            // value !== null
-                            // col.name
-                        ) {
-                            return "bg-blue"
-                        }
-                    }}
-                />
-                <div className="tab-panel bottom">
-                    <button
-                        className={ classList({ "small tab": true, active: gridType === "chart" }) }
-                        onClick={() => dispatch({ type: "UPDATE", payload: {gridType: "chart" }})}
-                    >Chart Data</button>
-                    <button
-                        className={ classList({ "small tab": true, active: gridType === "full" }) }
-                        onClick={() => dispatch({ type: "UPDATE", payload: {gridType: "full" }})}
-                    >Full Data</button>
-                </div>
-            </>}
-            
-            { !col1 && viewType === "overview" && (
-                <AlertError>
-                    It looks like the data source has been updated and this view is no longer compatible with the new data.
-                    Please create the view again.
-                </AlertError>
-            ) }
-            { col1 && viewType === "overview" && chartType === "pie"           && <PieChart        column={ col1 } dataSet={ chartPowerSet } /> }
-            { col1 && viewType === "overview" && chartType === "pie3d"         && <PieChart        column={ col1 } dataSet={ chartPowerSet } use3d /> }
-            { col1 && viewType === "overview" && chartType === "donut"         && <PieChart        column={ col1 } dataSet={ chartPowerSet } donut /> }
-            { col1 && viewType === "overview" && chartType === "donut3d"       && <PieChart        column={ col1 } dataSet={ chartPowerSet } donut use3d /> }
-            
-            { col1 && viewType === "overview" && chartType === "spline"        && <SPLineChart     column={ col1 } dataSet={ chartPowerSet } groupBy={ col2 } /> }
-            { col1 && viewType === "overview" && chartType === "areaspline"    && <AreaSPLineChart column={ col1 } dataSet={ chartPowerSet } groupBy={ col2 } /> }
-
-            { col1 && viewType === "overview" && chartType === "column"        && <ColumnChart     column={ col1 } dataSet={ chartPowerSet } groupBy={ col2 } /> }
-            { col1 && viewType === "overview" && chartType === "column3d"      && <ColumnChart     column={ col1 } dataSet={ chartPowerSet } groupBy={ col2 } use3d /> }
-            { col1 && viewType === "overview" && chartType === "columnStack"   && <ColumnChart     column={ col1 } dataSet={ chartPowerSet } groupBy={ col2 } stack /> }
-            { col1 && viewType === "overview" && chartType === "columnStack3d" && <ColumnChart     column={ col1 } dataSet={ chartPowerSet } groupBy={ col2 } stack use3d /> }
-
-            { col1 && viewType === "overview" && chartType === "bar"           && <BarChart        column={ col1 } dataSet={ chartPowerSet } groupBy={ col2 } /> }
-            { col1 && viewType === "overview" && chartType === "bar3d"         && <BarChart        column={ col1 } dataSet={ chartPowerSet } groupBy={ col2 } use3d /> }
-            { col1 && viewType === "overview" && chartType === "barStack"      && <BarChart        column={ col1 } dataSet={ chartPowerSet } groupBy={ col2 } stack /> }
-            { col1 && viewType === "overview" && chartType === "barStack3d"    && <BarChart        column={ col1 } dataSet={ chartPowerSet } groupBy={ col2 } stack use3d /> }
-        
-            <br/>
-            <br/>
-            <h5>SOURCE DATA { dataRequest.refresh ? "SUBSCRIPTION" : "REQUEST" }</h5>
-            <DataRequestLink request={ dataRequest } />
-            <br/>
-            <button className="btn btn-blue mt-1 mb-2 grey-out"> <b> Request Data </b> </button>
         </div>
     )
 }
-

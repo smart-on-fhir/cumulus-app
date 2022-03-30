@@ -18,38 +18,13 @@
 
 .main-chart {
     aspect-ratio: 100/60;
+    overflow: hidden;
+
+    * { 
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    }
+
 }
 
-.highcharts-data-table {
-    font-size: 80%;
-    max-width: 100%;
-    overflow: auto;
-    margin: 1.2em 0;
 
-    caption {
-        margin: 2em 0 1em;
-        font-size: 1.2rem;
-        display: none;
-    }
-
-    table {
-        min-width: 100%;
-        border-spacing: 0;
-        border-collapse: collapse;
-    }
-    th, td {
-        border: 1px solid #DDD;
-        text-align: center;
-        vertical-align: middle;
-        padding: 0.25em 0.5em;
-    }
-    td {
-        background: #FFF;
-    }
-    tr:hover {
-        th, td {
-            background: #EEE;
-        }
-    }
-}
 
