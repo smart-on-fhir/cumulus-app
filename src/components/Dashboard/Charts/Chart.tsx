@@ -246,168 +246,95 @@ export function getSeries({
         })        
     }
 
+    // ================================================================
+    // Additional Series (if any)
+    // ================================================================
     if (column2 && column2type) {
         
-        // 1. Use the same X column ("column")
-        // let groups = Array.from(dataSet.getUniqueValuesFromColumn(column.name))
-
-        // 2. Stratify by "column2"
+        let groups = Array.from(dataSet.getUniqueValuesFromColumn(column.name));
         
-        let data: any[] = [];
-        
-        // if (xType === "category") {
-        //     // let set: any = {
-        //     //     type,
-        //     //     name: groupBy.dataType.startsWith("date") ? moment(groupName + "", "YYYY-MM-DD").format(getDateFormat(groupBy, true)) : groupName + "",
-        //     //     data: [],
-        //     //     colorIndex: i,
-        //     //     fillColor: type === "areaspline" ? {
-        //     //         linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-        //     //         stops: [
-        //     //             [0, new Color(colors[i]).setOpacity(0.2 ).get('rgba') + ""],
-        //     //             [1, new Color(colors[i]).setOpacity(0.05).get('rgba') + ""]
-        //     //         ]
-        //     //     }: undefined
-        //     // };
+        let _series: Record<string, any> = {};
 
-        //     let categories = Array.from(dataSet.getUniqueValuesFromColumn(column.name))//.map(String)
-        //     let rows = dataSet.rows.sort((a, b) => categories.indexOf(a[column.name]) - categories.indexOf(b[column.name]));
-
-            
-        //     categories.sort().forEach(category => {
-
-        //         let set = {
-        //             type: column2type as SupportedNativeChartTypes,
-        //             name: column2.label || column2.name,
-        //             data: [] as any[]
-        //         };
- 
-        //         let row = dataSet.rows.filter(r => {
-        //             return (
-        //                 r[column.name ] === category //&&
-        //                 // r[groupBy.name] === groupName
-        //             )
-        //         }).forEach(row => {
-        //             set.data.push(
-        //                 pointFromRow(row, column2)
-        //             );
-        //         })
-
-        //         data.push(set)
-        //     })
-
-        //     console.log(data)
-        // }
-        // else {
-
-            let groups = Array.from(dataSet.getUniqueValuesFromColumn(column.name));
-            
-            let _series: Record<string, any> = {};
-
-            groups.forEach(x => {
-                let data = fullDataSet.pick([column.name, column2.name]).where({
-                    [column.name]: x
-                });
-
-                data.rows.forEach((row, i) => {
-                    let groupName = row[column2.name];
-                    let group = _series[groupName + ""];
-                    if (!group) {
-                        group = _series[groupName + ""] = {
-                            type: column2type as SupportedNativeChartTypes,
-                            name: groupName,
-                            colorIndex: series.length + i,
-                            dashStyle: "ShortDash",
-                            lineWidth: 1,
-                            opacity: column2opacity,
-                            borderColor: "rgba(0, 0, 0, 0.8)",
-                            // opacity: 0.75,
-                            color: column2type === "spline" ? undefined : {
-                                pattern: {
-                                    path: {
-                                        d: 'M 0 0 L 0 6',
-                                        strokeWidth: 11
-                                    },
-                                    width : 6,
-                                    height: 6,
-                                    opacity: 0.6,
-                                    patternTransform: 'scale(0.49) rotate(45)'
-                                }
-                            },
-                            data: []
-                        };
-                    }
-
-                    let value = row.cnt;
-                    let denominatorValue = 0;
-
-                    
-                    if (denominator === "local") {
-                        denominatorValue = fullDataSet.countWhere({ [column.name]: row[column.name] });
-                        value = value/denominatorValue * 100
-                    }
-                    
-                    // Convert the count to % of the total count
-                    else if (denominator === "global") {
-                        denominatorValue = fullDataSet.countAll();
-                        value = value/denominatorValue * 100
-                    }
-
-                    let point: any = {
-                        // x: row[column.name],
-                        y: value,
-                        custom: {
-                            data: row,
-                            denominator: denominatorValue
-                        }
-                    };
-
-                    if (xType === "datetime") {
-                        // For datetime axes, point name is the formatted date
-                        point.name = moment(row[column.name] + "", "YYYY-MM-DD").format(dateFormat)
-
-                        // For datetime axes, the X value is the timestamp in milliseconds since 1970.
-                        point.x = +moment(row[column.name] + "", "YYYY-MM-DD")
-                    }
-            
-                    // For linear (numeric) axes, the X value is the numeric value or 0.
-                    if (xType === "linear") {
-                        point.x = +(row[column.name] || 0)
-                    }
-
-                    if (xType === "category") {
-                        point.name = x
-                    }
-
-                    group.data.push(point)
-                });
-
-                // console.log({[column.name]: x}, data); 
-
-                // @ts-ignore
-                // series.push(Object.values(_series));
+        groups.forEach(x => {
+            let data = fullDataSet.pick([column.name, column2.name]).where({
+                [column.name]: x
             });
-            series = series.concat(Object.values(_series));
 
-            // const rows = 
-            // // groupBy ? 
-            // //     dataSet.where({ [groupBy.name]: groupName }).rows :
-            // dataSet.rows;
-            // data = rows.map(row => pointFromRow(row, column2));
-            // series.push({
-            //     color: "rgba(0, 0, 0, 0.5)",
-            //     type: column2type as SupportedNativeChartTypes,
-            //     name: column2.label || column2.name,
-            //     data//: [1,2,3,6,5,8,3,4,5,6,9,2,3]
-            // });
-        // }
+            data.rows.forEach((row, i) => {
+                let groupName = row[column2.name];
+                let group = _series[groupName + ""];
+                if (!group) {
+                    group = _series[groupName + ""] = {
+                        type: column2type as SupportedNativeChartTypes,
+                        name: groupName,
+                        colorIndex: series.length + i,
+                        dashStyle: "ShortDash",
+                        lineWidth: 1,
+                        opacity: column2opacity,
+                        borderColor: "rgba(0, 0, 0, 0.8)",
+                        // opacity: 0.75,
+                        color: column2type === "spline" ? undefined : {
+                            pattern: {
+                                path: {
+                                    d: 'M 0 0 L 0 6',
+                                    strokeWidth: 11
+                                },
+                                width : 6,
+                                height: 6,
+                                opacity: 0.6,
+                                patternTransform: 'scale(0.49) rotate(45)'
+                            }
+                        },
+                        data: []
+                    };
+                }
 
-        // series.push({
-        //     color: "rgba(0, 0, 0, 0.5)",
-        //     type: column2type as SupportedNativeChartTypes,
-        //     name: column2.label || column2.name,
-        //     data//: [1,2,3,6,5,8,3,4,5,6,9,2,3]
-        // });
+                let value = row.cnt;
+                let denominatorValue = 0;
+
+                
+                if (denominator === "local") {
+                    denominatorValue = fullDataSet.countWhere({ [column.name]: row[column.name] });
+                    value = value/denominatorValue * 100
+                }
+                
+                // Convert the count to % of the total count
+                else if (denominator === "global") {
+                    denominatorValue = fullDataSet.countAll();
+                    value = value/denominatorValue * 100
+                }
+
+                let point: any = {
+                    // x: row[column.name],
+                    y: value,
+                    custom: {
+                        data: row,
+                        denominator: denominatorValue
+                    }
+                };
+
+                if (xType === "datetime") {
+                    // For datetime axes, point name is the formatted date
+                    point.name = moment(row[column.name] + "", "YYYY-MM-DD").format(dateFormat)
+
+                    // For datetime axes, the X value is the timestamp in milliseconds since 1970.
+                    point.x = +moment(row[column.name] + "", "YYYY-MM-DD")
+                }
+        
+                // For linear (numeric) axes, the X value is the numeric value or 0.
+                if (xType === "linear") {
+                    point.x = +(row[column.name] || 0)
+                }
+
+                if (xType === "category") {
+                    point.name = x
+                }
+
+                group.data.push(point)
+            });
+        });
+
+        series = series.concat(Object.values(_series));
     }
 
     return series
@@ -672,7 +599,7 @@ export function buildChartOptions({
                 borderWidth: 0.25,
                 borderRadius: 0.5,
                 pointPadding: 0.02,
-                groupPadding: groupBy ? 0.2 : 0,
+                groupPadding: 0.2,
                 crisp: false,
                 
                 states: {
@@ -690,7 +617,7 @@ export function buildChartOptions({
                 borderWidth: 0.25,
                 borderRadius: 0.5,
                 pointPadding: 0.02,
-                groupPadding: groupBy ? 0.2 : 0,
+                groupPadding: 0.2,
                 crisp: false,
                 states: {
                     select: {
