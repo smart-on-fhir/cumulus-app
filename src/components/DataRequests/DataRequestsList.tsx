@@ -4,6 +4,7 @@ import { useBackend }  from "../../hooks";
 import { request }     from "../../backend";
 import { AlertError }  from "../Alert";
 import Loader          from "../Loader";
+import { Link } from "react-router-dom";
 
 
 function List({
@@ -42,6 +43,14 @@ export default function DataRequestsList()
 
     if (error) {
         return <AlertError><b>Error Loading Data Requests: </b>{ error + "" }</AlertError>
+    }
+
+    if (!groups || !groups.length) {
+        return <>
+            <p className="color-muted">No Data Requests found.</p>
+            <br/>
+            <Link to="/requests/new" className="color-blue underline">Create New Data Request</Link>
+        </>
     }
 
     return (
