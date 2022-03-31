@@ -94,7 +94,8 @@ export function getSeries({
     colors = [],
     denominator = "",
     column2,
-    column2type
+    column2type,
+    column2opacity = 1
 }: {
     column: app.DataRequestDataColumn
     dataSet: PowerSet
@@ -105,6 +106,7 @@ export function getSeries({
     denominator?: string
     column2    ?: app.DataRequestDataColumn | null
     column2type?: string
+    column2opacity?: number
 }): SeriesOptions[]
 {
     let xType = getXType(column, groupBy);
@@ -317,6 +319,7 @@ export function getSeries({
                             colorIndex: series.length + i,
                             dashStyle: "ShortDash",
                             lineWidth: 1,
+                            opacity: column2opacity,
                             borderColor: "rgba(0, 0, 0, 0.8)",
                             // opacity: 0.75,
                             color: column2type === "spline" ? undefined : {
@@ -434,7 +437,8 @@ export function buildChartOptions({
     denominator = "",
     type,
     column2,
-    column2type
+    column2type,
+    column2opacity = 1
 }: {
     options?: Highcharts.Options
     column: app.DataRequestDataColumn
@@ -446,6 +450,7 @@ export function buildChartOptions({
     denominator?: string
     column2    ?: app.DataRequestDataColumn | null
     column2type?: string
+    column2opacity?: number
 }): Highcharts.Options
 {
     const COLORS: string[] = [];
@@ -463,7 +468,8 @@ export function buildChartOptions({
         colors: COLORS,
         denominator,
         column2,
-        column2type
+        column2type,
+        column2opacity
     });
 
     // console.log("series", series)
@@ -665,8 +671,8 @@ export function buildChartOptions({
                 borderColor: "rgba(1, 1, 1, 0.5)",
                 borderWidth: 0.25,
                 borderRadius: 0.5,
-                pointPadding: 0.01,
-                groupPadding: 0.2,
+                pointPadding: 0.02,
+                groupPadding: groupBy ? 0.2 : 0,
                 crisp: false,
                 
                 states: {
@@ -683,8 +689,8 @@ export function buildChartOptions({
                 borderColor: "rgba(0, 0, 0, 0.5)",
                 borderWidth: 0.25,
                 borderRadius: 0.5,
-                pointPadding: 0.01,
-                groupPadding: 0.2,
+                pointPadding: 0.02,
+                groupPadding: groupBy ? 0.2 : 0,
                 crisp: false,
                 states: {
                     select: {
@@ -902,6 +908,7 @@ interface ChartProps {
     denominator?: string
     column2    ?: app.DataRequestDataColumn | null
     column2type?: string
+    column2opacity?: number
 }
 export default class Chart extends React.Component<ChartProps>
 {
@@ -923,7 +930,8 @@ export default class Chart extends React.Component<ChartProps>
             colorOptions,
             denominator,
             column2,
-            column2type
+            column2type,
+            column2opacity
         } = this.props;
 
         this.chart.update(buildChartOptions({
@@ -936,7 +944,8 @@ export default class Chart extends React.Component<ChartProps>
             colorOptions,
             denominator,
             column2,
-            column2type
+            column2type,
+            column2opacity
         }), true, true, false)
         // console.log(this.props.chartOptions)
     }
@@ -953,7 +962,8 @@ export default class Chart extends React.Component<ChartProps>
             colorOptions,
             denominator,
             column2,
-            column2type
+            column2type,
+            column2opacity
         } = this.props;
 
         this.chart = Highcharts.chart("chart", buildChartOptions({
@@ -966,7 +976,8 @@ export default class Chart extends React.Component<ChartProps>
             colorOptions,
             denominator,
             column2,
-            column2type
+            column2type,
+            column2opacity
         }));
         // console.log(this.props.chartOptions)
     }

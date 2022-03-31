@@ -42,6 +42,7 @@ interface ViewState
     cleanState    ?: ViewState
     column2        : string
     column2type    : string
+    column2opacity : number
 }
 
 interface ViewAction
@@ -68,7 +69,8 @@ function viewReducer(state: ViewState, action: ViewAction): ViewState
         "colorOptions",
         "denominator",
         "column2",
-        "column2type"
+        "column2type",
+        "column2opacity"
     ];
 
     function checkDirty(nextState: ViewState) {
@@ -141,7 +143,8 @@ export default function Dashboard({
             startColor: 0
         },
         column2: serverColumn2 = "",
-        column2type: serverColumn2type = ""
+        column2type: serverColumn2type = "",
+        column2opacity: serverColumn2opacity = 1
     } = view.settings || {}
 
     const navigate = useNavigate();
@@ -162,6 +165,7 @@ export default function Dashboard({
         denominator    : serverDenominator,
         column2        : serverColumn2,
         column2type    : serverColumn2type,
+        column2opacity : serverColumn2opacity,
         isDirty        : false
     } as ViewState, initViewState);
 
@@ -180,7 +184,8 @@ export default function Dashboard({
         colorOptions,
         denominator,
         column2,
-        column2type
+        column2type,
+        column2opacity
     } = state;
 
     const isAdmin = auth.user?.role === "admin"
@@ -223,7 +228,8 @@ export default function Dashboard({
                     colorOptions,
                     denominator,
                     column2,
-                    column2type
+                    column2type,
+                    column2opacity
                 }
             }).then(
                 () => dispatch({ type: "CLEAN" }),
@@ -249,7 +255,8 @@ export default function Dashboard({
                     colorOptions,
                     denominator,
                     column2,
-                    column2type
+                    column2type,
+                    column2opacity
                 }
             }).then(
                 v => defer(() => navigate("/views/" + v.id)),
@@ -371,7 +378,8 @@ export default function Dashboard({
                                 colorOptions,
                                 denominator,
                                 column2,
-                                column2type
+                                column2type,
+                                column2opacity
                             }}
                             onChange={state => {
                                 dispatch({ type: "UPDATE", payload: {
@@ -385,7 +393,8 @@ export default function Dashboard({
                                     colorOptions   : state.colorOptions,
                                     denominator    : state.denominator,
                                     column2        : state.column2,
-                                    column2type    : state.column2type
+                                    column2type    : state.column2type,
+                                    column2opacity : state.column2opacity
                                 }});
                             }}
                         />
@@ -500,6 +509,7 @@ export default function Dashboard({
                             stratifier={ stratifier }
                             column2={col2}
                             column2type={column2type}
+                            column2opacity={column2opacity}
                         /> }
                         <br/>
                         <div className="row mb-1">
@@ -518,7 +528,7 @@ export default function Dashboard({
     )
 }
 
-function Chart({ chartType, column, dataSet, fullDataSet, options, colorOptions, denominator, stratifier, column2, column2type }: {
+function Chart({ chartType, column, dataSet, fullDataSet, options, colorOptions, denominator, stratifier, column2, column2type, column2opacity }: {
     chartType   : string
     column      : app.DataRequestDataColumn
     stratifier ?: app.DataRequestDataColumn | null
@@ -529,6 +539,7 @@ function Chart({ chartType, column, dataSet, fullDataSet, options, colorOptions,
     denominator : string
     column2    ?: app.DataRequestDataColumn | null
     column2type?: string
+    column2opacity?: number
 }) {
     const commonProps = {
         column,
@@ -552,34 +563,34 @@ function Chart({ chartType, column, dataSet, fullDataSet, options, colorOptions,
         return <PieChart { ...commonProps } donut use3d />
     }
     if (chartType === "spline") {
-        return <SPLineChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} />
+        return <SPLineChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} />
     }
     if (chartType === "areaspline") {
-        return <AreaSPLineChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} />
+        return <AreaSPLineChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} />
     }
     if (chartType === "column") {
-        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} />
+        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} />
     }
     if (chartType === "column3d") {
-        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} use3d />
+        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} use3d />
     }
     if (chartType === "columnStack") {
-        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} stack />
+        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} stack />
     }
     if (chartType === "columnStack3d") {
-        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} stack use3d />
+        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} stack use3d />
     }
     if (chartType === "bar") {
-        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} />
+        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} />
     }
     if (chartType === "bar3d") {
-        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} use3d />
+        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} use3d />
     }
     if (chartType === "barStack") {
-        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} stack />
+        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} stack />
     }
     if (chartType === "barStack3d") {
-        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} stack use3d />
+        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} stack use3d />
     }
     return null;
 }

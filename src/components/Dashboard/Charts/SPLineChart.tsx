@@ -11,7 +11,8 @@ export default function SPLineChart({
     colorOptions,
     denominator,
     column2,
-    column2type
+    column2type,
+    column2opacity = 1
 }: {
     column: app.DataRequestDataColumn
     dataSet: PowerSet
@@ -22,6 +23,7 @@ export default function SPLineChart({
     denominator?: string
     column2    ?: app.DataRequestDataColumn | null
     column2type?: string
+    column2opacity?: number
 })
 {
     return <Chart
@@ -36,5 +38,6 @@ export default function SPLineChart({
         denominator={denominator}
         column2={column2}
         column2type={column2type}
+        column2opacity={column2opacity}
     />
 }

@@ -28,6 +28,7 @@ interface ChartConfigPanelState {
     denominator    : string
     column2        : string
     column2type    : string
+    column2opacity : number
 }
 
 export default function ConfigPanel({
@@ -129,7 +130,7 @@ export default function ConfigPanel({
                                     min={0}
                                     max={0.5}
                                     step={0.01}
-                                    value={ state.chartOptions.plotOptions?.column?.groupPadding }
+                                    value={ state.chartOptions.plotOptions?.column?.groupPadding === undefined ? 0.2 : state.chartOptions.plotOptions.column.groupPadding }
                                     onChange={e => onChange(
                                         merge(state, {
                                             chartOptions: {
@@ -156,7 +157,7 @@ export default function ConfigPanel({
                                     min={0}
                                     max={0.5}
                                     step={0.01}
-                                    value={ state.chartOptions.plotOptions?.column?.pointPadding }
+                                    value={ state.chartOptions.plotOptions?.column?.pointPadding === undefined ? 0.02 : state.chartOptions.plotOptions.column.pointPadding }
                                     onChange={e => onChange(     
                                         merge(state, {
                                             chartOptions: {
@@ -182,7 +183,7 @@ export default function ConfigPanel({
                                 min={1}
                                 max={90}
                                 step={1}
-                                value={ parseFloat(state.chartOptions.plotOptions?.pie?.innerSize + "" || "0") }
+                                value={ parseFloat(state.chartOptions.plotOptions?.pie?.innerSize === undefined ? "50" : state.chartOptions.plotOptions.pie.innerSize + "") }
                                 onChange={e => onChange(     
                                     merge(state, {
                                         chartOptions: {
@@ -206,7 +207,7 @@ export default function ConfigPanel({
                                 min={0}
                                 max={30}
                                 step={1}
-                                value={ state.chartOptions.plotOptions?.pie?.slicedOffset }
+                                value={ state.chartOptions.plotOptions?.pie?.slicedOffset === undefined ? 30 : state.chartOptions.plotOptions.pie.slicedOffset }
                                 onChange={e => onChange(
                                     merge(state, {
                                         chartOptions: {
@@ -477,7 +478,7 @@ export default function ConfigPanel({
                 <br/>
             </Collapse>
             { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") && 
-                <Collapse header="Secondary Data">
+                <Collapse collapsed header="Secondary Data">
                     <div className="pt-1">
                         <label>Column</label>
                         <Select
@@ -502,34 +503,42 @@ export default function ConfigPanel({
                             onChange={(column2: string) => onChange({ ...state, column2 })}
                         />
                     </div>
-                    { state.column2 && 
-                    <div className="pt-1">
+
+                    { !!state.column2 && <div className="pt-1">
                         <label>Render As</label>
                         <Select
                             value={ state.column2type }
                             onChange={ column2type => onChange({ ...state, column2type })}
-                            
-                            // @ts-ignore
                             options={[
                                 {
                                     value: "spline",
                                     label: "Line",
                                     icon: ChartIcons.spline
                                 },
-                                // state.chartType.startsWith("bar") ? {
-                                //     value: "bar",
-                                //     label: "Bars",
-                                //     icon: ChartIcons.bar
-                                // } : null,
                                 {
                                     value: "column",
                                     label: "Columns",
                                     icon: ChartIcons.column
                                 }
-                            ].filter(Boolean)}
+                            ]}
                         />
-                        <br/>
-                    </div>}
+                    </div> }
+
+                    { !!state.column2 && !!state.column2type && <div className="pt-1">
+                        <label>
+                            Opacity
+                            <input
+                                type="range"
+                                min={0}
+                                max={1}
+                                step={0.01}
+                                value={ state.column2opacity === undefined ? 1 : state.column2opacity }
+                                onChange={e => onChange({ ...state, column2opacity: e.target.valueAsNumber })}
+                                style={{ width: "100%", margin: 0 }}
+                            />
+                        </label>
+                    </div> }
+
                     <br/>
                     <br/>
                 </Collapse>
@@ -607,7 +616,6 @@ export default function ConfigPanel({
                         />
                     </label>
                     <p className="small color-muted">Select the hue of the first color. Any subsequent colors will be computed by shifting this hue with an ammount depending on the "variety" color setting.</p>
-
                 </div>
             </Collapse>
 
