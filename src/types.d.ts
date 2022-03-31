@@ -40,6 +40,9 @@ declare module app {
             chartOptions?: Partial<Highcharts.Options>
             colorOptions?: ColorOptions
             denominator ?: string
+
+            column2    ?: string // Extra Column
+            column2type?: string // Extra Column render as
         }
     }
 

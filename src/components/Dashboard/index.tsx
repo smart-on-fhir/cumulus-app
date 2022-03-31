@@ -22,10 +22,6 @@ import { operators }               from "./config";
 import "./Dashboard.scss";
 
 
-
-
-
-
 // =============================================================================
 
 interface ViewState
@@ -44,6 +40,8 @@ interface ViewState
     colorOptions   : app.ColorOptions
     denominator    : string
     cleanState    ?: ViewState
+    column2        : string
+    column2type    : string
 }
 
 interface ViewAction
@@ -68,7 +66,9 @@ function viewReducer(state: ViewState, action: ViewAction): ViewState
         "filters",
         "chartOptions",
         "colorOptions",
-        "denominator"
+        "denominator",
+        "column2",
+        "column2type"
     ];
 
     function checkDirty(nextState: ViewState) {
@@ -139,7 +139,9 @@ export default function Dashboard({
             variety   : 1,
             opacity   : 1,
             startColor: 0
-        }
+        },
+        column2: serverColumn2 = "",
+        column2type: serverColumn2type = ""
     } = view.settings || {}
 
     const navigate = useNavigate();
@@ -158,6 +160,8 @@ export default function Dashboard({
         chartOptions   : serverChartOptions,
         colorOptions   : serverColorOptions,
         denominator    : serverDenominator,
+        column2        : serverColumn2,
+        column2type    : serverColumn2type,
         isDirty        : false
     } as ViewState, initViewState);
 
@@ -174,7 +178,9 @@ export default function Dashboard({
         gridType,
         chartOptions,
         colorOptions,
-        denominator
+        denominator,
+        column2,
+        column2type
     } = state;
 
     const isAdmin = auth.user?.role === "admin"
@@ -215,7 +221,9 @@ export default function Dashboard({
                     viewType: chartType,
                     chartOptions,
                     colorOptions,
-                    denominator
+                    denominator,
+                    column2,
+                    column2type
                 }
             }).then(
                 () => dispatch({ type: "CLEAN" }),
@@ -239,7 +247,9 @@ export default function Dashboard({
                     viewType: chartType,
                     chartOptions,
                     colorOptions,
-                    denominator
+                    denominator,
+                    column2,
+                    column2type
                 }
             }).then(
                 v => defer(() => navigate("/views/" + v.id)),
@@ -255,49 +265,20 @@ export default function Dashboard({
         return Promise.resolve()
     })
 
-
-    
-
     const col1 = dataRequest.data.cols.find(col => col.name === viewColumn) as app.DataRequestDataColumn;
-    const col2 = viewGroupBy ? dataRequest.data.cols.find(col => col.name === viewGroupBy) as app.DataRequestDataColumn : null;
+    const stratifier = viewGroupBy ? dataRequest.data.cols.find(col => col.name === viewGroupBy) as app.DataRequestDataColumn : null;
+
+    const col2 = column2 ? dataRequest.data.cols.find(col => col.name === column2) as app.DataRequestDataColumn : null;
     
-    const groupBy = col2?.name;
+    const groupBy = stratifier?.name;
     const filterList = filters.map(f => JSON.stringify(f)).join(",");
 
     let powerSet = useMemo(() => PowerSet.from(dataRequest.data), [dataRequest.data]);
 
     let { chartPowerSet } = useMemo(function() {
 
-        // console.log("CREATE POWERSETS")
-
         let powerSet = PowerSet.from(dataRequest.data);
 
-        // FILTERS
-        // -------------------------------------------------------------------------
-        // filters.forEach(({ left, operator, negated, right }) => {
-
-        //     // Skip filters for which left column is not selected in the UI
-        //     if (!left) return;
-
-        //     // Skip filters for which the right column or value is not set in the UI
-        //     if (operator !== "isNull" && right.value === undefined) return;
-
-        //     const fn = operators.find(x => x.id === operator)?.fn || (() => true) as any;
-
-        //     const filterFn = (row: any) => {
-        //         const l = row[left];
-        //         const r = right.type === "column" ? row[right.value + ""] : right.value;
-        //         if (operator !== "isNull" && l === null) return false;
-        //         if (operator === "isNull" && negated && l !== null) return true;
-        //         let result = !!fn(l, r);
-        //         if (negated) return !result;
-        //         return result
-        //     };
-
-        //     powerSet = powerSet.filter(filterFn)
-        // })
-
-        // --------------------------------------------------------------------
         function createFilter(filter: app.Filter): false | ((row: any, index?: number) => boolean)
         {
             const { left, operator, negated, right } = filter;
@@ -339,50 +320,21 @@ export default function Dashboard({
 
             powerSet = powerSet.filter(filter)
         }
-        // --------------------------------------------------------------------
 
         const chartPowerSet = powerSet.getChartData({
             column : viewColumn,
             groupBy,
-            filters: usableFilters
+            filters: usableFilters,
+            column2
         });
         
         return { powerSet, chartPowerSet }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ powerSet, groupBy, viewColumn, filterList ]);
-    
-    // FILTERS
-    // -------------------------------------------------------------------------
-    // filters.forEach(({ left, operator, negated, right }) => {
-
-    //     // Skip filters for which left column is not selected in the UI
-    //     if (!left) return;
-
-    //     // Skip filters for which the right column or value is not set in the UI
-    //     if (operator !== "isNull" && right.value === undefined) return;
-
-    //     const fn = operators.find(x => x.id === operator)?.fn || (() => true) as any;
-
-    //     const filterFn = (row: any) => {
-    //         const l = row[left];
-    //         const r = right.type === "column" ? row[right.value + ""] : right.value;
-    //         if (operator !== "isNull" && l === null) return false;
-    //         if (operator === "isNull" && negated && l !== null) return true;
-    //         let result = !!fn(l, r);
-    //         if (negated) return !result;
-    //         return result
-    //     };
-
-    //     powerSet = powerSet.filter(filterFn)
-
-    // })
-    
 
     const onTransitionEnd = () => {
         window.Highcharts.charts.forEach(c => c?.reflow())
-    }
-
-    
+    };
     
     return (
         <div className={ saving || deleting ? "grey-out" : undefined }>
@@ -408,7 +360,7 @@ export default function Dashboard({
                             viewType={viewType}
                             state={{
                                 groupBy   : viewColumn,
-                                stratifyBy: col2?.name || "",
+                                stratifyBy: stratifier?.name || "",
                                 filters   : [...filters],
 
                                 // @ts-ignore
@@ -417,7 +369,9 @@ export default function Dashboard({
                                 viewDescription,
                                 chartOptions,
                                 colorOptions,
-                                denominator
+                                denominator,
+                                column2,
+                                column2type
                             }}
                             onChange={state => {
                                 dispatch({ type: "UPDATE", payload: {
@@ -429,7 +383,9 @@ export default function Dashboard({
                                     filters        : [...state.filters],
                                     chartOptions   : state.chartOptions,
                                     colorOptions   : state.colorOptions,
-                                    denominator    : state.denominator
+                                    denominator    : state.denominator,
+                                    column2        : state.column2,
+                                    column2type    : state.column2type
                                 }});
                             }}
                         />
@@ -505,7 +461,7 @@ export default function Dashboard({
                                     // col.name === "cnt" || col.name === "queryid" ? "private" : undefined
                                     if (
                                         col.name === "cnt" ||
-                                        (col.name === viewColumn || (col2 && col.name === col2.name)) ||
+                                        (col.name === viewColumn || (stratifier && col.name === stratifier.name)) ||
                                         (filters && filters.find(f => f.left === col.name))
                                         // chartPowerSet.getColumnByName(col.name) &&
                                         // value !== null
@@ -533,25 +489,18 @@ export default function Dashboard({
                                 Please create the view again.
                             </AlertError>
                         ) }
-                        
-                        { col1 && viewType === "overview" && chartType === "pie"           && <PieChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} /> }
-                        { col1 && viewType === "overview" && chartType === "pie3d"         && <PieChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} use3d /> }
-                        { col1 && viewType === "overview" && chartType === "donut"         && <PieChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} donut /> }
-                        { col1 && viewType === "overview" && chartType === "donut3d"       && <PieChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} donut use3d /> }
-                        
-                        { col1 && viewType === "overview" && chartType === "spline"        && <SPLineChart     column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } /> }
-                        { col1 && viewType === "overview" && chartType === "areaspline"    && <AreaSPLineChart column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } /> }
-
-                        { col1 && viewType === "overview" && chartType === "column"        && <ColumnChart     column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } /> }
-                        { col1 && viewType === "overview" && chartType === "column3d"      && <ColumnChart     column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } use3d /> }
-                        { col1 && viewType === "overview" && chartType === "columnStack"   && <ColumnChart     column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } stack /> }
-                        { col1 && viewType === "overview" && chartType === "columnStack3d" && <ColumnChart     column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } stack use3d /> }
-
-                        { col1 && viewType === "overview" && chartType === "bar"           && <BarChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } /> }
-                        { col1 && viewType === "overview" && chartType === "bar3d"         && <BarChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } use3d /> }
-                        { col1 && viewType === "overview" && chartType === "barStack"      && <BarChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } stack /> }
-                        { col1 && viewType === "overview" && chartType === "barStack3d"    && <BarChart        column={ col1 } fullDataSet={ powerSet } dataSet={ chartPowerSet } options={ chartOptions } colorOptions={colorOptions} denominator={denominator} groupBy={ col2 } stack use3d /> }
-
+                        { col1 && viewType === "overview" && <Chart
+                            chartType={chartType}
+                            column={ col1 }
+                            fullDataSet={ powerSet }
+                            dataSet={ chartPowerSet }
+                            options={ chartOptions }
+                            colorOptions={colorOptions}
+                            denominator={denominator}
+                            stratifier={ stratifier }
+                            column2={col2}
+                            column2type={column2type}
+                        /> }
                         <br/>
                         <div className="row mb-1">
                             <div className="col top">
@@ -567,4 +516,70 @@ export default function Dashboard({
             </div>
         </div>
     )
+}
+
+function Chart({ chartType, column, dataSet, fullDataSet, options, colorOptions, denominator, stratifier, column2, column2type }: {
+    chartType   : string
+    column      : app.DataRequestDataColumn
+    stratifier ?: app.DataRequestDataColumn | null
+    dataSet     : PowerSet
+    fullDataSet : PowerSet
+    options     : Partial<Highcharts.Options>
+    colorOptions: app.ColorOptions
+    denominator : string
+    column2    ?: app.DataRequestDataColumn | null
+    column2type?: string
+}) {
+    const commonProps = {
+        column,
+        fullDataSet,
+        dataSet,
+        options,
+        colorOptions,
+        denominator
+    };
+
+    if (chartType === "pie") {
+        return <PieChart { ...commonProps } />
+    }
+    if (chartType === "pie3d") {
+        return <PieChart { ...commonProps } use3d />
+    }
+    if (chartType === "donut") {
+        return <PieChart { ...commonProps } donut />
+    }
+    if (chartType === "donut3d") {
+        return <PieChart { ...commonProps } donut use3d />
+    }
+    if (chartType === "spline") {
+        return <SPLineChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} />
+    }
+    if (chartType === "areaspline") {
+        return <AreaSPLineChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} />
+    }
+    if (chartType === "column") {
+        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} />
+    }
+    if (chartType === "column3d") {
+        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} use3d />
+    }
+    if (chartType === "columnStack") {
+        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} stack />
+    }
+    if (chartType === "columnStack3d") {
+        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} stack use3d />
+    }
+    if (chartType === "bar") {
+        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} />
+    }
+    if (chartType === "bar3d") {
+        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} use3d />
+    }
+    if (chartType === "barStack") {
+        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} stack />
+    }
+    if (chartType === "barStack3d") {
+        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} stack use3d />
+    }
+    return null;
 }

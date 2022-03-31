@@ -24,8 +24,10 @@ interface ChartConfigPanelState {
     viewName       : string
     viewDescription: string
     chartOptions   : Partial<Highcharts.Options>
-    colorOptions   : app.ColorOptions,
+    colorOptions   : app.ColorOptions
     denominator    : string
+    column2        : string
+    column2type    : string
 }
 
 export default function ConfigPanel({
@@ -92,7 +94,7 @@ export default function ConfigPanel({
                             }))}
                         />
                     </div>
-                    <div className="mt-1 pb-2">
+                    <div className="mt-1">
                         <Checkbox
                             name="plotBorderWidth"
                             disabled={ state.chartType.includes("3d") }
@@ -117,6 +119,110 @@ export default function ConfigPanel({
                             }))}
                         />
                     </div>
+
+                    { (state.chartType.startsWith("column") || state.chartType.startsWith("bar")) && state.stratifyBy && 
+                        <div className="mt-1">
+                            <label>
+                                Group Padding
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={0.5}
+                                    step={0.01}
+                                    value={ state.chartOptions.plotOptions?.column?.groupPadding }
+                                    onChange={e => onChange(
+                                        merge(state, {
+                                            chartOptions: {
+                                                plotOptions: {
+                                                    [state.chartType.startsWith("column") ? "column" : "bar"]: {
+                                                        groupPadding: e.target.valueAsNumber
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    )}
+                                    style={{ width: "100%", margin: 0 }}
+                                />
+                            </label>
+                            <p className="small color-muted">Padding between each value groups</p>
+                        </div>
+                    }
+                    { (state.chartType.startsWith("column") || state.chartType.startsWith("bar")) && !state.chartType.endsWith("Stack") &&
+                        <div className="mt-1">
+                            <label>
+                                Point Padding
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={0.5}
+                                    step={0.01}
+                                    value={ state.chartOptions.plotOptions?.column?.pointPadding }
+                                    onChange={e => onChange(     
+                                        merge(state, {
+                                            chartOptions: {
+                                                plotOptions: {
+                                                    [state.chartType.startsWith("column") ? "column" : "bar"]: {
+                                                        pointPadding: e.target.valueAsNumber
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    )}
+                                    style={{ width: "100%", margin: 0 }}
+                                />
+                            </label>
+                            <p className="small color-muted">Padding between each column or bar</p>
+                        </div>
+                    }
+                    { state.chartType.startsWith("donut") && <div className="mt-1">
+                        <label>
+                            Inner Size
+                            <input
+                                type="range"
+                                min={1}
+                                max={90}
+                                step={1}
+                                value={ parseFloat(state.chartOptions.plotOptions?.pie?.innerSize + "" || "0") }
+                                onChange={e => onChange(     
+                                    merge(state, {
+                                        chartOptions: {
+                                            plotOptions: {
+                                                pie: {
+                                                    innerSize: e.target.valueAsNumber + "%"
+                                                }
+                                            }
+                                        }
+                                    })
+                                )}
+                                style={{ width: "100%", margin: 0 }}
+                            />
+                        </label>
+                    </div> }
+                    { (state.chartType.startsWith("pie") || state.chartType.startsWith("donut")) && <div className="mt-1">
+                        <label>
+                            Selected Slice Offset
+                            <input
+                                type="range"
+                                min={0}
+                                max={30}
+                                step={1}
+                                value={ state.chartOptions.plotOptions?.pie?.slicedOffset }
+                                onChange={e => onChange(
+                                    merge(state, {
+                                        chartOptions: {
+                                            plotOptions: {
+                                                pie: {
+                                                    slicedOffset: e.target.valueAsNumber
+                                                }
+                                            }
+                                        }
+                                    })
+                                )}
+                                style={{ width: "100%", margin: 0 }}
+                            />
+                        </label>
+                    </div> }
+                    <br/>
                 </Collapse>
             )}
 
@@ -281,6 +387,154 @@ export default function ConfigPanel({
                 <br/>
             </Collapse>
 
+            <Collapse collapsed header="Data">
+                <div className="pt-1">
+                    <label>Visualize Column</label>
+                    <ColumnSelector
+                        cols={ dataRequest.data.cols }
+                        value={ state.groupBy }
+                        filter={col => {
+                            if (col.name === "cnt") return false
+                            if (SingleDimensionChartTypes.includes(state.chartType)) {
+                                return true
+                            }
+                            return col.name !== state.stratifyBy
+                        } }
+                        onChange={(groupBy: string) => onChange({ ...state, groupBy })}
+                    />
+                </div>
+                { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
+                    <div className="pt-1">
+                        <label>Stratifier</label>
+                        <Select
+                            right
+                            placeholder="Select Column"
+                            value={ state.stratifyBy }
+                            onChange={(stratifyBy: string) => onChange({
+                                ...state,
+                                stratifyBy,
+                                denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
+                            })}
+                            options={[
+                                { value: "", label: "NONE", icon: "fas fa-close color-red" },
+                                ...dataRequest.data.cols.map(col => ({
+                                    value   : col.name,
+                                    label   : col.label || col.name,
+                                    disabled: col.name === "cnt" || col.name === state.groupBy,
+                                    icon    : "/icons/column.png",
+                                    right   : <span className={ col.dataType + " color-muted small right" }> {col.dataType}</span>
+                                }))
+                            ]}
+                        />
+                    </div>
+                }
+                { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
+                    <div className="pt-1">
+                        <label>Denominator</label>
+                        <Checkbox
+                            type="radio"
+                            checked={ state.denominator === "" }
+                            onChange={() => onChange({ ...state, denominator: "" })}
+                            name="denominator"
+                            label="None"
+                            description="Render the aggregate counts found in the data source without further processing"
+                            className="mb-1"
+                        />
+                        <Checkbox
+                            type="radio"
+                            disabled={ !state.stratifyBy }
+                            checked={ state.denominator === "local" }
+                            onChange={() => onChange({ ...state, denominator: "local" })}
+                            name="denominator"
+                            label="Stratified Count"
+                            description="Convert counts to percentage of the total count of every given data group. Not available with no stratifier."
+                            className="mb-1"
+                        />
+                        <Checkbox
+                            type="radio"
+                            // disabled={ !state.stratifyBy }
+                            checked={state.denominator === "global"}
+                            onChange={() => onChange({ ...state, denominator: "global" })}
+                            name="denominator"
+                            label="Total Count"
+                            description="Convert counts to percentage of the total count within the entire dataset"
+                            className="mb-1"
+                        />
+                        {/* <ColumnSelector
+                            cols={ dataRequest.data.cols }
+                            value={ state.groupBy }
+                            filter={col => {
+                                if (col.name === "cnt") return false
+                                if (SingleDimensionChartTypes.includes(state.chartType)) {
+                                    return true
+                                }
+                                return col.name !== state.stratifyBy
+                            } }
+                            onChange={(groupBy: string) => onChange({ ...state, groupBy })}
+                        /> */}
+                    </div>
+                }
+                <br/>
+            </Collapse>
+            { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") && 
+                <Collapse header="Secondary Data">
+                    <div className="pt-1">
+                        <label>Column</label>
+                        <Select
+                            options={[
+                                { value: "", label: "NONE", icon: "fas fa-close color-red" },
+                                ...dataRequest.data.cols.map(col => ({
+                                    value   : col.name,
+                                    label   : col.label || col.name,
+                                    disabled: col.name === "cnt" || col.name === state.groupBy,
+                                    icon    : "/icons/column.png",
+                                    right   : <span className={ col.dataType + " color-muted small right" }> {col.dataType}</span>
+                                }))
+                            ]}
+                            value={ state.column2 }
+                            // filter={col => {
+                            //     if (col.name === "cnt") return false
+                            //     if (SingleDimensionChartTypes.includes(state.chartType)) {
+                            //         return true
+                            //     }
+                            //     return col.name !== state.stratifyBy && col.name !== state.groupBy
+                            // } }
+                            onChange={(column2: string) => onChange({ ...state, column2 })}
+                        />
+                    </div>
+                    { state.column2 && 
+                    <div className="pt-1">
+                        <label>Render As</label>
+                        <Select
+                            value={ state.column2type }
+                            onChange={ column2type => onChange({ ...state, column2type })}
+                            
+                            // @ts-ignore
+                            options={[
+                                {
+                                    value: "spline",
+                                    label: "Line",
+                                    icon: ChartIcons.spline
+                                },
+                                // state.chartType.startsWith("bar") ? {
+                                //     value: "bar",
+                                //     label: "Bars",
+                                //     icon: ChartIcons.bar
+                                // } : null,
+                                {
+                                    value: "column",
+                                    label: "Columns",
+                                    icon: ChartIcons.column
+                                }
+                            ].filter(Boolean)}
+                        />
+                        <br/>
+                    </div>}
+                    <br/>
+                    <br/>
+                </Collapse>
+            }
+
             <Collapse collapsed header="Colors">
                 <div className="pt-1 pb-2">
                     <label>
@@ -355,95 +609,6 @@ export default function ConfigPanel({
                     <p className="small color-muted">Select the hue of the first color. Any subsequent colors will be computed by shifting this hue with an ammount depending on the "variety" color setting.</p>
 
                 </div>
-            </Collapse>
-
-            <Collapse collapsed header="Data">
-                <div className="pt-1">
-                    <label>Visualize&nbsp;Column</label>
-                    <ColumnSelector
-                        cols={ dataRequest.data.cols }
-                        value={ state.groupBy }
-                        filter={col => {
-                            if (col.name === "cnt") return false
-                            if (SingleDimensionChartTypes.includes(state.chartType)) {
-                                return true
-                            }
-                            return col.name !== state.stratifyBy
-                        } }
-                        onChange={(groupBy: string) => onChange({ ...state, groupBy })}
-                    />
-                </div>
-                { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
-                    <div className="pt-1">
-                        <label>Stratifier</label>
-                        <Select
-                            right
-                            placeholder="Select Column"
-                            value={ state.stratifyBy }
-                            onChange={(stratifyBy: string) => onChange({
-                                ...state,
-                                stratifyBy,
-                                denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
-                            })}
-                            options={[
-                                { value: "", label: "NONE", icon: "fas fa-close color-red" },
-                                ...dataRequest.data.cols.map(col => ({
-                                    value   : col.name,
-                                    label   : col.label || col.name,
-                                    disabled: col.name === "cnt" || col.name === state.groupBy,
-                                    icon    : "/icons/column.png",
-                                    right   : <span className={ col.dataType + " color-muted small right" }> {col.dataType}</span>
-                                }))
-                            ]}
-                        />
-                    </div>
-                }
-                { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
-                    <div className="pt-1 pb-1">
-                        <label>Denominator</label>
-                        <Checkbox
-                            type="radio"
-                            checked={ state.denominator === "" }
-                            onChange={() => onChange({ ...state, denominator: "" })}
-                            name="denominator"
-                            label="None"
-                            description="Render the aggregate counts found in the data source without further processing"
-                            className="mb-1"
-                        />
-                        <Checkbox
-                            type="radio"
-                            disabled={ !state.stratifyBy }
-                            checked={ state.denominator === "local" }
-                            onChange={() => onChange({ ...state, denominator: "local" })}
-                            name="denominator"
-                            label="Stratified Count"
-                            description="Convert counts to percentage of the total count of every given data group. Not available with no stratifier."
-                            className="mb-1"
-                        />
-                        <Checkbox
-                            type="radio"
-                            // disabled={ !state.stratifyBy }
-                            checked={state.denominator === "global"}
-                            onChange={() => onChange({ ...state, denominator: "global" })}
-                            name="denominator"
-                            label="Total Count"
-                            description="Convert counts to percentage of the total count within the entire dataset"
-                            className="mb-1"
-                        />
-                        {/* <ColumnSelector
-                            cols={ dataRequest.data.cols }
-                            value={ state.groupBy }
-                            filter={col => {
-                                if (col.name === "cnt") return false
-                                if (SingleDimensionChartTypes.includes(state.chartType)) {
-                                    return true
-                                }
-                                return col.name !== state.stratifyBy
-                            } }
-                            onChange={(groupBy: string) => onChange({ ...state, groupBy })}
-                        /> */}
-                    </div>
-                }
             </Collapse>
 
             <br/>

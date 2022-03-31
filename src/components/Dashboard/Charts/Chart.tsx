@@ -92,7 +92,9 @@ export function getSeries({
     fullDataSet,
     type,
     colors = [],
-    denominator = ""
+    denominator = "",
+    column2,
+    column2type
 }: {
     column: app.DataRequestDataColumn
     dataSet: PowerSet
@@ -101,6 +103,8 @@ export function getSeries({
     type: SupportedNativeChartTypes 
     colors?: string[]
     denominator?: string
+    column2    ?: app.DataRequestDataColumn | null
+    column2type?: string
 }): SeriesOptions[]
 {
     let xType = getXType(column, groupBy);
@@ -240,6 +244,169 @@ export function getSeries({
         })        
     }
 
+    if (column2 && column2type) {
+        
+        // 1. Use the same X column ("column")
+        // let groups = Array.from(dataSet.getUniqueValuesFromColumn(column.name))
+
+        // 2. Stratify by "column2"
+        
+        let data: any[] = [];
+        
+        // if (xType === "category") {
+        //     // let set: any = {
+        //     //     type,
+        //     //     name: groupBy.dataType.startsWith("date") ? moment(groupName + "", "YYYY-MM-DD").format(getDateFormat(groupBy, true)) : groupName + "",
+        //     //     data: [],
+        //     //     colorIndex: i,
+        //     //     fillColor: type === "areaspline" ? {
+        //     //         linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+        //     //         stops: [
+        //     //             [0, new Color(colors[i]).setOpacity(0.2 ).get('rgba') + ""],
+        //     //             [1, new Color(colors[i]).setOpacity(0.05).get('rgba') + ""]
+        //     //         ]
+        //     //     }: undefined
+        //     // };
+
+        //     let categories = Array.from(dataSet.getUniqueValuesFromColumn(column.name))//.map(String)
+        //     let rows = dataSet.rows.sort((a, b) => categories.indexOf(a[column.name]) - categories.indexOf(b[column.name]));
+
+            
+        //     categories.sort().forEach(category => {
+
+        //         let set = {
+        //             type: column2type as SupportedNativeChartTypes,
+        //             name: column2.label || column2.name,
+        //             data: [] as any[]
+        //         };
+ 
+        //         let row = dataSet.rows.filter(r => {
+        //             return (
+        //                 r[column.name ] === category //&&
+        //                 // r[groupBy.name] === groupName
+        //             )
+        //         }).forEach(row => {
+        //             set.data.push(
+        //                 pointFromRow(row, column2)
+        //             );
+        //         })
+
+        //         data.push(set)
+        //     })
+
+        //     console.log(data)
+        // }
+        // else {
+
+            let groups = Array.from(dataSet.getUniqueValuesFromColumn(column.name));
+            
+            let _series: Record<string, any> = {};
+
+            groups.forEach(x => {
+                let data = fullDataSet.pick([column.name, column2.name]).where({
+                    [column.name]: x
+                });
+
+                data.rows.forEach((row, i) => {
+                    let groupName = row[column2.name];
+                    let group = _series[groupName + ""];
+                    if (!group) {
+                        group = _series[groupName + ""] = {
+                            type: column2type as SupportedNativeChartTypes,
+                            name: groupName,
+                            colorIndex: series.length + i,
+                            dashStyle: "ShortDash",
+                            lineWidth: 1,
+                            borderColor: "rgba(0, 0, 0, 0.8)",
+                            // opacity: 0.75,
+                            color: column2type === "spline" ? undefined : {
+                                pattern: {
+                                    path: {
+                                        d: 'M 0 0 L 0 6',
+                                        strokeWidth: 11
+                                    },
+                                    width : 6,
+                                    height: 6,
+                                    opacity: 0.6,
+                                    patternTransform: 'scale(0.49) rotate(45)'
+                                }
+                            },
+                            data: []
+                        };
+                    }
+
+                    let value = row.cnt;
+                    let denominatorValue = 0;
+
+                    
+                    if (denominator === "local") {
+                        denominatorValue = fullDataSet.countWhere({ [column.name]: row[column.name] });
+                        value = value/denominatorValue * 100
+                    }
+                    
+                    // Convert the count to % of the total count
+                    else if (denominator === "global") {
+                        denominatorValue = fullDataSet.countAll();
+                        value = value/denominatorValue * 100
+                    }
+
+                    let point: any = {
+                        // x: row[column.name],
+                        y: value,
+                        custom: {
+                            data: row,
+                            denominator: denominatorValue
+                        }
+                    };
+
+                    if (xType === "datetime") {
+                        // For datetime axes, point name is the formatted date
+                        point.name = moment(row[column.name] + "", "YYYY-MM-DD").format(dateFormat)
+
+                        // For datetime axes, the X value is the timestamp in milliseconds since 1970.
+                        point.x = +moment(row[column.name] + "", "YYYY-MM-DD")
+                    }
+            
+                    // For linear (numeric) axes, the X value is the numeric value or 0.
+                    if (xType === "linear") {
+                        point.x = +(row[column.name] || 0)
+                    }
+
+                    if (xType === "category") {
+                        point.name = x
+                    }
+
+                    group.data.push(point)
+                });
+
+                // console.log({[column.name]: x}, data); 
+
+                // @ts-ignore
+                // series.push(Object.values(_series));
+            });
+            series = series.concat(Object.values(_series));
+
+            // const rows = 
+            // // groupBy ? 
+            // //     dataSet.where({ [groupBy.name]: groupName }).rows :
+            // dataSet.rows;
+            // data = rows.map(row => pointFromRow(row, column2));
+            // series.push({
+            //     color: "rgba(0, 0, 0, 0.5)",
+            //     type: column2type as SupportedNativeChartTypes,
+            //     name: column2.label || column2.name,
+            //     data//: [1,2,3,6,5,8,3,4,5,6,9,2,3]
+            // });
+        // }
+
+        // series.push({
+        //     color: "rgba(0, 0, 0, 0.5)",
+        //     type: column2type as SupportedNativeChartTypes,
+        //     name: column2.label || column2.name,
+        //     data//: [1,2,3,6,5,8,3,4,5,6,9,2,3]
+        // });
+    }
+
     return series
 }
 
@@ -265,7 +432,9 @@ export function buildChartOptions({
     fullDataSet,
     colorOptions,
     denominator = "",
-    type
+    type,
+    column2,
+    column2type
 }: {
     options?: Highcharts.Options
     column: app.DataRequestDataColumn
@@ -275,6 +444,8 @@ export function buildChartOptions({
     type: SupportedNativeChartTypes
     colorOptions: app.ColorOptions
     denominator?: string
+    column2    ?: app.DataRequestDataColumn | null
+    column2type?: string
 }): Highcharts.Options
 {
     const COLORS: string[] = [];
@@ -283,9 +454,21 @@ export function buildChartOptions({
     }
 
     // console.log(colorOptions)
-    const series = getSeries({ dataSet, column, groupBy, type, fullDataSet, colors: COLORS, denominator })
+    const series = getSeries({
+        dataSet,
+        column,
+        groupBy,
+        type,
+        fullDataSet,
+        colors: COLORS,
+        denominator,
+        column2,
+        column2type
+    });
 
-    let xType = getXType(column, groupBy)
+    // console.log("series", series)
+
+    let xType = getXType(column, groupBy);
 
     
     
@@ -482,8 +665,9 @@ export function buildChartOptions({
                 borderColor: "rgba(1, 1, 1, 0.5)",
                 borderWidth: 0.25,
                 borderRadius: 0.5,
-                // pointPadding: 0.01,
-                // groupPadding: 0.2,
+                pointPadding: 0.01,
+                groupPadding: 0.2,
+                crisp: false,
                 
                 states: {
                     select: {
@@ -499,8 +683,9 @@ export function buildChartOptions({
                 borderColor: "rgba(0, 0, 0, 0.5)",
                 borderWidth: 0.25,
                 borderRadius: 0.5,
-                // pointPadding: 0.02,
-                // groupPadding: 0.1,
+                pointPadding: 0.01,
+                groupPadding: 0.2,
+                crisp: false,
                 states: {
                     select: {
                         borderWidth: 1,
@@ -531,6 +716,7 @@ export function buildChartOptions({
                 cursor: "default",
                 connectNulls: false,
                 getExtremesFromAll: true,
+                dashStyle: "Solid",
                 ...options.plotOptions?.areaspline
             },
             area: {
@@ -556,6 +742,7 @@ export function buildChartOptions({
                 },
                 connectNulls: false,
                 getExtremesFromAll: true,
+                dashStyle: "Solid",
                 ...options.plotOptions?.area,
                 // @ts-ignore
                 depth: Math.min(options.plotOptions?.areaspline?.depth || 10,  100/(series.length || 1)),
@@ -580,7 +767,8 @@ export function buildChartOptions({
                         shadow: true, // show them even on datetime charts
                     }
                 },
-                connectNulls: false
+                connectNulls: false,
+                dashStyle: "Solid",
             }
         },
         tooltip: {
@@ -631,7 +819,7 @@ export function buildChartOptions({
                         otherRows.forEach(key => {
                             rows.push(`<tr style="color:#666"><td style="text-align:right">${
                                 dataSet.getLabelForColumnName(key)
-                            }:</td><td>${format(data[key], dataSet.getColumnByName(key)!.dataType, {
+                            }:</td><td>${format(data[key], fullDataSet.getColumnByName(key)!.dataType, {
                                 html: true,
                                 maxLength: 70,
                                 skipNull: true
@@ -712,6 +900,8 @@ interface ChartProps {
     type    : SupportedNativeChartTypes
     colorOptions: app.ColorOptions
     denominator?: string
+    column2    ?: app.DataRequestDataColumn | null
+    column2type?: string
 }
 export default class Chart extends React.Component<ChartProps>
 {
@@ -723,15 +913,61 @@ export default class Chart extends React.Component<ChartProps>
     }
 
     updateChart() {
-        const { options = {}, column, groupBy, dataSet, type, fullDataSet, colorOptions, denominator } = this.props;
-        this.chart.update(buildChartOptions({ options, column, groupBy, dataSet, type, fullDataSet, colorOptions, denominator }), true, true, false)
+        const {
+            options = {},
+            column,
+            groupBy,
+            dataSet,
+            type,
+            fullDataSet,
+            colorOptions,
+            denominator,
+            column2,
+            column2type
+        } = this.props;
+
+        this.chart.update(buildChartOptions({
+            options,
+            column,
+            groupBy,
+            dataSet,
+            type,
+            fullDataSet,
+            colorOptions,
+            denominator,
+            column2,
+            column2type
+        }), true, true, false)
         // console.log(this.props.chartOptions)
     }
 
     componentDidMount()
     {
-        const { options = {}, column, groupBy, dataSet, type, fullDataSet, colorOptions, denominator } = this.props;
-        this.chart = Highcharts.chart("chart", buildChartOptions({ options, column, groupBy, dataSet, type, fullDataSet, colorOptions, denominator }));
+        const {
+            options = {},
+            column,
+            groupBy,
+            dataSet,
+            type,
+            fullDataSet,
+            colorOptions,
+            denominator,
+            column2,
+            column2type
+        } = this.props;
+
+        this.chart = Highcharts.chart("chart", buildChartOptions({
+            options,
+            column,
+            groupBy,
+            dataSet,
+            type,
+            fullDataSet,
+            colorOptions,
+            denominator,
+            column2,
+            column2type
+        }));
         // console.log(this.props.chartOptions)
     }
 

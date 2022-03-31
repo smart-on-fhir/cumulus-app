@@ -23,6 +23,28 @@ export default function PieChart({
     denominator?: string
 })
 {
+    const mergedOptions = merge({
+        chart: {
+            type: "pie",
+            options3d: {
+                enabled: !!use3d,
+                alpha: 45,
+                beta: 0,
+                depth: 350
+            }
+        },
+        plotOptions: {
+            pie: {
+                innerSize: donut ? "50%" : 0,
+                slicedOffset: use3d ? 30 : 10
+            }
+        }
+    }, options);
+
+    if (!donut) {
+        mergedOptions.plotOptions.pie.innerSize = 0
+    }
+
     return <Chart
         column={column}
         dataSet={dataSet}
@@ -31,22 +53,6 @@ export default function PieChart({
         key={column.name}
         colorOptions={colorOptions}
         denominator={denominator}
-        options={merge({
-            chart: {
-                type: "pie",
-                options3d: {
-                    enabled: !!use3d,
-                    alpha: 45,
-                    beta: 0,
-                    depth: 350
-                }
-            },
-            plotOptions: {
-                pie: {
-                    innerSize: donut ? "50%" : 0,
-                    slicedOffset: use3d ? 30 : 10
-                }
-            }
-        }, options)}
+        options={mergedOptions}
     />
 }
