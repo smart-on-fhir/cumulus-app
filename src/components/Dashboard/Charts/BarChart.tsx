@@ -14,7 +14,8 @@ export default function BarChart({
     colorOptions,
     denominator,
     column2,
-    column2type
+    column2type,
+    column2opacity = 1
 }: {
     column: app.DataRequestDataColumn
     groupBy?: app.DataRequestDataColumn | null
@@ -27,6 +28,7 @@ export default function BarChart({
     denominator?: string
     column2    ?: app.DataRequestDataColumn | null
     column2type?: string
+    column2opacity?: number
 })
 {   
     return <Chart
@@ -40,6 +42,7 @@ export default function BarChart({
         denominator={denominator}
         column2={column2}
         column2type={column2type}
+        column2opacity={column2opacity}
         options={merge({
             chart: {
                 options3d: {
