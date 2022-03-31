@@ -142,7 +142,7 @@ module.exports = class DataRequest extends Model
      */
     static associate(sequelize) {
         sequelize.models.DataRequest.belongsTo(sequelize.models.RequestGroup, { as: "group", onDelete: "SET NULL" })
-        sequelize.models.DataRequest.hasMany(sequelize.models.View)
+        sequelize.models.DataRequest.hasMany(sequelize.models.View, { onDelete: "CASCADE" })
     }
 };
 
