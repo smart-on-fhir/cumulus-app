@@ -9,15 +9,19 @@ export default function SPLineChart({
     fullDataSet,
     options = {},
     colorOptions,
-    denominator
+    denominator,
+    column2,
+    column2type
 }: {
     column: app.DataRequestDataColumn
     dataSet: PowerSet
     fullDataSet: PowerSet
     groupBy?: app.DataRequestDataColumn | null
     options?: Partial<Highcharts.Options>
-    colorOptions: app.ColorOptions,
+    colorOptions: app.ColorOptions
     denominator?: string
+    column2    ?: app.DataRequestDataColumn | null
+    column2type?: string
 })
 {
     return <Chart
@@ -30,5 +34,7 @@ export default function SPLineChart({
         type="spline"
         colorOptions={colorOptions}
         denominator={denominator}
+        column2={column2}
+        column2type={column2type}
     />
 }

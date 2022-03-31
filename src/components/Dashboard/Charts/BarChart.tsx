@@ -12,7 +12,9 @@ export default function BarChart({
     stack,
     options,
     colorOptions,
-    denominator
+    denominator,
+    column2,
+    column2type
 }: {
     column: app.DataRequestDataColumn
     groupBy?: app.DataRequestDataColumn | null
@@ -23,6 +25,8 @@ export default function BarChart({
     options?: Partial<Highcharts.Options>
     colorOptions: app.ColorOptions
     denominator?: string
+    column2    ?: app.DataRequestDataColumn | null
+    column2type?: string
 })
 {   
     return <Chart
@@ -34,6 +38,8 @@ export default function BarChart({
         key={ [column.name, groupBy?.name || ""].join("-") }
         colorOptions={colorOptions}
         denominator={denominator}
+        column2={column2}
+        column2type={column2type}
         options={merge({
             chart: {
                 options3d: {

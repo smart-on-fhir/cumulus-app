@@ -119,7 +119,7 @@ export default function Select({
                             selectedOption.right && <span className="right">{ selectedOption.right }</span>
                         }
                     </>:
-                    <div className="select-component-placeholder">{ placeholder }</div>
+                    <div className="select-component-placeholder">{ placeholder || <>&nbsp;</> }</div>
             }</div>
             <div className={ classList({ "select-component-menu": true, open: menuOpen })}>
             { options.length ? options.map((option, i) => {

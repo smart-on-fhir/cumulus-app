@@ -243,7 +243,17 @@ export default class PowerSet
      * 
      * `
      */
-    public getChartData({ column, groupBy = "", filters = [] }: { column: string, groupBy?: string, filters?: app.Filter[] }): PowerSet {
+    public getChartData({
+        column,
+        groupBy = "",
+        filters = [],
+        column2
+    }: {
+        column: string,
+        groupBy?: string,
+        filters?: app.Filter[]
+        column2?: string
+    }): PowerSet {
         // console.log("CALL PowerSet.getChartData")
 
         // console.time("PowerSet.getChartData")
@@ -252,6 +262,10 @@ export default class PowerSet
         
         if (groupBy) {
             preservedColumns.push(groupBy)
+        }
+
+        if (column2) {
+            preservedColumns.push(column2)
         }
         
         const cols = preservedColumns.map(name => this.getColumnByName(name)).filter(Boolean) as app.DataRequestDataColumn[];
