@@ -46,9 +46,12 @@ export default function ViewsBrowser({
                 </div>
                 <div className="view-thumbnail-title color-blue">Create New View</div>
             </Link> }
-            {(result || []).map((v, i) => (
-                <ViewThumbnail key={i} view={ v } />
-            ))}
+            { (!result || !result.length) ?
+                <p className="color-muted pt-2 pb-2">No Views found!</p> :
+                (result || []).map((v, i) => (
+                    <ViewThumbnail key={i} view={ v } />
+                ))
+            }
         </div>
     )
 }

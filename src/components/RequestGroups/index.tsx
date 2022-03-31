@@ -91,7 +91,6 @@ export default class RequestGroupList extends Component<any, State>
                                 <td className="small">{row.createdAt}</td>
                                 <td className="small">{row.updatedAt}</td>
                                 <td className="right">
-                                    { row.id !== 1 ? <>
                                     <Link title="Edit" className="btn small color-brand-2" to={ row.id + "/edit" }>
                                         <i className="fa-solid fa-pen-to-square" />
                                     </Link>
@@ -99,7 +98,6 @@ export default class RequestGroupList extends Component<any, State>
                                     <button title="Delete" className="btn small color-red" onClick={() => this.deleteGroup(row.id)}>
                                         <i className="fa-solid fa-trash-can" />
                                     </button>
-                                    </> : <div style={{ lineHeight: "1.78em" }}>&nbsp;</div> }
                                 </td>
                             </tr>
                         ))}
