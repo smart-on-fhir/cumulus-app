@@ -222,14 +222,16 @@ export function getSeries({
                 rows = rows.sort((a, b) => categories.indexOf(a[column.name]) - categories.indexOf(b[column.name]));
 
                 categories.sort().forEach(category => {
-                    let row = dataSet.rows.filter(r => {
-                        return (
-                            r[column.name ] === category &&
-                            r[groupBy.name] === groupName
-                        )
-                    }).map(row => pointFromRow(row, column))[0];
+                    let row = rows.find(r => (
+                        r[column.name ] === category &&
+                        r[groupBy.name] === groupName
+                    ));
 
-                    set.data.push(row || { y: null, name: category })
+                    if (row) {
+                        set.data.push(pointFromRow(row, column))
+                    } else {
+                        set.data.push({ y: null, name: category })
+                    }
                 })
             }
 
@@ -255,10 +257,9 @@ export function getSeries({
         
         let _series: Record<string, any> = {};
 
+        let sub = fullDataSet.pick([column.name, column2.name]);
         groups.forEach(x => {
-            let data = fullDataSet.pick([column.name, column2.name]).where({
-                [column.name]: x
-            });
+            let data = sub.where({ [column.name]: x });
 
             data.rows.forEach((row, i) => {
                 let groupName = row[column2.name];
@@ -272,7 +273,6 @@ export function getSeries({
                         lineWidth: 1,
                         opacity: column2opacity,
                         borderColor: "rgba(0, 0, 0, 0.8)",
-                        // opacity: 0.75,
                         color: column2type === "spline" ? undefined : {
                             pattern: {
                                 path: {

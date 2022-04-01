@@ -55,7 +55,7 @@ export default function DataRequestView(): JSX.Element
     const { user } = useAuth();
 
     const { loading, error, result: model, execute: fetch } = useBackend<app.DataRequest>(
-        useCallback(() => request("/api/requests/" + id + "?include=group:name"), [id]),
+        useCallback(() => request("/api/requests/" + id + "?include=group:name&omit=rows"), [id]),
         true
     )
 

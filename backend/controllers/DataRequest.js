@@ -6,6 +6,7 @@ const slug            = require("slug");
 const { HttpError }   = require("httperrors");
 const Model           = require("../db/models/DataRequest");
 const GroupModel      = require("../db/models/RequestGroup")
+const ViewModel       = require("../db/models/View")
 const { requireAuth } = require("./Auth");
 const createRestRoutes = require("./BaseController") 
 const {
@@ -23,11 +24,23 @@ const router = module.exports = express.Router({ mergeParams: true });
 
 // Views -----------------------------------------------------------------------
 router.get("/:id/views", rw(async (req, res) => {
-    const model = await Model.findByPk(req.params.id, getFindOptions(req))
-    assert(model, HttpError.NotFound("Model not found"))
-    // @ts-ignore
-    const views = await model.getViews()
-    res.json(views)
+    // const options = getFindOptions(req);
+    // Object.assign(options, { attributes: { include: "id" }})
+    // const model = await Model.findByPk(req.params.id, options)
+    // assert(model, HttpError.NotFound("Model not found"))
+    // // @ts-ignore
+    // const views = await model.getViews()
+    // res.json(views)
+
+
+    const views = await ViewModel.findAll({
+        where: {
+            DataRequestId: +req.params.id
+        },
+        order: [["id", "ASC"]]
+    });
+    res.json(views);
+
 }));
 
 // Export Data endpoint --------------------------------------------------------
@@ -54,7 +67,7 @@ router.get("/by-group", rw(async (req, res) => {
     
     const groupLimit   = uInt(req.query.groupLimit); // >= 2!
     const requestLimit = uInt(req.query.requestLimit);
-    
+
     const test = await GroupModel.findAll({
         attributes: ["id", "name", "description", "createdAt"],
         include: {
@@ -79,7 +92,18 @@ router.get("/by-group", rw(async (req, res) => {
     }));
 }));
 
-createRestRoutes(router, Model);
+// Get Data endpoint --------------------------------------------------------
+router.get("/:id", rw(async (req, res) => {
+    const model = await Model.findByPk(req.params.id, getFindOptions(req))
+    assert(model, HttpError.NotFound("Model not found"))
+    const json = model.toJSON();
+    if (!req.query.includeData) {
+        delete json.data.rows
+    }
+    res.json(json)
+}));
+
+createRestRoutes(router, Model, { getOne: false });
 
 /**
  * @param {{ cols: { name: string }[], rows: any[][] }} data 

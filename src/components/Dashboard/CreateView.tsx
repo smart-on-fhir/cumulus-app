@@ -13,7 +13,7 @@ export default function CreateView()
     const { id } = useParams();
 
     const { loading, error, result } = useBackend(
-        useCallback(() => request("/api/requests/" + id), [id]),
+        useCallback(() => request("/api/requests/" + id + "?includeData=1"), [id]),
         true
     );
 

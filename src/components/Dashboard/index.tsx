@@ -284,7 +284,7 @@ export default function Dashboard({
 
     let { chartPowerSet } = useMemo(function() {
 
-        let powerSet = PowerSet.from(dataRequest.data);
+        // let powerSet = PowerSet.from(dataRequest.data);
 
         function createFilter(filter: app.Filter): false | ((row: any, index?: number) => boolean)
         {

@@ -18,11 +18,7 @@ export default function ViewsBrowser({
 
     const { result, loading, error } = useBackend(
         useCallback(
-            () => request<app.View[]>(
-                requestId ?
-                `/api/requests/${requestId}/views?order=id:asc` :
-                "/api/views?order=id:asc"
-            ),
+            () => request<app.View[]>(requestId ? `/api/requests/${requestId}/views` : "/api/views"),
             [requestId]
         ),
         true
