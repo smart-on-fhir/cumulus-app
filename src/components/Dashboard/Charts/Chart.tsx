@@ -480,6 +480,17 @@ export function buildChartOptions({
             },
             text: "SMART®"
         },
+        caption: {
+            text: "<b>Denominator</b>: " + (
+                denominator === "local" ?
+                    `the total count of every listed data group (total count = ${fullDataSet.countAll().toLocaleString()})` :
+                    denominator === "global" ?
+                        `total count (${fullDataSet.countAll().toLocaleString()})` :
+                        `none (showing raw aggregate counts; total count = ${fullDataSet.countAll().toLocaleString()})`
+            ),
+            floating: true,
+            y: 30
+        },
         title: {
             text: "",//series.length ? getChartTitleText(column, groupBy) : "",
             style: {
