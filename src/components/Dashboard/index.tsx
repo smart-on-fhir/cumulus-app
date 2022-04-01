@@ -265,6 +265,11 @@ export default function Dashboard({
         }
     })
 
+    const { execute: takeScreenshot, loading: takingScreenshot } = useBackend(async () => {
+        const screenShot = await getScreenShot();
+        await updateOne("views", view.id!, { screenShot }).catch(e  => alert(e.message));
+    });
+
     const { execute: destroy, loading: deleting } = useBackend(() => {
         if (window.confirm("Yre you sure you want to delete this view?")) {
             return deleteOne("views", view.id + "").then(() => navigate("/"))
@@ -439,6 +444,14 @@ export default function Dashboard({
                                             onClick={ destroy }
                                             title="Delete this View">
                                             <i className={ deleting ? "fas fa-circle-notch fa-spin" : "fas fa-trash-alt" } /> Delete
+                                        </button>
+                                    )}
+                                    { showOptions && isAdmin && view.id && (
+                                        <button
+                                            className="btn color-blue"
+                                            onClick={ takeScreenshot }
+                                            title="Update Screenshot">
+                                            <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
                                         </button>
                                     )}
                                     <button
