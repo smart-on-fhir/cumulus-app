@@ -14,7 +14,7 @@ export default function EditView()
     const { loading, error, result } = useBackend(
         useCallback(() => {
             return request("/api/views/" + id).then(view => {
-                return request("/api/requests/" + view.DataRequestId).then(request => ({
+                return request("/api/requests/" + view.DataRequestId + "?includeData=1").then(request => ({
                     request,
                     view
                 }));
