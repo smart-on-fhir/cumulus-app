@@ -1,5 +1,5 @@
-import { Component, createRef, MouseEvent } from "react"
-import { classList, format } from "../../utils";
+import { Component, createRef, MouseEvent, useMemo } from "react"
+import { defer, format } from "../../utils";
 import "./DataGrid.scss"
 
 
@@ -87,15 +87,17 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
         }, { once: true });
     }
 
-
     onWheel(e: WheelEvent)
     {
+        
+
         // Exit if this seems to be a horizontal scroll
         if (Math.abs(e.deltaX) >= Math.abs(e.deltaY)) {
             return true
         }
         
         const currentOffset = this.state.offset;
+
 
         // Exit if we have already scrolled to the top
         if (e.deltaY < 0 && currentOffset === 0) {
@@ -109,18 +111,18 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
 
         // Do not scroll the page if we got to here
         e.preventDefault()
-        
-        if (e.deltaY > 1) {
+
+        if (e.deltaY > 0) {
             this.setState({
                 offset: Math.min(
-                    this.state.offset + Math.ceil(e.deltaY/50),
+                    this.state.offset + Math.ceil(e.deltaY/1200),
                     this.props.rows.length - (this.props.limit || 0)
                 )
             })
-        } else {
+        } else if (e.deltaY < 0) {
             this.setState({
                 offset: Math.max(
-                    this.state.offset + Math.floor(e.deltaY/50),
+                    this.state.offset + Math.floor(e.deltaY/1200),
                     0
                 )
             })
@@ -154,12 +156,15 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
     componentDidMount()
     {
         if (this.gridWrapper.current) {
-            this.gridWrapper.current.addEventListener("wheel", this.onWheel, { passive: false });
+            this.gridWrapper.current.addEventListener("wheel", this.onWheel, { passive: false, capture: true });
             this.gridWrapper.current.addEventListener("touchstart", this.onTouchStart);
 
-            this.gridWrapper.current.querySelectorAll("th").forEach(th => {
-                th.style.minWidth = th.offsetWidth + 5 + "px"
-                th.style.maxWidth = th.offsetWidth + 5 + "px"
+            defer(() => {
+                if (this.gridWrapper.current) {
+                    this.gridWrapper.current.querySelectorAll("th").forEach(th => {
+                        th.style.minWidth = th.style.maxWidth = th.offsetWidth + 5 + "px"
+                    })
+                }
             })
         }
     }
@@ -184,13 +189,13 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
                 out = cols.map(c => row[c.name])
             }
     
-            Object.defineProperty(out, "__row_id__", {
-                configurable: false,
-                writable    : false,
-                enumerable  : false,
-                // @ts-ignore
-                value       : row.__row_id__
-            })
+            // Object.defineProperty(out, "__row_id__", {
+            //     configurable: false,
+            //     writable    : false,
+            //     enumerable  : false,
+            //     // @ts-ignore
+            //     value       : row.__row_id__
+            // })
     
             return out as any[][]
         });
@@ -219,13 +224,13 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
     {
         const { cols, rows, colClassName = () => undefined } = this.props;
 
-        const { sortBy, sortDir, limit, selection: { rowIndex } } = this.state;
+        const { sortBy, sortDir, limit } = this.state;
         
-        let _rows = this.sort()
+        // let _rows = this.sort()
         
-        let offset = Math.max(Math.min(this.state.offset, _rows.length - limit), 0)
+        // let offset = Math.max(Math.min(this.state.offset, _rows.length - limit), 0)
         
-        _rows = _rows.slice(offset, limit ? offset + limit : undefined);
+        // _rows = _rows.slice(offset, limit ? offset + limit : undefined);
 
         return (
             <div className="data-grid-wrap">
@@ -263,7 +268,16 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
                                 )) }
                             </tr>
                         </thead>
-                        <tbody onClick={this.onClick}>
+                        <GridBody
+                            limit={limit}
+                            offset={this.state.offset}
+                            onClick={() => {}}
+                            rows={rows}
+                            cols={cols}
+                            sortBy={sortBy}
+                            sortDir={sortDir}
+                        />
+                        {/* <tbody onClick={this.onClick}>
                             { _rows.map((row, y) => (
                                 // @ts-ignore
                                 <tr
@@ -288,19 +302,100 @@ export default class DataGrid extends Component<DataGridProps, DataGridState>
                                     }
                                 </tr>
                             ))}
-                        </tbody>
+                        </tbody> */}
                     </table>
                 </div>
                 <Scrollbar
                     total={ rows.length }
-                    offset={ offset }
+                    offset={ this.state.offset }
                     limit={ limit }
                     onChange={ offset => this.setState({ offset }) }
                 />
             </div>
         )
     }
-} 
+}
+
+function GridBody({
+    onClick,
+    sortBy,
+    sortDir,
+    offset,
+    limit,
+    rows,
+    cols
+}: {
+    onClick: () => void
+    sortBy : string | null
+    sortDir: "asc" | "desc"
+    limit  : number
+    offset : number
+    rows   : any[][] | Record<string, any>[]
+    cols   : Column[]
+})
+{
+    rows = rows.map((row, i) => {
+        let out = row
+
+        if (!Array.isArray(row)) {
+            out = cols.map(c => row[c.name])
+        }
+
+        return out as any[][]
+    });
+    // let _rows = this.sort()
+    
+    // let _offset = Math.max(Math.min(offset, rows.length - limit), 0)
+
+    const sorted = useMemo(() => {
+        const out = rows;
+    
+        if (!sortBy) {
+            return out
+        }
+    
+        const index = cols.findIndex(col => col.name === sortBy)
+        const type  = cols.find(col => col.name === sortBy)?.dataType
+    
+        return out.sort(
+            (a: any, b: any) => {
+                
+                if (type === "integer" || type === "float")
+                    return (
+                        b[index] === null ? -1 : a[index] === null ? 1 :
+                        b[index] - a[index]
+                    ) * (sortDir === "asc" ? -1 : 1)
+                return String(b[index] || "").localeCompare(String(a[index] || "")) * (sortDir === "asc" ? 1 : -1)
+            }
+        )
+    }, [sortBy, sortDir, cols, rows]);
+    
+    rows = useMemo(() => {
+        let _offset = Math.max(Math.min(offset, rows.length - limit), 0)
+        return sorted.slice(_offset, limit ? _offset + limit : undefined)
+
+    }, [offset, limit, sorted, rows.length]);
+
+    return (
+        <tbody onClick={ onClick }>
+            { rows.map((row, y) => (
+                <tr key={y}>
+                    {
+                        row.map((value: any, i: number) => {
+                            return <td key={i} dangerouslySetInnerHTML={{
+                                __html: format(value, cols[i].dataType, {
+                                    html     : true,
+                                    skipNull : true,
+                                    maxLength: 100
+                                })
+                            }} />
+                        })
+                    }
+                </tr>
+            ))}
+        </tbody>
+    )
+}
 
 function Scrollbar({
     total,
