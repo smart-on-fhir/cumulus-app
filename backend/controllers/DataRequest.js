@@ -97,7 +97,7 @@ router.get("/:id", rw(async (req, res) => {
     const model = await Model.findByPk(req.params.id, getFindOptions(req))
     assert(model, HttpError.NotFound("Model not found"))
     const json = model.toJSON();
-    if (!req.query.includeData) {
+    if (!req.query.includeData && json.data) {
         delete json.data.rows
     }
     res.json(json)
