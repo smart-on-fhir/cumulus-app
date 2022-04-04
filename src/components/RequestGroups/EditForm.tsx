@@ -58,9 +58,9 @@ export default function RequestGroupEditForm()
         e.preventDefault()
 
         if (record) {
-            if (record.id === 1) {
-                return alert("The default group cannot be edited!")
-            }
+            // if (record.id === 1) {
+            //     return alert("The default group cannot be edited!")
+            // }
 
             const formData    = new FormData(e.currentTarget);
             const name        = formData.get("requestGroupName") as string;
