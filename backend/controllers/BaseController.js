@@ -40,7 +40,7 @@ module.exports = function createRestRoutes(router, modelConstructor, {
 
     // Create ------------------------------------------------------------------
     if (create) {
-        router.post("/", requireAuth("admin"), express.json({ limit: "50MB" }), rw(async (req, res) => {
+        router.post("/", requireAuth("admin"), express.json({ limit: "60MB" }), rw(async (req, res) => {
             const model = await modelConstructor.create(req.body, { user: req.user });
             res.json(model)
         }));
@@ -48,7 +48,7 @@ module.exports = function createRestRoutes(router, modelConstructor, {
 
     // Update ------------------------------------------------------------------
     if (update) {
-        router.put("/:id", requireAuth("admin"), express.json({ limit: "50MB" }), rw(async (req, res) => {
+        router.put("/:id", requireAuth("admin"), express.json({ limit: "60MB" }), rw(async (req, res) => {
             const model = await modelConstructor.findByPk(req.params.id);
             assert(model, HttpError.NotFound("Model not found"))
             await model.update(req.body, { user: req.user });
