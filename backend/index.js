@@ -195,18 +195,20 @@ function setUpErrorHandlers(app, { verbose })
         
         // HTTP Errors
         if (error.http) {
-            return res.status(error.status).end(msg);
+            res.status(error.status).send(msg);
         }
 
         // Sequelize Validation Errors
-        if (error.name === "SequelizeValidationError") {
-            return res.status(400).send(error.errors.map(e => (
+        else if (error.name === "SequelizeValidationError") {
+            res.status(400).send(error.errors.map(e => (
                 `${e.type || "Error"} while validating ${e.path || "data"}: ${e.message}`
             )).join("\n"));
         }
 
         // Other Errors
-        res.status(500).end(msg);
+        else {
+            res.status(500).send(msg);
+        }
     });
 
     verbose && console.log("✔ Error handlers activated");
