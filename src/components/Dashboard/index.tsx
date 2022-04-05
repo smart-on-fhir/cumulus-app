@@ -318,6 +318,8 @@ export default function Dashboard({
             return true;
         });
 
+        let chartPowerSet: PowerSet;
+
         if (usableFilters.length) {
             // @ts-ignore
             const filter = usableFilters.reduce((prev: (row: any) => boolean, cur: app.Filter) => {
@@ -330,15 +332,22 @@ export default function Dashboard({
                     (row: any) => prev(row) || next(row) ;
             }, createFilter(usableFilters[0])) as (row: any, index?: number) => boolean;
 
-            powerSet = powerSet.filter(filter)
+            // powerSet = powerSet.filter(filter)
+            chartPowerSet = powerSet.filter(filter).getChartData({
+                column : viewColumn,
+                groupBy,
+                filters: usableFilters,
+                column2
+            });
         }
-
-        const chartPowerSet = powerSet.getChartData({
-            column : viewColumn,
-            groupBy,
-            filters: usableFilters,
-            column2
-        });
+        else {
+            chartPowerSet = powerSet.getChartData({
+                column : viewColumn,
+                groupBy,
+                filters: usableFilters,
+                column2
+            });
+        }
         
         return { powerSet, chartPowerSet }
         // eslint-disable-next-line react-hooks/exhaustive-deps
