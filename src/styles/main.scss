@@ -216,6 +216,10 @@ ul {
         color     : #999;
         margin-top: 0.1em;
 
+        &.fa-location-dot {
+          font-size : $font-size * 1.7;
+        }
+
         .fa-check-circle {
             position : relative;
             z-index  : 2;

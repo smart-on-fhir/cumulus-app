@@ -12,7 +12,7 @@ interface State {
     error  : Error | null
 }
 
-export default class DataSiteList extends Component<any, State>
+export default class DataSiteListPage extends Component<any, State>
 {
     constructor(props: any) {
         super(props);
