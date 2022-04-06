@@ -368,7 +368,8 @@ function GridBody({
                 return String(b[index] || "").localeCompare(String(a[index] || "")) * (sortDir === "asc" ? 1 : -1)
             }
         )
-    }, [sortBy, sortDir, cols, rows]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sortBy, sortDir]);
     
     rows = useMemo(() => {
         let _offset = Math.max(Math.min(offset, rows.length - limit), 0)
@@ -410,16 +411,31 @@ function Scrollbar({
 })
 {
 
-    function onBtnDown(e: MouseEvent<HTMLDivElement>)
+    function onMouseDown(e: MouseEvent<HTMLDivElement>)
     {
+        // No selectionStart
         e.preventDefault();
+                
+        // No jump-to by clicking on the scroll bar in case this event
+        // was fired on the scrollbar button
+        e.stopPropagation();
 
-        const rect    = e.currentTarget.parentElement?.getBoundingClientRect() as DOMRect
-        const btnRect = e.currentTarget.getBoundingClientRect();
-        const diffY   = e.clientY - btnRect.y
+        // @ts-ignore
+        const isBtn   = e.target.classList.contains("scrollbar-btn");
+        // @ts-ignore
+        const bar     = isBtn ? e.target.parentElement! : e.target;
+        // @ts-ignore
+        const btn     = isBtn ? e.target : e.target.firstElementChild;
+        // @ts-ignore
+        const barRect = bar.getBoundingClientRect();
+        // @ts-ignore
+        const btnRect = btn.getBoundingClientRect();
+        // @ts-ignore
+        const diffY   = isBtn ? e.clientY - btnRect.y : btnRect.height / 2;
 
         function onMouseMove(ev: any) {
-            const q = Math.min(Math.max(((ev.clientY - diffY - rect.top) / rect.height), 0), 1)
+            const layerY = ev.clientY - barRect.top - diffY
+            const q = Math.min(Math.max(layerY / (barRect.height), 0), 1)
             const newOffset = Math.min(Math.floor(total * q), total - limit)
             onChange(newOffset)
         }
@@ -429,7 +445,13 @@ function Scrollbar({
         window.addEventListener("mouseup", () => {
             window.removeEventListener("mousemove", onMouseMove)
         }, { once: true })
+
+        if (!isBtn) {
+            onMouseMove(e)
+        }
     }
+
+    
 
     const pageSize = Math.min(total - offset, limit)
     
@@ -437,14 +459,14 @@ function Scrollbar({
     let btnStart = offset + limit > total ? 0 : (offset / (total || 1) * 100);
     
     return (
-        <div className="scrollbar">
+        <div className="scrollbar" onMouseDown={onMouseDown}>
             <div className="scrollbar-btn" style={
                 {
-                    top    : Math.min(btnStart, 90) + "%",
-                    height : Math.max(btnSize, 10) + "%",
+                    top    : Math.min(btnStart, 98) + "%",
+                    height : Math.max(btnSize, 2) + "%",
                     display: btnSize >= 100 ? "none" : "block"
                 }
-            } onMouseDown={onBtnDown} />
+            } />
         </div>
     )
 }
