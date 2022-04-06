@@ -3,9 +3,10 @@ import { HelmetProvider, Helmet } from "react-helmet-async"
 import { useAuth }                from "../../auth";
 import DataRequestsList           from "../DataRequests/DataRequestsList"
 import ViewsBrowser               from "../Views/ViewsBrowser"
-import map                        from "./map.png"
+// import map                        from "./map.png"
 import ActivityPanel              from "../Activity/Panel";
 import Panel                      from "../Panel";
+import DataSiteList               from "../DataSites/List";
 
 
 
@@ -38,7 +39,8 @@ export default function Home() {
                     <Panel title="Data Sites" menu={[
                         <Link to="/sites">Manage Data Sites</Link>
                     ]}>
-                        <img src={ map } alt="Sites Map" className="grey-out" />
+                        <DataSiteList />
+                        {/* <img src={ map } alt="Sites Map" className="grey-out" /> */}
                     </Panel>
                     <br/>
                     <ActivityPanel limit={10} />

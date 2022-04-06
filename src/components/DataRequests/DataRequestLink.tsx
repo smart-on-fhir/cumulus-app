@@ -43,7 +43,7 @@ export default function DataRequestLink({
     return (
         <Link to={ href.replace(":id", request.id + "") } className="icon-item" title={ request.description }>
             <Icon type={iconType} />
-            { request.name }&nbsp;
+            <b>{ request.name }</b>&nbsp;
             {info}
         </Link>
     )
