@@ -37,7 +37,7 @@ export default class DataSiteList extends Component<any, State>
                 { !loading && !error && records.length > 0 && records.map((row, i) => (
                     <div key={row.id} style={{ margin: "0 0.5em" }}>
                         <Link to={`/sites/${row.id}/edit`} className="icon-item">
-                            <i className="fa-solid fa-location-dot icon"/>
+                            <i className="fa-solid fa-location-dot icon color-blue"/>
                             <b>{row.name}</b>
                             <div className="color-muted small">{row.description}</div>
                         </Link>

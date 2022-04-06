@@ -216,6 +216,18 @@ ul {
         color     : #999;
         margin-top: 0.1em;
 
+        &.color-green {
+          color: $color-green;
+        }
+        
+        &.color-orange {
+          color: $color-orange;
+        }
+
+        &.color-blue {
+          color: $color-blue;
+        }
+
         &.fa-location-dot {
           font-size : $font-size * 1.7;
         }
