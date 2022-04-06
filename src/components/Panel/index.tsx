@@ -6,10 +6,12 @@ export default function Panel({
     title,
     menu,
     loading,
-    children
+    children,
+    icon
 }: {
     title: string
     menu?: (JSX.Element|"separator"|null)[]
+    icon?: JSX.Element | null
     loading?: boolean
     children?: JSX.Element | string | (JSX.Element | string)[]
 })
@@ -18,7 +20,7 @@ export default function Panel({
         <>
             <div className="row gap baseline">
                 <div className="col">
-                    <h4>{ title }</h4>
+                    <h4>{ icon } { title }</h4>
                 </div>
                 { menu && <div className="col col-0">
                     <MenuButton right items={menu}>

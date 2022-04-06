@@ -19,26 +19,34 @@ export default function Home() {
                     <title>Cumulus</title>
                 </Helmet>
             </HelmetProvider>
-            <h4>Browse Views</h4>
+            <h4><i className="fa-solid fa-grip" style={{ color: "#999" }} /> Browse Views</h4>
             <hr/>
             <ViewsBrowser />
             <br/>
             <br/>
             <div className="row gap">
                 <div className="col col-6">
-                    <Panel title="Data Subscriptions & Requests" menu={[
-                        <Link to="/requests">View All Data Requests</Link>,
-                        (user?.role === "admin" ? "separator" : null),
-                        (user?.role === "admin" ? <Link to="/requests/new">Create New Data Request</Link> : null),
-                        (user?.role === "admin" ? <Link to="/groups">Manage Request Groups</Link> : null)
-                    ]}>
+                    <Panel
+                        title="Data Subscriptions & Requests"
+                        icon={<i className="fa-solid fa-database" style={{ color: "#999" }} />}
+                        menu={[
+                            <Link to="/requests">View All Data Requests</Link>,
+                            (user?.role === "admin" ? "separator" : null),
+                            (user?.role === "admin" ? <Link to="/requests/new">Create New Data Request</Link> : null),
+                            (user?.role === "admin" ? <Link to="/groups">Manage Request Groups</Link> : null)
+                        ]}
+                    >
                         <DataRequestsList />
                     </Panel>
                 </div>
                 <div className="col col-4">
-                    <Panel title="Data Sites" menu={[
-                        <Link to="/sites">Manage Data Sites</Link>
-                    ]}>
+                    <Panel
+                        title="Data Sites"
+                        icon={<i className="fa-solid fa-location-dot" style={{ color: "#999" }} />}
+                        menu={[
+                            <Link to="/sites">Manage Data Sites</Link>
+                        ]}
+                    >
                         <DataSiteList />
                         {/* <img src={ map } alt="Sites Map" className="grey-out" /> */}
                     </Panel>

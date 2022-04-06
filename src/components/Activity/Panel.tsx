@@ -24,7 +24,7 @@ export default function ActivityPanel({ limit }: { limit?: number }) {
         <Panel title="Recent Activity" loading={loading} menu={[
             <div title="Refresh Activity" onMouseDown={() => execute()}>Refresh</div>,
             <Link to="/activity">View All Activity</Link>
-        ]}>
+        ]} icon={<i className="fa-solid fa-info-circle" style={{ color: "#999" }} />}>
             <div className="activity-panel">
                 { error && <AlertError>{ error + "" }</AlertError> }
                 { (!result || !result.length) && <span className="color-muted">No activity found</span> }
