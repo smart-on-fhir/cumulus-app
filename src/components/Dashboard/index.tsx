@@ -1,8 +1,9 @@
-import { useMemo, useReducer }     from "react";
+import { Component, createRef, useMemo, useReducer }     from "react";
 import html2canvas                 from "html2canvas";
 import { useNavigate }             from "react-router-dom";
 import { HelmetProvider, Helmet }  from "react-helmet-async";
 import Highcharts                  from "highcharts";
+import ContentEditable             from "react-contenteditable";
 import PowerSet                    from "../../PowerSet";
 import { useBackend }              from "../../hooks";
 import { createOne, updateOne, deleteOne } from "../../backend";
@@ -43,6 +44,7 @@ interface ViewState
     column2        : string
     column2type    : string
     column2opacity : number
+    caption        : string
 }
 
 interface ViewAction
@@ -70,7 +72,8 @@ function viewReducer(state: ViewState, action: ViewAction): ViewState
         "denominator",
         "column2",
         "column2type",
-        "column2opacity"
+        "column2opacity",
+        "caption"
     ];
 
     function checkDirty(nextState: ViewState) {
@@ -144,7 +147,8 @@ export default function Dashboard({
         },
         column2: serverColumn2 = "",
         column2type: serverColumn2type = "",
-        column2opacity: serverColumn2opacity = 1
+        column2opacity: serverColumn2opacity = 1,
+        caption: serverCaption = ""
     } = view.settings || {}
 
     const navigate = useNavigate();
@@ -166,6 +170,7 @@ export default function Dashboard({
         column2        : serverColumn2,
         column2type    : serverColumn2type,
         column2opacity : serverColumn2opacity,
+        caption        : serverCaption,
         isDirty        : false
     } as ViewState, initViewState);
 
@@ -185,7 +190,8 @@ export default function Dashboard({
         denominator,
         column2,
         column2type,
-        column2opacity
+        column2opacity,
+        caption
     } = state;
 
     const isAdmin = auth.user?.role === "admin"
@@ -229,7 +235,8 @@ export default function Dashboard({
                     denominator,
                     column2,
                     column2type,
-                    column2opacity
+                    column2opacity,
+                    caption
                 }
             }).then(
                 () => dispatch({ type: "CLEAN" }),
@@ -256,7 +263,8 @@ export default function Dashboard({
                     denominator,
                     column2,
                     column2type,
-                    column2opacity
+                    column2opacity,
+                    caption
                 }
             }).then(
                 v => defer(() => navigate("/views/" + v.id)),
@@ -534,6 +542,8 @@ export default function Dashboard({
                             column2opacity={column2opacity}
                         /> }
                         <br/>
+                        <CaptionEditor html={caption} onChange={caption => dispatch({ type: "UPDATE", payload: { caption }})}/>
+                        <br/>
                         <div className="row mb-1">
                             <div className="col top">
                                 {/* <h6>SOURCE DATA { dataRequest.refresh ? "SUBSCRIPTION" : "REQUEST" }</h6> */}
@@ -615,4 +625,43 @@ function Chart({ chartType, column, dataSet, fullDataSet, options, colorOptions,
         return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} stack use3d />
     }
     return null;
+}
+
+
+interface CaptionEditorProps {
+    html: string | null
+    disabled?: boolean
+    onChange: (html: string) => void
+}
+
+interface CaptionEditorState {
+    html: string
+}
+
+class CaptionEditor extends Component<CaptionEditorProps, CaptionEditorState> {
+    
+    contentEditable: React.RefObject<HTMLDivElement>;
+
+    constructor(props: CaptionEditorProps) {
+        super(props);
+        this.contentEditable = createRef();
+        this.state = { html: String(props.html || "").trim() };
+    };
+  
+    handleChange = (evt: any) => {
+        const { onChange } = this.props
+        this.setState({ html: evt.target.value });
+        onChange && onChange(evt.target.value)
+    };
+  
+    render() {
+        return <ContentEditable
+            innerRef={this.contentEditable}
+            html={this.state.html}
+            disabled={!!this.props.disabled}
+            onChange={this.handleChange}
+            className="chart-caption"
+            tagName='div'
+        />
+    }
 }
