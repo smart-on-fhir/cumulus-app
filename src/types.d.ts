@@ -44,6 +44,8 @@ declare module app {
             column2    ?: string // Extra Column
             column2type?: string // Extra Column render as
             column2opacity?: number
+
+            caption?: string // HTML chart caption
         }
     }
 

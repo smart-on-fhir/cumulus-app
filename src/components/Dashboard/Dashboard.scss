@@ -26,5 +26,11 @@
 
 }
 
-
+.chart-caption {
+    padding: 4px;
+    &:empty:before {
+        content: "Click to add chart caption";
+        opacity: 0.5;
+    }
+}
 
