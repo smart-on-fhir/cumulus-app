@@ -1,9 +1,9 @@
-import React     from "react";
+import React                          from "react";
 import { Color, merge, XAxisOptions } from "highcharts"
-import moment    from "moment";
-import PowerSet  from "../../../PowerSet";
-import { defer, format } from "../../../utils";
-import { SupportedNativeChartTypes } from "../config";
+import moment                         from "moment";
+import PowerSet                       from "../../../PowerSet";
+import { defer, format }              from "../../../utils";
+import { SupportedNativeChartTypes }  from "../config";
 
 declare var Highcharts: any
 
@@ -17,24 +17,6 @@ type SeriesOptions = (
     // Highcharts.SeriesLineOptions |
     // Highcharts.SeriesTimelineOptions
 );
-
-
-function hslToHex(h: number, s: number, l: number) {
-    l /= 100;
-    const a = s * Math.min(l, 1 - l) / 100;
-    const f = (n: number) => {
-      const k = (n + h / 30) % 12;
-      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-      return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
-    };
-    return `#${f(0)}${f(8)}${f(4)}`;
-}
-
-function getColorAt(i: number, saturation = 75, lightness = 60, variety = 1, startColor = 0, opacity = 1) {
-    return new Color(hslToHex((startColor + (137.5 * i * variety)) % 360 , saturation, lightness))
-        .setOpacity(opacity).get('rgba') + ""
-    
-}
 
 /**
  * Function from https://github.com/danro/easing-js/blob/master/easing.js
@@ -175,11 +157,12 @@ export function getSeries({
             type,
             data,
             name: column.label || column.name,
+            colorIndex: series.length % colors.length,
             fillColor: type === "areaspline" ? {
                 linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                 stops: [
-                    [0, new Color(colors[series.length]).setOpacity(0.2 ).get('rgba') + ""],
-                    [1, new Color(colors[series.length]).setOpacity(0.05).get('rgba') + ""]
+                    [0, new Color(colors[series.length % colors.length]).setOpacity(0.2 ).get('rgba') + ""],
+                    [1, new Color(colors[series.length % colors.length]).setOpacity(0.05).get('rgba') + ""]
                 ]
             }: undefined
         });
@@ -201,12 +184,12 @@ export function getSeries({
                 type,
                 name: groupBy.dataType.startsWith("date") ? moment(groupName + "", "YYYY-MM-DD").format(getDateFormat(groupBy, true)) : groupName + "",
                 data: [],
-                colorIndex: i,
+                colorIndex: i % colors.length,
                 fillColor: type === "areaspline" ? {
                     linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                     stops: [
-                        [0, new Color(colors[i]).setOpacity(0.2 ).get('rgba') + ""],
-                        [1, new Color(colors[i]).setOpacity(0.05).get('rgba') + ""]
+                        [0, new Color(colors[i % colors.length]).setOpacity(0.2 ).get('rgba') + ""],
+                        [1, new Color(colors[i % colors.length]).setOpacity(0.05).get('rgba') + ""]
                     ]
                 }: undefined
             };
@@ -268,7 +251,7 @@ export function getSeries({
                     group = _series[groupName + ""] = {
                         type: column2type as SupportedNativeChartTypes,
                         name: groupName,
-                        colorIndex: series.length + i,
+                        colorIndex: (series.length + i) % colors.length,
                         dashStyle: "ShortDash",
                         lineWidth: 1,
                         opacity: column2opacity,
@@ -380,10 +363,7 @@ export function buildChartOptions({
     column2opacity?: number
 }): Highcharts.Options
 {
-    const COLORS: string[] = [];
-    for (let i = 0; i < 100; i++) {
-        COLORS.push(getColorAt(i, colorOptions.saturation, colorOptions.brightness, colorOptions.variety, colorOptions.startColor, colorOptions.opacity))
-    }
+    const COLORS = colorOptions.colors.map(c => new Color(c).setOpacity(colorOptions.opacity).get("rgba") + "")
 
     // console.log(colorOptions)
     const series = getSeries({

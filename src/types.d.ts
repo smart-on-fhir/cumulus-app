@@ -18,11 +18,12 @@ declare module app {
     }
 
     interface ColorOptions {
-        saturation: number
-        brightness: number
-        variety   : number
+        // saturation: number
+        // brightness: number
+        // variety   : number
         opacity   : number
-        startColor: number
+        // startColor: number
+        colors    : string[]
     }
 
     interface View {

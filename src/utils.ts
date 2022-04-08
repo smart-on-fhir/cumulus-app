@@ -173,3 +173,28 @@ export function ellipsis(str: string, maxLength: number) {
     }
     return out
 }
+
+
+export function hslToHex(h: number, s: number, l: number) {
+    l /= 100;
+    const a = s * Math.min(l, 1 - l) / 100;
+    const f = (n: number) => {
+      const k = (n + h / 30) % 12;
+      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+// export function getColorAt(i: number, saturation = 75, lightness = 60, variety = 1, startColor = 0, opacity = 1) {
+//     return new Color(hslToHex((startColor + (137.5 * i * variety)) % 360 , saturation, lightness))
+//         .setOpacity(opacity).get('rgba') + ""
+// }
+
+export function generateColors(count: number, saturation = 75, lightness = 60, variety = 1, startColor = 0) {
+    const colors: string[] = [];
+    for (let i = 0; i < count; i++) {
+        colors.push(hslToHex((startColor + (137.5 * i * variety)) % 360 , saturation, lightness));
+    }
+    return colors;
+}

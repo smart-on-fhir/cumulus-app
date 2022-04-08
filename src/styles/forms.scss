@@ -170,6 +170,60 @@ textarea,
     @include form-control();
 }
 
+input[type="color"] {
+    border: 1px solid rgba(0, 0, 0, 0.75);
+    box-shadow: 0 0 0 1px #FFF;
+    padding: 0;
+    margin: 3px;
+    display: inline-block;
+    line-height: 1;
+    font-size: 1px;
+    vertical-align: top;
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+    overflow: hidden;
+
+    &:focus {
+        box-shadow: 0 0 0 1px #000;
+    }
+
+    &:disabled {
+        border: 1px solid rgba(0, 0, 0, 0.5);
+        opacity: 0.5;
+        filter: grayscale(1);
+    }
+
+    &::-webkit-color-swatch-wrapper {
+        padding: 0;
+        display: block;
+        border-radius: 1px;
+    }
+    &::-webkit-color-swatch {
+        display: block;
+        height: 100%;
+        border: 0;
+        border-radius: 1px;
+    }
+
+    /* Firefox styles */
+    &::-moz-color-swatch {
+        padding: 0;
+        display: block;
+        border-radius: 1px;
+        margin: 0;
+        border: 0;
+    }
+    &::-moz-focus-inner {
+        display: block;
+        height: 100%;
+        border: 0;
+        border-radius: 1px;
+        padding: 0;
+        margin: 0;
+    }
+}
+
 ::-webkit-file-upload-button {
     @include file-selector-button();
 }
