@@ -1,24 +1,24 @@
-import { Component, createRef, useMemo, useReducer }     from "react";
-import html2canvas                 from "html2canvas";
-import { useNavigate }             from "react-router-dom";
-import { HelmetProvider, Helmet }  from "react-helmet-async";
-import Highcharts                  from "highcharts";
-import ContentEditable             from "react-contenteditable";
-import PowerSet                    from "../../PowerSet";
-import { useBackend }              from "../../hooks";
-import { createOne, updateOne, deleteOne } from "../../backend";
-import { useAuth }                 from "../../auth";
-import DataRequestLink             from "../DataRequests/DataRequestLink";
-import DataGrid                    from "../DataGrid";
-import BarChart                    from "./Charts/BarChart";
-import ColumnChart                 from "./Charts/ColumnChart";
-import AreaSPLineChart             from "./Charts/AreaSPLineChart";
-import SPLineChart                 from "./Charts/SPLineChart";
-import PieChart                    from "./Charts/PieChart";
-import Alert, { AlertError }       from "../Alert";
-import { classList, defer }        from "../../utils";
-import ConfigPanel                 from "./ConfigPanel"
-import { operators }               from "./config";
+import { Component, createRef, useMemo, useReducer } from "react";
+import html2canvas                          from "html2canvas";
+import { useNavigate }                      from "react-router-dom";
+import { HelmetProvider, Helmet }           from "react-helmet-async";
+import Highcharts                           from "highcharts";
+import ContentEditable                      from "react-contenteditable";
+import PowerSet                             from "../../PowerSet";
+import { useBackend }                       from "../../hooks";
+import { createOne, updateOne, deleteOne }  from "../../backend";
+import { useAuth }                          from "../../auth";
+import DataRequestLink                      from "../DataRequests/DataRequestLink";
+import DataGrid                             from "../DataGrid";
+import BarChart                             from "./Charts/BarChart";
+import ColumnChart                          from "./Charts/ColumnChart";
+import AreaSPLineChart                      from "./Charts/AreaSPLineChart";
+import SPLineChart                          from "./Charts/SPLineChart";
+import PieChart                             from "./Charts/PieChart";
+import Alert, { AlertError }                from "../Alert";
+import { classList, defer, generateColors } from "../../utils";
+import ConfigPanel                          from "./ConfigPanel"
+import { operators }                        from "./config";
 
 import "./Dashboard.scss";
 
@@ -124,6 +124,58 @@ function viewReducer(state: ViewState, action: ViewAction): ViewState
 }
 // =============================================================================
 
+
+function getColorsLength({
+    column,
+    stratifier,
+    dataSet,
+    // fullDataSet,
+    // colors = [],
+    column2,
+    column2type,
+    fullDataSet,
+    type
+}: {
+    column: app.DataRequestDataColumn
+    dataSet: PowerSet
+    fullDataSet: PowerSet
+    stratifier?: app.DataRequestDataColumn | null
+    // colors?: string[]
+    column2    ?: app.DataRequestDataColumn | null
+    column2type?: string
+    type: string
+}): number {
+    let out = type.startsWith("pie") ? dataSet.rows.length : 1;
+
+    if (stratifier) {
+        out = dataSet.getUniqueValuesFromColumn(stratifier.name).size
+    }
+
+    if (column2 && column2type) {
+        let groups = Array.from(fullDataSet.getUniqueValuesFromColumn(column2.name));
+        
+        out += groups.length
+        
+    //     // let _series: Record<string, any> = {};
+
+    //     // let sub = fullDataSet.pick([column.name, column2.name]);
+    //     // groups.forEach(x => {
+    //     //     let data = sub.where({ [column.name]: x });
+
+    //     //     data.rows.forEach((row, i) => {
+    //     //         let groupName = row[column2.name];
+    //     //         let group = _series[groupName + ""];
+    //     //         if (!group) {
+    //     //             group = _series[groupName + ""] = {};
+    //     //             out += 1
+    //     //         }
+    //     //     });
+    //     // });
+    }
+
+    return out
+}
+
 export default function Dashboard({
     view,
     dataRequest
@@ -139,17 +191,22 @@ export default function Dashboard({
         chartOptions: serverChartOptions = {},
         denominator: serverDenominator = "",
         colorOptions: serverColorOptions = {
-            saturation: 75,
-            brightness: 60,
-            variety   : 1,
+            // saturation: 75,
+            // brightness: 60,
+            // variety   : 1,
             opacity   : 1,
-            startColor: 0
+            // startColor: 0,
+            colors    : []
         },
         column2: serverColumn2 = "",
         column2type: serverColumn2type = "",
         column2opacity: serverColumn2opacity = 1,
         caption: serverCaption = ""
     } = view.settings || {}
+
+    if (!serverColorOptions.colors || !serverColorOptions.colors.length) {
+        serverColorOptions.colors = generateColors(36)
+    }
 
     const navigate = useNavigate();
     const auth     = useAuth();
@@ -364,7 +421,17 @@ export default function Dashboard({
     const onTransitionEnd = () => {
         window.Highcharts.charts.forEach(c => c?.reflow())
     };
-    
+
+    const colorsLength = getColorsLength({
+        column: col1,
+        fullDataSet: powerSet,
+        dataSet: chartPowerSet,
+        stratifier: stratifier,
+        column2: col2,
+        column2type: column2type,
+        type: chartType
+    });
+
     return (
         <div className={ saving || deleting ? "grey-out" : undefined }>
             <HelmetProvider>
@@ -387,6 +454,7 @@ export default function Dashboard({
                         <ConfigPanel
                             dataRequest={dataRequest}
                             viewType={viewType}
+                            colorsLength={colorsLength}
                             state={{
                                 groupBy   : viewColumn,
                                 stratifyBy: stratifier?.name || "",

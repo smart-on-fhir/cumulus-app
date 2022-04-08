@@ -35,14 +35,17 @@ export default function ConfigPanel({
     dataRequest,
     state,
     onChange,
-    viewType
+    viewType,
+    colorsLength
 } : {
     dataRequest: app.DataRequest
     state: ChartConfigPanelState
     viewType: "overview" | "data"
     onChange: (state: ChartConfigPanelState) => void
+    colorsLength: number
 }) {
     let auth = useAuth();
+
     return (
         <div style={{
             color: "#666",
@@ -546,7 +549,24 @@ export default function ConfigPanel({
 
             <Collapse collapsed header="Colors">
                 <div className="pt-1 pb-2">
-                    <label>
+                    <label>Color Preset</label>
+                    <br/>
+                    { state.colorOptions.colors.map((color, i) => {
+                        return <input
+                            type="color"
+                            key={i}
+                            value={color}
+                            onChange={e => {
+                                let colors = [ ...state.colorOptions.colors ]
+                                colors[i] = e.target.value
+                                onChange({ ...state, colorOptions: { ...state.colorOptions, colors }})
+                            }}
+                            disabled={ i >= colorsLength }
+                        />
+                    })}
+                    <br/>
+                    <br/>
+                    {/* <label>
                         Saturation
                         <input
                             type="range"
@@ -573,7 +593,7 @@ export default function ConfigPanel({
                         />
                     </label>
                     <p className="small color-muted">The lightness or darkness of all the colors</p>
-                    <br/>
+                    <br/> */}
                     <label>
                         Opacity
                         <input
@@ -588,7 +608,7 @@ export default function ConfigPanel({
                     </label>
                     <p className="small color-muted">Using semitransparent colors might slightly improve readability in case of overlaping lines or shapes</p>
                     <br/>
-                    <label>
+                    {/* <label>
                         Variety
                         <input
                             type="range"
@@ -615,7 +635,7 @@ export default function ConfigPanel({
                             style={{ width: "100%", margin: 0 }}
                         />
                     </label>
-                    <p className="small color-muted">Select the hue of the first color. Any subsequent colors will be computed by shifting this hue with an ammount depending on the "variety" color setting.</p>
+                    <p className="small color-muted">Select the hue of the first color. Any subsequent colors will be computed by shifting this hue with an ammount depending on the "variety" color setting.</p> */}
                 </div>
             </Collapse>
 
