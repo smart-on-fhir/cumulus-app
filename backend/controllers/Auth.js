@@ -50,12 +50,10 @@ function requireAuth(...roles) {
     return function(req, res, next) {
         
         if (!req.user) {
-            req.body = ""
             return next(new HttpError.Unauthorized("Authorization required"));
         }
 
         if (!roles.includes(req.user.role)) {
-            req.body = ""
             return next(new HttpError.Forbidden("Permission denied"))//.json({ error: "Permission denied" });
         }
 
