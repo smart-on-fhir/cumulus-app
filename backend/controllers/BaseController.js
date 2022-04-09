@@ -48,7 +48,7 @@ module.exports = function createRestRoutes(router, modelConstructor, {
 
     // Update ------------------------------------------------------------------
     if (update) {
-        router.put("/:id", requireAuth("admin"), express.json({ limit: "60MB" }), rw(async (req, res) => {
+        router.put("/:id", express.json({ limit: "60MB" }), requireAuth("admin"), rw(async (req, res) => {
             const model = await modelConstructor.findByPk(req.params.id);
             assert(model, HttpError.NotFound("Model not found"))
             await model.update(req.body, { user: req.user });
