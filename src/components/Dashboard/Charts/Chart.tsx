@@ -292,7 +292,8 @@ export function getSeries({
                     y: value,
                     custom: {
                         data: row,
-                        denominator: denominatorValue
+                        denominator: denominatorValue,
+                        secondary: true
                     }
                 };
 
@@ -714,15 +715,17 @@ export function buildChartOptions({
             },
 
             formatter() {
-                const rows = [
-                    `<tr><td style="text-align:right">${column.label || column.name}:</td><td><b>${this.point.name}</b></td></tr>`, 
-                    groupBy && `<tr><td style="text-align:right">${groupBy.label || groupBy.name}:</td><td><b>${this.series.name}</b></td></tr>`,
-                    
-                    // @ts-ignore
-                    `<tr><td style="text-align:right">Count:</td><td><b>${this.point.custom.data.cnt}</b></td></tr>`,
-                    // `<tr><td style="text-align:right">Count:</td><td><b>${this.point.y}</b></td></tr>`,
-                    // `<tr><td style="text-align:right">Other:</td><td><b>{point.custom}</b></td></tr>`
-                ];
+                const rows = [];
+
+                // @ts-ignore
+                if (!this.point.custom.secondary) {
+                    rows.push(`<tr><td style="text-align:right">${column.label || column.name}:</td><td><b>${this.point.name}</b></td></tr>`)
+                    if (groupBy) {
+                        rows.push(`<tr><td style="text-align:right">${groupBy.label || groupBy.name}:</td><td><b>${this.series.name}</b></td></tr>`)
+                    }
+                }
+                // @ts-ignore
+                rows.push(`<tr><td style="text-align:right">Count:</td><td><b>${this.point.custom.data.cnt}</b></td></tr>`)
                 
                 if (denominator) {
                     // @ts-ignore
