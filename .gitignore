@@ -153,3 +153,4 @@ yarn-error.log*
 /backend/screenShots/*
 !.gitkeep
 backend/db/cumulus.db
+notes.txt
