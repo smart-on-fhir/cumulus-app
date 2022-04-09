@@ -388,7 +388,7 @@ export function buildChartOptions({
     return {
         ...options,
         chart: {
-            height: "60%",
+            height: null,
             width: null,
             type,
             panning: {
@@ -422,7 +422,7 @@ export function buildChartOptions({
                 depth: Math.min(series.length * 10, 100),
                 ...options.chart?.options3d
             },
-            plotBorderColor: "rgba(0, 0, 0, 0.4)",
+            plotBorderColor: "#999",
             plotBorderWidth: options.chart?.options3d?.enabled ? 0 : options.chart?.plotBorderWidth
         },
         lang: {
@@ -443,7 +443,10 @@ export function buildChartOptions({
                 contextButton: {
                     menuItems: ["viewFullscreen", "printChart", "separator", "downloadPNG", "downloadJPEG", "downloadPDF", "downloadSVG", "separator", "downloadCSV", "downloadXLS"]
                 }
-            }
+            },
+            sourceWidth: 1000,
+            sourceHeight: 600,
+            scale: 3
         }, 
         credits: {
             enabled: true,
@@ -502,7 +505,7 @@ export function buildChartOptions({
             // maxPadding: 0,
             // minPadding: 0,
             endOnTick: false,
-            gridLineColor: "rgba(0, 0, 0, 0.1)",
+            gridLineColor: "#DDD", // "rgba(0, 0, 0, 0.1)",
             // @ts-ignore
             tickLength: options.yAxis?.lineWidth === 0 ? 0 : 10,
             tickWidth: 1,
@@ -518,7 +521,7 @@ export function buildChartOptions({
                 }
             },
             lineWidth: 1,
-            lineColor: "rgba(0, 0, 0, 0.4)",
+            lineColor: "#999",
             // softMax: denominator ? 100 : undefined,            
             
             // Up to 10X Zoom
@@ -772,7 +775,8 @@ export function buildChartOptions({
             minPadding: 0,
             // maxPadding: 0,
             lineWidth: 0,
-            lineColor: "rgba(0, 0, 0, 0.4)",
+            lineColor: "#999",
+            gridLineColor: "#DDD",
             maxPadding: 0,
             labels: {
                 // align: "center"

@@ -17,7 +17,10 @@
 }
 
 .main-chart {
-    aspect-ratio: 100/60;
+    width: 100%;
+    aspect-ratio: 5/3;
+    min-width: 500px;
+    min-height: 300px;
     overflow: hidden;
 
     * { 
