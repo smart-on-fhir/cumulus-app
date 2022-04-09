@@ -22,14 +22,14 @@ router.get("/:id", requireAuth("admin"), (req, res) => {
 });
 
 // Create ----------------------------------------------------------------------
-router.post("/", requireAuth("admin"), express.json(), (req, res) => {
+router.post("/", express.json(), requireAuth("admin"), (req, res) => {
     Model.create(req.body)
     .then(data  => res.json(data))
     .catch(error => res.status(400).end(error.message))
 });
 
 // Update ----------------------------------------------------------------------
-router.put("/:id", requireAuth("admin"), express.json(), async (req, res) => {
+router.put("/:id", express.json(), requireAuth("admin"), async (req, res) => {
     const model = await Model.findByPk(req.params.id);
     if (!model) {
         res.sendStatus(404).end(`${Model.name} not found`);

@@ -40,7 +40,7 @@ module.exports = function createRestRoutes(router, modelConstructor, {
 
     // Create ------------------------------------------------------------------
     if (create) {
-        router.post("/", requireAuth("admin"), express.json({ limit: "60MB" }), rw(async (req, res) => {
+        router.post("/", express.json({ limit: "60MB" }), requireAuth("admin"), rw(async (req, res) => {
             const model = await modelConstructor.create(req.body, { user: req.user });
             res.json(model)
         }));
