@@ -57,12 +57,16 @@ module.exports = class DataRequest extends Model
                         if (data !== null)  {
                             const cntColumn = data.cols.find(c => c.name === "cnt");
                             const colsLength = data.cols.length;
+                            
                             if (!cntColumn) {
                                 throw new Error('Data must have "cnt" column for aggregate counts');
                             }
+                            
                             if (cntColumn.dataType !== "integer") {
-                                throw new Error('The dataType of the "cnt" column must be "integer');
+                                throw new Error('The dataType of the "cnt" column must be "integer"');
                             }
+
+                            // If we have data already, then column names cannot 
 
                             data.rows.forEach((row, rowIndex) => {
 
