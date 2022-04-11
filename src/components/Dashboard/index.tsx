@@ -385,33 +385,38 @@ export default function Dashboard({
 
         let chartPowerSet: PowerSet;
 
-        if (usableFilters.length) {
-            // @ts-ignore
-            const filter = usableFilters.reduce((prev: (row: any) => boolean, cur: app.Filter) => {
-                const next = createFilter(cur);
-                if (!next) {
-                    return prev;
-                }
-                return cur.join === "and" ?
-                    (row: any) => prev(row) && next(row) :
-                    (row: any) => prev(row) || next(row) ;
-            }, createFilter(usableFilters[0])) as (row: any, index?: number) => boolean;
+        try {
+            if (usableFilters.length) {
+                // @ts-ignore
+                const filter = usableFilters.reduce((prev: (row: any) => boolean, cur: app.Filter) => {
+                    const next = createFilter(cur);
+                    if (!next) {
+                        return prev;
+                    }
+                    return cur.join === "and" ?
+                        (row: any) => prev(row) && next(row) :
+                        (row: any) => prev(row) || next(row) ;
+                }, createFilter(usableFilters[0])) as (row: any, index?: number) => boolean;
 
-            // powerSet = powerSet.filter(filter)
-            chartPowerSet = powerSet.filter(filter).getChartData({
-                column : viewColumn,
-                groupBy,
-                filters: usableFilters,
-                column2
-            });
-        }
-        else {
-            chartPowerSet = powerSet.getChartData({
-                column : viewColumn,
-                groupBy,
-                filters: usableFilters,
-                column2
-            });
+                // powerSet = powerSet.filter(filter)
+                chartPowerSet = powerSet.filter(filter).getChartData({
+                    column : viewColumn,
+                    groupBy,
+                    filters: usableFilters,
+                    column2
+                });
+            }
+            else {
+                chartPowerSet = powerSet.getChartData({
+                    column : viewColumn,
+                    groupBy,
+                    filters: usableFilters,
+                    column2
+                });
+            }
+        } catch (ex) {
+            console.error(ex);
+            chartPowerSet = PowerSet.from({ cols: [], rows: []})
         }
         
         return { powerSet, chartPowerSet }
@@ -593,7 +598,7 @@ export default function Dashboard({
                         { !col1 && viewType === "overview" && (
                             <AlertError>
                                 It looks like the data source has been updated and this view is no longer compatible with the new data.
-                                Please create the view again.
+                                Please edit this view or delete it and create new one.
                             </AlertError>
                         ) }
                         { col1 && viewType === "overview" && <Chart
