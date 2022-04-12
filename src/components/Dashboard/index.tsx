@@ -622,8 +622,8 @@ export default function Dashboard({
                                 {/* <h6>SOURCE DATA { dataRequest.refresh ? "SUBSCRIPTION" : "REQUEST" }</h6> */}
                                 <DataRequestLink request={ dataRequest } />
                             </div>
-                            <div className="col col-0 top">
-                                <button className="btn btn-blue mt-1 small grey-out"> <b> Request Line-level Data </b> </button>
+                            <div className="col col-0 top grey-out">
+                                <button className="btn btn-blue mt-1"> <b> Request Line-level Data </b> </button>
                             </div>
                         </div>
                     </div>
