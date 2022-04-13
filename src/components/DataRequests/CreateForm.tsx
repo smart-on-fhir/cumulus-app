@@ -41,7 +41,7 @@ export default function CreateDataRequestForm()
 
     function prefillDemoData() {
         setState({
-            groupId: 1, // COVID
+            // groupId: null, // COVID
             name: "Demo Data Requests",
             description: "This data requests has been created for demo purposes",
             requestedData: {

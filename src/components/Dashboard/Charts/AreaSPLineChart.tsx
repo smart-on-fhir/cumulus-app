@@ -35,7 +35,7 @@ export default function AreaSPLineChart({
         colorOptions={colorOptions}
         denominator={denominator}
         type="areaspline"
-        key={ [column.name, groupBy?.name || ""].join("-") }
+        key={ [column.name, groupBy?.name || "", options?.annotations?.length || ""].join("-") }
         column2={column2}
         column2type={column2type}
         column2opacity={column2opacity}

@@ -37,7 +37,7 @@ export default function ColumnChart({
         dataSet={dataSet}
         fullDataSet={fullDataSet}
         type="column"
-        key={ [column.name, groupBy?.name || ""].join("-") }
+        key={ [column.name, groupBy?.name || "", options?.annotations?.length || ""].join("-") }
         colorOptions={colorOptions}
         denominator={denominator}
         column2={column2}
