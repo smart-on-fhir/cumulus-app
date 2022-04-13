@@ -100,15 +100,15 @@ export default function CreateDataRequestForm()
         <div>
             <HelmetProvider>
                 <Helmet>
-                    <title>Create Data Request</title>
+                    <title>Create Data Subscription</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
                 { name: "Requests & Subscriptions", href: "/requests" },
-                { name: "Create Data Request" }
+                { name: "Create Data Subscription" }
             ]} />
-            <h3> <i className="fa-solid fa-wand-magic-sparkles color-muted pull-right" style={{ cursor: "pointer" }} onClick={prefillDemoData} />Create Data Request</h3>
+            <h3> <i className="fa-solid fa-wand-magic-sparkles color-muted pull-right" style={{ cursor: "pointer" }} onClick={prefillDemoData} />Create Data Subscription</h3>
             <hr/>
             <div className="row gap color-muted small">
                 <div className="col">

@@ -101,7 +101,7 @@ export default function EditDataRequestForm()
         <div>
             <HelmetProvider>
                 <Helmet>
-                    <title>Edit Data Request</title>
+                    <title>Edit Data Subscription</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[

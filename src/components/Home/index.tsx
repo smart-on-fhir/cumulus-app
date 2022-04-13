@@ -27,13 +27,16 @@ export default function Home() {
             <div className="row gap">
                 <div className="col col-6">
                     <Panel
-                        title="Data Subscriptions & Requests"
+                        title="Data Subscriptions"
                         icon={<i className="fa-solid fa-database" style={{ color: "#999" }} />}
                         menu={[
-                            <Link to="/requests">View All Data Requests</Link>,
+                            // <Link to="/requests">View All Data Requests</Link>,
+                            <Link to="/requests">View All Data Subscriptions</Link>,
                             (user?.role === "admin" ? "separator" : null),
-                            (user?.role === "admin" ? <Link to="/requests/new">Create New Data Request</Link> : null),
-                            (user?.role === "admin" ? <Link to="/groups">Manage Request Groups</Link> : null)
+                            // (user?.role === "admin" ? <Link to="/requests/new">Create New Data Request</Link> : null),
+                            (user?.role === "admin" ? <Link to="/requests/new">Create New Data Subscription</Link> : null),
+                            // (user?.role === "admin" ? <Link to="/groups">Manage Request Groups</Link> : null)
+                            (user?.role === "admin" ? <Link to="/groups">Manage Subscription Groups</Link> : null)
                         ]}
                     >
                         <DataRequestsList />
