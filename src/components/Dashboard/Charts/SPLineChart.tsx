@@ -32,7 +32,7 @@ export default function SPLineChart({
         dataSet={dataSet}
         fullDataSet={fullDataSet}
         options={options}
-        key={ [column.name, groupBy?.name || ""].join("-") }
+        key={ [column.name, groupBy?.name || "", options?.annotations?.length || ""].join("-") }
         type="spline"
         colorOptions={colorOptions}
         denominator={denominator}

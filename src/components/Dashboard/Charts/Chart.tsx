@@ -814,7 +814,8 @@ export function buildChartOptions({
                 }
             }
         }, options.xAxis) as XAxisOptions,
-        series
+        series,
+        annotations: options.annotations
     }
 }
 
@@ -859,7 +860,7 @@ export default class Chart extends React.Component<ChartProps>
             column2opacity
         } = this.props;
 
-        this.chart.update(buildChartOptions({
+        const chartOptions = buildChartOptions({
             options,
             column,
             groupBy,
@@ -871,8 +872,10 @@ export default class Chart extends React.Component<ChartProps>
             column2,
             column2type,
             column2opacity
-        }), true, true, false)
-        // console.log(this.props.chartOptions)
+        })
+
+        // console.log(JSON.stringify(chartOptions.annotations))
+        this.chart.update(chartOptions)
     }
 
     componentDidMount()

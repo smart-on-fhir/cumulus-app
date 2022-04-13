@@ -11,6 +11,7 @@ import {
 } from "./config"
 import Collapse from "../Collapse"
 import Checkbox from "../Checkbox"
+import AnnotationsUI from "./AnnotationsUI"
 
 
 type SupportedChartType = keyof typeof SupportedChartTypes
@@ -29,6 +30,7 @@ interface ChartConfigPanelState {
     column2        : string
     column2type    : string
     column2opacity : number
+    annotations    : app.Annotation[]
 }
 
 export default function ConfigPanel({
@@ -480,6 +482,7 @@ export default function ConfigPanel({
                 }
                 <br/>
             </Collapse>
+
             { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") && 
                 <Collapse collapsed header="Secondary Data">
                     <div className="pt-1">
@@ -639,6 +642,37 @@ export default function ConfigPanel({
                 </div>
             </Collapse>
 
+            { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
+                <Collapse collapsed header="Annotations">
+                    <AnnotationsUI
+                        onChange={ annotations => onChange(
+                            {
+                                ...state,
+                                chartOptions: {
+                                    
+                                    annotations: [{
+                                        visible: true,
+                                        draggable: '',
+                                        crop: false,
+                                        labelOptions: {
+                                            overflow: "justify",
+                                            allowOverlap: true,
+                                            className: "chart-annotation",
+                                            // style: {
+                                            //     textAlign: "center",
+                                            // }
+                                        },
+                                        labels: annotations
+                                    }]
+                                }
+                            }
+                        )}
+                        current={ state.chartOptions.annotations?.[0].labels || [] }
+                    />
+                    <br/>
+                </Collapse>
+            }
+            
             <br/>
         </div>
     )
