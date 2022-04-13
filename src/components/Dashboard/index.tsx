@@ -464,6 +464,7 @@ export default function Dashboard({
                                 groupBy   : viewColumn,
                                 stratifyBy: stratifier?.name || "",
                                 filters   : [...filters],
+                                xCol      : col1,
 
                                 // @ts-ignore
                                 chartType,
