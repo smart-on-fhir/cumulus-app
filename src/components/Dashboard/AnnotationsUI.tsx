@@ -1,4 +1,5 @@
 import { AnnotationMockPointOptionsObject, AnnotationsLabelsOptions } from "highcharts";
+import moment from "moment";
 import Checkbox from "../Checkbox";
 
 
@@ -23,6 +24,7 @@ function Annotation({
     annotation,
     onChange,
     onRemove,
+    xCol,
     down,
     up
 }: {
@@ -31,6 +33,7 @@ function Annotation({
     onRemove: () => void
     up     ?: () => void
     down   ?: () => void
+    xCol    : app.DataRequestDataColumn
 })
 {
     const point = { ...(annotation.point || {}) as AnnotationMockPointOptionsObject }
@@ -48,57 +51,63 @@ function Annotation({
                     />
                 </div>
             </div>
-            <div className="row middle small" style={{ margin: "6px 0 0" }}>
-                <div className="col col-1 right"><b>X:&nbsp;</b></div>
-                <div className="col col-3" style={{ margin: "3px 3px 0 0" }}>
-                    <input type="number" value={x} onChange={e => {
-                        point.x = e.target.valueAsNumber
-                        onChange({ ...annotation, point })
-                    }}/>
+            <div className="row middle small" style={{ margin: "6px 0 1px" }}>
+                <div className="col col-0 right" style={{ margin: "0 1px 0 2px" }}><b>X</b></div>
+                <div className="col" style={{ margin: "0 1px 0 2px" }}>
+                    { xCol.dataType.startsWith("date") ?
+                        <input type="date" value={moment(x).utc().format("YYYY-MM-DD")} onChange={e => {
+                            point.x = +(e.target.valueAsDate || 0)
+                            onChange({ ...annotation, point })
+                        }} /> :
+                        <input type="number" value={x} onChange={e => {
+                            point.x = e.target.valueAsNumber
+                            onChange({ ...annotation, point })
+                        }}/>
+                    }
                 </div>
-                <div className="col col-3" style={{ margin: "3px 3px 0 0" }}>
+                <div className="col col-3" style={{ margin: "0 1px 0 0" }}>
                     <select value={xAxis === null ? "px" : "axis"} onChange={e => {
                         point.xAxis = e.target.value === "px" ? null : 0
                         onChange({ ...annotation, point })
                     }}>
-                        <option value="axis">Axis Units</option>
+                        <option value="axis">Axis Unit</option>
                         <option value="px">Pixels</option>
                     </select>
                 </div>
-                <div className="col" style={{ margin: "3px 0 0" }}>
+                <div className="col col-3" style={{ margin: "0 0 0" }}>
                     <div className="row">
-                        <b className="col middle col-0"> +&nbsp;</b>
+                        <b className="col middle col-0" style={{ margin: "0 1px" }}>+</b>
                         <div className="col">
                             <input type="number" value={ annotation.x || 0 } onChange={e => onChange({ ...annotation, x: e.target.valueAsNumber })}/>
                         </div>
-                        <b className="col middle col-0">&nbsp;px&nbsp;</b>
+                        <b className="col middle col-0" style={{ margin: "0 2px 0 1px" }}>px</b>
                     </div>
                 </div>
             </div>
             <div className="row middle small" style={{ margin: "0 0 9px" }}>
-                <div className="col col-1 right"><b>Y:&nbsp;</b></div>
-                <div className="col col-3" style={{ margin: "3px 3px 0 0" }}>
+                <div className="col col-0 right" style={{ margin: "0 1px 0 2px" }}><b>Y</b></div>
+                <div className="col" style={{ margin: "0 1px 0 2px" }}>
                     <input type="number" value={y} onChange={e => {
                         point.y = e.target.valueAsNumber
                         onChange({ ...annotation, point })
                     }}/>
                 </div>
-                <div className="col col-3" style={{ margin: "3px 3px 0 0" }}>
+                <div className="col col-3" style={{ margin: "0 1px 0 0" }}>
                     <select value={yAxis === null ? "px" : "axis"} onChange={e => {
                         point.yAxis = e.target.value === "px" ? null : 0
                         onChange({ ...annotation, point })
                     }}>
-                        <option value="axis">Axis Units</option>
+                        <option value="axis">Axis Unit</option>
                         <option value="px">Pixels</option>
                     </select>
                 </div>
-                <div className="col" style={{ margin: "3px 0 0" }}>
+                <div className="col col-3" style={{ margin: "0 0 0" }}>
                     <div className="row">
-                        <b className="col middle col-0"> +&nbsp;</b>
+                        <b className="col middle col-0" style={{ margin: "0 1px" }}>+</b>
                         <div className="col">
                             <input type="number" value={ annotation.y } onChange={e => onChange({ ...annotation, y: e.target.valueAsNumber })}/>
                         </div>
-                        <b className="col middle col-0">&nbsp;px&nbsp;</b>
+                        <b className="col middle col-0" style={{ margin: "0 2px 0 1px" }}>px</b>
                     </div>
                 </div>
             </div>
@@ -223,7 +232,15 @@ function Annotation({
 }
 
 
-export default function AnnotationsUI({ current = [], onChange }: { current: AnnotationsLabelsOptions[], onChange: (current: AnnotationsLabelsOptions[]) => void })
+export default function AnnotationsUI({
+    current = [],
+    onChange,
+    xCol
+}: {
+    current: AnnotationsLabelsOptions[],
+    onChange: (current: AnnotationsLabelsOptions[]) => void
+    xCol: app.DataRequestDataColumn
+})
 {
     function add() {
         onChange([ ...current, emptyAnnotation ])
@@ -256,6 +273,7 @@ export default function AnnotationsUI({ current = [], onChange }: { current: Ann
                 <Annotation
                     key={i}
                     annotation={{...f}}
+                    xCol={xCol}
                     onRemove={() => remove(i)}
                     up={ i > 0 ? up.bind(null, i) : undefined }
                     down={ i < current.length - 1 ? down.bind(null, i) : undefined }

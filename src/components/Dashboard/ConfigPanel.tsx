@@ -31,6 +31,7 @@ interface ChartConfigPanelState {
     column2type    : string
     column2opacity : number
     annotations    : app.Annotation[]
+    xCol           : app.DataRequestDataColumn
 }
 
 export default function ConfigPanel({
@@ -668,6 +669,7 @@ export default function ConfigPanel({
                             }
                         )}
                         current={ state.chartOptions.annotations?.[0].labels || [] }
+                        xCol={ state.xCol }
                     />
                     <br/>
                 </Collapse>
