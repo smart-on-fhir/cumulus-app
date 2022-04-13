@@ -48,45 +48,64 @@ function Annotation({
                     />
                 </div>
             </div>
-            <div className="row middle small">
-                <div className="col right" style={{ maxWidth: "4em" }}><b>&nbsp;X:&nbsp;</b></div>
-                <div className="col" style={{ margin: "3px 3px 0 0" }}>
+            <div className="row middle small" style={{ margin: "6px 0 0" }}>
+                <div className="col col-1 right"><b>X:&nbsp;</b></div>
+                <div className="col col-3" style={{ margin: "3px 3px 0 0" }}>
                     <input type="number" value={x} onChange={e => {
                         point.x = e.target.valueAsNumber
                         onChange({ ...annotation, point })
                     }}/>
                 </div>
-                <div className="col col-0" style={{ margin: "3px 0 0" }}>
+                <div className="col col-3" style={{ margin: "3px 3px 0 0" }}>
                     <select value={xAxis === null ? "px" : "axis"} onChange={e => {
                         point.xAxis = e.target.value === "px" ? null : 0
                         onChange({ ...annotation, point })
                     }}>
                         <option value="axis">Axis Units</option>
-                        <option value="px">Pixel Coordinate</option>
+                        <option value="px">Pixels</option>
                     </select>
                 </div>
+                <div className="col" style={{ margin: "3px 0 0" }}>
+                    <div className="row">
+                        <b className="col middle col-0"> +&nbsp;</b>
+                        <div className="col">
+                            <input type="number" value={ annotation.x || 0 } onChange={e => onChange({ ...annotation, x: e.target.valueAsNumber })}/>
+                        </div>
+                        <b className="col middle col-0">&nbsp;px&nbsp;</b>
+                    </div>
+                </div>
             </div>
-            <div className="row middle small">
-                <div className="col right" style={{ maxWidth: "4em" }}><b>&nbsp;Y:&nbsp;</b></div>
-                <div className="col" style={{ margin: "3px 3px 0 0" }}>
+            <div className="row middle small" style={{ margin: "0 0 9px" }}>
+                <div className="col col-1 right"><b>Y:&nbsp;</b></div>
+                <div className="col col-3" style={{ margin: "3px 3px 0 0" }}>
                     <input type="number" value={y} onChange={e => {
                         point.y = e.target.valueAsNumber
                         onChange({ ...annotation, point })
                     }}/>
                 </div>
-                <div className="col col-0" style={{ margin: "3px 0 0" }}>
+                <div className="col col-3" style={{ margin: "3px 3px 0 0" }}>
                     <select value={yAxis === null ? "px" : "axis"} onChange={e => {
                         point.yAxis = e.target.value === "px" ? null : 0
                         onChange({ ...annotation, point })
                     }}>
                         <option value="axis">Axis Units</option>
-                        <option value="px">Pixel Coordinate</option>
+                        <option value="px">Pixels</option>
                     </select>
                 </div>
+                <div className="col" style={{ margin: "3px 0 0" }}>
+                    <div className="row">
+                        <b className="col middle col-0"> +&nbsp;</b>
+                        <div className="col">
+                            <input type="number" value={ annotation.y } onChange={e => onChange({ ...annotation, y: e.target.valueAsNumber })}/>
+                        </div>
+                        <b className="col middle col-0">&nbsp;px&nbsp;</b>
+                    </div>
+                </div>
             </div>
-            <div className="row middle small" style={{ margin: "3px 0 0" }}>
-                <div className="col right" style={{ maxWidth: "4em" }}><b>Shape:&nbsp;</b></div>
-                <div className="col">
+            <hr/>
+            <div className="row middle small" style={{ margin: "6px 0 0" }}>
+                <div className="col col-2 right"><b>Shape:&nbsp;</b></div>
+                <div className="col col-3">
                     <select value={ annotation.shape } onChange={e => {
                         onChange({ ...annotation, shape: e.target.value })
                     }}>
@@ -98,10 +117,10 @@ function Annotation({
                         <option value="triangle">Triangle</option>
                     </select>
                 </div>
-                <div className="col right" style={{ maxWidth: "5em" }}>
+                <div className="col col-1 right" style={{ maxWidth: "5em" }}>
                     <b>&nbsp;Position:&nbsp;</b>
                 </div>
-                <div className="col">
+                <div className="col col-3">
                     <select value={ (annotation.verticalAlign || "bottom") + "/" + (annotation.align || "center") } onChange={e => {
                         const [verticalAlign, align] = e.target.value.split("/")
                         // @ts-ignore
@@ -123,10 +142,10 @@ function Annotation({
                 </div>
             </div>
             <div className="row middle small" style={{ margin: "3px 0 0" }}>
-                <div className="col right" style={{ maxWidth: "4em" }}><b>Theme:&nbsp;</b></div>
-                <div className="col">
+                <div className="col col-2 right"><b>Theme:&nbsp;</b></div>
+                <div className="col col-3">
                     <select
-                        value={ annotation.borderColor === "#999" ? "light" : "dark" }
+                        value={ annotation.borderColor === "#888888" ? "light" : "dark" }
                         onChange={e => {
                             onChange({
                                 ...annotation,
@@ -140,8 +159,8 @@ function Annotation({
                         <option value="light">Light</option>
                     </select>
                 </div>
-                <div className="col right" style={{ maxWidth: "5em" }}>
-                    <b>&nbsp;&nbsp;Color:&nbsp;</b>
+                <div className="col col-2 right">
+                    <b>Color:&nbsp;</b>
                 </div>
                 <div className="col">
                     <input type="color" value={ annotation.style?.color || "#FFFFFF" } onChange={e => {
@@ -150,8 +169,8 @@ function Annotation({
                 </div>
             </div>
             <div className="row middle small" style={{ margin: "3px 0 0" }}>
-                <div className="col right" style={{ maxWidth: "4em" }}><b>Font:&nbsp;</b></div>
-                <div className="col">
+                <div className="col col-2 right"><b>Font:&nbsp;</b></div>
+                <div className="col col-3">
                     <select value={ annotation.style?.fontSize } onChange={e => {
                         onChange({ ...annotation, style: { ...annotation.style, fontSize: e.target.value } })
                     }}>
@@ -164,7 +183,7 @@ function Annotation({
                         <option value="22px">22px</option>
                     </select>
                 </div>
-                <div className="col right" style={{ maxWidth: "5em" }}><b>Padding:&nbsp;</b></div>
+                <div className="col col-2 right" style={{ maxWidth: "5em" }}><b>Padding:&nbsp;</b></div>
                 <div className="col">
                     <select value={ annotation.padding } onChange={e => {
                         onChange({ ...annotation, padding: +e.target.value })
@@ -183,10 +202,10 @@ function Annotation({
                 
             </div>
             <div className="row small middle" style={{ marginTop: 3 }}>
-                <div className="col" style={{ maxWidth: "3.7em" }}></div>
+                <div className="col col-2"></div>
                 <div className="col" style={{ lineHeight: 1.6 }}>
                     <Checkbox
-                        label="Sahdow"
+                        label="Shadow"
                         checked={ !!annotation.shadow }
                         // disabled={ annotation.shape === "connector" }
                         name="shadow"
