@@ -198,3 +198,104 @@ export function generateColors(count: number, saturation = 75, lightness = 60, v
     }
     return colors;
 }
+
+export function stripUndefined<T=Record<string, any> | any[]>(o: T): T {
+    if (Array.isArray(o)) {
+        for (let i = 0; i < o.length; i++) {
+            let value = o[i];
+            if (value === undefined) {
+                o.splice(i, 1)
+                i -= 1
+                continue;
+            }
+
+            if (value && typeof value === "object") {
+                o[i] = stripUndefined(value)
+            }
+        }
+    } else {
+        for (let key in o) {
+            let value = o[key];
+            if (value === undefined) {
+                delete o[key]
+                continue;
+            }
+
+            if (value && typeof value === "object") {
+                o[key] = stripUndefined(value)
+            }
+        }
+    }
+
+    return o
+}
+
+export function isEmptyObject(x: Record<string, any>): boolean {
+    for (let _ in x) {
+        return false
+    }
+    return true
+}
+
+export function forEach<T=Record<string, any>|any[]>(o: T, cb: (item: any, key: string | number, all: T) => void) {
+    if (Array.isArray(o)) {
+        for ( let i = 0; i < o.length; i++ ) {
+            cb(o[i], i, o);
+        }
+    } else {
+        for(let key in o) {
+            cb(o[key], key, o)
+        }
+    }
+}
+
+export function objectDiff<T=Record<string, any>|any[]>(a: T, b: T): T {
+    
+    const isArray = Array.isArray(a);
+
+    let out = isArray ? [] as any[] : {} as Record<string, any>;
+
+    forEach(a, (value, key) => {
+        const valueA = value;
+        // @ts-ignore
+        const valueB = b[key];
+        const typeA  = typeof valueA;
+        const typeB  = typeof valueB;
+
+        if (typeA !== typeB) {
+            out[key] = valueA
+        } else if (valueA && typeA === "object") {
+            const child = objectDiff(valueA, valueB)
+            if (!isEmptyObject(child)) {
+                out[key] = child
+            }
+        } else if (valueA !== valueB) {
+            out[key] = valueA
+        }
+    })
+
+    return out as T;
+}
+
+export function strip(
+    a: Record<string, any> | any[],
+    paths: string[],
+    _path: (string|number)[] = []
+): Record<string, any> | any[] {
+    
+    const isArray = Array.isArray(a);
+
+    let out = isArray ? [] as any[] : {} as Record<string, any>;
+
+    forEach(a, (value, key) => {
+        if (!paths.includes([..._path, key].join("."))) {
+            if (value && typeof value === "object") {
+                out[key] = strip(value, paths, [..._path, key])
+            } else {
+                out[key] = value
+            }
+        }
+    })
+
+    return out;
+}

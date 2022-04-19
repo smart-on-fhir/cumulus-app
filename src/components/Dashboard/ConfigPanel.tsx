@@ -7,11 +7,13 @@ import FilterUI       from "./FilterUI"
 import {
     SupportedChartTypes,
     ChartIcons,
-    SingleDimensionChartTypes
+    SingleDimensionChartTypes,
+    ReadOnlyPaths
 } from "./config"
 import Collapse from "../Collapse"
 import Checkbox from "../Checkbox"
 import AnnotationsUI from "./AnnotationsUI"
+import { DynamicEditor } from "../editors/FontEdotor"
 
 
 type SupportedChartType = keyof typeof SupportedChartTypes
@@ -48,6 +50,8 @@ export default function ConfigPanel({
     colorsLength: number
 }) {
     let auth = useAuth();
+
+    const { chartOptions } = state;
 
     return (
         <div style={{
@@ -94,7 +98,7 @@ export default function ConfigPanel({
                         <label>Chart Title</label>
                         <input
                             type="text"
-                            value={ state.chartOptions.title?.text || "" }
+                            value={ chartOptions.title?.text || "" }
                             onChange={ e => onChange(merge(state, {
                                 chartOptions: {
                                     title: {
@@ -110,7 +114,7 @@ export default function ConfigPanel({
                         <Checkbox
                             name="plotBorderWidth"
                             disabled={ state.chartType.includes("3d") }
-                            checked={ !!state.chartOptions.chart?.plotBorderWidth }
+                            checked={ !!chartOptions.chart?.plotBorderWidth }
                             onChange={ checked => onChange(merge(state, {
                                 chartOptions: {
                                     chart: {
@@ -123,7 +127,7 @@ export default function ConfigPanel({
                         <Checkbox
                             name="legend"
                             label="Show legend"
-                            checked={state.chartOptions.legend?.enabled !== false}
+                            checked={chartOptions.legend?.enabled !== false}
                             onChange={enabled => onChange(merge(state, {
                                 chartOptions: {
                                     legend: { enabled }
@@ -143,12 +147,12 @@ export default function ConfigPanel({
                                     step={0.01}
                                     value={
                                         state.chartType.startsWith("column") ? 
-                                            state.chartOptions.plotOptions?.column?.groupPadding === undefined ?
+                                            chartOptions.plotOptions?.column?.groupPadding === undefined ?
                                                 0.2 :
-                                                state.chartOptions.plotOptions.column.groupPadding :
-                                            state.chartOptions.plotOptions?.bar?.groupPadding === undefined ?
+                                                chartOptions.plotOptions.column.groupPadding :
+                                            chartOptions.plotOptions?.bar?.groupPadding === undefined ?
                                                 0.2 :
-                                                state.chartOptions.plotOptions.bar.groupPadding
+                                                chartOptions.plotOptions.bar.groupPadding
                                     }
                                     onChange={e => onChange(
                                         merge(state, {
@@ -178,12 +182,12 @@ export default function ConfigPanel({
                                     step={0.01}
                                     value={
                                         state.chartType.startsWith("column") ? 
-                                            state.chartOptions.plotOptions?.column?.pointPadding === undefined ?
+                                            chartOptions.plotOptions?.column?.pointPadding === undefined ?
                                                 0.02 :
-                                                state.chartOptions.plotOptions.column.pointPadding :
-                                            state.chartOptions.plotOptions?.bar?.pointPadding === undefined ?
+                                                chartOptions.plotOptions.column.pointPadding :
+                                            chartOptions.plotOptions?.bar?.pointPadding === undefined ?
                                                 0.02 :
-                                                state.chartOptions.plotOptions.bar.pointPadding
+                                                chartOptions.plotOptions.bar.pointPadding
                                     }
                                     onChange={e => onChange(     
                                         merge(state, {
@@ -210,7 +214,7 @@ export default function ConfigPanel({
                                 min={0}
                                 max={360}
                                 step={1}
-                                value={ state.chartOptions.plotOptions?.pie?.startAngle || 0 }
+                                value={ chartOptions.plotOptions?.pie?.startAngle || 0 }
                                 onChange={e => onChange(     
                                     merge(state, {
                                         chartOptions: {
@@ -234,7 +238,7 @@ export default function ConfigPanel({
                                 min={0}
                                 max={30}
                                 step={1}
-                                value={ state.chartOptions.plotOptions?.pie?.slicedOffset === undefined ? 30 : state.chartOptions.plotOptions.pie.slicedOffset }
+                                value={ chartOptions.plotOptions?.pie?.slicedOffset === undefined ? 30 : chartOptions.plotOptions.pie.slicedOffset }
                                 onChange={e => onChange(
                                     merge(state, {
                                         chartOptions: {
@@ -261,7 +265,7 @@ export default function ConfigPanel({
                         <input
                             type="text"
                             // @ts-ignore
-                            value={ state.chartOptions.yAxis?.title?.text || "" }
+                            value={ chartOptions.yAxis?.title?.text || "" }
                             onChange={ e => onChange(merge(state, {
                                 chartOptions: {
                                     yAxis: {
@@ -278,7 +282,7 @@ export default function ConfigPanel({
                             name="gridLineWidth"
                             label="Render grid lines"
                             // @ts-ignore
-                            checked={state.chartOptions.yAxis?.gridLineWidth !== 0}
+                            checked={chartOptions.yAxis?.gridLineWidth !== 0}
                             onChange={checked => onChange(merge(state, {
                                 chartOptions: {
                                     yAxis: {
@@ -291,7 +295,7 @@ export default function ConfigPanel({
                             name="lineWidth"
                             label="Render axis line"
                             // @ts-ignore
-                            checked={state.chartOptions.yAxis?.lineWidth !== 0}
+                            checked={chartOptions.yAxis?.lineWidth !== 0}
                             onChange={checked => onChange(merge(state, {
                                 chartOptions: {
                                     yAxis: {
@@ -304,9 +308,9 @@ export default function ConfigPanel({
                             name="YTicks"
                             label="Render axis tick marks"
                             // @ts-ignore
-                            // disabled={state.chartOptions.yAxis?.lineWidth === 0}
+                            // disabled={chartOptions.yAxis?.lineWidth === 0}
                             // @ts-ignore
-                            checked={state.chartOptions.yAxis?.tickWidth !== 0}
+                            checked={chartOptions.yAxis?.tickWidth !== 0}
                             onChange={checked => onChange(merge(state, {
                                 chartOptions: {
                                     yAxis: {
@@ -319,7 +323,7 @@ export default function ConfigPanel({
                             name="YLabels"
                             label="Render labels"
                             // @ts-ignore
-                            checked={state.chartOptions.yAxis?.labels?.enabled !== false}
+                            checked={chartOptions.yAxis?.labels?.enabled !== false}
                             onChange={checked => onChange(merge(state, {
                                 chartOptions: {
                                     yAxis: {
@@ -340,7 +344,7 @@ export default function ConfigPanel({
                             type="text"
                             placeholder={state.xCol.label || state.xCol.name || ""}
                             // @ts-ignore
-                            value={ state.chartOptions.xAxis?.title?.text || "" }
+                            value={ chartOptions.xAxis?.title?.text || "" }
                             onChange={ e => onChange(merge(state, {
                                 chartOptions: {
                                     xAxis: {
@@ -357,7 +361,7 @@ export default function ConfigPanel({
                             name="XTitle"
                             label="Render title"
                             // @ts-ignore
-                            checked={state.chartOptions.xAxis?.title?.enabled !== false}
+                            checked={chartOptions.xAxis?.title?.enabled !== false}
                             onChange={enabled => onChange(merge(state, {
                                 chartOptions: {
                                     xAxis: {
@@ -370,7 +374,7 @@ export default function ConfigPanel({
                             name="XGridLineWidth"
                             label="Render grid lines"
                             // @ts-ignore
-                            checked={state.chartOptions.xAxis?.gridLineWidth === 1}
+                            checked={chartOptions.xAxis?.gridLineWidth === 1}
                             onChange={checked => onChange(merge(state, {
                                 chartOptions: {
                                     xAxis: {
@@ -383,7 +387,7 @@ export default function ConfigPanel({
                             name="XLineWidth"
                             label="Render axis line"
                             // @ts-ignore
-                            checked={!!state.chartOptions.xAxis?.lineWidth}
+                            checked={!!chartOptions.xAxis?.lineWidth}
                             onChange={checked => onChange(merge(state, {
                                 chartOptions: {
                                     xAxis: {
@@ -396,9 +400,9 @@ export default function ConfigPanel({
                             name="XTicks"
                             label="Render axis tick marks"
                             // @ts-ignore
-                            // disabled={state.chartOptions.xAxis?.lineWidth === 0}
+                            // disabled={chartOptions.xAxis?.lineWidth === 0}
                             // @ts-ignore
-                            checked={ !!state.chartOptions.xAxis?.tickWidth }
+                            checked={ !!chartOptions.xAxis?.tickWidth }
                             onChange={checked => onChange(merge(state, {
                                 chartOptions: {
                                     xAxis: {
@@ -411,7 +415,7 @@ export default function ConfigPanel({
                             name="XLabels"
                             label="Render labels"
                             // @ts-ignore
-                            checked={state.chartOptions.xAxis?.labels?.enabled !== false}
+                            checked={chartOptions.xAxis?.labels?.enabled !== false}
                             onChange={checked => onChange(merge(state, {
                                 chartOptions: {
                                     xAxis: {
@@ -609,34 +613,6 @@ export default function ConfigPanel({
                     })}
                     <br/>
                     <br/>
-                    {/* <label>
-                        Saturation
-                        <input
-                            type="range"
-                            min={0}
-                            max={100}
-                            step={1}
-                            value={ state.colorOptions.saturation }
-                            onChange={e => onChange({ ...state, colorOptions: { ...state.colorOptions, saturation: e.target.valueAsNumber }})}
-                            style={{ width: "100%", margin: 0 }}
-                        />
-                    </label>
-                    <p className="small color-muted">The intensity of all the colors</p>
-                    <br/>
-                    <label>
-                        Brightness
-                        <input
-                            type="range"
-                            min={0}
-                            max={100}
-                            step={1}
-                            value={ state.colorOptions.brightness }
-                            onChange={e => onChange({ ...state, colorOptions: { ...state.colorOptions, brightness: e.target.valueAsNumber }})}
-                            style={{ width: "100%", margin: 0 }}
-                        />
-                    </label>
-                    <p className="small color-muted">The lightness or darkness of all the colors</p>
-                    <br/> */}
                     <label>
                         Opacity
                         <input
@@ -651,34 +627,6 @@ export default function ConfigPanel({
                     </label>
                     <p className="small color-muted">Using semitransparent colors might slightly improve readability in case of overlaping lines or shapes</p>
                     <br/>
-                    {/* <label>
-                        Variety
-                        <input
-                            type="range"
-                            min={0}
-                            max={1}
-                            step={0.001}
-                            value={ state.colorOptions.variety }
-                            onChange={e => onChange({ ...state, colorOptions: { ...state.colorOptions, variety: e.target.valueAsNumber }})}
-                            style={{ width: "100%", margin: 0 }}
-                        />
-                    </label>
-                    <p className="small color-muted">We use "golden angle" slices of the color wheel to generate unique colors. However, in some cases you might want to reduce the variety and use colors that are closer to each other.</p>
-                    <br/>
-                    <label>
-                        Start Color
-                        <div style={{ background: "linear-gradient(90deg, #F00, #FF0, #0F0, #0FF, #00F, #F0F, #F00)", height: "3px", margin: "0 1px 5px", borderRadius: 6 }}></div>
-                        <input
-                            type="range"
-                            min={0}
-                            max={360}
-                            step={1}
-                            value={ state.colorOptions.startColor }
-                            onChange={e => onChange({ ...state, colorOptions: { ...state.colorOptions, startColor: e.target.valueAsNumber }})}
-                            style={{ width: "100%", margin: 0 }}
-                        />
-                    </label>
-                    <p className="small color-muted">Select the hue of the first color. Any subsequent colors will be computed by shifting this hue with an ammount depending on the "variety" color setting.</p> */}
                 </div>
             </Collapse>
 
@@ -707,12 +655,25 @@ export default function ConfigPanel({
                                 }
                             }
                         )}
-                        current={ state.chartOptions.annotations?.[0]?.labels || [] }
+                        current={ chartOptions.annotations?.[0]?.labels || [] }
                         xCol={ state.xCol }
                     />
                     <br/>
                 </Collapse>
             }
+
+            <Collapse collapsed header="Adavanced Chart Options">
+                <div className="mt-1 mb-1">
+                    Most of the <a className="link" rel="noreferrer noopener" href="https://api.highcharts.com/highcharts/"
+                    target="_blank">chart options</a> can be set below
+                </div>
+                <DynamicEditor
+                    obj={ chartOptions }
+                    onChange={o => onChange({ ...state, chartOptions: o })}
+                    readOnlyPaths={ ReadOnlyPaths }
+                />
+                <br/>
+            </Collapse>
             
             <br/>
         </div>

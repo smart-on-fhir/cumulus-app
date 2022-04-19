@@ -10,15 +10,13 @@ import { createOne, updateOne, deleteOne }  from "../../backend";
 import { useAuth }                          from "../../auth";
 import DataRequestLink                      from "../DataRequests/DataRequestLink";
 import DataGrid                             from "../DataGrid";
-import BarChart                             from "./Charts/BarChart";
-import ColumnChart                          from "./Charts/ColumnChart";
-import AreaSPLineChart                      from "./Charts/AreaSPLineChart";
-import SPLineChart                          from "./Charts/SPLineChart";
-import PieChart                             from "./Charts/PieChart";
 import Alert, { AlertError }                from "../Alert";
-import { classList, defer, generateColors } from "../../utils";
+import { classList, defer, generateColors, objectDiff, strip, stripUndefined } from "../../utils";
 import ConfigPanel                          from "./ConfigPanel"
-import { operators }                        from "./config";
+import { operators, ReadOnlyPaths, SupportedChartTypes, SupportedNativeChartTypes } from "./config";
+import {Chart2 as BaseChart}                from "./Charts/Chart"
+import { buildChartOptions }                from "./Charts/Chart";
+import DefaultChartOptions, { getDefaultChartOptions } from "./Charts/DefaultChartOptions";
 
 import "./Dashboard.scss";
 
@@ -126,51 +124,22 @@ function viewReducer(state: ViewState, action: ViewAction): ViewState
 
 
 function getColorsLength({
-    column,
     stratifier,
     dataSet,
-    // fullDataSet,
-    // colors = [],
     column2,
     column2type,
-    fullDataSet,
-    type
+    fullDataSet
 }: {
-    column: app.DataRequestDataColumn
     dataSet: PowerSet
     fullDataSet: PowerSet
     stratifier?: app.DataRequestDataColumn | null
-    // colors?: string[]
     column2    ?: app.DataRequestDataColumn | null
     column2type?: string
-    type: string
 }): number {
-    let out = type.startsWith("pie") || type.startsWith("donut") ? dataSet.rows.length : 1;
-
-    if (stratifier) {
-        out = dataSet.getUniqueValuesFromColumn(stratifier.name).size
-    }
+    let out = stratifier ? dataSet.getUniqueValuesFromColumn(stratifier.name).size : dataSet.rows.length;    
 
     if (column2 && column2type) {
-        let groups = Array.from(fullDataSet.getUniqueValuesFromColumn(column2.name));
-        
-        out += groups.length
-        
-    //     // let _series: Record<string, any> = {};
-
-    //     // let sub = fullDataSet.pick([column.name, column2.name]);
-    //     // groups.forEach(x => {
-    //     //     let data = sub.where({ [column.name]: x });
-
-    //     //     data.rows.forEach((row, i) => {
-    //     //         let groupName = row[column2.name];
-    //     //         let group = _series[groupName + ""];
-    //     //         if (!group) {
-    //     //             group = _series[groupName + ""] = {};
-    //     //             out += 1
-    //     //         }
-    //     //     });
-    //     // });
+        out += Array.from(fullDataSet.getUniqueValuesFromColumn(column2.name)).length;
     }
 
     return out
@@ -191,11 +160,7 @@ export default function Dashboard({
         chartOptions: serverChartOptions = {},
         denominator: serverDenominator = "",
         colorOptions: serverColorOptions = {
-            // saturation: 75,
-            // brightness: 60,
-            // variety   : 1,
             opacity   : 1,
-            // startColor: 0,
             colors    : []
         },
         column2: serverColumn2 = "",
@@ -274,6 +239,13 @@ export default function Dashboard({
             await getScreenShot() :
             undefined;
 
+        const chartOptionsToSave = objectDiff(
+            strip(chartOptions, ReadOnlyPaths),
+            DefaultChartOptions
+        );
+
+        // console.log(chartOptions, chartOptionsToSave)
+        
         // Update
         if (view.id) {
             await updateOne("views", view.id, {
@@ -287,7 +259,7 @@ export default function Dashboard({
                     column : viewColumn,
                     filters,
                     viewType: chartType,
-                    chartOptions,
+                    chartOptions: chartOptionsToSave,
                     colorOptions,
                     denominator,
                     column2,
@@ -315,7 +287,7 @@ export default function Dashboard({
                     column : viewColumn,
                     filters,
                     viewType: chartType,
-                    chartOptions,
+                    chartOptions: chartOptionsToSave,
                     colorOptions,
                     denominator,
                     column2,
@@ -428,14 +400,32 @@ export default function Dashboard({
     };
 
     const colorsLength = getColorsLength({
-        column: col1,
         fullDataSet: powerSet,
-        dataSet: chartPowerSet,
-        stratifier: stratifier,
-        column2: col2,
-        column2type: column2type,
-        type: chartType
+        dataSet    : chartPowerSet,
+        column2    : col2,
+        stratifier,
+        column2type
     });
+
+    // Start by building a default options for the given type
+    let options = getDefaultChartOptions(chartType as keyof typeof SupportedChartTypes, chartOptions)
+
+    // Now build the final options by adding dynamic properties like series data
+    // and function options
+    let finalChartOptions = buildChartOptions({
+        options     : options,
+        column      : col1,
+        dataSet     : chartPowerSet,
+        fullDataSet : powerSet,
+        groupBy     : stratifier,
+        type        : options.chart!.type as SupportedNativeChartTypes,
+        colorOptions: colorOptions,
+        column2     : col2,
+        column2type,
+        column2opacity,
+        denominator
+    })
+    // console.log("finalChartOptions:", finalChartOptions)
 
     return (
         <div className={ saving || deleting ? "grey-out" : undefined }>
@@ -470,7 +460,8 @@ export default function Dashboard({
                                 chartType,
                                 viewName,
                                 viewDescription,
-                                chartOptions,
+                                chartOptions: stripUndefined(finalChartOptions),
+                                // chartOptions: finalChartOptions,
                                 colorOptions,
                                 denominator,
                                 column2,
@@ -602,18 +593,16 @@ export default function Dashboard({
                                 Please edit this view or delete it and create new one.
                             </AlertError>
                         ) }
-                        { col1 && viewType === "overview" && <Chart
-                            chartType={chartType}
-                            column={ col1 }
-                            fullDataSet={ powerSet }
-                            dataSet={ chartPowerSet }
-                            options={ chartOptions }
-                            colorOptions={colorOptions}
-                            denominator={denominator}
-                            stratifier={ stratifier }
-                            column2={col2}
-                            column2type={column2type}
-                            column2opacity={column2opacity}
+                        { col1 && viewType === "overview" && <BaseChart
+                            options={ finalChartOptions }
+                            key={ [
+                                chartType,
+                                col1.name,
+                                stratifier || "",
+                                finalChartOptions.annotations?.length || "",
+                                column2,
+                                column2type
+                            ].join("-") }
                         /> }
                         <br/>
                         <CaptionEditor html={caption} onChange={caption => dispatch({ type: "UPDATE", payload: { caption }})}/>
@@ -633,74 +622,6 @@ export default function Dashboard({
         </div>
     )
 }
-
-function Chart({ chartType, column, dataSet, fullDataSet, options, colorOptions, denominator, stratifier, column2, column2type, column2opacity }: {
-    chartType   : string
-    column      : app.DataRequestDataColumn
-    stratifier ?: app.DataRequestDataColumn | null
-    dataSet     : PowerSet
-    fullDataSet : PowerSet
-    options     : Partial<Highcharts.Options>
-    colorOptions: app.ColorOptions
-    denominator : string
-    column2    ?: app.DataRequestDataColumn | null
-    column2type?: string
-    column2opacity?: number
-}) {
-    const commonProps = {
-        column,
-        fullDataSet,
-        dataSet,
-        options,
-        colorOptions,
-        denominator
-    };
-
-    if (chartType === "pie") {
-        return <PieChart { ...commonProps } />
-    }
-    if (chartType === "pie3d") {
-        return <PieChart { ...commonProps } use3d />
-    }
-    if (chartType === "donut") {
-        return <PieChart { ...commonProps } donut />
-    }
-    if (chartType === "donut3d") {
-        return <PieChart { ...commonProps } donut use3d />
-    }
-    if (chartType === "spline") {
-        return <SPLineChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} />
-    }
-    if (chartType === "areaspline") {
-        return <AreaSPLineChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} />
-    }
-    if (chartType === "column") {
-        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} />
-    }
-    if (chartType === "column3d") {
-        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} use3d />
-    }
-    if (chartType === "columnStack") {
-        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} stack />
-    }
-    if (chartType === "columnStack3d") {
-        return <ColumnChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} stack use3d />
-    }
-    if (chartType === "bar") {
-        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} />
-    }
-    if (chartType === "bar3d") {
-        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} use3d />
-    }
-    if (chartType === "barStack") {
-        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} stack />
-    }
-    if (chartType === "barStack3d") {
-        return <BarChart { ...commonProps } groupBy={ stratifier } column2={column2} column2type={column2type} column2opacity={column2opacity} stack use3d />
-    }
-    return null;
-}
-
 
 interface CaptionEditorProps {
     html: string | null
