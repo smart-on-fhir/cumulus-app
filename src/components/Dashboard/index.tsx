@@ -145,7 +145,7 @@ function getColorsLength({
     column2type?: string
     type: string
 }): number {
-    let out = type.startsWith("pie") ? dataSet.rows.length : 1;
+    let out = type.startsWith("pie") || type.startsWith("donut") ? dataSet.rows.length : 1;
 
     if (stratifier) {
         out = dataSet.getUniqueValuesFromColumn(stratifier.name).size

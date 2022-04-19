@@ -83,7 +83,10 @@ export default function ConfigPanel({
                             options={Object.keys(SupportedChartTypes).map((type, i) => ({
                                 value: type,
                                 label: SupportedChartTypes[type as SupportedChartType],
-                                icon: ChartIcons[type as keyof typeof ChartIcons]
+                                icon: ChartIcons[type as keyof typeof ChartIcons],
+                                disabled: (type.includes("Stack") && !state.stratifyBy) || (
+                                    (type.includes("pie") || type.includes("donut")) && !!state.stratifyBy
+                                )
                             }))}
                         />
                     </div>
@@ -100,6 +103,8 @@ export default function ConfigPanel({
                                 }
                             }))}
                         />
+                        <br/>
+                        
                     </div>
                     <div className="mt-1">
                         <Checkbox
@@ -136,7 +141,15 @@ export default function ConfigPanel({
                                     min={0}
                                     max={0.5}
                                     step={0.01}
-                                    value={ state.chartOptions.plotOptions?.column?.groupPadding === undefined ? 0.2 : state.chartOptions.plotOptions.column.groupPadding }
+                                    value={
+                                        state.chartType.startsWith("column") ? 
+                                            state.chartOptions.plotOptions?.column?.groupPadding === undefined ?
+                                                0.2 :
+                                                state.chartOptions.plotOptions.column.groupPadding :
+                                            state.chartOptions.plotOptions?.bar?.groupPadding === undefined ?
+                                                0.2 :
+                                                state.chartOptions.plotOptions.bar.groupPadding
+                                    }
                                     onChange={e => onChange(
                                         merge(state, {
                                             chartOptions: {
@@ -163,7 +176,15 @@ export default function ConfigPanel({
                                     min={0}
                                     max={0.5}
                                     step={0.01}
-                                    value={ state.chartOptions.plotOptions?.column?.pointPadding === undefined ? 0.02 : state.chartOptions.plotOptions.column.pointPadding }
+                                    value={
+                                        state.chartType.startsWith("column") ? 
+                                            state.chartOptions.plotOptions?.column?.pointPadding === undefined ?
+                                                0.02 :
+                                                state.chartOptions.plotOptions.column.pointPadding :
+                                            state.chartOptions.plotOptions?.bar?.pointPadding === undefined ?
+                                                0.02 :
+                                                state.chartOptions.plotOptions.bar.pointPadding
+                                    }
                                     onChange={e => onChange(     
                                         merge(state, {
                                             chartOptions: {
@@ -181,21 +202,21 @@ export default function ConfigPanel({
                             <p className="small color-muted">Padding between each column or bar</p>
                         </div>
                     }
-                    { state.chartType.startsWith("donut") && <div className="mt-1">
+                    { (state.chartType.startsWith("donut") || state.chartType.startsWith("pie")) && <div className="mt-1">
                         <label>
-                            Inner Size
+                            Start Angle
                             <input
                                 type="range"
-                                min={1}
-                                max={90}
+                                min={0}
+                                max={360}
                                 step={1}
-                                value={ parseFloat(state.chartOptions.plotOptions?.pie?.innerSize === undefined ? "50" : state.chartOptions.plotOptions.pie.innerSize + "") }
+                                value={ state.chartOptions.plotOptions?.pie?.startAngle || 0 }
                                 onChange={e => onChange(     
                                     merge(state, {
                                         chartOptions: {
                                             plotOptions: {
                                                 pie: {
-                                                    innerSize: e.target.valueAsNumber + "%"
+                                                    startAngle: e.target.valueAsNumber
                                                 }
                                             }
                                         }
@@ -283,7 +304,7 @@ export default function ConfigPanel({
                             name="YTicks"
                             label="Render axis tick marks"
                             // @ts-ignore
-                            disabled={state.chartOptions.yAxis?.lineWidth === 0}
+                            // disabled={state.chartOptions.yAxis?.lineWidth === 0}
                             // @ts-ignore
                             checked={state.chartOptions.yAxis?.tickWidth !== 0}
                             onChange={checked => onChange(merge(state, {
@@ -313,8 +334,26 @@ export default function ConfigPanel({
 
             { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
                 <Collapse collapsed header={ state.chartType.startsWith("bar") ? "Y Axis" : "X Axis" }>
+                    <div className="mt-1">
+                        <label>Axis Title</label>
+                        <input
+                            type="text"
+                            placeholder={state.xCol.label || state.xCol.name || ""}
+                            // @ts-ignore
+                            value={ state.chartOptions.xAxis?.title?.text || "" }
+                            onChange={ e => onChange(merge(state, {
+                                chartOptions: {
+                                    xAxis: {
+                                        title: {
+                                            text: e.target.value
+                                        }
+                                    }
+                                }
+                            }))}
+                        />
+                    </div>
                     <div className="mt-1 pb-2">
-                        <Checkbox
+                        {/* <Checkbox
                             name="XTitle"
                             label="Render title"
                             // @ts-ignore
@@ -326,7 +365,7 @@ export default function ConfigPanel({
                                     }
                                 }
                             }))}
-                        />
+                        /> */}
                         <Checkbox
                             name="XGridLineWidth"
                             label="Render grid lines"
@@ -357,7 +396,7 @@ export default function ConfigPanel({
                             name="XTicks"
                             label="Render axis tick marks"
                             // @ts-ignore
-                            disabled={state.chartOptions.xAxis?.lineWidth === 0}
+                            // disabled={state.chartOptions.xAxis?.lineWidth === 0}
                             // @ts-ignore
                             checked={ !!state.chartOptions.xAxis?.tickWidth }
                             onChange={checked => onChange(merge(state, {
@@ -668,7 +707,7 @@ export default function ConfigPanel({
                                 }
                             }
                         )}
-                        current={ state.chartOptions.annotations?.[0].labels || [] }
+                        current={ state.chartOptions.annotations?.[0]?.labels || [] }
                         xCol={ state.xCol }
                     />
                     <br/>
