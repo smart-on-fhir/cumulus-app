@@ -1,0 +1,130 @@
+
+
+.dynamic-editor-wrap {
+    overflow   : auto;
+    width      : auto;
+    font-family: monospace;
+    color      : #999;
+    white-space: nowrap;
+    font-size  : 14px;
+    line-height: 18px;
+    padding    : 0 0 0 18px;
+    // padding    : 4px 4px 4px 18px;
+    // border     : 1px solid #CCC;
+    // background : #FFF;
+
+    // * {
+    //    box-shadow: 0 0 1px 0 #000 inset; 
+    // }
+
+    input[type="text"] {
+        display       : inline-block;
+        width         : auto;
+        color         : #000;
+        line-height   : inherit;        
+        border        : 0;
+        padding       : 0;
+        position      : relative;
+        border-radius : 0;
+        background    : transparent;
+        vertical-align: top;
+        &[name="name"] {
+            color: rgb(179, 95, 0);
+        }
+        &.string { color: #390; }
+        &.number { color: #C00; }
+        &.boolean { color: #066; font-weight: bold; }
+        &.object { color: #00C; }
+        &.undefined { color: #06C; }
+        &.txt { background: rgba(255, 0, 0, 0.1); }
+        &:focus {
+            z-index: 2;
+            box-shadow: 0 0px 0px 1px rgb(0 0 0 / 30%), 0 2px 3px 0px rgb(0 0 0 / 30%) !important;
+            outline: none;
+        }
+    }
+}
+
+.dynamic-editor {
+    
+    display: flex;
+    
+    &.open {
+        display: block;
+    }
+
+    .add {
+        color         : rgb(151, 173, 209);
+        border-radius : 3px;
+        padding       : 1px 6px;
+        font-size     : 11px;
+        line-height   : 13px;
+        height        : 15px;
+        cursor        : pointer;
+        white-space   : nowrap;
+        font-weight   : bold;
+        vertical-align: top;
+        display       : inline-block;
+        margin        : 1px 2px;
+        &::before {
+            content: "+";
+            font-weight: bold;
+            padding-right: 2px;
+        }
+        &:hover {
+            background-color: rgb(0, 119, 255);
+            color: #FFF;
+        }
+    }
+
+    b {
+        color: #555;
+        vertical-align: top;
+        display: inline-block;
+    }
+
+    small {
+        font-size: small;
+    }
+
+    code {
+        flex         : 1 1 0em;
+        padding      : 0 4px;
+        text-overflow: ellipsis;
+        white-space  : pre;
+        overflow     : hidden;
+        max-width    : min-content;
+
+        &:empty {
+            padding: 0;
+        }
+    }
+
+    > .dynamic-editor {
+        padding  : 0 0 0 18px;
+        min-width: none;
+        width    : 100%;
+    }
+
+    .fa-solid {
+        display  : inline-block;
+        width    : 18px;
+        min-width: 18px;
+        text-align: center;
+        margin: 0 0 0 -18px;
+        height: 18px;
+        line-height: 18px;
+        vertical-align: top;
+    }
+
+    &.readonly {
+        .add {
+            display: none;
+        }
+        input[type="text"], b, code {
+            color: #999;
+            appearance: none;
+            pointer-events: none;
+        }
+    }
+}

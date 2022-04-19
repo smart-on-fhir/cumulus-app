@@ -254,6 +254,7 @@ export function getSeries({
                         colorIndex: (series.length + i) % colors.length,
                         dashStyle: "ShortDash",
                         lineWidth: 1,
+                        zIndex: 10,
                         opacity: column2opacity,
                         borderColor: "rgba(0, 0, 0, 0.8)",
                         color: column2type === "spline" ? undefined : {
@@ -324,20 +325,6 @@ export function getSeries({
     return series
 }
 
-export function needsCrosshair(type: string, column: app.DataRequestDataColumn, groupBy?: app.DataRequestDataColumn | null): boolean {
-    const xType = getXType(column, groupBy);
-    if (type === "spline" || type === "areaspline") {
-        if (xType === "category") {
-            return false
-        }
-        // if (!!groupBy) {
-        //     return true
-        // }
-        return true
-    }
-    return false
-}
-
 export function buildChartOptions({
     options = {},
     column,
@@ -366,12 +353,12 @@ export function buildChartOptions({
 {
     const COLORS = colorOptions.colors.map(c => new Color(c).setOpacity(colorOptions.opacity).get("rgba") + "")
 
-    // console.log(colorOptions)
     const series = getSeries({
         dataSet,
         column,
         groupBy,
-        type,
+        // @ts-ignore
+        type: type,
         fullDataSet,
         colors: COLORS,
         denominator,
@@ -380,186 +367,31 @@ export function buildChartOptions({
         column2opacity
     });
 
-    // console.log("series", series)
-
     let xType = getXType(column, groupBy);
 
-    
-    
-    return {
-        ...options,
+    return merge(options, {
         chart: {
-            height: null,
-            width: null,
-            type,
-            panning: {
-                enabled: true
-            },
-            panKey: 'shift',
-            // scrollablePlotArea: {
-            //     minWidth: 600
-            // },
-            // reflow: false,
-            // marginRight: type === "pie" ? undefined : 40,
-            marginTop: type === "pie" || options.title?.text ? undefined : 40,
-            // marginLeft: 40,
-            // marginRight: 40,
-            spacingBottom: 25,
-            // spacingRight: 15,
-            zoomType: type === "spline" ||
-                      type === "areaspline" ||
-                      type === "column" ||
-                      type === "bar" ||
-                      type === "area" ?
-                (series[0]?.data || []).length > 2 ? "x" : undefined :
-                undefined,
-            ...options.chart,
-            animation: {
-                duration: 400,
-                defer: 0,
-                easing
-            },
+            marginTop: type === "pie" || options.title?.text ? null : 40,
             options3d: {
                 depth: Math.min(series.length * 10, 100),
-                ...options.chart?.options3d
             },
-            plotBorderColor: "#999",
             plotBorderWidth: options.chart?.options3d?.enabled ? 0 : options.chart?.plotBorderWidth
         },
-        lang: {
-            noData: `<div style="text-align:center;padding:10px;color:#900;font-size:15px">No data to display!</div>
-            <div style="padding:0 20px 10px;font-weight:400">If you have filters applied, try changing or removing them.</div>`,
-        },
-        noData: {
-            attr: {
-                fill: "#F6F6F6",
-                r: 5,
-                stroke: "#E6E6E6",
-                "stroke-width": "1px"
-            },
-            useHTML: true
-        },
-        exporting: {
-            buttons: {
-                contextButton: {
-                    menuItems: ["viewFullscreen", "printChart", "separator", "downloadPNG", "downloadJPEG", "downloadPDF", "downloadSVG", "separator", "downloadCSV", "downloadXLS"]
-                }
-            },
-            sourceWidth: 1000,
-            sourceHeight: 600,
-            scale: 3
-        }, 
-        credits: {
-            enabled: true,
-            href: "https://smarthealthit.org/",
-            style: {
-                fontSize: "10px",
-                color: "#999",
-                fontWeight: "bold"
-            },
-            position: {
-                y: -8,
-                x: -8,
-                align: "right"
-            },
-            text: "SMART®"
-        },
-        // caption: {
-        //     text: "<b>Denominator</b>: " + (
-        //         denominator === "local" ?
-        //             `the total count of every listed data group (total count = ${fullDataSet.countAll().toLocaleString()})` :
-        //             denominator === "global" ?
-        //                 `total count (${fullDataSet.countAll().toLocaleString()})` :
-        //                 `none (showing raw aggregate counts; total count = ${fullDataSet.countAll().toLocaleString()})`
-        //     ),
-        //     floating: true,
-        //     y: 30
-        // },
-        title: {
-            text: "",//series.length ? getChartTitleText(column, groupBy) : "",
-            style: {
-                fontWeight: "bold",
-                fontSize: "20px"
-            },
-            ...options.title,
-        },
-        legend: {
-            enabled: series.length > 1 || type === "pie",
-            // margin: 0,
-            // padding: 0,
-            ...options.legend,
-        },
         colors: COLORS,
-        yAxis: Highcharts.merge({
-            // lineColor: "rgba(0, 0, 0, 0.2)",
-            // lineWidth: 1,
-            title: {
-                text: "",
-                skew3d: true,
-                margin: 15,
-                style: {
-                    fontWeight: "bold",
-                    fontSize: "16px"
-                }
-            },
+        yAxis: {
             allowDecimals: denominator ? true : false,
-            // maxPadding: 0,
-            // minPadding: 0,
-            endOnTick: false,
-            gridLineColor: "#DDD", // "rgba(0, 0, 0, 0.1)",
-            // @ts-ignore
-            tickLength: options.yAxis?.lineWidth === 0 ? 0 : 10,
-            tickWidth: 1,
-            // gridZIndex: 1,
-            // endOnTick: true,
-            // startOnTick: true,
-            // floor: denominator ? 0 : undefined,
-            // ceiling: denominator ? 100 : undefined,
             labels: {
                 format: denominator ? "{text}%" : "{text}",
-                style: {
-                    fontSize: "13px"
-                }
-            },
-            lineWidth: 1,
-            lineColor: "#999",
-            // softMax: denominator ? 100 : undefined,            
-            
-            // Up to 10X Zoom
-            // softMax: series.reduce((prev, cur) => {
-            //     const max = cur.data ?
-            //         (cur.data as Highcharts.XrangePointOptionsObject[]).reduce((p: number, c) => Math.max(p, c.y || 0), 0) :
-            //         prev;
-            //     return Math.max(prev, max)
-            // }, 0) / 10,
-        }, options.yAxis),
+            }
+        },
         plotOptions: {
-            series: {
-                borderColor     : "rgba(0, 0, 0, 0.5)",
-                borderWidth     : 0.25,
-                allowPointSelect: true,
-                cursor          : 'pointer',
-                showInLegend    : true,
-                animation: {
-                    duration: 400,
-                    defer: 0,
-                    easing,
-                }
-            },
             pie: {
-                // startAngle : 20,
-                innerSize       : 0,
-                depth           : 50,
-                slicedOffset    : 10,
-                // @ts-ignore
-                edgeColor: "rgba(0, 0, 0, 0.1)",
-                ...options.plotOptions?.pie,
                 dataLabels: {
-                    enabled: true,
-                    // format: `<b>{point.name}</b><span style="opacity:0.5;font-weight:400"> - {point.percentage:.1f} %</span>`,
-                    formatter() {
+                    formatter(): any {
+                        // @ts-ignore
                         if (this.point) {
                             // console.log(this.point)
+                            // @ts-ignore
                             let label = `<b>${this.point.name}</b>`
 
                             let suffix = ""
@@ -576,151 +408,30 @@ export function buildChartOptions({
                             // }
 
                             if (!suffix) {
+                                // @ts-ignore
                                 suffix = `<span style="opacity:0.5;font-weight:400"> - ${parseFloat((this.point.percentage || 0).toPrecision(2))} %</span>`
                             }
 
                             return label + suffix
                         }
-                    },
-                    ...options.plotOptions?.pie?.dataLabels,
+                    }
                 }
-
             },
-            column: {
-                edgeColor: "rgba(0, 0, 0, 0.1)",
-                getExtremesFromAll: true,
-
-                borderColor: "rgba(1, 1, 1, 0.5)",
-                borderWidth: 0.25,
-                borderRadius: 0.5,
-                pointPadding: 0.02,
-                groupPadding: 0.2,
-                crisp: false,
-                
-                states: {
-                    select: {
-                        borderWidth: 1,
-                        color: "#999"
-                    }
-                },
-                ...options.plotOptions?.column,
-            },
-            bar: {
-                edgeColor: "rgba(0, 0, 0, 0.1)",
-                getExtremesFromAll: true,
-                borderColor: "rgba(0, 0, 0, 0.5)",
-                borderWidth: 0.25,
-                borderRadius: 0.5,
-                pointPadding: 0.02,
-                groupPadding: 0.2,
-                crisp: false,
-                states: {
-                    select: {
-                        borderWidth: 1,
-                        color: "#999"
-                    }
-                },
-                ...options.plotOptions?.bar,
-            },
-            areaspline: {
-                allowPointSelect: false,
-                marker: {
-                    radius: 0,
-                    enabled: true,
-                    states: {
-                        hover: {
-                            radius: 4
-                        }
-                    }
-                },
-                lineWidth: 1.5,
-                shadow: false,
-                states: {
-                    hover: {
-                        lineWidth: 2,
-                        shadow: true, // show them even on datetime charts
-                    }
-                },
-                cursor: "default",
-                connectNulls: false,
-                getExtremesFromAll: true,
-                dashStyle: "Solid",
-                ...options.plotOptions?.areaspline
-            },
-            area: {
-                fillOpacity: 0.2,
-                allowPointSelect: false,
-                cursor: "default",
-                marker: {
-                    radius: 0,
-                    enabled: true,
-                    states: {
-                        hover: {
-                            radius: 4
-                        }
-                    }
-                },
-                lineWidth: 1.5,
-                shadow: false,
-                states: {
-                    hover: {
-                        lineWidth: 2,
-                        shadow: true, // show them even on datetime charts
-                    }
-                },
-                connectNulls: false,
-                getExtremesFromAll: true,
-                dashStyle: "Solid",
-                ...options.plotOptions?.area,
-                // @ts-ignore
-                depth: Math.min(options.plotOptions?.areaspline?.depth || 10,  100/(series.length || 1)),
-            },
-            spline: {
-                allowPointSelect: false,
-                cursor: "default",
-                marker: {
-                    radius: 2,
-                    enabled: true,
-                    states: {
-                        hover: {
-                            radius: 4
-                        }
-                    }
-                },
-                lineWidth: 1.5,
-                shadow: false,
-                states: {
-                    hover: {
-                        lineWidth: 2,
-                        shadow: true, // show them even on datetime charts
-                    }
-                },
-                connectNulls: false,
-                dashStyle: "Solid",
+            custom: {
+                opacity: colorOptions.opacity,
+                denominator
             }
         },
         tooltip: {
-            useHTML: true,
-            // outside: true,
-            // headerFormat: `<table>`,    
-            // pointFormat : [
-            //     `<tr><td style="text-align:right">${column.label || column.name}:</td><td><b>{point.name}</b></td></tr>`, 
-            //     groupBy && `<tr><td style="text-align:right">${groupBy.label || groupBy.name}:</td><td><b>{series.name}</b></td></tr>`,
-            //     `<tr><td style="text-align:right">Count:</td><td><b>{point.y}</b></td></tr>`,
-            //     `<tr><td style="text-align:right">Other:</td><td><b>{point.custom}</b></td></tr>`
-            // ].filter(Boolean).join("\n"),
-            // footerFormat: '</table>',
-            style: {
-                // whiteSpace: "normal"
-            },
-
-            formatter() {
+            formatter(): any {
                 const rows = [];
 
                 // @ts-ignore
                 if (!this.point.custom.secondary) {
+                    // @ts-ignore
                     rows.push(`<tr><td style="text-align:right">${column.label || column.name}:</td><td><b>${this.point.name}</b></td></tr>`)
                     if (groupBy) {
+                        // @ts-ignore
                         rows.push(`<tr><td style="text-align:right">${groupBy.label || groupBy.name}:</td><td><b>${this.series.name}</b></td></tr>`)
                     }
                 }
@@ -758,65 +469,13 @@ export function buildChartOptions({
                     }
                 }
                 return `<table>${rows.join("")}</table>`
-            },
-            ...options.tooltip
-        },
-        xAxis: merge({
-            type: xType,
-            crosshair: needsCrosshair(type, column, groupBy),
-            // lineColor: "#CCC",
-            currentDateIndicator: true,
-            minRange: xType === "category" ? undefined : 1,
-            maxRange: xType === "category" ? undefined : 2,
-
-            // @ts-ignore
-            tickLength: options.xAxis?.lineWidth === 0 ? 0 : 10,
-            // minRange: 1,
-            // maxRange: 2,
-            // startOnTick: true,
-            // endOnTick: false,
-            minPadding: 0,
-            // maxPadding: 0,
-            lineWidth: 0,
-            lineColor: "#999",
-            gridLineColor: "#DDD",
-            maxPadding: 0,
-            labels: {
-                // align: "center"
-                autoRotationLimit: 80,
-                overflow: "justify",
-                padding: 1,
-                style: {
-                    fontSize: "13px"
-                }
-                // staggerLines: 0,
-
-                // style: {
-                //     textOverflow: "ellipsis",
-                //     // whiteSpace: "pre-wrap",
-                //     // wordBreak: "break-all"
-                // //     // width: 120
-                // //     // fontSize: "80%"
-                // },
-                // autoRotation: [-60],
-                // position3d: "ortho",
-                // skew3d: true
-
-            },
-            title: {
-                text: column.label || column.name,
-                // position3d: "ortho",
-                skew3d: true,
-                margin: 15,
-                style: {
-                    fontWeight: "bold",
-                    fontSize: "16px"
-                }
             }
-        }, options.xAxis) as XAxisOptions,
-        series,
-        annotations: options.annotations
-    }
+        },
+        xAxis: {
+            type: xType
+        },
+        series
+    }) as Highcharts.Options
 }
 
 
@@ -824,18 +483,19 @@ export function buildChartOptions({
 
 
 interface ChartProps {
-    options?: Highcharts.Options
-    column  : app.DataRequestDataColumn
-    dataSet : PowerSet
-    fullDataSet: PowerSet
-    groupBy?: app.DataRequestDataColumn | null
-    type    : SupportedNativeChartTypes
-    colorOptions: app.ColorOptions
-    denominator?: string
-    column2    ?: app.DataRequestDataColumn | null
-    column2type?: string
+    options       ?: Highcharts.Options
+    column         : app.DataRequestDataColumn
+    dataSet        : PowerSet
+    fullDataSet    : PowerSet
+    groupBy       ?: app.DataRequestDataColumn | null
+    type           : SupportedNativeChartTypes
+    colorOptions   : app.ColorOptions
+    denominator   ?: string
+    column2       ?: app.DataRequestDataColumn | null
+    column2type   ?: string
     column2opacity?: number
 }
+
 export default class Chart extends React.Component<ChartProps>
 {
     chart: any;
@@ -846,72 +506,47 @@ export default class Chart extends React.Component<ChartProps>
     }
 
     updateChart() {
-        const {
-            options = {},
-            column,
-            groupBy,
-            dataSet,
-            type,
-            fullDataSet,
-            colorOptions,
-            denominator,
-            column2,
-            column2type,
-            column2opacity
-        } = this.props;
-
-        const chartOptions = buildChartOptions({
-            options,
-            column,
-            groupBy,
-            dataSet,
-            type,
-            fullDataSet,
-            colorOptions,
-            denominator,
-            column2,
-            column2type,
-            column2opacity
-        })
-
-        // console.log(JSON.stringify(chartOptions.annotations))
+        const chartOptions = buildChartOptions(this.props)
+        // console.log(JSON.stringify(chartOptions))
         this.chart.update(chartOptions)
     }
 
-    componentDidMount()
-    {
-        const {
-            options = {},
-            column,
-            groupBy,
-            dataSet,
-            type,
-            fullDataSet,
-            colorOptions,
-            denominator,
-            column2,
-            column2type,
-            column2opacity
-        } = this.props;
-
-        this.chart = Highcharts.chart("chart", buildChartOptions({
-            options,
-            column,
-            groupBy,
-            dataSet,
-            type,
-            fullDataSet,
-            colorOptions,
-            denominator,
-            column2,
-            column2type,
-            column2opacity
-        }));
-        // console.log(this.props.chartOptions)
+    componentDidMount() {
+        const chartOptions = buildChartOptions(this.props)
+        // console.log(chartOptions)
+        this.chart = Highcharts.chart("chart", chartOptions);
     }
 
-    componentDidUpdate()
-    {
+    componentDidUpdate() {
+        defer(this.updateChart);
+    }
+
+    render() {
+        return <div id="chart" className="main-chart"/>
+    }
+}
+
+interface Chart2Props {
+    options: Highcharts.Options
+}
+export class Chart2 extends React.Component<Chart2Props>
+{
+    chart: any;
+
+    constructor(props: Chart2Props) {
+        super(props);
+        this.updateChart = this.updateChart.bind(this);
+    }
+
+    updateChart() {
+        this.chart.update(this.props.options, true, true, false)
+    }
+
+    componentDidMount() {
+        this.chart = Highcharts.chart("chart", this.props.options);
+    }
+
+    componentDidUpdate() {
         defer(this.updateChart);
     }
 

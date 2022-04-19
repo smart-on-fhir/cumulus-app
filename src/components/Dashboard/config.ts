@@ -49,7 +49,19 @@ export type SupportedNativeChartTypes = "pie" | "spline" | "areaspline" | "colum
  */
 export const SingleDimensionChartTypes: (keyof typeof SupportedChartTypes)[] = ["pie", "pie3d", "donut", "donut3d"]
 
-
+export const ReadOnlyPaths = [
+    "chart.marginTop",
+    "chart.type",
+    "series",
+    "chart.options3d.depth",
+    "chart.plotBorderWidth",
+    "colors",
+    "yAxis.allowDecimals",
+    "yAxis.labels.format",
+    "plotOptions.pie.dataLabels.formatter",
+    "tooltip.formatter",
+    "xAxis.type",
+];
 
 // export const CHART_COLORS = [
 //     "#f63", "#ea5", "#dd0", "#ae0", "#5d0", "#2ee", "#8af", "#96f", "#c6f",
