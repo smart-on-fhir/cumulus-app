@@ -59,7 +59,6 @@ function setupStaticContent(app, { verbose })
 {
     app.get("/favicon.ico", (req, res) => res.status(404).end());
     app.use(express.static(Path.join(__dirname, "../build/")));
-    app.use("/api/screenshot", express.static(Path.join(__dirname, "screenShots")));
     app.get("*", (req, res) => res.sendFile("index.html", { root: "../build" }));
     verbose && console.log("✔ Static content hosted");
 }
@@ -150,6 +149,7 @@ async function applySeeds({ db, verbose }, dbConnection)
     }
 }
 
+// TODO: Install Umzug and enable this
 async function applyMigrations({ db, verbose }, dbConnection)
 {
     const migrationsPath = db.migrationsPath;
