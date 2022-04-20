@@ -360,6 +360,7 @@ interface State {
     stringDelimiter    : string
     cols               : Col[]
     rows               : string[][]
+    src                : string // the file name
     selectedColIndex   : number
     trimSpaces         : boolean
     startRow           : number
@@ -383,6 +384,7 @@ const INITIAL_STATE: State = {
     stringDelimiter    : '"',
     cols               : [],
     rows               : [],
+    src                : "",
     selectedColIndex   : 0,
     trimSpaces         : false,
     startRow           : 1,
@@ -642,7 +644,8 @@ export default function DataUploader()
         startRow,
         endRow,
         loading,
-        errorMessage
+        errorMessage,
+        src
     } = state;
 
     
@@ -660,7 +663,8 @@ export default function DataUploader()
         return updateOne("requests", requestID + "", {
             data: {
                 cols: _cols as app.DataRequestDataColumn[],
-                rows: _rows
+                rows: _rows,
+                src
             }
         })
     }, [requestID, cols, rows, trimSpaces]));
@@ -668,7 +672,7 @@ export default function DataUploader()
     function onFileSelected(e: React.ChangeEvent<HTMLInputElement>)
     {
         dispatch({ type: "SET_LOADING", payload: true })
-        const file   = (e.target.files as FileList)[0];
+        const file   = (e.target.files as FileList)[0]; // console.log(file);
         const reader = new FileReader();
         
         reader.addEventListener("load", () => {
@@ -686,7 +690,8 @@ export default function DataUploader()
                         separateBySpace: false,
                         separateBySemicolon: false,
                         customSeparator: null,
-                        input: window.atob(data)
+                        input: window.atob(data),
+                        src: file.name
                     }})
                 } else {
                     dispatch({ type: "MERGE", payload: {
@@ -695,7 +700,8 @@ export default function DataUploader()
                         separateBySpace: false,
                         separateBySemicolon: false,
                         customSeparator: null,
-                        input: window.atob(data)
+                        input: window.atob(data),
+                        src: file.name
                     }})
                 }
             } else {
