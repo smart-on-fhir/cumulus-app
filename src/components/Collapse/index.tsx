@@ -22,7 +22,9 @@ export default function Collapse({ header, children, collapsed }: {
         }
     }, [isCollapsed, refBody])
 
-    const onTransitionEnd = (e: TransitionEvent<HTMLDivElement>) => {
+    useEffect(() => onTransitionEnd(), []);
+
+    const onTransitionEnd = () => {
         if (refBody.current) {
             refBody.current.classList.remove("animating")
             refBody.current.style.height = isCollapsed ? "0" : "auto"
