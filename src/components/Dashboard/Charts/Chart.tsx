@@ -1,5 +1,5 @@
 import React                          from "react";
-import { Color, merge, XAxisOptions } from "highcharts"
+import { Color, merge }               from "highcharts"
 import moment                         from "moment";
 import PowerSet                       from "../../../PowerSet";
 import { defer, format }              from "../../../utils";
@@ -11,7 +11,7 @@ type SeriesOptions = (
     Highcharts.SeriesPieOptions |
     Highcharts.SeriesSplineOptions |
     Highcharts.SeriesAreasplineOptions |
-    Highcharts.SeriesAreaOptions |
+    // Highcharts.SeriesAreaOptions |
     Highcharts.SeriesColumnOptions |
     Highcharts.SeriesBarOptions //|
     // Highcharts.SeriesLineOptions |
@@ -375,7 +375,10 @@ export function buildChartOptions({
             options3d: {
                 depth: Math.min(series.length * 10, 100),
             },
-            plotBorderWidth: options.chart?.options3d?.enabled ? 0 : options.chart?.plotBorderWidth
+            plotBorderWidth: options.chart?.options3d?.enabled ? 0 : options.chart?.plotBorderWidth,
+            animation: {
+                easing
+            },
         },
         colors: COLORS,
         yAxis: {
@@ -385,6 +388,11 @@ export function buildChartOptions({
             }
         },
         plotOptions: {
+            series: {
+                animation: {
+                    easing
+                }
+            },
             pie: {
                 dataLabels: {
                     formatter(): any {

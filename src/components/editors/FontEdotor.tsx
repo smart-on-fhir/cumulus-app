@@ -99,6 +99,14 @@ function PropertyEditor({
         )
     }
 
+    const displayValue = _value === "<New Value>" ?
+        "" :
+        typeof value === "function" ?
+            "<Function>" :
+            value === undefined ?
+                "undefined" :
+                String(_value);
+
     return (
         <div className={ classList({
             "dynamic-editor": true,
@@ -119,10 +127,10 @@ function PropertyEditor({
                 type="text"
                 name="value"
                 placeholder="Enter valid JSON"
-                value={ _value === "<New Value>" ? "" : String(_value) }
+                value={ displayValue }
                 onChange={ e => setValue(e.target.value) }
                 className={type}
-                size={ _value === "<New Value>" ? 11 : _value === undefined ? 2 : String(_value).length }
+                size={ displayValue.length }
                 onBlur={onValueBlur}
             />
         </div>
@@ -140,7 +148,11 @@ class ObjectEditor extends Component<{
         let key = [...this.props.path, name].join(".") + "=";
         if (Array.isArray(value)) {
             key += `Array(${value.length})`
-        } else {
+        }
+        else if (typeof value === "function") {
+            key += "[function]"
+        }
+        else {
             key += String(value)
         }
         return key
@@ -148,6 +160,7 @@ class ObjectEditor extends Component<{
 
     render() {
         const { obj, onChange, path, readOnlyPaths } = this.props;
+        
         return Array.isArray(obj) ? obj.map((value, i) => (
             <PropertyEditor
                 readOnlyPaths={readOnlyPaths}

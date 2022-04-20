@@ -41,7 +41,7 @@ export const ChartIcons = {
     barStack3d   : "/icons/bar_chart.png",
 }
 
-export type SupportedNativeChartTypes = "pie" | "spline" | "areaspline" | "column" | "bar" | "area"
+export type SupportedNativeChartTypes = "pie" | "spline" | "areaspline" | "column" | "bar"
 
 /**
  * Charts that can only have one dimension plus count. They DO NOT support
@@ -52,29 +52,18 @@ export const SingleDimensionChartTypes: (keyof typeof SupportedChartTypes)[] = [
 export const ReadOnlyPaths = [
     "chart.marginTop",
     "chart.type",
+    "chart.animation.easing",
     "series",
     "chart.options3d.depth",
     "chart.plotBorderWidth",
     "colors",
     "yAxis.allowDecimals",
     "yAxis.labels.format",
+    "plotOptions.series.animation.easing",
     "plotOptions.pie.dataLabels.formatter",
     "tooltip.formatter",
     "xAxis.type",
 ];
-
-// export const CHART_COLORS = [
-//     "#f63", "#ea5", "#dd0", "#ae0", "#5d0", "#2ee", "#8af", "#96f", "#c6f",
-//     "#f6f", "#c44", "#cb4", "#9b0", "#3a0", "#3ab", "#2bb", "#658", "#65d",
-//     "#b5e", "#c4c", "#d88", "#cc3", "#9a0", "#6b0", "#3b6", "#3d9", "#476",
-//     "#779", "#b7a", "#c69", '#a66', '#796', '#669', '#C66', '#6C6', '#66C',
-//     '#F66', '#6F6', '#63F', '#933', '#396', '#339'
-
-//     // "#036", "#147", "#258", "#369", "#47A", "#58B", "#69C", "#7AD", "#8BE", "#9CF"
-//     // "#04d", "#09c", "#0c9", "#99c", "#c99", "#f96", "#c63", "#f66", "#F90", "#cc0", "#9c0", "#099"
-// ];
-
-
 
 type ColData = string|number|boolean|null
 
