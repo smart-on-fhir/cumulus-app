@@ -39,13 +39,11 @@
         padding         : 2px;
         border-radius   : 2px;
         margin-top      : 2px;
-        // display: none;
         transform-origin: 100% 0;
         transform       : scale(0.9, 0);
         opacity         : 0;
         transition      : transform 0.4s ease-out, opacity 0.1s ease-out;
         white-space     : pre;
-        // pointer-events: none;
 
         > hr {
             background: #DDD;
@@ -60,14 +58,6 @@
         color: currentColor;
     }
 
-    // &:focus {
-    //     pointer-events: none;
-    //     > .menu-button-btn {
-    //         background: rgba(0, 0, 0, 0.05);
-    //         color: currentColor;
-    //     }    
-    // }
-
     &:focus, &:focus-within {
         > .menu-button-btn {
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2) inset;
@@ -81,8 +71,6 @@
             transform: scale(1, 1);
             opacity: 1;
             transition: transform 0.1s ease-out, opacity 0.4s ease-out;
-            // display: block;
-            // pointer-events: auto;
         }
 
         .default-icon {
@@ -94,7 +82,6 @@
         transform: scale(1, 1);
         opacity: 1;
         transition: transform 0.1s ease-out, opacity 0.4s ease-out;
-        // display: block;
     }
 
     .menu-item {
