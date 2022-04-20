@@ -73,7 +73,7 @@ export function getSeries({
     dataSet,
     fullDataSet,
     type,
-    colors = [],
+    colors = ["#F00", "#0F0", "#00F"],
     denominator = "",
     column2,
     column2type,
