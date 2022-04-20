@@ -1,3 +1,4 @@
+@use "sass:math";
 @import "./variables.scss";
 
 @function contrast($color, $threshold: 50%, $light: #FFF, $dark: #000) {
@@ -487,7 +488,7 @@ $ie-bottom-track-color: darken($track-color, $contrast) !default;
 [type='range'] {
   -webkit-appearance: none;
   background: transparent;
-  margin: $thumb-height / 2 0;
+  margin: math.div($thumb-height, 2) 0;
   width: $track-width;
 
   &::-moz-focus-outer {
@@ -505,7 +506,7 @@ $ie-bottom-track-color: darken($track-color, $contrast) !default;
   &::-webkit-slider-thumb {
     @include thumb;
     -webkit-appearance: none;
-    margin-top: ((-$track-border-width * 2 + $track-height) / 2 - $thumb-height / 2);
+    margin-top: math.div(-$track-border-width * 2 + $track-height, 2) - math.div($thumb-height, 2);
   }
 
   &::-moz-range-track {
@@ -514,7 +515,7 @@ $ie-bottom-track-color: darken($track-color, $contrast) !default;
     background: $track-color;
     border: $track-border-width solid $track-border-color;
     border-radius: $track-radius;
-    height: $track-height / 2;
+    height: math.div($track-height, 2);
   }
 
   &::-moz-range-thumb {
@@ -525,7 +526,7 @@ $ie-bottom-track-color: darken($track-color, $contrast) !default;
     @include track;
     background: transparent;
     border-color: transparent;
-    border-width: ($thumb-height / 2) 0;
+    border-width: math.div($thumb-height, 2) 0;
     color: transparent;
   }
 
@@ -545,7 +546,7 @@ $ie-bottom-track-color: darken($track-color, $contrast) !default;
 
   &::-ms-thumb {
     @include thumb;
-    margin-top: $track-height / 4;
+    margin-top: math.div($track-height, 4);
   }
 
   &:focus, &:focus-within, &:focus-visible {

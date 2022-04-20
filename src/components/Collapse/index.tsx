@@ -13,10 +13,8 @@ export default function Collapse({ header, children, collapsed }: {
 
     useEffect(() => {
         if (refBody.current) {
-            // refBody.current.style.height = "auto";
             if (isCollapsed) {
-                refBody.current.style.height = refBody.current.scrollHeight + "px";
-                requestAnimationFrame(() => { if (refBody.current) refBody.current.style.height = "2px" })
+                refBody.current.style.height = "0"
             }
             else {
                 refBody.current.style.height = refBody.current.scrollHeight + "px";
@@ -26,21 +24,27 @@ export default function Collapse({ header, children, collapsed }: {
 
     const onTransitionEnd = (e: TransitionEvent<HTMLDivElement>) => {
         if (refBody.current) {
-            refBody.current.style.height = isCollapsed ? "2px" : "auto"
             refBody.current.classList.remove("animating")
+            refBody.current.style.height = isCollapsed ? "0" : "auto"
         }
     }
 
     const onTransitionStart = () => {
         if (refBody.current) {
             refBody.current.classList.add("animating")
-            setCollapsed(!isCollapsed)
+            refBody.current.style.height = refBody.current.scrollHeight + "px";
+            
         }
+    }
+
+    const toggle = () => {
+        onTransitionStart()
+        setCollapsed(!isCollapsed)
     }
 
     return (
         <div className={"collapse" + (isCollapsed ? " collapsed" : "")}>
-            <div className="collapse-header" onClick={onTransitionStart}>
+            <div className="collapse-header" onClick={toggle}>
                 <i className={ "fa-solid fa-caret-" + (isCollapsed ? "right" : "down") }/> {header}
             </div>
             <div className="collapse-body" ref={refBody} onTransitionEnd={onTransitionEnd}>{children}</div>
