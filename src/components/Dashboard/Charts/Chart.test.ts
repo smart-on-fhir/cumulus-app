@@ -15,16 +15,9 @@ function expectInclude(src: any, needle: any) {
         if (Array.isArray(needle)) {
             expect(Array.isArray(src)).toEqual(true)
             
-            for (const value of needle) {
-                expect((src as any[]).some(x => {
-                    try {
-                        expectInclude(x, value)
-                        return true
-                    } catch {
-                        return false
-                    }
-                })).toEqual(true)
-            }    
+            needle.forEach((v, i) => {
+                expectInclude(src[i], v)
+            })
         } else {
             for (const key in needle) {
                 expectInclude(src[key], needle[key])
@@ -143,8 +136,8 @@ describe("Chart", () => {
                 type: "pie",
                 name: "x",
                 data: [
-                    { y: 6, name: "1.3", x: 1.3 },
                     { y: 5, name: "2.2", x: 2.2 },
+                    { y: 6, name: "1.3", x: 1.3 },
                     { y: 7, name: "3.4", x: 3.4 },
                 ]
             }])
@@ -169,8 +162,8 @@ describe("Chart", () => {
                 type: "pie",
                 name: "x",
                 data: [
-                    { y: 6, name: "false" },
                     { y: 5, name: "true"  },
+                    { y: 6, name: "false" },
                     { y: 7, name: "true"  },
                 ]
             }])
@@ -355,35 +348,36 @@ describe("Chart", () => {
                 fullDataSet: dataSet
             });
 
-            
-
-            expectInclude(series, [{
-                type: "spline",
-                name: "2000-02",
-                colorIndex: 0,
-                fillColor: undefined,
-                data: [
-                    { y: 5   , name: "a" },
-                    { y: 8   , name: "b" },
-                    { y: 6   , name: "c" },
-                    { y: null, name: "d" },
-                    { y: null, name: "e" },
-                    { y: null, name: "f" },
-                ]
-            }, {
-                type: "spline",
-                name: "2001-04",
-                colorIndex: 1,
-                fillColor: undefined,
-                data: [
-                    { y: null, name: "a" },
-                    { y: null, name: "b" },
-                    { y: null, name: "c" },
-                    { y: 9   , name: "d" },
-                    { y: 7   , name: "e" },
-                    { y: 4   , name: "f" },
-                ]
-            }])
+            expectInclude(series, [
+                {
+                    type: "spline",
+                    name: "2000-02",
+                    colorIndex: 0,
+                    fillColor: undefined,
+                    data: [
+                        { y: 5   , name: "a" },
+                        { y: 8   , name: "b" },
+                        { y: 6   , name: "c" },
+                        { y: null, name: "d" },
+                        { y: null, name: "e" },
+                        { y: null, name: "f" },
+                    ]
+                },
+                {
+                    type: "spline",
+                    name: "2001-04",
+                    colorIndex: 1,
+                    fillColor: undefined,
+                    data: [
+                        { y: null, name: "a" },
+                        { y: null, name: "b" },
+                        { y: null, name: "c" },
+                        { y: 9   , name: "d" },
+                        { y: 7   , name: "e" },
+                        { y: 4   , name: "f" },
+                    ]
+                }
+            ])
 
             // expect(series). toEqual([
             //     {
