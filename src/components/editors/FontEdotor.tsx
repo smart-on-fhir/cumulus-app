@@ -1,6 +1,6 @@
-import { merge }               from "highcharts"
-import { Component, useState } from "react"
-import { classList }           from "../../utils"
+import { merge } from "highcharts"
+import { Component, FocusEvent, KeyboardEvent, useState } from "react"
+import { classList } from "../../utils"
 import "./editors.scss"
 
 
@@ -38,9 +38,9 @@ function PropertyEditor({
         }
     }
 
-    const onValueBlur = () => {
+    const onValueBlur = (e: FocusEvent<HTMLInputElement>) => {
         try {
-            var _v = JSON.parse(_value)
+            var _v = JSON.parse(e.target.value)
         } catch {
             return
         }
@@ -107,6 +107,35 @@ function PropertyEditor({
                 "undefined" :
                 String(_value);
 
+    const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "ArrowUp") {
+            if (type === "number") {
+                e.preventDefault()
+                try {
+                    e.currentTarget.value = String(JSON.parse(e.currentTarget.value) + 1);
+                    e.currentTarget.size = e.currentTarget.value.length;
+                } catch {}
+            }
+        }
+        else if (e.key === "ArrowDown") {
+            if (type === "number") {
+                e.preventDefault()
+                try {
+                    e.currentTarget.value = String(JSON.parse(e.currentTarget.value) - 1);
+                    e.currentTarget.size = e.currentTarget.value.length;
+                } catch {}
+            }
+        }
+        else if (e.key === "Enter") {
+            e.preventDefault()
+            onValueBlur(e as any)
+        }
+        else if (e.key === "Escape") {
+            e.preventDefault()
+            onValueBlur(e as any)
+        }
+    };
+
     return (
         <div className={ classList({
             "dynamic-editor": true,
@@ -132,6 +161,8 @@ function PropertyEditor({
                 className={type}
                 size={ displayValue.length }
                 onBlur={onValueBlur}
+                onKeyDown={onKeyDown}
+                autoComplete="off"
             />
         </div>
     )
