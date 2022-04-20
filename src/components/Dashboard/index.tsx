@@ -607,13 +607,28 @@ export default function Dashboard({
                         <br/>
                         <CaptionEditor html={caption} onChange={caption => dispatch({ type: "UPDATE", payload: { caption }})}/>
                         <br/>
-                        <div className="row mb-1">
-                            <div className="col top">
-                                {/* <h6>SOURCE DATA { dataRequest.refresh ? "SUBSCRIPTION" : "REQUEST" }</h6> */}
+                        <div className="row mb-1 wrap middle half-gap">
+                            <div className="col" style={{ minWidth: "15em" }}>
                                 <DataRequestLink request={ dataRequest } />
                             </div>
-                            <div className="col col-0 top grey-out">
-                                <button className="btn btn-blue mt-1"> <b> Request Line-level Data </b> </button>
+                            <div className="col col-0">
+                                <div className="row half-gap nowrap">
+                                    <div className="col col-0" style={{ minWidth: "17em" }}>
+                                        <a
+                                            className={ "btn btn-blue" + (process.env.REACT_APP_BACKEND_HOST ? " grey-out" : "") }
+                                            href={`https://cumulusdemo.notebook.us-east-1.sagemaker.aws/notebooks/cumulus/demo.ipynb?fileLoc=${
+                                                encodeURIComponent(window.location.origin + "/api/requests/" + dataRequest.id + "/data?format=csv")
+                                            }`}
+                                            target="_blank"
+                                            rel="noreferrer noopener"
+                                        >
+                                            <b> Open in Analytic Environment </b>
+                                        </a>
+                                    </div>
+                                    <div className="col col-0 grey-out" style={{ minWidth: "14em" }}>
+                                        <button className="btn btn-blue"> <b> Request Line-level Data </b> </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
