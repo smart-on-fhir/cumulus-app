@@ -1,9 +1,7 @@
-const Path = require("path")
 const { Sequelize } = require("sequelize");
 const { debuglog }  = require("util");
 const colors        = require("colors")
 const config        = require("../config");
-const { walkSync } = require("../lib");
 const debugDB       = debuglog("app:db");
 
 // @ts-ignore
@@ -13,35 +11,6 @@ const DB = new Sequelize({
     storage: __dirname + '/cumulus.db',
     logging: false
 });
-
-/**
- * @param {Sequelize} connection 
- */
-function initModels(connection, verbose = false) {
-    for (let path of walkSync(Path.join(__dirname, "./models"))) {
-        verbose && console.log(`  - Initializing model from ${path.replace(__dirname, "backend/db")}`)
-        require(path).initialize(connection);
-    }
-
-    verbose && console.log(colors.bold("  Activating associations..."));
-
-    Object.keys(connection.models).forEach(modelName => {
-
-        // @ts-ignore
-        const associate = connection.models[modelName].associate;
-        if (associate) {
-            try {
-                associate(connection);
-            } catch (e) {
-                console.log(`Activating the associations of model "${modelName}" FAILED!`)
-                throw e
-            }
-        }
-    });
-}
-
-// initModels(DB, true)
-
 
 module.exports = DB;
 
