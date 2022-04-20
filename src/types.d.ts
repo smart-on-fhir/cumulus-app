@@ -132,6 +132,8 @@ declare module app {
         cols: DataRequestDataColumn[]
 
         rows: any[][]
+
+        src?: string
     }
 
     interface DataRequestDataColumn {
