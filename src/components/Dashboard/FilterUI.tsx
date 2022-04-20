@@ -1,6 +1,5 @@
 import moment         from "moment"
 import { classList }  from "../../utils"
-// import { classList }  from "../../utils"
 import Select         from "../Select"
 import ColumnSelector from "./ColumnSelector"
 import { operators }  from "./config"

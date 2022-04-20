@@ -7,8 +7,6 @@ import { AlertError }                       from "../Alert";
 import Breadcrumbs                          from "../Breadcrumbs";
 import Loader                               from "../Loader";
 
-// import "./RequestGroups.scss";
-
 
 interface State {
     record : app.DataSite | null
