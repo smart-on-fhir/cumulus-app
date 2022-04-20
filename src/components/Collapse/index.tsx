@@ -1,4 +1,4 @@
-import { ReactNode, TransitionEvent, useEffect, useRef, useState }  from "react"
+import { ReactNode, useEffect, useRef, useState }  from "react"
 import "./Collapse.scss"
 
 
@@ -22,15 +22,14 @@ export default function Collapse({ header, children, collapsed }: {
         }
     }, [isCollapsed, refBody])
 
-    useEffect(() => onTransitionEnd(), []);
-
+    
     const onTransitionEnd = () => {
         if (refBody.current) {
             refBody.current.classList.remove("animating")
             refBody.current.style.height = isCollapsed ? "0" : "auto"
         }
     }
-
+    
     const onTransitionStart = () => {
         if (refBody.current) {
             refBody.current.classList.add("animating")
@@ -38,11 +37,14 @@ export default function Collapse({ header, children, collapsed }: {
             
         }
     }
-
+    
     const toggle = () => {
         onTransitionStart()
         setCollapsed(!isCollapsed)
     }
+    
+    // eslint-disable-next-line
+    useEffect(() => onTransitionEnd(), []);
 
     return (
         <div className={"collapse" + (isCollapsed ? " collapsed" : "")}>
