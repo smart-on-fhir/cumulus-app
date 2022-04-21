@@ -618,7 +618,7 @@ export default function Dashboard({
                                             className={ "btn btn-blue" + (process.env.REACT_APP_BACKEND_HOST ? " grey-out" : "") }
                                             href={`https://cumulusdemo.notebook.us-east-1.sagemaker.aws/notebooks/cumulus/demo.ipynb?fileLoc=${
                                                 encodeURIComponent(
-                                                    dataRequest.data.src ||
+                                                    // dataRequest.data.src ||
                                                     window.location.origin + "/api/requests/" + dataRequest.id + "/data?format=csv"
                                                 )
                                             }`}
