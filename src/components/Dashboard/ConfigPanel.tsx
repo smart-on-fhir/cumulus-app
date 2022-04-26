@@ -662,7 +662,7 @@ export default function ConfigPanel({
                 </Collapse>
             }
 
-            <Collapse collapsed header="Adavanced Chart Options">
+            <Collapse collapsed header="Advanced Chart Options">
                 <div className="mt-1 mb-1">
                     Most of the <a className="link" rel="noreferrer noopener" href="https://api.highcharts.com/highcharts/"
                     target="_blank">chart options</a> can be set below
