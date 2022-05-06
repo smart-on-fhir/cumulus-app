@@ -106,12 +106,12 @@ export default function DataRequestView(): JSX.Element
         <div>
             <HelmetProvider>
                 <Helmet>
-                    <title>Data Request: {model.name}</title>
+                    <title>Data Subscription: {model.name}</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Requests & Subscriptions", href: "/requests" },
+                { name: "Data Subscriptions", href: "/requests" },
                 { name: model.name }
             ]}/>
             <h3><i className="fas fa-database" /> { model.name }</h3>
@@ -125,7 +125,7 @@ export default function DataRequestView(): JSX.Element
                         <table>
                             <tbody>
                                 <tr><th className="right pr-1 pl-1">Group:</th><td>{ model.group?.name || "GENERAL" }</td></tr>
-                                <tr><th className="right pr-1 pl-1">Type:</th><td>{ model.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION" }</td></tr>
+                                {/* <tr><th className="right pr-1 pl-1">Type:</th><td>{ model.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION" }</td></tr> */}
                                 <tr><th className="right pr-1 pl-1">Status:</th><td>{
                                         model.completed ?
                                         <>completed <Format value={ model.completed } format="date-time" /></> :
@@ -247,7 +247,7 @@ export default function DataRequestView(): JSX.Element
                 { user?.role === "admin" && <Link
                     className="btn btn-blue pl-1 pr-1 mt-1 mb-1"
                     to={`/requests/${model.id}/edit`}
-                    ><b> Edit this Data Request </b></Link>
+                    ><b> Edit this Data Subscription </b></Link>
                 }
             </div>
         </div>

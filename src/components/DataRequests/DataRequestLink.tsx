@@ -24,7 +24,7 @@ export default function DataRequestLink({
     let info = null
     let iconType: "ok"|"pending"|"working" = "ok"
     if (!request.completed) {
-        info = <div className="color-muted small">PENDING {type}</div>
+        info = <div className="color-muted small">PENDING SUBSCRIPTION</div>
         iconType = "pending"
     }
     else if (request.refresh) {

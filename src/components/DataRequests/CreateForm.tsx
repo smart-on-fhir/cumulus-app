@@ -42,8 +42,8 @@ export default function CreateDataRequestForm()
     function prefillDemoData() {
         setState({
             // groupId: null, // COVID
-            name: "Demo Data Requests",
-            description: "This data requests has been created for demo purposes",
+            name: "Demo Data Subscription",
+            description: "This data subscription has been created for demo purposes",
             requestedData: {
                 dataSites: [
                     { name: "Boston Children's Hospital", description: "Short description of the Boston Children's Hospital data site" },
@@ -83,11 +83,11 @@ export default function CreateDataRequestForm()
     }
 
     if (loadingRequestGroups) {
-        return <Loader msg="Loading Request Groups..." />
+        return <Loader msg="Loading Subscription Groups..." />
     }
 
     if (loadingRequestGroupsError) {
-        return <AlertError><b>Error loading request groups:</b> { loadingRequestGroupsError + "" }</AlertError>
+        return <AlertError><b>Error loading subscription groups:</b> { loadingRequestGroupsError + "" }</AlertError>
     }
 
     if (!data) {
@@ -105,14 +105,14 @@ export default function CreateDataRequestForm()
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Requests & Subscriptions", href: "/requests" },
+                { name: "Data Subscriptions", href: "/requests" },
                 { name: "Create Data Subscription" }
             ]} />
             <h3> <i className="fa-solid fa-wand-magic-sparkles color-muted pull-right" style={{ cursor: "pointer" }} onClick={prefillDemoData} />Create Data Subscription</h3>
             <hr/>
             <div className="row gap color-muted small">
                 <div className="col">
-                    { savingError && <AlertError><b>Error saving request:</b> { savingError + "" }</AlertError> }
+                    { savingError && <AlertError><b>Error saving subscription:</b> { savingError + "" }</AlertError> }
                     { saving && <Loader msg="Saving..."/> }
                 </div>
             </div>

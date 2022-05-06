@@ -38,18 +38,18 @@ export default function DataRequestsList()
     );
 
     if (loading) {
-        return <Loader msg="Loading Data Requests..." />
+        return <Loader msg="Loading Data Subscriptions..." />
     }
 
     if (error) {
-        return <AlertError><b>Error Loading Data Requests: </b>{ error + "" }</AlertError>
+        return <AlertError><b>Error Loading Data Subscriptions: </b>{ error + "" }</AlertError>
     }
 
     if (!groups || !groups.length) {
         return <>
-            <p className="color-muted">No Data Requests found.</p>
+            <p className="color-muted">No Data Subscriptions found.</p>
             <br/>
-            <Link to="/requests/new" className="color-blue underline">Create New Data Request</Link>
+            <Link to="/requests/new" className="color-blue underline">Create New Data Subscription</Link>
         </>
     }
 

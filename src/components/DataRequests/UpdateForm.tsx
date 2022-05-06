@@ -66,7 +66,7 @@ export default function EditDataRequestForm()
         useCallback(
             async () => {
                 if (window.confirm(
-                    "Deleting this request will also delete all the views " +
+                    "Deleting this subscription will also delete all the views " +
                     "associated with it! Are you sure?")) {
                     deleteOne("requests", id + "").then(() => setDeleted(true))
                 }
@@ -80,13 +80,13 @@ export default function EditDataRequestForm()
     }
 
     if (loadingData) {
-        return <Loader msg="Loading Request Groups..." />
+        return <Loader msg="Loading Subscription Groups..." />
     }
 
     if (loadingRequestGroupsError) {
         return (
             <AlertError>
-                <b>Error loading request groups:</b> { loadingRequestGroupsError + "" }
+                <b>Error loading subscription groups:</b> { loadingRequestGroupsError + "" }
             </AlertError>
         );
     }
@@ -106,16 +106,16 @@ export default function EditDataRequestForm()
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Requests & Subscriptions", href: "/requests" },
+                { name: "Data Subscriptions", href: "/requests" },
                 { name: state.name + "", href: `/requests/${state.id}` },
-                { name: "Edit Request" }
+                { name: "Edit Subscription" }
             ]}/>
             <div className="row middle">
                 <div className="col col-0">
-                    <h3>Edit Data Request</h3>
+                    <h3>Edit Data Subscription</h3>
                 </div>
                 <div className="col right color-muted small">
-                    { loading  && <Loader msg="Loading Data Request..." /> }
+                    { loading  && <Loader msg="Loading Data Subscription..." /> }
                     { saving   && <Loader msg="Saving..." /> }
                     { deleting && <Loader msg="Deleting..." /> }
                 </div>
@@ -123,9 +123,9 @@ export default function EditDataRequestForm()
             <hr/>
             <div className="row gap color-muted small">
                 <div className="col">
-                    { error && <AlertError><b>Error loading request:</b> { error + "" }</AlertError> }
-                    { savingError && <AlertError><b>Error saving request:</b> { savingError + "" }</AlertError> }
-                    { deletingError && <AlertError><b>Error deleting request:</b> { deletingError + "" }</AlertError> }
+                    { error && <AlertError><b>Error loading subscription:</b> { error + "" }</AlertError> }
+                    { savingError && <AlertError><b>Error saving subscription:</b> { savingError + "" }</AlertError> }
+                    { deletingError && <AlertError><b>Error deleting subscription:</b> { deletingError + "" }</AlertError> }
                 </div>
             </div>
             <DataRequestForm

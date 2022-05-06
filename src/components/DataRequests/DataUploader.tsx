@@ -731,7 +731,7 @@ export default function DataUploader()
     if (requestError) {
         return (
             <AlertError>
-                <b>Error Loading Data Request</b> - { requestError + "" }
+                <b>Error Loading Data Subscription</b> - { requestError + "" }
             </AlertError>
         )
     }
@@ -739,7 +739,7 @@ export default function DataUploader()
     if (!requestResult) {
         return (
             <AlertError>
-                <b>Error Loading Data Request</b> - Failed to fetch data
+                <b>Error Loading Data Subscription</b> - Failed to fetch data
             </AlertError>
         )
     }
@@ -765,9 +765,9 @@ export default function DataUploader()
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Requests & Subscriptions", href: "/requests" },
+                { name: "Data Subscriptions", href: "/requests" },
                 { name: requestResult.name, href: `/requests/${requestID}` },
-                { name: "Edit Request", href: `/requests/${requestID}/edit` },
+                { name: "Edit Subscription", href: `/requests/${requestID}/edit` },
                 { name: "Import Data" }
             ]}/>
 

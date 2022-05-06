@@ -157,8 +157,8 @@ export function AuthStatus() {
     return (
         <>
             <MenuButton right items={[
-                <NavLink to="/requests">Data Requests</NavLink>,
-                <NavLink to="/groups">Data Request Groups</NavLink>,
+                <NavLink to="/requests">Data Subscriptions</NavLink>,
+                <NavLink to="/groups">Data Subscription Groups</NavLink>,
                 <NavLink to="/sites">Data Sites</NavLink>,
                 <NavLink to="/activity">Activity Log</NavLink>,
                 "separator",
