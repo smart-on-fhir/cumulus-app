@@ -79,15 +79,15 @@ export default function RequestGroupEditForm()
         <div className="request-groups-list">
             <HelmetProvider>
                 <Helmet>
-                    <title>Edit Data Request Group</title>
+                    <title>Edit Data Subscription Group</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Request Groups", href: "/groups" },
-                { name: "Edit Request Group" }
+                { name: "Subscription Groups", href: "/groups" },
+                { name: "Edit Subscription Group" }
             ]} />
-            <h4><i className="fa-solid fa-pen-to-square" /> Edit Data Request Group</h4>
+            <h4><i className="fa-solid fa-pen-to-square" /> Edit Data Subscription Group</h4>
             <hr className="mb-2" />
             { loading && <Loader/> }
             { error && <AlertError>{ error + "" }</AlertError> }

@@ -347,7 +347,7 @@ export default function DataRequestForm({
                         value={ name || "" }
                         onChange={e => onChange({ ...record, name: e.target.value })}
                         name="DataRequestName"
-                        placeholder="Data Request Name"
+                        placeholder="Data Subscription Name"
                         required
                     />
                     <div className="row gap mt-1">
@@ -378,7 +378,7 @@ export default function DataRequestForm({
                             <textarea
                                 value={ description || "" }
                                 onChange={e => onChange({ ...record, description: e.target.value })}
-                                placeholder="Data Request Description"
+                                placeholder="Data Subscription Description"
                                 style={{ height: "100%" }}
                             />
                         </div>
@@ -430,7 +430,7 @@ export default function DataRequestForm({
                                 <div className="col"/>
                             </> :
                             <div className="col">
-                                You can upload data once this data request is saved 
+                                You can upload data once this data subscription is saved 
                             </div> :
                         null
                 }
@@ -454,7 +454,7 @@ export default function DataRequestForm({
                                         Refresh Manually
                                         <div className="color-muted small">
                                             Refresh on demand by clicking on dedicated
-                                            button in the request page
+                                            button in the subscription page
                                         </div>
                                     </div>,
                                     icon : "fa-solid fa-user-gear color-blue"
@@ -526,7 +526,7 @@ export default function DataRequestForm({
                                 <div className="col mt-1 mb-1">
                                     <button className="btn color-red" type="button" onClick={deleteRequest}>
                                         { working === "deleting" && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
-                                        Delete Request
+                                        Delete Subscription
                                     </button>
                                 </div>
                             }
@@ -539,7 +539,7 @@ export default function DataRequestForm({
                 <div className="col mt-1 mb-1">
                     <button className="btn btn-green" type="submit">
                         { working === "saving" && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
-                        { id ? "Save Changes" : "Create Request" }
+                        { id ? "Save Changes" : "Create Subscription" }
                     </button>
                 </div>
                 { !id && <div className="col"/> }

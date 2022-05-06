@@ -43,15 +43,15 @@ export default function RequestGroupCreateForm()
         <div className="request-groups-list">
             <HelmetProvider>
                 <Helmet>
-                    <title>Edit Data Request Group</title>
+                    <title>Edit Data Subscription Group</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
-                { name: "Home"              , href: "/" },
-                { name: "Request Groups"    , href: "/groups" },
-                { name: "Create Request Group" }
+                { name: "Home"               , href: "/" },
+                { name: "Subscription Groups", href: "/groups" },
+                { name: "Create Subscription Group" }
             ]} />
-            <h4>Create Data Request Group</h4>
+            <h4>Create Data Subscription Group</h4>
             <hr className="mb-1" />
             { error && <AlertError>{ error + "" }</AlertError> }
             <form onSubmit={ onSubmit }>

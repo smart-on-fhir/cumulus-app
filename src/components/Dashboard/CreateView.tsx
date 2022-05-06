@@ -18,15 +18,15 @@ export default function CreateView()
     );
 
     if (loading) {
-        return <Loader msg="Loading Request..." />
+        return <Loader msg="Loading subscription..." />
     }
 
     if (error) {
-        return <AlertError>{`Error fetching request with id "${id}": ${error}`}</AlertError>
+        return <AlertError>{`Error fetching subscription with id "${id}": ${error}`}</AlertError>
     }
 
     if (!result) {
-        return <AlertError>{`Error fetching request with id "${id}"`}</AlertError>
+        return <AlertError>{`Error fetching subscription with id "${id}"`}</AlertError>
     }
 
     return (

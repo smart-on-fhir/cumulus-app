@@ -33,7 +33,7 @@ export default class RequestGroupList extends Component<any, State>
 
     
     deleteGroup(id: number) {
-        if (window.confirm("If you delete this group, all the requests that " +
+        if (window.confirm("If you delete this group, all the subscriptions that " +
         "belong to it will be assigned to a 'GENERAL' group. Are you sure?"))
         {
             this.setState({ loading: true });
@@ -50,24 +50,24 @@ export default class RequestGroupList extends Component<any, State>
             <div className="request-groups-list">
                 <HelmetProvider>
                     <Helmet>
-                        <title>Data Request Groups</title>
+                        <title>Data Subscription Groups</title>
                     </Helmet>
                 </HelmetProvider>
                 <Breadcrumbs links={[
                     { name: "Home", href: "/" },
-                    { name: "Request Groups" },
+                    { name: "Subscription Groups" },
                 ]} />
                 <div className="row gap middle">
                     <div className="col">
-                        <h4><i className="fa-solid fa-folder" /> Data Request Groups</h4>
+                        <h4><i className="fa-solid fa-folder" /> Data Subscription Groups</h4>
                     </div>
                     <div className="col col-0">
-                        <Link to="new" className="btn color-blue">Create Request Group</Link>
+                        <Link to="new" className="btn color-blue">Create Subscription Group</Link>
                     </div>
                 </div>
                 <hr className="mb-1" />
                 <div className="color-muted mb-3">
-                    Requests can be assigned to certain group. Otherwise they are considered part of the "GENERAL" group.
+                    Subscriptions can be assigned to certain group. Otherwise they are considered part of the "GENERAL" group.
                 </div>
                 { loading && <Loader/> }
                 { error && <AlertError>{ error + "" }</AlertError> }

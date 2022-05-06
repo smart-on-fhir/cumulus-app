@@ -100,7 +100,7 @@ export default class ActivityPage extends Component<any, State>
                     <div className="col col-0">
                         <div className="toolbar">
                             <button className={"btn"+(tags.requests ? " active" : "")} onClick={() => this.tag("requests")}>
-                                <i className="fa-solid fa-database"/> Data Requests
+                                <i className="fa-solid fa-database"/> Data Subscriptions
                             </button>
                             <button className={"btn"+(tags.views ? " active" : "")} onClick={() => this.tag("views")}>
                                 <i className="fa-solid fa-chart-pie" /> Views

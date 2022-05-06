@@ -43,30 +43,30 @@ export default function DataRequestsListPage()
     );
 
     if (loading) {
-        return <Loader msg="Loading Data Requests..."/>
+        return <Loader msg="Loading Data Subscriptions..."/>
     }
 
     if (error) {
-        return <AlertError><b>Error Loading Data Requests: </b>{ error + "" }</AlertError>
+        return <AlertError><b>Error Loading Data Subscriptions: </b>{ error + "" }</AlertError>
     }
 
     return (
         <div>
             <HelmetProvider>
                 <Helmet>
-                    <title>Requests & Subscriptions</title>
+                    <title>Data Subscriptions</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Requests & Subscriptions" }
+                { name: "Data Subscriptions" }
             ]} />
             <div className="row gap">
                 <div className="col middle">
-                    <h3>Data Subscriptions & Requests</h3>
+                    <h3>Data Subscriptions</h3>
                 </div>
                 { user?.role === "admin" && (<div className="col col-0 middle">
-                    <Link className="btn color-blue" to="/requests/new"><b>New Data Request</b></Link>
+                    <Link className="btn color-blue" to="/requests/new"><b>New Data Subscription</b></Link>
                 </div>) }
             </div>
             <hr/>
