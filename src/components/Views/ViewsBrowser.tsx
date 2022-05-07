@@ -6,19 +6,26 @@ import Loader          from "../Loader"
 import { AlertError }  from "../Alert"
 
 import "./ViewsBrowser.scss"
+import { ellipsis, highlight } from "../../utils"
 
 
 export default function ViewsBrowser({
     layout = "grid",
-    requestId
+    requestId,
+    search = ""
 }: {
     layout?: "grid" | "column",
-    requestId?: string | number
+    requestId?: string | number,
+    showDescription?: boolean,
+    search?: string
 }) {
 
-    const { result, loading, error } = useBackend(
+    let { result, loading, error } = useBackend(
         useCallback(
-            () => request<app.View[]>(requestId ? `/api/requests/${requestId}/views?order=createdAt:asc` : "/api/views?order=name:asc,createdAt:asc"),
+            () => request<app.View[]>(
+                requestId ?
+                    `/api/requests/${requestId}/views?order=createdAt:asc` :
+                    "/api/views?order=name:asc,createdAt:asc"),
             [requestId]
         ),
         true
@@ -32,6 +39,12 @@ export default function ViewsBrowser({
         return <AlertError><b>Error loading views</b>: { error + "" }</AlertError>
     }
 
+    result = result || [];
+
+    if (search) {
+        result = result.filter(view => view.name.toLowerCase().includes(search.toLowerCase()));
+    }
+
     return (
         <div className={"view-browser view-browser-" + layout}>
             { requestId && <Link to={`/requests/${requestId}/create-view`} className="view-thumbnail view-thumbnail-add-btn">
@@ -40,29 +53,49 @@ export default function ViewsBrowser({
                         <i className="fas fa-plus"/>
                     </div>
                 </div>
-                <div className="view-thumbnail-title color-blue">Create New View</div>
+                <div className="view-thumbnail-title color-blue pt-1">
+                    Create New View
+                    <div className="view-thumbnail-description grey-out">
+                        Click here to create new view from the data provided
+                        by this data subscription
+                    </div>
+                </div>
             </Link> }
-            { (!result || !result.length) ?
+            { !result.length ?
                 <p className="color-muted pt-2 pb-2">No Views found!</p> :
                 (result || []).map((v, i) => (
-                    <ViewThumbnail key={i} view={ v } />
+                    <ViewThumbnail
+                        key={i}
+                        view={ v }
+                        showDescription={layout === "grid" ? 0 : requestId ? 120 : 200}
+                        search={search}
+                    />
                 ))
             }
         </div>
     )
 }
 
-function ViewThumbnail({ view }: { view: app.View }) {
+function ViewThumbnail({
+    view,
+    showDescription = 0,
+    search=""
+}: {
+    view: app.View,
+    showDescription?: number,
+    search?: string
+}) {
     return (
-        <Link to={ "/views/" + view.id } className="view-thumbnail" title={ view.description || undefined }>
+        <Link to={ "/views/" + view.id } className="view-thumbnail" title={ showDescription ? undefined : view.description || undefined }>
             <div className="view-thumbnail-image" style={{
                 backgroundImage: `url('${view.screenShot ? `/api/views/${ view.id }/screenshot` : "/view.png"}')`
             }}/>
             <div className="view-thumbnail-title">
-                { view.name }
-                {/* <div className="view-thumbnail-description color-muted">{ view.description }</div> */}
-            </div>
-            
+                <span dangerouslySetInnerHTML={{
+                        __html: search ? highlight(view.name, search) : view.name
+                }}/>
+                { view.description && showDescription && <div className="view-thumbnail-description color-muted">{ ellipsis(view.description, showDescription) }</div> }
+            </div>            
         </Link>
     )
 }

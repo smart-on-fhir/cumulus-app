@@ -361,3 +361,11 @@ table {
     vertical-align: baseline;
   }
 }
+
+.search-match {
+  background: rgba(255, 222, 0, 0.76);
+  box-shadow: 0 0 0 0.5px rgb(0, 0, 0, 0.20), 1px 1px 5px -1px rgb(0, 0, 0, 0.25);
+  border-radius: 2px;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+}

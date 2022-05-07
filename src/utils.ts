@@ -165,7 +165,7 @@ export function toTitleCase(str: string) {
 }
 
 export function ellipsis(str: string, maxLength: number) {
-    let out = str.substr(0, maxLength).trim();
+    let out = str.substring(0, maxLength).trim();
     if (out.length < str.length) {
         return out + "..."
     }
@@ -295,3 +295,19 @@ export function strip(
 export function stripTags(s: string) {
     return s.replace(/<.*?>/g, "")
 }
+
+export function highlight(str: string, stringToFind = "") {
+    if (!stringToFind) {
+        return str
+    }
+    let temp  = str;
+    let index = str.toLocaleLowerCase().indexOf(stringToFind.toLocaleLowerCase());
+    while (index > -1) {
+        const replacement = `<span class="search-match">${temp.substr(index, stringToFind.length)}</span>`;
+        const endIndex = index + stringToFind.length;
+        temp  = temp.substring(0, index) + replacement + temp.substring(endIndex);
+        index = temp.toLocaleLowerCase().indexOf(stringToFind.toLocaleLowerCase(), index + replacement.length);
+    }
+    return temp;
+}
+
