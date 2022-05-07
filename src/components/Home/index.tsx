@@ -6,11 +6,30 @@ import ViewsBrowser               from "../Views/ViewsBrowser"
 import ActivityPanel              from "../Activity/Panel";
 import Panel                      from "../Panel";
 import DataSiteList               from "../DataSites/List";
+import { useState }               from "react";
 
 
 
 export default function Home() {
+
+    const url = new URL(window.location.href)
+
     const { user } = useAuth();
+    const [ viewType, setViewType ] = useState(url.searchParams.get("view") || "grid")
+    const [ search, setSearch ] = useState(url.searchParams.get("q") || "")
+
+    const onSearch = (q: string) => {
+        url.searchParams.set("q", q)
+        window.history.replaceState(null, "", url.href)
+        setSearch(q)
+    };
+
+    const onSetViewType = (t: "grid" | "list") => {
+        url.searchParams.set("view", t)
+        window.history.replaceState(null, "", url.href)
+        setViewType(t)
+    };
+
     return (
         <>
             <HelmetProvider>
@@ -18,9 +37,38 @@ export default function Home() {
                     <title>Cumulus</title>
                 </Helmet>
             </HelmetProvider>
-            <h4><i className="fa-solid fa-grip" style={{ color: "#999" }} /> Browse Views</h4>
+            <div className="row middle">
+                <div className="col">
+                    <h4>Browse Views</h4>
+                </div>
+                <div className="col center">
+                    <input
+                        type="search"
+                        placeholder="Search Views by Name"
+                        value={search}
+                        onChange={e => onSearch(e.target.value)}
+                    />
+                </div>
+                <div className="col right">
+                    <div className="toolbar flex">
+                        <button
+                            className={"btn" + (viewType === "grid" ? " active" : "")}
+                            onClick={() => onSetViewType("grid")}
+                            title="Grid View"
+                        ><i className="fa-solid fa-grip" /></button>
+                        <button
+                            className={"btn" + (viewType === "list" ? " active" : "")}
+                            onClick={() => onSetViewType("list")}
+                            title="List View"
+                            ><i className="fa-solid fa-list" /></button>
+                    </div>    
+                </div>
+            </div>
             <hr/>
-            <ViewsBrowser />
+            <ViewsBrowser
+                layout={ viewType === "grid" ? "grid" : "column" }
+                search={search}
+            />
             <br/>
             <br/>
             <div className="row gap">
