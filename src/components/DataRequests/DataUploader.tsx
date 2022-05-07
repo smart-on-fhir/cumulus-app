@@ -667,7 +667,7 @@ export default function DataUploader()
                 src
             }
         })
-    }, [requestID, cols, rows, trimSpaces]));
+    }, [requestID, cols, rows, trimSpaces, src]));
 
     function onFileSelected(e: React.ChangeEvent<HTMLInputElement>)
     {
