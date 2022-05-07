@@ -6,7 +6,7 @@
     margin-bottom: $gap;
     display: flex;
     flex-wrap: wrap;
-    max-height: calc(100vh - 360px);
+    max-height: calc(100vh - 310px);
     overflow: auto;
     min-height: 200px;
     // justify-content: space-evenly;
@@ -137,7 +137,7 @@
         // // flex-wrap: nowrap;
         // align-content: center;
         // align-items: center;
-        align-items: flex-start;
+        align-items: center;
         // justify-content: flex-start;
         max-width: 100%;
         // width: 100%;
