@@ -370,9 +370,9 @@ export default function DataRequestForm({
                 </div>
                 
                 <div className="col">
-                    <div className="row gap middle">
-                        <label className="col">Description</label>
-                        <span className="col right color-muted small">Up to 500 characters</span>
+                    <div className="row gap top">
+                        <label className="col col-0">Description</label>
+                        <span className="col color-muted small" style={{ padding: "1em 0 0.2em 0" }}>(HTML enabled)</span>
                     </div>
                     <div className="row row-10 stretch">
                         <div className="col stretch">
