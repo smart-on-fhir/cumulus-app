@@ -1,17 +1,15 @@
 require("dotenv").config();
 
-const HTTP             = require("http")
-const Path             = require("path")
-const express          = require("express")
-const cors             = require("cors")
-const cookieParser     = require("cookie-parser")
-const { Sequelize }    = require("sequelize")
-const Auth             = require("./controllers/Auth")
-const { getDockerContainer } = require("./Docker")
-const { walkSync } = require("./lib")
-
-
-
+const HTTP                        = require("http")
+const Path                        = require("path")
+const express                     = require("express")
+const cors                        = require("cors")
+const cookieParser                = require("cookie-parser")
+const { Sequelize }               = require("sequelize")
+const { Umzug, SequelizeStorage } = require("umzug");
+const Auth                        = require("./controllers/Auth")
+const { getDockerContainer }      = require("./Docker")
+const { walkSync }                = require("./lib")
 
 
 function createServer(config)
@@ -149,34 +147,37 @@ async function applySeeds({ db, verbose }, dbConnection)
     }
 }
 
-// TODO: Install Umzug and enable this
 async function applyMigrations({ db, verbose }, dbConnection)
 {
-    const migrationsPath = db.migrationsPath;
-    if (migrationsPath) {
-        const umzug = new Umzug({
-            // @ts-ignore
-            migrations: {
-                path: __dirname + "/db/" + migrationsPath,
-                // @ts-ignore
-                wrap: fn => () => fn(dbConnection.getQueryInterface(), Sequelize)
-            },
-            storageOptions: {
-                dbConnection,
-                model: dbConnection.models.migrations,
-                schema: 'public',
-            },
-            storage: "sequelize",
-        });
+    const umzug = new Umzug({
+        context: dbConnection.getQueryInterface(),
+        migrations: {
+            glob: ["db/migrations/*.js", { cwd: __dirname }],
+        //     resolve: ({ name, path, context }) => {
 
-        const pending = await umzug.pending();
-        verbose && console.log("✔ Pending migrations: %s", pending.length ? pending.map(m => m.file).join(',') : "none")
-        
-        // Checks migrations and run them if they are not already applied.
-        // Metadata stored in the SequelizeMeta table in postgres
-        const migrations = await umzug.up();
-        verbose && console.log('✔ Successful migrations: %s', migrations.length ? migrations.map(m => m.file).join(','): "none")
-    }
+        //         // @ts-ignore
+        //         const migration = require(path);
+                
+        //         // adjust the parameters Umzug will
+        //         // pass to migration methods when called
+        //         return {
+        //             name,
+        //             up: async () => migration.up(context),
+        //             down: async () => migration.down(context),
+        //         };
+        //     }
+        },
+        storage: new SequelizeStorage({ sequelize: dbConnection }),
+        logger: verbose ? console : undefined
+    });
+
+    const pending = await umzug.pending();
+    verbose && console.log("✔ Pending migrations: %s", pending.length ? pending.map(m => m.path).join(',') : "none")
+    
+    // Checks migrations and run them if they are not already applied.
+    // Metadata stored in the SequelizeMeta table in postgres
+    const migrations = await umzug.up();
+    verbose && console.log('✔ Successful migrations: %s', migrations.length ? migrations.map(m => m.path).join(','): "none")
 }
 
 function setUpErrorHandlers(app, { verbose })
@@ -245,7 +246,7 @@ async function main(config)
     const dbConnection = await setupDB(config);
     
     await applySeeds(config, dbConnection);
-    // await applyMigrations(config, dbConnection);
+    await applyMigrations(config, dbConnection);
     
     // app.set("db", dbConnection);
     
