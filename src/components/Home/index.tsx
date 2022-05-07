@@ -3,7 +3,6 @@ import { HelmetProvider, Helmet } from "react-helmet-async"
 import { useAuth }                from "../../auth";
 import DataRequestsList           from "../DataRequests/DataRequestsList"
 import ViewsBrowser               from "../Views/ViewsBrowser"
-// import map                        from "./map.png"
 import ActivityPanel              from "../Activity/Panel";
 import Panel                      from "../Panel";
 import DataSiteList               from "../DataSites/List";
