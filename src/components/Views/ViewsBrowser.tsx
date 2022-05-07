@@ -53,7 +53,7 @@ export default function ViewsBrowser({
                         <i className="fas fa-plus"/>
                     </div>
                 </div>
-                <div className="view-thumbnail-title color-blue pt-1">
+                <div className="view-thumbnail-title color-blue">
                     Create New View
                     <div className="view-thumbnail-description grey-out">
                         Click here to create new view from the data provided
