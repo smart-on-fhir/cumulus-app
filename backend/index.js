@@ -153,19 +153,19 @@ async function applyMigrations({ db, verbose }, dbConnection)
         context: dbConnection.getQueryInterface(),
         migrations: {
             glob: ["db/migrations/*.js", { cwd: __dirname }],
-        //     resolve: ({ name, path, context }) => {
+            resolve: ({ name, path, context }) => {
 
-        //         // @ts-ignore
-        //         const migration = require(path);
+                // @ts-ignore
+                const migration = require(path);
                 
-        //         // adjust the parameters Umzug will
-        //         // pass to migration methods when called
-        //         return {
-        //             name,
-        //             up: async () => migration.up(context),
-        //             down: async () => migration.down(context),
-        //         };
-        //     }
+                // adjust the parameters Umzug will
+                // pass to migration methods when called
+                return {
+                    name,
+                    up: async () => migration.up(context),
+                    down: async () => migration.down(context),
+                };
+            }
         },
         storage: new SequelizeStorage({ sequelize: dbConnection }),
         logger: verbose ? console : undefined
