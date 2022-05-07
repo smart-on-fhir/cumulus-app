@@ -1,9 +1,10 @@
-import React      from "react"
-import { Link }   from "react-router-dom"
-import Checkbox   from "../Checkbox";
-import { Format } from "../Format"
-import Panel      from "../Panel";
-import Select     from "../Select"
+import React           from "react"
+import { Link }        from "react-router-dom"
+import ContentEditable from "react-contenteditable";
+import Checkbox        from "../Checkbox";
+import { Format }      from "../Format"
+import Panel           from "../Panel";
+import Select          from "../Select"
 
 import "./form.scss";
 
@@ -375,11 +376,10 @@ export default function DataRequestForm({
                     </div>
                     <div className="row row-10 stretch">
                         <div className="col stretch">
-                            <textarea
-                                value={ description || "" }
+                            <ContentEditable
+                                html={ description || "" }
                                 onChange={e => onChange({ ...record, description: e.target.value })}
-                                placeholder="Data Subscription Description"
-                                style={{ height: "100%" }}
+                                className="form-control description-editor"
                             />
                         </div>
                     </div>

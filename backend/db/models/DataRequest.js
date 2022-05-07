@@ -28,7 +28,7 @@ module.exports = class DataRequest extends Model
             },
             
             description: {
-                type: DataTypes.STRING(500)
+                type: DataTypes.TEXT
             },
             
             refresh: {
