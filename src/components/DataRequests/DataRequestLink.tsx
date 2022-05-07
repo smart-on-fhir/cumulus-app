@@ -20,7 +20,7 @@ export default function DataRequestLink({
     href?: string
 }) {
 
-    let type = request.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION"
+    // let type = request.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION"
     let info = null
     let iconType: "ok"|"pending"|"working" = "ok"
     if (!request.completed) {
