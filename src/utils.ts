@@ -291,3 +291,7 @@ export function strip(
 
     return out;
 }
+
+export function stripTags(s: string) {
+    return s.replace(/<.*?>/g, "")
+}

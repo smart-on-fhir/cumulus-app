@@ -115,7 +115,7 @@ export default function DataRequestView(): JSX.Element
                 { name: model.name }
             ]}/>
             <h3><i className="fas fa-database" /> { model.name }</h3>
-            <p className="color-muted">{ model.description }</p>
+            <p className="color-muted" dangerouslySetInnerHTML={{ __html: model.description || "" }}/>
             <br/>
             <div className="row gap">
                 <div className="col col-6">

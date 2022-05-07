@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { stripTags } from "../../utils"
 import { Format } from "../Format"
 
 function Icon(props: { type: "ok"|"pending"|"working" }) {
@@ -41,7 +42,7 @@ export default function DataRequestLink({
     }
 
     return (
-        <Link to={ href.replace(":id", request.id + "") } className="icon-item" title={ request.description }>
+        <Link to={ href.replace(":id", request.id + "") } className="icon-item" title={ request.description ? stripTags(request.description) : undefined}>
             <Icon type={iconType} />
             <b>{ request.name }</b>&nbsp;
             {info}
