@@ -37,9 +37,9 @@ export default function Home() {
                     <title>Cumulus</title>
                 </Helmet>
             </HelmetProvider>
-            <div className="row middle">
-                <div className="col">
-                    <h4>Browse Views</h4>
+            <div className="row gap middle" style={{ marginTop: "-1em", padding: "6px 0 4px 0" }}>
+                <div className="col col-0">
+                    <h4 className="m-0">Browse Views</h4>
                 </div>
                 <div className="col center">
                     <input
@@ -49,7 +49,7 @@ export default function Home() {
                         onChange={e => onSearch(e.target.value)}
                     />
                 </div>
-                <div className="col right">
+                <div className="col col-0 right">
                     <div className="toolbar flex">
                         <button
                             className={"btn" + (viewType === "grid" ? " active" : "")}
