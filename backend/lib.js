@@ -469,6 +469,29 @@ function valueToDataType(x) {
     return "string"
 }
 
+/**
+ * Rounds the given number @n using the specified precision.
+ * @param {number | string} n
+ * @param {number} [precision]
+ */
+function roundToPrecision(n, precision) {
+    n = parseFloat(n + "");
+
+    if ( isNaN(n) || !isFinite(n) ) {
+        return NaN;
+    }
+
+    if ( !precision || isNaN(precision) || !isFinite(precision) || precision < 1 ) {
+        n = Math.round( n );
+    }
+    else {
+        const q = Math.pow(10, precision);
+        n = Math.round( n * q ) / q;
+    }
+
+    return n;
+}
+
 module.exports = {
     bool,
     uInt,
@@ -479,5 +502,6 @@ module.exports = {
     wait,
     parseDelimitedString,
     toTitleCase,
-    getFindOptions
+    getFindOptions,
+    roundToPrecision
 };

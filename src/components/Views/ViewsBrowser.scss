@@ -59,9 +59,8 @@
     }
 
     .view-thumbnail-description {
-        font-size: small;
+        font-size  : small;
         font-weight: normal;
-        line-height: 1;
     }
 
     // a .view-thumbnail-title {
@@ -176,17 +175,14 @@
             text-overflow: ellipsis;
             overflow: hidden;
             padding: 1px;
+            flex: 1;
             // font-size: $font-size * 1.1;
 
             .view-thumbnail-description {
-                white-space: normal;
-                max-height: 3em;
-        //         display: block;
-        //         color: #999;
-        //         font-weight: normal;
-        //         line-height: 1.1;
-        //         text-decoration: none !important;
-        //         font-size: $font-size * 0.9;
+                white-space  : nowrap;
+                font-weight  : 400;
+                overflow     : hidden;
+                text-overflow: ellipsis;
             }
         }
     }

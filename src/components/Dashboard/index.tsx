@@ -449,6 +449,7 @@ export default function Dashboard({
                         <ConfigPanel
                             dataRequest={dataRequest}
                             viewType={viewType}
+                            view={view}
                             colorsLength={colorsLength}
                             state={{
                                 groupBy   : viewColumn,

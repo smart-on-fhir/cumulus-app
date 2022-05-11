@@ -24,21 +24,9 @@ const router = module.exports = express.Router({ mergeParams: true });
 
 // Views -----------------------------------------------------------------------
 router.get("/:id/views", rw(async (req, res) => {
-    // const options = getFindOptions(req);
-    // Object.assign(options, { attributes: { include: "id" }})
-    // const model = await Model.findByPk(req.params.id, options)
-    // assert(model, HttpError.NotFound("Model not found"))
-    // // @ts-ignore
-    // const views = await model.getViews()
-    // res.json(views)
-
-
-    const views = await ViewModel.findAll({
-        where: {
-            DataRequestId: +req.params.id
-        },
-        order: [["id", "ASC"]]
-    });
+    const options = getFindOptions(req);
+    options.where = { DataRequestId: +req.params.id };
+    const views = await ViewModel.findAll(options);
     res.json(views);
 
 }));

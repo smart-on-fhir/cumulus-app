@@ -7,6 +7,7 @@ import { AlertError }  from "../Alert"
 
 import "./ViewsBrowser.scss"
 import { ellipsis, highlight } from "../../utils"
+import { StaticRating } from "../Rating"
 
 
 export default function ViewsBrowser({
@@ -24,8 +25,9 @@ export default function ViewsBrowser({
         useCallback(
             () => request<app.View[]>(
                 requestId ?
-                    `/api/requests/${requestId}/views?order=createdAt:asc` :
-                    "/api/views?order=name:asc,createdAt:asc"),
+                    `/api/requests/${requestId}/views?order=normalizedRating:desc,createdAt:asc` :
+                    "/api/views?order=normalizedRating:desc,name:asc,createdAt:asc"
+            ),
             [requestId]
         ),
         true
@@ -55,7 +57,7 @@ export default function ViewsBrowser({
                 </div>
                 <div className="view-thumbnail-title color-blue">
                     Create New View
-                    <div className="view-thumbnail-description grey-out">
+                    <div className="view-thumbnail-description grey-out" style={{ whiteSpace: "normal"}}>
                         Click here to create new view from the data provided
                         by this data subscription
                     </div>
@@ -94,7 +96,8 @@ function ViewThumbnail({
                 <span dangerouslySetInnerHTML={{
                         __html: search ? highlight(view.name, search) : view.name
                 }}/>
-                { view.description && showDescription && <div className="view-thumbnail-description color-muted">{ ellipsis(view.description, showDescription) }</div> }
+                { showDescription > 0 && <div className="view-thumbnail-description color-muted" title={ view.description || undefined }>{ ellipsis(view.description || "No description provided", showDescription) }</div> }
+                { showDescription > 0 && <StaticRating value={ view.normalizedRating } votes={ view.votes } /> }
             </div>            
         </Link>
     )
