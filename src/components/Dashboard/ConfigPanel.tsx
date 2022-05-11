@@ -1,20 +1,22 @@
 
-import { merge }      from "highcharts"
-import { useAuth }    from "../../auth"
-import Select         from "../Select"
-import ColumnSelector from "./ColumnSelector"
-import FilterUI       from "./FilterUI"
+import { merge }         from "highcharts"
+import { useAuth }       from "../../auth"
+import Select            from "../Select"
+import ColumnSelector    from "./ColumnSelector"
+import FilterUI          from "./FilterUI"
+import Collapse          from "../Collapse"
+import Checkbox          from "../Checkbox"
+import AnnotationsUI     from "./AnnotationsUI"
+import { DynamicEditor } from "../editors/FontEdotor"
+import Rating            from "../Rating"
+import { request }       from "../../backend"
+import { useState }      from "react"
 import {
     SupportedChartTypes,
     ChartIcons,
     SingleDimensionChartTypes,
     ReadOnlyPaths
 } from "./config"
-import Collapse from "../Collapse"
-import Checkbox from "../Checkbox"
-import AnnotationsUI from "./AnnotationsUI"
-import { DynamicEditor } from "../editors/FontEdotor"
-
 
 type SupportedChartType = keyof typeof SupportedChartTypes
 
@@ -41,9 +43,11 @@ export default function ConfigPanel({
     state,
     onChange,
     viewType,
-    colorsLength
+    colorsLength,
+    view
 } : {
     dataRequest: app.DataRequest
+    view: Partial<app.View>
     state: ChartConfigPanelState
     viewType: "overview" | "data"
     onChange: (state: ChartConfigPanelState) => void
@@ -51,6 +55,48 @@ export default function ConfigPanel({
 }) {
     let auth = useAuth();
 
+    let [rating, setRating] = useState(view.normalizedRating || 0)
+    let [votes , setVotes ] = useState(view.votes || 0)
+    let [voting, setVoting] = useState(false);
+
+    const vote = async (n: number) => {
+        setVoting(true)
+        await request<app.View>(`/api/views/${view.id}/vote`, {
+            method : "PUT",
+            body   : "rating=" + n,
+            headers: {
+                "content-type": "application/x-www-form-urlencoded"
+            }
+        }).then(
+            v => {
+                setRating(v.normalizedRating)
+                setVotes(v.votes)
+                setVoting(false)
+            },
+            e  => {
+                setVoting(false)
+                alert(e.message)
+            }
+        );
+    }
+
+    const resetRating = async () => {
+        setVoting(true)
+        await request<app.View>(`/api/views/${view.id}/reset-rating`, {
+            method : "PUT"
+        }).then(
+            v => {
+                setRating(v.normalizedRating)
+                setVotes(v.votes)
+                setVoting(false)
+            },
+            e  => {
+                setVoting(false)
+                alert(e.message)
+            }
+        );
+    }
+    
     const { chartOptions } = state;
 
     return (
@@ -70,10 +116,20 @@ export default function ConfigPanel({
                         <label>Title</label>
                         <input type="text" value={state.viewName} onChange={ e => onChange({ ...state, viewName: e.target.value })} required />
                     </div>
-                    <div className="mt-1 pb-2">
+                    <div className="mt-1">
                         <label className="mt-1">Short Description</label>
                         <textarea rows={3} value={state.viewDescription} onChange={ e => onChange({ ...state, viewDescription: e.target.value })}></textarea>
                     </div>
+                    { view.id && <div className="mt-1">
+                        <Rating
+                            value={ rating }
+                            votes={ votes }
+                            loading={ voting }
+                            onVote={ vote }
+                            onClear={ resetRating }
+                        />
+                    </div> }
+                    <br/>
                 </Collapse>
             )}
             

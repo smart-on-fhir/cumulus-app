@@ -1,0 +1,158 @@
+@import "../../styles/variables.scss";
+
+.rating-meassage {
+    font-size  : 90%;
+    line-height: 1.1;
+    padding    : 0.5em 0 1em 0;
+    text-align : justify;
+    color      : #000;
+    opacity    : 0.4;
+}
+
+.rating, .rating-static {
+    .blank {
+        fill: none;
+        stroke: none;
+    }
+    svg {
+        box-sizing: content-box;
+        margin: 0;
+        max-width: 16px;
+        flex: 1;
+    }
+    svg.none {
+        .star {
+            fill: #EEE;
+            stroke: rgba(0, 0, 0, 0.6);
+            stroke-width: 4;
+        }
+    }
+    svg.full {
+        .star {
+            stroke-width: 0;
+        }
+        .star-left {
+            fill: rgb(255, 179, 64);
+            stroke: rgba(0, 0, 0, 0.6);
+            stroke-width: 4;
+        }    
+    }
+    svg.half {
+        .star {
+            stroke-width: 4;
+            stroke: rgba(0, 0, 0, 0.3);
+        }
+        .star-left {
+            fill: rgb(255, 179, 64);
+            stroke: rgba(0, 0, 0, 0.3);
+            stroke-width: 4;
+        }
+        .star-right {
+            fill: #EEE;
+            stroke: rgba(0, 0, 0, 0.3);
+            stroke-width: 4;
+            filter: drop-shadow(0px 2px 1px);
+        }
+    }
+}
+
+.rating-static {
+    max-width     : 100%;
+    display       : flex;
+    flex-direction: row;
+    flex-wrap     : wrap;
+    align-items   : baseline;
+    font-weight   : 400;
+    line-height   : 1.6em;
+    
+    .stars {
+        flex: 0 0 90px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: flex-start;
+        align-self: baseline;
+        position: relative;
+        line-height: 1.6em;
+        top: 0.1em;
+    }
+
+    .rating-meassage {
+        flex       : 0 0 content;
+        white-space: nowrap;
+        line-height: normal;
+        padding    : 0;
+        font-size  : 90%;
+        line-height: 1.6em;
+        color      : #000;
+        opacity    : 0.4;
+    }
+}
+
+.rating {
+    display: flex;
+    flex-wrap: nowrap;
+    border: 1px solid $color-grey;
+    padding: 2px 6px 2px 2px;
+    border-radius: 4px;
+    align-items: center;
+    background: #FFF;
+    cursor: default;
+
+    .value {
+        background: #FBFBFB;
+        padding: 2px 8px;
+        border-radius: 2px 0 0 2px;
+        white-space: nowrap;
+        // min-width: 8em;
+        text-align: center;
+        font-weight: normal;
+        color: #333;
+        text-shadow: 0 1px 0 #FFF;
+        box-shadow: 0px -35px 15px -15px rgba(0, 0, 0, 0.1) inset, 0 0 1px rgba(0, 0, 0, 0.5) inset;
+    }
+
+    .stars {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+        justify-content: space-evenly;
+
+        > span {
+            padding: 0 0 0 14px;
+            cursor: pointer;
+        }
+    }
+
+    .fa-delete-left {
+        flex: 0 0 16px;
+        justify-content: flex-end;
+        display: flex;
+        opacity: 0;
+        transition: all 0.2s;
+        cursor: pointer;
+        color : #CCC;
+        margin-left: 16px;
+
+        &:hover {
+            color: #B00;
+        }
+        &:active {
+            color: #800;
+        }
+    }
+
+    &:hover .fa-delete-left {
+        opacity: 1;
+    }
+
+    .blank {
+        fill: none;
+        stroke: none;
+    }
+
+    svg {
+        cursor: pointer;
+    }
+}

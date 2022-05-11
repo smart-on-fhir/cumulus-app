@@ -32,6 +32,9 @@ declare module app {
         description: string
         DataRequestId: number | null
         screenShot?: string
+        votes: number
+        rating: number
+        normalizedRating: number
         settings?: {
             viewType?: string
             showOptions?: boolean

@@ -57,6 +57,24 @@ class View extends Model
 
             settings: {
                 type: DataTypes.JSONB
+            },
+
+            rating: {
+                type        : DataTypes.FLOAT,
+                defaultValue: 0,
+                allowNull   : false
+            },
+
+            votes: {
+                type        : DataTypes.INTEGER,
+                defaultValue: 0,
+                allowNull   : false
+            },
+
+            normalizedRating: {
+                type        : DataTypes.FLOAT,
+                defaultValue: 0,
+                allowNull   : false
             }
         }, {
             sequelize,
