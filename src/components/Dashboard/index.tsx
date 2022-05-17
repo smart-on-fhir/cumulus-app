@@ -629,8 +629,22 @@ export default function Dashboard({
                                             <b> Open in Analytic Environment </b>
                                         </a>
                                     </div>
-                                    <div className="col col-0 grey-out" style={{ minWidth: "14em" }}>
-                                        <button className="btn btn-blue"> <b> Request Line-level Data </b> </button>
+                                    <div className="col col-0" style={{ minWidth: "14em" }}>
+                                        {/* <button className="btn btn-blue"> <b> Request Line-level Data </b> </button> */}
+                                        <a
+                                            className="btn btn-blue"
+                                            href={
+                                                "mailto:investigate@cumulus.chip.org?subject=" +
+                                                encodeURIComponent("Request line-level data request") +
+                                                "&body=" + encodeURIComponent(
+                                                    `View: ${window.location.href}\n` +
+                                                    `Subscription: ${window.location.origin}/requests/${dataRequest.id}\n\n` +
+                                                    `Regards,\nThe Cumulus team`
+                                                )
+                                            }
+                                        >
+                                            <b> Request Line-level Data </b>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
