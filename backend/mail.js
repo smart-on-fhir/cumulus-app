@@ -91,7 +91,7 @@ async function requestLineLevelData({ subscription, view, user, dataElements, re
     })));
 
     html.push(`<br /><b>Request Type: </b>${type}`);
-    html.push(`<br /><br />The Cumulus team`);
+    html.push(`<br /><br />Regards,<br/>The Cumulus team`);
 
     return client.messages.create(config.mailGun.domain, {
         from   : config.appEmail,
