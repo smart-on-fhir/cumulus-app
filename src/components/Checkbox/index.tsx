@@ -15,7 +15,7 @@ export default function Checkbox({
     checked     : boolean
     onChange    : (checked: boolean) => void
     name        : string
-    label      ?: string
+    label      ?: string | JSX.Element
     description?: string
     type       ?: "checkbox" | "radio"
     className  ?: string

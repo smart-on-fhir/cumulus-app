@@ -2,6 +2,7 @@ const express = require("express")
 const { HttpError }    = require("httperrors");
 const Model            = require("../db/models/View");
 const { rw, assert, roundToPrecision }   = require("../lib");
+const { requestLineLevelData } = require("../mail");
 const { requireAuth } = require("./Auth");
 const createRestRoutes = require("./BaseController");
 
@@ -62,3 +63,12 @@ router.put("/:id/reset-rating", requireAuth("admin"), rw(async (req, res) => {
     res.json(model)
 }));
 
+router.post("/:id/request-linelevel-data", express.json(), (req, res) => {
+    requestLineLevelData(req.body).then(
+        () => res.end(),
+        e  => {
+            console.error(e)
+            res.status(400).json(e)
+        }
+    )
+});

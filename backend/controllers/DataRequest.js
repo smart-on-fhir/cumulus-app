@@ -1,14 +1,14 @@
-const http            = require("http");
-const https           = require("https");
-const { URL }         = require("url");
-const express         = require("express");
-const slug            = require("slug");
-const { HttpError }   = require("httperrors");
-const Model           = require("../db/models/DataRequest");
-const GroupModel      = require("../db/models/RequestGroup")
-const ViewModel       = require("../db/models/View")
-const { requireAuth } = require("./Auth");
-const createRestRoutes = require("./BaseController") 
+const http             = require("http");
+const https            = require("https");
+const { URL }          = require("url");
+const express          = require("express");
+const slug             = require("slug");
+const { HttpError }    = require("httperrors");
+const Model            = require("../db/models/DataRequest");
+const GroupModel       = require("../db/models/RequestGroup");
+const ViewModel        = require("../db/models/View");
+const { requireAuth }  = require("./Auth");
+const createRestRoutes = require("./BaseController");
 const {
     getFindOptions,
     assert,

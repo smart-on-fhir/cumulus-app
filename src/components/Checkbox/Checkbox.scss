@@ -3,20 +3,22 @@
 
 label.checkbox-label {
     display: block;
-    padding: 0.1em 0.5em 0.1em 1.5em;
+    padding: 0.25em 0.5em 0.25em 1.6em;
     border-radius: 4px;
     position: relative;
     font-weight: normal;
+    // box-shadow: 0 0 1px #000 inset;
+    line-height: 1.6em;
 
     > input[type="checkbox"], > input[type="radio"] {
         font-size:  inherit;
-        margin: 0em 0.2em 0em -1.2em;
+        margin: 0em 0.3em 0em -1.3em;
         width: 1em;
+        height: 1em;
         outline: 0;
-        background: orange;
-        vertical-align: top;
+        vertical-align: middle;
         position: relative;
-        top: 0.24em;
+        top: -0.03em;
 
         &:focus-visible + .checkbox-label-focus-highlight {
             box-shadow: 0 0 0 1px lighten($color: $color-blue, $amount: 10%) inset;
@@ -29,9 +31,16 @@ label.checkbox-label {
         }
     }
 
+    > input[type="text"] {
+       vertical-align: top; 
+       line-height: inherit;
+       padding: 0 0.5em;
+    }
+
     .checkbox-label-description {
         font-weight: normal;
         font-size: 85%;
+        line-height: normal;
     }
 
     &:hover {

@@ -19,6 +19,7 @@ import { buildChartOptions }                from "./Charts/Chart";
 import DefaultChartOptions, { getDefaultChartOptions } from "./Charts/DefaultChartOptions";
 
 import "./Dashboard.scss";
+import { Link } from "react-router-dom";
 
 
 // =============================================================================
@@ -631,7 +632,8 @@ export default function Dashboard({
                                     </div>
                                     <div className="col col-0" style={{ minWidth: "14em" }}>
                                         {/* <button className="btn btn-blue"> <b> Request Line-level Data </b> </button> */}
-                                        <a
+                                        
+                                        {/* <a
                                             className="btn btn-blue"
                                             href={
                                                 "mailto:investigate@cumulus.chip.org?subject=" +
@@ -644,7 +646,9 @@ export default function Dashboard({
                                             }
                                         >
                                             <b> Request Line-level Data </b>
-                                        </a>
+                                        </a> */}
+
+                                        <Link to="./request-data" className="btn btn-blue"><b> Request Line-level Data </b></Link>
                                     </div>
                                 </div>
                             </div>
