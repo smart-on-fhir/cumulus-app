@@ -15,9 +15,10 @@ import RequestGroupEditForm                     from "./RequestGroups/EditForm";
 import RequestGroupCreateForm                   from "./RequestGroups/CreateForm";
 import DataSiteListPage                         from "./DataSites";
 import DataSiteEditForm                         from "./DataSites/EditForm";
+import DataSiteCreateForm                       from "./DataSites/CreateForm";
+import RequestDataForm                          from "./Dashboard/RequestDataForm";
 
 import "../styles/main.scss";
-import DataSiteCreateForm from "./DataSites/CreateForm";
 
 export default function App()
 {
@@ -31,7 +32,12 @@ export default function App()
                             <Route path="/">
                                 <Route index element={ <RequireAuth><Home /></RequireAuth> } />
 
-                                <Route path="views/:id" element={ <RequireAuth><EditView /></RequireAuth> } />
+                                <Route path="views">
+                                    <Route path=":id">
+                                        <Route index element={ <RequireAuth><EditView /></RequireAuth> } />
+                                        <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />
+                                    </Route>
+                                </Route>
 
                                 <Route path="requests">
                                     <Route index element={ <RequireAuth><DataRequestsListPage /></RequireAuth> } />

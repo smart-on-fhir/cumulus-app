@@ -2,24 +2,25 @@ const Path           = require("path");
 const { bool, uInt } = require("./lib");
 
 const {
-    NODE_ENV            = "production",
-    HOST                = "0.0.0.0",
-    PORT                = "4000",
-    DB_SEED             = "",
-    DB_SYNC             = "none", // normal|force|alter|none
-    DB_HOST             = "localhost",
-    DB_PORT             = "5432",
-    DB_USER             = "postgres",
-    DB_PASS             = "",
-    DB_DATABASE         = "cumulus",
-    VERBOSE             = "false",
-    THROTTLE            = "0",
-    DB_SSL              = "true",
-    DB_DOCKER_CONTAINER = "",
-    MAILGUN_API_KEY     = "",
-    MAILGUN_DOMAIN      = "smarthealthit.org",
-    APP_EMAIL_FROM      = "admin@cumulus.org",
-    CUMULUS_ADMIN_EMAIL = "vlad.ignatov@gmail.com",
+    NODE_ENV               = "production",
+    HOST                   = "0.0.0.0",
+    PORT                   = "4000",
+    DB_SEED                = "",
+    DB_SYNC                = "none", // normal|force|alter|none
+    DB_HOST                = "localhost",
+    DB_PORT                = "5432",
+    DB_USER                = "postgres",
+    DB_PASS                = "",
+    DB_DATABASE            = "cumulus",
+    VERBOSE                = "false",
+    THROTTLE               = "0",
+    DB_SSL                 = "true",
+    DB_DOCKER_CONTAINER    = "",
+    MAILGUN_API_KEY        = "",
+    MAILGUN_DOMAIN         = "smarthealthit.org",
+    APP_EMAIL_FROM         = "admin@cumulus.org",
+    CUMULUS_ADMIN_EMAIL    = "vlad.ignatov@gmail.com",
+    REGIONAL_CLUSTER_EMAIL = "vlad.ignatov@gmail.com",
 
 } = process.env;
 
@@ -29,8 +30,19 @@ module.exports = {
     host    : HOST,
     verbose : bool(VERBOSE),
     throttle: uInt(THROTTLE),
+    
+    
     appEmail: APP_EMAIL_FROM,
+
+    // When line-level data is requested, the email is sent to this address.
+    // Typpicaly, this would represent a subscription group that handles for
+    // example "MA DPH Subscriptions to the Massachusetts regional cluster"
+    regionalClusterEmail: REGIONAL_CLUSTER_EMAIL,
+
+    // When new data requests (and/or subscriptions) are created, notification
+    // emails are sent to this address
     cumulusAdminEmail: CUMULUS_ADMIN_EMAIL,
+
     docker: {
         containerName: DB_DOCKER_CONTAINER
     },
