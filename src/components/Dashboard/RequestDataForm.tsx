@@ -1,17 +1,16 @@
 import { FormEvent, useCallback, useState } from "react";
-import { Helmet, HelmetProvider } from "react-helmet-async";
-import { useParams } from "react-router";
-import { useAuth } from "../../auth";
-import { request } from "../../backend";
-import { useBackend } from "../../hooks";
-import Alert, { AlertError } from "../Alert";
-import Breadcrumbs from "../Breadcrumbs";
-import Checkbox from "../Checkbox";
-import Loader from "../Loader";
+import { Helmet, HelmetProvider }           from "react-helmet-async";
+import { useParams }                        from "react-router";
+import { Link }                             from "react-router-dom";
+import { useAuth }                          from "../../auth";
+import { request }                          from "../../backend";
+import { useBackend }                       from "../../hooks";
+import Alert, { AlertError }                from "../Alert";
+import Breadcrumbs                          from "../Breadcrumbs";
+import Checkbox                             from "../Checkbox";
+import Loader                               from "../Loader";
 
 type DataElementNeed = "required" | "preferred" | "optional"
-
-// TODO: prepopulate from request, can add...
 
 interface DataElement {
     name: string
@@ -122,8 +121,6 @@ function PriorityEditor({
     ];
 
     const elements = [];
-
-    const [ otherValue, setOtherValue ] = useState(list.includes(value) ? "" : value)
     
     list.forEach((item, i) => {
         elements.push(
@@ -208,12 +205,14 @@ export function RequestDataForm({
     const auth = useAuth();
 
     const [loading, setLoading] = useState(false);
+    const [sent   , setSent   ] = useState(false);
+    const [error  , setError  ] = useState<Error | null>(null);
     
     const [state, setState] = useState({
         dataElements,
         type        : "",
-        view        : view.id,
-        subscription: subscription.id,
+        view        : { id: view.id, name: view.name },
+        subscription: { id: subscription.id, name: subscription.name },
         reason      : "",
         user: {
             username: auth.user?.username
@@ -231,31 +230,49 @@ export function RequestDataForm({
                 "content-type": "application/json"
             }
         }).then(
-            ()  => setLoading(false),
+            ()  => {
+                setLoading(false)
+                setSent(true)
+            },
             err => {
                 setLoading(false);
+                setError(err)
             }
         );
     };
 
-    return (
-        <div>
-            <HelmetProvider>
-                <Helmet>
-                    <title>Request Line-level Data</title>
-                </Helmet>
-            </HelmetProvider>
-            <Breadcrumbs links={[
-                { name: "Home"   , href: "/" },
-                { name: view!.name, href: `/views/${view!.id}` },
-                { name: "Request Line-level Data" }
-            ]}/>
-            <h1>Request Line-level Data</h1>
-            <hr />
+    let content: any = null
+
+    if (loading) {
+        content = <Loader/>
+    }
+    else if (error) {
+        content = <AlertError>{error.message}</AlertError>
+    }
+    else if (sent) {
+        content = <Alert color="green" icon="fas fa-info-circle">
+            <b>Your request has beem sent successfully!</b>
+            <p>
+                <Link className="btn small btn-green" to="/">Go Home</Link> <Link className="btn small btn-green" to={`/views/${view!.id}`}>Go back</Link>
+            </p>
+        </Alert>
+    }
+    else {
+        content = <>
+            <Alert color="blue" icon="fas fa-info-circle">
+                <b>Contact information</b>
+                <p>
+                    The Cumulus committee for your regional cluster will be notified
+                    with your line level data request. Your Cumulus email address and
+                    contact information will serve as the primary contact. For
+                    emergencies, please contact the Cumulus committee directly at
+                    617-123-4567. 
+                </p>
+            </Alert>
             <p className="color-muted mb-2">
                 All fields are required!
             </p>
-            { loading ? <Loader/> : <form onSubmit={onSubmit}>
+            <form onSubmit={onSubmit}>
                 <label htmlFor="reason">Reason for investigation</label>
                 <div className="color-muted mb-1">
                     Justify this request the best you can
@@ -283,24 +300,30 @@ export function RequestDataForm({
                             onChange={ dataElements => setState({ ...state, dataElements }) }
                         />
                     </div>
-                </div>
-                
-                <Alert color="blue" icon="fas fa-info-circle">
-                    <b>Contact information</b>
-                    <p>
-                        The Cumulus committee for your regional cluster will be notified
-                        with your line level data request. Your Cumulus email address and
-                        contact information will serve as the primary contact. For
-                        emergencies, please contact the Cumulus committee directly at
-                        617-123-4567. 
-                    </p>
-                </Alert>
-                
+                </div>                
                 <hr className="mt-1" />
                 <div className="center mt-1 mb-1">
                     <button className="btn btn-blue">Send Request</button>
                 </div>
-            </form> }
+            </form>
+        </>
+    }
+
+    return (
+        <div>
+            <HelmetProvider>
+                <Helmet>
+                    <title>Request Line-level Data</title>
+                </Helmet>
+            </HelmetProvider>
+            <Breadcrumbs links={[
+                { name: "Home"   , href: "/" },
+                { name: view!.name, href: `/views/${view!.id}` },
+                { name: "Request Line-level Data" }
+            ]}/>
+            <h1>Request Line-level Data</h1>
+            <hr />
+            { content }
         </div>
     )
 }

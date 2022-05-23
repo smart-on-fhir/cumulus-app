@@ -58,8 +58,12 @@ async function sendDataRequest(dataRequest) {
 
 /**
  * @param { object } options
- * @param { number } options.subscription subscription ID
- * @param { number } options.view view ID
+ * @param { object } options.subscription subscription
+ * @param { number } options.subscription.id subscription ID
+ * @param { string } options.subscription.name subscription name
+ * @param { object } options.view view
+ * @param { number } options.view.id view ID
+ * @param { string } options.view.name view name
  * @param { string } options.type "required" | "preferred" | "optional"
  * @param { string } options.reason
  * @param {{ username: string }} options.user
@@ -72,8 +76,8 @@ async function requestLineLevelData({ subscription, view, user, dataElements, re
         `<b>From: </b>${user.username}@cumulus<br/>`,
         `<b>To: </b>Subscription Group: MA DPH Subscriptions to the Massachusetts regional cluster<br />`,
         `<br />`,
-        `<b>Subscription ID: </b>45 NLP Prediction of COVID19 PCR Result`,
-        `<b>Chart View ID: 36 NLP Predictions of missing PCR Test Results`,
+        `<b>Subscription: </b><a href="https://smart-cumulus.herokuapp.com/requests/${subscription.id}">${subscription.name} (${subscription.id})</a>`,
+        `<b>Chart View: </b><a href="https://smart-cumulus.herokuapp.com/views/${view.id}">${view.id} (#${view.id})</a>`,
         `<br />`,
         `<b>Reason for investigation</b><br/>`,
         reason,
@@ -87,13 +91,7 @@ async function requestLineLevelData({ subscription, view, user, dataElements, re
     })));
 
     html.push(`<br /><b>Request Type: </b>${type}`);
-
-    // console.log(config.mailGun.domain, {
-    //     from   : config.appEmail,
-    //     to     : [config.regionalClusterEmail],
-    //     subject: "New Request for Line-level Data",
-    //     html   : html.join("\n")
-    // });
+    html.push(`<br /><br />The Cumulus team`);
 
     return client.messages.create(config.mailGun.domain, {
         from   : config.appEmail,
