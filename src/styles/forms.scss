@@ -146,7 +146,7 @@
     }
 
     &:disabled {
-        background  : #EEE;
+        background  : #EEE !important;
         border-color: #CCC;
         color       : #888;
         text-shadow : 0 1px 0 #FFF;
@@ -263,7 +263,14 @@ input[type="color"] {
 :disabled::file-selector-button {
     @include disabled-file-selector-button();
 }
-
+:disabled .file-input-value {
+    background  : #EEE !important;
+    color       : #888;
+    text-shadow : 0 1px 0 #FFF;
+}
+fieldset:disabled * {
+    color       : #888;
+}
 ::placeholder,
 ::-webkit-input-placeholder {
     color: #999;
@@ -306,6 +313,11 @@ select option.empty-option {
     @include button($color-green);
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
+.btn-brand-2 {
+    @include button($color-brand-2);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
 
 .toolbar {
     background: $color-grey;
