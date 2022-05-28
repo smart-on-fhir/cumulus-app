@@ -46,6 +46,7 @@ function waitForReady(container) {
         }, function (err, stream) {
             if (err) return reject(err)
             let logCount = 0
+            let expectedCount = 2
             stream
                 .once('data', function onStart() {
                     debug("Timer set")
@@ -58,9 +59,13 @@ function waitForReady(container) {
                 .on('data', function (data) {
                     const text = data.toString('utf8')
 
+                    if (text.includes("PostgreSQL Database directory appears to contain a database; Skipping initialization")) {
+                        expectedCount = 1
+                    }
+
                     if (POSTGRES_READY_LOG.test(text)) {
-                        logCount++
-                        if (logCount === 2) {
+
+                        if (++logCount === expectedCount) {
                             clearTimeout(this.timer)
                             // this.timer = null;
                             // Stops following logs.
@@ -79,11 +84,16 @@ function waitForReady(container) {
 }
 
 async function createContainer(name) {
+    const bindMounts = config.docker.dataDir ? {
+        [config.docker.dataDir]: "/var/lib/postgresql/data"
+    } : undefined;
+
     return runSimple({
         name,
         image: "postgres",
         autoRemove: true,
         ports: { "5432": "5432" },
+        bindMounts,
         env: {
             POSTGRES_PASSWORD: config.db.options.password,
             POSTGRES_USER    : config.db.options.username,
