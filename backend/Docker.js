@@ -42,7 +42,7 @@ async function waitForReady() {
             await connection.close();
             break
         } catch {
-            await wait(50)
+            await wait(1)
         }
     }
 }

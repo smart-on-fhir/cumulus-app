@@ -28,7 +28,6 @@ router.get("/:id/views", rw(async (req, res) => {
     options.where = { DataRequestId: +req.params.id };
     const views = await ViewModel.findAll(options);
     res.json(views);
-
 }));
 
 // Export Data endpoint --------------------------------------------------------
@@ -74,7 +73,7 @@ router.get("/by-group", rw(async (req, res) => {
         }
         if (out.id === null) {
             out.name = "GENERAL"
-            out.description = "Contains reqyests that are not assigned to any specific group"
+            out.description = "Contains requests that are not assigned to any specific group"
         }
         return out
     }));

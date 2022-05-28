@@ -8,7 +8,7 @@
     white-space: pre-wrap;
     position: relative;
     text-shadow: 0 1px 0 #fff;
-    word-break: normal;
+    word-break: break-all;
     font-family: monospace;
     font-size: 85%;
     line-height: 1.2;
@@ -26,38 +26,38 @@
     }
   
     &.alert-blue {
-        color: darken($color: $color-blue, $amount: 12%);
+        &, * { color: darken($color: $color-blue, $amount: 12%); }
         border-color: fade-out($color: $color-blue, $amount: 0.9);
         background: fade-out($color: $color-blue, $amount: 0.9);
     }
 
     &.alert-orange {
-        color: darken($color: $color-orange, $amount: 10%);
+        &, * { color: darken($color: $color-orange, $amount: 10%); }
         border-color: fade-out($color: $color-orange, $amount: 0.9);
         background: fade-out($color: $color-orange, $amount: 0.9);
     }
 
     &.alert-red {
-        color: darken($color: $color-red, $amount: 10%);
+        &, * { color: darken($color: $color-red, $amount: 10%); }
         border-color: fade-out($color: $color-red, $amount: 0.9);
         background: fade-out($color: $color-red, $amount: 0.9);
     }
 
     &.alert-grey {
-        color: darken($color: $color-grey, $amount: 40%);
+        &, * { color: darken($color: $color-grey, $amount: 40%); }
         border-color: fade-out($color: $color-grey, $amount: 0.5);
         background: fade-out($color: $color-grey, $amount: 0.5);
     }
     
     &.alert-grey-dark {
-        color: darken($color: $color-grey-dark, $amount: 10%);
+        &, * { color: darken($color: $color-grey-dark, $amount: 10%); }
         border-color: fade-out($color: $color-grey-dark, $amount: 0.8);
         background: fade-out($color: $color-grey-dark, $amount: 0.7);
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
     }
 
     &.alert-green {
-        color: darken($color: $color-green, $amount: 20%);
+        &, * { color: darken($color: $color-green, $amount: 20%); }
         border-color: fade-out($color: $color-green, $amount: 0.8);
         background: fade-out($color: $color-green, $amount: 0.8);
     }

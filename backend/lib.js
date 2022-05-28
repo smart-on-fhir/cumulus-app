@@ -280,7 +280,7 @@ function parseDelimitedLine(line, delimiters = [","], stringDelimiter = '"')
     }
 
     if (expect) {
-        throw new SyntaxError(`Syntax error - unterminated string. Expecting '"'`);
+        throw new SyntaxError(`Syntax error - unterminated string. Expecting ${JSON.stringify(expect)}, line: ${line}`);
     }
 
     return out//.map(s => s.trim());
@@ -409,7 +409,7 @@ function toTitleCase(str) {
  * 
  * @param {number} i 
  * @param {string[][]} rows 
- * @returns {}
+ * @returns {string}
  */
 function detectDataTypeAt(i, rows) {
     let type = "";
@@ -501,6 +501,7 @@ module.exports = {
     filterFiles,
     wait,
     parseDelimitedString,
+    parseDelimitedLine,
     toTitleCase,
     getFindOptions,
     roundToPrecision
