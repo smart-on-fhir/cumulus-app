@@ -21,6 +21,7 @@ const {
     APP_EMAIL_FROM         = "admin@cumulus.org",
     CUMULUS_ADMIN_EMAIL    = "vlad.ignatov@gmail.com",
     REGIONAL_CLUSTER_EMAIL = "vlad.ignatov@gmail.com",
+    DB_DOCKER_DATA_DIR     = "./db/postgres-data"
 
 } = process.env;
 
@@ -35,7 +36,7 @@ module.exports = {
     appEmail: APP_EMAIL_FROM,
 
     // When line-level data is requested, the email is sent to this address.
-    // Typpicaly, this would represent a subscription group that handles for
+    // Typically, this would represent a subscription group that handles for
     // example "MA DPH Subscriptions to the Massachusetts regional cluster"
     regionalClusterEmail: REGIONAL_CLUSTER_EMAIL,
 
@@ -44,7 +45,8 @@ module.exports = {
     cumulusAdminEmail: CUMULUS_ADMIN_EMAIL,
 
     docker: {
-        containerName: DB_DOCKER_CONTAINER
+        containerName: DB_DOCKER_CONTAINER,
+        dataDir: DB_DOCKER_DATA_DIR
     },
     db: {
         sync: DB_SYNC,
