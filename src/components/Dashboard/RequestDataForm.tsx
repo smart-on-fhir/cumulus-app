@@ -48,7 +48,7 @@ function DataElementEditor({
                 </select>
             </div>
             <div className="col col-0">
-                <button className="btn color-red" title="Remove this data elemnt" onClick={() => onRemove()}>
+                <button className="btn color-red" title="Remove this data element" onClick={() => onRemove()}>
                     <i className="fas fa-trash-alt"/>    
                 </button>    
             </div>
@@ -251,7 +251,7 @@ export function RequestDataForm({
     }
     else if (sent) {
         content = <Alert color="green" icon="fas fa-info-circle">
-            <b>Your request has beem sent successfully!</b>
+            <b>Your request has been sent successfully!</b>
             <p>
                 <Link className="btn small btn-green" to="/">Go Home</Link> <Link className="btn small btn-green" to={`/views/${view!.id}`}>Go back</Link>
             </p>
