@@ -1,10 +1,9 @@
 const Docker        = require("dockerode")
 const { runSimple } = require("run-container")
 const config        = require("./config")
-const { debuglog }  = require("util")
-const debug         = debuglog('app:db')
+const { Sequelize } = require("sequelize")
+const { wait }      = require("./lib")
 
-const POSTGRES_READY_LOG = /database system is ready to accept connections/;
 
 
 async function getDockerContainer(name = config.docker.containerName)
@@ -30,57 +29,22 @@ async function getDockerContainer(name = config.docker.containerName)
         }
     }
     
-    await waitForReady(container)
+    await waitForReady()
     return () => container.stop()
 }
 
-// Resolves when POSTGRES_READY_LOG appears for the second time in the logs
-function waitForReady(container) {
-    debug('Waiting...')
-
-    return new Promise((resolve, reject) => {
-        container.logs({
-            follow: true,
-            stdout: true,
-            stderr: true
-        }, function (err, stream) {
-            if (err) return reject(err)
-            let logCount = 0
-            let expectedCount = 2
-            stream
-                .once('data', function onStart() {
-                    debug("Timer set")
-                    this.timer = setTimeout(function () {
-                        debug("Timeout")
-                        stream.push(Buffer.from('!stop!'))
-                        reject(new Error('Docker startup timed out'))
-                    }, 50000).unref()
-                })
-                .on('data', function (data) {
-                    const text = data.toString('utf8')
-
-                    if (text.includes("PostgreSQL Database directory appears to contain a database; Skipping initialization")) {
-                        expectedCount = 1
-                    }
-
-                    if (POSTGRES_READY_LOG.test(text)) {
-
-                        if (++logCount === expectedCount) {
-                            clearTimeout(this.timer)
-                            // this.timer = null;
-                            // Stops following logs.
-                            // @ see https://github.com/apocas/dockerode/blob/master/examples/logs.js#L29
-                            stream.push(Buffer.from('!stop!'))
-                            setTimeout(() => resolve(true), 100);
-                        }
-                    }
-                })
-                // .on('error', function (e) {
-                //     this.timer && clearTimeout(this.timer)
-                //     reject(e)
-                // })
-        })
-    })
+async function waitForReady() {
+    while (true) {
+        try {
+            // @ts-ignore
+            const connection = new Sequelize(config.db.options);
+            await connection.authenticate();
+            await connection.close();
+            break
+        } catch {
+            await wait(50)
+        }
+    }
 }
 
 async function createContainer(name) {
