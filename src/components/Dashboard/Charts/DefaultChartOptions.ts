@@ -1,4 +1,5 @@
 import { merge } from "highcharts";
+import { generateColors } from "../../../utils";
 import { SupportedChartTypes } from "../config";
 
 const DefaultChartOptions = {
@@ -72,7 +73,7 @@ const DefaultChartOptions = {
         // margin: 0,
         // padding: 0,
     },
-    colors: [],
+    colors: generateColors(36),
     yAxis: {
         title: {
             text: "",
@@ -93,7 +94,7 @@ const DefaultChartOptions = {
         // @ts-ignore
         tickLength: 10,
         tickWidth: 0,
-        // gridZIndex: 1,
+        gridZIndex: 0,
         // endOnTick: true,
         // startOnTick: true,
         // floor: denominator ? 0 : undefined,
@@ -125,7 +126,7 @@ const DefaultChartOptions = {
             cursor          : 'pointer',
             showInLegend    : true,
             animation: {
-                duration: 400,
+                duration: 0,//400,
                 defer: 0,
             }
         },
@@ -230,13 +231,13 @@ const DefaultChartOptions = {
             allowPointSelect: false,
             cursor: "default",
             marker: {
-                radius: 2,
-                enabled: true,
-                states: {
-                    hover: {
-                        radius: 4
-                    }
-                }
+            //     radius: 2,
+                enabled: false,
+            //     states: {
+            //         hover: {
+            //             radius: 4
+            //         }
+            //     }
             },
             lineWidth: 1.5,
             shadow: false,
@@ -246,7 +247,7 @@ const DefaultChartOptions = {
                     shadow: true, // show them even on datetime charts
                 }
             },
-            connectNulls: false,
+            connectNulls: true,
             dashStyle: "Solid",
         }
     },
@@ -273,13 +274,15 @@ const DefaultChartOptions = {
         gridLineColor: "#DDD",
         gridLineWidth: 0,
         tickColor: "#DDD",
+        gridZIndex: 0,
+        
         // maxPadding: 0,
         labels: {
             enabled: true,
             // align: "center"
             autoRotationLimit: 80,
             overflow: "justify",
-            padding: 1,
+            padding: 2,
             style: {
                 fontSize: "13px"
             }
@@ -306,6 +309,16 @@ const DefaultChartOptions = {
                 fontWeight: "bold",
                 fontSize: "16px"
             }
+        },
+        dateTimeLabelFormats: {
+            millisecond: '%e %b %Y',
+            second     : '%e %b %Y',
+            minute     : '%e %b %Y',
+            hour       : '%e %b %Y',
+            day        : '%e %b %Y', // %e. %b
+            week       : '%e %b %Y', // %e. %b
+            month      : '%b %Y'   , // %b \'%y
+            year       : '%Y'
         }
     },
     annotations: []
@@ -462,27 +475,33 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
             }) as Highcharts.Options;
         
         case "columnStack":
-            return merge(DefaultChartOptions as unknown, customOptions, {
-                chart: {
-                    type: "column",
-                    options3d: {
-                        enabled: false
+            return merge(
+                DefaultChartOptions as unknown,
+                {
+                    yAxis: {
+                        title: {
+                            text: "Count"
+                        }
                     }
                 },
-                plotOptions: {
-                    column: {
-                        stacking: "normal"
+                customOptions,
+                {
+                    chart: {
+                        type: "column",
+                        options3d: {
+                            enabled: false
+                        }
+                    },
+                    plotOptions: {
+                        column: {
+                            stacking: "normal"
+                        }
+                    },
+                    xAxis: {
+                        offset: 0
                     }
-                },
-                yAxis: {
-                    title: {
-                        text: "Count"
-                    }
-                },
-                xAxis: {
-                    offset: 0
                 }
-            }) as Highcharts.Options;
+            ) as Highcharts.Options;
 
         case "columnStack3d":
             return merge(DefaultChartOptions as unknown, customOptions, {

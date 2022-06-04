@@ -287,7 +287,8 @@ ul {
 #chart {
   border: 2px solid $color-grey;
   border-radius: 5px;
-  width: 100%;
+  // width: 100%;
+  box-sizing: content-box;
 }
 
 .grey-out, [aria-disabled="true"] {
