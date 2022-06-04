@@ -11,21 +11,19 @@ import moment from "moment";
 // }
 
 const deferMap = new WeakMap();
+
 export function defer(fn: () => void, delay = 0)
 {
-    if (deferMap.has(fn)) {
+    const ref = deferMap.get(fn);
+    if (ref) {
         if (delay) {
-            clearTimeout(deferMap.get(fn))
+            clearTimeout(ref)
         } else {
-            cancelAnimationFrame(deferMap.get(fn))
+            cancelAnimationFrame(ref)
         }
     }
-    deferMap.set(
-        fn,
-        delay ?
-            setTimeout(fn, delay) :
-            requestAnimationFrame(fn)
-    );
+
+    deferMap.set(fn, delay ? setTimeout(fn, delay) : requestAnimationFrame(fn));
 }
 
 export function classList(map: Record<string, boolean>): string | undefined {

@@ -19,10 +19,10 @@ export function useBackend<T=any>(fn: () => Promise<T>, immediate = false)
     });
 
     const execute = useCallback(() => {
-        dispatch({ loading: true });
+        dispatch({ loading: true, result: null, error: null });
         return fn().then(
-            (result: T) => dispatch({ loading: false, result, error: null }),
-            (error: Error) => dispatch({ loading: false, error, result: null })
+            (result: T) => dispatch({ loading: false, result }),
+            (error: Error) => dispatch({ loading: false, error })
         );
     }, [fn]);
     

@@ -9,12 +9,14 @@ import Loader          from "../Loader";
 
 export default function EditView()
 {
+    // The subscription ID from the URL params
     const { id } = useParams()
 
+    // Fetch the subscription by ID
     const { loading, error, result } = useBackend(
         useCallback(() => {
             return request("/api/views/" + id).then(view => {
-                return request("/api/requests/" + view.DataRequestId + "?includeData=1").then(request => ({
+                return request("/api/requests/" + view.DataRequestId).then(request => ({
                     request,
                     view
                 }));
@@ -23,15 +25,19 @@ export default function EditView()
         true
     );
 
-    if (loading) return <Loader/>
-    if (error) return <AlertError>{`Error fetching view with id "${id}": ${error}`}</AlertError>
-
-    if (!result) {
-        return <AlertError>{`Error fetching subscription with id "${id}": ${error}`}</AlertError>
+    // Show loader whole the subscription is being loaded
+    if (loading) {
+        return <Loader/>
     }
 
+    // If the subscription failed to load exit with an error message
+    if (error) {
+        return <AlertError>{`Error fetching view with id "${id}": ${error}`}</AlertError>
+    }
+
+     // If the subscription request was successful but did not return the expected data exit with an error message
     if (!result) {
-        return <b>Failed to fetch data!</b>
+        return <AlertError>{`Fetching subscription with id "${id}" produced empty response`}</AlertError>
     }
 
     return (
