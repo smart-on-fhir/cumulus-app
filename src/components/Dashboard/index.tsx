@@ -13,10 +13,7 @@ import DataGrid                             from "../DataGrid";
 import Alert, { AlertError }                from "../Alert";
 import { classList, defer, generateColors, objectDiff, strip, stripUndefined } from "../../utils";
 import ConfigPanel                          from "./ConfigPanel"
-import { operators, ReadOnlyPaths, SupportedChartTypes, SupportedNativeChartTypes } from "./config";
-import {Chart2 as BaseChart}                from "./Charts/Chart"
-import { buildChartOptions }                from "./Charts/Chart";
-import DefaultChartOptions, { getDefaultChartOptions } from "./Charts/DefaultChartOptions";
+import CaptionEditor                        from "./CaptionEditor"
 
 import "./Dashboard.scss";
 import { Link } from "react-router-dom";
