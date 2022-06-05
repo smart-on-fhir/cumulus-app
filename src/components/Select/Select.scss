@@ -159,8 +159,8 @@
         }
 
         &.highlighted {
-            background: linear-gradient(90deg, rgba(129, 171, 214, 0.3), rgb(186, 206, 224));
-            box-shadow: 0 0 0 0.75px rgb(154, 178, 201) inset;
+            background: linear-gradient(90deg, rgba(129, 171, 214, 0.3), rgba(129, 171, 214, 0.32));
+            box-shadow: 0 0 0 0.5px rgb(154, 178, 201) inset;
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
         }
 
