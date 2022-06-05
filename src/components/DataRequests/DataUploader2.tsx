@@ -461,6 +461,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
         params.set("labels", _cols.map(c => c.label).join(","))
         params.set("descriptions", _cols.map(c => c.description).join(","))
         
+        let url = "/api/requests/" + this.props.requestID + "/data?" + params.toString();
         
         // @ts-ignore
         const readableStream = file.stream() as ReadableStream;
@@ -489,17 +490,36 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
 
         let extra = ""
         let jobId = ""
-        let streamDone = false
 
         while (true) {
-            const { done, value } = streamDone ? { done: true, value: undefined } : await reader.read();
-            if (done && !extra) {
-                streamDone = true
-                defer(() => {
-                    this.setState({ importCompleted: true, uploading: false })
+
+            const { done, value } = await reader.read();
+
+            if (done) {
+                const res = await fetch(url, {
+                    method: "PUT",
+                    body: extra,
+                    signal: this.abortController.signal,
+                    headers: {
+                        "content-type": "text/plain;charset=UTF-8",
+                        "x-continue"  : "false",
+                        "x-job-id"    : jobId
+                    }
+                });
+
+                if (!res.ok) {
+                    const errorMessage = await res.text()
+                    this.setState({ errorMessage })
+                    throw new Error(errorMessage)
+                }
+
+                return defer(() => {
+                    this.setState({
+                        importCompleted: true,
+                        uploading: false
+                    })
                     defer(() => this.props.navigate(`/requests/${this.props.requestID}`), 1400)
                 }, estimate);
-                return;
             }
 
             let body = extra + (value || "")
@@ -518,7 +538,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
                 signal: this.abortController.signal,
                 headers: {
                     "content-type": "text/plain;charset=UTF-8",
-                    "x-continue"  : String(!done || !!extra),
+                    "x-continue"  : "true",
                     "x-job-id"    : jobId
                 }
             }).then(res => res.text().then(txt => {
