@@ -283,7 +283,7 @@ export default function AnnotationsUI({
                     }}
                 />
             )) }
-            <hr className="mt-1 mb-1"/>
+            { current.length > 0 && <hr className="mt-1 mb-1"/> }
             <div className="row middle">
                 <div className="col center">
                     <button className="btn color-green small" onClick={add}>Add Annotation</button>

@@ -38,7 +38,7 @@ function Filter({
     
 
     return (
-        <div style={{ background: "#EAEAEA", padding: 3, borderRadius: 7, border: "1px solid #D9D9D9" }}>
+        <div style={{ background: "#EFEFEF", padding: 3, borderRadius: 7, border: "1px solid #D9D9D9" }}>
             <div className="row">
                 <div className="col">
                     <ColumnSelector
@@ -196,13 +196,13 @@ export default function FilterUI({
     }
 
     return (
-        <div className="mt-1 mb-1">
+        <div>
             { current.map((f, i) => (
                 <div key={i}>
                     { i > 0 &&
                     <div className="row center" style={{ margin: "-1px 0" }}>
                         <div className="col"/>
-                        <div className="col col-0" style={{ background: "#EAEAEA", padding: "0 3px", borderRight: "1px solid #D9D9D9", borderLeft: "1px solid #D9D9D9" }}>
+                        <div className="col col-0" style={{ background: "#EFEFEF", padding: "0 3px", borderRight: "1px solid #D9D9D9", borderLeft: "1px solid #D9D9D9" }}>
                             <div className="toolbar small">
                                 <button
                                     style={{ width: "3.4em" }}
@@ -237,7 +237,7 @@ export default function FilterUI({
                     />
                 </div>
             )) }
-            <hr className="mt-1 mb-1"/>
+            { current.length > 0 && <br /> }
             <div className="row middle">
                 <div className="col center">
                     <button className="btn color-green small" onClick={add}>Add Filter</button>
