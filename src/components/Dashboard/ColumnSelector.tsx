@@ -41,17 +41,37 @@ export default function ColumnSelector({
     placeholder?: string
 })
 {
+    const options: any[] = cols.filter(filter).sort(comparator).map((col, i) => ({
+        value   : col.name,
+        disabled: disabled.includes(col.name),
+        icon    : "/icons/column.png",
+        label   : col.label || col.name,
+        right   : <span className={ col.dataType + " color-muted small right" }> {
+            col.dataType
+                .replace(/date:YYYY-MM-DD/, "Day")
+                .replace(/date:YYYY-MM/, "Month")
+                .replace(/date:YYYY-MM/, "Year")
+                .replace(/date:YYYY wk W/, "Week")
+        }</span>
+    }));
+
+    if (addEmptyOption !== "none") {
+        const emptyOption = {
+            value   : null,
+            icon    : "fas fa-close color-red",
+            label   : "NONE"
+        };
+
+        if (addEmptyOption === "end") {
+            options.push(emptyOption)
+        } else {
+            options.unshift(emptyOption)
+        }
+    }
+
     return (
         <Select
-            options={
-                cols.filter(filter).sort(comparator).map((col, i) => ({
-                    value   : col.name,
-                    disabled: disabled.includes(col.name),
-                    icon    : "/icons/column.png",
-                    label   : col.label || col.name,
-                    right   : <span className={ col.dataType + " color-muted small right" }> {col.dataType}</span>
-                }))
-            }
+            options={ options }
             placeholder={ placeholder }
             value={ props.value }
             onChange={ props.onChange }
