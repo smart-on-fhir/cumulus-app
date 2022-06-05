@@ -406,6 +406,11 @@ label {
 
     position: relative;
     z-index: 2;
+    border-bottom: 1px solid $color-grey;
+    padding: 3px 0 0;
+    text-shadow: 0 1px 0 #FFF;
+    // background: linear-gradient(rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.04));
+    border-radius: 5px 5px 0 0;
 
     .tab {
         border-color : transparent;
@@ -413,18 +418,20 @@ label {
         border-width : 1px 1px 0 1px;
         border-radius: $border-radius $border-radius 0 0;
         padding: 0.2em 1em;
-        margin: 0 0 0 6px;
+        margin: 0 0 -1px 4px;
         background: transparent;
         font-family: inherit;
         color: inherit;
         opacity: 0.65;
         cursor: pointer;
         font-weight: bold;
+        display: inline-block;
 
         &.active {
             background: #FFF;
             border-color : $color-grey;
             opacity: 1;
+            padding: 0.2em 1em;
         }
 
         &:focus-visible {
