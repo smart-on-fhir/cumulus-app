@@ -25,27 +25,20 @@ interface Col
 }
 
 function detectDataTypeAt(i: number, name: string, rows: string[][]) {
-
-    if (name === "cnt") return "integer";
     
-    if (name.match(/year/i )) return "year";
-    if (name.match(/month/i)) return "month";
-    if (name.match(/week/i )) return "week";
-    if (name.match(/day/i  )) return "day";
-    if (name.match(/date/i )) return "day";
+    if (name === "cnt") return "integer";
 
-
+    if (name.match(/year/i )) return "date:YYYY";
+    if (name.match(/month/i)) return "date:YYYY-MM";
+    if (name.match(/week/i )) return "date:YYYY-MM-DD";
+    if (name.match(/day/i  )) return "date:YYYY-MM-DD";
+    if (name.match(/date/i )) return "date:YYYY-MM-DD";
+    
     let type = "";
 
     function getType(x: string) {
         if (!x) {
             return ""
-        }
-        if ((/^-?[0-9]+$/).test(x)) {
-            return "integer"
-        }
-        if ((/^-?[0-9]*\.[0-9]+$/).test(x)) {
-            return "float"
         }
         if ((/^\d{4}-01-01$/).test(x)) {
             return "year"
@@ -197,10 +190,10 @@ return (
                             <option value="integer">Integer</option>
                             <option value="float">Float</option>
                             <option value="string">Text</option>
-                            <option value="day">Day</option>
-                            <option value="week">Week</option>
-                            <option value="month">Month</option>
-                            <option value="year">Year</option>
+                            <option value="date:YYYY-MM-DD">Day</option>
+                            <option value="date:YYYY wk W">Week</option>
+                            <option value="date:YYYY-MM">Month</option>
+                            <option value="date:YYYY">Year</option>
                             <option value="boolean">Boolean</option>
                             <option value="hidden">Hidden</option> 
                         </select>
