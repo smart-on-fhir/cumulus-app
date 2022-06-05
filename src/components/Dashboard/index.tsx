@@ -147,7 +147,17 @@ export default function Dashboard({
     view,
     dataRequest
 }: {
+    /**
+     * The view object that we are editing. If this is an empty object
+     * or a partial which does not have an `id` property, then the
+     * dashboard is in "create mode"
+     */
     view: Partial<app.View>
+
+    /**
+     * The data subscription that this view is (or is going to be)
+     * assigned to.
+     */
     dataRequest: app.DataRequest
 }) {
     const {
@@ -628,23 +638,7 @@ export default function Dashboard({
                                         </a>
                                     </div>
                                     <div className="col col-0" style={{ minWidth: "14em" }}>
-                                        {/* <button className="btn btn-blue"> <b> Request Line-level Data </b> </button> */}
                                         
-                                        {/* <a
-                                            className="btn btn-blue"
-                                            href={
-                                                "mailto:investigate@cumulus.chip.org?subject=" +
-                                                encodeURIComponent("Request line-level data request") +
-                                                "&body=" + encodeURIComponent(
-                                                    `View: ${window.location.href}\n` +
-                                                    `Subscription: ${window.location.origin}/requests/${dataRequest.id}\n\n` +
-                                                    `Regards,\nThe Cumulus team`
-                                                )
-                                            }
-                                        >
-                                            <b> Request Line-level Data </b>
-                                        </a> */}
-
                                         <Link to="./request-data" className="btn btn-blue"><b> Request Line-level Data </b></Link>
                                     </div>
                                 </div>
