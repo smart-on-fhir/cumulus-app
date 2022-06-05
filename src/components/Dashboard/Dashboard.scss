@@ -17,15 +17,17 @@
 }
 
 .main-chart {
-    width: 100%;
+    // width: 100%;
     aspect-ratio: 5/3;
     min-width: 500px;
     min-height: 300px;
     overflow: hidden;
+    position: relative;
 
     * { 
-        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif !important;
     }
+}
 
 }
 
