@@ -361,7 +361,7 @@ export default function DataRequestForm({
                             </Link>
                         </div>
                     </div>
-                    <select value={groupId} onChange={e => onChange({ ...record, groupId: +e.target.value })}>
+                    <select value={groupId || undefined} onChange={e => onChange({ ...record, groupId: +e.target.value })}>
                         <option>None (GENERAL)</option>
                         {requestGroups.map((g, i) => (
                             <option key={i} value={g.id}>{g.name}</option>
