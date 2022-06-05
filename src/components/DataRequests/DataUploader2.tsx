@@ -1,11 +1,11 @@
-import moment                      from "moment"
-import { Component }               from "react"
-import { useNavigate, useParams }  from "react-router"
-import { HelmetProvider, Helmet }  from "react-helmet-async"
-import Breadcrumbs                 from "../Breadcrumbs"
-import Alert, { AlertError }       from "../Alert"
-import Loader                      from "../Loader"
-import { request }      from "../../backend"
+import moment                            from "moment"
+import { Component }                     from "react"
+import { useNavigate, useParams }        from "react-router"
+import { HelmetProvider, Helmet }        from "react-helmet-async"
+import Breadcrumbs                       from "../Breadcrumbs"
+import Alert, { AlertError }             from "../Alert"
+import Loader                            from "../Loader"
+import { request }                       from "../../backend"
 import { classList, defer, toTitleCase } from "../../utils"
 import "./DataUploader.scss"
 
@@ -326,7 +326,6 @@ function Preview({
     )
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
 interface DataUploader2Props {
@@ -447,10 +446,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
     }
 
     async upload() {
-        const {
-            file,
-            cols
-        } = this.state;
+        const { file, cols } = this.state;
 
         if (!file) {
             return Promise.reject(new Error("No file"));
@@ -461,15 +457,11 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
         let _cols = cols.filter(col => col.dataType !== "hidden");
         
         let params = new URLSearchParams();
-        // url.searchParams.set("columns", _cols.map(c => c.name).join(","))
         params.set("types", _cols.map(c => c.dataType).join(","))
         params.set("labels", _cols.map(c => c.label).join(","))
         params.set("descriptions", _cols.map(c => c.description).join(","))
         
-        let url = "/api/data/" + file.name + "?" + params.toString();
         
-        // console.log(url);
-
         // @ts-ignore
         const readableStream = file.stream() as ReadableStream;
 
@@ -512,15 +504,13 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
 
             let body = extra + (value || "")
             let idx = body.lastIndexOf("\n")
-            
+
             if (idx === -1 || idx === body.length - 1) {
                 extra = ""
             } else {
                 extra = body.slice(idx + 1)
                 body  = body.slice(0, idx)
             }
-
-            // console.log(body)
 
             await fetch(url, {
                 method: "PUT",
@@ -629,7 +619,6 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
                 <hr />
                 <fieldset disabled={uploading}>
                 { errorMessage && <AlertError><b>Error importing data</b> - {errorMessage}</AlertError> }
-                {/* importingError && <AlertError><b>Error importing data</b> - {importingError + ""}</AlertError> } */}
                 <div className="row gap mt-1 mb-1">
                     <div className="col">
                         <label>Select CSV File</label>
@@ -676,7 +665,6 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
                     { uploading && <div className="progress">
                         <div className="row gap small">
                             <div className="col">Importing data...</div>
-                            {/* <div className="col right">{Math.floor(uploadedBytes/(totalBytes || 1) * 100)}%</div> */}
                         </div>
                         <div className="progress-bar-wrap">
                             <div className="progress-bar" style={{
