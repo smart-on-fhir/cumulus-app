@@ -125,6 +125,7 @@ const DefaultChartOptions = {
             allowPointSelect: true,
             cursor          : 'pointer',
             showInLegend    : true,
+            shadow          : false,
             animation: {
                 duration: 0,//400,
                 defer: 0,

@@ -17,46 +17,7 @@ import {
 
 type SupportedChartType = keyof typeof SupportedChartTypes
 
-function PrimaryDataEditor({
-    state,
-    dataRequest,
-    onChange
-}: {
-    state: ChartConfigPanelState
-    dataRequest: app.DataRequest
-    onChange: (state: ChartConfigPanelState) => void
-}) {
-    
-    const { cols } = dataRequest.metadata || { cols: [] }
 
-    return (
-        <>
-            { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
-                <>
-                    <div className="pt-1">
-                        <label>Stratifier</label>
-                        <ColumnSelector
-                            cols={ cols }
-                            placeholder="Select Column"
-                            addEmptyOption="start"
-                            value={ state.stratifyBy }
-                            disabled={[ "cnt", state.groupBy, state.column2 ].filter(Boolean)}
-                            onChange={ (stratifyBy: string) => onChange({
-                                ...state,
-                                stratifyBy,
-                                denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
-                            }) }
-                        />
-                        <p className="small color-muted">
-                            Stratify the data into multiple series based on the chosen column. For example,
-                            this would produce multiple lines in a line chart.
-                        </p>
-                    </div>
-                </>
-            }
-        </>
-    )
-}
 
 function SecondaryDataEditor({
     state,
@@ -213,16 +174,19 @@ export default function ConfigPanel({
     
     const { chartOptions } = state;
 
+    const isBar    = state.chartType.startsWith("bar")
+    const isColumn = state.chartType.startsWith("column")
+    const isPie    = state.chartType.startsWith("pie") || state.chartType.startsWith("donut")
+    const isStack  = state.chartType.endsWith("Stack")
+    const is3D     = state.chartType.includes("3d")
+    const isBarOrColumn = isBar || isColumn
+
     return (
         <div style={{
             color: "#666",
-            // height: "calc(100vh - 13em)",
-            // overflowY: "auto",
             padding: "0 15px 0 3px",
             width: 330,
-            marginRight: "1em",
-            // position: "sticky",
-            // top: 0
+            marginRight: "1em"
         }}>
             { view.id && <div className="mt-1">
                 <Rating
@@ -233,197 +197,87 @@ export default function ConfigPanel({
                     onClear={ resetRating }
                 />
             </div> }
-            { false && viewType === "overview" && auth.user?.role === "admin" && (
-                <Collapse header="View" collapsed={!!state.viewName}>
-                    <div className="mt-1">
-                        <label>Title</label>
-                        <input type="text" value={state.viewName} onChange={ e => onChange({ ...state, viewName: e.target.value })} required />
-                    </div>
-                    <div className="mt-1">
-                        <label className="mt-1">Short Description</label>
-                        <textarea rows={3} value={state.viewDescription} onChange={ e => onChange({ ...state, viewDescription: e.target.value })}></textarea>
-                    </div>
-                    { view.id && <div className="mt-1">
-                        <Rating
-                            value={ rating }
-                            votes={ votes }
-                            loading={ voting }
-                            onVote={ vote }
-                            onClear={ resetRating }
-                        />
-                    </div> }
+            <Collapse collapsed header="Chart">
+                <div className="mt-1">
+                    <label>Chart Type</label>
+                    <Select
+                        value={ state.chartType }
+                        onChange={ chartType => onChange({ ...state, chartType })}
+                        options={Object.keys(SupportedChartTypes).map((type, i) => ({
+                            value: type,
+                            label: SupportedChartTypes[type as SupportedChartType],
+                            icon: ChartIcons[type as keyof typeof ChartIcons],
+                            disabled: (type.includes("Stack") && !state.stratifyBy) || (
+                                (type.includes("pie") || type.includes("donut")) && !!state.stratifyBy
+                            )
+                        }))}
+                    />
+                </div>
+                <div className="mt-1">
+                    <label>Chart Title</label>
+                    <input
+                        type="text"
+                        value={ chartOptions.title?.text || "" }
+                        onChange={ e => onChange(merge(state, {
+                            chartOptions: {
+                                title: {
+                                    text: e.target.value
+                                }
+                            }
+                        }))}
+                    />
                     <br/>
-                </Collapse>
-            )}
-            
-            { viewType === "overview" && (
-                <Collapse collapsed header="Chart">
-                    <div className="mt-1">
-                        <label>Chart Type</label>
-                        <Select
-                            value={ state.chartType }
-                            onChange={ chartType => onChange({ ...state, chartType })}
-                            options={Object.keys(SupportedChartTypes).map((type, i) => ({
-                                value: type,
-                                label: SupportedChartTypes[type as SupportedChartType],
-                                icon: ChartIcons[type as keyof typeof ChartIcons],
-                                disabled: (type.includes("Stack") && !state.stratifyBy) || (
-                                    (type.includes("pie") || type.includes("donut")) && !!state.stratifyBy
-                                )
-                            }))}
-                        />
-                    </div>
-                    <div className="mt-1">
-                        <label>Chart Title</label>
-                        <input
-                            type="text"
-                            value={ chartOptions.title?.text || "" }
-                            onChange={ e => onChange(merge(state, {
-                                chartOptions: {
-                                    title: {
-                                        text: e.target.value
-                                    }
+                </div>
+                <div className="mt-1">
+                    <Checkbox
+                        name="plotBorderWidth"
+                        disabled={ is3D }
+                        checked={ !!chartOptions.chart?.plotBorderWidth }
+                        onChange={ checked => onChange(merge(state, {
+                            chartOptions: {
+                                chart: {
+                                    plotBorderWidth: checked ? 1 : 0
                                 }
-                            }))}
-                        />
-                        <br/>
-                        
-                    </div>
-                    <div className="mt-1">
-                        <Checkbox
-                            name="plotBorderWidth"
-                            disabled={ state.chartType.includes("3d") }
-                            checked={ !!chartOptions.chart?.plotBorderWidth }
-                            onChange={ checked => onChange(merge(state, {
-                                chartOptions: {
-                                    chart: {
-                                        plotBorderWidth: checked ? 1 : 0
-                                    }
-                                }
-                            }))}
-                            label="Render Plot Border"
-                        />
-                        <Checkbox
-                            name="legend"
-                            label="Show legend"
-                            checked={chartOptions.legend?.enabled !== false}
-                            onChange={enabled => onChange(merge(state, {
-                                chartOptions: {
-                                    legend: { enabled }
-                                }
-                            }))}
-                        />
-                    </div>
+                            }
+                        }))}
+                        label="Render Plot Border"
+                    />
+                    <Checkbox
+                        name="legend"
+                        label="Show legend"
+                        checked={chartOptions.legend?.enabled !== false}
+                        onChange={enabled => onChange(merge(state, {
+                            chartOptions: {
+                                legend: { enabled }
+                            }
+                        }))}
+                    />
+                </div>
 
-                    { (state.chartType.startsWith("column") || state.chartType.startsWith("bar")) && state.stratifyBy && 
-                        <div className="mt-1">
-                            <label>
-                                Group Padding
-                                <input
-                                    type="range"
-                                    min={0}
-                                    max={0.5}
-                                    step={0.01}
-                                    value={
-                                        state.chartType.startsWith("column") ? 
-                                            chartOptions.plotOptions?.column?.groupPadding === undefined ?
-                                                0.2 :
-                                                chartOptions.plotOptions.column.groupPadding :
-                                            chartOptions.plotOptions?.bar?.groupPadding === undefined ?
-                                                0.2 :
-                                                chartOptions.plotOptions.bar.groupPadding
-                                    }
-                                    onChange={e => onChange(
-                                        merge(state, {
-                                            chartOptions: {
-                                                plotOptions: {
-                                                    [state.chartType.startsWith("column") ? "column" : "bar"]: {
-                                                        groupPadding: e.target.valueAsNumber
-                                                    }
-                                                }
-                                            }
-                                        })
-                                    )}
-                                    style={{ width: "100%", margin: 0 }}
-                                />
-                            </label>
-                            <p className="small color-muted">Padding between each value groups</p>
-                        </div>
-                    }
-                    { (state.chartType.startsWith("column") || state.chartType.startsWith("bar")) && !state.chartType.endsWith("Stack") &&
-                        <div className="mt-1">
-                            <label>
-                                Point Padding
-                                <input
-                                    type="range"
-                                    min={0}
-                                    max={0.5}
-                                    step={0.01}
-                                    value={
-                                        state.chartType.startsWith("column") ? 
-                                            chartOptions.plotOptions?.column?.pointPadding === undefined ?
-                                                0.02 :
-                                                chartOptions.plotOptions.column.pointPadding :
-                                            chartOptions.plotOptions?.bar?.pointPadding === undefined ?
-                                                0.02 :
-                                                chartOptions.plotOptions.bar.pointPadding
-                                    }
-                                    onChange={e => onChange(     
-                                        merge(state, {
-                                            chartOptions: {
-                                                plotOptions: {
-                                                    [state.chartType.startsWith("column") ? "column" : "bar"]: {
-                                                        pointPadding: e.target.valueAsNumber
-                                                    }
-                                                }
-                                            }
-                                        })
-                                    )}
-                                    style={{ width: "100%", margin: 0 }}
-                                />
-                            </label>
-                            <p className="small color-muted">Padding between each column or bar</p>
-                        </div>
-                    }
-                    { (state.chartType.startsWith("donut") || state.chartType.startsWith("pie")) && <div className="mt-1">
+                { isBarOrColumn && state.stratifyBy && 
+                    <div className="mt-1">
                         <label>
-                            Start Angle
+                            Group Padding
                             <input
                                 type="range"
                                 min={0}
-                                max={360}
-                                step={1}
-                                value={ chartOptions.plotOptions?.pie?.startAngle || 0 }
-                                onChange={e => onChange(     
-                                    merge(state, {
-                                        chartOptions: {
-                                            plotOptions: {
-                                                pie: {
-                                                    startAngle: e.target.valueAsNumber
-                                                }
-                                            }
-                                        }
-                                    })
-                                )}
-                                style={{ width: "100%", margin: 0 }}
-                            />
-                        </label>
-                    </div> }
-                    { (state.chartType.startsWith("pie") || state.chartType.startsWith("donut")) && <div className="mt-1">
-                        <label>
-                            Selected Slice Offset
-                            <input
-                                type="range"
-                                min={0}
-                                max={30}
-                                step={1}
-                                value={ chartOptions.plotOptions?.pie?.slicedOffset === undefined ? 30 : chartOptions.plotOptions.pie.slicedOffset }
+                                max={0.5}
+                                step={0.01}
+                                value={
+                                    isColumn ? 
+                                        chartOptions.plotOptions?.column?.groupPadding === undefined ?
+                                            0.2 :
+                                            chartOptions.plotOptions.column.groupPadding :
+                                        chartOptions.plotOptions?.bar?.groupPadding === undefined ?
+                                            0.2 :
+                                            chartOptions.plotOptions.bar.groupPadding
+                                }
                                 onChange={e => onChange(
                                     merge(state, {
                                         chartOptions: {
                                             plotOptions: {
-                                                pie: {
-                                                    slicedOffset: e.target.valueAsNumber
+                                                [isColumn ? "column" : "bar"]: {
+                                                    groupPadding: e.target.valueAsNumber
                                                 }
                                             }
                                         }
@@ -432,180 +286,243 @@ export default function ConfigPanel({
                                 style={{ width: "100%", margin: 0 }}
                             />
                         </label>
-                    </div> }
-                    <br/>
-                </Collapse>
-            )}
-
-            { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
-                <Collapse collapsed header={ state.chartType.startsWith("bar") ? "X Axis" : "Y Axis" }>
+                        <p className="small color-muted">Padding between each value groups</p>
+                    </div>
+                }
+                { isBarOrColumn && !isStack &&
                     <div className="mt-1">
-                        <label>Axis Title</label>
+                        <label>
+                            Point Padding
+                            <input
+                                type="range"
+                                min={0}
+                                max={0.5}
+                                step={0.01}
+                                value={
+                                    isColumn ? 
+                                        chartOptions.plotOptions?.column?.pointPadding === undefined ?
+                                            0.02 :
+                                            chartOptions.plotOptions.column.pointPadding :
+                                        chartOptions.plotOptions?.bar?.pointPadding === undefined ?
+                                            0.02 :
+                                            chartOptions.plotOptions.bar.pointPadding
+                                }
+                                onChange={e => onChange(     
+                                    merge(state, {
+                                        chartOptions: {
+                                            plotOptions: {
+                                                [isColumn ? "column" : "bar"]: {
+                                                    pointPadding: e.target.valueAsNumber
+                                                }
+                                            }
+                                        }
+                                    })
+                                )}
+                                style={{ width: "100%", margin: 0 }}
+                            />
+                        </label>
+                        <p className="small color-muted">Padding between each column or bar</p>
+                    </div>
+                }
+                { isPie && <div className="mt-1">
+                    <label>
+                        Start Angle
                         <input
-                            type="text"
-                            // @ts-ignore
-                            value={ chartOptions.yAxis?.title?.text || "" }
-                            onChange={ e => onChange(merge(state, {
-                                chartOptions: {
-                                    yAxis: {
-                                        title: {
-                                            text: e.target.value
+                            type="range"
+                            min={0}
+                            max={360}
+                            step={1}
+                            value={ chartOptions.plotOptions?.pie?.startAngle || 0 }
+                            onChange={e => onChange(     
+                                merge(state, {
+                                    chartOptions: {
+                                        plotOptions: {
+                                            pie: {
+                                                startAngle: e.target.valueAsNumber
+                                            }
                                         }
                                     }
-                                }
-                            }))}
+                                })
+                            )}
+                            style={{ width: "100%", margin: 0 }}
                         />
-                    </div>
-                    <div className="mt-1 pb-2">
-                        <Checkbox
-                            name="gridLineWidth"
-                            label="Render grid lines"
-                            // @ts-ignore
-                            checked={chartOptions.yAxis?.gridLineWidth !== 0}
-                            onChange={checked => onChange(merge(state, {
-                                chartOptions: {
-                                    yAxis: {
-                                        gridLineWidth: checked ? 1 : 0
-                                    }
-                                }
-                            }))}
-                        />
-                        <Checkbox
-                            name="lineWidth"
-                            label="Render axis line"
-                            // @ts-ignore
-                            checked={chartOptions.yAxis?.lineWidth !== 0}
-                            onChange={checked => onChange(merge(state, {
-                                chartOptions: {
-                                    yAxis: {
-                                        lineWidth: checked ? 1 : 0
-                                    }
-                                }
-                            }))}
-                        />
-                        <Checkbox
-                            name="YTicks"
-                            label="Render axis tick marks"
-                            // @ts-ignore
-                            // disabled={chartOptions.yAxis?.lineWidth === 0}
-                            // @ts-ignore
-                            checked={chartOptions.yAxis?.tickWidth !== 0}
-                            onChange={checked => onChange(merge(state, {
-                                chartOptions: {
-                                    yAxis: {
-                                        tickWidth: checked ? 1 : 0
-                                    }
-                                }
-                            }))}
-                        />
-                        <Checkbox
-                            name="YLabels"
-                            label="Render labels"
-                            // @ts-ignore
-                            checked={chartOptions.yAxis?.labels?.enabled !== false}
-                            onChange={checked => onChange(merge(state, {
-                                chartOptions: {
-                                    yAxis: {
-                                        labels: { enabled: checked }
-                                    }
-                                }
-                            }))}
-                        />
-                    </div>
-                </Collapse>
-            }
-
-            { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
-                <Collapse collapsed header={ state.chartType.startsWith("bar") ? "Y Axis" : "X Axis" }>
-                    <div className="mt-1">
-                        <label>Axis Title</label>
+                    </label>
+                </div> }
+                { isPie && <div className="mt-1">
+                    <label>
+                        Selected Slice Offset
                         <input
-                            type="text"
-                            placeholder={state.xCol.label || state.xCol.name || ""}
-                            // @ts-ignore
-                            value={ chartOptions.xAxis?.title?.text || "" }
-                            onChange={ e => onChange(merge(state, {
-                                chartOptions: {
-                                    xAxis: {
-                                        title: {
-                                            text: e.target.value
+                            type="range"
+                            min={0}
+                            max={30}
+                            step={1}
+                            value={ chartOptions.plotOptions?.pie?.slicedOffset === undefined ? 30 : chartOptions.plotOptions.pie.slicedOffset }
+                            onChange={e => onChange(
+                                merge(state, {
+                                    chartOptions: {
+                                        plotOptions: {
+                                            pie: {
+                                                slicedOffset: e.target.valueAsNumber
+                                            }
                                         }
                                     }
-                                }
-                            }))}
+                                })
+                            )}
+                            style={{ width: "100%", margin: 0 }}
                         />
-                    </div>
-                    <div className="mt-1 pb-2">
-                        {/* <Checkbox
-                            name="XTitle"
-                            label="Render title"
-                            // @ts-ignore
-                            checked={chartOptions.xAxis?.title?.enabled !== false}
-                            onChange={enabled => onChange(merge(state, {
-                                chartOptions: {
-                                    xAxis: {
-                                        title: { enabled }
+                    </label>
+                </div> }
+                <br/>
+            </Collapse>
+
+            { !isPie && <Collapse collapsed header={ isBar ? "X Axis" : "Y Axis" }>
+                <div className="mt-1">
+                    <label>Axis Title</label>
+                    <input
+                        type="text"
+                        // @ts-ignore
+                        value={ chartOptions.yAxis?.title?.text || "" }
+                        onChange={ e => onChange(merge(state, {
+                            chartOptions: {
+                                yAxis: {
+                                    title: {
+                                        text: e.target.value
                                     }
                                 }
-                            }))}
-                        /> */}
-                        <Checkbox
-                            name="XGridLineWidth"
-                            label="Render grid lines"
-                            // @ts-ignore
-                            checked={chartOptions.xAxis?.gridLineWidth === 1}
-                            onChange={checked => onChange(merge(state, {
-                                chartOptions: {
-                                    xAxis: {
-                                        gridLineWidth: checked ? 1 : 0
+                            }
+                        }))}
+                    />
+                </div>
+                <div className="mt-1 pb-2">
+                    <Checkbox
+                        name="gridLineWidth"
+                        label="Render grid lines"
+                        // @ts-ignore
+                        checked={chartOptions.yAxis?.gridLineWidth !== 0}
+                        onChange={checked => onChange(merge(state, {
+                            chartOptions: {
+                                yAxis: {
+                                    gridLineWidth: checked ? 1 : 0
+                                }
+                            }
+                        }))}
+                    />
+                    <Checkbox
+                        name="lineWidth"
+                        label="Render axis line"
+                        // @ts-ignore
+                        checked={chartOptions.yAxis?.lineWidth !== 0}
+                        onChange={checked => onChange(merge(state, {
+                            chartOptions: {
+                                yAxis: {
+                                    lineWidth: checked ? 1 : 0
+                                }
+                            }
+                        }))}
+                    />
+                    <Checkbox
+                        name="YTicks"
+                        label="Render axis tick marks"
+                        // @ts-ignore
+                        checked={chartOptions.yAxis?.tickWidth !== 0}
+                        onChange={checked => onChange(merge(state, {
+                            chartOptions: {
+                                yAxis: {
+                                    tickWidth: checked ? 1 : 0
+                                }
+                            }
+                        }))}
+                    />
+                    <Checkbox
+                        name="YLabels"
+                        label="Render labels"
+                        // @ts-ignore
+                        checked={chartOptions.yAxis?.labels?.enabled !== false}
+                        onChange={checked => onChange(merge(state, {
+                            chartOptions: {
+                                yAxis: {
+                                    labels: { enabled: checked }
+                                }
+                            }
+                        }))}
+                    />
+                </div>
+            </Collapse> }
+
+            { !isPie && <Collapse collapsed header={ isBar ? "Y Axis" : "X Axis" }>
+                <div className="mt-1">
+                    <label>Axis Title</label>
+                    <input
+                        type="text"
+                        placeholder={state.xCol.label || state.xCol.name || ""}
+                        // @ts-ignore
+                        value={ chartOptions.xAxis?.title?.text || "" }
+                        onChange={ e => onChange(merge(state, {
+                            chartOptions: {
+                                xAxis: {
+                                    title: {
+                                        text: e.target.value
                                     }
                                 }
-                            }))}
-                        />
-                        <Checkbox
-                            name="XLineWidth"
-                            label="Render axis line"
-                            // @ts-ignore
-                            checked={!!chartOptions.xAxis?.lineWidth}
-                            onChange={checked => onChange(merge(state, {
-                                chartOptions: {
-                                    xAxis: {
-                                        lineWidth: checked ? 1 : 0
-                                    }
+                            }
+                        }))}
+                    />
+                </div>
+                <div className="mt-1 pb-2">
+                    <Checkbox
+                        name="XGridLineWidth"
+                        label="Render grid lines"
+                        // @ts-ignore
+                        checked={chartOptions.xAxis?.gridLineWidth === 1}
+                        onChange={checked => onChange(merge(state, {
+                            chartOptions: {
+                                xAxis: {
+                                    gridLineWidth: checked ? 1 : 0
                                 }
-                            }))}
-                        />
-                        <Checkbox
-                            name="XTicks"
-                            label="Render axis tick marks"
-                            // @ts-ignore
-                            // disabled={chartOptions.xAxis?.lineWidth === 0}
-                            // @ts-ignore
-                            checked={ !!chartOptions.xAxis?.tickWidth }
-                            onChange={checked => onChange(merge(state, {
-                                chartOptions: {
-                                    xAxis: {
-                                        tickWidth: checked ? 1 : 0
-                                    }
+                            }
+                        }))}
+                    />
+                    <Checkbox
+                        name="XLineWidth"
+                        label="Render axis line"
+                        // @ts-ignore
+                        checked={!!chartOptions.xAxis?.lineWidth}
+                        onChange={checked => onChange(merge(state, {
+                            chartOptions: {
+                                xAxis: {
+                                    lineWidth: checked ? 1 : 0
                                 }
-                            }))}
-                        />
-                        <Checkbox
-                            name="XLabels"
-                            label="Render labels"
-                            // @ts-ignore
-                            checked={chartOptions.xAxis?.labels?.enabled !== false}
-                            onChange={checked => onChange(merge(state, {
-                                chartOptions: {
-                                    xAxis: {
-                                        labels: { enabled: checked }
-                                    }
+                            }
+                        }))}
+                    />
+                    <Checkbox
+                        name="XTicks"
+                        label="Render axis tick marks"
+                        // @ts-ignore
+                        checked={ !!chartOptions.xAxis?.tickWidth }
+                        onChange={checked => onChange(merge(state, {
+                            chartOptions: {
+                                xAxis: {
+                                    tickWidth: checked ? 1 : 0
                                 }
-                            }))}
-                        />
-                    </div>
-                </Collapse>
-            }
+                            }
+                        }))}
+                    />
+                    <Checkbox
+                        name="XLabels"
+                        label="Render labels"
+                        // @ts-ignore
+                        checked={chartOptions.xAxis?.labels?.enabled !== false}
+                        onChange={checked => onChange(merge(state, {
+                            chartOptions: {
+                                xAxis: {
+                                    labels: { enabled: checked }
+                                }
+                            }
+                        }))}
+                    />
+                </div>
+            </Collapse> }
             
             <Collapse collapsed header="Filters">
                 <div className="pt-1 pb-1">
@@ -619,7 +536,7 @@ export default function ConfigPanel({
 
             <Collapse collapsed header="Data">
                 <div className="pt-1">
-                    <label>{ state.chartType.startsWith("pie") ? "Slices" : "X Axis" }</label>
+                    <label>{ isPie ? "Slices" : "X Axis" }</label>
                     <ColumnSelector
                         cols={ cols }
                         value={ state.groupBy }
@@ -627,8 +544,7 @@ export default function ConfigPanel({
                         onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
                     />
                 </div>
-                { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
-                    <>
+                { !isPie && <>
                     <div className="pt-1 pb-1">
                         <label>Denominator</label>
                         <Select
@@ -684,10 +600,29 @@ export default function ConfigPanel({
                             style={{ background: tabIndex === 1 ? "#f8f8f7" : "transparent" }}
                         >Secondary Data</span>
                     </div>
-                    { tabIndex === 0 && <PrimaryDataEditor   state={state} dataRequest={dataRequest} onChange={onChange} /> }
+
+                    { tabIndex === 0 && !isPie && <div className="pt-1">
+                        <label>Stratifier</label>
+                        <ColumnSelector
+                            cols={ cols }
+                            placeholder="Select Column"
+                            addEmptyOption="start"
+                            value={ state.stratifyBy }
+                            disabled={[ "cnt", state.groupBy, state.column2 ].filter(Boolean)}
+                            onChange={ (stratifyBy: string) => onChange({
+                                ...state,
+                                stratifyBy,
+                                denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
+                            }) }
+                        />
+                        <p className="small color-muted">
+                            Stratify the data into multiple series based on the chosen column. For example,
+                            this would produce multiple lines in a line chart.
+                        </p>
+                    </div> }
+
                     { tabIndex === 1 && <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onChange} /> }
-                    </>
-                }
+                </> }
                 <br />
             </Collapse>
 
@@ -732,36 +667,31 @@ export default function ConfigPanel({
                 </div>
             </Collapse>
 
-            { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
-                <Collapse collapsed header="Annotations">
-                    <AnnotationsUI
-                        onChange={ annotations => onChange(
-                            {
-                                ...state,
-                                chartOptions: {
-                                    
-                                    annotations: [{
-                                        visible: true,
-                                        draggable: '',
-                                        crop: false,
-                                        labelOptions: {
-                                            overflow: "justify",
-                                            allowOverlap: true,
-                                            className: "chart-annotation",
-                                            // style: {
-                                            //     textAlign: "center",
-                                            // }
-                                        },
-                                        labels: annotations
-                                    }]
-                                }
+            { !isPie && <Collapse collapsed header="Annotations">
+                <AnnotationsUI
+                    onChange={ annotations => onChange(
+                        {
+                            ...state,
+                            chartOptions: {
+                                
+                                annotations: [{
+                                    visible: true,
+                                    draggable: '',
+                                    crop: false,
+                                    labelOptions: {
+                                        overflow: "justify",
+                                        allowOverlap: true,
+                                        className: "chart-annotation"
+                                    },
+                                    labels: annotations
+                                }]
                             }
-                        )}
-                        current={ chartOptions.annotations?.[0]?.labels || [] }
-                        xCol={ state.xCol }
-                    />
-                </Collapse>
-            }
+                        }
+                    )}
+                    current={ chartOptions.annotations?.[0]?.labels || [] }
+                    xCol={ state.xCol }
+                />
+            </Collapse> }
             
             <br/>
         </div>
