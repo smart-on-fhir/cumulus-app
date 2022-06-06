@@ -44,6 +44,10 @@ module.exports = class DataRequest extends Model
             requestedData: {
                 type: DataTypes.JSONB
             },
+
+            metadata: {
+                type: DataTypes.JSONB
+            },
             
             data: {
                 type: DataTypes.JSONB,

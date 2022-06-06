@@ -5,7 +5,6 @@ import Home                                     from "./Home";
 import EditView                                 from "./Dashboard/EditView";
 import CreateView                               from "./Dashboard/CreateView";
 import DataUploader                             from "./DataRequests/DataUploader";
-import DataUploader2                            from "./DataRequests/DataUploader2";
 import DataRequestView                          from "./DataRequests/DataRequestView";
 import EditDataRequestForm                      from "./DataRequests/UpdateForm";
 import DataRequestsListPage                     from "./DataRequests/DataRequestsListPage";
@@ -47,7 +46,6 @@ export default function App()
                                         <Route index element={ <RequireAuth><DataRequestView /></RequireAuth> } />
                                         <Route path="edit" element={ <RequireAuth><EditDataRequestForm /></RequireAuth> } />
                                         <Route path="import" element={ <RequireAuth><DataUploader /></RequireAuth> } />
-                                        <Route path="import2" element={ <RequireAuth><DataUploader2 /></RequireAuth> } />
                                         <Route path="create-view" element={ <RequireAuth><CreateView /></RequireAuth> } />
                                     </Route>
                                 </Route>

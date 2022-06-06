@@ -309,3 +309,37 @@ export function highlight(str: string, stringToFind = "") {
     return temp;
 }
 
+export function Json(data: any, indent = 0): any {
+    if (data === null) return <span className="json-null">null</span>
+    if (typeof data === "boolean") return <span className="json-bool">{data ? "true" : "false"}</span>
+    if (typeof data === "number") return <span className="json-number">{data}</span>
+    if (typeof data === "string") return <span className="json-string">{JSON.stringify(data)}</span>
+    if (typeof data === "object") {
+        if (Array.isArray(data)) {
+            if (data.length < 4) {
+                return <><b>[</b>{ data.map((x, i) => (<span key={i}>
+                    { i > 0 ? ", " : "" }
+                    { Json(x, indent) }
+                </span>)) }<b>]</b></>
+            }
+            return <><b>[</b>{ data.map((x, i) => (
+                <span key={i}>
+                    { i > 0 && "," }
+                    <br />
+                    {"    ".repeat(indent + 1)}
+                    { Json(x, indent + 1) }
+                </span>
+            )) }<br />{"    ".repeat(indent)}<b>]</b></>
+        } else {
+            return <><b>{"{"} </b>{ Object.keys(data).map((k, i) => (
+                <span key={i}>
+                    { i > 0 && "," }
+                    <br />
+                    {"    ".repeat(indent + 1)}
+                    <span className="json-key">{k}</span>: { Json(data[k], indent + 1) }
+                </span>
+            )) }<br />{"    ".repeat(indent)}<b>{"}"}</b></>
+        }
+    }
+    return JSON.stringify(data)
+}

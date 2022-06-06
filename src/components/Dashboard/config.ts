@@ -1,5 +1,3 @@
-import moment from "moment";
-
 
 export const SupportedChartTypes = {
     pie          : "Pie Chart",
@@ -49,13 +47,16 @@ export type SupportedNativeChartTypes = "pie" | "spline" | "areaspline" | "colum
  */
 export const SingleDimensionChartTypes: (keyof typeof SupportedChartTypes)[] = ["pie", "pie3d", "donut", "donut3d"]
 
+export const TURBO_THRESHOLD = 1000
+
+// These are computed at runtime and will not be saved on the server
 export const ReadOnlyPaths = [
     "chart.marginTop",
     "chart.type",
     "chart.animation.easing",
     "series",
     "chart.options3d.depth",
-    "chart.plotBorderWidth",
+    // "chart.plotBorderWidth",
     "colors",
     "yAxis.allowDecimals",
     "yAxis.labels.format",
@@ -71,46 +72,59 @@ interface FilterConfig {
     id: string
     label: string
     type: string[]
-    fn: (left: ColData, right: ColData) => boolean
     defaultValue?: ColData
 }
 
 export const operators: FilterConfig[] = [
-    { id: "eq" , label: "==", type: ["integer", "float" ], defaultValue: undefined, fn: (l, r) => typeof l === "number" && typeof r === "number" && l === r },
-    { id: "gt" , label: ">" , type: ["integer", "float" ], defaultValue: undefined, fn: (l, r) => typeof l === "number" && typeof r === "number" && l >   r },
-    { id: "gte", label: ">=", type: ["integer", "float" ], defaultValue: undefined, fn: (l, r) => typeof l === "number" && typeof r === "number" && l >=  r },
-    { id: "lt" , label: "<" , type: ["integer", "float" ], defaultValue: undefined, fn: (l, r) => typeof l === "number" && typeof r === "number" && l <   r },
-    { id: "lte", label: "<=", type: ["integer", "float" ], defaultValue: undefined, fn: (l, r) => typeof l === "number" && typeof r === "number" && l <=  r },
+    { id: "eq"                , label: "=="                                    , type: ["integer", "float" ] },
+    { id: "ne"                , label: "!="                                    , type: ["integer", "float" ] },
+    { id: "gt"                , label: ">"                                     , type: ["integer", "float" ] },
+    { id: "gte"               , label: ">="                                    , type: ["integer", "float" ] },
+    { id: "lt"                , label: "<"                                     , type: ["integer", "float" ] },
+    { id: "lte"               , label: "<="                                    , type: ["integer", "float" ] },
 
-    { id: "strEq"          , label: "Equal"                             , type: ["string"], defaultValue: undefined, fn: (l, r) => typeof l === "string" && typeof r === "string" && l === r                                                             },
-    { id: "strContains"    , label: "Contain"                           , type: ["string"], defaultValue: undefined, fn: (l, r) => typeof l === "string" && typeof r === "string" && l.search(r) > -1                                                    },
-    { id: "strStartsWith"  , label: "Start with"                        , type: ["string"], defaultValue: undefined, fn: (l, r) => typeof l === "string" && typeof r === "string" && l.startsWith(r)                                                     },
-    { id: "strEndsWith"    , label: "End with"                          , type: ["string"], defaultValue: undefined, fn: (l, r) => typeof l === "string" && typeof r === "string" && l.endsWith(r)                                                       },
-    { id: "matches"        , label: "Matches RegExp"                    , type: ["string"], defaultValue: undefined, fn: (l, r) => { try { return typeof l === "string" && typeof r === "string" && new RegExp(r).test(l) } catch { return false }}      },
-    { id: "strEqCI"        , label: "Equal (case insensitive)"          , type: ["string"], defaultValue: undefined, fn: (l, r) => typeof l === "string" && typeof r === "string" && l.toLowerCase() === r.toLowerCase()                                 },
-    { id: "strContainsCI"  , label: "Contain (case insensitive)"        , type: ["string"], defaultValue: undefined, fn: (l, r) => typeof l === "string" && typeof r === "string" && l.toLowerCase().search(r.toLowerCase()) > -1                        },
-    { id: "strStartsWithCI", label: "Start with (case insensitive)"     , type: ["string"], defaultValue: undefined, fn: (l, r) => typeof l === "string" && typeof r === "string" && l.toLowerCase().startsWith(r.toLowerCase())                         },
-    { id: "strEndsWithCI"  , label: "End with (case insensitive)"       , type: ["string"], defaultValue: undefined, fn: (l, r) => typeof l === "string" && typeof r === "string" && l.toLowerCase().endsWith(r.toLowerCase())                           },
-    { id: "matchesCI"      , label: "Matches RegExp  (case insensitive)", type: ["string"], defaultValue: undefined, fn: (l, r) => { try { return typeof l === "string" && typeof r === "string" && new RegExp(r, "i").test(l) } catch { return false }} },
+    { id: "strEq"             , label: "Equal"                                 , type: ["string"           ] },
+    { id: "strContains"       , label: "Contains"                              , type: ["string"           ] },
+    { id: "strStartsWith"     , label: "Starts with"                           , type: ["string"           ] },
+    { id: "strEndsWith"       , label: "Ends with"                             , type: ["string"           ] },
+    { id: "matches"           , label: "Matches RegExp"                        , type: ["string"           ] },
+    { id: "strEqCI"           , label: "Equal (case insensitive)"              , type: ["string"           ] },
+    { id: "strContainsCI"     , label: "Contains (case insensitive)"           , type: ["string"           ] },
+    { id: "strStartsWithCI"   , label: "Starts with (case insensitive)"        , type: ["string"           ] },
+    { id: "strEndsWithCI"     , label: "Ends with (case insensitive)"          , type: ["string"           ] },
+    { id: "matchesCI"         , label: "Matches RegExp (case insensitive)"     , type: ["string"           ] },
+    { id: "strNotEq"          , label: "Not: Equals"                           , type: ["string"           ] },
+    { id: "strNotContains"    , label: "Not: Contains"                         , type: ["string"           ] },
+    { id: "strNotStartsWith"  , label: "Not: Starts with"                      , type: ["string"           ] },
+    { id: "strNotEndsWith"    , label: "Not: Ends with"                        , type: ["string"           ] },
+    { id: "notMatches"        , label: "Not: Matches RegExp"                   , type: ["string"           ] },
+    { id: "strNotEqCI"        , label: "Not: Equals (case insensitive)"        , type: ["string"           ] },
+    { id: "strNotContainsCI"  , label: "Not: Contains (case insensitive)"      , type: ["string"           ] },
+    { id: "strNotStartsWithCI", label: "Not: Starts with (case insensitive)"   , type: ["string"           ] },
+    { id: "strNotEndsWithCI"  , label: "Not: Ends with (case insensitive)"     , type: ["string"           ] },
+    { id: "notMatchesCI"      , label: "Not: Matches RegExp (case insensitive)", type: ["string"           ] },
     
-    { id: "sameDay"          , label: "Same date"           , type: [ "date:YYYY-MM-DD" ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSame        (moment(r).utc(), "day"  ) },
-    { id: "sameMonth"        , label: "Same month"          , type: [ "date:YYYY-MM"    ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSame        (moment(r).utc(), "month") },
-    { id: "sameYear"         , label: "Same year"           , type: [ "date:YYYY"       ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSame        (moment(r).utc(), "year" ) },
-    { id: "sameDayOrBefore"  , label: "Same date or before" , type: [ "date:YYYY-MM-DD" ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSameOrBefore(moment(r).utc(), "day"  ) },
-    { id: "sameDayOrAfter"   , label: "Same date or after"  , type: [ "date:YYYY-MM-DD" ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSameOrAfter (moment(r).utc(), "day"  ) },
-    { id: "sameMonthOrBefore", label: "Same month or before", type: [ "date:YYYY-MM"    ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSameOrBefore(moment(r).utc(), "month") },
-    { id: "sameMonthOrAfter" , label: "Same month or after" , type: [ "date:YYYY-MM"    ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSameOrAfter (moment(r).utc(), "month") },
-    { id: "sameYearOrBefore" , label: "Same year or before" , type: [ "date:YYYY"       ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSameOrBefore(moment(r).utc(), "year" ) },
-    { id: "sameYearOrAfter"  , label: "Same year or after"  , type: [ "date:YYYY"       ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSameOrAfter (moment(r).utc(), "year" ) },
-    { id: "beforeDay"        , label: "Before date"         , type: [ "date:YYYY-MM-DD" ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isBefore      (moment(r).utc(), "day"  ) },
-    { id: "afterDay"         , label: "After date"          , type: [ "date:YYYY-MM-DD" ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isAfter       (moment(r).utc(), "day"  ) },
-    { id: "beforeMonth"      , label: "Before month"        , type: [ "date:YYYY-MM"    ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isBefore      (moment(r).utc(), "month") },
-    { id: "afterMonth"       , label: "After month"         , type: [ "date:YYYY-MM"    ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isAfter       (moment(r).utc(), "month") },
-    { id: "beforeYear"       , label: "Before year"         , type: [ "date:YYYY"       ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isBefore      (moment(r).utc(), "year" ) },
-    { id: "afterYear"        , label: "After year"          , type: [ "date:YYYY"       ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isAfter       (moment(r).utc(), "year" ) },
+    { id: "sameDay"           , label: "Same date"                             , type: [ "date:YYYY-MM-DD"                              ] },
+    { id: "sameMonth"         , label: "Same month"                            , type: [ "date:YYYY-MM-DD", "date:YYYY-MM"              ] },
+    { id: "sameYear"          , label: "Same year"                             , type: [ "date:YYYY-MM-DD", "date:YYYY-MM", "date:YYYY" ] },
+    { id: "sameDayOrBefore"   , label: "Same date or before"                   , type: [ "date:YYYY-MM-DD"                              ] },
+    { id: "sameMonthOrBefore" , label: "Same month or before"                  , type: [ "date:YYYY-MM-DD", "date:YYYY-MM"              ] },
+    { id: "sameYearOrBefore"  , label: "Same year or before"                   , type: [ "date:YYYY-MM-DD", "date:YYYY-MM", "date:YYYY" ] },
+    { id: "sameDayOrAfter"    , label: "Same date or after"                    , type: [ "date:YYYY-MM-DD"                              ] },
+    { id: "sameMonthOrAfter"  , label: "Same month or after"                   , type: [ "date:YYYY-MM-DD", "date:YYYY-MM"              ] },
+    { id: "sameYearOrAfter"   , label: "Same year or after"                    , type: [ "date:YYYY-MM-DD", "date:YYYY-MM", "date:YYYY" ] },
+    { id: "beforeDay"         , label: "Before date"                           , type: [ "date:YYYY-MM-DD"                              ] },
+    { id: "beforeMonth"       , label: "Before month"                          , type: [ "date:YYYY-MM-DD", "date:YYYY-MM"              ] },
+    { id: "beforeYear"        , label: "Before year"                           , type: [ "date:YYYY-MM-DD", "date:YYYY-MM", "date:YYYY" ] },
+    { id: "afterDay"          , label: "After date"                            , type: [ "date:YYYY-MM-DD"                              ] },
+    { id: "afterMonth"        , label: "After month"                           , type: [ "date:YYYY-MM-DD", "date:YYYY-MM"              ] },
+    { id: "afterYear"         , label: "After year"                            , type: [ "date:YYYY-MM-DD", "date:YYYY-MM", "date:YYYY" ] },
     
-    { id: "isTrue" , label: "IS TRUE" , type: ["boolean"], defaultValue: true , fn: (l, r) => l === true  },
-    { id: "isFalse", label: "IS FALSE", type: ["boolean"], defaultValue: false, fn: (l, r) => l === false },
+    { id: "isTrue"            , label: "IS TRUE"                               , type: ["boolean"          ] },
+    { id: "isFalse"           , label: "IS FALSE"                              , type: ["boolean"          ] },
+    { id: "isNotTrue"         , label: "IS NOT TRUE"                           , type: ["boolean"          ] },
+    { id: "isNotFalse"        , label: "IS NOT FALSE"                          , type: ["boolean"          ] },
     
-    { id: "isNull", label: "IS NULL", type: ["*"], defaultValue: null , fn: (l, r) => l === null  },
+    { id: "isNull"            , label: "IS NULL"                               , type: ["*"                ] },
+    { id: "isNotNull"         , label: "IS NOT NULL"                           , type: ["*"                ] },
 ];

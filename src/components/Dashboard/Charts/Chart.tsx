@@ -1,9 +1,12 @@
-import React                          from "react";
-import { Color, merge }               from "highcharts"
-import moment                         from "moment";
-import PowerSet                       from "../../../PowerSet";
-import { defer, format }              from "../../../utils";
-import { SupportedNativeChartTypes }  from "../config";
+import React                         from "react";
+import { Color, merge, Series }      from "highcharts"
+import { defer }                     from "../../../utils";
+import Loader                        from "../../Loader";
+import {
+    SupportedNativeChartTypes,
+    SupportedChartTypes
+} from "../config";
+import moment from "moment";
 
 declare var Highcharts: any
 
@@ -11,11 +14,8 @@ type SeriesOptions = (
     Highcharts.SeriesPieOptions |
     Highcharts.SeriesSplineOptions |
     Highcharts.SeriesAreasplineOptions |
-    // Highcharts.SeriesAreaOptions |
     Highcharts.SeriesColumnOptions |
-    Highcharts.SeriesBarOptions //|
-    // Highcharts.SeriesLineOptions |
-    // Highcharts.SeriesTimelineOptions
+    Highcharts.SeriesBarOptions
 );
 
 /**
@@ -34,10 +34,7 @@ export function getChartTitleText(column: app.DataRequestDataColumn, groupBy?: a
     return txt
 }
 
-export function getXType(column: app.DataRequestDataColumn, groupBy?: app.DataRequestDataColumn | null): "category" | "linear" | "datetime" {
-    // if (groupBy) {
-    //     return getXType(groupBy);
-    // }
+export function getXType(column: app.DataRequestDataColumn): "category" | "linear" | "datetime" {
     
     let xType: "category" | "linear" | "datetime" = "category";
 
@@ -67,259 +64,185 @@ export function getDateFormat({ dataType }: app.DataRequestDataColumn, forMoment
             "%Y-%m-%d"
 }
 
-export function getSeries({
-    column,
-    groupBy,
-    dataSet,
-    fullDataSet,
-    type,
-    colors = ["#F00", "#0F0", "#00F"],
-    denominator = "",
-    column2,
-    column2type,
-    column2opacity = 1
-}: {
-    column: app.DataRequestDataColumn
-    dataSet: PowerSet
-    fullDataSet: PowerSet
-    groupBy?: app.DataRequestDataColumn | null
-    type: SupportedNativeChartTypes 
-    colors?: string[]
-    denominator?: string
-    column2    ?: app.DataRequestDataColumn | null
-    column2type?: string
-    column2opacity?: number
-}): SeriesOptions[]
-{
-    let xType = getXType(column, groupBy);
+function getDenominatorFactory(data: app.ServerResponses.DataResponse) {
+    
+    const cache: Record<string, number> = {};
 
-    let series: SeriesOptions[] = []
-
-    let dateFormat = getDateFormat(column, true)
-
-    function pointFromRow(row: { cnt: number, [key: string]: any }, col: app.DataRequestDataColumn): Highcharts.XrangePointOptionsObject {
-        
-        let value = row.cnt;
-        let denominatorValue = 0;
-
-        
-        if (denominator === "local") {
-            denominatorValue = fullDataSet.countWhere({ [column.name]: row[col.name] });
-            value = value/denominatorValue * 100
+    return function(row: [string, number], type: "local" | "global" | any) {
+        if (type === "global") {
+            return data.totalCount
         }
-        
-        // Convert the count to % of the total count
-        else if (denominator === "global") {
-            denominatorValue = fullDataSet.countAll();
-            value = value/denominatorValue * 100
-        }
-
-        const point: Highcharts.XrangePointOptionsObject = {
-            // Y is always the patient count
-            y: value,
-
-            // The name of the point as shown in the legend, tooltip, dataLabels, etc.
-            name: row[col.name] + "",
-
-            custom: {
-                data: row,
-                denominator: denominatorValue
+        if (type === "local") {
+            let x = row[0]
+            let out = cache[x];
+            if (out === undefined) {
+                // console.log("computing denominator")
+                out = cache[x] = (data as app.ServerResponses.StratifiedDataResponse).data.reduce(
+                    (prev, cur) => prev + (cur.rows.find(r => r[0] === x)||[0, 0])[1],
+                    0
+                );
             }
-        };
-
-        if (xType === "datetime") {
-            // For datetime axes, the X value is the timestamp in milliseconds since 1970.
-            point.x = +moment(row[col.name] + "", "YYYY-MM-DD")
-
-            // For datetime axes, point name is the formatted date
-            point.name = moment(row[col.name] + "", "YYYY-MM-DD").format(dateFormat)
+            return out
         }
+        return 100
+    }
+}
 
-        // For linear (numeric) axes, the X value is the numeric value or 0.
-        if (xType === "linear") {
-            point.x = +(row[col.name] || 0)
+function getPoint({
+    row,
+    xType,
+    denominator
+}: {
+    row: [string, number]
+    xType: "category" | "linear" | "datetime"
+    denominator: number
+}): Highcharts.XrangePointOptionsObject | number | number[] {
+
+    let value = denominator === 100 ? row[1] : row[1] / denominator * 100;
+
+    const point: Highcharts.XrangePointOptionsObject = {
+        y: value,
+
+        // The name of the point as shown in the legend, tooltip, dataLabels, etc.
+        name: String(row[0]),
+
+        custom: {
+            data: {
+                cnt: row[1]
+            },
+            denominator
         }
-        
-        return point
+    };
+
+    // For datetime axes, the X value is the timestamp in milliseconds since 1970.
+    if (xType === "datetime") {
+        point.x = +new Date(row[0])
     }
 
-    // ========================================================================
-    // Simple case: Y = count; X = column.name
-    // This applis to pie charts or other charts with single series.
-    // Denominator is not applicable here as the value would have to be
-    // compared to itself, thus the result will always be 100%!
-    // ========================================================================
-    if (!groupBy) {
-        const rows = dataSet.rows;
-        const data = rows.map(row => pointFromRow(row, column))//.sort((a, b) => a.name!.localeCompare(b.name || ""));
+    // For linear (numeric) axes, the X value is the numeric value or 0.
+    if (xType === "linear") {
+        point.x = +(row[0] || 0)
+    }
+    
+    return point
+}
 
-        series.push({
-            type,
-            data,
-            name: column.label || column.name,
+function getSeries({
+    column,
+    data,
+    data2,
+    type,
+    colors,
+    denominator,
+    column2type,
+    column2opacity,
+    seriesVisibility,
+    xType
+}: {
+    data            : app.ServerResponses.DataResponse
+    data2           : app.ServerResponses.StratifiedDataResponse | null
+    column          : app.DataRequestDataColumn
+    type            : SupportedNativeChartTypes 
+    colors          : string[]
+    denominator     : "" | "local" | "global"
+    column2type    ?: keyof typeof SupportedChartTypes
+    column2opacity  : number
+    seriesVisibility: Record<string, boolean>
+    xType           : "category" | "linear" | "datetime"
+}): SeriesOptions[]
+{
+    
+    let series: SeriesOptions[] = []
+
+    let getDenominator = getDenominatorFactory(data)
+
+    function pointFromRow(row: [string, number]): Highcharts.XrangePointOptionsObject | number | number[] {
+        return getPoint({ row, xType, denominator: getDenominator(row, denominator) })
+    }
+
+    function addSeries(options: any, secondary = false) {
+        
+        const cfg: any = {
+            index: series.length,
             colorIndex: series.length % colors.length,
-            fillColor: type === "areaspline" ? {
+            visible: seriesVisibility[options.name] !== false,
+            id: (secondary ? "secondary-" : "primary-") + options.name
+            // id: options.name
+            // id: secondary ? "secondary-" + options.name : undefined
+        }
+
+        if (options.type.includes("area")) {
+            cfg.fillColor = {
                 linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                 stops: [
                     [0, new Color(colors[series.length % colors.length]).setOpacity(0.2 ).get('rgba') + ""],
                     [1, new Color(colors[series.length % colors.length]).setOpacity(0.05).get('rgba') + ""]
                 ]
-            }: undefined
-        });
-    }
-
-    // ========================================================================
-    // Complex case:
-    //     Y = count or %
-    //     X = column.name
-    //     X.stratifier = groupBy
-    // ========================================================================
-    else {
-        let groups = Array.from(dataSet.getUniqueValuesFromColumn(groupBy.name))//.map(String)
-        
-
-        // For each group
-        groups.sort().forEach((groupName, i) => {
-            let set: any = {
-                type,
-                name: groupBy.dataType.startsWith("date") ? moment(groupName + "", "YYYY-MM-DD").format(getDateFormat(groupBy, true)) : groupName + "",
-                data: [],
-                colorIndex: i % colors.length,
-                fillColor: type === "areaspline" ? {
-                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-                    stops: [
-                        [0, new Color(colors[i % colors.length]).setOpacity(0.2 ).get('rgba') + ""],
-                        [1, new Color(colors[i % colors.length]).setOpacity(0.05).get('rgba') + ""]
-                    ]
-                }: undefined
-            };
-
-            // All data rows in this group
-            let rows = dataSet.where({ [groupBy.name]: groupName }).rows;
-
-            // ================================================================
-            // Category charts
-            // ================================================================
-            if (xType === "category") {
-                let categories = Array.from(dataSet.getUniqueValuesFromColumn(column.name))//.map(String)
-                rows = rows.sort((a, b) => categories.indexOf(a[column.name]) - categories.indexOf(b[column.name]));
-
-                categories.sort().forEach(category => {
-                    let row = rows.find(r => (
-                        r[column.name ] === category &&
-                        r[groupBy.name] === groupName
-                    ));
-
-                    if (row) {
-                        set.data.push(pointFromRow(row, column))
-                    } else {
-                        set.data.push({ y: null, name: category })
-                    }
-                })
             }
+        }
 
-            // ================================================================
-            // Linear or timeline charts
-            // ================================================================
-            else {
-                rows.forEach(row => set.data.push(
-                    pointFromRow(row, column)
-                ));
-            }
+        if (secondary) {
+            cfg.zIndex = -1
+            cfg.opacity = column2opacity
+            cfg.shadow = false
 
-            series.push(set);
-        })        
-    }
-
-    // ================================================================
-    // Additional Series (if any)
-    // ================================================================
-    if (column2 && column2type) {
-        
-        let groups = Array.from(dataSet.getUniqueValuesFromColumn(column.name));
-        
-        let _series: Record<string, any> = {};
-
-        let sub = fullDataSet.pick([column.name, column2.name]);
-        groups.forEach(x => {
-            let data = sub.where({ [column.name]: x });
-
-            data.rows.forEach((row, i) => {
-                let groupName = row[column2.name];
-                let group = _series[groupName + ""];
-                if (!group) {
-                    group = _series[groupName + ""] = {
-                        type: column2type as SupportedNativeChartTypes,
-                        name: groupName,
-                        colorIndex: (series.length + i) % colors.length,
-                        dashStyle: "ShortDash",
-                        lineWidth: 1,
-                        zIndex: 10,
-                        opacity: column2opacity,
-                        borderColor: "rgba(0, 0, 0, 0.8)",
-                        color: column2type === "spline" ? undefined : {
-                            pattern: {
-                                path: {
-                                    d: 'M 0 0 L 0 6',
-                                    strokeWidth: 11
-                                },
-                                width : 6,
-                                height: 6,
-                                opacity: 0.6,
-                                patternTransform: 'scale(0.49) rotate(45)'
-                            }
+            if (options.type.includes("column")) {
+                cfg.color = {
+                    pattern: {
+                        path: {
+                            d: 'M 0 0 L 0 6',
+                            strokeWidth: 10
                         },
-                        data: []
-                    };
-                }
-
-                let value = row.cnt;
-                let denominatorValue = 0;
-
-                
-                if (denominator === "local") {
-                    denominatorValue = fullDataSet.countWhere({ [column.name]: row[column.name] });
-                    value = value/denominatorValue * 100
-                }
-                
-                // Convert the count to % of the total count
-                else if (denominator === "global") {
-                    denominatorValue = fullDataSet.countAll();
-                    value = value/denominatorValue * 100
-                }
-
-                let point: any = {
-                    // x: row[column.name],
-                    y: value,
-                    custom: {
-                        data: row,
-                        denominator: denominatorValue,
-                        secondary: true
+                        width : 6,
+                        height: 6,
+                        patternTransform: 'scale(0.5) rotate(45)'
                     }
-                };
-
-                if (xType === "datetime") {
-                    // For datetime axes, point name is the formatted date
-                    point.name = moment(row[column.name] + "", "YYYY-MM-DD").format(dateFormat)
-
-                    // For datetime axes, the X value is the timestamp in milliseconds since 1970.
-                    point.x = +moment(row[column.name] + "", "YYYY-MM-DD")
                 }
+            }
+
+            if (column2type!.includes("columnStack")) {
+                cfg.stacking = "normal"
+            }
+
+            if (options.type.includes("line")) {
+                cfg.dashStyle = "ShortDash"
+                cfg.lineWidth = 1.35
+            }
+        }
+
+        series.push({ ...cfg, ...options });
+    }
+
+    function stratify(data: app.ServerResponses.StratifiedDataResponse, secondary = false) {
+
+        const _type = secondary ?
+            column2type!.replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes :
+            type;
         
-                // For linear (numeric) axes, the X value is the numeric value or 0.
-                if (xType === "linear") {
-                    point.x = +(row[column.name] || 0)
-                }
+        data.data.forEach(group => {
+            addSeries({
+                type: _type,
+                name: group.stratifier,
+                data: group.rows.map(pointFromRow)
+            }, secondary)
+        })
+    }
 
-                if (xType === "category") {
-                    point.name = x
-                }
-
-                group.data.push(point)
-            });
+    if (!data.stratifier) {
+        addSeries({
+            type,
+            name: column.label || column.name,
+            data: data.data[0].rows.map(pointFromRow)
         });
+        
+    }
+    else {
+        stratify(data as app.ServerResponses.StratifiedDataResponse)
+    }
 
-        series = series.concat(Object.values(_series));
+    if (data2) {
+        getDenominator = getDenominatorFactory(data2)
+        stratify(data2, true)
     }
 
     return series
@@ -329,49 +252,50 @@ export function buildChartOptions({
     options = {},
     column,
     groupBy,
-    dataSet,
-    fullDataSet,
+    data,
+    data2,
     colorOptions,
     denominator = "",
     type,
-    column2,
     column2type,
-    column2opacity = 1
+    column2opacity = 1,
+    onSeriesToggle,
+    seriesVisibility
 }: {
-    options?: Highcharts.Options
-    column: app.DataRequestDataColumn
-    dataSet: PowerSet
-    fullDataSet: PowerSet
-    groupBy?: app.DataRequestDataColumn | null
-    type: SupportedNativeChartTypes
-    colorOptions: app.ColorOptions
-    denominator?: string
-    column2    ?: app.DataRequestDataColumn | null
-    column2type?: string
-    column2opacity?: number
+    data            : app.ServerResponses.DataResponse
+    data2           : app.ServerResponses.StratifiedDataResponse | null
+    options        ?: Highcharts.Options
+    column          : app.DataRequestDataColumn
+    groupBy        ?: app.DataRequestDataColumn
+    type            : SupportedNativeChartTypes
+    colorOptions    : app.ColorOptions
+    denominator    ?: "" | "local" | "global"
+    column2type    ?: keyof typeof SupportedChartTypes
+    column2opacity ?: number
+    onSeriesToggle  : (s: Record<string, boolean>) => void
+    seriesVisibility: Record<string, boolean>
 }): Highcharts.Options
 {
     const COLORS = colorOptions.colors.map(c => new Color(c).setOpacity(colorOptions.opacity).get("rgba") + "")
 
+    const xType = getXType(column);
+
     const series = getSeries({
-        dataSet,
+        data,
+        data2,
         column,
-        groupBy,
-        // @ts-ignore
-        type: type,
-        fullDataSet,
+        type,
         colors: COLORS,
         denominator,
-        column2,
         column2type,
-        column2opacity
+        column2opacity,
+        seriesVisibility,
+        xType
     });
 
-    let xType = getXType(column, groupBy);
-
-    return merge(options, {
+    const dynamicOptions: Highcharts.Options = {
         chart: {
-            marginTop: type === "pie" || options.title?.text ? null : 40,
+            marginTop: type === "pie" || options.title?.text ? undefined : 40,
             options3d: {
                 depth: Math.min(series.length * 10, 100),
             },
@@ -391,6 +315,21 @@ export function buildChartOptions({
             series: {
                 animation: {
                     easing
+                },
+                events: {
+                    legendItemClick(e) {
+                        e.preventDefault()
+                        const visMap: Record<string, boolean> = {};
+                        e.target.chart.series.forEach(
+                            (s: Series) => visMap[s.name] = s.name === e.target.name ? !s.visible : s.visible
+                        )
+                        onSeriesToggle(visMap)
+                    }
+                },
+                dataSorting: {
+                    enabled: xType === "category",
+                    matchByName: false,
+                    sortKey: "index"
                 }
             },
             pie: {
@@ -425,83 +364,68 @@ export function buildChartOptions({
                     }
                 }
             },
-            custom: {
-                opacity: colorOptions.opacity,
-                denominator
+            spline: {
+                shadow: !!data2
+            },
+            areaspline: {
+                shadow: !!data2
             }
         },
         tooltip: {
+            borderColor: "rgba(0, 0, 0, 0.4)",
             formatter(): any {
                 const rows = [];
 
-                // @ts-ignore
-                if (!this.point.custom.secondary) {
-                    // @ts-ignore
-                    rows.push(`<tr><td style="text-align:right">${column.label || column.name}:</td><td><b>${this.point.name}</b></td></tr>`)
-                    if (groupBy) {
-                        // @ts-ignore
-                        rows.push(`<tr><td style="text-align:right">${groupBy.label || groupBy.name}:</td><td><b>${this.series.name}</b></td></tr>`)
-                    }
+                let x: any
+                if (xType === "datetime") {
+                    x = moment(this.point.x).format("YYYY-MM-DD")
+                } else if (xType === "linear") {
+                    x = this.point.x
+                } else {
+                    x = this.point.name
                 }
-                // @ts-ignore
-                rows.push(`<tr><td style="text-align:right">Count:</td><td><b>${this.point.custom.data.cnt}</b></td></tr>`)
-                
-                if (denominator) {
-                    // @ts-ignore
-                    rows.push(`<tr class="color-blue"><td style="text-align:right">Computed Value:</td><td><b>${this.point.y?.toPrecision(3)}% of ${this.point.custom.denominator}</b></td></tr>`)
-                }
-                
-                // @ts-ignore
-                let data = this.point.custom?.data as Record<string, any>
-                if (data) {
 
-                    const otherRows = Object.keys(data).filter(key => (
-                        data[key] !== null &&
-                        data[key] !== undefined &&
-                        key !== "cnt" &&
-                        key !== column.name &&
-                        (!groupBy || key !== groupBy.name)
-                    ));
-
-                    if (otherRows.length) {
-                        rows.push(`<tr><td style="text-align:center;padding: 5px 0" colspan="2"><hr/></td></tr>`)
-                        otherRows.forEach(key => {
-                            rows.push(`<tr style="color:#666"><td style="text-align:right">${
-                                dataSet.getLabelForColumnName(key)
-                            }:</td><td>${format(data[key], fullDataSet.getColumnByName(key)!.dataType, {
-                                html: true,
-                                maxLength: 70,
-                                skipNull: true
-                            })}</td></tr>`)
-                        })
-                    }
+                rows.push(`<tr><td colspan="2"><b style="color:${COLORS[this.point.series.index % COLORS.length]};-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
+                
+                if (groupBy) {
+                    rows.push(`<b>${this.point.series.name}</b><hr/></td></tr>`)
+                } else {
+                    rows.push(`<b>${x}</b><hr/></td></tr>`)
                 }
+
+                if (groupBy) {
+                    rows.push(`<tr><td style="text-align:right">${column.label || column.name}:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
+                }
+
+                rows.push(
+                    `<tr><td style="text-align:right">${denominator ? "Computed Value:" : "Count:"}</td>`,
+                    `<td style="width: 100%"><b>${denominator ? this.point.y?.toPrecision(3) + "%" : this.point.y}</b></td></tr>`
+                )
+
+                // @ts-ignore
+                if (denominator && this.point.custom?.denominator) {
+                    // @ts-ignore
+                    rows.push(`<tr><td style="text-align:right">Denominator:</td><td><b>${this.point.custom.denominator}</b></td></tr>`)
+                }
+                
                 return `<table>${rows.join("")}</table>`
             }
         },
         xAxis: {
-            type: xType
+            type: xType,
+            crosshair: type.includes("line")
         },
         series
-    }) as Highcharts.Options
+    };
+
+    return merge(options, dynamicOptions) as Highcharts.Options
 }
 
 
 
-
-
 interface ChartProps {
-    options       ?: Highcharts.Options
-    column         : app.DataRequestDataColumn
-    dataSet        : PowerSet
-    fullDataSet    : PowerSet
-    groupBy       ?: app.DataRequestDataColumn | null
-    type           : SupportedNativeChartTypes
-    colorOptions   : app.ColorOptions
-    denominator   ?: string
-    column2       ?: app.DataRequestDataColumn | null
-    column2type   ?: string
-    column2opacity?: number
+    options : Highcharts.Options
+    loading?: boolean
 }
 
 export default class Chart extends React.Component<ChartProps>
@@ -514,51 +438,30 @@ export default class Chart extends React.Component<ChartProps>
     }
 
     updateChart() {
-        const chartOptions = buildChartOptions(this.props)
-        // console.log(JSON.stringify(chartOptions))
-        this.chart.update(chartOptions)
+        try {
+            // update(options [, redraw] [, oneToOne] [, animation])
+            this.chart.update(this.props.options || {}, true, true, false)
+        } catch (e) {
+            console.debug(e)
+        }
     }
 
     componentDidMount() {
-        const chartOptions = buildChartOptions(this.props)
-        // console.log(chartOptions)
-        this.chart = Highcharts.chart("chart", chartOptions);
+        this.chart = Highcharts.chart("chart", this.props.options || {});
     }
 
     componentDidUpdate() {
-        defer(this.updateChart);
+        // The UI can generate too frequent state updates in some cases (for
+        // example via color pickers). Using defer here allows us to skip
+        // some needless re-rendering 
+        defer(this.updateChart, 1);
     }
 
     render() {
-        return <div id="chart" className="main-chart"/>
-    }
-}
-
-interface Chart2Props {
-    options: Highcharts.Options
-}
-export class Chart2 extends React.Component<Chart2Props>
-{
-    chart: any;
-
-    constructor(props: Chart2Props) {
-        super(props);
-        this.updateChart = this.updateChart.bind(this);
-    }
-
-    updateChart() {
-        this.chart.update(this.props.options, true, true, false)
-    }
-
-    componentDidMount() {
-        this.chart = Highcharts.chart("chart", this.props.options);
-    }
-
-    componentDidUpdate() {
-        defer(this.updateChart);
-    }
-
-    render() {
-        return <div id="chart" className="main-chart"/>
+        const { loading } = this.props
+        return <div style={{ position: "relative" }} className={ loading ? "loading" : undefined }>
+            <div id="chart" className="main-chart"/>
+            <div className="chart-loader"><Loader/></div>
+        </div>
     }
 }

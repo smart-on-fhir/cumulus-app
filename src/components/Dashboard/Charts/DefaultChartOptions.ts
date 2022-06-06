@@ -137,15 +137,19 @@ const DefaultChartOptions = {
             slicedOffset    : 10,
             // center          : ["50%", "50%"],
             // size            : "75%",
-            // @ts-ignore
-            edgeColor: "rgba(0, 0, 0, 0.1)",
+            
+            borderColor: "rgba(1, 1, 1, 0.5)",
+            borderWidth: 0.5,
+            edgeColor: "rgba(0, 0, 0, 0.25)",
+            edgeWidth: 1,
             dataLabels: {
                 enabled: true,
 
             }
         },
         column: {
-            edgeColor: "rgba(0, 0, 0, 0.1)",
+            edgeColor: "rgba(0, 0, 0, 0.25)",
+            edgeWidth: 0.5,
             getExtremesFromAll: true,
             borderColor: "rgba(1, 1, 1, 0.5)",
             borderWidth: 0.25,
@@ -190,7 +194,6 @@ const DefaultChartOptions = {
                 }
             },
             lineWidth: 1.5,
-            shadow: false,
             states: {
                 hover: {
                     lineWidth: 2,
@@ -240,7 +243,6 @@ const DefaultChartOptions = {
             //     }
             },
             lineWidth: 1.5,
-            shadow: false,
             states: {
                 hover: {
                     lineWidth: 2,

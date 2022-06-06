@@ -4,11 +4,15 @@ const { URL }          = require("url");
 const express          = require("express");
 const slug             = require("slug");
 const { HttpError }    = require("httperrors");
+const crypto           = require("crypto");
+const { debuglog }     = require("util");
+const { QueryTypes }   = require("sequelize");
 const Model            = require("../db/models/DataRequest");
 const GroupModel       = require("../db/models/RequestGroup");
 const ViewModel        = require("../db/models/View");
 const { requireAuth }  = require("./Auth");
 const createRestRoutes = require("./BaseController");
+const ImportJob        = require("../DataManager/ImportJob");
 const {
     getFindOptions,
     assert,
@@ -20,9 +24,72 @@ const {
 
 const router = module.exports = express.Router({ mergeParams: true });
 
+const debug = debuglog("app:sql:api")
+
+function logSql(sql) {
+    debug(sql)
+}
+
+const FilterConfig = {
+    
+    // Text -------------------------------------------------------------------
+    strEq             : col => `"${col}" LIKE ?`,
+    strContains       : col => `"${col}" LIKE concat('%', ?, '%')`,
+    strStartsWith     : col => `"${col}" LIKE concat(?, '%')`,
+    strEndsWith       : col => `"${col}" LIKE concat('%', ?)`,
+    matches           : col => `"${col}" ~ ?`, 
+    strEqCI           : col => `"${col}" ILIKE ?`,
+    strContainsCI     : col => `"${col}" ILIKE concat('%', ?, '%')`,
+    strStartsWithCI   : col => `"${col}" ILIKE concat(?, '%')`,
+    strEndsWithCI     : col => `"${col}" ILIKE concat('%', ?)`,
+    matchesCI         : col => `"${col}" ~* ?`,
+    strNotEq          : col => `"${col}" NOT LIKE ?`,
+    strNotContains    : col => `"${col}" NOT LIKE concat('%', ?, '%')`,
+    strNotStartsWith  : col => `"${col}" NOT LIKE concat(?, '%')`,
+    strNotEndsWith    : col => `"${col}" NOT LIKE concat('%', ?)`,
+    notMatches        : col => `"${col}" !~ ?`, 
+    strNotEqCI        : col => `"${col}" NOT ILIKE ?`,
+    strNotContainsCI  : col => `"${col}" NOT ILIKE concat('%', ?, '%')`,
+    strNotStartsWithCI: col => `"${col}" NOT ILIKE concat(?, '%')`,
+    strNotEndsWithCI  : col => `"${col}" NOT ILIKE concat('%', ?)`,
+    notMatchesCI      : col => `"${col}" !~* ?`,
+    
+    // Dates ------------------------------------------------------------------
+    sameDay           : col => `date_trunc('day'  , "${col}") =  date_trunc('day'  , TIMESTAMP ?)`,
+    sameMonth         : col => `date_trunc('month', "${col}") =  date_trunc('month', TIMESTAMP ?)`,
+    sameYear          : col => `date_trunc('year' , "${col}") =  date_trunc('year' , TIMESTAMP ?)`,
+    sameDayOrBefore   : col => `date_trunc('day'  , "${col}") <= date_trunc('day'  , TIMESTAMP ?)`,
+    sameMonthOrBefore : col => `date_trunc('month', "${col}") <= date_trunc('month', TIMESTAMP ?)`,
+    sameYearOrBefore  : col => `date_trunc('year' , "${col}") <= date_trunc('year' , TIMESTAMP ?)`,
+    sameDayOrAfter    : col => `date_trunc('day'  , "${col}") >= date_trunc('day'  , TIMESTAMP ?)`,
+    sameMonthOrAfter  : col => `date_trunc('month', "${col}") >= date_trunc('month', TIMESTAMP ?)`,
+    sameYearOrAfter   : col => `date_trunc('year' , "${col}") >= date_trunc('year' , TIMESTAMP ?)`,
+    beforeDay         : col => `date_trunc('day'  , "${col}") <  date_trunc('day'  , TIMESTAMP ?)`,
+    beforeMonth       : col => `date_trunc('month', "${col}") <  date_trunc('month', TIMESTAMP ?)`,
+    beforeYear        : col => `date_trunc('year' , "${col}") <  date_trunc('year' , TIMESTAMP ?)`,
+    afterDay          : col => `date_trunc('day'  , "${col}") >  date_trunc('day'  , TIMESTAMP ?)`,
+    afterMonth        : col => `date_trunc('month', "${col}") >  date_trunc('month', TIMESTAMP ?)`,
+    afterYear         : col => `date_trunc('year' , "${col}") >  date_trunc('year' , TIMESTAMP ?)`,
+
+    // Booleans ---------------------------------------------------------------
+    isTrue            : col => `"${col}" IS TRUE`,
+    isNotTrue         : col => `"${col}" IS NOT TRUE`,
+    isFalse           : col => `"${col}" IS FALSE`,
+    isNotFalse        : col => `"${col}" IS NOT FALSE`,
+
+    // Any --------------------------------------------------------------------
+    isNull            : col => `"${col}" IS NULL`,
+    isNotNull         : col => `"${col}" IS NOT NULL`,
+    eq                : col => `"${col}" = ?` ,
+    ne                : col => `"${col}" != ?`,
+    gt                : col => `"${col}" > ?` ,
+    gte               : col => `"${col}" >= ?`,
+    lt                : col => `"${col}" < ?` ,
+    lte               : col => `"${col}" <= ?`,
+};
 
 
-// Views -----------------------------------------------------------------------
+// Views ----------------------------------------------------------------------
 router.get("/:id/views", rw(async (req, res) => {
     const options = getFindOptions(req);
     options.where = { DataRequestId: +req.params.id };
@@ -30,7 +97,7 @@ router.get("/:id/views", rw(async (req, res) => {
     res.json(views);
 }));
 
-// Export Data endpoint --------------------------------------------------------
+// Export Data endpoint -------------------------------------------------------
 router.get("/:id/data", rw(async (req, res) => {
     const model = await Model.findByPk(req.params.id, getFindOptions(req))
     assert(model, HttpError.NotFound("Model not found"))
@@ -40,7 +107,7 @@ router.get("/:id/data", rw(async (req, res) => {
     exportData(data || { cols: [], rows: [] }, name, req, res)
 }));
 
-// Refresh Data endpoint -------------------------------------------------------
+// Refresh Data endpoint ------------------------------------------------------
 router.get("/:id/refresh", requireAuth("admin"), rw(async (req, res) => {
     const model = await Model.findByPk(req.params.id, getFindOptions(req))
     assert(model, HttpError.NotFound("Model not found"))
@@ -79,18 +146,225 @@ router.get("/by-group", rw(async (req, res) => {
     }));
 }));
 
-// Get Data endpoint --------------------------------------------------------
-router.get("/:id", rw(async (req, res) => {
-    const model = await Model.findByPk(req.params.id, getFindOptions(req))
-    assert(model, HttpError.NotFound("Model not found"))
-    const json = model.toJSON();
-    if (!req.query.includeData && json.data) {
-        delete json.data.rows
+// Import Data endpoint -------------------------------------------------------
+/**
+ * Create (or update?) data by uploading a CSV file in a streaming fashion
+ * CURL example:
+ * ```sh
+ * curl -i -X PUT "http://localhost:4000/api/data/bigdata?types=day,string,string,string,string,integer,integer" --data-binary @./big-data.csv
+ * ```
+ */
+router.put("/:id/data", rw(async (req, res) => {
+    const jobId = String(req.headers["x-job-id"] || "");
+    
+    // if job is passed in - continue
+    if (jobId) {
+        const job = ImportJob.find(jobId);
+        if (!job) {
+            throw new Error(`No such job "${jobId}"`)
+        }
+        await job.handle(req, res);
     }
-    res.json(json)
+
+    // else use a single-run job
+    else {
+        const job = await ImportJob.create();
+        await job.handle(req, res);
+    }
 }));
 
-createRestRoutes(router, Model, { getOne: false });
+// Data API endpoint ----------------------------------------------------------
+router.get("/:id/api", rw(async (req, res) => {
+
+    /** @type {any} */
+    const subscription = await Model.findByPk(req.params.id)
+
+    assert(subscription, HttpError.NotFound("Subscription not found"))
+
+    const table = "subscription_data_" + req.params.id;
+
+    const column = String(req.query.column || "");
+
+    const stratifier = String(req.query.stratifier || "");
+
+    const filtersParams = (Array.isArray(req.query.filter) ?
+        req.query.filter :
+        [req.query.filter || ""]).map(String).filter(Boolean);
+
+    const cacheKey = crypto.createHash("sha1").update([
+        table,
+        column,
+        stratifier,
+        filtersParams.join("+"),
+        subscription.completed + ""
+    ].join("-")).digest("hex");
+
+    res.setHeader('Cache-Control', `max-age=31536000, no-cache`)
+    res.setHeader('Vary', 'Origin, ETag')
+    res.setHeader('ETag', cacheKey)
+
+    let ifNoneMatchValue = req.headers['if-none-match']
+    if (ifNoneMatchValue && ifNoneMatchValue === cacheKey) {
+        res.statusCode = 304
+        return res.end()
+    }
+
+    const allColumns = subscription.metadata.cols;
+
+    // Verify that at least one column is requested
+    if (!column) throw new Error(`No column requested`)
+
+    // Verify that column is not "cnt"
+    if (column === "cnt") throw new Error(`Must select a column other than "cnt"`)
+
+    // Verify that column exists
+    if (!allColumns.find(x => x.name === column)) throw new Error(`No such column "${column}"`)
+
+    // Verify that stratifier exists
+    if (stratifier && !allColumns.find(c => c.name === stratifier)) {
+        throw new Error(`No such column "${stratifier}" (used as stratifier)`)
+    }
+
+    // Replacement values for the SQL query
+    const replacements = [];
+
+    // Filters ----------------------------------------------------------------
+    //  OR: filter=gender:eq:male,age:gt:3
+    // AND: filter=gender:eq:male&filter=age:gt:3
+    // MIX: filter=gender:eq:male,age:gt:3&filter=year:gt:2022
+    // ------------------------------------------------------------------------
+    const filterConditions = [];
+
+    filtersParams.forEach(f => {
+        f.split(/\s*,\s*/).filter(Boolean).forEach((cond, i) => {
+            const parts = cond.split(":");
+            if (parts.length < 2) {
+                throw new Error("Each filter must have at least 2 parts");
+            }
+            
+            const [column, operator, right] = parts;
+            
+            if (typeof FilterConfig[operator] !== "function") {
+                throw new Error(`Filter operator "${operator}" is not implemented`);
+            }
+
+            filterConditions.push({
+                column,
+                
+                // If i === 0, then this is the first filter in an OR chain,
+                // but it means that entire chain must be joined using "AND"
+                // to any previous filters
+                join: i ? "OR" : "AND",
+
+                sql: FilterConfig[operator](column)
+            });
+
+            if (right) {
+                replacements.push(right)
+            }
+        });
+    });
+
+    const filterWhere = filterConditions.reduce((prev, cur) => {
+        if (cur.join !== prev.join) {
+            return {
+                sql: prev.sql ? `(${prev.sql}) ${cur.join} ${cur.sql}` : cur.sql,
+                join: cur.join
+            }
+        }
+        return { sql: `${prev.sql} ${cur.join} ${cur.sql}`, join: cur.join }
+    }, { sql: "", join: "" }).sql;
+
+    // Find which of the columns are already used -----------------------------
+    const unusedColumns = allColumns.filter(c => {
+        
+        // The "cnt" is always used
+        if (c.name === "cnt") return false
+
+        // The selected column is used
+        if (c.name === column) return false
+
+        // The stratifier is used
+        if (stratifier && c.name === stratifier) return false
+
+        // Columns used by filters
+        if (filterConditions.some(f => f.column === c.name)) return false
+
+        return true
+    });
+
+    // ========================================================================
+    // BUILD SQL
+    // ========================================================================
+    function where() {
+        let out = []
+        if (stratifier) out.push(`"${stratifier}" IS NOT NULL`)
+        out.push(`"${column}" IS NOT NULL`)
+        if (unusedColumns.length) {
+            out.push(...unusedColumns.map(c => `"${c.name}" IS NULL`))
+        }
+        return out
+    }
+
+    let sql = `SELECT `
+
+    // Select the stratifier if any
+    if (stratifier) sql += `"${stratifier}" as stratifier, `
+
+    // Select the column as "x"
+    sql += `"${column}" AS x`
+
+    // Select the count as "y"
+    sql += `, sum(cnt::float) AS y `
+
+    sql += `FROM "${table}" `
+
+    // The column must not be null
+    sql += `WHERE ${where().join(" AND ")} `
+    
+    // Filters
+    if (filterWhere) sql += `AND (${ filterWhere }) `
+
+    if (stratifier) sql += `GROUP BY "${stratifier}", "${column}" `
+    else sql += `GROUP BY "${column}" `
+    
+    // order by stratifier asc, column asc
+    if (stratifier) sql += `ORDER BY stratifier, x`
+    else sql += `ORDER BY x`
+
+    // Execute the query
+    const result = await subscription.sequelize.query(sql, {
+        replacements,
+        logging: logSql,
+        type: QueryTypes.SELECT
+    });
+
+    // Do some post-processing
+    let data = [];
+    let group;
+
+    result.forEach(row => {
+        if (!group || group.stratifier !== row.stratifier) {
+            group = {
+                stratifier: row.stratifier,
+                rows: []
+            };
+            data.push(group)
+        }
+        group.rows.push([ row.x, row.y ])
+    })
+
+    res.json({
+        column,
+        stratifier: stratifier || undefined,
+        filters   : filtersParams,
+        totalCount: subscription.metadata.total,
+        rowCount  : result.length,
+        data
+    });
+}));
+
+createRestRoutes(router, Model);
 
 /**
  * @param {{ cols: { name: string }[], rows: any[][] }} data 
@@ -160,7 +434,7 @@ async function fetchData(model) {
     const type = response.headers["content-type"];
 
     if (!type) {
-        throw new Error("The data url endpoint does reply with Content-Type header")
+        throw new Error("The data url endpoint did not reply with Content-Type header");
     }
 
     if ((/\bjson\b/i).test(type)) {

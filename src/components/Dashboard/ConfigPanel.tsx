@@ -7,18 +7,131 @@ import FilterUI          from "./FilterUI"
 import Collapse          from "../Collapse"
 import Checkbox          from "../Checkbox"
 import AnnotationsUI     from "./AnnotationsUI"
-import { DynamicEditor } from "../editors/FontEdotor"
 import Rating            from "../Rating"
 import { request }       from "../../backend"
 import { useState }      from "react"
 import {
     SupportedChartTypes,
-    ChartIcons,
-    SingleDimensionChartTypes,
-    ReadOnlyPaths
+    ChartIcons
 } from "./config"
 
 type SupportedChartType = keyof typeof SupportedChartTypes
+
+function PrimaryDataEditor({
+    state,
+    dataRequest,
+    onChange
+}: {
+    state: ChartConfigPanelState
+    dataRequest: app.DataRequest
+    onChange: (state: ChartConfigPanelState) => void
+}) {
+    
+    const { cols } = dataRequest.metadata || { cols: [] }
+
+    return (
+        <>
+            { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
+                <>
+                    <div className="pt-1">
+                        <label>Stratifier</label>
+                        <ColumnSelector
+                            cols={ cols }
+                            placeholder="Select Column"
+                            addEmptyOption="start"
+                            value={ state.stratifyBy }
+                            disabled={[ "cnt", state.groupBy, state.column2 ].filter(Boolean)}
+                            onChange={ (stratifyBy: string) => onChange({
+                                ...state,
+                                stratifyBy,
+                                denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
+                            }) }
+                        />
+                        <p className="small color-muted">
+                            Stratify the data into multiple series based on the chosen column. For example,
+                            this would produce multiple lines in a line chart.
+                        </p>
+                    </div>
+                </>
+            }
+        </>
+    )
+}
+
+function SecondaryDataEditor({
+    state,
+    dataRequest,
+    onChange
+}: {
+    state: ChartConfigPanelState
+    dataRequest: app.DataRequest
+    onChange: (state: ChartConfigPanelState) => void
+}) {
+    
+    const { cols } = dataRequest.metadata || { cols: [] }
+
+    return (
+        <>
+            <div className="pt-1">
+                <label>Secondary Column</label>
+                <ColumnSelector
+                    addEmptyOption="start"
+                    cols={ cols }
+                    value={ state.column2 || null }
+                    disabled={[ "cnt", state.stratifyBy, state.groupBy ].filter(Boolean)}
+                    onChange={ (column2: string) => onChange({ ...state, column2 }) }
+                />
+            </div>
+            
+            { !!state.column2 && <div className="pt-1">
+                <label>Render As</label>
+                <Select
+                    value={ state.column2type }
+                    onChange={ column2type => onChange({ ...state, column2type })}
+                    options={[
+                        {
+                            value: "spline",
+                            label: "Line",
+                            icon: ChartIcons.spline
+                        },
+                        {
+                            value: "areaspline",
+                            label: "Area",
+                            icon: ChartIcons.areaspline
+                        },
+                        {
+                            value: "column",
+                            label: "Columns",
+                            icon: ChartIcons.column
+                        },
+                        {
+                            value: "columnStack",
+                            label: "Stacked Columns",
+                            icon : ChartIcons.columnStack
+                        }
+                    ]}
+                />
+            </div> }
+
+            { !!state.column2 && !!state.column2type && <div className="pt-1">
+                <label>
+                    Opacity
+                    <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={ state.column2opacity === undefined ? 1 : state.column2opacity }
+                        onChange={e => onChange({ ...state, column2opacity: e.target.valueAsNumber })}
+                        style={{ width: "100%", margin: 0 }}
+                    />
+                </label>
+            </div> }
+        </>
+    )
+}
+
+// ----------------------------------------------------------------------------
 
 interface ChartConfigPanelState {
     groupBy        : string
@@ -43,7 +156,6 @@ export default function ConfigPanel({
     state,
     onChange,
     viewType,
-    colorsLength,
     view
 } : {
     dataRequest: app.DataRequest
@@ -51,13 +163,15 @@ export default function ConfigPanel({
     state: ChartConfigPanelState
     viewType: "overview" | "data"
     onChange: (state: ChartConfigPanelState) => void
-    colorsLength: number
 }) {
     let auth = useAuth();
 
-    let [rating, setRating] = useState(view.normalizedRating || 0)
-    let [votes , setVotes ] = useState(view.votes || 0)
-    let [voting, setVoting] = useState(false);
+    let [ rating  , setRating   ] = useState(view.normalizedRating || 0)
+    let [ votes   , setVotes    ] = useState(view.votes || 0)
+    let [ voting  , setVoting   ] = useState(false)
+    let [ tabIndex, setTabIndex ] = useState(0)
+
+    const { cols } = dataRequest.metadata || { cols: [] }
 
     const vote = async (n: number) => {
         setVoting(true)
@@ -110,8 +224,17 @@ export default function ConfigPanel({
             // position: "sticky",
             // top: 0
         }}>
-            { viewType === "overview" && auth.user?.role === "admin" && (
-                <Collapse header="View">
+            { view.id && <div className="mt-1">
+                <Rating
+                    value={ rating }
+                    votes={ votes }
+                    loading={ voting }
+                    onVote={ vote }
+                    onClear={ resetRating }
+                />
+            </div> }
+            { false && viewType === "overview" && auth.user?.role === "admin" && (
+                <Collapse header="View" collapsed={!!state.viewName}>
                     <div className="mt-1">
                         <label>Title</label>
                         <input type="text" value={state.viewName} onChange={ e => onChange({ ...state, viewName: e.target.value })} required />
@@ -485,180 +608,103 @@ export default function ConfigPanel({
             }
             
             <Collapse collapsed header="Filters">
-                <FilterUI
-                    onChange={filters => onChange({ ...state, filters })}
-                    current={ state.filters }
-                    cols={ dataRequest.data.cols }
-                />
-                <br/>
+                <div className="pt-1 pb-1">
+                    <FilterUI
+                        onChange={filters => onChange({ ...state, filters })}
+                        current={ state.filters }
+                        cols={ cols }
+                    />
+                </div>
             </Collapse>
 
             <Collapse collapsed header="Data">
                 <div className="pt-1">
-                    <label>Visualize Column</label>
+                    <label>{ state.chartType.startsWith("pie") ? "Slices" : "X Axis" }</label>
                     <ColumnSelector
-                        cols={ dataRequest.data.cols }
+                        cols={ cols }
                         value={ state.groupBy }
-                        filter={col => {
-                            if (col.name === "cnt") return false
-                            if (SingleDimensionChartTypes.includes(state.chartType)) {
-                                return true
-                            }
-                            return col.name !== state.stratifyBy
-                        } }
-                        onChange={(groupBy: string) => onChange({ ...state, groupBy })}
+                        disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
+                        onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
                     />
                 </div>
                 { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
-                    <div className="pt-1">
-                        <label>Stratifier</label>
-                        <Select
-                            right
-                            placeholder="Select Column"
-                            value={ state.stratifyBy }
-                            onChange={(stratifyBy: string) => onChange({
-                                ...state,
-                                stratifyBy,
-                                denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
-                            })}
-                            options={[
-                                { value: "", label: "NONE", icon: "fas fa-close color-red" },
-                                ...dataRequest.data.cols.map(col => ({
-                                    value   : col.name,
-                                    label   : col.label || col.name,
-                                    disabled: col.name === "cnt" || col.name === state.groupBy,
-                                    icon    : "/icons/column.png",
-                                    right   : <span className={ col.dataType + " color-muted small right" }> {col.dataType}</span>
-                                }))
-                            ]}
-                        />
-                    </div>
-                }
-                { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") &&
-                    <div className="pt-1">
+                    <>
+                    <div className="pt-1 pb-1">
                         <label>Denominator</label>
-                        <Checkbox
-                            type="radio"
-                            checked={ state.denominator === "" }
-                            onChange={() => onChange({ ...state, denominator: "" })}
-                            name="denominator"
-                            label="None"
-                            description="Render the aggregate counts found in the data source without further processing"
-                            className="mb-1"
-                        />
-                        <Checkbox
-                            type="radio"
-                            disabled={ !state.stratifyBy }
-                            checked={ state.denominator === "local" }
-                            onChange={() => onChange({ ...state, denominator: "local" })}
-                            name="denominator"
-                            label="Stratified Count"
-                            description="Convert counts to percentage of the total count of every given data group. Not available with no stratifier."
-                            className="mb-1"
-                        />
-                        <Checkbox
-                            type="radio"
-                            // disabled={ !state.stratifyBy }
-                            checked={state.denominator === "global"}
-                            onChange={() => onChange({ ...state, denominator: "global" })}
-                            name="denominator"
-                            label="Total Count"
-                            description="Convert counts to percentage of the total count within the entire dataset"
-                            className="mb-1"
-                        />
-                        {/* <ColumnSelector
-                            cols={ dataRequest.data.cols }
-                            value={ state.groupBy }
-                            filter={col => {
-                                if (col.name === "cnt") return false
-                                if (SingleDimensionChartTypes.includes(state.chartType)) {
-                                    return true
-                                }
-                                return col.name !== state.stratifyBy
-                            } }
-                            onChange={(groupBy: string) => onChange({ ...state, groupBy })}
-                        /> */}
-                    </div>
-                }
-                <br/>
-            </Collapse>
-
-            { !state.chartType.startsWith("pie") && !state.chartType.startsWith("donut") && 
-                <Collapse collapsed header="Secondary Data">
-                    <div className="pt-1">
-                        <label>Column</label>
                         <Select
-                            options={[
-                                { value: "", label: "NONE", icon: "fas fa-close color-red" },
-                                ...dataRequest.data.cols.map(col => ({
-                                    value   : col.name,
-                                    label   : col.label || col.name,
-                                    disabled: col.name === "cnt" || col.name === state.groupBy,
-                                    icon    : "/icons/column.png",
-                                    right   : <span className={ col.dataType + " color-muted small right" }> {col.dataType}</span>
-                                }))
-                            ]}
-                            value={ state.column2 }
-                            // filter={col => {
-                            //     if (col.name === "cnt") return false
-                            //     if (SingleDimensionChartTypes.includes(state.chartType)) {
-                            //         return true
-                            //     }
-                            //     return col.name !== state.stratifyBy && col.name !== state.groupBy
-                            // } }
-                            onChange={(column2: string) => onChange({ ...state, column2 })}
-                        />
-                    </div>
-
-                    { !!state.column2 && <div className="pt-1">
-                        <label>Render As</label>
-                        <Select
-                            value={ state.column2type }
-                            onChange={ column2type => onChange({ ...state, column2type })}
                             options={[
                                 {
-                                    value: "spline",
-                                    label: "Line",
-                                    icon: ChartIcons.spline
+                                    label: <div>
+                                        <div>None</div>
+                                        <div className="small color-muted">
+                                            Render the aggregate counts as found in the<br/>
+                                            data source without further processing
+                                        </div>
+                                    </div>,
+                                    value: "",
+                                    icon: "fa-solid fa-percent grey-out"
                                 },
                                 {
-                                    value: "column",
-                                    label: "Columns",
-                                    icon: ChartIcons.column
+                                    label: <div>
+                                        <div>Stratified Count</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the total<br />
+                                            count of every given data group.<br />
+                                            Not available with no stratifier.
+                                        </div>
+                                    </div>,
+                                    value: "local",
+                                    icon: "fa-solid fa-percent color-brand-2"
+                                },
+                                {
+                                    label: <div>
+                                        <div>Total Count</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the total<br />
+                                            count within the entire dataset
+                                        </div>
+                                    </div>,
+                                    value: "global",
+                                    icon: "fa-solid fa-percent color-blue"
                                 }
                             ]}
+                            value={ state.denominator }
+                            onChange={ denominator => onChange({ ...state, denominator })}
                         />
-                    </div> }
-
-                    { !!state.column2 && !!state.column2type && <div className="pt-1">
-                        <label>
-                            Opacity
-                            <input
-                                type="range"
-                                min={0}
-                                max={1}
-                                step={0.01}
-                                value={ state.column2opacity === undefined ? 1 : state.column2opacity }
-                                onChange={e => onChange({ ...state, column2opacity: e.target.valueAsNumber })}
-                                style={{ width: "100%", margin: 0 }}
-                            />
-                        </label>
-                    </div> }
-
-                    <br/>
-                    <br/>
-                </Collapse>
-            }
+                    </div>
+                    <div className="tab-panel mt-1">
+                        <span
+                            onClick={() => setTabIndex(0)}
+                            className={"tab" + (tabIndex === 0 ? " active" : "")}
+                            style={{ background: tabIndex === 0 ? "#f8f8f7" : "transparent" }}
+                        >Primary Data</span>
+                        <span
+                            onClick={() => setTabIndex(1)}
+                            className={"tab" + (tabIndex === 1 ? " active" : "")}
+                            style={{ background: tabIndex === 1 ? "#f8f8f7" : "transparent" }}
+                        >Secondary Data</span>
+                    </div>
+                    { tabIndex === 0 && <PrimaryDataEditor   state={state} dataRequest={dataRequest} onChange={onChange} /> }
+                    { tabIndex === 1 && <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onChange} /> }
+                    </>
+                }
+                <br />
+            </Collapse>
 
             <Collapse collapsed header="Colors">
                 <div className="pt-1 pb-2">
                     <label>Color Preset</label>
                     <br/>
                     { state.colorOptions.colors.map((color, i) => {
+                        const colorsLength = state.stratifyBy ?
+                            state.chartOptions.series?.length || 1 :
+                            // @ts-ignore
+                            state.chartOptions.series?.[0]?.data?.length || 1
+
                         return <input
                             type="color"
                             key={i}
-                            value={color}
+                            value={i >= colorsLength ? "#DDDDDD" : color}
                             onChange={e => {
                                 let colors = [ ...state.colorOptions.colors ]
                                 colors[i] = e.target.value
@@ -714,22 +760,8 @@ export default function ConfigPanel({
                         current={ chartOptions.annotations?.[0]?.labels || [] }
                         xCol={ state.xCol }
                     />
-                    <br/>
                 </Collapse>
             }
-
-            <Collapse collapsed header="Advanced Chart Options">
-                <div className="mt-1 mb-1">
-                    Most of the <a className="link" rel="noreferrer noopener" href="https://api.highcharts.com/highcharts/"
-                    target="_blank">chart options</a> can be set below
-                </div>
-                <DynamicEditor
-                    obj={ chartOptions }
-                    onChange={o => onChange({ ...state, chartOptions: o })}
-                    readOnlyPaths={ ReadOnlyPaths }
-                />
-                <br/>
-            </Collapse>
             
             <br/>
         </div>
