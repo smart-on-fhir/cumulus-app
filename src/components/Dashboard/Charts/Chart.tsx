@@ -362,7 +362,8 @@ export function buildChartOptions({
                             return label + suffix
                         }
                     }
-                }
+                },
+                shadow: false
             },
             spline: {
                 shadow: !!data2

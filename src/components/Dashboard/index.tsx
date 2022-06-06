@@ -73,6 +73,11 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
     function computeChartOptions(nextState: ViewState) {
         try {
             if (nextState.data) {
+                if (nextState.chartType.startsWith("pie") || nextState.chartType.startsWith("donut")) {
+                    nextState.viewGroupBy = undefined
+                    nextState.data2 = null
+                }
+
                 const options = getDefaultChartOptions(
                     nextState.chartType as keyof typeof SupportedChartTypes,
                     nextState.chartOptions
