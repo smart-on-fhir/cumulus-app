@@ -1,31 +1,14 @@
-import moment                      from "moment"
-import { useCallback, useReducer } from "react"
-import { useNavigate, useParams }  from "react-router"
-import { HelmetProvider, Helmet }  from "react-helmet-async"
-import Breadcrumbs                 from "../Breadcrumbs"
-import Alert, { AlertError }       from "../Alert"
-import Loader                      from "../Loader"
-import { useBackend }              from "../../hooks"
-import { request, updateOne }      from "../../backend"
-import { toTitleCase }             from "../../utils"
+import moment                            from "moment"
+import { Component }                     from "react"
+import { useNavigate, useParams }        from "react-router"
+import { HelmetProvider, Helmet }        from "react-helmet-async"
+import Breadcrumbs                       from "../Breadcrumbs"
+import Alert, { AlertError }             from "../Alert"
+import Loader                            from "../Loader"
+import { request }                       from "../../backend"
+import { classList, defer, toTitleCase } from "../../utils"
 import "./DataUploader.scss"
 
-
-const CSV_MIME_TYPES = [
-    "application/csv",
-    "application/x-csv",
-    "text/csv",
-    "text/comma-separated-values",
-    "text/x-comma-separated-values"
-];
-
-const TSV_MIME_TYPES = [
-    "application/tsv",
-    "application/x-tsv",
-    "text/tsv",
-    "text/tab-separated-values",
-    "text/x-tab-separated-values"
-];
 
 interface Payload
 {
@@ -41,28 +24,37 @@ interface Col
     dataType: string
 }
 
-function detectDataTypeAt(i: number, rows: string[][]) {
+function detectDataTypeAt(i: number, name: string, rows: string[][]) {
+    
+    if (name === "cnt") return "integer";
+
+    if (name.match(/year/i )) return "date:YYYY";
+    if (name.match(/month/i)) return "date:YYYY-MM";
+    if (name.match(/week/i )) return "date:YYYY-MM-DD";
+    if (name.match(/day/i  )) return "date:YYYY-MM-DD";
+    if (name.match(/date/i )) return "date:YYYY-MM-DD";
+    
     let type = "";
 
     function getType(x: string) {
         if (!x) {
             return ""
         }
-        if ((/^-?[0-9]+$/).test(x)) {
-            return "integer"
+        if ((/^\d{4}-01-01$/).test(x)) {
+            return "year"
         }
-        if ((/^-?[0-9]*\.[0-9]+$/).test(x)) {
-            return "float"
+        if ((/^\d{4}-\d{2}-01$/).test(x)) {
+            return "month"
         }
-        if ((/^\d{4}-\d{2}-\d{2}/).test(x)) {
-            return "date:YYYY-MM-DD"
+        if ((/^\d{4}-\d{2}-\d{2}$/).test(x)) {
+            return "day"
         }
         return "string"
     }
 
     for (let row of rows) {
         let col = String(row[i] || "").trim()
-        let t = getType(col)
+        let t = getType(col);
 
         if (t === "") {
             continue
@@ -170,70 +162,52 @@ function ColumnEditor({
     onSelectionChange: (index: number) => void
 })
 {
-    const selectedColumn = cols[selectedIndex] || {
-        name: "",
-        label: "",
-        description: "",
-        dataType: "string"
-    }
-
-    return (
-        <>
-            <label>Columns</label>
-            <hr/>
-            <div className="row gap mb-1 mt-1">
-                <div className="col col-4">
-                    <select size={5} value={ selectedIndex } onChange={e => onSelectionChange(e.target.selectedIndex)}>
-                        { cols.map((col, i) => (
-                            <option key={i} value={i}>{col.name}</option>
-                        )) }
-                    </select>
-                </div>
-                <div className="col col-6">
-                    <div className="row half-gap">
-                        <div className="col" title="The name of the column as it appears in the source file. Change only if you need to rename it!">
-                            <label>Name</label>
-                            <input type="text" value={selectedColumn.name} onChange={e => {
-                                selectedColumn.name = e.target.value
-                                onChange(cols)
-                            }} />
-                        </div>
-                        <div className="col" title="Used by apps as human-readable name in charts and table headers.">
-                            <label>Label</label>
-                            <input type="text" value={selectedColumn.label} onChange={e => {
-                                selectedColumn.label = e.target.value
-                                onChange(cols)
-                            }} />
-                        </div>
-                    </div>
-                    <div className="row half-gap">
-                        <div className="col" title="Please select the appropriate data type!">
-                            <label>Data Type</label>
-                            <select value={selectedColumn.dataType} onChange={e => {
-                                selectedColumn.dataType = e.target.value
-                                onChange(cols)
-                            }}>
-                                <option value="integer">Integer</option>
-                                <option value="float">Float</option>
-                                <option value="string">Text</option>
-                                <option value="hidden">Hide</option>
-                                <option value="date:YYYY-MM-DD">Date YYYY-MM-DD</option>
-                                <option value="date:YYYY-MM">Date YYYY-MM</option>
-                                <option value="date:YYYY">Date YYYY</option>
-                                <option value="boolean">Boolean</option>
-                            </select>
-                        </div>
-                        <div className="col" title="May be used by apps to show short description of the column.">
-                            <label>Description</label>
-                            <input type="text" value={selectedColumn.description} onChange={e => {
-                                selectedColumn.description = e.target.value
-                                onChange(cols)
-                            }} />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
+return (
+    <table>
+        <thead>
+            <tr>
+                <th>Column</th>
+                <th>Label</th>
+                <th>Data Type</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            { cols.map((col, i) => (
+                <tr key={i} onClick={() => onSelectionChange(i)} className={ selectedIndex === i ? "selected" : undefined}>
+                    <td>{col.name}</td>
+                    <td className="small">
+                        <input type="text" value={col.label} onChange={e => {
+                            col.label = e.target.value
+                            onChange(cols)
+                        }} />    
+                    </td>
+                    <td className="small">
+                        <select value={col.dataType} onChange={e => {
+                            col.dataType = e.target.value
+                            onChange(cols)
+                        }}>
+                            <option value="integer">Integer</option>
+                            <option value="float">Float</option>
+                            <option value="string">Text</option>
+                            <option value="date:YYYY-MM-DD">Day</option>
+                            <option value="date:YYYY wk W">Week</option>
+                            <option value="date:YYYY-MM">Month</option>
+                            <option value="date:YYYY">Year</option>
+                            <option value="boolean">Boolean</option>
+                            <option value="hidden">Hidden</option> 
+                        </select>
+                    </td>
+                    <td className="small">
+                        <input type="text" value={col.description} onChange={e => {
+                            col.description = e.target.value
+                            onChange(cols)
+                        }} />    
+                    </td>
+                </tr>
+            )) }
+        </tbody>
+    </table>
     )
 }
 
@@ -280,7 +254,7 @@ function Preview({
     payload,
     selectedColIndex = 0,
     onSelectionChange,
-    trimSpaces = false
+    trimSpaces = true
 }: {
     payload: Payload
     selectedColIndex: number
@@ -289,7 +263,7 @@ function Preview({
 })
 {
     if (!payload.cols.filter(c => c.dataType !== "hidden").length) {
-        return <div className="mt-1 mb-1 color-muted center">NO DATA TO PREVIEW</div>
+        return <div className="mb-1 color-muted">NO DATA TO PREVIEW</div>
     }
     return (
         <div className="import-preview-wrap">
@@ -307,7 +281,7 @@ function Preview({
                     </tr>
                 </thead>
                 <tbody>
-                    { payload.rows.slice(0, 20).map((row, i) => (
+                    { payload.rows.slice(0, 10).map((row, i) => (
                         <tr key={i} tabIndex={0}>
                             {row.map((r, y) => {
                                 let value: any = r, type = payload.cols[y]?.dataType || ""
@@ -330,15 +304,17 @@ function Preview({
                                     value = <span style={{ color: "#D00" }}>{value}</span>
                                 }
                                 else if (type === "boolean") {
-                                    value = value ? <span style={{ color: "#0C0" }}>{value + ""}</span> : <span style={{ color: "#C00" }}>{value + ""}</span>
+                                    value = value ?
+                                        <span style={{ color: "#0C0" }}>{value + ""}</span> :
+                                        <span style={{ color: "#C00" }}>{value + ""}</span>
                                 }
-                                else if (type.startsWith("date")) {
+                                else if (type === "year" || type === "month" || type === "day" || type === "week" || type.startsWith("date")) {
                                     value = <span style={{ color: "#606" }}>{value}</span>
                                 }
                                 return (
                                     <td
                                         key={y}
-                                        className={ selectedColIndex === y ? "selected" : ""}
+                                        className={ selectedColIndex === y ? "selected" : undefined}
                                         onClick={() => onSelectionChange(y)}
                                     >{value}</td>)
                             })}
@@ -350,539 +326,389 @@ function Preview({
     )
 }
 
-interface State {
-    input              : string
-    separateByComma    : boolean
-    separateByTab      : boolean
-    separateBySemicolon: boolean
-    separateBySpace    : boolean
-    customSeparator    : string | null
-    stringDelimiter    : string
+///////////////////////////////////////////////////////////////////////////////
+
+interface DataUploader2Props {
+    requestID: number | string
+    navigate: (location: string) => void
+}
+
+interface DataUploader2State {
     cols               : Col[]
     rows               : string[][]
-    src                : string // the file name
+    file               : File | null
     selectedColIndex   : number
-    trimSpaces         : boolean
-    startRow           : number
-    endRow             : number | null
     loading            : boolean
-    errorMessage       : string | null 
+    errorMessage       : string | null
+    uploadedBytes      : number
+    totalBytes         : number
+    requestLoading     : boolean
+    requestError       : Error | null
+    requestResult      : app.DataRequest | null
+    importCompleted    : boolean
+    uploading          : boolean
+    estimate           : number
 }
 
-interface Action {
-    type: string
-    payload?: any
-}
-
-const INITIAL_STATE: State = {
-    input              : "",
-    separateByComma    : true,
-    separateByTab      : false,
-    separateBySemicolon: false,
-    separateBySpace    : false,
-    customSeparator    : null,
-    stringDelimiter    : '"',
-    cols               : [],
-    rows               : [],
-    src                : "",
-    selectedColIndex   : 0,
-    trimSpaces         : false,
-    startRow           : 1,
-    endRow             : null,
-    loading            : false,
-    errorMessage       : null
-}
-
-function reducer(state: State, action: Action): State
+class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
 {
-    const requireParse = [
-        "input",
-        "separateByComma",
-        "separateByTab",
-        "separateBySemicolon",
-        "separateBySpace",
-        "customSeparator",
-        "stringDelimiter"
-    ];
+    abortController: AbortController;
 
-    function parse(newState: Partial<State> = {}) {
+    constructor(props: DataUploader2Props) {
+        super(props);
 
-        newState = { ...state, ...newState }
+        this.state = {
+            cols            : [],
+            rows            : [],
+            selectedColIndex: 0,
+            loading         : false,
+            errorMessage    : null,
+            file            : null,
+            uploadedBytes   : 0,
+            totalBytes      : 0,
+            requestLoading  : true,
+            requestError    : null,
+            requestResult   : null,
+            importCompleted : false,
+            uploading       : false,
+            estimate        : 1000
+        };
 
-        const input = newState.input || "\n" as string;
+        this.upload = this.upload.bind(this)
+        this.onFileSelected = this.onFileSelected.bind(this)
+        this.abort = this.abort.bind(this)
+
+        this.abortController = new AbortController()
+    }
+
+    parse(input: string) {
 
         let rows: any[] = input.split("\n").map(s => s.trim()).filter(Boolean)
         let cols: Col[] = []
 
-        const separators: string[] = []
-        if (newState.separateByComma    ) separators.push(",")
-        if (newState.separateByTab      ) separators.push("\t")
-        if (newState.separateBySemicolon) separators.push(";")
-        if (newState.separateBySpace    ) separators.push(" ")
-        if (newState.customSeparator    ) separators.push(newState.customSeparator)
+        const separators: string[] = [","]
 
         const header = rows.shift() as string;
 
-        // console.assert(
-        //     rows.length >= newState.startRow!,
-        //     "Start row set to %s but the total rows are %s",
-        //     newState.startRow,
-        //     rows.length
-        // )
-        
-        if (rows.length >= newState.startRow! - 1) {
-            rows = rows.slice(newState.startRow! - 1, newState.endRow || undefined).map(row => {
-                if (separators.length) {
-                    return parseDelimitedLine(row, separators, newState.stringDelimiter)
-                }
-                return [row]
-            })
+        if (rows.length >= 0) {
+            rows = rows.map(row => parseDelimitedLine(row, separators))
 
-            if (separators.length) {
-                cols = parseDelimitedLine(header, separators, newState.stringDelimiter).map(
-                    (col, i) => {
-                        const title = toTitleCase(col)
-                        return {
-                            name : col,
-                            label: title,
-                            description: title.charAt(0) + title.substring(1).toLowerCase(),
-                            dataType: detectDataTypeAt(i, rows)
-                        }
-                    }
-                )
-            } else {
-                const title = toTitleCase(header)
-                cols = [{
-                    name: header,
+            cols = parseDelimitedLine(header, separators).map((col, i) => {
+                const title = toTitleCase(col)
+                return {
+                    name : col,
                     label: title,
                     description: title.charAt(0) + title.substring(1).toLowerCase(),
-                    dataType: "string"
-                }]
+                    dataType: detectDataTypeAt(i, col, rows)
+                }
+            })
+        }
+
+        return { rows, cols };
+    }
+
+    abort(reason = "Aborted") {
+        // @ts-ignore
+        this.abortController.abort(reason);
+        this.abortController = new AbortController()
+        this.setState({
+            importCompleted: false,
+            uploading      : false,
+            uploadedBytes: 0
+        })
+    }
+
+    async onFileSelected(e: React.ChangeEvent<HTMLInputElement>)
+    {
+        const file = (e.target.files as FileList)[0];
+        
+        // @ts-ignore
+        const readableStream = file.stream() as ReadableStream;
+
+        const transformStream = new TransformStream({
+            transform(chunk, controller) {
+                controller.enqueue(new TextDecoder().decode(chunk as Uint8Array));
+            },
+            flush(controller) {
+                controller.terminate();
+            },
+        });
+
+        const stream = readableStream.pipeThrough(transformStream);
+        const { value } = await stream.getReader().read()
+
+        this.setState({
+            totalBytes: +file.size,
+            file,
+            ...this.parse(value.substring(0, value.lastIndexOf("\n")))
+        });
+        
+    }
+
+    async upload() {
+        const { file, cols } = this.state;
+
+        if (!file) {
+            return Promise.reject(new Error("No file"));
+        }
+        
+        this.setState({ uploading: true })
+
+        let _cols = cols.filter(col => col.dataType !== "hidden");
+        
+        let params = new URLSearchParams();
+        params.set("types", _cols.map(c => c.dataType).join(","))
+        params.set("labels", _cols.map(c => c.label).join(","))
+        params.set("descriptions", _cols.map(c => c.description).join(","))
+        
+        let url = "/api/requests/" + this.props.requestID + "/data?" + params.toString();
+        
+        // @ts-ignore
+        const readableStream = file.stream() as ReadableStream;
+
+        let start = Date.now()
+        let estimate = 1000
+
+        const transformStream = new TransformStream({
+            transform: (chunk, controller) => {
+                this.setState({
+                    uploadedBytes: this.state.uploadedBytes + chunk.byteLength,
+                    estimate: 
+                    this.state.uploadedBytes ?
+                        (((Date.now() - start) || 1)  / (this.state.uploadedBytes || 1)) * chunk.byteLength :
+                        Math.round(chunk.byteLength * 0.02)
+                }, () => {
+                    controller.enqueue(new TextDecoder().decode(chunk as Uint8Array));
+                })
+            },
+            flush(controller) {
+                controller.terminate();
+            },
+        });
+
+        const reader = readableStream.pipeThrough(transformStream).getReader();
+
+        let extra = ""
+        let jobId = ""
+
+        while (true) {
+
+            const { done, value } = await reader.read();
+
+            if (done) {
+                const res = await fetch(url, {
+                    method: "PUT",
+                    body: extra,
+                    signal: this.abortController.signal,
+                    headers: {
+                        "content-type": "text/plain;charset=UTF-8",
+                        "x-continue"  : "false",
+                        "x-job-id"    : jobId
+                    }
+                });
+
+                if (!res.ok) {
+                    const errorMessage = await res.text()
+                    this.setState({ errorMessage })
+                    throw new Error(errorMessage)
+                }
+
+                return defer(() => {
+                    this.setState({
+                        importCompleted: true,
+                        uploading: false
+                    })
+                    defer(() => this.props.navigate(`/requests/${this.props.requestID}`), 1400)
+                }, estimate);
             }
-        }
 
-        return {
+            let body = extra + (value || "")
+            let idx = body.lastIndexOf("\n")
+
+            if (idx === -1 || idx === body.length - 1) {
+                extra = ""
+            } else {
+                extra = body.slice(idx + 1)
+                body  = body.slice(0, idx)
+            }
+
+            await fetch(url, {
+                method: "PUT",
+                body,
+                signal: this.abortController.signal,
+                headers: {
+                    "content-type": "text/plain;charset=UTF-8",
+                    "x-continue"  : "true",
+                    "x-job-id"    : jobId
+                }
+            }).then(res => res.text().then(txt => {
+                if (!res.ok) {
+                    this.setState({ errorMessage: txt })
+                    throw new Error(txt)
+                } else {
+                    if (res.status === 202) {
+                        jobId = txt;
+                    }
+                }
+            }))
+        }
+    }
+
+    componentDidMount() {
+        request("/api/requests/" + this.props.requestID).then(
+            rq => this.setState({
+                requestLoading: false,
+                requestError  : null,
+                requestResult : rq
+            }),
+            er => this.setState({
+                requestLoading: false,
+                requestError  : er,
+                requestResult : null
+            })
+        )
+    }
+
+    render() {
+        const {
+            loading,
+            selectedColIndex,
+            cols,
             rows,
-            cols
-        }
-    }
+            file,
+            uploadedBytes,
+            totalBytes,
+            requestLoading,
+            requestError,
+            requestResult,
+            importCompleted,
+            uploading,
+            estimate,
+            errorMessage
+        } = this.state;
 
-    function validate(newState: State) {
-        if (!newState.rows || !newState.rows.length) {
-            newState.errorMessage = "No data rows included"
+        if (requestLoading) {
+            return <Loader/>
         }
-        else if (!newState.cols || !newState.cols.length) {
-            newState.errorMessage = "No data columns included"
-        }
-        else if (!newState.cols.find(c => c.dataType !== "hidden")) {
-            newState.errorMessage = "All columns are excluded"
-        }
-        else if (!newState.cols.find(c => c.name === "cnt")) {
-            newState.errorMessage = "Input files must have a 'cnt' column for aggregate counts"
-        }
-        else {
-            newState.errorMessage = null
-        }
-        return newState
-    }
 
-    if (action.type === "MERGE") {
-        const needsParsing = Object.keys(action.payload).some(key => requireParse.includes(key));
-        if (needsParsing) {
-            return validate({
-                ...state,
-                ...action.payload,
-                ...parse(action.payload)
-            })
-        } else {
-            return validate({
-                ...state,
-                ...action.payload
-            })
+        if (requestError) {
+            return (
+                <AlertError>
+                    <b>Error Loading Data Subscription</b> - { requestError + "" }
+                </AlertError>
+            )
         }
-    }
-
-    if (action.type === "SET_INPUT") {
-        return {
-            ...state,
-            ...parse({ input: action.payload }),
-            input: action.payload
+    
+        if (!requestResult) {
+            return (
+                <AlertError>
+                    <b>Error Loading Data Subscription</b> - Failed to fetch data
+                </AlertError>
+            )
         }
-    }
-
-    if (action.type === "SET_COLS") {
-        return validate({
-            ...state,
-            cols: action.payload
-        })
-    }
-
-    if (action.type === "SET_SEPARATE_BY_COMMA") {
-        return {
-            ...state,
-            separateByComma: !!action.payload,
-            ...parse({separateByComma: !!action.payload})
+    
+        if (importCompleted) {
+            return (
+                <Alert color="green">
+                    <div className="center">
+                        <b>Data imported successfully!</b><br/>Redirecting...
+                    </div>
+                </Alert>
+            )
         }
-    }
 
-    if (action.type === "SET_SEPARATE_BY_TAB") {
-        return {
-            ...state,
-            separateByTab: !!action.payload,
-            ...parse({separateByTab: !!action.payload})
-        }
+        return (
+            <div className={ classList({
+                "grey-out": loading,
+                "data-uploader": true
+            })}>
+                <HelmetProvider>
+                    <Helmet>
+                        <title>Import Data</title>
+                    </Helmet>
+                </HelmetProvider>
+                <Breadcrumbs links={[
+                    { name: "Home", href: "/" },
+                    { name: "Data Subscriptions", href: "/requests" },
+                    { name: requestResult.name, href: `/requests/${requestResult.id}` },
+                    { name: "Edit Subscription", href: `/requests/${requestResult.id}/edit` },
+                    { name: "Import Data" }
+                ]}/>
+    
+                <h3>Import Data</h3>
+                <hr />
+                <fieldset disabled={uploading}>
+                { errorMessage && <AlertError><b>Error importing data</b> - {errorMessage}</AlertError> }
+                <div className="row gap mt-1 mb-1">
+                    <div className="col">
+                        <label>Select CSV File</label>
+                        <div style={{ position: "relative" }}>
+                            <input
+                                type="file"
+                                value=""
+                                accept=".csv,application/csv,application/x-csv,text/csv,text/comma-separated-values,text/x-comma-separated-values"
+                                onChange={ this.onFileSelected } />
+                            <div className="file-input-value" style={{
+                                position: "absolute",
+                                background: "#FFF",
+                                top: "0.45em",
+                                left: "7em",
+                                right: "0.45em",
+                                pointerEvents: "none"
+                            }}>{file ? file.name : ""}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                { !!file && <>
+                    <label>Preview (up to 10 rows)</label>
+                    <Preview
+                        payload={{ cols, rows }}
+                        selectedColIndex={ selectedColIndex }
+                        onSelectionChange={ selectedColIndex => this.setState({ selectedColIndex })}
+                        trimSpaces={ true }
+                    />
+                    <br />
+                
+                    <ColumnEditor
+                        cols={ cols }
+                        onChange={ cols => this.setState({ cols }) }
+                        selectedIndex={ selectedColIndex }
+                        onSelectionChange={ selectedColIndex => this.setState({ selectedColIndex }) }
+                    />
+                    <hr className="mt-1"/>
+               
+                    
+                </> }
+                </fieldset>
+                { !!file && <div className="col center mt-1 mb-2">
+                    { uploading && <div className="progress">
+                        <div className="row gap small">
+                            <div className="col">Importing data...</div>
+                        </div>
+                        <div className="progress-bar-wrap">
+                            <div className="progress-bar" style={{
+                                width: (uploadedBytes/(totalBytes || 1) * 100) + "%",
+                                transitionDuration: estimate + "ms"
+                            }}/>
+                        </div>
+                    </div> }
+                    { !uploading && <button className="btn btn-blue big" onClick={this.upload}> <b> IMPORT </b> </button> }
+                    { uploading && <button className="btn btn-brand-2 big" onClick={() => this.abort("Canceled by user")}> <b> Cancel </b> </button> }
+                </div> }
+            </div>
+        )
     }
-
-    if (action.type === "SET_SEPARATE_BY_SEMICOLON") {
-        return {
-            ...state,
-            separateBySemicolon: !!action.payload,
-            ...parse({separateBySemicolon: !!action.payload})
-        }
-    }
-
-    if (action.type === "SET_SEPARATE_BY_SPACE") {
-        return {
-            ...state,
-            separateBySpace: !!action.payload,
-            ...parse({separateBySpace: !!action.payload})
-        }
-    }
-
-    if (action.type === "SET_CUSTOM_SEPARATOR") {
-        return {
-            ...state,
-            customSeparator: action.payload,
-            ...parse({customSeparator: action.payload})
-        }
-    }
-
-    if (action.type === "SET_STRING_DELIMITER") {
-        return {
-            ...state,
-            stringDelimiter: action.payload,
-            ...parse({stringDelimiter: action.payload})
-        }
-    }
-
-    if (action.type === "SET_SELECTED_COL_INDEX") {
-        return {
-            ...state,
-            selectedColIndex: action.payload
-        }
-    }
-
-    if (action.type === "SET_TRIM_SPACES") {
-        return {
-            ...state,
-            trimSpaces: !!action.payload
-        }
-    }
-
-    if (action.type === "SET_START_ROW") {
-        const endRow = state.endRow ? Math.max(state.endRow, action.payload + 1) : null;
-        return validate({
-            ...state,
-            startRow: action.payload,
-            endRow,
-            ...parse({startRow: action.payload, endRow})
-        })
-    }
-
-    if (action.type === "SET_END_ROW") {
-        // const startRow = Math.max(Math.min(action.payload - 1, state.startRow), 1);
-        return validate({
-            ...state,
-            endRow: action.payload,
-            // startRow,
-            ...parse({endRow: action.payload/*, startRow*/})
-        })
-    }
-
-    if (action.type === "SET_LOADING") {
-        return {
-            ...state,
-            loading: !!action.payload
-        }
-    }
-
-    return state
 }
 
 export default function DataUploader()
 {
     const { id: requestID } = useParams();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
-
-    const {
-        loading: requestLoading,
-        error  : requestError,
-        result : requestResult
-    } = useBackend(
-        useCallback(
-            () => request("/api/requests/" + requestID),
-            [requestID]
-        ),
-        true
-    );
-
-    const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
-
-    const {
-        // input,
-        separateByComma,
-        separateByTab,
-        separateBySemicolon,
-        separateBySpace,
-        customSeparator,
-        stringDelimiter,
-        cols,
-        rows,
-        selectedColIndex,
-        trimSpaces,
-        startRow,
-        endRow,
-        loading,
-        errorMessage,
-        src
-    } = state;
-
-    
-
-    const {
-        execute: doImport,
-        loading: importing,
-        error  : importingError,
-        result : importingResult
-    } = useBackend(useCallback(() => {
-        let _cols = cols.filter(col => col.dataType !== "hidden")
-        let _rows = rows.map(row => row.filter((_, i) => cols[i].dataType !== "hidden").map((r, y) => {
-            return format(r, _cols[y].dataType, trimSpaces)
-        }));
-        return updateOne("requests", requestID + "", {
-            data: {
-                cols: _cols as app.DataRequestDataColumn[],
-                rows: _rows,
-                src
-            }
-        })
-    }, [requestID, cols, rows, trimSpaces, src]));
-
-    function onFileSelected(e: React.ChangeEvent<HTMLInputElement>)
-    {
-        dispatch({ type: "SET_LOADING", payload: true })
-        const file   = (e.target.files as FileList)[0]; // console.log(file);
-        const reader = new FileReader();
-        
-        reader.addEventListener("load", () => {
-            // data:text/csv;base64, data
-            const re = /^\s*data:.*?;base64,\s*(77u\/)?/
-            const data = String(reader.result).replace(re, "")
-            // console.log(String(reader.result))
-            // console.log("data: '%s'", data, reader.result)
-            
-            if (data !== "data:") {
-                if (file.name.toLocaleLowerCase().endsWith(".tsv") || TSV_MIME_TYPES.includes(file.type)) {
-                    dispatch({ type: "MERGE", payload: {
-                        separateByTab: true,
-                        separateByComma: false,
-                        separateBySpace: false,
-                        separateBySemicolon: false,
-                        customSeparator: null,
-                        input: window.atob(data),
-                        src: file.name
-                    }})
-                } else {
-                    dispatch({ type: "MERGE", payload: {
-                        separateByTab: false,
-                        separateByComma: true,
-                        separateBySpace: false,
-                        separateBySemicolon: false,
-                        customSeparator: null,
-                        input: window.atob(data),
-                        src: file.name
-                    }})
-                }
-            } else {
-                dispatch({ type: "MERGE", payload: {
-                    input: ""
-                }})
-            }
-            
-            dispatch({ type: "SET_LOADING", payload: false })
-        }, false);
-        
-        reader.readAsDataURL(file);
+    if (!requestID) {
+        return <p>No request ID</p>
     }
 
-    const accept = [
-        ".csv",
-        ".tsv",
-        "text/plain",
-        ...CSV_MIME_TYPES,
-        ...TSV_MIME_TYPES
-    ];
-
-    if (requestLoading) {
-        return <Loader/>
-    }
-
-    if (requestError) {
-        return (
-            <AlertError>
-                <b>Error Loading Data Subscription</b> - { requestError + "" }
-            </AlertError>
-        )
-    }
-
-    if (!requestResult) {
-        return (
-            <AlertError>
-                <b>Error Loading Data Subscription</b> - Failed to fetch data
-            </AlertError>
-        )
-    }
-
-    if (importingResult) {
-        setTimeout(() => navigate(`/requests/${requestID}`), 1000)
-        return (
-            <Alert color="green">
-                <div className="center">
-                    <b>Data imported successfully!</b><br/>Redirecting...
-                </div>
-            </Alert>
-        )
-    }
-
-
-    return (
-        <div className={ loading ? "grey-out" : undefined }>
-            <HelmetProvider>
-                <Helmet>
-                    <title>Import Data</title>
-                </Helmet>
-            </HelmetProvider>
-            <Breadcrumbs links={[
-                { name: "Home", href: "/" },
-                { name: "Data Subscriptions", href: "/requests" },
-                { name: requestResult.name, href: `/requests/${requestID}` },
-                { name: "Edit Subscription", href: `/requests/${requestID}/edit` },
-                { name: "Import Data" }
-            ]}/>
-
-            <h3>Import Data</h3>
-            <hr />
-            { importing && <Loader msg="Importing Data..." /> }
-            { errorMessage && <AlertError><b>Input data error</b> - {errorMessage}</AlertError> }
-            { importingError && <AlertError><b>Error importing data</b> - {importingError + ""}</AlertError> }
-            <div className="row gap mt-1 mb-1">
-                <div className="col">
-                    <label>Select File</label>
-                    <input
-                        type="file"
-                        value=""
-                        accept={accept.join(",")}
-                        onChange={ onFileSelected } />
-                    <div className="color-muted" style={{ marginTop: "3px" }}>
-                        Select a text file in delimited format like CSV or TSV
-                    </div>
-                </div>
-            </div>
-            
-            <div className="row gap mt-1 mb-1">
-                <div className="col nowrap">
-                    <label>From row</label>
-                    <input type="number" min={1} step={1} value={startRow} onChange={e => dispatch({ type: "SET_START_ROW", payload: e.target.valueAsNumber })} />
-                </div>
-                <div className="col nowrap" title="Use empty value to include all rows until the end of the input file">
-                    <label>To row</label>
-                    <input type="number" min={startRow + 1} step={1} value={endRow || undefined} onChange={e => dispatch({ type: "SET_END_ROW", payload: e.target.valueAsNumber })} />
-                </div>
-                <div className="col nowrap">
-                    <label>String delimiter</label>
-                    <select value={stringDelimiter} onChange={e => dispatch({ type: "SET_STRING_DELIMITER", payload: e.target.value })}>
-                        <option value='"'>"</option>
-                        <option value="'">'</option>
-                    </select>
-                </div>
-                <div className="col nowrap bottom">
-                    <label>
-                        <input type="checkbox" checked={ trimSpaces } onChange={e => dispatch({ type: "SET_TRIM_SPACES", payload: e.target.checked })} /> Trim spaces
-                    </label>
-                </div>
-            </div>
-            
-            <div className="row gap mt-1 mb-1">
-                <div className="col">
-                    <label>Separator</label>
-                    <hr/>
-                    <div className="row half-gap middle">
-                        <div className="col col-0 nowrap mr-1">
-                            <label className="inline">
-                                <input type="checkbox" checked={separateByComma} onChange={e => dispatch({ type: "SET_SEPARATE_BY_COMMA", payload: e.target.checked })} /> Comma
-                            </label>
-                        </div>
-                        <div className="col col-0 nowrap mr-1">
-                            <label className="inline">
-                                <input type="checkbox" checked={separateByTab} onChange={e => dispatch({ type: "SET_SEPARATE_BY_TAB", payload: e.target.checked })} /> Tab
-                            </label>
-                        </div>
-                        <div className="col col-0 nowrap mr-1">
-                            <label className="inline">
-                                <input type="checkbox" checked={separateBySemicolon} onChange={e => dispatch({ type: "SET_SEPARATE_BY_SEMICOLON", payload: e.target.checked })} /> Semicolon
-                            </label>
-                        </div>
-                        <div className="col col-0 nowrap mr-1">
-                            <label className="inline">
-                                <input type="checkbox" checked={separateBySpace} onChange={e => dispatch({ type: "SET_SEPARATE_BY_SPACE", payload: e.target.checked })} /> Space
-                            </label>
-                        </div>
-                        <div className="col col-0 nowrap">
-                            <div className="row middle">
-                                <div className="col pr-1">
-                                    <label className="inline">
-                                        <input
-                                            type="checkbox"
-                                            checked={customSeparator !== null}
-                                            onChange={e => dispatch({ type: "SET_CUSTOM_SEPARATOR", payload: e.target.checked ? "" : null })}
-                                        /> Other:
-                                    </label>
-                                </div>
-                                <div className="col">
-                                    <input
-                                        type="text"
-                                        disabled={customSeparator === null}
-                                        value={customSeparator || ""}
-                                        onChange={e => dispatch({ type: "SET_CUSTOM_SEPARATOR", payload: e.target.value })}
-                                        size={2}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <ColumnEditor
-                cols={ cols }
-                onChange={ cols => dispatch({ type: "SET_COLS", payload: cols }) }
-                selectedIndex={ selectedColIndex }
-                onSelectionChange={ index => dispatch({ type: "SET_SELECTED_COL_INDEX", payload: index })}
-            />
-            
-            <label>Preview (first 20 rows)</label>
-            <hr className="mb-1"/>
-            <Preview
-                payload={{ cols, rows }}
-                selectedColIndex={ selectedColIndex }
-                onSelectionChange={ index => dispatch({ type: "SET_SELECTED_COL_INDEX", payload: index })}
-                trimSpaces={ trimSpaces }
-            />
-            <hr className="mt-1"/>
-            <div className="col center mt-1 mb-2">
-                <button className="btn btn-blue big" onClick={doImport}> <b> IMPORT </b> </button>
-            </div>
-        </div>
-    )
+    return <DataUploader2 requestID={requestID} navigate={navigate} />
 }

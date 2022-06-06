@@ -29,6 +29,46 @@
     }
 }
 
+.data-view {
+    width: 100%;
+    aspect-ratio: 5/3;
+    min-width: 500px;
+    min-height: 300px;
+    overflow: auto;
+    position: relative;
+    font-family: monospace;
+    white-space: pre-wrap;
+    font-size: 13px;
+    border: 1px solid $color-grey;
+    border-top: 0;
+    border-radius: 0 0 5px 5px;
+    padding: 4px;
+    line-height: 1.182;
+    background: #FFF;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+
+.chart-loader {
+    position: absolute;
+    z-index: 2;
+    background: #FFF;
+    border-radius: 5px;
+    top: 2px;
+    right: 2px;
+    bottom: 2px;
+    left: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.6s linear 0.1s;
+}
+
+.loading > .chart-loader {
+    opacity: 0.9;
+    pointer-events: all;
 }
 
 .chart-caption {
@@ -39,3 +79,8 @@
     }
 }
 
+.json-null { color: #C60; font-weight: bold; }
+.json-bool { color: #606; font-weight: bold; }
+.json-number { color: #C00 }
+.json-string { color: #093 }
+.json-key { color: #36C }

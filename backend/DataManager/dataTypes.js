@@ -1,14 +1,18 @@
 const { bool } = require("../lib");
 
 const DATA_TYPES = {
-    "integer": int,
-    "float"  : float,
-    "string" : String,
-    "boolean": bool,
-    "day"    : day,
-    "week"   : week,
-    "month"  : month,
-    "year"   : year,
+    "integer"        : int,
+    "float"          : float,
+    "string"         : String,
+    "boolean"        : bool,
+    "day"            : day,
+    "week"           : week,
+    "month"          : month,
+    "year"           : year,
+    "date:YYYY-MM-DD": day,
+    "date:YYYY wk W" : week,
+    "date:YYYY-MM"   : month,
+    "date:YYYY"      : year
 };
 
 /**

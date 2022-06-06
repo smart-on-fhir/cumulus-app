@@ -29,11 +29,12 @@ async function getDockerContainer(name = config.docker.containerName)
         }
     }
     
-    await waitForReady()
+    await waitForReady(container)
     return () => container.stop()
 }
 
-async function waitForReady() {
+async function waitForReady(container) {
+    let start = Date.now()
     while (true) {
         try {
             // @ts-ignore
@@ -42,7 +43,11 @@ async function waitForReady() {
             await connection.close();
             break
         } catch {
-            await wait(1)
+            if (Date.now() - start > 1000*60*5) {
+                container.stop()
+                throw new Error("Failed to connect to database in 5 minutes")
+            }
+            await wait(50)
         }
     }
 }

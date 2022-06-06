@@ -1,13 +1,7 @@
 const { Transform }  = require("stream");
-const { QueryTypes, Sequelize, Transaction } = require("sequelize");
 const { DATA_TYPES, evaluate } = require("./dataTypes");
-const { debuglog } = require("util")
+const { PoolClient } = require("pg")
 
-const debug = debuglog("app:sql:import")
-
-function logger(sql) {
-    debug(sql)
-}
 
 // TODO: org_id column special?
 
@@ -20,14 +14,14 @@ function logger(sql) {
 class CSV2DB extends Transform
 {
     /**
-     * @type {Sequelize}
+     * @type {PoolClient}
      */
-    #connection;
+    #client;
 
     /**
-     * @type {Transaction}
+     * @type {number}
      */
-    #transaction;
+    #subscriptionID;
 
     /**
      * @type {string}
@@ -59,18 +53,17 @@ class CSV2DB extends Transform
     #insertRowsBufferMaxLength = 1000;
 
     /**
-     * @param {Sequelize} db
-     * @param {Transaction} trx
-     * @param {string} tableName
+     * @param {PoolClient} client
+     * @param {number} subscriptionID
      * @param {(keyof typeof DATA_TYPES)[]} dataTypes
      * @param {string[]} [labels = []]
      * @param {string[]} [descriptions = []]
      * @param {string[]} [columnNames = []]
      */
-    constructor(db, trx, tableName, dataTypes, labels = [], descriptions = [], columnNames = [])
+    constructor(client, subscriptionID, dataTypes, labels = [], descriptions = [], columnNames = [])
     {
-        if (!tableName) {
-            throw new Error("No table name provided")
+        if (!subscriptionID) {
+            throw new Error("No subscription ID provided")
         }
 
         if (!dataTypes || !dataTypes.length) {
@@ -82,22 +75,32 @@ class CSV2DB extends Transform
             readableObjectMode: true,
         });
 
-        this.#tableName    = tableName
-        this.#dataTypes    = dataTypes
-        this.#labels       = labels
-        this.#descriptions = descriptions
-        this.#connection   = db;
-        this.#transaction  = trx;
-        this.columnNames   = columnNames
-
+        this.#subscriptionID   = subscriptionID
+        this.#dataTypes        = dataTypes
+        this.#labels           = labels
+        this.#descriptions     = descriptions
+        this.#client           = client;
+        this.columnNames       = columnNames
         this.#insertRowsBuffer = []
+
+        this.#tableName = "subscription_data_" + this.#subscriptionID
+    }
+
+    async query(sql, params)
+    {
+        try {
+            return await this.#client.query(sql, params)
+        } catch (e) {
+            console.log(sql, params)
+            throw e
+        }
     }
 
     _transform(line, _encoding, next)
     {
         if (!this.columnNames.length) {
             this.columnNames = line
-            this.#writeMetaData(this.columnNames)
+            this.#writeMetaData()
             .then(() => this.#createDataTable(this.columnNames))
             .then(() => next(), next);
         } else {
@@ -119,59 +122,28 @@ class CSV2DB extends Transform
     }
 
     /**
-     * @param {string[]} columnNames 
+     * Prepare a metadata object and write it to the corresponding data
+     * subscription table
      */
-    async #writeMetaData(columnNames)
+    async #writeMetaData()
     {
-        if (!columnNames || !columnNames.length) {
-            throw new Error("No column names provided")
+        if (this.#dataTypes.length !== this.columnNames.length) {
+            throw new Error("The number of data types does not match the number of columns")
         }
 
-        // Create the meta table if not exists
-        await this.#connection.query(`CREATE TABLE IF NOT EXISTS "meta" (
-            "table" Character Varying(100),
-            "name"  Character Varying(100),
-            "type"  Character Varying(100),
-            "label" Character Varying(100),
-            "description" Character Varying(255),
-            "createdAt" Timestamp With Time Zone,
-            "updatedAt" Timestamp With Time Zone
-        )`, {
-            transaction: this.#transaction,
-            type: QueryTypes.RAW,
-            logging: logger
-        });
+        const metadata = {
+            cols: this.columnNames.map((name, i) => ({
+                name,
+                dataType   : this.#dataTypes[i],
+                label      : this.#labels[i] ?? name,
+                description: this.#descriptions[i] || ""
+            }))
+        };
 
-        // Delete previous entries
-        await this.#connection.query(`DELETE FROM "meta" WHERE "table" = ?`, {
-            transaction: this.#transaction,
-            type: QueryTypes.DELETE,
-            logging: logger,
-            replacements: [ this.#tableName ]
-        });
-        
-        let i = 0;
-        for (let col of columnNames) {
-            const now = new Date()
-            await this.#connection.query(
-                `INSERT INTO "meta" ("table", "name", "type", "label", "description", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                {
-                    transaction: this.#transaction,
-                    type: QueryTypes.INSERT,
-                    logging: logger,
-                    replacements: [
-                        this.#tableName,
-                        col,
-                        this.#dataTypes[i],
-                        this.#labels[i] || null,
-                        this.#descriptions[i] || null,
-                        now,
-                        now
-                    ]
-                }
-            );
-            i++;
-        }
+        await this.query(
+            `UPDATE "DataRequests" SET "metadata" = $1 WHERE id = $2`,
+            [ JSON.stringify(metadata), this.#subscriptionID ]
+        );
     }
 
     /**
@@ -190,6 +162,11 @@ class CSV2DB extends Transform
                     return JSON.stringify(name) + " REAL";
                 case "string":
                     return JSON.stringify(name) + " TEXT";
+
+                case "date:YYYY-MM-DD":
+                case "date:YYYY wk W":
+                case "date:YYYY-MM":
+                case "date:YYYY":
                 case "day":
                 case "week":
                 case "month":
@@ -201,49 +178,24 @@ class CSV2DB extends Transform
         }).join(",\n") + ");"
 
         // Drop the table if exists
-        await this.#connection.query(`DROP TABLE IF EXISTS "${this.#tableName}"`, {
-            transaction: this.#transaction,
-            type: QueryTypes.RAW,
-            logging: logger
-        });
+        await this.query(`DROP TABLE IF EXISTS "${this.#tableName}"`);
         
         // Drop the index if exists
-        await this.#connection.query(`DROP INDEX IF EXISTS "${this.#tableName}_unique"`, {
-            transaction: this.#transaction,
-            type: QueryTypes.RAW,
-            logging: logger
-        });
+        await this.query(`DROP INDEX IF EXISTS "${this.#tableName}_unique"`);
 
         // Create the table
-        await this.#connection.query(sql, {
-            transaction: this.#transaction,
-            type: QueryTypes.RAW,
-            logging: logger
-        });
+        await this.query(sql);
 
         // Create unique index to reject invalid powersets
-        let index = `CREATE UNIQUE INDEX "${this.#tableName}_unique" ON "${this.#tableName}" USING btree(${
-            columnNames.filter(c => c !== "cnt").map(c => `"${c}" Asc NULLS Last`).join(", ")
-        })`;
-        await this.#connection.query(index, {
-            transaction: this.#transaction,
-            type: QueryTypes.RAW,
-            logging: logger
-        });
+        await this.query(`CREATE UNIQUE INDEX "${this.#tableName}_unique" ON "${this.#tableName
+            }" USING btree(${columnNames.filter(c => c !== "cnt").map(c => `"${c}" Asc NULLS Last`).join(", ")})`);
     }
 
     async #insertData(next) {
         try {
-            let sql = `INSERT INTO "${this.#tableName}" (${
+            await this.query(`INSERT INTO "${this.#tableName}" (${
                 this.columnNames.map(x => `"${x}"`).join(",")
-            }) VALUES ${ this.#insertRowsBuffer.join(",\n") }`;
-
-            await this.#connection.query(sql, {
-                transaction: this.#transaction,
-                type: QueryTypes.INSERT,
-                logging: logger
-            })
-
+            }) VALUES ${ this.#insertRowsBuffer.join(",\n") }`);
             this.#insertRowsBuffer = [];
             next()
         } catch (ex) {

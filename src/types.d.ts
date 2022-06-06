@@ -35,22 +35,22 @@ declare module app {
         votes: number
         rating: number
         normalizedRating: number
-        settings?: {
-            viewType?: string
-            showOptions?: boolean
-            column: string
-            groupBy: string
-            filters: Filter[]
-            chartOptions?: Partial<Highcharts.Options>
-            colorOptions?: ColorOptions
-            denominator ?: string
+        settings?: ViewSettings
+    }
 
-            column2    ?: string // Extra Column
-            column2type?: string // Extra Column render as
-            column2opacity?: number
-
-            caption?: string // HTML chart caption
-        }
+    interface ViewSettings {
+        column: string
+        groupBy: string
+        filters: Filter[]
+        viewType?: string
+        chartOptions?: Partial<Highcharts.Options>
+        colorOptions?: ColorOptions
+        denominator ?: string
+        column2    ?: string // Extra Column
+        column2type?: string // Extra Column render as
+        column2opacity?: number
+        caption?: string // HTML chart caption
+        seriesVisibility?: Record<string, boolean>
     }
 
     interface DataRequest {
@@ -107,6 +107,11 @@ declare module app {
         dataURL: string | null
 
         dataSourceType: "file" | "url"
+
+        metadata: {
+            cols : DataRequestDataColumn[],
+            total: number
+        } | null
     }
 
     interface RequestedData {
@@ -160,7 +165,7 @@ declare module app {
          * The type of data this column is supposed to contain. Used for
          * formatting in the UI
          */
-        dataType: "string" | "integer" | "float" | "boolean" | "date:YYYY-MM-DD" | "date:YYYY-MM" | "date:YYYY"
+        dataType: supportedDataType
 
     }
 
@@ -241,5 +246,29 @@ declare module app {
     interface Activity {
         message: string
         createdAt: string
+    }
+
+    namespace ServerResponses {
+        
+        interface UnStratifiedDataResponse {
+            column: string
+            stratifier?: string
+            filters: string[]
+            totalCount: number
+            rowCount: number
+            data: [{
+                rows: [string, number][]
+            }]
+        }
+
+        interface StratifiedDataResponse extends UnStratifiedDataResponse {
+            stratifier: string
+            data: ({
+                stratifier: string
+                rows: [string, number][]
+            })[]
+        }
+
+        type DataResponse = StratifiedDataResponse | UnStratifiedDataResponse
     }
 }

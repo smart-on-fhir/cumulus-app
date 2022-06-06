@@ -66,7 +66,7 @@ function PropertyEditor({
                     open: !!open,
                     readonly: isReadOnly
                 }) } title={
-                    isReadOnly ? "This property cannot be editted!" : undefined
+                    isReadOnly ? "This property cannot be edited!" : undefined
                 }>
                     <i className={ "fa-solid fa-caret-" + (open ? "down" : "right") } onClick={() => setOpen(!open) } />
                     <input
@@ -141,7 +141,7 @@ function PropertyEditor({
             "dynamic-editor": true,
             readonly: isReadOnly
         }) } title={
-            isReadOnly ? "This property cannot be editted!" : undefined
+            isReadOnly ? "This property cannot be edited!" : undefined
         }>
             { !!onNameChange && <><input
                 type="text"

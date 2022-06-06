@@ -1,46 +1,51 @@
-import { Component, createRef, useMemo, useReducer } from "react";
-import html2canvas                          from "html2canvas";
-import { useNavigate }                      from "react-router-dom";
-import { HelmetProvider, Helmet }           from "react-helmet-async";
-import Highcharts                           from "highcharts";
-import ContentEditable                      from "react-contenteditable";
-import PowerSet                             from "../../PowerSet";
-import { useBackend }                       from "../../hooks";
-import { createOne, updateOne, deleteOne }  from "../../backend";
-import { useAuth }                          from "../../auth";
-import DataRequestLink                      from "../DataRequests/DataRequestLink";
-import DataGrid                             from "../DataGrid";
-import Alert, { AlertError }                from "../Alert";
-import { classList, defer, generateColors, objectDiff, strip, stripUndefined } from "../../utils";
+import { useCallback, useEffect, useReducer } from "react"
+import html2canvas                          from "html2canvas"
+import { useNavigate }                      from "react-router-dom"
+import { HelmetProvider, Helmet }           from "react-helmet-async"
+import Highcharts                           from "highcharts"
+import { Link }                             from "react-router-dom"
+import { useBackend }                       from "../../hooks"
+import { createOne, updateOne, deleteOne, request } from "../../backend"
+import { useAuth }                          from "../../auth"
+import DataRequestLink                      from "../DataRequests/DataRequestLink"
+import { AlertError }                       from "../Alert"
 import ConfigPanel                          from "./ConfigPanel"
+import {buildChartOptions, default as BaseChart} from "./Charts/Chart"
 import CaptionEditor                        from "./CaptionEditor"
+import EditInPlace                          from "../EditInPlace"
+import { ReadOnlyPaths, SupportedChartTypes, SupportedNativeChartTypes, TURBO_THRESHOLD } from "./config"
+import { defer, generateColors, Json, objectDiff, strip } from "../../utils"
+import DefaultChartOptions, { getDefaultChartOptions } from "./Charts/DefaultChartOptions"
 
-import "./Dashboard.scss";
-import { Link } from "react-router-dom";
+import "./Dashboard.scss"
 
 
 // =============================================================================
 
 interface ViewState
 {
-    viewType       : "overview" | "data",
-    showOptions    : boolean
-    viewName       : string
-    viewDescription: string
-    viewColumn     : string
-    viewGroupBy    : string
-    filters        : app.Filter[]
-    chartType      : string
-    gridType       : string
-    isDirty        : boolean
-    chartOptions   : Partial<Highcharts.Options>
-    colorOptions   : app.ColorOptions
-    denominator    : string
-    cleanState    ?: ViewState
-    column2        : string
-    column2type    : string
-    column2opacity : number
-    caption        : string
+    viewType        : "overview" | "data",
+    showOptions     : boolean
+    viewName        : string
+    viewDescription : string
+    viewColumn      : app.DataRequestDataColumn
+    viewGroupBy    ?: app.DataRequestDataColumn
+    filters         : app.Filter[]
+    chartType       : string
+    chartOptions    : Partial<Highcharts.Options>
+    colorOptions    : app.ColorOptions
+    denominator     : "" | "local" | "global"
+    cleanState     ?: ViewState
+    column2        ?: app.DataRequestDataColumn
+    column2type     : keyof typeof SupportedChartTypes
+    column2opacity  : number
+    caption         : string
+    data            : app.ServerResponses.DataResponse | null
+    data2           : app.ServerResponses.StratifiedDataResponse | null
+    loadingData     : boolean
+    fullChartOptions: Partial<Highcharts.Options>
+    seriesVisibility: Record<string, boolean>
+    dataTabIndex    : number
 }
 
 interface ViewAction
@@ -54,92 +59,116 @@ function initViewState(initialState: ViewState): ViewState
     return { ...initialState, cleanState: { ...initialState } }
 }
 
-function viewReducer(state: ViewState, action: ViewAction): ViewState
+function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string, boolean>) => void })
 {
-    const preservable: (keyof ViewState)[] = [
-        "viewName",
-        "viewDescription",
-        "viewGroupBy",
-        "viewColumn",
+    const chartable = [
         "chartType",
-        "filters",
         "chartOptions",
         "colorOptions",
         "denominator",
-        "column2",
-        "column2type",
-        "column2opacity",
-        "caption"
+        "seriesVisibility",
+        "data",
     ];
 
-    function checkDirty(nextState: ViewState) {
-        nextState.isDirty = preservable.some(key => (
-            JSON.stringify(nextState[key]) !== JSON.stringify(state.cleanState?.[key])
-        ));
+    function computeChartOptions(nextState: ViewState) {
+        try {
+            if (nextState.data) {
+                const options = getDefaultChartOptions(
+                    nextState.chartType as keyof typeof SupportedChartTypes,
+                    nextState.chartOptions
+                );
+
+                // Now build the final options by adding dynamic properties
+                // like series data and function options
+                nextState.fullChartOptions = buildChartOptions({
+                    options,
+                    type            : options.chart!.type as SupportedNativeChartTypes,
+                    data            : nextState.data,
+                    data2           : nextState.data2,
+                    column          : nextState.viewColumn,
+                    groupBy         : nextState.viewGroupBy,
+                    colorOptions    : nextState.colorOptions,
+                    denominator     : nextState.denominator,
+                    column2type     : nextState.column2type,
+                    column2opacity  : nextState.column2opacity,
+                    seriesVisibility: nextState.seriesVisibility,
+                    onSeriesToggle
+                })
+            }
+        } catch {
+            // Errors might happen due to partially incompatible state properties.
+            // For example if a stratifier is added to un-stratified data and the
+            // stratified data is not yet available
+        }
+
         return nextState
     }
 
-    if (action.type === "SET_CHART_OPTIONS") {
-        return {
-            ...state,
-            chartOptions: Highcharts.merge(state.chartOptions, action.payload)
-        };
-    }
-
-    if (action.type === "SET_VIEW_TYPE") {
-        return {
-            ...state,
-            viewType: action.payload
-        };
-    }
-
-    if (action.type === "TOGGLE_OPTIONS") {
-        return {
-            ...state,
-            showOptions: !state.showOptions
-        };
-    }
-
-    if (action.type === "UPDATE") {
-        const nextState = Highcharts.merge(state, action.payload);
-        if (nextState.chartType.startsWith("pie") || nextState.chartType.startsWith("donut")) {
-            nextState.viewGroupBy = ""
+    return function viewReducer(state: ViewState, action: ViewAction): ViewState
+    {
+        if (action.type === "SET_CHART_OPTIONS") {
+            const nextState = {
+                ...state,
+                chartOptions: Highcharts.merge(state.chartOptions, action.payload)
+            };
+            return computeChartOptions(nextState);
         }
-        return checkDirty(nextState);
-    }
 
-    if (action.type === "CLEAN") {
-        return {
-            ...state,
-            cleanState: { ...state },
-            isDirty: false
-        };
-    }
+        if (action.type === "SET_VIEW_TYPE") {
+            return {
+                ...state,
+                viewType: action.payload
+            };
+        }
 
-    return state
+        if (action.type === "TOGGLE_OPTIONS") {
+            return {
+                ...state,
+                showOptions: !state.showOptions
+            };
+        }
+
+        if (action.type === "UPDATE") {
+            const nextState = Highcharts.merge(state, action.payload);
+            if (nextState.chartType.startsWith("pie") || nextState.chartType.startsWith("donut")) {
+                nextState.viewGroupBy = undefined
+            }
+
+            // seriesVisibility
+            if (
+                (action.payload.chartType   && action.payload.chartType        !== state.chartType)         ||
+                (action.payload.viewGroupBy && action.payload.viewGroupBy.name !== state.viewGroupBy?.name) ||
+                (action.payload.viewColumn  && action.payload.viewColumn.name  !== state.viewColumn?.name)  ||
+                (action.payload.column2     && action.payload.column2.name     !== state.column2?.name)
+            ) {
+                nextState.seriesVisibility = {}
+            }
+
+            // @ts-ignore
+            if (Object.keys(action.payload).some(key => chartable.includes(key) && action.payload[key] !== state[key])) {
+                computeChartOptions(nextState);
+            }
+
+            return nextState;
+        }
+
+        return state
+    }
 }
-// =============================================================================
 
+function isTurbo(primaryData: app.ServerResponses.DataResponse, secondaryData?: app.ServerResponses.StratifiedDataResponse | null) {
+    let out = false
 
-function getColorsLength({
-    stratifier,
-    dataSet,
-    column2,
-    column2type,
-    fullDataSet
-}: {
-    dataSet: PowerSet
-    fullDataSet: PowerSet
-    stratifier?: app.DataRequestDataColumn | null
-    column2    ?: app.DataRequestDataColumn | null
-    column2type?: string
-}): number {
-    let out = stratifier ? dataSet.getUniqueValuesFromColumn(stratifier.name).size : dataSet.rows.length;    
-
-    if (column2 && column2type) {
-        out += Array.from(fullDataSet.getUniqueValuesFromColumn(column2.name)).length;
+    if (!primaryData.stratifier) {
+        out = primaryData.data[0].rows.length > TURBO_THRESHOLD
+    } else {
+        out = (primaryData as app.ServerResponses.StratifiedDataResponse).data.some(g => g.rows.length > TURBO_THRESHOLD)
     }
 
+    if (!out && secondaryData) {
+        out = secondaryData.data.some(g => g.rows.length > TURBO_THRESHOLD)
+    }
+    
     return out
 }
 
@@ -160,48 +189,80 @@ export default function Dashboard({
      */
     dataRequest: app.DataRequest
 }) {
-    const {
-        viewType: serverViewType = "column",
-        column = dataRequest.data.cols[0].name === "cnt" ? dataRequest.data.cols[1].name : dataRequest.data.cols[0].name,
-        groupBy: serverGroupBy = "",
-        filters: serverFilters = [],
-        chartOptions: serverChartOptions = {},
-        denominator: serverDenominator = "",
-        colorOptions: serverColorOptions = {
-            opacity   : 1,
-            colors    : []
-        },
-        column2: serverColumn2 = "",
-        column2type: serverColumn2type = "",
-        column2opacity: serverColumn2opacity = 1,
-        caption: serverCaption = ""
-    } = view.settings || {}
-
-    if (!serverColorOptions.colors || !serverColorOptions.colors.length) {
-        serverColorOptions.colors = generateColors(36)
-    }
 
     const navigate = useNavigate();
     const auth     = useAuth();
-    
-    const [ state, dispatch ] = useReducer(viewReducer, {
-        viewType       : "overview",
-        showOptions    : !view.id,
-        viewName       : view.name || "",
+    const isAdmin  = auth.user?.role === "admin"
+
+    const { cols = [] } = dataRequest.metadata ?? {}
+
+    const viewSettings = view.settings || {} as Partial<app.ViewSettings>
+
+    const [ state, dispatch ] = useReducer(getViewReducer({ onSeriesToggle }), {
+        
+        // Chart or grid view? start with chart
+        viewType: "overview",
+
+        // Whether sidebar and save/delete buttons are visible. True in create mode
+        showOptions: !view.id,
+
+        // View name
+        viewName: view.name || "Untitled View",
+
+        // View description
         viewDescription: view.description || "",
-        chartType      : serverViewType,
-        gridType       : "chart",
-        viewColumn     : column,
-        viewGroupBy    : serverGroupBy,
-        filters        : serverFilters,
-        chartOptions   : serverChartOptions,
-        colorOptions   : serverColorOptions,
-        denominator    : serverDenominator,
-        column2        : serverColumn2,
-        column2type    : serverColumn2type,
-        column2opacity : serverColumn2opacity,
-        caption        : serverCaption,
-        isDirty        : false
+
+        // Line chart seems to be most universal so begin with it
+        chartType: viewSettings.viewType || "spline",
+
+        // If column is not set pick the firs one other than "cnt"
+        viewColumn: cols.find(c => c.name === viewSettings.column || "") || cols.find(c => c.name !== "cnt")!,
+
+        // The stratifier if any (groupBy is its legacy name)
+        viewGroupBy: cols.find(c => c.name === viewSettings.groupBy),
+
+        // The filters if any
+        filters: viewSettings.filters || [],
+
+        // any custom chart options
+        chartOptions: viewSettings.chartOptions || {},
+
+        // any custom colors
+        colorOptions: viewSettings.colorOptions || { opacity: 1, colors: generateColors(36) },
+
+        // the denominator option
+        denominator: viewSettings.denominator || "",
+        
+        // secondary column
+        column2: cols.find(c => c.name === viewSettings.column2 || ""),
+
+        // secondary data type
+        column2type: viewSettings.column2type || "",
+
+        // secondary data opacity
+        column2opacity: viewSettings.column2opacity || 1,
+
+        // previously stored series visibility state
+        seriesVisibility: viewSettings.seriesVisibility || {},
+        
+        // View caption if any
+        caption: viewSettings.caption || "",
+        
+        // The chart data (to be fetched later)
+        data: null,
+
+        // The secondary chart data (to be fetched later)
+        data2: null,
+
+        // True while chart data is loaded
+        loadingData: false,
+
+        // The final chart options that are rendered in the chart
+        fullChartOptions: {},
+
+        // Which is the active tab in the data view
+        dataTabIndex: 0
+
     } as ViewState, initViewState);
 
     const {
@@ -213,18 +274,28 @@ export default function Dashboard({
         viewColumn,
         viewGroupBy,
         filters,
-        isDirty,
-        gridType,
         chartOptions,
         colorOptions,
         denominator,
         column2,
         column2type,
         column2opacity,
-        caption
+        caption,
+        data,
+        data2,
+        fullChartOptions,
+        loadingData,
+        seriesVisibility,
+        dataTabIndex
     } = state;
 
-    const isAdmin = auth.user?.role === "admin"
+    function onSeriesToggle(map: Record<string, boolean>) {
+        dispatch({ type: "UPDATE", payload: { seriesVisibility: map }});
+    }
+
+    const onTransitionEnd = () => {
+        window.Highcharts.charts.forEach(c => c?.reflow())
+    };
 
     async function getScreenShot()
     {
@@ -237,6 +308,7 @@ export default function Dashboard({
         return canvas.toDataURL();
     }
 
+    // Save
     const { execute: save, loading: saving } = useBackend(async () => {
         
         if (!isAdmin) {
@@ -263,22 +335,20 @@ export default function Dashboard({
                 screenShot,
                 settings: {
                     ...view.settings,
-                    groupBy: viewGroupBy,
-                    column : viewColumn,
+                    groupBy: viewGroupBy?.name,
+                    column : viewColumn.name,
                     filters,
                     viewType: chartType,
                     chartOptions: chartOptionsToSave,
                     colorOptions,
                     denominator,
-                    column2,
+                    column2: column2?.name,
                     column2type,
                     column2opacity,
-                    caption
+                    caption,
+                    seriesVisibility
                 }
-            }).then(
-                () => dispatch({ type: "CLEAN" }),
-                e  => alert(e.message)
-            );
+            }).catch(e => alert(e.message));
         }
 
         // Create
@@ -291,149 +361,116 @@ export default function Dashboard({
                 screenShot,
                 settings: {
                     ...view.settings,
-                    groupBy: viewGroupBy,
-                    column : viewColumn,
+                    groupBy: viewGroupBy?.name,
+                    column : viewColumn.name,
                     filters,
                     viewType: chartType,
                     chartOptions: chartOptionsToSave,
                     colorOptions,
                     denominator,
-                    column2,
+                    column2: column2?.name,
                     column2type,
                     column2opacity,
-                    caption
+                    caption,
+                    seriesVisibility
                 }
             }).then(
                 v => defer(() => navigate("/views/" + v.id)),
                 e => alert(e.message)
             );
         }
-    })
+    });
 
+    // Take Screenshot
     const { execute: takeScreenshot, loading: takingScreenshot } = useBackend(async () => {
         const screenShot = await getScreenShot();
         await updateOne("views", view.id!, { screenShot }).catch(e  => alert(e.message));
     });
 
+    // Delete
     const { execute: destroy, loading: deleting } = useBackend(() => {
         if (window.confirm("Yre you sure you want to delete this view?")) {
             return deleteOne("views", view.id + "").then(() => navigate("/"))
         }
         return Promise.resolve()
-    })
-
-    const col1 = dataRequest.data.cols.find(col => col.name === viewColumn) as app.DataRequestDataColumn;
-    const stratifier = viewGroupBy ? dataRequest.data.cols.find(col => col.name === viewGroupBy) as app.DataRequestDataColumn : null;
-
-    const col2 = column2 ? dataRequest.data.cols.find(col => col.name === column2) as app.DataRequestDataColumn : null;
-    
-    const groupBy = stratifier?.name;
-    const filterList = filters.map(f => JSON.stringify(f)).join(",");
-
-    let powerSet = useMemo(() => PowerSet.from(dataRequest.data), [dataRequest.data]);
-
-    let { chartPowerSet } = useMemo(function() {
-
-        // let powerSet = PowerSet.from(dataRequest.data);
-
-        function createFilter(filter: app.Filter): false | ((row: any, index?: number) => boolean)
-        {
-            const { left, operator, negated, right } = filter;
-
-            const fn = operators.find(x => x.id === operator)!.fn;
-
-            return (row: any) => {
-                const l = row[left];
-                const r = right.type === "column" ? row[right.value + ""] : right.value;
-                if (operator !== "isNull" && l === null) return false;
-                if (operator === "isNull" && negated && l !== null) return true;
-                let result = !!fn(l, r);
-                if (negated) return !result;
-                return result
-            };
-        }
-
-        const usableFilters = filters.filter(f => {
-            // Skip filters for which left column is not selected in the UI
-            if (!f.left) return false;
-
-            // Skip filters for which the right column or value is not set in the UI
-            if (f.operator !== "isNull" && f.right.value === undefined) return false;
-
-            return true;
-        });
-
-        let chartPowerSet: PowerSet;
-
-        try {
-            if (usableFilters.length) {
-                // @ts-ignore
-                const filter = usableFilters.reduce((prev: (row: any) => boolean, cur: app.Filter) => {
-                    const next = createFilter(cur);
-                    if (!next) {
-                        return prev;
-                    }
-                    return cur.join === "and" ?
-                        (row: any) => prev(row) && next(row) :
-                        (row: any) => prev(row) || next(row) ;
-                }, createFilter(usableFilters[0])) as (row: any, index?: number) => boolean;
-
-                // powerSet = powerSet.filter(filter)
-                chartPowerSet = powerSet.filter(filter).getChartData({
-                    column : viewColumn,
-                    groupBy,
-                    filters: usableFilters,
-                    column2
-                });
-            }
-            else {
-                chartPowerSet = powerSet.getChartData({
-                    column : viewColumn,
-                    groupBy,
-                    filters: usableFilters,
-                    column2
-                });
-            }
-        } catch (ex) {
-            console.error(ex);
-            chartPowerSet = PowerSet.from({ cols: [], rows: []})
-        }
-        
-        return { powerSet, chartPowerSet }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ powerSet, groupBy, viewColumn, filterList ]);
-
-    const onTransitionEnd = () => {
-        window.Highcharts.charts.forEach(c => c?.reflow())
-    };
-
-    const colorsLength = getColorsLength({
-        fullDataSet: powerSet,
-        dataSet    : chartPowerSet,
-        column2    : col2,
-        stratifier,
-        column2type
     });
 
-    // Start by building a default options for the given type
-    let options = getDefaultChartOptions(chartType as keyof typeof SupportedChartTypes, chartOptions)
-
-    // Now build the final options by adding dynamic properties like series data
-    // and function options
-    let finalChartOptions = buildChartOptions({
-        options     : options,
-        column      : col1,
-        dataSet     : chartPowerSet,
-        fullDataSet : powerSet,
-        groupBy     : stratifier,
-        type        : options.chart!.type as SupportedNativeChartTypes,
-        colorOptions: colorOptions,
-        column2     : col2,
-        column2type,
-        column2opacity,
-        denominator
+    // Convert filters to search parameters
+    const filterParams: string[] = []
+    let f: string[] = [];
+    filters.forEach(filter => {
+        if (filter.left && filter.operator && filter.right.value !== undefined) {
+            if (filter.join === "and" && f.length) {
+                filterParams.push(f.join(","))
+                f = []
+            }
+            f.push([filter.left, filter.operator, filter.right.value].join(":"))
+        }
     })
-    // console.log("finalChartOptions:", finalChartOptions)
+    if (f.length) filterParams.push(f.join(","))
+
+    // Variables that control if new data needs to be fetched
+    const stratifierName = viewGroupBy?.name
+    const secColumnName  = column2?.name || ""
+    const viewColumnName = viewColumn.name
+    const requestId      = dataRequest.id
+    const filter         = filterParams.map(encodeURIComponent).join("&")
+
+    const loadData = useCallback(() => {
+        dispatch({ type: "UPDATE", payload: {
+            loadingData: true,
+            loadingDataError: null,
+            data : null,
+            data2: null,
+        }})
+
+        const base = `/api/requests/${requestId}/api?`
+
+        const fetchPrimaryData = async () => {
+            const params = new URLSearchParams()
+            params.set("column", viewColumnName)
+            if (stratifierName) params.set("stratifier", stratifierName)
+            let url = base + params
+            if (filter) url += "&filter=" + filter
+            return request(url)
+        };
+
+        const fetchSecondaryData = async () => {
+            if (!secColumnName) return null
+            const params = new URLSearchParams()
+            params.set("column"    , viewColumnName)
+            params.set("stratifier", secColumnName )
+            let url = base + params
+            if (filter) url += "&filter=" + filter
+            return request(url)
+        };
+
+        return Promise.all([
+            fetchPrimaryData(),
+            fetchSecondaryData()
+        ]).then(
+            ([
+                primaryData,
+                secondaryData
+            ]) => {
+                dispatch({ type: "UPDATE", payload: {
+                    data : primaryData,
+                    data2: secondaryData,
+                    loadingData: false
+                }})
+            },
+            error => {
+                dispatch({ type: "UPDATE", payload: {
+                    loadingDataError: error,
+                    loadingData: false
+                }})
+            }
+        )
+    }, [requestId, stratifierName, viewColumnName, filter, secColumnName]);
+
+    useEffect(() => { loadData() }, [loadData])
+
+    const turbo = data && isTurbo(data, data2);
 
     return (
         <div className={ saving || deleting ? "grey-out" : undefined }>
@@ -446,34 +483,32 @@ export default function Dashboard({
             <div className="row">
                 <div className="col col-0">
                     <div onTransitionEnd={onTransitionEnd} style={{
-                        position: "relative",
-                        width   : showOptions ? 330 : 0,
-                        // overflow: showOptions ? "auto" : "hidden",
-                        opacity : showOptions ? 1 : 0,
+                        position     : "relative",
+                        width        : showOptions ? 330 : 0,
+                        opacity      : showOptions ? 1 : 0,
                         pointerEvents: showOptions ? "all" : "none",
-                        zIndex: showOptions ? 1 : -1,
-                        transition: "all 0.2s ease-in-out"
+                        zIndex       : showOptions ? 1 : -1,
+                        transition   : "all 0.2s ease-in-out"
                     }}>
                         <ConfigPanel
                             dataRequest={dataRequest}
                             viewType={viewType}
                             view={view}
-                            colorsLength={colorsLength}
                             state={{
-                                groupBy   : viewColumn,
-                                stratifyBy: stratifier?.name || "",
+                                groupBy   : viewColumn.name,
+                                stratifyBy: viewGroupBy?.name || "",
                                 filters   : [...filters],
-                                xCol      : col1,
+                                xCol      : viewColumn,
 
                                 // @ts-ignore
                                 chartType,
                                 viewName,
                                 viewDescription,
-                                chartOptions: stripUndefined(finalChartOptions),
+                                chartOptions: fullChartOptions,
                                 // chartOptions: finalChartOptions,
                                 colorOptions,
                                 denominator,
-                                column2,
+                                column2: column2?.name || "",
                                 column2type,
                                 column2opacity
                             }}
@@ -482,13 +517,13 @@ export default function Dashboard({
                                     viewName       : state.viewName,
                                     viewDescription: state.viewDescription,
                                     chartType      : state.chartType,
-                                    viewColumn     : state.groupBy,
-                                    viewGroupBy    : state.stratifyBy,
+                                    viewColumn     : cols.find(c => c.name === state.groupBy),
+                                    viewGroupBy    : cols.find(c => c.name === state.stratifyBy),
                                     filters        : [...state.filters],
                                     chartOptions   : state.chartOptions,
                                     colorOptions   : state.colorOptions,
                                     denominator    : state.denominator,
-                                    column2        : state.column2,
+                                    column2        : cols.find(c => c.name === state.column2),
                                     column2type    : state.column2type,
                                     column2opacity : state.column2opacity
                                 }});
@@ -498,15 +533,30 @@ export default function Dashboard({
                 </div>
                 <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start" }}>
                     <div style={{ position: "sticky", top: 2 }}>
-                        <h2 style={{ marginTop: 0 }}>{viewName}</h2>
-                        <div className="color-muted mb-1">{viewDescription}</div>
-                        <div className="row mb-1 half-gap">
-                            <div className="col col-5">
+                        <h2 style={{ margin: "0 0 0.5ex", lineHeight: 1.2 }}>
+                            <EditInPlace
+                                required
+                                maxLength={100}
+                                text={state.viewName}
+                                onChange={ viewName => dispatch({ type: "UPDATE", payload: { viewName }}) }
+                            />
+                        </h2>
+                        <hr/>
+                        <div className="color-muted" style={{ margin: "1ex 0 2ex", lineHeight: 1.2 }}>
+                            <EditInPlace
+                                maxLength={500}
+                                text={viewDescription || "no description provided"}
+                                onChange={ viewDescription => dispatch({ type: "UPDATE", payload: { viewDescription }}) }
+                            />
+                        </div>
+                        <div className="row mb-1">
+                            <div className="col col-0">
                                 <div className="toolbar flex">
                                     <button
                                         className={"btn" + (viewType === "overview" ? " active" : "")}
                                         onClick={() => dispatch({ type: "SET_VIEW_TYPE", payload: "overview" })}
                                         title="Report View"
+                                        style={{ minWidth: "7em" }}
                                         >
                                         <i className="fas fa-chart-pie" /> Overview
                                     </button>
@@ -514,37 +564,33 @@ export default function Dashboard({
                                         className={"btn" + (viewType === "data"     ? " active" : "")}
                                         onClick={() => dispatch({ type: "SET_VIEW_TYPE", payload: "data"})}
                                         title="Data View"
+                                        style={{ minWidth: "7em" }}
                                         ><i className="fas fa-th" /> Data</button>
                                 </div>
                             </div>
                             <div className="col"></div>
-                            <div className="col col-4 right">
+                            <div className="col col-0 right">
                                 <div className="toolbar flex">
-                                    { showOptions && (
-                                        <button
-                                            className="btn color-green"
-                                            onClick={save}
-                                            disabled={ !!view.id && !isDirty }
-                                            title="Save Changes">
-                                            <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
-                                        </button>
-                                    )}
-                                    { showOptions && isAdmin && view.id && (
-                                        <button
-                                            className="btn color-red"
-                                            onClick={ destroy }
-                                            title="Delete this View">
-                                            <i className={ deleting ? "fas fa-circle-notch fa-spin" : "fas fa-trash-alt" } /> Delete
-                                        </button>
-                                    )}
-                                    { showOptions && isAdmin && view.id && (
-                                        <button
-                                            className="btn color-blue"
-                                            onClick={ takeScreenshot }
-                                            title="Update Screenshot">
-                                            <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
-                                        </button>
-                                    )}
+                                    <button
+                                        className="btn"
+                                        onClick={save}
+                                        title="Save Changes">
+                                        <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
+                                    </button>
+                                    <button
+                                        className="btn"
+                                        onClick={ destroy }
+                                        title="Delete this View"
+                                        disabled={!view.id || !isAdmin}>
+                                        <i className={ deleting ? "fas fa-circle-notch fa-spin" : "fas fa-trash-alt" } /> Delete
+                                    </button>
+                                    <button
+                                        className="btn"
+                                        onClick={ takeScreenshot }
+                                        title="Update Screenshot"
+                                        disabled={!view.id || !isAdmin || viewType !== "overview" }>
+                                        <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
+                                    </button>
                                     <button
                                         className={ "btn" + (showOptions ? " active" : "")}
                                         onClick={() => dispatch({ type: "TOGGLE_OPTIONS" })}
@@ -555,63 +601,41 @@ export default function Dashboard({
                         </div>
 
                         { viewType === "data" && <>
-                            { gridType === "full" && filters.length > 0 && (
-                                <Alert className="small mt-1 mb-1" color="orange" icon="fa-solid fa-circle-info">
-                                    Filters are not applied to the data grid when it is in "Full Data" mode.
-                                    To view them <button
-                                    className="small link"
-                                    onClick={() => dispatch({ type: "UPDATE", payload: {gridType: "chart" }})}
-                                    >switch to Chart Data mode</button>. 
-                                </Alert>
-                            ) }
-                            <DataGrid
-                                cols={ gridType === "chart" ? chartPowerSet.cols : dataRequest.data.cols }
-                                rows={ gridType === "chart" ? chartPowerSet.rows : dataRequest.data.rows }
-                                offset={0}
-                                limit={20}
-                                key={gridType}
-                                colClassName={col => {
-                                    // col.name === "cnt" || col.name === "queryid" ? "private" : undefined
-                                    if (
-                                        col.name === "cnt" ||
-                                        (col.name === viewColumn || (stratifier && col.name === stratifier.name)) ||
-                                        (filters && filters.find(f => f.left === col.name))
-                                        // chartPowerSet.getColumnByName(col.name) &&
-                                        // value !== null
-                                        // col.name
-                                    ) {
-                                        return "bg-blue"
-                                    }
-                                }}
-                            />
-                            <div className="tab-panel bottom">
-                                <button
-                                    className={ classList({ "small tab": true, active: gridType === "chart" }) }
-                                    onClick={() => dispatch({ type: "UPDATE", payload: {gridType: "chart" }})}
-                                >Chart Data</button>
-                                <button
-                                    className={ classList({ "small tab": true, active: gridType === "full" }) }
-                                    onClick={() => dispatch({ type: "UPDATE", payload: {gridType: "full" }})}
-                                >Full Data</button>
+                            <div className="tab-panel mt-1">
+                                <span onClick={() => dispatch({ type: "UPDATE", payload: { dataTabIndex: 0 }})} className={"tab" + (dataTabIndex === 0 ? " active" : "")}>Primary Data</span>
+                                <span onClick={() => dispatch({ type: "UPDATE", payload: { dataTabIndex: 1 }})} className={"tab" + (dataTabIndex === 1 ? " active" : "")}>Secondary Data</span>
                             </div>
-                        </>}
-                        
-                        { !col1 && viewType === "overview" && (
+                            { viewType === "data" && dataTabIndex === 0 && <div className="data-view">{ Json(data ) }</div> }
+                            { viewType === "data" && dataTabIndex === 1 && <div className="data-view">{ Json(data2) }</div> }
+                        </> }
+
+                        { !viewColumn && viewType === "overview" && (
                             <AlertError>
-                                It looks like the data source has been updated and this view is no longer compatible with the new data.
-                                Please edit this view or delete it and create new one.
+                                It looks like the data source has been updated and this view is no longer compatible
+                                with the new data. Please edit this view or delete it and create new one.
                             </AlertError>
                         ) }
-                        { col1 && viewType === "overview" && <BaseChart
-                            options={ finalChartOptions }
+                        { viewType === "overview" && turbo && (
+                            <AlertError>
+                                The data is too big to render properly in the chart view. We did our best but there might be some issues.
+                                Please change your settings and perhaps add some filters to reduce the data size.
+                            </AlertError>
+                        ) }
+                        { viewColumn && viewType === "overview" && <BaseChart
+                            loading={ loadingData }
+                            options={ fullChartOptions }
+
+                            // This key controls in which cases the chart should be re-created rather than updated!
                             key={ [
                                 chartType,
-                                col1.name,
-                                stratifier || "",
-                                finalChartOptions.annotations?.length || "",
-                                column2,
-                                column2type
-                            ].join("-") }
+                                viewColumn.name,
+                                viewGroupBy?.name || "no_stratifier",
+                                // "vis=" + Object.values(seriesVisibility).join(","),
+                            //     // finalChartOptions.annotations?.length || "",
+                                column2?.name || "no_secondary",
+                                column2type || "no_second_type",
+                                // Date.now()
+                            ].join(":") }
                         /> }
                         <br/>
                         <CaptionEditor html={caption} onChange={caption => dispatch({ type: "UPDATE", payload: { caption }})}/>
@@ -649,42 +673,4 @@ export default function Dashboard({
             </div>
         </div>
     )
-}
-
-interface CaptionEditorProps {
-    html: string | null
-    disabled?: boolean
-    onChange: (html: string) => void
-}
-
-interface CaptionEditorState {
-    html: string
-}
-
-class CaptionEditor extends Component<CaptionEditorProps, CaptionEditorState> {
-    
-    contentEditable: React.RefObject<HTMLDivElement>;
-
-    constructor(props: CaptionEditorProps) {
-        super(props);
-        this.contentEditable = createRef();
-        this.state = { html: String(props.html || "").trim() };
-    };
-  
-    handleChange = (evt: any) => {
-        const { onChange } = this.props
-        this.setState({ html: evt.target.value });
-        onChange && onChange(evt.target.value)
-    };
-  
-    render() {
-        return <ContentEditable
-            innerRef={this.contentEditable}
-            html={this.state.html}
-            disabled={!!this.props.disabled}
-            onChange={this.handleChange}
-            className="chart-caption"
-            tagName='div'
-        />
-    }
 }
