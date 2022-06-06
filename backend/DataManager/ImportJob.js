@@ -9,14 +9,16 @@ const { DATA_TYPES }       = require("../DataManager/dataTypes");
 const Subscription         = require("../db/models/DataRequest");
 const { assert }           = require("../lib");
 const { Pool, PoolClient } = require('pg')
-const { db }               = require("../config")
+// const { db }               = require("../config")
 
 const pool = new Pool({
-    user    :  db.options.username,
-    host    :  db.options.host,
-    database:  db.options.database,
-    password:  db.options.password,
-    port    : +db.options.port
+    connectionString: process.env.DATABASE_URL,
+    // user    :  db.options.username,
+    // host    :  db.options.host,
+    // database:  db.options.database,
+    // password:  db.options.password,
+    // port    : +db.options.port,
+    ssl     : process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
 });
 
 const JOBS = {};
