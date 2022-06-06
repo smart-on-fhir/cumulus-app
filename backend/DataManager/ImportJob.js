@@ -12,7 +12,7 @@ const { Pool, PoolClient } = require('pg')
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl     : process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
+    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
 });
 
 const JOBS = {};
@@ -55,8 +55,8 @@ class ImportJob
         client.on('notification', msg => console.log("ImportJob notification:", msg));
 
         try {
-            await client.query(`ALTER SYSTEM SET min_wal_size = '1GB'`)
-            await client.query(`ALTER SYSTEM SET max_wal_size = '2GB'`)
+            // await client.query(`ALTER SYSTEM SET min_wal_size = '1GB'`)
+            // await client.query(`ALTER SYSTEM SET max_wal_size = '2GB'`)
             await client.query('BEGIN');
             const id  = randomUUID();
             const job = JOBS[id] = new ImportJob(id, client);
