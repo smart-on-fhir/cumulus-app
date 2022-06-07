@@ -320,9 +320,7 @@ export function buildChartOptions({
                     legendItemClick(e) {
                         e.preventDefault()
                         const visMap: Record<string, boolean> = {};
-                        e.target.chart.series.forEach(
-                            (s: Series) => visMap[s.name] = s.name === e.target.name ? !s.visible : s.visible
-                        )
+                        e.target.chart.series.forEach((s: Series) => visMap[s.name] = s === e.target ? !s.visible : s.visible)
                         onSeriesToggle(visMap)
                     }
                 },
