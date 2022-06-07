@@ -51,10 +51,14 @@ export const TURBO_THRESHOLD = 1000
 
 // These are computed at runtime and will not be saved on the server
 export const ReadOnlyPaths = [
+    "exporting",
+    "plotOptions",
+    "tooltip",
     "chart.marginTop",
     "chart.type",
     "chart.animation.easing",
-    "series",
+    // "series",
+    "series.[].data",
     "chart.options3d.depth",
     // "chart.plotBorderWidth",
     "colors",
