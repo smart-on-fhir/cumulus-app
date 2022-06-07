@@ -440,7 +440,8 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                 },
                 plotOptions: {
                     column: {
-                        stacking: undefined
+                        stacking: undefined,
+                        crisp: false
                     }
                 },
                 xAxis: {
@@ -497,7 +498,8 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                     },
                     plotOptions: {
                         column: {
-                            stacking: "normal"
+                            stacking: "normal",
+                            crisp: false
                         }
                     },
                     xAxis: {

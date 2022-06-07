@@ -170,7 +170,7 @@ function getSeries({
 
         const cfg: any = {
             index: series.length,
-            colorIndex: series.length % colors.length,
+            // colorIndex: series.length % colors.length,
             visible,
             id
         }
@@ -319,6 +319,7 @@ export function buildChartOptions({
         colors: COLORS,
         yAxis: {
             allowDecimals: denominator ? true : false,
+            max: denominator === "local" ? 100 : undefined,
             labels: {
                 format: denominator ? "{text}%" : "{text}",
             }
@@ -340,6 +341,11 @@ export function buildChartOptions({
                     enabled: xType === "category",
                     matchByName: false,
                     sortKey: "index"
+                },
+                states: {
+                    hover: {
+                        opacity: 1
+                    }
                 }
             },
             pie: {
