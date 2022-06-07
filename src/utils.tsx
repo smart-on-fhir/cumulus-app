@@ -14,6 +14,11 @@ const deferMap = new WeakMap();
 
 export function defer(fn: () => void, delay = 0)
 {
+    const f = () => {
+        fn()
+        deferMap.delete(fn)
+    };
+
     const ref = deferMap.get(fn);
     if (ref) {
         if (delay) {
@@ -23,7 +28,7 @@ export function defer(fn: () => void, delay = 0)
         }
     }
 
-    deferMap.set(fn, delay ? setTimeout(fn, delay) : requestAnimationFrame(fn));
+    deferMap.set(fn, delay === undefined ? requestAnimationFrame(f) : setTimeout(f, delay));
 }
 
 export function classList(map: Record<string, boolean>): string | undefined {
