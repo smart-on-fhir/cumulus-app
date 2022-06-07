@@ -186,19 +186,21 @@ function getSeries({
             cfg.opacity = column2opacity
             cfg.shadow = false
 
-            if (options.type.includes("column")) {
-                cfg.color = {
-                    pattern: {
-                        path: {
-                            d: 'M 0 0 L 0 6',
-                            strokeWidth: 10
-                        },
-                        width : 6,
-                        height: 6,
-                        patternTransform: 'scale(0.5) rotate(45)'
-                    }
-                }
-            }
+            // There is a bug in Highcharts that prevents us from rendering hidden series
+            // having pattern fills
+            // if (options.type.includes("column")) {
+            //     cfg.color = {
+            //         pattern: {
+            //             path: {
+            //                 d: 'M 0 0 L 0 6',
+            //                 strokeWidth: 10
+            //             },
+            //             width : 6,
+            //             height: 6,
+            //             patternTransform: 'scale(0.5) rotate(45)'
+            //         }
+            //     }
+            // }
 
             if (column2type!.includes("columnStack")) {
                 cfg.stacking = "normal"
