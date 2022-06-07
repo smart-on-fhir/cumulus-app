@@ -190,6 +190,14 @@ function getSeries({
             cfg.opacity = column2opacity
             cfg.shadow = false
 
+            cfg.color = {
+                linearGradient: { x1: 1, y1: 0, x2: 0, y2: 1 },
+                stops: [
+                    [0, new Color(colors[series.length % colors.length]).setOpacity(1.0).get('rgba') + ""],
+                    [1, new Color(colors[series.length % colors.length]).setOpacity(0.5).get('rgba') + ""]
+                ]
+            }
+
             // There is a bug in Highcharts that prevents us from rendering hidden series
             // having pattern fills
             // if (options.type.includes("column")) {
