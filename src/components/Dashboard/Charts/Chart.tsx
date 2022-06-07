@@ -136,7 +136,7 @@ function getSeries({
     denominator,
     column2type,
     column2opacity,
-    seriesVisibility,
+    serverOptions,
     xType
 }: {
     data            : app.ServerResponses.DataResponse
@@ -147,8 +147,8 @@ function getSeries({
     denominator     : "" | "local" | "global"
     column2type    ?: keyof typeof SupportedChartTypes
     column2opacity  : number
-    seriesVisibility: Record<string, boolean>
     xType           : "category" | "linear" | "datetime"
+    serverOptions   : Highcharts.Options
 }): SeriesOptions[]
 {
     
@@ -162,13 +162,17 @@ function getSeries({
 
     function addSeries(options: any, secondary = false) {
         
+        // The ID of this series
+        const id = (secondary ? "secondary-" : "primary-") + options.name
+
+        // Should the series be hidden?
+        const visible = serverOptions.series?.find((s: any) => s.id === id)?.visible !== false
+
         const cfg: any = {
             index: series.length,
             colorIndex: series.length % colors.length,
-            visible: seriesVisibility[options.name] !== false,
-            id: (secondary ? "secondary-" : "primary-") + options.name
-            // id: options.name
-            // id: secondary ? "secondary-" + options.name : undefined
+            visible,
+            id
         }
 
         if (options.type.includes("area")) {
@@ -261,8 +265,7 @@ export function buildChartOptions({
     type,
     column2type,
     column2opacity = 1,
-    onSeriesToggle,
-    seriesVisibility
+    onSeriesToggle
 }: {
     data            : app.ServerResponses.DataResponse
     data2           : app.ServerResponses.StratifiedDataResponse | null
@@ -275,7 +278,6 @@ export function buildChartOptions({
     column2type    ?: keyof typeof SupportedChartTypes
     column2opacity ?: number
     onSeriesToggle  : (s: Record<string, boolean>) => void
-    seriesVisibility: Record<string, boolean>
 }): Highcharts.Options
 {
     const COLORS = colorOptions.colors.map(c => new Color(c).setOpacity(colorOptions.opacity).get("rgba") + "")
@@ -291,8 +293,8 @@ export function buildChartOptions({
         denominator,
         column2type,
         column2opacity,
-        seriesVisibility,
-        xType
+        xType,
+        serverOptions: options
     });
 
     const dynamicOptions: Highcharts.Options = {
@@ -322,7 +324,7 @@ export function buildChartOptions({
                     legendItemClick(e) {
                         e.preventDefault()
                         const visMap: Record<string, boolean> = {};
-                        e.target.chart.series.forEach((s: Series) => visMap[s.name] = s === e.target ? !s.visible : s.visible)
+                        e.target.chart.series.forEach((s: Series) => visMap[s.userOptions.id!] = s === e.target ? !s.visible : s.visible)
                         onSeriesToggle(visMap)
                     }
                 },

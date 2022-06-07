@@ -283,7 +283,12 @@ export function strip(
     let out = isArray ? [] as any[] : {} as Record<string, any>;
 
     forEach(a, (value, key) => {
-        if (!paths.includes([..._path, key].join("."))) {
+        if (Array.isArray(a)) {
+            if (!paths.includes([..._path, "[]", key].join("."))) {
+                out[key] = strip(value, paths, [ ..._path, "[]" ])
+            }
+        }
+        else if (!paths.includes([..._path, key].join("."))) {
             if (value && typeof value === "object") {
                 out[key] = strip(value, paths, [..._path, key])
             } else {

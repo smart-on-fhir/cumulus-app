@@ -44,7 +44,6 @@ interface ViewState
     data2           : app.ServerResponses.StratifiedDataResponse | null
     loadingData     : boolean
     fullChartOptions: Partial<Highcharts.Options>
-    seriesVisibility: Record<string, boolean>
     dataTabIndex    : number
 }
 
@@ -66,7 +65,6 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
         "chartOptions",
         "colorOptions",
         "denominator",
-        "seriesVisibility",
         "data",
     ];
 
@@ -96,7 +94,6 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
                     denominator     : nextState.denominator,
                     column2type     : nextState.column2type,
                     column2opacity  : nextState.column2opacity,
-                    seriesVisibility: nextState.seriesVisibility,
                     onSeriesToggle
                 })
             }
@@ -137,16 +134,6 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
             const nextState = Highcharts.merge(state, action.payload);
             if (nextState.chartType.startsWith("pie") || nextState.chartType.startsWith("donut")) {
                 nextState.viewGroupBy = undefined
-            }
-
-            // seriesVisibility
-            if (
-                (action.payload.chartType   && action.payload.chartType        !== state.chartType)         ||
-                (action.payload.viewGroupBy && action.payload.viewGroupBy.name !== state.viewGroupBy?.name) ||
-                (action.payload.viewColumn  && action.payload.viewColumn.name  !== state.viewColumn?.name)  ||
-                (action.payload.column2     && action.payload.column2.name     !== state.column2?.name)
-            ) {
-                nextState.seriesVisibility = {}
             }
 
             // @ts-ignore
@@ -247,9 +234,6 @@ export default function Dashboard({
         // secondary data opacity
         column2opacity: viewSettings.column2opacity || 1,
 
-        // previously stored series visibility state
-        seriesVisibility: viewSettings.seriesVisibility || {},
-        
         // View caption if any
         caption: viewSettings.caption || "",
         
@@ -279,7 +263,6 @@ export default function Dashboard({
         viewColumn,
         viewGroupBy,
         filters,
-        chartOptions,
         colorOptions,
         denominator,
         column2,
@@ -290,12 +273,18 @@ export default function Dashboard({
         data2,
         fullChartOptions,
         loadingData,
-        seriesVisibility,
         dataTabIndex
     } = state;
 
     function onSeriesToggle(map: Record<string, boolean>) {
-        dispatch({ type: "UPDATE", payload: { seriesVisibility: map }});
+        const next = {
+            chartOptions: {
+                series: (fullChartOptions.series || []).map(s => {
+                    return { ...s, visible: map[s.id + ""] !== false }
+                })
+            }
+        }
+        dispatch({ type: "UPDATE", payload: next})
     }
 
     const onTransitionEnd = () => {
@@ -325,7 +314,7 @@ export default function Dashboard({
             undefined;
 
         const chartOptionsToSave = objectDiff(
-            strip(chartOptions, ReadOnlyPaths),
+            strip(fullChartOptions, ReadOnlyPaths),
             DefaultChartOptions
         );
 
@@ -350,8 +339,7 @@ export default function Dashboard({
                     column2: column2?.name,
                     column2type,
                     column2opacity,
-                    caption,
-                    seriesVisibility
+                    caption
                 }
             }).catch(e => alert(e.message));
         }
@@ -376,8 +364,7 @@ export default function Dashboard({
                     column2: column2?.name,
                     column2type,
                     column2opacity,
-                    caption,
-                    seriesVisibility
+                    caption
                 }
             }).then(
                 v => defer(() => navigate("/views/" + v.id)),
@@ -635,8 +622,7 @@ export default function Dashboard({
                                 chartType,
                                 viewColumn.name,
                                 viewGroupBy?.name || "no_stratifier",
-                                // "vis=" + Object.values(seriesVisibility).join(","),
-                            //     // finalChartOptions.annotations?.length || "",
+                                // finalChartOptions.annotations?.length || "",
                                 column2?.name || "no_secondary",
                                 column2type || "no_second_type",
                                 // Date.now()
