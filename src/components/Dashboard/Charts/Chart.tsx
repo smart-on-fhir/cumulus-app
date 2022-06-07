@@ -368,10 +368,15 @@ export function buildChartOptions({
                 shadow: false
             },
             spline: {
-                shadow: !!data2
+                shadow: data2 ? { width: 2, opacity: (colorOptions.opacity ?? 1 + column2opacity)/4 } : false
             },
             areaspline: {
-                shadow: !!data2
+                shadow: data2 ? {
+                    width  : 2,
+                    offsetY: 1,
+                    offsetX: 0,
+                    opacity: (colorOptions.opacity ?? 1 + column2opacity) / 4
+                } : false
             }
         },
         tooltip: {
