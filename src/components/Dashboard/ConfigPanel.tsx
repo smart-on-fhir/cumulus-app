@@ -76,6 +76,10 @@ function SecondaryDataEditor({
 
             { !!state.column2 && !!state.column2type && <>
                 <div className="pt-1">
+                    <label>Colors</label>
+                    <br/>
+                    <ColorPresetEditor state={state} onChange={onChange} type="secondary" />
+                </div>
                 <div className="pt-1">
                     <label>
                         Opacity
@@ -102,7 +106,6 @@ interface ChartConfigPanelState {
     viewName       : string
     viewDescription: string
     chartOptions   : Partial<Highcharts.Options>
-    colorOptions   : app.ColorOptions
     denominator    : string
     column2        : string
     column2type    : string
@@ -373,6 +376,127 @@ export default function ConfigPanel({
                 <br/>
             </Collapse>
 
+            <Collapse collapsed header="Data">
+                <div className="pt-1">
+                    <label>{ isPie ? "Slices" : "X Axis" }</label>
+                    <ColumnSelector
+                        cols={ cols }
+                        value={ state.groupBy }
+                        disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
+                        onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
+                    />
+                </div>
+                { !isPie && <>
+                    <div className="pt-1 pb-1">
+                        <label>Denominator</label>
+                        <Select
+                            options={[
+                                {
+                                    label: <div>
+                                        <div>None</div>
+                                        <div className="small color-muted">
+                                            Render the aggregate counts as found in the<br/>
+                                            data source without further processing
+                                        </div>
+                                    </div>,
+                                    value: "",
+                                    icon: "fa-solid fa-percent grey-out"
+                                },
+                                {
+                                    label: <div>
+                                        <div>Stratified Count</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the total<br />
+                                            count of every given data group.<br />
+                                            Not available with no stratifier.
+                                        </div>
+                                    </div>,
+                                    value: "local",
+                                    icon: "fa-solid fa-percent color-brand-2"
+                                },
+                                {
+                                    label: <div>
+                                        <div>Total Count</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the total<br />
+                                            count within the entire dataset
+                                        </div>
+                                    </div>,
+                                    value: "global",
+                                    icon: "fa-solid fa-percent color-blue"
+                                }
+                            ]}
+                            value={ state.denominator }
+                            onChange={ denominator => onChange({ ...state, denominator })}
+                        />
+                    </div>
+                    <div className="tab-panel mt-1">
+                        <span
+                            onClick={() => setTabIndex(0)}
+                            className={"tab" + (tabIndex === 0 ? " active" : "")}
+                            style={{ background: tabIndex === 0 ? "#f8f8f7" : "transparent" }}
+                        >Primary Data</span>
+                        <span
+                            onClick={() => setTabIndex(1)}
+                            className={"tab" + (tabIndex === 1 ? " active" : "")}
+                            style={{ background: tabIndex === 1 ? "#f8f8f7" : "transparent" }}
+                        >Secondary Data</span>
+                    </div>
+
+                    { tabIndex === 0 && !isPie && <>
+                        <div className="pt-1">
+                            <label>Stratifier</label>
+                            <ColumnSelector
+                                cols={ cols }
+                                placeholder="Select Column"
+                                addEmptyOption="start"
+                                value={ state.stratifyBy }
+                                disabled={[ "cnt", state.groupBy, state.column2 ].filter(Boolean)}
+                                onChange={ (stratifyBy: string) => onChange({
+                                    ...state,
+                                    stratifyBy,
+                                    denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
+                                }) }
+                            />
+                            <p className="small color-muted">
+                                Stratify the data into multiple series based on the chosen column. For example,
+                                this would produce multiple lines in a line chart.
+                            </p>
+                        </div>
+                    </> }
+
+                    { tabIndex === 1 && <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onChange} /> }
+                </> }
+
+                { tabIndex === 0 && <>
+                    <div className="pt-1">
+                        <b>Colors</b>
+                        <div>
+                            <ColorPresetEditor state={state} onChange={onChange} type={ isPie ? "only" : "primary" } />
+                        </div>
+                    </div>
+                    <div className="pt-1">
+                        <b>Opacity</b>
+                        <PrimaryDataOpacityEditor state={state} onChange={onChange} />
+                        <p className="small color-muted">
+                            Using semitransparent colors might slightly improve readability in case
+                            of overlapping lines or shapes
+                        </p>
+                    </div>
+                </> }
+                <br />
+            </Collapse>
+
+            <Collapse collapsed header="Filters">
+                <div className="pt-1 pb-1">
+                    <FilterUI
+                        onChange={filters => onChange({ ...state, filters })}
+                        current={ state.filters }
+                        cols={ cols }
+                    />
+                </div>
+            </Collapse>
+
             { !isPie && <Collapse collapsed header={ isBar ? "X Axis" : "Y Axis" }>
                 <div className="mt-1">
                     <label>Axis Title</label>
@@ -521,149 +645,6 @@ export default function ConfigPanel({
                     />
                 </div>
             </Collapse> }
-            
-            <Collapse collapsed header="Filters">
-                <div className="pt-1 pb-1">
-                    <FilterUI
-                        onChange={filters => onChange({ ...state, filters })}
-                        current={ state.filters }
-                        cols={ cols }
-                    />
-                </div>
-            </Collapse>
-
-            <Collapse collapsed header="Data">
-                <div className="pt-1">
-                    <label>{ isPie ? "Slices" : "X Axis" }</label>
-                    <ColumnSelector
-                        cols={ cols }
-                        value={ state.groupBy }
-                        disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
-                        onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
-                    />
-                </div>
-                { !isPie && <>
-                    <div className="pt-1 pb-1">
-                        <label>Denominator</label>
-                        <Select
-                            options={[
-                                {
-                                    label: <div>
-                                        <div>None</div>
-                                        <div className="small color-muted">
-                                            Render the aggregate counts as found in the<br/>
-                                            data source without further processing
-                                        </div>
-                                    </div>,
-                                    value: "",
-                                    icon: "fa-solid fa-percent grey-out"
-                                },
-                                {
-                                    label: <div>
-                                        <div>Stratified Count</div>
-                                        <div className="small color-muted">
-                                            Convert counts to percentage of the total<br />
-                                            count of every given data group.<br />
-                                            Not available with no stratifier.
-                                        </div>
-                                    </div>,
-                                    value: "local",
-                                    icon: "fa-solid fa-percent color-brand-2"
-                                },
-                                {
-                                    label: <div>
-                                        <div>Total Count</div>
-                                        <div className="small color-muted">
-                                            Convert counts to percentage of the total<br />
-                                            count within the entire dataset
-                                        </div>
-                                    </div>,
-                                    value: "global",
-                                    icon: "fa-solid fa-percent color-blue"
-                                }
-                            ]}
-                            value={ state.denominator }
-                            onChange={ denominator => onChange({ ...state, denominator })}
-                        />
-                    </div>
-                    <div className="tab-panel mt-1">
-                        <span
-                            onClick={() => setTabIndex(0)}
-                            className={"tab" + (tabIndex === 0 ? " active" : "")}
-                            style={{ background: tabIndex === 0 ? "#f8f8f7" : "transparent" }}
-                        >Primary Data</span>
-                        <span
-                            onClick={() => setTabIndex(1)}
-                            className={"tab" + (tabIndex === 1 ? " active" : "")}
-                            style={{ background: tabIndex === 1 ? "#f8f8f7" : "transparent" }}
-                        >Secondary Data</span>
-                    </div>
-
-                    { tabIndex === 0 && !isPie && <div className="pt-1">
-                        <label>Stratifier</label>
-                        <ColumnSelector
-                            cols={ cols }
-                            placeholder="Select Column"
-                            addEmptyOption="start"
-                            value={ state.stratifyBy }
-                            disabled={[ "cnt", state.groupBy, state.column2 ].filter(Boolean)}
-                            onChange={ (stratifyBy: string) => onChange({
-                                ...state,
-                                stratifyBy,
-                                denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
-                            }) }
-                        />
-                        <p className="small color-muted">
-                            Stratify the data into multiple series based on the chosen column. For example,
-                            this would produce multiple lines in a line chart.
-                        </p>
-                    </div> }
-
-                    { tabIndex === 1 && <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onChange} /> }
-                </> }
-                <br />
-            </Collapse>
-
-            <Collapse collapsed header="Colors">
-                <div className="pt-1 pb-2">
-                    <label>Color Preset</label>
-                    <br/>
-                    { state.colorOptions.colors.map((color, i) => {
-                        const colorsLength = state.stratifyBy ?
-                            state.chartOptions.series?.length || 1 :
-                            // @ts-ignore
-                            state.chartOptions.series?.[0]?.data?.length || 1
-
-                        return <input
-                            type="color"
-                            key={i}
-                            value={i >= colorsLength ? "#DDDDDD" : color}
-                            onChange={e => {
-                                let colors = [ ...state.colorOptions.colors ]
-                                colors[i] = e.target.value
-                                onChange({ ...state, colorOptions: { ...state.colorOptions, colors }})
-                            }}
-                            disabled={ i >= colorsLength }
-                        />
-                    })}
-                    <br/>
-                    <br/>
-                    <label>
-                        Opacity
-                        <input
-                            type="range"
-                            min={0}
-                            max={1}
-                            step={0.01}
-                            value={ state.colorOptions.opacity }
-                            onChange={e => onChange({ ...state, colorOptions: { ...state.colorOptions, opacity: e.target.valueAsNumber }})}
-                            style={{ width: "100%", margin: 0 }}
-                        />
-                    </label>
-                    <p className="small color-muted">Using semitransparent colors might slightly improve readability in case of overlaping lines or shapes</p>
-                    <br/>
-                </div>
-            </Collapse>
 
             { !isPie && <Collapse collapsed header="Annotations">
                 <AnnotationsUI
@@ -696,6 +677,63 @@ export default function ConfigPanel({
     )
 }
 
+function ColorPresetEditor({
+    state,
+    onChange,
+    type
+}: {
+    state: ChartConfigPanelState,
+    type?: "primary" | "secondary" | "only",
+    onChange: (state: ChartConfigPanelState) => void
+}) {
+    let colors = state.chartOptions.colors;
+    if (!colors) {
+        return null
+    }
+    return <>{ colors.map((c, i) => {
+        
+        if (type === "only") {
+            // @ts-ignore
+            if (i > state.chartOptions.series![0].data.length) {
+                return null    
+            }
+        }
+
+        else if (type && !state.chartOptions.series?.[i]?.id?.startsWith(type + "-")) {
+            return null
+        }
+        
+        return <input
+            type="color"
+            key={i}
+            value={String(c || "#DDDDDD")}
+            onChange={e => {
+                state.chartOptions.colors![i] = e.target.value
+                onChange(state)
+            }}
+        />
+    }) }</>
+}
+
+function PrimaryDataOpacityEditor({ state, onChange }: { state: ChartConfigPanelState, onChange: (state: ChartConfigPanelState) => void }) {
+    return <OpacityEditor
+        value={state.chartOptions.series?.find(s => s.id?.startsWith("primary-"))?.opacity ?? 1}
+        onChange={opacity => {
+            onChange({
+                ...state,
+                chartOptions: {
+                    // @ts-ignore
+                    series: state.chartOptions.series!.map(s => {
+                        if (s.id!.startsWith("primary-")) {
+                            return { ...s, opacity }
+                        }
+                        return s
+                    })
+                }
+            })
+        }}
+    />
+}
 
 function SecondaryDataOpacityEditor({ state, onChange }: { state: ChartConfigPanelState, onChange: (state: ChartConfigPanelState) => void }) {
     return <OpacityEditor
