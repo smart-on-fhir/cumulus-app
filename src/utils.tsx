@@ -254,12 +254,12 @@ export function objectDiff<T=Record<string, any>|any[]>(a: T, b: T): T {
         const valueA = value;
         // @ts-ignore
         const valueB = b[key];
-        const typeA  = typeof valueA;
-        const typeB  = typeof valueB;
+        const typeA  = Object.prototype.toString.call(valueA);
+        const typeB  = Object.prototype.toString.call(valueB);
 
         if (typeA !== typeB) {
             out[key] = valueA
-        } else if (valueA && typeA === "object") {
+        } else if (typeA === "[object Object]" || typeA === "[object Array]") {
             const child = objectDiff(valueA, valueB)
             if (!isEmptyObject(child)) {
                 out[key] = child
@@ -282,20 +282,27 @@ export function strip(
 
     let out = isArray ? [] as any[] : {} as Record<string, any>;
 
-    forEach(a, (value, key) => {
-        if (Array.isArray(a)) {
+    if (Array.isArray(a)) {
+        forEach(a, (value, key) => {
             if (!paths.includes([..._path, "[]", key].join("."))) {
-                out[key] = strip(value, paths, [ ..._path, "[]" ])
+                if (value && typeof value === "object") {
+                    out[key] = strip(value, paths, [..._path, "[]"])
+                } else {
+                    out[key] = value
+                }
             }
-        }
-        else if (!paths.includes([..._path, key].join("."))) {
-            if (value && typeof value === "object") {
-                out[key] = strip(value, paths, [..._path, key])
-            } else {
-                out[key] = value
+        })
+    } else {
+        forEach(a, (value, key) => {
+            if (!paths.includes([..._path, key].join("."))) {
+                if (value && typeof value === "object") {
+                    out[key] = strip(value, paths, [..._path, key])
+                } else {
+                    out[key] = value
+                }
             }
-        }
-    })
+        })
+    }
 
     return out;
 }
