@@ -73,7 +73,7 @@ const DefaultChartOptions = {
         // margin: 0,
         // padding: 0,
     },
-    colors: generateColors(36),
+    colors: generateColors(16),
     yAxis: {
         title: {
             text: "",

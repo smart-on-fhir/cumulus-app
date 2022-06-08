@@ -44,11 +44,9 @@ declare module app {
         filters: Filter[]
         viewType?: string
         chartOptions?: Partial<Highcharts.Options>
-        colorOptions?: ColorOptions
         denominator ?: string
         column2    ?: string // Extra Column
         column2type?: string // Extra Column render as
-        column2opacity?: number
         caption?: string // HTML chart caption
         seriesVisibility?: Record<string, boolean>
     }

@@ -1,3 +1,4 @@
+import { generateColors } from "../../utils"
 
 export const SupportedChartTypes = {
     pie          : "Pie Chart",
@@ -49,6 +50,8 @@ export const SingleDimensionChartTypes: (keyof typeof SupportedChartTypes)[] = [
 
 export const TURBO_THRESHOLD = 1000
 
+export const DEFAULT_COLORS = generateColors(36)
+
 // These are computed at runtime and will not be saved on the server
 export const ReadOnlyPaths = [
     "exporting",
@@ -59,9 +62,10 @@ export const ReadOnlyPaths = [
     "chart.animation.easing",
     // "series",
     "series.[].data",
+    "series.[].color",
     "chart.options3d.depth",
     // "chart.plotBorderWidth",
-    "colors",
+    // "colors",
     "yAxis.allowDecimals",
     "yAxis.labels.format",
     "plotOptions.series.animation.easing",

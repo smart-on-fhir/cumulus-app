@@ -4,7 +4,8 @@ import { defer }                     from "../../../utils";
 import Loader                        from "../../Loader";
 import {
     SupportedNativeChartTypes,
-    SupportedChartTypes
+    SupportedChartTypes,
+    DEFAULT_COLORS
 } from "../config";
 import moment from "moment";
 
@@ -132,7 +133,6 @@ function getSeries({
     data,
     data2,
     type,
-    colors,
     denominator,
     column2type,
     serverOptions,
@@ -142,7 +142,6 @@ function getSeries({
     data2           : app.ServerResponses.StratifiedDataResponse | null
     column          : app.DataRequestDataColumn
     type            : SupportedNativeChartTypes 
-    colors          : string[]
     denominator     : "" | "local" | "global"
     column2type    ?: keyof typeof SupportedChartTypes
     xType           : "category" | "linear" | "datetime"
@@ -163,12 +162,20 @@ function getSeries({
         // The ID of this series
         const id = (secondary ? "secondary-" : "primary-") + options.name
 
+        const S = serverOptions.series?.find((s: any) => s.id === id)
+
         // Should the series be hidden?
-        const visible = serverOptions.series?.find((s: any) => s.id === id)?.visible !== false
+        const visible = S?.visible !== false
+
+        const colors: string[] = serverOptions.colors!
+
+        const color = colors[series.length % colors.length]
 
         const cfg: any = {
             index: series.length,
             // colorIndex: series.length % colors.length,
+            opacity: S?.opacity,
+            color,
             visible,
             id
         }
@@ -177,23 +184,24 @@ function getSeries({
             cfg.fillColor = {
                 linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                 stops: [
-                    [0, new Color(colors[series.length % colors.length]).setOpacity(0.2 ).get('rgba') + ""],
-                    [1, new Color(colors[series.length % colors.length]).setOpacity(0.05).get('rgba') + ""]
+                    [0, new Color(color).setOpacity(0.2 ).get('rgba') + ""],
+                    [1, new Color(color).setOpacity(0.05).get('rgba') + ""]
                 ]
             }
         }
 
         if (secondary) {
             cfg.zIndex = -1
-            cfg.opacity = column2opacity
             cfg.shadow = false
 
-            cfg.color = {
-                linearGradient: { x1: 1, y1: 0, x2: 0, y2: 1 },
-                stops: [
-                    [0, new Color(colors[series.length % colors.length]).setOpacity(1.0).get('rgba') + ""],
-                    [1, new Color(colors[series.length % colors.length]).setOpacity(0.5).get('rgba') + ""]
-                ]
+            if (options.type.includes("column")) {
+                cfg.color = {
+                    linearGradient: { x1: 1, y1: 0, x2: 0, y2: 1 },
+                    stops: [
+                        [0, new Color(color).setOpacity(1.0).get('rgba') + ""],
+                        [1, new Color(color).setOpacity(0.5).get('rgba') + ""]
+                    ]
+                }
             }
 
             // There is a bug in Highcharts that prevents us from rendering hidden series
@@ -266,7 +274,6 @@ export function buildChartOptions({
     groupBy,
     data,
     data2,
-    colorOptions,
     denominator = "",
     type,
     column2type,
@@ -278,14 +285,11 @@ export function buildChartOptions({
     column          : app.DataRequestDataColumn
     groupBy        ?: app.DataRequestDataColumn
     type            : SupportedNativeChartTypes
-    colorOptions    : app.ColorOptions
     denominator    ?: "" | "local" | "global"
     column2type    ?: keyof typeof SupportedChartTypes
     onSeriesToggle  : (s: Record<string, boolean>) => void
 }): Highcharts.Options
 {
-    const COLORS = colorOptions.colors.map(c => new Color(c).setOpacity(colorOptions.opacity).get("rgba") + "")
-
     const xType = getXType(column);
 
     const series = getSeries({
@@ -293,7 +297,6 @@ export function buildChartOptions({
         data2,
         column,
         type,
-        colors: COLORS,
         denominator,
         column2type,
         xType,
@@ -311,7 +314,6 @@ export function buildChartOptions({
                 easing
             },
         },
-        colors: COLORS,
         yAxis: {
             allowDecimals: denominator ? true : false,
             max: denominator === "local" ? 100 : undefined,
@@ -402,7 +404,10 @@ export function buildChartOptions({
                     x = this.point.name
                 }
 
-                rows.push(`<tr><td colspan="2"><b style="color:${COLORS[this.point.series.index % COLORS.length]};-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
+                rows.push(`<tr><td colspan="2"><b style="color:${
+                    // @ts-ignore
+                    this.point.series.color?.stops?.[0]?.[1] || this.point.color || DEFAULT_COLORS[this.point.series.index % DEFAULT_COLORS.length]
+                };-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
                 
                 if (groupBy) {
                     rows.push(`<b>${this.point.series.name}</b><hr/></td></tr>`)

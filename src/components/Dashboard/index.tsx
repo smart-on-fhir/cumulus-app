@@ -33,7 +33,6 @@ interface ViewState
     filters         : app.Filter[]
     chartType       : string
     chartOptions    : Partial<Highcharts.Options>
-    colorOptions    : app.ColorOptions
     denominator     : "" | "local" | "global"
     cleanState     ?: ViewState
     column2        ?: app.DataRequestDataColumn
@@ -62,7 +61,6 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
     const chartable = [
         "chartType",
         "chartOptions",
-        "colorOptions",
         "denominator",
         "data",
     ];
@@ -89,7 +87,6 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
                     data2           : nextState.data2,
                     column          : nextState.viewColumn,
                     groupBy         : nextState.viewGroupBy,
-                    colorOptions    : nextState.colorOptions,
                     denominator     : nextState.denominator,
                     column2type     : nextState.column2type,
                     onSeriesToggle
@@ -217,9 +214,6 @@ export default function Dashboard({
         // any custom chart options
         chartOptions: viewSettings.chartOptions || {},
 
-        // any custom colors
-        colorOptions: viewSettings.colorOptions || { opacity: 1, colors: generateColors(36) },
-
         // the denominator option
         denominator: viewSettings.denominator || "",
         
@@ -258,7 +252,6 @@ export default function Dashboard({
         viewColumn,
         viewGroupBy,
         filters,
-        colorOptions,
         denominator,
         column2,
         column2type,
@@ -329,7 +322,6 @@ export default function Dashboard({
                     filters,
                     viewType: chartType,
                     chartOptions: chartOptionsToSave,
-                    colorOptions,
                     denominator,
                     column2: column2?.name,
                     column2type,
@@ -353,7 +345,6 @@ export default function Dashboard({
                     filters,
                     viewType: chartType,
                     chartOptions: chartOptionsToSave,
-                    colorOptions,
                     denominator,
                     column2: column2?.name,
                     column2type,
@@ -491,7 +482,6 @@ export default function Dashboard({
                                 viewDescription,
                                 chartOptions: fullChartOptions,
                                 // chartOptions: finalChartOptions,
-                                colorOptions,
                                 denominator,
                                 column2: column2?.name || "",
                                 column2type
@@ -505,7 +495,6 @@ export default function Dashboard({
                                     viewGroupBy    : cols.find(c => c.name === state.stratifyBy),
                                     filters        : [...state.filters],
                                     chartOptions   : state.chartOptions,
-                                    colorOptions   : state.colorOptions,
                                     denominator    : state.denominator,
                                     column2        : cols.find(c => c.name === state.column2),
                                     column2type    : state.column2type
