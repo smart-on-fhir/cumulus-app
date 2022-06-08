@@ -189,15 +189,14 @@ export default function ConfigPanel({
             width: 330,
             marginRight: "1em"
         }}>
-            { view.id && <div className="mt-1">
-                <Rating
+            { view.id && <Rating
                     value={ rating }
                     votes={ votes }
                     loading={ voting }
                     onVote={ vote }
                     onClear={ resetRating }
                 />
-            </div> }
+            }
             <Collapse collapsed header="Chart">
                 <div className="mt-1">
                     <label>Chart Type</label>

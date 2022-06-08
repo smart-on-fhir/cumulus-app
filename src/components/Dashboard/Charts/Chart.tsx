@@ -348,31 +348,9 @@ export function buildChartOptions({
             pie: {
                 dataLabels: {
                     formatter(): any {
-                        // @ts-ignore
                         if (this.point) {
-                            // console.log(this.point)
-                            // @ts-ignore
-                            let label = `<b>${this.point.name}</b>`
-
-                            let suffix = ""
-
-                            // @ts-ignore
-                            // let data = this.point.custom.data as Record<string, any>
-
-                            // if (data) {
-                            //     for(const key in data) {
-                            //         if (key !== "cnt" && data[key] !== null && data[key] + "" !== this.point.name) {
-                            //             suffix += `<span style="opacity:0.5;font-weight:400"> ${data[key]}</span>`
-                            //         }
-                            //     }
-                            // }
-
-                            if (!suffix) {
-                                // @ts-ignore
-                                suffix = `<span style="opacity:0.5;font-weight:400"> - ${parseFloat((this.point.percentage || 0).toPrecision(2))} %</span>`
-                            }
-
-                            return label + suffix
+                            return `<b>${this.point.name}</b><span style="opacity:0.5;font-weight:400">` +
+                                ` - ${parseFloat((this.point.percentage || 0).toPrecision(2))} %</span>`
                         }
                     }
                 },
