@@ -135,7 +135,6 @@ function getSeries({
     colors,
     denominator,
     column2type,
-    column2opacity,
     serverOptions,
     xType
 }: {
@@ -146,7 +145,6 @@ function getSeries({
     colors          : string[]
     denominator     : "" | "local" | "global"
     column2type    ?: keyof typeof SupportedChartTypes
-    column2opacity  : number
     xType           : "category" | "linear" | "datetime"
     serverOptions   : Highcharts.Options
 }): SeriesOptions[]
@@ -272,7 +270,6 @@ export function buildChartOptions({
     denominator = "",
     type,
     column2type,
-    column2opacity = 1,
     onSeriesToggle
 }: {
     data            : app.ServerResponses.DataResponse
@@ -284,7 +281,6 @@ export function buildChartOptions({
     colorOptions    : app.ColorOptions
     denominator    ?: "" | "local" | "global"
     column2type    ?: keyof typeof SupportedChartTypes
-    column2opacity ?: number
     onSeriesToggle  : (s: Record<string, boolean>) => void
 }): Highcharts.Options
 {
@@ -300,7 +296,6 @@ export function buildChartOptions({
         colors: COLORS,
         denominator,
         column2type,
-        column2opacity,
         xType,
         serverOptions: options
     });
@@ -382,14 +377,14 @@ export function buildChartOptions({
                 shadow: false
             },
             spline: {
-                shadow: data2 ? { width: 2, opacity: (colorOptions.opacity ?? 1 + column2opacity)/4 } : false
+                shadow: data2 ? { width: 2, opacity: 0.2, offsetY: 1 } : false
             },
             areaspline: {
                 shadow: data2 ? {
                     width  : 2,
                     offsetY: 1,
                     offsetX: 0,
-                    opacity: (colorOptions.opacity ?? 1 + column2opacity) / 4
+                    opacity: 0.2,
                 } : false
             }
         },

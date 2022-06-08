@@ -74,20 +74,19 @@ function SecondaryDataEditor({
                 />
             </div> }
 
-            { !!state.column2 && !!state.column2type && <div className="pt-1">
-                <label>
-                    Opacity
-                    <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.01}
-                        value={ state.column2opacity === undefined ? 1 : state.column2opacity }
-                        onChange={e => onChange({ ...state, column2opacity: e.target.valueAsNumber })}
-                        style={{ width: "100%", margin: 0 }}
-                    />
-                </label>
-            </div> }
+            { !!state.column2 && !!state.column2type && <>
+                <div className="pt-1">
+                <div className="pt-1">
+                    <label>
+                        Opacity
+                        <SecondaryDataOpacityEditor state={state} onChange={onChange} />
+                    </label>
+                    <p className="small color-muted">
+                        Using semitransparent colors might slightly improve readability in case
+                        of overlapping lines or shapes
+                    </p>
+                </div>
+            </> }
         </>
     )
 }
@@ -107,7 +106,6 @@ interface ChartConfigPanelState {
     denominator    : string
     column2        : string
     column2type    : string
-    column2opacity : number
     annotations    : app.Annotation[]
     xCol           : app.DataRequestDataColumn
 }
@@ -695,5 +693,40 @@ export default function ConfigPanel({
             
             <br/>
         </div>
+    )
+}
+
+
+function SecondaryDataOpacityEditor({ state, onChange }: { state: ChartConfigPanelState, onChange: (state: ChartConfigPanelState) => void }) {
+    return <OpacityEditor
+        value={state.chartOptions.series?.find(s => s.id?.startsWith("secondary-"))?.opacity ?? 1}
+        onChange={opacity => {
+            onChange({
+                ...state,
+                chartOptions: {
+                    // @ts-ignore
+                    series: state.chartOptions.series!.map(s => {
+                        if (s.id!.startsWith("secondary-")) {
+                            return { ...s, opacity }
+                        }
+                        return s
+                    })
+                }
+            })
+        }}
+    />
+}
+
+function OpacityEditor({ value, onChange }: { value: number, onChange: (value: number) => void}) {
+    return (
+        <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={value}
+            onChange={e => onChange(e.target.valueAsNumber)}
+            style={{ width: "100%", margin: 0 }}
+        />
     )
 }
