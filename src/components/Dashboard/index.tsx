@@ -38,7 +38,6 @@ interface ViewState
     cleanState     ?: ViewState
     column2        ?: app.DataRequestDataColumn
     column2type     : keyof typeof SupportedChartTypes
-    column2opacity  : number
     caption         : string
     data            : app.ServerResponses.DataResponse | null
     data2           : app.ServerResponses.StratifiedDataResponse | null
@@ -93,7 +92,6 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
                     colorOptions    : nextState.colorOptions,
                     denominator     : nextState.denominator,
                     column2type     : nextState.column2type,
-                    column2opacity  : nextState.column2opacity,
                     onSeriesToggle
                 })
             }
@@ -231,9 +229,6 @@ export default function Dashboard({
         // secondary data type
         column2type: viewSettings.column2type || "",
 
-        // secondary data opacity
-        column2opacity: viewSettings.column2opacity || 1,
-
         // View caption if any
         caption: viewSettings.caption || "",
         
@@ -267,7 +262,6 @@ export default function Dashboard({
         denominator,
         column2,
         column2type,
-        column2opacity,
         caption,
         data,
         data2,
@@ -313,10 +307,11 @@ export default function Dashboard({
             await getScreenShot() :
             undefined;
 
-        const chartOptionsToSave = objectDiff(
-            strip(fullChartOptions, ReadOnlyPaths),
-            DefaultChartOptions
-        );
+        // const chartOptionsToSave = objectDiff(
+        //     strip(fullChartOptions, ReadOnlyPaths),
+        //     DefaultChartOptions
+        // );
+        const chartOptionsToSave = strip(fullChartOptions, ReadOnlyPaths);
 
         // console.log(chartOptions, chartOptionsToSave)
         
@@ -338,7 +333,6 @@ export default function Dashboard({
                     denominator,
                     column2: column2?.name,
                     column2type,
-                    column2opacity,
                     caption
                 }
             }).catch(e => alert(e.message));
@@ -363,7 +357,6 @@ export default function Dashboard({
                     denominator,
                     column2: column2?.name,
                     column2type,
-                    column2opacity,
                     caption
                 }
             }).then(
@@ -501,8 +494,7 @@ export default function Dashboard({
                                 colorOptions,
                                 denominator,
                                 column2: column2?.name || "",
-                                column2type,
-                                column2opacity
+                                column2type
                             }}
                             onChange={state => {
                                 dispatch({ type: "UPDATE", payload: {
@@ -516,8 +508,7 @@ export default function Dashboard({
                                     colorOptions   : state.colorOptions,
                                     denominator    : state.denominator,
                                     column2        : cols.find(c => c.name === state.column2),
-                                    column2type    : state.column2type,
-                                    column2opacity : state.column2opacity
+                                    column2type    : state.column2type
                                 }});
                             }}
                         />
