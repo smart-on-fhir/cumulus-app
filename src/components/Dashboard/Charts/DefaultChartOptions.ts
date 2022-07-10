@@ -12,7 +12,7 @@ const DefaultChartOptions = {
         },
         panKey: 'shift',
         spacingBottom: 25,
-        zoomType: "x",
+        zoomType: "xy",
         animation: {
             duration: 400,
             defer: 0,
