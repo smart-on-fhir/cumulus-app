@@ -316,7 +316,7 @@ export function buildChartOptions({
         },
         yAxis: {
             allowDecimals: denominator ? true : false,
-            max: denominator === "local" ? 100 : undefined,
+            // max: denominator === "local" ? 100 : undefined,
             labels: {
                 format: denominator ? "{text}%" : "{text}",
             }
