@@ -10,13 +10,19 @@ async function up(queryInterface) {
         return true;
     }
 
-    await queryInterface.addColumn('DataRequests', 'metadata', {
-        type: DataTypes.JSONB
-    });
+    const cols = await queryInterface.describeTable('DataRequests');
+    if (!('metadata' in cols)) {
+        await queryInterface.addColumn('DataRequests', 'metadata', {
+            type: DataTypes.JSONB
+        });
+    }
 }
 
 async function down(queryInterface) {
-	await queryInterface.removeColumn('DataRequests', 'metadata');
+    const cols = await queryInterface.describeTable('DataRequests');
+    if ('metadata' in cols) {
+	    await queryInterface.removeColumn('DataRequests', 'metadata');
+    }
 }
 
 module.exports = { up, down };
