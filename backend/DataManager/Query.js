@@ -1,47 +1,51 @@
 const { QueryTypes, Sequelize } = require("sequelize");
 
 const FilterConfig = {
-    eq : col => `"${col}" = ?` ,
-    ne : col => `"${col}" != ?`,
-    gt : col => `"${col}" > ?` ,
-    gte: col => `"${col}" >= ?`,
-    lt : col => `"${col}" < ?` ,
-    lte: col => `"${col}" <= ?`,
+    
+    // Text --------------------------------------------------------------------
+    strEq            : col => `"${col}" LIKE ?`,
+    strContains      : col => `"${col}" ILIKE concat('%', ?, '%')`,
+    strStartsWith    : col => `"${col}" LIKE concat(?, '%')`,
+    strEndsWith      : col => `"${col}" LIKE concat('%', ?)`,
+    matches          : col => `"${col}" ~ ?`, 
+    strEqCI          : col => `"${col}" ILIKE ?`,
+    strContainsCI    : col => `"${col}" ILIKE concat('%', ?, '%')`,
+    strStartsWithCI  : col => `"${col}" ILIKE concat(?, '%')`,
+    strEndsWithCI    : col => `"${col}" ILIKE concat('%', ?)`,
+    matchesCI        : col => `"${col}" ~* ?`,
+    
+    // Dates -------------------------------------------------------------------
+    sameDay          : col => `date_trunc('day'  , "${col}") =  date_trunc('day'  , TIMESTAMP ?)`,
+    sameMonth        : col => `date_trunc('month', "${col}") =  date_trunc('month', TIMESTAMP ?)`,
+    sameYear         : col => `date_trunc('year' , "${col}") =  date_trunc('year' , TIMESTAMP ?)`,
+    sameDayOrBefore  : col => `date_trunc('day'  , "${col}") <= date_trunc('day'  , TIMESTAMP ?)`,
+    sameMonthOrBefore: col => `date_trunc('month', "${col}") <= date_trunc('month', TIMESTAMP ?)`,
+    sameYearOrBefore : col => `date_trunc('year' , "${col}") <= date_trunc('year' , TIMESTAMP ?)`,
+    sameDayOrAfter   : col => `date_trunc('day'  , "${col}") >= date_trunc('day'  , TIMESTAMP ?)`,
+    sameMonthOrAfter : col => `date_trunc('month', "${col}") >= date_trunc('month', TIMESTAMP ?)`,
+    sameYearOrAfter  : col => `date_trunc('year' , "${col}") >= date_trunc('year' , TIMESTAMP ?)`,
+    beforeDay        : col => `date_trunc('day'  , "${col}") <  date_trunc('day'  , TIMESTAMP ?)`,
+    beforeMonth      : col => `date_trunc('month', "${col}") <  date_trunc('month', TIMESTAMP ?)`,
+    beforeYear       : col => `date_trunc('year' , "${col}") <  date_trunc('year' , TIMESTAMP ?)`,
+    afterDay         : col => `date_trunc('day'  , "${col}") >  date_trunc('day'  , TIMESTAMP ?)`,
+    afterMonth       : col => `date_trunc('month', "${col}") >  date_trunc('month', TIMESTAMP ?)`,
+    afterYear        : col => `date_trunc('year' , "${col}") >  date_trunc('year' , TIMESTAMP ?)`,
 
-    strEq          : col => `"${col}" LIKE ?`,
-    strContains    : col => `"${col}" ILIKE concat('%', ?, '%')`,
-    strStartsWith  : col => `"${col}" LIKE concat(?, '%')`,
-    strEndsWith    : col => `"${col}" LIKE concat('%', ?)`,
-    matches        : col => `"${col}" ~ ?`, 
-    strEqCI        : col => `"${col}" ILIKE ?`,
-    strContainsCI  : col => `"${col}" ILIKE concat('%', ?, '%')`,
-    strStartsWithCI: col => `"${col}" ILIKE concat(?, '%')`,
-    strEndsWithCI  : col => `"${col}" ILIKE concat('%', ?)`,
-    matchesCI      : col => `"${col}" ~* ?`,
-    
-    sameDay  : col => `date_trunc('day', "${col}") = date_trunc('day', TIMESTAMP '?')`,
-    sameMonth: col => `date_trunc('month', "${col}") = date_trunc('month', TIMESTAMP '?')`,
-    sameYear : col => `date_trunc('year', "${col}") = date_trunc('year', TIMESTAMP '?')`,
-    
-    // { id: "sameDayOrBefore"  , label: "Same date or before" , type: [ "date:YYYY-MM-DD" ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSameOrBefore(moment(r).utc(), "day"  ) },
-    // { id: "sameDayOrAfter"   , label: "Same date or after"  , type: [ "date:YYYY-MM-DD" ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSameOrAfter (moment(r).utc(), "day"  ) },
-    // { id: "sameMonthOrBefore", label: "Same month or before", type: [ "date:YYYY-MM"    ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSameOrBefore(moment(r).utc(), "month") },
-    // { id: "sameMonthOrAfter" , label: "Same month or after" , type: [ "date:YYYY-MM"    ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSameOrAfter (moment(r).utc(), "month") },
-    // { id: "sameYearOrBefore" , label: "Same year or before" , type: [ "date:YYYY"       ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSameOrBefore(moment(r).utc(), "year" ) },
-    // { id: "sameYearOrAfter"  , label: "Same year or after"  , type: [ "date:YYYY"       ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isSameOrAfter (moment(r).utc(), "year" ) },
-    // { id: "beforeDay"        , label: "Before date"         , type: [ "date:YYYY-MM-DD" ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isBefore      (moment(r).utc(), "day"  ) },
-    // { id: "afterDay"         , label: "After date"          , type: [ "date:YYYY-MM-DD" ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isAfter       (moment(r).utc(), "day"  ) },
-    // { id: "beforeMonth"      , label: "Before month"        , type: [ "date:YYYY-MM"    ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isBefore      (moment(r).utc(), "month") },
-    // { id: "afterMonth"       , label: "After month"         , type: [ "date:YYYY-MM"    ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isAfter       (moment(r).utc(), "month") },
-    // { id: "beforeYear"       , label: "Before year"         , type: [ "date:YYYY"       ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isBefore      (moment(r).utc(), "year" ) },
-    // { id: "afterYear"        , label: "After year"          , type: [ "date:YYYY"       ], defaultValue: undefined, fn: (l, r) => l !== null && typeof l === "string" && typeof r === "number" && moment(l, "YYYY-MM-DD").utc().isAfter       (moment(r).utc(), "year" ) },
-    
-    isTrue    : col => `"${col}" IS TRUE`,
-    isNotTrue : col => `"${col}" IS NOT TRUE`,
-    isFalse   : col => `"${col}" IS FALSE`,
-    isNotFalse: col => `"${col}" IS NOT FALSE`,
-    isNull    : col => `"${col}" IS NULL`,
-    isNotNull : col => `"${col}" IS NOT NULL`,
+    // Booleans ----------------------------------------------------------------
+    isTrue           : col => `"${col}" IS TRUE`,
+    isNotTrue        : col => `"${col}" IS NOT TRUE`,
+    isFalse          : col => `"${col}" IS FALSE`,
+    isNotFalse       : col => `"${col}" IS NOT FALSE`,
+
+    // Any ---------------------------------------------------------------------
+    isNull           : col => `"${col}" IS NULL`,
+    isNotNull        : col => `"${col}" IS NOT NULL`,
+    eq               : col => `"${col}" = ?` ,
+    ne               : col => `"${col}" != ?`,
+    gt               : col => `"${col}" > ?` ,
+    gte              : col => `"${col}" >= ?`,
+    lt               : col => `"${col}" < ?` ,
+    lte              : col => `"${col}" <= ?`,
 };
 
 
@@ -165,6 +169,9 @@ class Query {
      */
     whiteList(allColumns) {
         allColumns.forEach(c => {
+            // if (!this.#allColumns.includes(c)) {
+            //     this.andWhere(c, "IS NULL")    
+            // }
             this.andWhere(c, this.#allColumns.includes(c) ? "IS NOT NULL" : "IS NULL")
         });
         return this;
