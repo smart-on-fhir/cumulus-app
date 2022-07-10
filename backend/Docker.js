@@ -47,7 +47,7 @@ async function waitForReady(container) {
                 container.stop()
                 throw new Error("Failed to connect to database in 5 minutes")
             }
-            await wait(50)
+            await wait(150)
         }
     }
 }
