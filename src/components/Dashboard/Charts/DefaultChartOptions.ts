@@ -85,6 +85,7 @@ const DefaultChartOptions = {
             }
         },
         allowDecimals: true,
+        max: null,
         // maxPadding: 0,
         // minPadding: 0,
         endOnTick: false,
