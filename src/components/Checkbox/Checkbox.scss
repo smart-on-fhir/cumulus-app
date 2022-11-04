@@ -3,11 +3,10 @@
 
 label.checkbox-label {
     display: block;
-    padding: 0.25em 0.5em 0.25em 1.6em;
+    padding: 0 0.5em 0 1.6em;
     border-radius: 4px;
     position: relative;
     font-weight: normal;
-    // box-shadow: 0 0 1px #000 inset;
     line-height: 1.6em;
 
     > input[type="checkbox"], > input[type="radio"] {
@@ -16,9 +15,9 @@ label.checkbox-label {
         width: 1em;
         height: 1em;
         outline: 0;
-        vertical-align: middle;
+        vertical-align: top;
         position: relative;
-        top: -0.03em;
+        top: 0.3em;
 
         &:focus-visible + .checkbox-label-focus-highlight {
             box-shadow: 0 0 0 1px lighten($color: $color-blue, $amount: 10%) inset;
@@ -41,6 +40,11 @@ label.checkbox-label {
         font-weight: normal;
         font-size: 85%;
         line-height: normal;
+        padding: 0 0 0.3em;
+
+        &:empty {
+            display: none;
+        }
     }
 
     &:hover {

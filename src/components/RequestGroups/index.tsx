@@ -59,10 +59,12 @@ export default class RequestGroupList extends Component<any, State>
                 ]} />
                 <div className="row gap middle">
                     <div className="col">
-                        <h4><i className="fa-solid fa-folder" /> Data Subscription Groups</h4>
+                        <h4><i className="fa-solid fa-folder color-blue-dark" /> Data Subscription Groups</h4>
                     </div>
                     <div className="col col-0">
-                        <Link to="new" className="btn color-blue">Create Subscription Group</Link>
+                        <Link to="new" className="btn color-blue btn-virtual">
+                            <b className="color-green"><i className="fa-solid fa-circle-plus" /> Create Subscription Group</b>
+                        </Link>
                     </div>
                 </div>
                 <hr className="mb-1" />
@@ -90,12 +92,11 @@ export default class RequestGroupList extends Component<any, State>
                                 <td>{row.description}</td>
                                 <td className="small">{row.createdAt}</td>
                                 <td className="small">{row.updatedAt}</td>
-                                <td className="right">
-                                    <Link title="Edit" className="btn small color-brand-2" to={ row.id + "/edit" }>
+                                <td className="right nowrap">
+                                    <Link title="Edit" className="btn small color-brand-2 btn-virtual" to={ row.id + "/edit" }>
                                         <i className="fa-solid fa-pen-to-square" />
                                     </Link>
-                                    &nbsp;
-                                    <button title="Delete" className="btn small color-red" onClick={() => this.deleteGroup(row.id)}>
+                                    <button title="Delete" className="btn small color-red btn-virtual" onClick={() => this.deleteGroup(row.id)}>
                                         <i className="fa-solid fa-trash-can" />
                                     </button>
                                 </td>

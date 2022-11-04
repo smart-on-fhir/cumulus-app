@@ -17,6 +17,10 @@ import DataSiteListPage                         from "./DataSites";
 import DataSiteEditForm                         from "./DataSites/EditForm";
 import DataSiteCreateForm                       from "./DataSites/CreateForm";
 import RequestDataForm                          from "./Dashboard/RequestDataForm";
+import Navigation                               from "./Navigation"
+import TODO                                     from "./TODO";
+import Projects                                 from "./Projects";
+import Views                                    from "./Views";
 
 import "../styles/main.scss";
 
@@ -26,13 +30,15 @@ export default function App()
         <AuthProvider>
             <BrowserRouter>
                 <Header/>
-                <div className="container row p-1">
+                <div className="container container-fluid row p-1">
+                    <Navigation />
                     <div id="main" className="col">
                         <Routes>
                             <Route path="/">
                                 <Route index element={ <RequireAuth><Home /></RequireAuth> } />
 
                                 <Route path="views">
+                                    <Route index element={ <Views /> } />
                                     <Route path=":id">
                                         <Route index element={ <RequireAuth><EditView /></RequireAuth> } />
                                         <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />
@@ -64,7 +70,20 @@ export default function App()
                                     <Route path=":id/edit" element={<RequireAuth><RequestGroupEditForm /></RequireAuth>} />
                                 </Route>
 
-                                <Route path="/login" element={ <LoginPage /> } />
+                                <Route path="login" element={ <LoginPage /> } />
+                                
+                                <Route path="user" element={ <TODO /> } />
+                                <Route path="activity" element={ <TODO /> } />
+                                <Route path="settings" element={ <TODO /> } />
+                                <Route path="users">
+                                    <Route index element={ <TODO /> } />
+                                    <Route path="invite" element={ <TODO /> } />
+                                </Route>
+                                <Route path="permissions" element={ <TODO /> } />                                
+                                <Route path="projects">
+                                    <Route index element={ <Projects /> } />
+                                    <Route path="new" element={ <TODO /> } />
+                                </Route>
                                 
                                 <Route path="*" element="Page Not Found" />
                             </Route>
