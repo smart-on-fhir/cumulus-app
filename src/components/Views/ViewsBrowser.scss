@@ -19,7 +19,7 @@
         display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
         column-gap: 1em;
-        font-size: 14px;
+        font-size: 0.9rem;
     }
 
     .view-thumbnail-image {
@@ -59,7 +59,7 @@
     }
 
     .view-thumbnail-description {
-        font-size  : small;
+        font-size  : 90%;
         font-weight: normal;
     }
 

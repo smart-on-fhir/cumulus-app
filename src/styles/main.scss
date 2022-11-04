@@ -7,19 +7,18 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size  : $font-size;
+  line-height: $line-height;
+}
 
 body {
-    margin: 0;
-    background-color: $color-grey-light;
-    color: $color-grey-dark;
-    // font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    //   'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    //   sans-serif;
-    font-family: Nunito, 'Helvetica Neue', sans-serif;
-    font-size: $font-size;
-    line-height: $line-height;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  background-color: $color-grey-light;
+  color: $color-grey-dark;
+  font-family: $font-family;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .nowrap {
@@ -30,14 +29,12 @@ body {
 .pull-right { float: right; }
 .pull-left { float: left; }
 
-
-// Typography ------------------------------------------------------------------
-h1 { font-size: $font-size * 2;   font-family: "Open Sans"; margin: 1ex 0 0.5ex 0; }
-h2 { font-size: $font-size * 1.8; font-family: "Open Sans"; margin: 1ex 0 0.5ex 0; }
-h3 { font-size: $font-size * 1.6; font-family: "Open Sans"; margin: 1ex 0 0.5ex 0; }
-h4 { font-size: $font-size * 1.4; font-family: "Open Sans"; margin: 1ex 0 0.5ex 0; }
-h5 { font-size: $font-size * 1.2; font-family: "Open Sans"; margin: 1ex 0 0.5ex 0; }
-h6 { font-size: $font-size;       font-family: "Open Sans"; margin: 1ex 0 0.5ex 0; }
+h1 { font-size: 2rem;   margin: 1ex 0 0.5ex 0; }
+h2 { font-size: 1.8rem; margin: 1ex 0 0.5ex 0; }
+h3 { font-size: 1.6rem; margin: 1ex 0 0.5ex 0; }
+h4 { font-size: 1.4rem; margin: 1ex 0 0.5ex 0; }
+h5 { font-size: 1.2rem; margin: 1ex 0 0.5ex 0; }
+h6 { font-size: 1rem;   margin: 1ex 0 0.5ex 0; }
 
 p {
   margin: 0.5em 0 0;
@@ -48,8 +45,8 @@ p {
 }
 
 code, pre {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, monospace;
-    font-size: $font-size - 3;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9rem;
 }
 
 label {
@@ -62,8 +59,6 @@ a {
   cursor: pointer;
 
   &:hover {
-    // text-decoration: underline;
-
     .color-muted {
       text-decoration: none !important;
     }
@@ -76,17 +71,14 @@ b {
 
 .link {
   color: #36C;
-  // text-decoration: underline;
   cursor: pointer;
   appearance: none;
   background: initial;
   margin: initial;
   padding: initial;
   border: 0;
-  // font: inherit;
 
   &:hover {
-    // box-shadow: 0 -1px 0 0 currentColor inset;
     text-decoration: underline;
   }
 }
@@ -97,6 +89,7 @@ b {
 
 // Colors ----------------------------------------------------------------------
 .color-blue       { color: $color-blue       }
+.color-blue-dark  { color: $color-blue-dark  }
 .color-orange     { color: $color-orange     }
 .color-red        { color: $color-red        }
 .color-grey-light { color: $color-grey-light }
@@ -188,7 +181,6 @@ ul {
   }
 }
 
-
 .icon-list {
   padding: 0;
   margin : 0 0 2em 0;
@@ -201,8 +193,6 @@ ul {
   }
 }
 
-
-
 .icon-item {
     position: relative;
     padding: 0.5em 0.5em 0.5em 2.75em;
@@ -212,7 +202,7 @@ ul {
     .icon {
         position  : absolute;
         left      : 0.5em;
-        font-size : $font-size * 1.4;
+        font-size : 1.4rem;
         color     : #999;
         margin-top: 0.1em;
 
@@ -229,13 +219,13 @@ ul {
         }
 
         &.fa-location-dot {
-          font-size : $font-size * 1.7;
+          font-size : 1.7rem;
         }
 
         .fa-check-circle {
             position : relative;
             z-index  : 2;
-            font-size: $font-size;
+            font-size: 1rem;
             top: 0.6em;
             left: -0.6em;
             color: $color-green;
@@ -247,7 +237,7 @@ ul {
         .fa-clock {
             position  : relative;
             z-index   : 2;
-            font-size : $font-size;
+            font-size : 1rem;
             top       : 0.6em;
             left      : -0.6em;
             color     : $color-orange;
@@ -259,7 +249,7 @@ ul {
         .fa-sync-alt {
             position  : relative;
             z-index   : 2;
-            font-size : $font-size * 0.78;
+            font-size : 0.78rem;
             top       : 0.5em;
             left      : -1em;
             color     : #FFF;
@@ -275,11 +265,10 @@ ul {
   a.icon-item {
     display: block;
     border-radius: 4px;
-    // padding: ;
+
     &:hover {
       background: lighten($color: $color-blue, $amount: 36%);
       box-shadow: 0 0 0 1px lighten($color: $color-blue, $amount: 30%) inset;
-      // border-radius: 1px;
     }
   }
 }
@@ -350,7 +339,6 @@ ul {
   &.bg-brand-2    { background-color: $color-brand-2    }
 }
 
-
 img {
   max-width: 100%;
 }
@@ -370,3 +358,13 @@ table {
   color: #000;
   text-shadow: 0 1px 0 #fff;
 }
+
+#root {
+  min-height: 100vh;
+}
+
+#main {
+  padding: 1em;
+  min-height: calc(100vh - 6rem);
+}
+

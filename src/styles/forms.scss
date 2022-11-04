@@ -15,7 +15,7 @@
     $paddingRight  : 0.8em;
     $paddingBottom : 0.4em;
     $paddingLeft   : 0.8em;
-    $contrast      : 60;
+    $contrast      : 70;
     $color         : contrast($bg, 60%, lighten($bg, $contrast), darken($bg, $contrast));
 
     // background     : $bg linear-gradient(lighten($bg, 5%), darken($bg, 5%));
@@ -26,7 +26,7 @@
     // vertical-align: middle;
     line-height: inherit;
     // font           : inherit;
-    font-size      : $font-size;
+    font-size      : 1rem; // $font-size;
     color          : $color;
     border-radius  : $border-radius;
     // vertical-align : top;
@@ -92,16 +92,12 @@
     // pointer-events    : none;
     background        : $color-grey;
     color             : $color-grey-dark;
-    padding           : round($font-size * 0.2)
-                        round($font-size * 0.5);
+    padding           : 0.2rem 0.5rem;
     // margin: 0;
-    margin            : round($font-size * -0.2)
-                        0.5em
-                        round($font-size * -0.2)
-                        round($font-size * -0.5);
+    margin            : -0.2rem 0.5em -0.2rem -0.5rem;
     // vertical-align    : middle;
     vertical-align    : top;
-    line-height: $font-size * $line-height;
+    line-height: $line-height;
     // position: absolute;
 }
 
@@ -124,7 +120,7 @@
     width        : 100%;
     line-height  : $line-height;
     color        : inherit;
-    max-height   : ($font-size * ($line-height + 0.8)) + 2;
+    max-height   : (1rem * ($line-height + 0.8)) + 2;
     margin: 0;
     // height   : ($font-size * $line-height) + round($font-size * 0.8);
   
@@ -316,6 +312,14 @@ select option.empty-option {
 .btn-brand-2 {
     @include button($color-brand-2);
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.btn-virtual {
+    &:not(:hover,:focus) {
+        background  : transparent;
+        border-color: transparent;
+        box-shadow: none;
+    }
 }
 
 

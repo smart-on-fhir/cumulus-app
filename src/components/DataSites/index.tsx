@@ -56,10 +56,14 @@ export default class DataSiteListPage extends Component<any, State>
                 ]} />
                 <div className="row gap middle">
                     <div className="col">
-                        <h4><i className="fa-solid fa-database" /> Data Sites</h4>
+                        <h4><i className="fa-solid fa-location-dot color-blue-dark" /> Data Sites</h4>
                     </div>
                     <div className="col col-0">
-                        <Link to="new" className="btn color-blue">Create Data Site</Link>
+                        <Link to="new" className="btn btn-virtual">
+                            <b className="color-green">
+                                <i className="fa-solid fa-circle-plus" /> Create Data Site
+                            </b>
+                        </Link>
                     </div>
                 </div>
                 <hr className="mb-1" />
@@ -72,7 +76,7 @@ export default class DataSiteListPage extends Component<any, State>
                             <th>Name</th>
                             <th>Description</th>
                             <th>Latitude</th>
-                            <th>Longtitude</th>
+                            <th>Longitude</th>
                             <th/>
                         </tr>
                     </thead>
@@ -85,11 +89,10 @@ export default class DataSiteListPage extends Component<any, State>
                                 <td className="small">{row.lat}</td>
                                 <td className="small">{row.long}</td>
                                 <td className="right nowrap">
-                                    <Link title="Edit" className="btn small color-brand-2" to={ row.id + "/edit" }>
+                                    <Link title="Edit" className="btn small color-brand-2 btn-virtual" to={ row.id + "/edit" }>
                                         <i className="fa-solid fa-pen-to-square" />
                                     </Link>
-                                    &nbsp;
-                                    <button title="Delete" className="btn small color-red" onClick={() => this.deleteRecord(row.id)}>
+                                    <button title="Delete" className="btn small color-red btn-virtual" onClick={() => this.deleteRecord(row.id)}>
                                         <i className="fa-solid fa-trash-can" />
                                     </button>
                                 </td>

@@ -2,7 +2,7 @@
 
 
 .data-grid {
-    font-size: $font-size * 0.8;
+    font-size: 0.8rem;
     min-height: 4em;
     overflow: auto;
     position: relative;
@@ -94,10 +94,9 @@
     height    : auto;
     right     : -1px;
     left      : auto;
-    top       : $font-size * ($line-height + 0.5);
+    top       : 1.8rem;
     bottom    : 3.5px;
     overflow  : hidden;
-    // transition: all 0.2s linear 1s;
     position  : absolute;
     z-index   : 100;
     transition: width 0.2s linear 1s;
@@ -112,9 +111,6 @@
         right        : 0;
         bottom       : auto;
         transition   : top 0.1s ease-out;
-        // min-height: 20px;
-        // transition   : all 0.1s;
-        // min-height   : 50px;
 
         &:hover {
             background: #AAA;

@@ -8,7 +8,7 @@
     .highcharts-menu-item {
         margin: 0;
         font-family: inherit;
-        font-size: $font-size * 0.86 !important;
+        font-size: 0.86rem !important;
     }
 
     hr {
@@ -39,7 +39,7 @@
     position: relative;
     font-family: monospace;
     white-space: pre-wrap;
-    font-size: 13px;
+    font-size: 0.86rem;
     border: 1px solid $color-grey;
     border-top: 0;
     border-radius: 0 0 5px 5px;

@@ -130,7 +130,7 @@ class FieldEditorList extends React.Component<FieldEditorListProps>
                         <label>{ label } {  list.length > 0 && <b className="badge">{ list.length }</b> }</label>
                     </div>
                     <div className="col col-0 middle">
-                        <span className="btn small color-green" onClick={() => this.add()}>Add</span>
+                        <span className="btn small color-green btn-virtual" onClick={() => this.add()}>Add</span>
                     </div>
                 </div>
                 <hr/>
