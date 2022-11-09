@@ -1,17 +1,23 @@
 const Docker        = require("dockerode")
 const { runSimple } = require("run-container")
-const config        = require("./config")
 const { Sequelize } = require("sequelize")
 const { wait }      = require("./lib")
 
 
-
-async function getDockerContainer(name = config.docker.containerName)
+/**
+ * @param {object} options
+ * @param {object} options.docker
+ * @param {string} options.docker.containerName
+ * @param {string} [options.docker.dataDir]
+ * @param {object} options.db
+ * @param {import("sequelize").Options} options.db.options
+ */
+async function getDockerContainer(options)
 {
     var container;
 
     try {
-        container = await createContainer(name)
+        container = await createContainer(options)
     }
     catch(error) {
 
@@ -21,24 +27,33 @@ async function getDockerContainer(name = config.docker.containerName)
         // Happens after unexpected exit!
         if (error.statusCode === 409) {
             const docker = new Docker({ socketPath: '/var/run/docker.sock' })
-            container = docker.getContainer(name)
+            container = docker.getContainer(options.docker.containerName)
             await container.restart()
         }
         else {
             throw error;
         }
     }
-    
-    await waitForReady(container)
+
+    await waitForReady(container, options)
     return () => container.stop()
 }
 
-async function waitForReady(container) {
+/**
+ * @param {Docker.Container} container
+ * @param {object} options
+ * @param {object} options.docker
+ * @param {string} options.docker.containerName
+ * @param {string} [options.docker.dataDir]
+ * @param {object} options.db
+ * @param {import("sequelize").Options} options.db.options
+ */
+async function waitForReady(container, options) {
     let start = Date.now()
     while (true) {
         try {
             // @ts-ignore
-            const connection = new Sequelize(config.db.options);
+            const connection = new Sequelize(options.db.options);
             await connection.authenticate();
             await connection.close();
             break
@@ -52,22 +67,31 @@ async function waitForReady(container) {
     }
 }
 
-async function createContainer(name) {
-    const bindMounts = config.docker.dataDir ? {
-        [config.docker.dataDir]: "/var/lib/postgresql/data"
-    } : undefined;
-
+/**
+ * @param {object} options
+ * @param {object} options.docker
+ * @param {string} options.docker.containerName
+ * @param {string} [options.docker.dataDir]
+ * @param {object} options.db
+ * @param {import("sequelize").Options} options.db.options
+ */
+async function createContainer(options) {
     return runSimple({
-        name,
-        image: "postgres",
+        name      : options.docker.containerName,
+        image     : "postgres",
         autoRemove: true,
-        ports: { "5432": "5432" },
-        bindMounts,
+        ports: {
+            "5432": String(options.db.options.port || "5432")
+        },
+        bindMounts: options.docker.dataDir ? {
+            [ options.docker.dataDir ]: "/var/lib/postgresql/data"
+        } : {},
         env: {
-            POSTGRES_PASSWORD: config.db.options.password,
-            POSTGRES_USER    : config.db.options.username,
-            POSTGRES_DB      : config.db.options.database
-        }
+            POSTGRES_PASSWORD: options.db.options.password || "",
+            POSTGRES_USER    : options.db.options.username || "",
+            POSTGRES_DB      : options.db.options.database || ""
+        },
+        verbose: true
     });
 }
 
