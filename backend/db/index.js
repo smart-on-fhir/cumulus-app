@@ -2,7 +2,6 @@ const Path                   = require("path");
 const { Sequelize }          = require("sequelize");
 const { getDockerContainer } = require("../Docker");
 const { walkSync }           = require("../lib");
-const config                 = require("../config");
 
 /** @type {Sequelize} */
 let connection;
@@ -15,7 +14,7 @@ let connection;
  * @param {boolean} options.verbose
  * @returns 
  */
-async function setupDB(options = config)
+async function setupDB(options)
 {
     if (connection) {
         return connection;
@@ -26,7 +25,7 @@ async function setupDB(options = config)
     // Bring up a Docker container ---------------------------------------------
     if (docker?.containerName && !process.env.GITHUB_CI) {
         try {
-            await getDockerContainer(docker.containerNames)
+            await getDockerContainer(options)
         } catch (ex) {
             if (ex.failed && !ex.isCanceled && !ex.killed) {
                 console.error(ex.message)
