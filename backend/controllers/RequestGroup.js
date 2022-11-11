@@ -5,4 +5,10 @@ const createRestRoutes  = require("./BaseController");
 const router = module.exports = express.Router({ mergeParams: true });
 
 
-createRestRoutes(router, RequestGroupModel);
+createRestRoutes(router, RequestGroupModel, {
+    getAll : "request_groups_list",
+    getOne : "request_groups_view",
+    create : "request_groups_create",
+    update : "request_groups_update",
+    destroy: "request_groups_delete"
+});

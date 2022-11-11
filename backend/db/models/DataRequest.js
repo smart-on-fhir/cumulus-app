@@ -120,24 +120,24 @@ module.exports = class DataRequest extends Model
 
                 async afterCreate(model, { user }) {
                     await Activity.create({
-                        message: `${model} created by ${user ? user.username : "system"}`,
+                        message: `${model} created by ${user ? user.name || "user #" + user.id : "system"}`,
                         tags   : "requests"
                     });
-                    // Note that we don't really wait for this to complete
+                    // Note that we don't wait for this to complete
                     sendDataRequest(model.toJSON()).catch(console.error);
 
                 },
 
                 async afterUpdate(model, { user }) {
                     await Activity.create({
-                        message: `${model} updated by ${user ? user.username : "system"}`,
+                        message: `${model} updated by ${user ? user.name || "user #" + user.id : "system"}`,
                         tags   : "requests"
                     });
                 },
 
                 async afterDestroy(model, { user }) {
                     await Activity.create({
-                        message: `${model} deleted by ${user ? user.username : "system"}`,
+                        message: `${model} deleted by ${user ? user.name || "user #" + user.id : "system"}`,
                         tags   : "requests"
                     });
                 }

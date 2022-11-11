@@ -16,12 +16,14 @@ const {
     THROTTLE               = "0",
     DB_SSL                 = "true",
     DB_DOCKER_CONTAINER    = "",
-    MAILGUN_API_KEY        = "",
+    MAILGUN_API_KEY        = "missing mailgun api key",
     MAILGUN_DOMAIN         = "smarthealthit.org",
     APP_EMAIL_FROM         = "admin@cumulus.org",
     CUMULUS_ADMIN_EMAIL    = "vlad.ignatov@gmail.com",
     REGIONAL_CLUSTER_EMAIL = "vlad.ignatov@gmail.com",
-    DB_DOCKER_DATA_DIR     = "./db/postgres-data"
+    DB_DOCKER_DATA_DIR     = "./db/postgres-data",
+    LOG_SQL                = "false",
+    // BASE_URL               = "./db/postgres-data"
 
 } = process.env;
 
@@ -60,7 +62,7 @@ module.exports = {
             dialect : "postgres",
             schema  : "public",
             database: DB_DATABASE,
-            logging : NODE_ENV === "production" ? false : console.log,
+            logging : bool(LOG_SQL) ? console.log : false,
             username: DB_USER,
             password: DB_PASS,
             port    : DB_PORT,

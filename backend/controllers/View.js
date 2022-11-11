@@ -1,17 +1,26 @@
-const express = require("express")
-const { HttpError }    = require("httperrors");
-const Model            = require("../db/models/View");
+const express                            = require("express")
+const { HttpError }                      = require("httperrors");
+const Model                              = require("../db/models/View");
 const { rw, assert, roundToPrecision }   = require("../lib");
-const { requestLineLevelData } = require("../mail");
-const { requireAuth } = require("./Auth");
-const createRestRoutes = require("./BaseController");
+const { requestLineLevelData }           = require("../mail");
+const { requireAuth, requestPermission } = require("./Auth");
+const createRestRoutes                   = require("./BaseController");
 
 const router = module.exports = express.Router({ mergeParams: true });
 
-createRestRoutes(router, Model);
+createRestRoutes(router, Model, {
+    getAll : "views_list",
+    getOne : "views_view",
+    create : "views_create",
+    update : "views_update",
+    destroy: "views_delete"
+});
 
 
 router.get("/:id/screenshot", rw(async (req, res) => {
+
+    requestPermission("views_get_screenshot", req)
+
     const model = await Model.findByPk(req.params.id);
 
     assert(model, HttpError.NotFound("Model not found"))
@@ -33,6 +42,9 @@ router.get("/:id/screenshot", rw(async (req, res) => {
 }));
 
 router.put("/:id/vote", express.urlencoded({ extended: false }), rw(async (req, res) => {
+
+    requestPermission("views_vote", req)
+
     const model = await Model.findByPk(req.params.id);
     
     if (!model) {
@@ -52,6 +64,9 @@ router.put("/:id/vote", express.urlencoded({ extended: false }), rw(async (req, 
 }));
 
 router.put("/:id/reset-rating", requireAuth("admin"), rw(async (req, res) => {
+
+    requestPermission("views_reset_rating", req)
+
     const model = await Model.findByPk(req.params.id);
 
     if (!model) {
@@ -64,6 +79,7 @@ router.put("/:id/reset-rating", requireAuth("admin"), rw(async (req, res) => {
 }));
 
 router.post("/:id/request-linelevel-data", express.json(), (req, res) => {
+    requestPermission("views_request_line_data", req)
     requestLineLevelData(req.body).then(
         () => res.end(),
         e  => {

@@ -32,7 +32,7 @@ module.exports = class RequestGroup extends Model
             hooks: {
                 async afterCreate(model, { user }) {
                     await Activity.create({
-                        message: `${model} created by ${user ? user.username : "system"}`,
+                        message: `${model} created by ${user ? user.name || "user #" + user.id : "system"}`,
                         tags   : "requests"
                     })
                 }

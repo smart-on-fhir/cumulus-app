@@ -14,6 +14,7 @@ interface AuthContextType {
     user: app.User | null;
     login: (username: string, password: string, remember?: boolean) => Promise<void>;
     logout: () => Promise<void>;
+    update: (props: Partial<app.User>) => void;
     error: Error | null;
     loading: boolean;
 }
@@ -27,6 +28,12 @@ export function AuthProvider({ children }: { children: React.ReactNode })
     const [user , setUser ] = React.useState<app.User|null>(storedUser);
     const [error, setError] = React.useState<Error|null>(null);
     const [loading, setLoading] = React.useState(false);
+
+    async function update(props: Partial<app.User>) {
+        const updatedUser = { ...user, ...props } as app.User;
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setUser(updatedUser)
+    }
   
     async function login(username: string, password: string, remember = false) {
 
@@ -52,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode })
     }
   
     return (
-        <AuthContext.Provider value={{ user, login, logout, error, loading }}>
+        <AuthContext.Provider value={{ user, login, logout, error, loading, update }}>
             {children}
         </AuthContext.Provider>
     );
@@ -170,7 +177,7 @@ export function AuthStatus() {
             ]}>
                 <span style={{ fontSize: "120%" }}> 
                     <i className="fas fa-user-circle" style={{ fontSize: "200%", margin: 5, lineHeight: 1 }}/>
-                    <b>{auth.user.username || "Anonymous"} &nbsp;<i className="fa-solid fa-caret-down"/></b>
+                    <b>{auth.user.name || auth.user.email} &nbsp;<i className="fa-solid fa-caret-down"/></b>
                 </span>
                 {/* <span className="ml-1 underline" style={{ cursor: "pointer" }} onClick={() => { auth.logout().then(() => navigate("/")); }}><b>SIGN OUT</b></span> */}
             </MenuButton>

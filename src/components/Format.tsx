@@ -2,7 +2,7 @@ import moment from "moment"
 
 export function Format({ value, format }: {
     value: any
-    format: string
+    format: "date" | "date-time"
 })
 {
     if (format === "date") {

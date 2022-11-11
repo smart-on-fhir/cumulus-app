@@ -1,6 +1,7 @@
-const Path            = require("path");
+const Path                      = require("path");
 const { readdirSync, statSync } = require("fs");
-const { Op }          = require("sequelize");
+const { Op }                    = require("sequelize");
+const { validationResult }      = require("express-validator");
 
 const RE_FALSE = /^(0|no|false|off|null|undefined|NaN|)$/i;
 
@@ -161,11 +162,16 @@ function rw(fn) {
 /**
  * @param {any} condition 
  * @param {Error | string} error
+ * @param {ErrorConstructor} ctor Error constructor
  * @type {import("../index").app.assert}
  */
-function assert(condition, error) {
+function assert(condition, error, ctor = Error) {
     if (!(condition)) {
-        throw error || "Assertion failed"
+        if (error instanceof Error) {
+            throw error
+        } else {
+            throw new ctor(error || "Assertion failed")
+        }
     }
 }
 
@@ -492,6 +498,51 @@ function roundToPrecision(n, precision) {
     return n;
 }
 
+/**
+ * Given a request object, returns its base URL
+ * @param {import("express").Request} req
+ */
+function getRequestBaseURL(req) {
+    const host = req.headers["x-forwarded-host"] || req.headers.host;
+    const protocol = req.headers["x-forwarded-proto"] || req.protocol || "http";
+    return protocol + "://" + host;
+}
+
+/**
+ * @param {import("sequelize").Sequelize} connection
+ * @param {string} tableName
+ * @param {string} incrementColumnName
+ */
+async function fixAutoIncrement(connection, tableName, incrementColumnName) {
+    await connection.query(
+        `select setval(
+            '"${tableName}_${incrementColumnName}_seq"',
+            (select max("${incrementColumnName}") from "${tableName}"),
+            true
+        )`
+    );
+}
+
+function validateRequest(...validations) {
+    return async (req, res, next) => {
+        for (let validation of validations) {
+            const result = await validation.run(req);
+            if (result.errors.length) break;
+        }
+
+        const errors = validationResult(req).formatWith(({ location, msg, param, value, nestedErrors }) => {
+            // Build your resulting errors however you want! String, object, whatever - it works!
+            return `${param}: ${msg}`;
+        });
+
+        if (errors.isEmpty()) {
+            return next()
+        }
+
+        res.status(400).json({ errors: errors.array() });
+    };
+}
+
 module.exports = {
     bool,
     uInt,
@@ -504,5 +555,8 @@ module.exports = {
     parseDelimitedLine,
     toTitleCase,
     getFindOptions,
-    roundToPrecision
+    roundToPrecision,
+    getRequestBaseURL,
+    fixAutoIncrement,
+    validateRequest
 };

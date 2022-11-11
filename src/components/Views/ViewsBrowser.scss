@@ -1,12 +1,14 @@
 @import "../../styles/variables.scss";
 
+#main > .view-browser {
+    max-height: calc(100vh - 310px);
+}
 
 .view-browser {
     margin-top: $gap;
     margin-bottom: $gap;
     display: flex;
     flex-wrap: wrap;
-    max-height: calc(100vh - 310px);
     overflow: auto;
     min-height: 200px;
     // justify-content: space-evenly;

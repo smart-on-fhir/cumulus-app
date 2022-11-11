@@ -6,8 +6,12 @@ const express                     = require("express")
 const cors                        = require("cors")
 const cookieParser                = require("cookie-parser")
 const { Umzug, SequelizeStorage } = require("umzug");
+const { debuglog }                = require("util");
 const Auth                        = require("./controllers/Auth")
 const setupDB                     = require("./db")
+const settings                    = require("./config")
+
+const debug = debuglog("server");
 
 
 function createServer(config)
@@ -47,7 +51,7 @@ function setupAPI(app, { verbose })
     app.use("/api/request-groups", require("./controllers/RequestGroup"));
     app.use("/api/requests"      , require("./controllers/DataRequest" ));
     app.use("/api/views"         , require("./controllers/View"        ));
-    app.use("/api/users"         , require("./controllers/User"        ));
+    app.use("/api/users"         , require("./routes/users"            ));
     app.use("/api/activity"      , require("./controllers/Activity"    ));
     app.use("/api/data-sites"    , require("./controllers/DataSites"   ));
     verbose && console.log("✔ REST API set up");
@@ -116,7 +120,7 @@ function setUpErrorHandlers(app, { verbose })
     // Global error 500 handler
     app.use((error, req, res, next) => {
 
-        console.error(error)
+        debug(error)
 
         const msg = error.message.replace(/^\s*\w*Error:\s+/, "")
         
@@ -136,6 +140,8 @@ function setUpErrorHandlers(app, { verbose })
         else {
             res.status(500).send(msg);
         }
+
+        res.end()
     });
 
     verbose && console.log("✔ Error handlers activated");
@@ -165,11 +171,13 @@ function startServer(server, config)
     });
 }
 
-async function main(config)
+async function main(config = settings)
 {
     const { app, server } = createServer(config);
 
     const dbConnection = await setupDB(config);
+
+    app.set("dbConnection", dbConnection);
     
     await applySeeds(config, dbConnection);
     await applyMigrations(config, dbConnection);
@@ -189,7 +197,7 @@ async function main(config)
 
 // If invoked directly start a server (otherwise let the tests do that)
 if (require.main === module) {
-    main(require("./config"));
+    main();
 }
 
 module.exports = main;

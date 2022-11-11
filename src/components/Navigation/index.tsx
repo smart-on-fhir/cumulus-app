@@ -19,7 +19,7 @@ function NavGroup({ to, label, icon, children }: {
         <>
             { to ?
                 <NavLink to={ to } end>
-                    <i className={ "icon " + icon } />{ label }
+                    <i className={ "icon " + icon } /><label>{ label }</label>
                     <i
                         className={ "fas chevron " + (isOpen ? "fa-chevron-down" : "fa-chevron-right") }
                         title={ isOpen ? "Collapse Group" : "Expand Group" }
@@ -35,7 +35,7 @@ function NavGroup({ to, label, icon, children }: {
                     title={ isOpen ? "Collapse Group" : "Expand Group" }
                     onClick={() => setOpen(!isOpen)}
                 >
-                    <i className={ "icon " + icon } />{ label }
+                    <i className={ "icon " + icon } /><label>{ label }</label>
                     <i className={ "fas chevron " + (isOpen ? "fa-chevron-down" : "fa-chevron-right") } />
                 </div>
             }
@@ -74,18 +74,20 @@ export default function Navigation()
                     <NavLink to="/requests/new"><i className="icon fa-solid fa-calendar-plus" /> New Data Subscription</NavLink>
                 </NavGroup>
                 
-                <NavGroup icon="fa-solid fa-screwdriver-wrench" label="Administration">
-                    <NavLink to="/settings"><i className="icon fa-solid fa-cog" /> Settings</NavLink>
-                    <NavLink to="/users" end><i className="icon fa-solid fa-users" /> Users</NavLink>
-                    <NavLink to="/users/invite"><i className="icon fa-solid fa-user-plus" /> Invite User</NavLink>
-                    <NavLink to="/permissions"><i className="icon fa-solid fa-user-shield" /> Roles &amp; Permissions</NavLink>
-                    <NavLink to="/activity"><i className="icon fa-solid fa-clipboard-list" /> Logs</NavLink>
-                </NavGroup>
+                { user.role === "admin" && (
+                    <NavGroup icon="fa-solid fa-screwdriver-wrench" label="Administration">
+                        <NavLink to="/settings"><i className="icon fa-solid fa-cog" /> Settings</NavLink>
+                        <NavLink to="/users" end><i className="icon fa-solid fa-users" /> Users</NavLink>
+                        <NavLink to="/users/invite"><i className="icon fa-solid fa-user-plus" /> Invite User</NavLink>
+                        <NavLink to="/permissions"><i className="icon fa-solid fa-user-shield" /> Roles &amp; Permissions</NavLink>
+                        <NavLink to="/activity"><i className="icon fa-solid fa-clipboard-list" /> Logs</NavLink>
+                    </NavGroup>
+                )}
 
                 <hr />
 
-                <NavGroup icon="fa-solid fa-user" label={ user?.username || "ANONYMOUS!" }>
-                    <NavLink to="/user"><i className="icon fa-solid fa-user-pen" /> Account Settings</NavLink>
+                <NavGroup icon="fa-solid fa-user" label={ user?.name || user?.email }>
+                    <NavLink to="/user"><i className="icon fa-solid fa-user-pen" /> My Account</NavLink>
                     <div className="link" onClick={() => {
                         logout().then(() => navigate("/"));
                     }}>

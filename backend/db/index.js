@@ -70,7 +70,6 @@ async function setupDB(options)
 
     // Sync --------------------------------------------------------------------
 
-
     // This creates the table if it doesn't exist (and does nothing if it already
     // exists)
     if (db.sync == "normal") {
