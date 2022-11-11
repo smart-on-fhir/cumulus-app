@@ -215,7 +215,10 @@ async function resetTable(modelName, data) {
     await fixAutoIncrement(dbConnection, ModelConstructor.tableName, "id")
 }
 
-before(async () => await SERVER.start())
+before(async function() {
+    this.timeout(30000)
+    return await SERVER.start()
+})
 
 after(async () => await SERVER.stop())
 
