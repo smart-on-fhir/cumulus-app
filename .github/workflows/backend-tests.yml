@@ -7,7 +7,6 @@ on:
   pull_request:
     branches: [ "*" ]
   workflow_dispatch:
-    branches: [ "*" ]
 
 jobs:
   build:
@@ -27,6 +26,30 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
+        env:
+          NODE_ENV: "test"
+          HOST: "0.0.0.0"
+          PORT: 0
+          THROTTLE: 0
+          VERBOSE: "false"
+          MAILGUN_API_KEY: "whatever"
+          MAILGUN_DOMAIN: "whatever"
+          APP_EMAIL_FROM: "test@cumulus.org"
+          CUMULUS_ADMIN_EMAIL: "test@cumulus.org"
+          REGIONAL_CLUSTER_EMAIL: "test@cumulus.org"
+          DATABASE_URL: "postgres://postgres:cumulus_test_db_password@localhost:5455/cumulus_test"
+          DB_HOST: "localhost"
+          DB_PORT: 5455
+          DB_USER: "postgres"
+          DB_PASS: "cumulus_test_db_password"
+          DB_DATABASE: "cumulus_test"
+          DB_SEED: "../test/test-seeds.js"
+          LOG_SQL: "false"
+          DB_SYNC: "force"
+          DB_DOCKER_CONTAINER: "cumulus_test"
+          DB_DOCKER_DATA_DIR: ""
+          DB_SSL: "false"
+          DEBUG: "*"
 
       - run: npm ci --legacy-peer-deps
 
