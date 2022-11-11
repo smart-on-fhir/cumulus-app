@@ -1,6 +1,6 @@
 {
   "name": "cumulus-app",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.1",
@@ -17,6 +17,7 @@
     "dockerode": "^3.3.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
+    "express-validator": "^6.14.2",
     "form-data": "^4.0.0",
     "google-map-react": "^2.1.10",
     "highcharts": "^9.3.2",
@@ -46,7 +47,9 @@
     "start:dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test:server": "DOTENV_CONFIG_PATH=backend/test.env nyc --reporter=lcov mocha --exit -t 5000 -r dotenv/config",
+    "test:server:watch": "npm run test:server -- -w"
   },
   "eslintConfig": {
     "extends": [
@@ -67,11 +70,18 @@
     ]
   },
   "devDependencies": {
+    "@types/chai": "^4.3.4",
+    "@types/express-validator": "^3.0.0",
     "@types/google-map-react": "^2.1.4",
+    "@types/mocha": "^10.0.0",
     "@types/pg": "^8.6.5",
     "@types/react-helmet": "^6.1.5",
     "@types/react-router": "^5.1.17",
-    "@types/react-router-dom": "^5.3.2"
+    "@types/react-router-dom": "^5.3.2",
+    "@types/sequelize": "^4.28.14",
+    "chai": "^4.3.7",
+    "mocha": "^10.1.0",
+    "nyc": "^15.1.0"
   },
   "proxy": "http://localhost:4000"
 }

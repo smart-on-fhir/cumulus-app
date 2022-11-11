@@ -1,69 +1,160 @@
 const express                        = require("express");
 const { HttpError }                  = require("httperrors");
-const { requireAuth }                = require("./Auth");
+const { requestPermission }          = require("./Auth");
 const { getFindOptions, assert, rw } = require("../lib");
+const { ACL }                        = require("../acl");
+
+/**
+ * @param {import("sequelize").ModelStatic<any>} modelConstructor
+ * @param { keyof ACL } permission
+ */
+function createGetAllHandler(modelConstructor, permission) {
+    
+    /**
+     * @param {import("../../index").app.UserRequest} req
+     * @param {import("express").Response} res
+     */
+    return async function getAll(req, res) {
+        requestPermission(permission, req);
+        try {
+            const models = await modelConstructor.findAll(getFindOptions(req));
+            res.json(models);
+        } catch(error) {
+            throw new HttpError.InternalServerError(
+                `Error reading ${modelConstructor.name} models`
+            );
+        }
+    }
+}
+
+/**
+ * @param {import("sequelize").ModelStatic<any>} modelConstructor
+ * @param { keyof ACL } permission
+ */
+function createGetOneHandler(modelConstructor, permission) {
+    
+    /**
+     * @param {import("../../index").app.UserRequest} req
+     * @param {import("express").Response} res
+     */
+    return async function getOne(req, res) {
+        requestPermission(permission, req);
+        const model = await modelConstructor.findByPk(req.params.id)
+        assert(model, HttpError.NotFound(`${modelConstructor.name} not found`))
+        res.json(model)
+    }
+}
+
+/**
+ * @param {import("sequelize").ModelStatic<any>} modelConstructor
+ * @param { keyof ACL } permission
+ */
+function createCreateHandler(modelConstructor, permission) {
+    
+    /**
+     * @param {import("../../index").app.UserRequest} req
+     * @param {import("express").Response} res
+     */
+    return async function create(req, res) {
+        requestPermission(permission, req);
+        try {
+            const model = await modelConstructor.create(req.body);
+            res.json(model)
+        } catch (error) {
+            throw new HttpError.InternalServerError(`Error creating ${modelConstructor.name}`);
+        }
+    }
+}
+
+/**
+ * @param {import("sequelize").ModelStatic<any>} modelConstructor
+ * @param { keyof ACL } permission
+ */
+function createUpdateHandler(modelConstructor, permission) {
+    
+    /**
+     * @param {import("../../index").app.UserRequest} req
+     * @param {import("express").Response} res
+     */
+    return async function update(req, res) {
+        requestPermission(permission, req);
+
+        const model = await modelConstructor.findByPk(req.params.id);
+        assert(model, new HttpError.NotFound(`${modelConstructor.name} not found`));
+        
+        try {
+            await model.update(req.body, { user: req.user });
+            res.json(model);
+        }
+        catch(error) {
+            throw new HttpError.BadRequest(`Error updating ${modelConstructor.name}`);
+        }
+    }
+}
+
+/**
+ * @param {import("sequelize").ModelStatic<any>} modelConstructor
+ * @param { keyof ACL } permission
+ */
+function createDeleteHandler(modelConstructor, permission) {
+    
+    /**
+     * @param {import("../../index").app.UserRequest} req
+     * @param {import("express").Response} res
+     */
+    return async function destroy(req, res) {
+        requestPermission(permission, req);
+
+        const model = await modelConstructor.findByPk(req.params.id);
+        assert(model, new HttpError.NotFound(`${modelConstructor.name} not found`));
+        
+        try {
+            await model.destroy({ user: req.user });
+            res.json(model);
+        }
+        catch(error) {
+            throw new HttpError.BadRequest(`Error deleting ${modelConstructor.name}`);
+        }
+    }
+}
+
 
 /**
  * @param {express.Router} router
  * @param {import("sequelize").ModelStatic<any>} modelConstructor
  * @param {Object} options
- * @param {boolean} [options.getAll = true] 
- * @param {boolean} [options.getOne = true] 
- * @param {boolean} [options.create = true] 
- * @param {boolean} [options.update = true] 
- * @param {boolean} [options.destroy = true] 
+ * @param {keyof ACL} [options.getAll] 
+ * @param {keyof ACL} [options.getOne] 
+ * @param {keyof ACL} [options.create] 
+ * @param {keyof ACL} [options.update] 
+ * @param {keyof ACL} [options.destroy] 
  */
 module.exports = function createRestRoutes(router, modelConstructor, {
-    getAll  = true,
-    getOne  = true,
-    create  = true,
-    update  = true,
-    destroy = true
+    getAll,
+    getOne,
+    create,
+    update,
+    destroy
 } = {})
 {
-    // get all -----------------------------------------------------------------
     if (getAll) {
-        router.get("/", rw(async (req, res) => {
-            const models = await modelConstructor.findAll(getFindOptions(req));
-            res.json(models);
-        }));        
+        router.get("/", rw(createGetAllHandler(modelConstructor, getAll)));
     }
 
-    // get one -----------------------------------------------------------------
     if (getOne) {
-        router.get("/:id", rw(async (req, res) => {
-            const model = await modelConstructor.findByPk(req.params.id, getFindOptions(req))
-            assert(model, HttpError.NotFound("Model not found"))
-            res.json(model)
-        }));
+        router.get("/:id", rw(createGetOneHandler(modelConstructor, getOne)));
     }
 
-    // Create ------------------------------------------------------------------
     if (create) {
-        router.post("/", express.json({ limit: "60MB" }), requireAuth("admin"), rw(async (req, res) => {
-            const model = await modelConstructor.create(req.body, { user: req.user });
-            res.json(model)
-        }));
+        router.post("/", express.json({ limit: "60MB" }), rw(createCreateHandler(modelConstructor, create)));
     }
 
-    // Update ------------------------------------------------------------------
     if (update) {
-        router.put("/:id", express.json({ limit: "60MB" }), requireAuth("admin"), rw(async (req, res) => {
-            const model = await modelConstructor.findByPk(req.params.id);
-            assert(model, HttpError.NotFound("Model not found"))
-            await model.update(req.body, { user: req.user });
-            res.json(model);
-        }));
+        router.put("/:id", express.json({ limit: "60MB" }), rw(createUpdateHandler(modelConstructor, update)));
     }
 
-    // Delete ------------------------------------------------------------------
     if (destroy) {
-        router.delete("/:id", requireAuth("admin"), rw(async (req, res) => {
-            const model = await modelConstructor.findByPk(req.params.id);
-            assert(model, HttpError.NotFound("Model not found"))
-            await model.destroy({ user: req.user });
-            res.json(model);
-        }));
+        router.delete("/:id", rw(createDeleteHandler(modelConstructor, destroy)));
     }
 }
 

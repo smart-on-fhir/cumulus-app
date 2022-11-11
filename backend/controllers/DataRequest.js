@@ -364,7 +364,13 @@ router.get("/:id/api", rw(async (req, res) => {
     });
 }));
 
-createRestRoutes(router, Model);
+createRestRoutes(router, Model, {
+    create : "views_create",
+    destroy: "views_delete",
+    getAll : "views_delete",
+    getOne : "views_view",
+    update : "views_update"
+});
 
 /**
  * @param {{ cols: { name: string }[], rows: any[][] }} data 

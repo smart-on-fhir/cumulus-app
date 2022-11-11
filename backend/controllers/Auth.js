@@ -1,9 +1,15 @@
-const express   = require("express")
-const Crypto    = require("crypto")
-const Bcrypt    = require("bcryptjs")
-const HttpError = require("httperrors")
-const User      = require("../db/models/User")
-const { wait }  = require("../lib")
+const express        = require("express")
+const Crypto         = require("crypto")
+const Bcrypt         = require("bcryptjs")
+const HttpError      = require("httperrors")
+const { Op }         = require("sequelize")
+const { debuglog }   = require("util");
+const User           = require("../db/models/User")
+const { wait }       = require("../lib")
+const { ACL, roles } = require("../acl")
+
+const debug = debuglog("auth");
+
 
 const AUTH_DELAY = process.env.NODE_ENV === "production" ? 1000 : 1000;
 
@@ -28,7 +34,7 @@ async function authenticate(req, res, next) {
                 req.user = user.toJSON()    
             }
         } catch (ex) {
-            console.log(ex);
+            debug(ex);
         }
     }
     next();
@@ -36,10 +42,10 @@ async function authenticate(req, res, next) {
 
 /**
  * Require Authentication middleware -------------------------------------------
- * Checks `req.user` and if that does not exist or does not have the same role
- * redirects to the login page.
- * role The role to require. Currently only "admin" is supported
- * @param {string[]} roles
+ * Checks `req.user?.role`.
+ * - if the user does not exist throws HttpError.Unauthorized
+ * - if the user does not have one of the required roles throws HttpError.Forbidden
+ * @param {(keyof roles)[]} roles The roles to require
  * @returns {(
  *  req: import("../..").app.UserRequest,
  *  res: import("express").Response,
@@ -53,14 +59,70 @@ function requireAuth(...roles) {
             return next(new HttpError.Unauthorized("Authorization required"));
         }
 
-        if (!roles.includes(req.user.role)) {
-            return next(new HttpError.Forbidden("Permission denied"))//.json({ error: "Permission denied" });
+        if (roles.length && !roles.includes(req.user.role)) {
+            return next(new HttpError.Forbidden("Permission denied"));
         }
 
         next();
     }
 }
 
+/**
+ * Require permission middleware -----------------------------------------------
+ * Checks if the user is allowed to perform the specified action and if not,
+ * throws HttpError.Forbidden.
+ * @param {keyof ACL} action 
+ * @param {(req: import("../../index").app.UserRequest) => boolean} [isOwner] In
+ *  some cases the user might also be considered an owner of the resource. To
+ *  determine that, a callback function can be passed. For example, if we are
+ *  trying to read one user and we want to say that the current user is the
+ *  owner of that record if it has the same id, then we can pass
+ * `req => req.user.id === +req.params.id`.
+ */
+function requirePermission(action, isOwner) {
+    return (req, res, next) => {
+        requestPermission(action, req, isOwner && isOwner(req))
+        next()
+    }
+}
+
+/**
+ * @param { keyof ACL } action 
+ * @param { import("../../index").app.UserRequest } req 
+ */
+function requestPermission(action, req, isOwner = false) {
+    const role = req.user?.role || "guest";
+
+    if (isOwner && hasPermission(action, "owner")) {
+        return true
+    }
+
+    if (!hasPermission(action, role)) {
+        debug(`Permission denied for "${role}" to perform "${action}" action!`)
+        throw new HttpError.Forbidden(`Permission denied`)
+    }
+}
+
+/**
+ * @param { keyof ACL } action 
+ * @param { keyof roles } role  
+ * @returns { boolean }
+ */
+function hasPermission(action, role) {
+    const row = ACL[action];
+    if (!row) {
+        debug(`Unknown action "${action}"!`);
+        return false;
+    }
+
+    const index = roles[role];
+    if (!index && index !== 0) {
+        debug(`Unknown role "${role}"!`);
+        return false;
+    }
+
+    return !!row[index];
+}
 
 /**
  * WARNING: This is just a temporary solution for demo. Not secure enough for
@@ -79,7 +141,7 @@ async function login(req, res) {
         const { username, password, remember } = req.body;
 
         // Search for user by username
-        const user = await User.findOne({ where: { username }});
+        const user = await User.findOne({ where: { email: { [Op.iLike]: username }}});
 
         // No such username
         // Do NOT specify what is wrong in the error message!
@@ -107,15 +169,18 @@ async function login(req, res) {
             expires.setFullYear(new Date().getFullYear() + 1)
         }
 
-        res.cookie("sid", sid, {
-            httpOnly: true,
-            expires,
-            // domain: "http://localhost:4000",
-            // sameSite: "lax"
-        }).json({ username, role: user.get("role"), remember }).end();
+        res.cookie("sid", sid, { httpOnly: true, expires });
+
+        res.json({
+            name : user.get("name"),
+            email: user.get("email"),
+            role : user.get("role"),
+            remember
+        });
 
     } catch (ex) {
-        res.status(401).end(ex.code === 'SQLITE_ERROR' ? "Login failed" : ex.message);
+        debug(ex)
+        res.status(401).end("Login failed");
     }
 }
 
@@ -139,7 +204,7 @@ async function logout(req, res) {
                     }
                 });
         } catch (ex) {
-            console.error(ex);
+            debug(ex);
         }
     }
     res.clearCookie("sid").json({ message: "Logged out" }).end();
@@ -151,5 +216,8 @@ router.get("/logout", logout);
 module.exports = {
     router,
     authenticate,
-    requireAuth
+    requireAuth,
+    requirePermission,
+    requestPermission,
+    hasPermission
 };

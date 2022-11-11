@@ -101,8 +101,45 @@ async function requestLineLevelData({ subscription, view, user, dataElements, re
     })
 }
 
+/**
+ * @param { object } options
+ * @param { string } options.email Recipient email
+ * @param { string } options.baseUrl
+ * @param { string } options.code activation code
+ * @param { string } [options.message = ""]
+ */
+async function inviteUser({ email, baseUrl, code, message = "" }) {
+
+    const href = new URL("/activate", baseUrl)
+    href.searchParams.set("code", code)
+
+    let html = [
+        `<h2>You have been invited</h2>`,
+        `<p>Please use the following link within the next 24 hours to activate your Cumulus account:</p>`,
+        `<p><a href="${href}" target="_blank">${href}</a></p>`
+    ];
+
+    if (message) {
+        html.push(
+            `<p>Here is a personal message from the person who invited you to join Cumulus:</p>`,
+            `<p>${message.replace(/<.+?>/g, "")}</p>`
+        )
+    }
+
+    html.push(`<br /><br />Regards,<br/>The Cumulus team`)
+    
+
+    return client.messages.create(config.mailGun.domain, {
+        from   : config.appEmail,
+        to     : email,
+        subject: "Activate your account",
+        html   : html.join("\n")
+    })
+}
+
 
 module.exports = {
     sendDataRequest,
-    requestLineLevelData
+    requestLineLevelData,
+    inviteUser
 };

@@ -215,7 +215,7 @@ export function RequestDataForm({
         subscription: { id: subscription.id, name: subscription.name },
         reason      : "",
         user: {
-            username: auth.user?.username
+            username: auth.user?.email
         }
     });
 

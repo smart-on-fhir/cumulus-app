@@ -6,6 +6,9 @@
 #app-header {
     background: $color-blue linear-gradient(-90deg, #0AE, darken($color-blue, 20%)) 0px 50% no-repeat;
     color: #FFF;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 
     .logo-link {
         line-height   : 1;

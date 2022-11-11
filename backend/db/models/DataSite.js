@@ -45,19 +45,19 @@ module.exports = class DataSite extends Model
             hooks: {
                 async afterCreate(model, { user }) {
                     await Activity.create({
-                        message: `${model} created by ${user ? user.username : "system"}`,
+                        message: `${model} created by ${user ? user.name || "user #" + user.id : "system"}`,
                         tags   : "requests"
                     });
                 },
                 async afterUpdate(model, { user }) {
                     await Activity.create({
-                        message: `${model} updated by ${user ? user.username : "system"}`,
+                        message: `${model} updated by ${user ? user.name || "user #" + user.id : "system"}`,
                         tags   : "requests"
                     });
                 },
                 async afterDestroy(model, { user }) {
                     await Activity.create({
-                        message: `${model} deleted by ${user ? user.username : "system"}`,
+                        message: `${model} deleted by ${user ? user.name || "user #" + user.id : "system"}`,
                         tags   : "requests"
                     });
                 }

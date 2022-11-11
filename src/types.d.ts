@@ -1,10 +1,20 @@
 
 declare module app {
 
+    /**
+     * The current user of the app
+     */
     interface User {
-        username: string
+        // username: string
+        name: string
+        email: string
         role: string
         remember: boolean
+        // last_login: string | null
+        // createdAt: string | null
+        // updatedAt: string | null
+        // sid: string | null
+        // email: string
     }
 
     interface ColumnDescriptor {
@@ -268,5 +278,25 @@ declare module app {
         }
 
         type DataResponse = StratifiedDataResponse | UnStratifiedDataResponse
+
+        interface User {
+            id: number
+            email: string
+            name: string | null
+            role: string
+            last_login: string | null
+            createdAt: string | null
+            updatedAt: string | null
+            activationCode: string | null
+            invitedBy: string | null
+            
+            sid: string | null
+            password: string
+            
+            status: string
+            // online: boolean
+            // activated: boolean
+
+        }
     }
 }

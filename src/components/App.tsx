@@ -21,8 +21,12 @@ import Navigation                               from "./Navigation"
 import TODO                                     from "./TODO";
 import Projects                                 from "./Projects";
 import Views                                    from "./Views";
+import Users                                    from "./Users";
+import Invite                                   from "./Users/Invite";
+import Account                                  from "./Users/Account";
 
 import "../styles/main.scss";
+import Activate from "./Users/Activate";
 
 export default function App()
 {
@@ -71,19 +75,30 @@ export default function App()
                                 </Route>
 
                                 <Route path="login" element={ <LoginPage /> } />
-                                
-                                <Route path="user" element={ <TODO /> } />
+
+
+
+
+
+
+                                <Route path="activate" element={ <Activate/> } />
+                                <Route path="user" element={ <RequireAuth><Account /></RequireAuth> } />
                                 <Route path="activity" element={ <TODO /> } />
                                 <Route path="settings" element={ <TODO /> } />
                                 <Route path="users">
-                                    <Route index element={ <TODO /> } />
-                                    <Route path="invite" element={ <TODO /> } />
+                                    <Route index element={ <RequireAuth><Users /></RequireAuth> } />
+                                    <Route path="invite" element={ <RequireAuth><Invite /></RequireAuth> } />
                                 </Route>
                                 <Route path="permissions" element={ <TODO /> } />                                
                                 <Route path="projects">
                                     <Route index element={ <Projects /> } />
                                     <Route path="new" element={ <TODO /> } />
                                 </Route>
+
+
+
+
+
                                 
                                 <Route path="*" element="Page Not Found" />
                             </Route>

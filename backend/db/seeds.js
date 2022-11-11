@@ -29,44 +29,43 @@ module.exports = async (connection) => {
         // },
         {
             role    : "admin",
-            username: "Vlad",
+            email   : "vladimir.ignatov@childrens.harvard.edu",
+            name    : "Vladimir Ignatov",
             password: "$2a$10$CC5JlRcl5q2Nj7cd2TCoEekvO/GPOM.bzI2CvMAnKniPfHe1qI8RS"
         },
         {
             role    : "admin",
-            username: "Bin",
-            password: "$2a$10$PlcG6tgeJw5ltCQcneQhjuqKH8EdS0FVOU6bDSE9Idf4ZQXLMdu1G"
-        },
-        {
-            role    : "admin",
-            username: "Andy",
+            email   : "Andrew.McMurry@childrens.harvard.edu",
+            name    : "Andrew McMurry",
             password: "$2a$10$d75V9g4d0UzXbIT.WdKlOe96t7spk2EbzvuTSR8mJRGpiqbWESI2i"
         },
         {
             role    : "admin",
-            username: "Jamie",
+            email   : "James.Jones@childrens.harvard.edu",
+            name    : "James Jones",
             password: "$2a$10$63M9WPcdGflCawGrzDNEOu3.Y9a34YX3PZ6abM7R/HCwZsg7qkcSG"
         },
         {
             role    : "admin",
-            username: "Dan",
+            email   : "dan.gottlieb@gmail.com",
+            name    : "Daniel Gottlieb",
             password: "$2a$10$/jfy/tem2ZBSl4VOjCH6T.aHfqYvK6kE40JpP5zzgsDopy5uIBgJq"
         },
-        {
-            role    : "admin",
-            username: "Ken",
-            password: "$2a$10$0Hsj6JAI7jOy8uJKNWHXS.N3V.GHcNErBAh7T03VbpbFuv.N1N0Ju"
-        },
-        {
-            role    : "user",
-            username: "CumulusGuest",
-            password: "$2a$10$7j/Pt6FK7LCWxY6dZr1HcO/dVBndSM8ucXH5wmVIxJqpKMmcZUaya"
-        },
-        {
-            role    : "admin",
-            username: "CumulusAdmin",
-            password: "$2a$10$eDA0il4ysEoHzup6ikQ07eRahnd7BEICy4gTzS1ctX/hcnslgaXYq"
-        }
+        // {
+        //     role    : "admin",
+        //     username: "Ken",
+        //     password: "$2a$10$0Hsj6JAI7jOy8uJKNWHXS.N3V.GHcNErBAh7T03VbpbFuv.N1N0Ju"
+        // },
+        // {
+        //     role    : "user",
+        //     username: "CumulusGuest",
+        //     password: "$2a$10$7j/Pt6FK7LCWxY6dZr1HcO/dVBndSM8ucXH5wmVIxJqpKMmcZUaya"
+        // },
+        // {
+        //     role    : "admin",
+        //     username: "CumulusAdmin",
+        //     password: "$2a$10$eDA0il4ysEoHzup6ikQ07eRahnd7BEICy4gTzS1ctX/hcnslgaXYq"
+        // }
     ]);
 
     // Data Sites -------------------------------------------------------------

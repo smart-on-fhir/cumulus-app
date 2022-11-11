@@ -1,4 +1,4 @@
-import { Request } from "express";
+import { Request } from "express-serve-static-core";
 
 declare module app {
 
@@ -8,12 +8,21 @@ declare module app {
         user?: User
     }
 
-    interface User {
-        username: string
-        role: UserRole
+    interface AuthenticatedRequest extends Request {
+        user: User
+
     }
 
-    type UserRole = "admin" | "user"
+    interface User {
+        id: number
+        email: string
+        name: string
+        role: UserRole
+        password: string | null
+        createdAt: Date
+    }
+
+    type UserRole = "admin" | "manager" | "owner" | "user" | "guest"
 
     interface ColumnDescriptor {
         name: string

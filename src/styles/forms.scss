@@ -305,13 +305,17 @@ select option.empty-option {
     @include button($color-blue);
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
+.btn-blue-dark {
+    @include button($color-blue-dark);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
 .btn-green {
     @include button($color-green);
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 .btn-brand-2 {
     @include button($color-brand-2);
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5);
 }
 
 .btn-virtual {
