@@ -83,7 +83,7 @@ router.put(
     lib.validateRequest(
         param("id", "The 'id' parameter must be integer").isInt(),
         param("id", "The 'id' parameter must be a positive integer").toInt().custom(x => x > 0),
-        // body("email").isEmail().normalizeEmail().toLowerCase(),
+        // body("email").isEmail().toLowerCase(),
         // body("role").isIn(["user", "manager", "admin"])
     ),
     (req, res, next) => userController.updateUser(+req.params?.id, req.body)
@@ -97,7 +97,7 @@ router.post(
     express.json(),
     auth.requirePermission("users_create"),
     lib.validateRequest(
-        body("email").isEmail().normalizeEmail().toLowerCase(),
+        body("email").isEmail().toLowerCase(),
         body("role").isIn(["user", "manager", "admin"])
     ),
     (req, res, next) => userController.createUser(req.body)
@@ -113,7 +113,7 @@ router.post(
     lib.validateRequest(
         body("email", "Missing email property").exists(),
         body("role" , "Missing role property").exists(),
-        body("email", "Invalid email").isEmail().normalizeEmail({ all_lowercase: true }),
+        body("email", "Invalid email").isEmail().toLowerCase(),
         body("role", "Invalid role").isIn(["user", "manager", "admin"])
     ),
     // @ts-ignore
