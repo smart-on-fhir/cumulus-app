@@ -2,10 +2,13 @@ const Crypto        = require("crypto");
 const Bcrypt        = require("bcryptjs");
 const { HttpError } = require("httperrors");
 const moment        = require("moment");
+const { debuglog }  = require("util");
 const User          = require("../db/models/User");
 const mail          = require("../mail");
 const { assert }    = require("../lib");
 const { roles }     = require("../acl");
+
+const debug = debuglog("app");
 
 
 /**
@@ -195,6 +198,8 @@ async function handleUserInvite({ email, role, message }, invitedBy, baseUrl) {
             transaction
         });
     } catch (e) {
+
+        debug(e)
 
         await transaction.rollback()
 
