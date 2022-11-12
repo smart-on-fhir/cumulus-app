@@ -128,6 +128,14 @@ async function inviteUser({ email, baseUrl, code, message = "" }) {
 
     html.push(`<br /><br />Regards,<br/>The Cumulus team`)
     
+    console.log("Sending email")
+    console.log("config.mailGun.domain:", config.mailGun.domain)
+    console.log({
+        from   : config.appEmail,
+        to     : email,
+        subject: "Activate your account",
+        html   : html.join("\n")
+    })
 
     return client.messages.create(config.mailGun.domain, {
         from   : config.appEmail,
