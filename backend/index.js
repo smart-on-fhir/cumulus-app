@@ -11,7 +11,7 @@ const Auth                        = require("./controllers/Auth")
 const setupDB                     = require("./db")
 const settings                    = require("./config")
 
-const debug = debuglog("server");
+const debug = debuglog("app");
 
 
 function createServer(config)

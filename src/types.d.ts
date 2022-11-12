@@ -10,7 +10,7 @@ declare module app {
         email: string
         role: string
         remember: boolean
-        // last_login: string | null
+        // lastLogin: string | null
         // createdAt: string | null
         // updatedAt: string | null
         // sid: string | null
@@ -284,7 +284,7 @@ declare module app {
             email: string
             name: string | null
             role: string
-            last_login: string | null
+            lastLogin: string | null
             createdAt: string | null
             updatedAt: string | null
             activationCode: string | null

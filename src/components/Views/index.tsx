@@ -25,10 +25,10 @@ export default function()
         <div>
             <HelmetProvider>
                 <Helmet>
-                    <title>Cumulus Views</title>
+                    <title>Cumulus Graphs</title>
                 </Helmet>
             </HelmetProvider>
-            <div className="row gap middle" style={{ marginTop: "-1em", padding: "6px 0 4px 0" }}>
+            <div className="row gap middle">
                 <div className="col col-0">
                     <h4 className="m-0"><i className="icon fa-solid fa-chart-pie color-blue-dark" /> Graphs</h4>
                 </div>
