@@ -1,6 +1,9 @@
-const formData = require("form-data");
-const Mailgun  = require("mailgun.js");
-const config   = require("./config");
+const formData     = require("form-data");
+const Mailgun      = require("mailgun.js");
+const { debuglog } = require("util");
+const config       = require("./config");
+
+const debug = debuglog("app:email");
 
 const mailgun = new Mailgun(formData);
 const client = mailgun.client({
@@ -128,14 +131,12 @@ async function inviteUser({ email, baseUrl, code, message = "" }) {
 
     html.push(`<br /><br />Regards,<br/>The Cumulus team`)
     
-    console.log("Sending email")
-    console.log("config.mailGun.domain:", config.mailGun.domain)
-    console.log({
+    debug("Sending user invitation email:", JSON.stringify({
         from   : config.appEmail,
         to     : email,
         subject: "Activate your account",
         html   : html.join("\n")
-    })
+    }, null, 4));
 
     return client.messages.create(config.mailGun.domain, {
         from   : config.appEmail,
