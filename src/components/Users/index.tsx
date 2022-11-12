@@ -204,8 +204,8 @@ function UserEditor({
                 </p>
                 <p className="row gap">
                     <b className="col col-4 right color-blue-dark">Last Login: </b>
-                    <div className="col">{ user.last_login ?
-                        <Format value={ user.last_login } format="date-time" /> :
+                    <div className="col">{ user.lastLogin ?
+                        <Format value={ user.lastLogin } format="date-time" /> :
                         <span className="color-muted">never</span> }
                     </div>
                 </p>

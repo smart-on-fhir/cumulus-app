@@ -83,7 +83,7 @@ module.exports = class User extends Model
             
             // "user" or "admin"
             role: {
-                type: DataTypes.STRING(50),
+                type: DataTypes.ENUM('user', 'manager', 'admin'),
                 allowNull: false,
                 defaultValue: "user",
                 validate: {
@@ -97,23 +97,15 @@ module.exports = class User extends Model
                 set(value) {
                     this.setDataValue('sid', value);
                     if (value) {
-                        this.setDataValue('last_login', new Date());
+                        this.setDataValue('lastLogin', new Date());
                     }
                 }
             },
             
             // Last login datetime (automatically updated on login)
-            last_login: {
+            lastLogin: {
                 type: DataTypes.DATE
             },
-
-            // Virtual boolean
-            // online: {
-            //     type: DataTypes.VIRTUAL,
-            //     get() {
-            //         return this.sid !== null;
-            //     }
-            // },
 
             status: {
                 type: DataTypes.VIRTUAL,
@@ -122,7 +114,7 @@ module.exports = class User extends Model
                         return "Logged in";
                     }
                     if (this.password) {
-                        return this.last_login ? "Not logged in" : "Never logged in";
+                        return this.lastLogin ? "Not logged in" : "Never logged in";
                     }
                     if (moment().diff(moment(this.createdAt), "days") > 1) {
                         return "Expired invitation";

@@ -1,6 +1,7 @@
 @import "../../styles/variables.scss";
 
 .activity-panel {
+    
     > div {
         padding: 4px;
         cursor: default;
@@ -22,10 +23,12 @@
 .log {
     max-height: calc(100vh - 21em);
     overflow: auto;
+    background-color: #FFF;
+    border: 1px solid $color-grey;
 }
 .log-line {
     padding: 0px 2px;
-    line-height: 1.4;
+    line-height: normal;
 
     &:hover {
         box-shadow: 0 0 0 0.5px fade-out($color-blue, 0.8);

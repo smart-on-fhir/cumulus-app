@@ -76,10 +76,10 @@ export default function Navigation()
                 
                 { user.role === "admin" && (
                     <NavGroup icon="fa-solid fa-screwdriver-wrench" label="Administration">
-                        <NavLink to="/settings"><i className="icon fa-solid fa-cog" /> Settings</NavLink>
+                        {/* <NavLink to="/settings"><i className="icon fa-solid fa-cog" /> Settings</NavLink> */}
                         <NavLink to="/users" end><i className="icon fa-solid fa-users" /> Users</NavLink>
                         <NavLink to="/users/invite"><i className="icon fa-solid fa-user-plus" /> Invite User</NavLink>
-                        <NavLink to="/permissions"><i className="icon fa-solid fa-user-shield" /> Roles &amp; Permissions</NavLink>
+                        {/* <NavLink to="/permissions"><i className="icon fa-solid fa-user-shield" /> Roles &amp; Permissions</NavLink> */}
                         <NavLink to="/activity"><i className="icon fa-solid fa-clipboard-list" /> Logs</NavLink>
                     </NavGroup>
                 )}
