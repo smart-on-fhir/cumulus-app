@@ -24,7 +24,7 @@
     "html2canvas": "^1.4.1",
     "httperrors": "^2.3.0",
     "if-env": "^1.0.4",
-    "mailgun.js": "^5.0.1",
+    "mailgun.js": "^8.0.2",
     "moment": "^2.29.1",
     "pg": "^8.7.3",
     "react": "^17.0.2",
@@ -83,7 +83,7 @@
     "mocha": "^10.1.0",
     "nyc": "^15.1.0"
   },
-  "proxy": "http://localhost:4000",
+  "proxy": "http://127.0.0.1:4000",
   "engines": {
     "node": ">=18"
   }
