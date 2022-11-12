@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom"
+import { classList } from "../../utils"
+import MenuButton from "../MenuButton"
 import "./Projects.scss"
 
 export default function Projects()
@@ -11,19 +13,32 @@ export default function Projects()
                 <br/>
                 <br/>
                 <div style={{ flex: 1 }}/>
-                <div className="row gap color-muted small mb-1" style={{ justifyContent: "space-between" }}>
+                <div className="row gap color-muted small mb-1" style={{ justifyContent: "space-around" }}>
+                    <div className="col col-0">
+                        <i>Graphs: <span className="color-brand-2">12</span></i>
+                    </div>
                     <div className="col col-0">
                         <i>Created: <span className="color-brand-2">10/12/22</span></i>
-                        <i>Updated: <span className="color-brand-2">10/24/22</span></i>
                     </div>
-                    <div className="col">
-                        <i>Graphs: <span className="color-brand-2">12</span></i>
-                        <i>Contributors: <span className="color-brand-2">7</span></i>
+                    <div className="col col-0">
+                        <i>Updated: <span className="color-brand-2">10/24/22</span></i>
                     </div>
                 </div>
                 <hr/>
                 <div className="center">
-                    <Link to="/" className="btn btn-blue pl-2 pr-2 mt-2">Explore</Link>
+                    <div className="btn btn-blue mt-2 p-0">
+                        <Link to="/projects/id" className="pl-2 pr-2"><b>Explore</b></Link>
+                        <MenuButton right items={[
+                            <Link to="/projects/id/edit">
+                                <i className="fa-solid fa-pen-to-square color-blue-dark" /> Edit Project
+                            </Link>,
+                            <Link to="/projects/id/delete">
+                                <i className="fa-solid fa-trash-can color-red" /> Delete Project
+                            </Link>
+                        ]}>
+                            <i className="fa-solid fa-caret-down small" />
+                        </MenuButton>
+                    </div>
                 </div>
             </div>
             <div className="col project project">
@@ -32,19 +47,32 @@ export default function Projects()
                 <br/>
                 <br/>
                 <div style={{ flex: 1 }}/>
-                <div className="row gap color-muted small mb-1" style={{ justifyContent: "space-between" }}>
+                <div className="row gap color-muted small mb-1" style={{ justifyContent: "space-around" }}>
+                    <div className="col col-0">
+                        <i>Graphs: <span className="color-brand-2">12</span></i>
+                    </div>
                     <div className="col col-0">
                         <i>Created: <span className="color-brand-2">10/12/22</span></i>
-                        <i>Updated: <span className="color-brand-2">10/24/22</span></i>
                     </div>
-                    <div className="col">
-                        <i>Graphs: <span className="color-brand-2">12</span></i>
-                        <i>Contributors: <span className="color-brand-2">7</span></i>
+                    <div className="col col-0">
+                        <i>Updated: <span className="color-brand-2">10/24/22</span></i>
                     </div>
                 </div>
                 <hr/>
                 <div className="center">
-                    <Link to="/" className="btn btn-blue pl-2 pr-2 mt-2">Explore</Link>
+                    <div className="btn btn-blue mt-2 p-0">
+                        <Link to="/projects/id" className="pl-2 pr-2"><b>Explore</b></Link>
+                        <MenuButton right items={[
+                            <Link to="/projects/id/edit">
+                                <i className="fa-solid fa-pen-to-square color-blue-dark" /> Edit Project
+                            </Link>,
+                            <Link to="/projects/id/delete">
+                                <i className="fa-solid fa-trash-can color-red" /> Delete Project
+                            </Link>
+                        ]}>
+                            <i className="fa-solid fa-caret-down small" />
+                        </MenuButton>
+                    </div>
                 </div>
             </div>
             <div className="col project">
@@ -53,19 +81,32 @@ export default function Projects()
                 <br/>
                 <br/>
                 <div style={{ flex: 1 }}/>
-                <div className="row gap color-muted small mb-1" style={{ justifyContent: "space-between" }}>
+                <div className="row gap color-muted small mb-1" style={{ justifyContent: "space-around" }}>
+                    <div className="col col-0">
+                        <i>Graphs: <span className="color-brand-2">12</span></i>
+                    </div>
                     <div className="col col-0">
                         <i>Created: <span className="color-brand-2">10/12/22</span></i>
-                        <i>Updated: <span className="color-brand-2">10/24/22</span></i>
                     </div>
-                    <div className="col">
-                        <i>Graphs: <span className="color-brand-2">12</span></i>
-                        <i>Contributors: <span className="color-brand-2">7</span></i>
+                    <div className="col col-0">
+                        <i>Updated: <span className="color-brand-2">10/24/22</span></i>
                     </div>
                 </div>
                 <hr/>
                 <div className="center">
-                    <Link to="/" className="btn btn-blue pl-2 pr-2 mt-2">Explore</Link>
+                    <div className="btn btn-blue mt-2 p-0">
+                        <Link to="/projects/id" className="pl-2 pr-2"><b>Explore</b></Link>
+                        <MenuButton right items={[
+                            <Link to="/projects/id/edit">
+                                <i className="fa-solid fa-pen-to-square color-blue-dark" /> Edit Project
+                            </Link>,
+                            <Link to="/projects/id/delete">
+                                <i className="fa-solid fa-trash-can color-red" /> Delete Project
+                            </Link>
+                        ]}>
+                            <i className="fa-solid fa-caret-down small" />
+                        </MenuButton>
+                    </div>
                 </div>
             </div>
         </div>
