@@ -6,6 +6,7 @@ declare module app {
      */
     interface User {
         // username: string
+        id: number
         name: string
         email: string
         role: string

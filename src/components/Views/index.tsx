@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import ViewsBrowser from "./ViewsBrowser";
 
-export default function()
+export default function Views()
 {
     const url = new URL(window.location.href)
 

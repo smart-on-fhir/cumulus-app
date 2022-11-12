@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState }          from "react";
-import { Link }              from "react-router-dom";
-import { useAuth } from "../../auth";
-import { request }           from "../../backend";
-import Alert, { AlertError } from "../Alert";
+import { useEffect, useRef, useState } from "react";
+import { useAuth }    from "../../auth";
+import { request }    from "../../backend";
+import { AlertError } from "../Alert";
 
 export default function Account()
 {

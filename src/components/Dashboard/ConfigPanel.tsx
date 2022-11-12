@@ -1,6 +1,5 @@
 
 import { merge }         from "highcharts"
-import { useAuth }       from "../../auth"
 import Select            from "../Select"
 import ColumnSelector    from "./ColumnSelector"
 import FilterUI          from "./FilterUI"
@@ -117,7 +116,6 @@ export default function ConfigPanel({
     dataRequest,
     state,
     onChange,
-    viewType,
     view
 } : {
     dataRequest: app.DataRequest
@@ -126,8 +124,6 @@ export default function ConfigPanel({
     viewType: "overview" | "data"
     onChange: (state: ChartConfigPanelState) => void
 }) {
-    let auth = useAuth();
-
     let [ rating  , setRating   ] = useState(view.normalizedRating || 0)
     let [ votes   , setVotes    ] = useState(view.votes || 0)
     let [ voting  , setVoting   ] = useState(false)
