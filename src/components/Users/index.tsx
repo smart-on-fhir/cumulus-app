@@ -1,5 +1,6 @@
 import { Component, useState } from "react";
 import { Link }                from "react-router-dom";
+import { useAuth }             from "../../auth";
 import { request }             from "../../backend";
 import { AlertError }          from "../Alert";
 import { Format }              from "../Format";
@@ -162,38 +163,38 @@ function UserEditor({
     onChange: (patch: Partial<app.ServerResponses.User>) => void
     onDelete: () => void
 }) {
-
+    const auth = useAuth()
     const [ editing, setEditing ] = useState(false)
     const [ role, setRole ] = useState(user.role)
 
     return (
         <div className="row wrap">
             <div className="col" style={{ flexBasis: "28em" }}>
-                <p className="row gap">
+                <div className="row gap mb-05">
                     <b className="col col-4 right color-blue-dark">Display name: </b>
                     <div className="col"><DisplayName user={user} /></div>
-                </p>
-                <p className="row gap">
+                </div>
+                <div className="row gap mb-05">
                     <b className="col col-4 right color-blue-dark">Email: </b>
                     <div className="col"><Email address={ user.email } /></div>
-                </p>
-                <p className="row gap">
+                </div>
+                <div className="row gap mb-05">
                     <b className="col col-4 right color-blue-dark">Role: </b>
                     <div className="col"><Role user={ user } /></div>
-                </p>
-                <p className="row gap">
+                </div>
+                <div className="row gap mb-05">
                     <b className="col col-4 right color-blue-dark">Created at: </b>
                     <div className="col"><Format value={ user.createdAt } format="date-time" /></div>
-                </p>
-                <p className="row gap">
+                </div>
+                <div className="row gap mb-05">
                     <b className="col col-4 right color-blue-dark">Updated at: </b>
                     <div className="col"><Format value={ user.updatedAt } format="date-time" /></div>
-                </p>
-                <p className="row gap">
+                </div>
+                <div className="row gap mb-05">
                     <b className="col col-4 right color-blue-dark">Status: </b>
                     <div className="col"><Status user={ user } /></div>
-                </p>
-                <p className="row gap">
+                </div>
+                <div className="row gap mb-05">
                     <b className="col col-4 right color-blue-dark">Invited by: </b>
                     <div className="col">{
                         user.invitedBy ?
@@ -201,15 +202,16 @@ function UserEditor({
                             <span className="color-muted">Nobody (system user)</span>
                     }
                     </div>
-                </p>
-                <p className="row gap">
+                </div>
+                <div className="row gap mb-05">
                     <b className="col col-4 right color-blue-dark">Last Login: </b>
                     <div className="col">{ user.lastLogin ?
                         <Format value={ user.lastLogin } format="date-time" /> :
                         <span className="color-muted">never</span> }
                     </div>
-                </p>
+                </div>
             </div>
+            { user.id !== auth.user?.id && (
             <div className="col center middle" style={{ flexBasis: "28em" }}>
                 <br />
                 {
@@ -240,7 +242,7 @@ function UserEditor({
                 }}>
                     Delete User
                 </button>
-            </div>
+            </div> )}
         </div>
     )
 }
@@ -250,7 +252,7 @@ function Status({ user }: { user: app.ServerResponses.User }) {
         return <b className="color-red">Expired invitation</b>
     }
     if (user.status === "Pending invitation") {
-        return <b className="color-orange">Expired invitation</b>
+        return <b className="color-orange">Pending invitation</b>
     }
     return <span>{ user.status }</span>
 }

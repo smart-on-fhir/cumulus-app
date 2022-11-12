@@ -14,8 +14,8 @@ import {buildChartOptions, default as BaseChart} from "./Charts/Chart"
 import CaptionEditor                        from "./CaptionEditor"
 import EditInPlace                          from "../EditInPlace"
 import { ReadOnlyPaths, SupportedChartTypes, SupportedNativeChartTypes, TURBO_THRESHOLD } from "./config"
-import { defer, generateColors, Json, objectDiff, strip } from "../../utils"
-import DefaultChartOptions, { getDefaultChartOptions } from "./Charts/DefaultChartOptions"
+import { defer, Json, strip }               from "../../utils"
+import { getDefaultChartOptions }           from "./Charts/DefaultChartOptions"
 
 import "./Dashboard.scss"
 

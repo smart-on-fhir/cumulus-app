@@ -172,6 +172,7 @@ async function login(req, res) {
         res.cookie("sid", sid, { httpOnly: true, expires });
 
         res.json({
+            id   : user.get("id"),
             name : user.get("name"),
             email: user.get("email"),
             role : user.get("role"),

@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom"
-import { classList } from "../../utils"
 import MenuButton from "../MenuButton"
 import "./Projects.scss"
 
