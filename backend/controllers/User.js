@@ -217,7 +217,8 @@ async function handleUserInvite({ email, role, message }, invitedBy, baseUrl) {
             baseUrl,
             message
         })
-    } catch {
+    } catch (e) {
+        debug(e)
         await transaction.rollback()
         throw new HttpError.InternalServerError("Error sending invitation email")
     }
