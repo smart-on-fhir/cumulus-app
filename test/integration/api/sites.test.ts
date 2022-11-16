@@ -1,5 +1,5 @@
-const { testCRUDEndpointPermissions, server } = require("../../test-lib");
-const DataSites = require("../../fixtures/DataSites")
+import { testCRUDEndpointPermissions, server } from "../../test-lib"
+import DataSites from "../../fixtures/DataSites"
 
 describe("DataSites", () => {
     

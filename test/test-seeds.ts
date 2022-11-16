@@ -1,9 +1,8 @@
-const { fixAutoIncrement } = require("../backend/lib");
+import { Sequelize }        from "sequelize"
+import { fixAutoIncrement } from "../backend/lib"
 
-/**
- * @param {import("sequelize").Sequelize} connection
- */
-module.exports = async (connection) => {
+
+module.exports = async function(connection: Sequelize) {
 
     const { models } = connection
 
@@ -16,5 +15,4 @@ module.exports = async (connection) => {
     await models.Project.bulkCreate(require("./fixtures/Projects"));
     await fixAutoIncrement(connection, models.Project.tableName, "id");
 
-};
-
+}
