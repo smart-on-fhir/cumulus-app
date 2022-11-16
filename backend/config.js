@@ -1,5 +1,6 @@
 const Path           = require("path");
 const { bool, uInt } = require("./lib");
+const { logger }     = require("./logger");
 
 const {
     NODE_ENV               = "production",
@@ -62,7 +63,9 @@ module.exports = {
             dialect : "postgres",
             schema  : "public",
             database: DB_DATABASE,
-            logging : bool(LOG_SQL) ? console.log : false,
+            logging : bool(LOG_SQL) ?
+                (msg) => logger.log("info", msg, { tags: ["SQL"] }) :
+                false,
             username: DB_USER,
             password: DB_PASS,
             port    : DB_PORT,

@@ -10,7 +10,6 @@ declare module app {
 
     interface AuthenticatedRequest extends Request {
         user: User
-
     }
 
     interface User {

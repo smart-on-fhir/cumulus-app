@@ -27,6 +27,14 @@ const ACL = {
     users_check_activation   :[ 1, 1, 1,  , 1 ], // check activation code
     // -------------------------------------------------------------------------
 
+    // projects ----------------------------------------------------------------
+    projects_list            :[ 0, 1, 1,  , 1 ], // view all projects
+    projects_view            :[ 0, 1, 1,  , 1 ], // view single project
+    projects_create          :[ 0, 0, 1,  , 1 ], // create new project
+    projects_update          :[ 0, 0, 1,  , 1 ], // update project
+    projects_delete          :[ 0, 0, 1,  , 1 ], // delete project
+    // -------------------------------------------------------------------------
+
     // views/graphs ------------------------------------------------------------
     views_list               :[ 0, 1, 1,  , 1 ], // view all graphs
     views_view               :[ 0, 1, 1,  , 1 ], // view one graph by id
@@ -74,8 +82,9 @@ const ACL = {
     data_read                :[ 0, 0, 1,  , 1 ], // read aggregate data
     // -------------------------------------------------------------------------
 
-    // activity logs -----------------------------------------------------------
+    // logs --------------------------------------------------------------------
     activity_list            :[ 0, 1, 1,  , 1 ], // browse activity logs
+    logs_list                :[ 0, 0, 0,  , 1 ], // browse logs
     // -------------------------------------------------------------------------
 };
 

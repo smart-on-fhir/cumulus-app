@@ -29,22 +29,25 @@
 
     &.gap {
         margin-left: -0.5em;
-        margin-right: -0.5em;
-        // justify-content: space-between;
-        // flex-wrap: nowrap;
-
+        margin-right: -0.5em;    
         > .col {
             padding-right: 0.5em;
             padding-left: 0.5em;
         }
     }
 
+    &.gap-2 {
+        margin-left: -1em;
+        margin-right: -1em;    
+        > .col {
+            padding-right: 1em;
+            padding-left: 1em;
+        }
+    }
+
     &.half-gap {
         margin-left: -0.25em;
         margin-right: -0.25em;
-        // justify-content: space-between;
-        // flex-wrap: nowrap;
-
         > .col {
             padding: 0.25em;
         }

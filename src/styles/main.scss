@@ -368,3 +368,13 @@ table {
   min-height: calc(100vh - 6rem);
 }
 
+.panel {
+  border: 1px solid #DDD;
+  background: #FFF;
+  border-radius: 0.5rem;
+  padding: 2rem;
+
+  > h3, > h4 {
+      margin-top: 0;
+  }
+}

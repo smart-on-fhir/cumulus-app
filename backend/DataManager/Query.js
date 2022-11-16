@@ -1,4 +1,5 @@
 const { QueryTypes, Sequelize } = require("sequelize");
+const { logger } = require("../logger");
 
 const FilterConfig = {
     
@@ -243,7 +244,7 @@ class Query {
         const [sql, replacements] = this.compile()
         return connection.query(sql, {
             replacements,
-            logging: console.log,
+            logging: msg => logger.info(msg, { tags: ["SQL", "DATA"] }),
             type: QueryTypes.SELECT
         });
     }

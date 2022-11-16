@@ -4,10 +4,11 @@ import { useAuth } from "../../auth"
 import "./Navigation.scss"
 
 
-function NavGroup({ to, label, icon, children }: {
+function NavGroup({ to, label, icon, children, end }: {
     to?: string
     icon: string
     label: string
+    end?: RegExp
     children: ReactNode
 }) {
     const { pathname } = useLocation()
@@ -18,7 +19,7 @@ function NavGroup({ to, label, icon, children }: {
     return (
         <>
             { to ?
-                <NavLink to={ to } end>
+                <NavLink to={ to } end={ end ? !end.test(pathname) : true }>
                     <i className={ "icon " + icon } /><label>{ label }</label>
                     <i
                         className={ "fas chevron " + (isOpen ? "fa-chevron-down" : "fa-chevron-right") }
@@ -58,7 +59,7 @@ export default function Navigation()
             <div className="navigation-wrap">
                 <NavLink to="/"><i className="icon fa-solid fa-house-chimney"></i> Home</NavLink>
                 
-                <NavGroup to="/projects" label="Projects" icon="fa-solid fa-book">
+                <NavGroup to="/projects" label="Projects" icon="fa-solid fa-book" end={ /^\/projects(\/\d+.*?)?$/ }>
                     <NavLink to="/projects/new"><i className="icon fa-solid fa-circle-plus" /> New Project</NavLink>
                 </NavGroup>
 
@@ -81,6 +82,7 @@ export default function Navigation()
                         <NavLink to="/users/invite"><i className="icon fa-solid fa-user-plus" /> Invite User</NavLink>
                         {/* <NavLink to="/permissions"><i className="icon fa-solid fa-user-shield" /> Roles &amp; Permissions</NavLink> */}
                         <NavLink to="/activity"><i className="icon fa-solid fa-clipboard-list" /> Logs</NavLink>
+                        <NavLink to="/logs"><i className="icon fa-solid fa-clipboard-list" /> Logs 2</NavLink>
                     </NavGroup>
                 )}
 

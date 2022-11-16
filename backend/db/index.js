@@ -2,6 +2,7 @@ const Path                   = require("path");
 const { Sequelize }          = require("sequelize");
 const { getDockerContainer } = require("../Docker");
 const { walkSync }           = require("../lib");
+const { logger }             = require("../logger");
 
 /** @type {Sequelize} */
 let connection;
@@ -20,7 +21,7 @@ async function setupDB(options)
         return connection;
     }
 
-    const { db, docker, verbose } = options
+    const { db, docker } = options
 
     // Bring up a Docker container ---------------------------------------------
     if (docker?.containerName && !process.env.GITHUB_CI) {
@@ -28,27 +29,27 @@ async function setupDB(options)
             await getDockerContainer(options)
         } catch (ex) {
             if (ex.failed && !ex.isCanceled && !ex.killed) {
-                console.error(ex.message)
+                logger.error(ex, { tags: ["DOCKER"] })
                 process.exit(ex.exitCode)
             }
             throw ex
         }
-        verbose && console.log(`✔ Initialized Docker container "${docker.containerName}"`)
+        logger.verbose(`✔ Initialized Docker container "${docker.containerName}"`, { tags: ["DATA"] })
     }
 
     // Test connection ---------------------------------------------------------
     try {
         connection = new Sequelize(db.options);
         await connection.authenticate();
-        verbose && console.log("✔ Connected to the database");
+        logger.verbose("✔ Connected to the database");
     } catch (ex) {
-        console.log("\u001b[1m\u001b[31m✘ Failed to connected to the database\u001b[39m\u001b[22m");
+        logger.error("✘ Failed to connected to the database", { ...ex, tags: ["DATA"] });
         throw ex;
     }
 
     // Initialize models -------------------------------------------------------
     for (let path of walkSync(Path.join(__dirname, "./models"))) {
-        verbose && console.log(`  - Initializing model from ${path.replace(__dirname, "backend/db")}`)
+        logger.verbose(`  - Initializing model from ${path.replace(__dirname, "backend/db")}`, { tags: ["DATA"] })
         require(path).initialize(connection);
     }
 
@@ -60,12 +61,12 @@ async function setupDB(options)
             try {
                 associate(connection);
             } catch (e) {
-                console.log(`Activating the associations of model "${modelName}" FAILED!`)
+                logger.error(`Activating the associations of model "${modelName}" FAILED!`, { ...e, tags: ["DATA"] })
                 throw e
             }
         }
     });
-    verbose && console.log("✔ Activated model associations");
+    logger.verbose("✔ Activated model associations", { tags: ["DATA"] });
 
 
     // Sync --------------------------------------------------------------------
@@ -74,13 +75,13 @@ async function setupDB(options)
     // exists)
     if (db.sync == "normal") {
         await connection.sync()  
-        verbose && console.log(`✔ Created tables which did not exist (if any)`)
+        logger.verbose(`✔ Created tables which did not exist (if any)`, { tags: ["DATA"] })
     }
 
     // This creates the table, dropping it first if it already existed
     if (db.sync == "force") {
         await connection.sync({ force: true })
-        verbose && console.log(`✔ Dropped and re-created tables`)
+        logger.verbose(`✔ Dropped and re-created tables`, { tags: ["DATA"] })
     }
 
     // This checks what is the current state of the table in the database (which
@@ -88,7 +89,7 @@ async function setupDB(options)
     // necessary changes in the table to make it match the model.
     if (db.sync == "alter") {
         await connection.sync({ alter: true })
-        verbose && console.log(`✔ Updated tables to match model structures`)
+        logger.verbose(`✔ Updated tables to match model structures`, { tags: ["DATA"] })
     }
 
     require("../Scheduler");

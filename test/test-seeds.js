@@ -13,5 +13,8 @@ module.exports = async (connection) => {
     await models.DataSite.bulkCreate(require("./fixtures/DataSites"));
     await fixAutoIncrement(connection, models.DataSite.tableName, "id");
 
+    await models.Project.bulkCreate(require("./fixtures/Projects"));
+    await fixAutoIncrement(connection, models.Project.tableName, "id");
+
 };
 

@@ -5,7 +5,6 @@ const express          = require("express");
 const slug             = require("slug");
 const { HttpError }    = require("httperrors");
 const crypto           = require("crypto");
-const { debuglog }     = require("util");
 const { QueryTypes }   = require("sequelize");
 const Model            = require("../db/models/DataRequest");
 const GroupModel       = require("../db/models/RequestGroup");
@@ -13,6 +12,7 @@ const ViewModel        = require("../db/models/View");
 const { requireAuth }  = require("./Auth");
 const createRestRoutes = require("./BaseController");
 const ImportJob        = require("../DataManager/ImportJob");
+const { logger }       = require("../logger");
 const {
     getFindOptions,
     assert,
@@ -23,12 +23,6 @@ const {
 
 
 const router = module.exports = express.Router({ mergeParams: true });
-
-const debug = debuglog("app:sql:api")
-
-function logSql(sql) {
-    debug(sql)
-}
 
 const FilterConfig = {
     
@@ -335,7 +329,7 @@ router.get("/:id/api", rw(async (req, res) => {
     // Execute the query
     const result = await subscription.sequelize.query(sql, {
         replacements,
-        logging: logSql,
+        logging: sql => logger.info(sql, { tags: ["SQL", "DATA"] }),
         type: QueryTypes.SELECT
     });
 

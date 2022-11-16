@@ -6,12 +6,14 @@ const express                     = require("express")
 const cors                        = require("cors")
 const cookieParser                = require("cookie-parser")
 const { Umzug, SequelizeStorage } = require("umzug");
-const { debuglog }                = require("util");
+// const { debuglog }                = require("util");
 const Auth                        = require("./controllers/Auth")
 const setupDB                     = require("./db")
 const settings                    = require("./config")
+const { logger }                  = require("./logger");
+// const { getRequestBaseURL } = require("./lib");
 
-const debug = debuglog("app");
+// const debug = debuglog("app");
 
 
 function createServer(config)
@@ -23,14 +25,33 @@ function createServer(config)
 
     app.use(cors({ origin: true, credentials: true }));
 
-    config.verbose && console.log("✔ Created a server");
+    logger.verbose("✔ Created a server");
+
+    app.use((req, res, next) => {
+        res.on("finish", () => {
+            const meta = {
+                tags     : ["WEB"],
+                userAgent: req.headers["user-agent"],
+                ip       : req.ip,
+                user     : req.user?.email || "guest"
+            }
+            
+            if (req.method === "POST" || req.method === "PUT") {
+                meta.requestBody = req.body
+            }
+            
+            logger.log(
+                res.statusCode >= 400 ? "error" : "http",
+                `${res.statusCode} ${req.method.padStart(6)} ${req.originalUrl}`,
+                meta
+            )
+        })
+        next()
+    });
 
     if (config.throttle) {
         app.use((rec, res, next) => setTimeout(next, 1000));
-        config.verbose && console.log(
-            "✔ \u001b[1m\u001b[35mAll responses delayed by %sms\u001b[39m\u001b[22m",
-            config.throttle
-        );
+        logger.verbose("All responses delayed by %sms", config.throttle);
     }
 
     server.requestTimeout = 0;
@@ -38,46 +59,48 @@ function createServer(config)
     return { app, server };
 }
 
-function setupAuth(app, config)
+function setupAuth(app)
 {
     // We use cookies for user sessions
     app.use(cookieParser(), Auth.authenticate);
     app.use("/api/auth", Auth.router);
-    config.verbose && console.log("✔ Authentication set up");
+    logger.verbose("✔ Authentication set up");
 }
 
-function setupAPI(app, { verbose })
+function setupAPI(app)
 {
     app.use("/api/request-groups", require("./controllers/RequestGroup"));
     app.use("/api/requests"      , require("./controllers/DataRequest" ));
     app.use("/api/views"         , require("./controllers/View"        ));
     app.use("/api/users"         , require("./routes/users"            ));
+    app.use("/api/projects"      , require("./routes/projects"         ));
+    app.use("/api/logs"          , require("./routes/logs"             ));
     app.use("/api/activity"      , require("./controllers/Activity"    ));
     app.use("/api/data-sites"    , require("./controllers/DataSites"   ));
-    verbose && console.log("✔ REST API set up");
+    logger.verbose("✔ REST API set up");
 }
 
-function setupStaticContent(app, { verbose })
+function setupStaticContent(app)
 {
     app.get("/favicon.ico", (req, res) => res.status(404).end());
     app.use(express.static(Path.join(__dirname, "../build/")));
     app.get("*", (req, res) => res.sendFile("index.html", { root: "../build" }));
-    verbose && console.log("✔ Static content hosted");
+    logger.verbose("✔ Static content hosted");
 }
 
-async function applySeeds({ db, verbose }, dbConnection)
+async function applySeeds({ db }, dbConnection)
 {
     const seedPath = db.seed;
     if (seedPath) {
         const seed = require(seedPath);
         await seed(dbConnection);
-        verbose && console.log(`✔ Applied seeds from ${seedPath.replace(__dirname, "")}`);
+        logger.verbose(`✔ Applied seeds from ${seedPath.replace(__dirname, "")}`);
     } else {
-        verbose && console.log("- Seeding the database SKIPPED because config.db.seedPath is not set!");
+        logger.verbose("- Seeding the database SKIPPED because config.db.seedPath is not set!");
     }
 }
 
-async function applyMigrations({ db, verbose }, dbConnection)
+async function applyMigrations({ db }, dbConnection)
 {
     const umzug = new Umzug({
         context: dbConnection.getQueryInterface(),
@@ -98,53 +121,58 @@ async function applyMigrations({ db, verbose }, dbConnection)
             }
         },
         storage: new SequelizeStorage({ sequelize: dbConnection }),
-        logger: verbose ? console : undefined
+        logger: db.logging
     });
 
     const pending = await umzug.pending();
-    verbose && console.log("✔ Pending migrations: %s", pending.length ? pending.map(m => m.path).join(',') : "none")
+    logger.verbose("✔ Pending migrations: %s", pending.length ? pending.map(m => m.path).join(',') : "none")
     
     // Checks migrations and run them if they are not already applied.
     // Metadata stored in the SequelizeMeta table in postgres
     const migrations = await umzug.up();
-    verbose && console.log('✔ Successful migrations: %s', migrations.length ? migrations.map(m => m.path).join(','): "none")
+    logger.verbose('✔ Successful migrations: %s', migrations.length ? migrations.map(m => m.path).join(','): "none")
 }
 
-function setUpErrorHandlers(app, { verbose })
+function setUpErrorHandlers(app)
 {
     // Global error 404 handler
-    app.use((_, res) => {
+    app.use((req, res) => {
+        logger.error(`${req.method} ${req.originalUrl} -> 404 Not Found`)
         res.sendStatus(404).end("Not Found");
     });
 
     // Global error 500 handler
     app.use((error, req, res, next) => {
-
-        debug(error)
-
-        const msg = error.message.replace(/^\s*\w*Error:\s+/, "")
         
         // HTTP Errors
         if (error.http) {
+            const msg = error.message.replace(/^\s*\w*Error:\s+/, "")
+            error.data = { ...error.data, user: req.user?.email || "guest" }
+            if (req.method === "POST" || req.method === "PUT") {
+                error.data.requestBody = req.body
+            }
+            logger.error(`${error.status} ${req.method.padStart(6)} ${req.originalUrl} => `, error)
             res.status(error.status).send(msg);
         }
 
         // Sequelize Validation Errors
         else if (error.name === "SequelizeValidationError") {
-            res.status(400).send(error.errors.map(e => (
-                `${e.type || "Error"} while validating ${e.path || "data"}: ${e.message}`
-            )).join("\n"));
+            const msg = error.errors.map(e => `${req.method.padStart(6)} ${req.originalUrl} => ${e.type || "Error"} while validating ${e.path || "data"}: ${e.message}`).join("\n")
+            logger.error("Sequelize Validation Error " + JSON.stringify(error, null, 4))
+            res.status(400).send(msg);
         }
 
         // Other Errors
         else {
+            const msg = `${req.method.padStart(6)} ${req.originalUrl} => ${error.message.replace(/^\s*\w*Error:\s+/, "")}`
+            logger.error(msg, error)
             res.status(500).send(msg);
         }
 
         res.end()
     });
 
-    verbose && console.log("✔ Error handlers activated");
+    logger.verbose("✔ Error handlers activated");
 }
 
 /**
@@ -164,7 +192,7 @@ function startServer(server, config)
                 addr = `http://${address}:${port}`;
             }
 
-            console.log("✔ \u001b[1m\u001b[33mServer listening on %s\u001b[39m\u001b[22m", addr);
+            logger.verbose("✔ Server listening on %s", addr);
 
             resolve(server);
         });
@@ -184,10 +212,10 @@ async function main(config = settings)
     
     // app.set("db", dbConnection);
     
-    setupAuth(app, config);
-    setupAPI(app, config);
-    setupStaticContent(app, config);
-    setUpErrorHandlers(app, config);
+    setupAuth(app);
+    setupAPI(app);
+    setupStaticContent(app);
+    setUpErrorHandlers(app);
 
     await startServer(server, config);
 
