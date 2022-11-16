@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer } from "react"
+import { useCallback, useEffect, useMemo, useReducer } from "react"
 
 interface State<T = any> {
     loading: boolean
@@ -10,7 +10,7 @@ function reducer(state: State, payload: Partial<State>): State {
     return { ...state, ...payload };
 }
 
-export function useBackend<T=any>(fn: () => Promise<T>, immediate = false)
+export function useBackend<T=any>(fn: (signal?: AbortSignal) => Promise<T>, immediate = false)
 {
     const [state, dispatch] = useReducer(reducer, {
         loading: immediate,
@@ -18,11 +18,21 @@ export function useBackend<T=any>(fn: () => Promise<T>, immediate = false)
         result: null
     });
 
+    const abortController = useMemo(() => new AbortController(), [fn])
+
     const execute = useCallback(() => {
         dispatch({ loading: true, result: null, error: null });
-        return fn().then(
-            (result: T) => dispatch({ loading: false, result }),
-            (error: Error) => dispatch({ loading: false, error })
+        return fn(abortController.signal).then(
+            (result: T) => {
+                if (!abortController.signal.aborted) {
+                    dispatch({ loading: false, result })
+                }
+            },
+            (error: Error) => {
+                if (!abortController.signal.aborted) {
+                    dispatch({ loading: false, error })
+                }
+            }
         );
     }, [fn]);
     
@@ -32,6 +42,8 @@ export function useBackend<T=any>(fn: () => Promise<T>, immediate = false)
         }
     }, [execute, immediate]);
 
+    useEffect(() => () => abortController.abort(), []);
+
     return {
         execute,
         loading: state.loading,
@@ -39,4 +51,3 @@ export function useBackend<T=any>(fn: () => Promise<T>, immediate = false)
         error: state.error
     };
 }
-

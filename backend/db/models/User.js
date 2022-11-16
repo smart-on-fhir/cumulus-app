@@ -1,7 +1,8 @@
 const { DataTypes, Model } = require("sequelize");
 const Bcrypt               = require("bcryptjs");
 const moment               = require("moment");
-const Activity             = require("./Activity");
+// const Activity             = require("./Activity");
+const { logger } = require("../../logger");
 
 
 /**
@@ -142,10 +143,11 @@ module.exports = class User extends Model
             hooks: {
                 async afterUpdate(model) {
                     if (model.changed("sid")) {
-                        await Activity.create({
-                            message: `${model} ${model.sid ? "logged in" : "logged out"}`,
-                            tags: "auth"
-                        })
+                        logger.info(`${model} ${model.sid ? "logged in" : "logged out"}`, { tags: ["AUTH", "ACTIVITY"] })
+                        // await Activity.create({
+                        //     message: `${model} ${model.sid ? "logged in" : "logged out"}`,
+                        //     tags: "auth"
+                        // })
                     }
                 }
             }

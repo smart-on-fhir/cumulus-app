@@ -26,15 +26,21 @@ export default function Alert({
 }
 
 export function AlertError({ className, children = "Unknown error" }: {
-    children?: JSX.Element | string | (JSX.Element | string)[],
+    children?: JSX.Element | string | Error | (JSX.Element | string | Error)[],
     className?: string
 }) {
+    children = Array.isArray(children) ? children : [children]
     return (
         <Alert className={ classList({
             [className || ""]: !!className,
             " mt-1 mb-1": true
         })} color="red" icon="fas fa-exclamation-circle">
-            {children}
+            { children.map((c, i) => {
+                if (c instanceof Error) {
+                    return <div key={i}>{ c.message }</div>
+                }
+                return <div key={i}>{ c }</div>
+            })}
         </Alert>
     )
 }

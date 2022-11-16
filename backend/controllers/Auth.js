@@ -3,12 +3,11 @@ const Crypto         = require("crypto")
 const Bcrypt         = require("bcryptjs")
 const HttpError      = require("httperrors")
 const { Op }         = require("sequelize")
-const { debuglog }   = require("util");
 const User           = require("../db/models/User")
 const { wait }       = require("../lib")
 const { ACL, roles } = require("../acl")
+const { logger }     = require("../logger")
 
-const debug = debuglog("app");
 
 
 const AUTH_DELAY = process.env.NODE_ENV === "production" ? 1000 : 1000;
@@ -34,7 +33,7 @@ async function authenticate(req, res, next) {
                 req.user = user.toJSON()    
             }
         } catch (ex) {
-            debug(ex);
+            logger.error(ex, { tags: ["AUTH"] });
         }
     }
     next();
@@ -98,8 +97,14 @@ function requestPermission(action, req, isOwner = false) {
     }
 
     if (!hasPermission(action, role)) {
-        debug(`Permission denied for "${role}" to perform "${action}" action!`)
-        throw new HttpError.Forbidden(`Permission denied`)
+        throw new HttpError.Forbidden({
+            message: `Permission denied`,
+            tags   : ["AUTH"],
+            data: {
+                reason: `Permission denied for "${role}" to perform "${action}" action!`,
+                owner : isOwner,
+            }
+        })
     }
 }
 
@@ -111,13 +116,13 @@ function requestPermission(action, req, isOwner = false) {
 function hasPermission(action, role) {
     const row = ACL[action];
     if (!row) {
-        debug(`Unknown action "${action}"!`);
+        logger.warn(`Unknown action "${action}"!`, { tags: ["AUTH"], action, role });
         return false;
     }
 
     const index = roles[role];
     if (!index && index !== 0) {
-        debug(`Unknown role "${role}"!`);
+        logger.warn(`Unknown role "${role}"!`, { tags: ["AUTH"], action, role });
         return false;
     }
 
@@ -180,7 +185,7 @@ async function login(req, res) {
         });
 
     } catch (ex) {
-        debug(ex)
+        logger.error(ex, { tags: ["AUTH"] })
         res.status(401).end("Login failed");
     }
 }
@@ -205,7 +210,7 @@ async function logout(req, res) {
                     }
                 });
         } catch (ex) {
-            debug(ex);
+            logger.error(ex, { tags: ["AUTH"] });
         }
     }
     res.clearCookie("sid").json({ message: "Logged out" }).end();

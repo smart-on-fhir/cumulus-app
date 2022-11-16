@@ -257,6 +257,15 @@ declare module app {
         createdAt: string
     }
 
+    interface Project {
+        id         : number
+        name       : string
+        description: string
+        creatorId  : number
+        updatedAt  : string
+        createdAt  : string
+    }
+
     namespace ServerResponses {
         
         interface UnStratifiedDataResponse {

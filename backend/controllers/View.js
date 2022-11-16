@@ -2,6 +2,7 @@ const express                            = require("express")
 const { HttpError }                      = require("httperrors");
 const Model                              = require("../db/models/View");
 const { rw, assert, roundToPrecision }   = require("../lib");
+const { logger }                         = require("../logger");
 const { requestLineLevelData }           = require("../mail");
 const { requireAuth, requestPermission } = require("./Auth");
 const createRestRoutes                   = require("./BaseController");
@@ -58,7 +59,7 @@ router.put("/:id/vote", express.urlencoded({ extended: false }), rw(async (req, 
         rating,
         votes,
         normalizedRating: roundToPrecision(rating / (votes || 1), 2)
-    });
+    }, { user: req.user });
 
     res.json(model)
 }));
@@ -73,7 +74,7 @@ router.put("/:id/reset-rating", requireAuth("admin"), rw(async (req, res) => {
         throw new HttpError.NotFound("Model not found");
     }
 
-    await model.update({ rating: 0, votes : 0, normalizedRating: 0 });
+    await model.update({ rating: 0, votes : 0, normalizedRating: 0 }, { user: req.user });
 
     res.json(model)
 }));
@@ -83,7 +84,7 @@ router.post("/:id/request-linelevel-data", express.json(), (req, res) => {
     requestLineLevelData(req.body).then(
         () => res.end(),
         e  => {
-            console.error(e)
+            logger.error(e, { tags: ["DATA"] })
             res.status(400).json(e)
         }
     )

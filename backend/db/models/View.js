@@ -1,5 +1,6 @@
 const { DataTypes, Model } = require("sequelize");
-const Activity = require("./Activity");
+const { logger } = require("../../logger");
+// const Activity = require("./Activity");
 
 
 class View extends Model
@@ -81,24 +82,27 @@ class View extends Model
             modelName: "View",
             hooks: {
                 async afterCreate(model, { user }) {
-                    await Activity.create({
-                        message: `${model} created by ${user ? user.name || "user #" + user.id : "system"}`,
-                        tags   : "views"
-                    });
+                    logger.info(`${model} created by ${user ? user.email : "system"}`, { tags: ["ACTIVITY", "GRAPHS"] })
+                    // await Activity.create({
+                    //     message: `${model} created by ${user ? user.email : "system"}`,
+                    //     tags   : "views"
+                    // });
                 },
 
                 async afterUpdate(model, { user }) {
-                    await Activity.create({
-                        message: `${model} updated by ${user ? user.name || "user #" + user.id : "system"}`,
-                        tags   : "views"
-                    });
+                    logger.info(`${model} updated by ${user ? user.email : "system"}`, { tags: ["ACTIVITY", "GRAPHS"] })
+                    // await Activity.create({
+                    //     message: `${model} updated by ${user ? user.email : "system"}`,
+                    //     tags   : "views"
+                    // });
                 },
 
                 async afterDestroy(model, { user }) {
-                    await Activity.create({
-                        message: `${model} deleted by ${user ? user.name || "user #" + user.id : "system"}`,
-                        tags   : "views"
-                    });
+                    logger.info(`${model} deleted by ${user ? user.email : "system"}`, { tags: ["ACTIVITY", "GRAPHS"] })
+                    // await Activity.create({
+                    //     message: `${model} deleted by ${user ? user.email : "system"}`,
+                    //     tags   : "views"
+                    // });
                 }
             }
         });

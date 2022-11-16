@@ -1,6 +1,6 @@
 const { Transform }  = require("stream");
 const { DATA_TYPES, evaluate } = require("./dataTypes");
-const { PoolClient } = require("pg")
+const { logger } = require("../logger");
 
 
 // TODO: org_id column special?
@@ -14,7 +14,7 @@ const { PoolClient } = require("pg")
 class CSV2DB extends Transform
 {
     /**
-     * @type {PoolClient}
+     * @type {import("pg").PoolClient}
      */
     #client;
 
@@ -53,7 +53,7 @@ class CSV2DB extends Transform
     #insertRowsBufferMaxLength = 1000;
 
     /**
-     * @param {PoolClient} client
+     * @param {import("pg").PoolClient} client
      * @param {number} subscriptionID
      * @param {(keyof typeof DATA_TYPES)[]} dataTypes
      * @param {string[]} [labels = []]
@@ -91,7 +91,7 @@ class CSV2DB extends Transform
         try {
             return await this.#client.query(sql, params)
         } catch (e) {
-            console.log(sql, params)
+            logger.info(sql, { params, tags: ["SQL", "DATA"] })
             throw e
         }
     }
