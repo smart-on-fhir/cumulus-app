@@ -83,6 +83,7 @@ export default function Navigation()
                         {/* <NavLink to="/permissions"><i className="icon fa-solid fa-user-shield" /> Roles &amp; Permissions</NavLink> */}
                         <NavLink to="/activity"><i className="icon fa-solid fa-clipboard-list" /> Logs</NavLink>
                         <NavLink to="/logs"><i className="icon fa-solid fa-clipboard-list" /> Logs 2</NavLink>
+                        <NavLink to="/tags"><i className="icon fa-solid fa-tag" /> Tags</NavLink>
                     </NavGroup>
                 )}
 
