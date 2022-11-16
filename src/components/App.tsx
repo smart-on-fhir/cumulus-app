@@ -102,6 +102,7 @@ export default function App()
                                     <Route path=":id/edit" element={ <EditProject /> } />
                                     <Route path=":id/delete" element={ <DeleteProject /> } />
                                 </Route>
+                                <Route path="tags" element={ <TODO /> } />
 
 
 
