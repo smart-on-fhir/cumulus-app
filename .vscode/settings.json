@@ -5,6 +5,7 @@
         "datetime",
         "geometricprecision",
         "ILIKE",
+        "mocharc",
         "Xrange"
     ]
 }

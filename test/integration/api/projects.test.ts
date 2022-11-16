@@ -1,13 +1,12 @@
-const { expect } = require("chai");
-const Projects = require("../../fixtures/Projects");
-const {
+import { expect } from "chai"
+import Projects   from "../../fixtures/Projects"
+import {
     server,
     resetTable,
     admin,
     user,
     manager
-} = require("../../test-lib");
-
+} from "../../test-lib"
 
 
 describe("Projects", () => {

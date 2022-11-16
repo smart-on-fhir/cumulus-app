@@ -1,6 +1,6 @@
-const { expect } = require("chai");
-const Users = require("../../fixtures/Users");
-const {
+import { expect } from "chai"
+import Users from "../../fixtures/Users"
+import {
     server,
     resetTable,
     admin,
@@ -9,7 +9,7 @@ const {
     recentlyInvitedUser,
     activatedUser,
     expiredUser
-} = require("../../test-lib");
+} from "../../test-lib"
 
 
 
@@ -305,8 +305,8 @@ describe("Users", () => {
         it ("rejects if mail cannot be sent", async () => {
             
             const resolved = require.resolve("../../../backend/mail");
-            /** @type {any} */
-            const cachedModule = require.cache[resolved]
+            
+            const cachedModule: any = require.cache[resolved]
             
             const orig = cachedModule.exports.inviteUser;
 
@@ -331,8 +331,8 @@ describe("Users", () => {
         it ("works as expected", async () => {
 
             const resolved = require.resolve("../../../backend/mail");
-            /** @type {any} */
-            const cachedModule = require.cache[resolved]
+            
+            const cachedModule: any = require.cache[resolved]
             
             const orig = cachedModule.exports.inviteUser;
 
@@ -353,7 +353,7 @@ describe("Users", () => {
             expect(await res.json()).to.deep.equal({ message: "User invited" })
 
             const res2 = await fetch(`${server.baseUrl}/api/users`, { headers: { Cookie: "sid=" + admin.sid }});
-            expect((await res2.json()).find(u => u.email === "whoever@wherever.org")).to.exist
+            expect((await res2.json()).find((u: any) => u.email === "whoever@wherever.org")).to.exist
 
         })
     })
