@@ -84,8 +84,17 @@ function Filter({
                     }
 
                     { leftDataType.startsWith("date") && <div className="row"><div className="col"><input type="date"
-                        value={ moment(filter.right.value).utc().format("YYYY-MM-DD") }
-                        onChange={e => onChange({ ...filter, right: { ...filter.right, value: moment(e.target.valueAsDate).utc().format("YYYY-MM-DD") } })}
+                        value={ filter.right.value ? moment(filter.right.value).utc().format("YYYY-MM-DD") : "" }
+                        onChange={e => {
+                            const m = moment(e.target.valueAsDate)
+                            onChange({
+                                ...filter,
+                                right: {
+                                    ...filter.right,
+                                    value: m.isValid() ? m.utc().format("YYYY-MM-DD") : undefined
+                                }
+                            })
+                        }}
                     /></div></div> }
 
                     { leftDataType === "string" && <div className="row"><div className="col"><input type="text"
