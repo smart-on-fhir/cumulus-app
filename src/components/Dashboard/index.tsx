@@ -373,24 +373,25 @@ export default function Dashboard({
 
     // Convert filters to search parameters
     const filterParams: string[] = []
-    let f: string[] = [];
+    let chain: string[] = [];
     filters.forEach(filter => {
+        // Skip incomplete filters
         if (filter.left && filter.operator && filter.right.value !== undefined) {
-            if (filter.join === "and" && f.length) {
-                filterParams.push(f.join(","))
-                f = []
+            if (filter.join === "and" && chain.length) {
+                filterParams.push(chain.join(","))
+                chain = []
             }
-            f.push([filter.left, filter.operator, filter.right.value].join(":"))
+            chain.push([filter.left, filter.operator, filter.right.value].join(":"))
         }
     })
-    if (f.length) filterParams.push(f.join(","))
+    if (chain.length) filterParams.push(chain.join(","))
 
     // Variables that control if new data needs to be fetched
     const stratifierName = viewGroupBy?.name
     const secColumnName  = column2?.name || ""
     const viewColumnName = viewColumn.name
     const requestId      = dataRequest.id
-    const filter         = filterParams.map(encodeURIComponent).join("&")
+    const filter         = filterParams.map(encodeURIComponent).join("&filter=")
 
     const loadData = useCallback(() => {
         dispatch({ type: "UPDATE", payload: {
