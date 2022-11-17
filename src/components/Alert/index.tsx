@@ -37,9 +37,9 @@ export function AlertError({ className, children = "Unknown error" }: {
         })} color="red" icon="fas fa-exclamation-circle">
             { children.map((c, i) => {
                 if (c instanceof Error) {
-                    return <div key={i}>{ c.message }</div>
+                    return <span key={i}>{ c.message }</span>
                 }
-                return <div key={i}>{ c }</div>
+                return <span key={i}>{ c }</span>
             })}
         </Alert>
     )
