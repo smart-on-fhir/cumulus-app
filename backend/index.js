@@ -6,14 +6,10 @@ const express                     = require("express")
 const cors                        = require("cors")
 const cookieParser                = require("cookie-parser")
 const { Umzug, SequelizeStorage } = require("umzug");
-// const { debuglog }                = require("util");
 const Auth                        = require("./controllers/Auth")
 const setupDB                     = require("./db")
 const settings                    = require("./config")
 const { logger }                  = require("./logger");
-// const { getRequestBaseURL } = require("./lib");
-
-// const debug = debuglog("app");
 
 
 function createServer(config)
@@ -41,8 +37,8 @@ function createServer(config)
             }
             
             logger.log(
-                res.statusCode >= 400 ? "error" : "http",
-                `${res.statusCode} ${req.method.padStart(6)} ${req.originalUrl}`,
+                "http", // res.statusCode >= 400 ? "error" : "http",
+                `${res.statusCode} ${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)}`,
                 meta
             )
         })
@@ -93,7 +89,12 @@ async function applySeeds({ db }, dbConnection)
     const seedPath = db.seed;
     if (seedPath) {
         const seed = require(seedPath);
-        await seed(dbConnection);
+        try {
+            await seed(dbConnection);
+        } catch (error) {
+            logger.error("Applying seeds failed %o", error)
+            process.exit(1)
+        }
         logger.verbose(`✔ Applied seeds from ${seedPath.replace(__dirname, "")}`);
     } else {
         logger.verbose("- Seeding the database SKIPPED because config.db.seedPath is not set!");
@@ -102,6 +103,11 @@ async function applySeeds({ db }, dbConnection)
 
 async function applyMigrations({ db }, dbConnection)
 {
+    if (db.sync === "force") {
+        logger.verbose("- migrations are skipped if db.sync is set to 'force'");
+        return
+    }
+
     const umzug = new Umzug({
         context: dbConnection.getQueryInterface(),
         migrations: {
@@ -125,19 +131,19 @@ async function applyMigrations({ db }, dbConnection)
     });
 
     const pending = await umzug.pending();
-    logger.verbose("✔ Pending migrations: %s", pending.length ? pending.map(m => m.path).join(',') : "none")
+    logger.verbose("✔ Pending migrations: %s", pending.length ? pending.map(m => m.path) : "none")
     
     // Checks migrations and run them if they are not already applied.
     // Metadata stored in the SequelizeMeta table in postgres
     const migrations = await umzug.up();
-    logger.verbose('✔ Successful migrations: %s', migrations.length ? migrations.map(m => m.path).join(','): "none")
+    logger.verbose('✔ Successful migrations: %s', migrations.length ? migrations.map(m => m.path): "none")
 }
 
 function setUpErrorHandlers(app)
 {
     // Global error 404 handler
     app.use((req, res) => {
-        logger.error(`${req.method} ${req.originalUrl} -> 404 Not Found`)
+        logger.error(`${req.method} ${decodeURIComponent(req.originalUrl)} -> 404 Not Found`)
         res.sendStatus(404).end("Not Found");
     });
 
@@ -146,25 +152,27 @@ function setUpErrorHandlers(app)
         
         // HTTP Errors
         if (error.http) {
-            const msg = error.message.replace(/^\s*\w*Error:\s+/, "")
             error.data = { ...error.data, user: req.user?.email || "guest" }
+            error.tags = error.data.tags
+            delete error.data.tags
             if (req.method === "POST" || req.method === "PUT") {
                 error.data.requestBody = req.body
             }
-            logger.error(`${error.status} ${req.method.padStart(6)} ${req.originalUrl} => `, error)
-            res.status(error.status).send(msg);
+            logger.error(`${error.status} ${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => `, error)
+            const msg = error.message.replace(/^\s*\w*Error:\s+/, "")
+            res.status(error.status).send(msg)
         }
 
         // Sequelize Validation Errors
         else if (error.name === "SequelizeValidationError") {
-            const msg = error.errors.map(e => `${req.method.padStart(6)} ${req.originalUrl} => ${e.type || "Error"} while validating ${e.path || "data"}: ${e.message}`).join("\n")
+            const msg = error.errors.map(e => `${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => ${e.type || "Error"} while validating ${e.path || "data"}: ${e.message}`).join("\n")
             logger.error("Sequelize Validation Error " + JSON.stringify(error, null, 4))
             res.status(400).send(msg);
         }
 
         // Other Errors
         else {
-            const msg = `${req.method.padStart(6)} ${req.originalUrl} => ${error.message.replace(/^\s*\w*Error:\s+/, "")}`
+            const msg = `${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => ${error.message.replace(/^\s*\w*Error:\s+/, "")}`
             logger.error(msg, error)
             res.status(500).send(msg);
         }

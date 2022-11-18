@@ -1,6 +1,6 @@
-const { HttpError } = require("httperrors");
-const Project       = require("../db/models/Project");
-const { assert }    = require("../lib");
+const HttpError  = require("../errors");
+const Project    = require("../db/models/Project");
+const { assert } = require("../lib");
 
 
 /**

@@ -1,12 +1,12 @@
 const express        = require("express")
 const Crypto         = require("crypto")
 const Bcrypt         = require("bcryptjs")
-const HttpError      = require("httperrors")
 const { Op }         = require("sequelize")
 const User           = require("../db/models/User")
 const { wait }       = require("../lib")
 const { ACL, roles } = require("../acl")
 const { logger }     = require("../logger")
+const HttpError      = require("../errors")
 
 
 
@@ -100,10 +100,8 @@ function requestPermission(action, req, isOwner = false) {
         throw new HttpError.Forbidden({
             message: `Permission denied`,
             tags   : ["AUTH"],
-            data: {
-                reason: `Permission denied for "${role}" to perform "${action}" action!`,
-                owner : isOwner,
-            }
+            reason: `Permission denied for "${role}" to perform "${action}" action!`,
+            owner : isOwner
         })
     }
 }
@@ -151,12 +149,14 @@ async function login(req, res) {
         // No such username
         // Do NOT specify what is wrong in the error message!
         if (!user) {
-            throw new Error("Invalid username or password");
+            logger.warn("Failed login attempt due to invalid email")
+            throw new HttpError.BadRequest("Invalid email or password", { reason: `Email ${username} not found` });
         }
 
         // Wrong password (Do NOT specify what is wrong in the error message!)
         if (!Bcrypt.compareSync(password, user.get("password") + "")) {
-            throw new Error("Invalid username or password");
+            logger.warn("Failed login attempt due to invalid password")
+            throw new HttpError.BadRequest("Invalid email or password", { reason: "Invalid password" });
         }
 
         // Generate SID and update the user in DB
