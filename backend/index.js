@@ -5,7 +5,6 @@ const Path                        = require("path")
 const express                     = require("express")
 const cors                        = require("cors")
 const cookieParser                = require("cookie-parser")
-const { Umzug, SequelizeStorage } = require("umzug");
 const Auth                        = require("./controllers/Auth")
 const setupDB                     = require("./db").default
 const settings                    = require("./config")
@@ -71,7 +70,7 @@ function setupAPI(app)
     app.use("/api/users"         , require("./routes/users"            ));
     app.use("/api/projects"      , require("./routes/projects"         ));
     app.use("/api/logs"          , require("./routes/logs"             ));
-    app.use("/api/tags"          , require("./routes/tags"             ));
+    // app.use("/api/tags"          , require("./routes/tags"             ));
     app.use("/api/activity"      , require("./controllers/Activity"    ));
     app.use("/api/data-sites"    , require("./controllers/DataSites"   ));
     logger.verbose("✔ REST API set up");
