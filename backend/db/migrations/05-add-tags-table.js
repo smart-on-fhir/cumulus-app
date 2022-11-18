@@ -10,7 +10,7 @@ async function up(queryInterface) {}
  * @param {QueryInterface} queryInterface 
  */
 async function down(queryInterface) {
-    await queryInterface.dropTable("Projects")
+    await queryInterface.dropTable("Tags")
 }
 
 module.exports = { up, down };

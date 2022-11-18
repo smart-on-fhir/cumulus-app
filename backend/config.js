@@ -22,7 +22,7 @@ const {
     APP_EMAIL_FROM         = "admin@cumulus.org",
     CUMULUS_ADMIN_EMAIL    = "vlad.ignatov@gmail.com",
     REGIONAL_CLUSTER_EMAIL = "vlad.ignatov@gmail.com",
-    DB_DOCKER_DATA_DIR     = "./db/postgres-data",
+    DB_DOCKER_DATA_DIR     = "",
     LOG_SQL                = "false",
     // BASE_URL               = "./db/postgres-data"
 
@@ -49,7 +49,7 @@ module.exports = {
 
     docker: {
         containerName: DB_DOCKER_CONTAINER,
-        dataDir: DB_DOCKER_DATA_DIR
+        dataDir: DB_DOCKER_DATA_DIR //? Path.resolve(__dirname, DB_DOCKER_DATA_DIR) : ""
     },
     db: {
         sync: DB_SYNC,
