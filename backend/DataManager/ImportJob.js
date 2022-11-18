@@ -1,7 +1,7 @@
 const { QueryTypes }       = require("sequelize");
 const { pipeline }         = require('stream/promises');
 const { randomUUID }       = require("crypto");
-const { HttpError }        = require("httperrors");
+const HttpError            = require("../errors");
 const Text2Lines           = require("../DataManager/Text2Lines");
 const Line2CSV             = require("../DataManager/Line2CSV");
 const CSV2DB               = require("../DataManager/CSV2DB");
@@ -155,7 +155,7 @@ class ImportJob
     async writeCounts(subscriptionID) {
         const subscription = await Subscription.findByPk(subscriptionID);
         
-        assert(subscription, HttpError.NotFound("Subscription not found"))
+        assert(subscription, "Subscription not found", HttpError.NotFound)
 
         const countRow = await subscription.sequelize.query(
             `SELECT "cnt" FROM "subscription_data_${subscriptionID}" WHERE ${

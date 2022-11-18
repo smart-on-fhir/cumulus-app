@@ -3,7 +3,7 @@ const https            = require("https");
 const { URL }          = require("url");
 const express          = require("express");
 const slug             = require("slug");
-const { HttpError }    = require("httperrors");
+const HttpError        = require("../errors");
 const crypto           = require("crypto");
 const { QueryTypes }   = require("sequelize");
 const Model            = require("../db/models/DataRequest");
@@ -94,7 +94,7 @@ router.get("/:id/views", rw(async (req, res) => {
 // Export Data endpoint -------------------------------------------------------
 router.get("/:id/data", rw(async (req, res) => {
     const model = await Model.findByPk(req.params.id, getFindOptions(req))
-    assert(model, HttpError.NotFound("Model not found"))
+    assert(model, "Model not found", HttpError.NotFound)
     const data = model.get("data")
     const name = model.get("name")
     // @ts-ignore
@@ -104,7 +104,7 @@ router.get("/:id/data", rw(async (req, res) => {
 // Refresh Data endpoint ------------------------------------------------------
 router.get("/:id/refresh", requireAuth("admin"), rw(async (req, res) => {
     const model = await Model.findByPk(req.params.id, getFindOptions(req))
-    assert(model, HttpError.NotFound("Model not found"))
+    assert(model, "Model not found", HttpError.NotFound)
     const data = await fetchData(model)
     await model.set({ data, completed: new Date() }).save({ user: req.user })
     res.json(model)
@@ -173,7 +173,7 @@ router.get("/:id/api", rw(async (req, res) => {
     /** @type {any} */
     const subscription = await Model.findByPk(req.params.id)
 
-    assert(subscription, HttpError.NotFound("Subscription not found"))
+    assert(subscription, "Subscription not found", HttpError.NotFound)
 
     const table = "subscription_data_" + req.params.id;
 

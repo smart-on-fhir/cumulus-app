@@ -1,5 +1,5 @@
 const express                            = require("express")
-const { HttpError }                      = require("httperrors");
+const HttpError                          = require("../errors");
 const Model                              = require("../db/models/View");
 const { rw, assert, roundToPrecision }   = require("../lib");
 const { logger }                         = require("../logger");
