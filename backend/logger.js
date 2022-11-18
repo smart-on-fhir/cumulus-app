@@ -1,12 +1,13 @@
 const { transports, format, createLogger } = require("winston");
 const DailyRotateFile = require("winston-daily-rotate-file");
+const { resolve } = require("path")
 
 const { combine, splat, cli, printf, timestamp, ms, json } = format;
 
 const combinedLogger = createLogger({
     transports: [
         new DailyRotateFile({
-            filename     : '../logs/combined_%DATE%',
+            filename     : resolve(__dirname, '../logs/combined_%DATE%'),
             datePattern  : 'YYYY-MM',
             zippedArchive: true,
             maxSize      : '10MB',
@@ -16,6 +17,7 @@ const combinedLogger = createLogger({
             extension    : ".log",
             level        : "silly",
             json         : true,
+            silent: process.env.NODE_ENV === "test",
             format: combine(
                 format(info => info.tags?.includes("SQL") ? false : info)(),
                 format.errors({ stack: true }),
@@ -39,25 +41,10 @@ const defaultLogger = createLogger({
                 format(info => info.tags?.includes("SQL") || info.tags?.includes("WEB") ? false : info)(),
                 splat(),
                 format.errors({ stack: true }),
-                // printf(info => {
-                //     console.log(info)
-                //     return ""
-                // }),
-                // format.errors(),
-                // cli(),
                 printf(info => {
-                    // if (info instanceof Error) {
-                    //     return `${info.timestamp} [${info.label}] ${info.level}: ${info.message} ${info.stack}`;
-                    // }
-                    // if (info.HttpError) {
-                    //     return `${info.level.padStart(7)}: ${info.status} ${info.name}`;
-                    // }
                     return `${String(info.level).padStart(18, " ")}: ${info.message}`
                 }),
                 cli({ message: true, level: true }),
-                // format.colorize(),
-                
-                // printf(info => info[Symbol.for('message')]),
             )
         }),
 
@@ -68,7 +55,7 @@ const defaultLogger = createLogger({
 
         // ACCESS LOG ----------------------------------------------------------
         new DailyRotateFile({
-            filename     : '../logs/access_%DATE%',
+            filename     : resolve(__dirname, '../logs/access_%DATE%'),
             datePattern  : 'YYYY-MM',
             zippedArchive: true,
             maxSize      : '10MB',
@@ -90,7 +77,7 @@ const defaultLogger = createLogger({
 
         // ERROR LOG -----------------------------------------------------------
         new DailyRotateFile({
-            filename: '../logs/error_%DATE%',
+            filename: resolve(__dirname, '../logs/error_%DATE%'),
             datePattern: 'YYYY-MM',
             zippedArchive: true,
             maxSize: '10MB',
@@ -110,7 +97,7 @@ const defaultLogger = createLogger({
 
         // SQL LOG -------------------------------------------------------------
         new DailyRotateFile({
-            filename     : '../logs/sql_%DATE%',
+            filename     : resolve(__dirname, '../logs/sql_%DATE%'),
             datePattern  : 'YYYY-MM',
             zippedArchive: true,
             maxSize      : '10MB',
@@ -132,17 +119,6 @@ const defaultLogger = createLogger({
     defaultMeta: {}
 })
 
-// const orig = defaultLogger.error
-// defaultLogger.error = (ex, meta) => {
-//     if (ex instanceof Error) {
-//         // return orig(inspect(ex, true), ...rest)
-//         if (meta) {
-//             return orig(ex.message, { ...meta, ...ex, stack: ex.stack})
-//         }
-//         return orig(ex.message, { ...ex, stack: ex.stack })
-//     }
-//     return orig(ex, meta)
-// }
 
 module.exports = {
     logger: defaultLogger,

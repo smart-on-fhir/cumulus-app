@@ -2,8 +2,7 @@ const Path                      = require("path");
 const { readdirSync, statSync } = require("fs");
 const { Op }                    = require("sequelize");
 const { validationResult }      = require("express-validator");
-// const { HttpError } = require("httperrors");
-const { logger } = require("./logger");
+const { logger }                = require("./logger");
 
 const RE_FALSE = /^(0|no|false|off|null|undefined|NaN|)$/i;
 
@@ -541,11 +540,6 @@ function validateRequest(...validations) {
         }
 
         logger.error("Request validation error", errors)
-
-        // next(new HttpError.BadRequest({
-        //     message: errors.array().map(e => e.message).join("; "),
-        //     errors: errors.array()
-        // }))
 
         res.status(400).json({ errors: errors.array() });
     };
