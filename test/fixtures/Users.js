@@ -1,5 +1,3 @@
-const Bcrypt = require("bcryptjs");
-
 module.exports = [
     {
         id      : 1,
@@ -7,7 +5,7 @@ module.exports = [
         email   : "admin@cumulus.test",
         name    : "Cumulus user",
         sid     : "admin_session_id",
-        password: Bcrypt.hashSync("Admin@12345", Bcrypt.genSaltSync(10)),
+        password: "Admin@12345",
     },
     {
         id      : 2,
@@ -15,7 +13,7 @@ module.exports = [
         email   : "manager@cumulus.test",
         name    : "Cumulus manager",
         sid     : "manager_session_id",
-        password: Bcrypt.hashSync("Manager@12345", Bcrypt.genSaltSync(10)),
+        password: "Manager@12345",
     },
     {
         id      : 3,
@@ -23,7 +21,7 @@ module.exports = [
         email   : "user@cumulus.test",
         name    : "Cumulus user",
         sid     : "user_session_id",
-        password: Bcrypt.hashSync("User@12345", Bcrypt.genSaltSync(10)),
+        password: "User@12345",
     },
 
     // Recently invited
@@ -46,7 +44,7 @@ module.exports = [
         email    : "user5@cumulus.test",
         name     : "Recently activated user",
         sid      : null,
-        password : Bcrypt.hashSync("User5@12345", Bcrypt.genSaltSync(10)),
+        password : "User5@12345",
         invitedBy: "admin@cumulus.test",
         createdAt: Date.now() - 1000*60*60,
         activationCode: "test-activation-code-2"
