@@ -175,7 +175,11 @@ export default function LogViewer()
                                                     <div style={{ width: "5em" }} className="color-blue">{ ms }</div>
                                                     <Level level={ level } />
                                                     {/* <div style={{ width: "4em"  }} className="color-brand-2"><b>{ tag }</b></div> */}
-                                                    <div className="color-blue-dark">{ message }</div>
+                                                    <div className="color-blue-dark">{
+                                                        message && typeof message === "object" ?
+                                                            JSON.stringify(message) :
+                                                            message + ""
+                                                    }</div>
                                                 </summary>
                                                 { hasInfo && <Info obj={rest} /> }
                                             </details>
