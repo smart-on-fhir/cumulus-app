@@ -1,6 +1,6 @@
 const Crypto        = require("crypto");
 const Bcrypt        = require("bcryptjs");
-const { HttpError } = require("httperrors");
+const HttpError     = require("../errors");
 const moment        = require("moment");
 const { debuglog }  = require("util");
 const User          = require("../db/models/User");

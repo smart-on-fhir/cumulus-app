@@ -1,5 +1,5 @@
 const express                        = require("express");
-const { HttpError }                  = require("httperrors");
+const HttpError                      = require("../errors");
 const { requestPermission }          = require("./Auth");
 const { getFindOptions, assert, rw } = require("../lib");
 const { ACL }                        = require("../acl");
@@ -40,7 +40,7 @@ function createGetOneHandler(modelConstructor, permission) {
     return async function getOne(req, res) {
         requestPermission(permission, req);
         const model = await modelConstructor.findByPk(req.params.id)
-        assert(model, HttpError.NotFound(`${modelConstructor.name} not found`))
+        assert(model, `${modelConstructor.name} not found`, HttpError.NotFound)
         res.json(model)
     }
 }
@@ -80,7 +80,7 @@ function createUpdateHandler(modelConstructor, permission) {
         requestPermission(permission, req);
 
         const model = await modelConstructor.findByPk(req.params.id);
-        assert(model, new HttpError.NotFound(`${modelConstructor.name} not found`));
+        assert(model, `${modelConstructor.name} not found`, HttpError.NotFound);
         
         try {
             await model.update(req.body, { user: req.user });
@@ -106,7 +106,7 @@ function createDeleteHandler(modelConstructor, permission) {
         requestPermission(permission, req);
 
         const model = await modelConstructor.findByPk(req.params.id);
-        assert(model, new HttpError.NotFound(`${modelConstructor.name} not found`));
+        assert(model, `${modelConstructor.name} not found`, HttpError.NotFound);
         
         try {
             await model.destroy({ user: req.user });
