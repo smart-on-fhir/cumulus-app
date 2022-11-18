@@ -7,7 +7,7 @@ const cors                        = require("cors")
 const cookieParser                = require("cookie-parser")
 const { Umzug, SequelizeStorage } = require("umzug");
 const Auth                        = require("./controllers/Auth")
-const setupDB                     = require("./db")
+const setupDB                     = require("./db").default
 const settings                    = require("./config")
 const { logger }                  = require("./logger");
 
@@ -71,6 +71,7 @@ function setupAPI(app)
     app.use("/api/users"         , require("./routes/users"            ));
     app.use("/api/projects"      , require("./routes/projects"         ));
     app.use("/api/logs"          , require("./routes/logs"             ));
+    app.use("/api/tags"          , require("./routes/tags"             ));
     app.use("/api/activity"      , require("./controllers/Activity"    ));
     app.use("/api/data-sites"    , require("./controllers/DataSites"   ));
     logger.verbose("✔ REST API set up");
@@ -84,60 +85,6 @@ function setupStaticContent(app)
     logger.verbose("✔ Static content hosted");
 }
 
-async function applySeeds({ db }, dbConnection)
-{
-    const seedPath = db.seed;
-    if (seedPath) {
-        const seed = require(seedPath);
-        try {
-            await seed(dbConnection);
-        } catch (error) {
-            logger.error("Applying seeds failed %o", error)
-            process.exit(1)
-        }
-        logger.verbose(`✔ Applied seeds from ${seedPath.replace(__dirname, "")}`);
-    } else {
-        logger.verbose("- Seeding the database SKIPPED because config.db.seedPath is not set!");
-    }
-}
-
-async function applyMigrations({ db }, dbConnection)
-{
-    if (db.sync === "force") {
-        logger.verbose("- migrations are skipped if db.sync is set to 'force'");
-        return
-    }
-
-    const umzug = new Umzug({
-        context: dbConnection.getQueryInterface(),
-        migrations: {
-            glob: ["db/migrations/*.js", { cwd: __dirname }],
-            resolve: ({ name, path, context }) => {
-
-                // @ts-ignore
-                const migration = require(path);
-                
-                // adjust the parameters Umzug will
-                // pass to migration methods when called
-                return {
-                    name,
-                    up: async () => migration.up(context),
-                    down: async () => migration.down(context),
-                };
-            }
-        },
-        storage: new SequelizeStorage({ sequelize: dbConnection }),
-        logger: db.logging
-    });
-
-    const pending = await umzug.pending();
-    logger.verbose("✔ Pending migrations: %s", pending.length ? pending.map(m => m.path) : "none")
-    
-    // Checks migrations and run them if they are not already applied.
-    // Metadata stored in the SequelizeMeta table in postgres
-    const migrations = await umzug.up();
-    logger.verbose('✔ Successful migrations: %s', migrations.length ? migrations.map(m => m.path): "none")
-}
 
 function setUpErrorHandlers(app)
 {
@@ -214,10 +161,7 @@ async function main(config = settings)
     const dbConnection = await setupDB(config);
 
     app.set("dbConnection", dbConnection);
-    
-    await applySeeds(config, dbConnection);
-    await applyMigrations(config, dbConnection);
-    
+
     // app.set("db", dbConnection);
     
     setupAuth(app);

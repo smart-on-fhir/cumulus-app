@@ -1,20 +1,17 @@
-const Docker        = require("dockerode")
-const { runSimple } = require("run-container")
-const { Sequelize } = require("sequelize")
-const { wait }      = require("./lib")
+import Docker        from "dockerode"
+import { runSimple } from "run-container"
+import { Sequelize } from "sequelize"
+import { Config }    from ".."
+import { wait }      from"../lib"
+import { logger }    from "../logger"
+
+const RETRY_DELAY   = 1000  // 1s
+const RETRY_TIMEOUT = 10000 // 10s
 
 
-/**
- * @param {object} options
- * @param {object} options.docker
- * @param {string} options.docker.containerName
- * @param {string} [options.docker.dataDir]
- * @param {object} options.db
- * @param {import("sequelize").Options} options.db.options
- */
-async function getDockerContainer(options)
+export async function getDockerContainer(options: Config)
 {
-    var container;
+    var container: Docker.Container;
 
     try {
         container = await createContainer(options)
@@ -39,46 +36,43 @@ async function getDockerContainer(options)
     return () => container.stop()
 }
 
-/**
- * @param {Docker.Container} container
- * @param {object} options
- * @param {object} options.docker
- * @param {string} options.docker.containerName
- * @param {string} [options.docker.dataDir]
- * @param {object} options.db
- * @param {import("sequelize").Options} options.db.options
- */
-async function waitForReady(container, options) {
+async function waitForReady(container: Docker.Container, options: Config) {
     let start = Date.now()
     while (true) {
         try {
-            // @ts-ignore
             const connection = new Sequelize(options.db.options);
             await connection.authenticate();
             await connection.close();
             break
         } catch {
-            if (Date.now() - start > 1000*60*5) {
-                container.stop()
-                throw new Error("Failed to connect to database in 5 minutes")
+            if (Date.now() - start > RETRY_TIMEOUT) {
+                if (container) {
+                    await container.stop().catch(e => {
+                        console.log("Failed to stop the container", e.message)
+                    })
+                }
+                throw new Error(`Failed to connect to database in ${RETRY_TIMEOUT.toLocaleString()} ms`)
             }
-            await wait(150)
+
+            logger.verbose(`Failed to connect to database. Retrying in ${RETRY_DELAY.toLocaleString()} ms`)
+            await wait(RETRY_DELAY)
         }
     }
 }
 
-/**
- * @param {object} options
- * @param {object} options.docker
- * @param {string} options.docker.containerName
- * @param {string} [options.docker.dataDir]
- * @param {object} options.db
- * @param {import("sequelize").Options} options.db.options
- */
-async function createContainer(options) {
-    return runSimple({
+export async function createContainer(options: Config): Promise<Docker.Container> {
+
+    // docker run -it 
+    //   -v /Users/vlad/dev/cumulus-app/backend/db/postgres-data:/var/lib/postgresql/data
+    //   -e POSTGRES_PASSWORD=********
+    //   -e POSTGRES_USER=postgres
+    //   -e POSTGRES_DB=cumulus
+    //   -p 5432:5432
+    //   postgres:14
+
+    return await runSimple({
         name      : options.docker.containerName,
-        image     : "postgres",
+        image     : "postgres:14",
         autoRemove: true,
         ports: {
             "5432": String(options.db.options.port || "5432")
@@ -94,7 +88,3 @@ async function createContainer(options) {
         verbose: true
     });
 }
-
-module.exports = {
-    getDockerContainer
-};
