@@ -1,12 +1,14 @@
-import { Router }      from "express"
-import Tag             from "../db/models/Tag"
-import * as lib        from "../lib"
-import * as auth       from "../controllers/Auth"
-import { NotFound } from "../errors"
-import { assert } from "../lib"
-import { route } from "../lib/route"
+import { Response, Router } from "express"
+import Tag                  from "../db/models/Tag"
+import * as lib             from "../lib"
+import * as auth            from "../controllers/Auth"
+import { NotFound }         from "../errors"
+import { assert }           from "../lib"
+import { route }            from "../lib/route"
+import { AppRequest }       from ".."
+import { Includeable } from "sequelize/types"
 
-const router = module.exports = Router({ mergeParams: true });
+const router = Router({ mergeParams: true });
 
 
 // list ------------------------------------------------------------------------
@@ -14,7 +16,7 @@ route(router, {
     path: "/",
     method: "get",
     permission: ["tags_list"],
-    handler: async (req, res) => {
+    handler: async (req: AppRequest, res: Response) => {
         res.json(await Tag.findAll(lib.getFindOptions(req)));
     }
 })
@@ -26,8 +28,7 @@ route(router, {
     request: {
         schema: {
             id: {
-                in: ['params'],
-                errorMessage: 'ID is wrong',
+                in: ["params"],
                 isInt: {
                     errorMessage: "The 'id' parameter must be integer"
                 },
@@ -35,12 +36,39 @@ route(router, {
                     options: x => x > 0,
                     errorMessage: "The 'id' parameter must be a positive integer"
                 },
-                toInt: true,
+                toInt: true
+            },
+
+            // If set include the creator id and email
+            creator: {
+                in: ["query"],
+                optional: true,
+                isBoolean: true
+            },
+
+            // TODO: If set include the graphs count
+            graphs: {
+                in: ["query"],
+                optional: true,
+                isBoolean: true
+            },
+
+            // TODO: If set include the subscriptions count
+            subscriptions: {
+                in: ["query"],
+                optional: true,
+                isBoolean: true
             }
         }
     },
-    handler: async (req, res) => {
-        const model = await Tag.findByPk(+req.params?.id);
+    handler: async (req: AppRequest, res: Response) => {
+        const include: Includeable[] = [];
+
+        if (req.query.creator) {
+            include.push({ association: "creator", attributes: ["id", "email"] })
+        }
+
+        const model = await Tag.findByPk(req.params.id, { include });
         assert(model, NotFound);
         auth.requestPermission("tags_view", req, req.user?.id === model.creatorId)
         res.json(model)
@@ -68,12 +96,20 @@ route(router, {
             name: {
                 in: ['body'],
                 optional: true,
-                notEmpty: true
+                notEmpty: true,
+                custom: {
+                    options: x => x.length <= 50,
+                    errorMessage: "The name cannot be longer than 50 characters"
+                }
             },
             description: {
                 in: ['body'],
                 optional: true,
-                notEmpty: true
+                notEmpty: true,
+                custom: {
+                    options: x => x.length <= 200,
+                    errorMessage: "The description cannot be longer than 200 characters"
+                }
             }
         }
     },
@@ -95,12 +131,20 @@ route(router, {
             name: {
                 in: ['body'],
                 exists: true,
-                notEmpty: true
+                notEmpty: true,
+                custom: {
+                    options: x => x.length <= 50,
+                    errorMessage: "The name cannot be longer than 50 characters"
+                }
             },
             description: {
                 in: ['body'],
                 exists: true,
-                notEmpty: true
+                notEmpty: true,
+                custom: {
+                    options: x => x.length <= 200,
+                    errorMessage: "The description cannot be longer than 200 characters"
+                }
             }
         }
     },
@@ -140,3 +184,5 @@ route(router, {
     }
 });
 
+// @ts-ignore
+export = router
