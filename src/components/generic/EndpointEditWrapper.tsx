@@ -26,7 +26,7 @@ export default function EndpointEditWrapper({
     const abortController = useMemo(() => new AbortController(), [])
 
     let { result, loading, error } = useBackend(
-        useCallback(signal => request(`${endpoint}/${id}`, { signal }), [id]),
+        useCallback(signal => request(`${endpoint}/${id}`, { signal }), [id, endpoint]),
         true
     )
 
@@ -52,7 +52,7 @@ export default function EndpointEditWrapper({
         })
     }
 
-    useEffect(() => () => abortController.abort(), []);
+    useEffect(() => () => abortController.abort(), [ abortController ]);
 
     if (loading) {
         return <Loader msg="Loading data..." />
