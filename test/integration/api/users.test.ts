@@ -21,7 +21,7 @@ describe("Users", () => {
         
         it ("guest cannot list Users", async () => {
             const res = await fetch(`${server.baseUrl}/api/users`)
-            expect(res.status).to.equal(403)
+            expect(res.status).to.equal(401)
         })
 
         it ("user cannot list Users", async () => {
@@ -52,7 +52,7 @@ describe("Users", () => {
         
         it ("guest cannot view User", async () => {
             const res = await fetch(`${server.baseUrl}/api/users/${admin.id}`)
-            expect(res.status).to.equal(403)
+            expect(res.status).to.equal(401)
         })
 
         it ("user cannot view User", async () => {
@@ -104,7 +104,7 @@ describe("Users", () => {
 
         it ("guest cannot create users", async () => {
             const res = await fetch(`${server.baseUrl}/api/users`, { method: "POST" })
-            expect(res.status).to.equal(403)
+            expect(res.status).to.equal(401)
         })
 
         it ("user cannot create users", async () => {
@@ -151,7 +151,7 @@ describe("Users", () => {
 
         it ("guest cannot update users", async () => {
             const res = await fetch(`${server.baseUrl}/api/users/${admin.id}`, { method: "PUT" })
-            expect(res.status).to.equal(403)
+            expect(res.status).to.equal(401)
         })
 
         it ("user cannot update users", async () => {
@@ -197,7 +197,7 @@ describe("Users", () => {
 
         it ("guest cannot delete users", async () => {
             const res = await fetch(`${server.baseUrl}/api/users/${admin.id}`, { method: "DELETE" });
-            expect(res.status).to.equal(403);
+            expect(res.status).to.equal(401);
         })
 
         it ("user cannot delete users", async () => {
@@ -237,7 +237,7 @@ describe("Users", () => {
         
         it ("guest cannot invite other users", async () => {
             const res = await fetch(`${server.baseUrl}/api/users/invite`, { method: "POST" })
-            expect(res.status).to.equal(403)
+            expect(res.status).to.equal(401)
         })
 
         it ("user cannot invite other users", async () => {
@@ -586,7 +586,7 @@ describe("Users", () => {
                     "content-type": "application/json"
                 }
             })
-            expect(res.status).to.equal(403)
+            expect(res.status).to.equal(401)
         })
 
         it ("invalid user cannot update themselves", async () => {

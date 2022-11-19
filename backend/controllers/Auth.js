@@ -87,7 +87,7 @@ function requirePermission(action, isOwner) {
 
 /**
  * @param { keyof ACL } action 
- * @param { import("../../index").app.UserRequest } req 
+ * @param { import("../index").AppRequest } req 
  */
 function requestPermission(action, req, isOwner = false) {
     const role = req.user?.role || "guest";
@@ -97,11 +97,11 @@ function requestPermission(action, req, isOwner = false) {
     }
 
     if (!hasPermission(action, role)) {
-        throw new HttpError.Forbidden({
+        throw new HttpError[role === "guest" ? "Unauthorized" : "Forbidden"]({
             message: `Permission denied`,
             tags   : ["AUTH"],
-            reason: `Permission denied for "${role}" to perform "${action}" action!`,
-            owner : isOwner
+            reason : `Permission denied for "${role}" to perform "${action}" action!`,
+            owner  : isOwner
         })
     }
 }

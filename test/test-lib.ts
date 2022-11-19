@@ -129,7 +129,7 @@ export function testCRUDEndpointPermissions(mountPoint: string, modelName: strin
                     const cookie = getCookie(role)
                     if (cookie) headers.cookie = cookie
                     const res = await fetch(`${SERVER.baseUrl}${mountPoint}`, { headers })
-                    expect(res.status === 403).to.equal(!allowed)
+                    expect(res.status === (role === "guest" || !cookie ? 401 : 403)).to.equal(!allowed)
                 })
             }
         }
@@ -142,7 +142,7 @@ export function testCRUDEndpointPermissions(mountPoint: string, modelName: strin
                     const cookie = getCookie(role)
                     if (cookie) headers.cookie = cookie
                     const res = await fetch(`${SERVER.baseUrl}${mountPoint}/1`, { headers })
-                    expect(res.status === 403).to.equal(!allowed)
+                    expect(res.status === (role === "guest" || !cookie ? 401 : 403)).to.equal(!allowed)
                 })
             }
         }
@@ -159,7 +159,7 @@ export function testCRUDEndpointPermissions(mountPoint: string, modelName: strin
                         body: "{}",
                         headers
                     })
-                    expect(res.status === 403).to.equal(!allowed)
+                    expect(res.status === (role === "guest" || !cookie ? 401 : 403)).to.equal(!allowed)
                 })
             }
         }
@@ -172,7 +172,7 @@ export function testCRUDEndpointPermissions(mountPoint: string, modelName: strin
                     const cookie = getCookie(role)
                     if (cookie) headers.cookie = cookie
                     const res = await fetch(`${SERVER.baseUrl}${mountPoint}/1`, { method: "PUT", headers })
-                    expect(res.status === 403).to.equal(!allowed)
+                    expect(res.status === (role === "guest" || !cookie ? 401 : 403)).to.equal(!allowed)
                 })
             }
         }
@@ -186,7 +186,11 @@ export function testCRUDEndpointPermissions(mountPoint: string, modelName: strin
                     if (cookie) headers.cookie = cookie
                     const res = await fetch(`${SERVER.baseUrl}${mountPoint}/1`, { method: "DELETE", headers })
                     // console.log(res.status, await res.text())
-                    expect(res.status === 403).to.equal(!allowed)
+                    if (allowed) {
+                        expect([401, 403]).to.not.include(res.status)    
+                    } else {
+                        expect(res.status).to.equal(role === "guest" || !cookie ? 401 : 403)
+                    }
                 })
             }
         }

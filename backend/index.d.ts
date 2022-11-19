@@ -1,4 +1,17 @@
-import { Options } from "sequelize";
+import { InstanceDestroyOptions, Options } from "sequelize"
+import { ParsedQs } from "qs"
+import {
+    Request,
+    ParamsDictionary,
+    RequestHandler,
+    Response,
+    NextFunction
+} from "express-serve-static-core"
+
+
+interface ModelDestroyOptions extends InstanceDestroyOptions {
+    user?: CurrentUser
+}
 
 interface Config {
     port    : number
@@ -30,4 +43,34 @@ interface Config {
         domain: string
         [key: string]: any
     }
+}
+
+interface CurrentUser {
+    id: number
+    email: string
+    [key: string]: any
+}
+
+interface AppRequest<
+    P = ParamsDictionary,
+    ResBody = any,
+    ReqBody = any,
+    ReqQuery = ParsedQs,
+    Locals extends Record<string, any> = Record<string, any>
+> extends Request<P, ResBody, ReqBody, ReqQuery, Locals> {
+    user?: CurrentUser
+}
+
+interface AppRequestHandler<
+    P = ParamsDictionary,
+    ResBody = any,
+    ReqBody = any,
+    ReqQuery = ParsedQs,
+    Locals extends Record<string, any> = Record<string, any>
+> extends RequestHandler<P, ResBody, ReqBody, ReqQuery, Locals> {
+    (
+        req: AppRequest<P, ResBody, ReqBody, ReqQuery, Locals>,
+        res: Response<ResBody, Locals>,
+        next: NextFunction,
+    ): void;
 }
