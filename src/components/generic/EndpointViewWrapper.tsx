@@ -17,7 +17,7 @@ export default function EndpointViewWrapper({
     const { id } = useParams()
     
     let { result: data, loading, error } = useBackend(
-        useCallback(signal => request(`${endpoint}/${id}`, { signal }), [id]),
+        useCallback(signal => request(`${endpoint}/${id}`, { signal }), [id, endpoint]),
         true
     )
 

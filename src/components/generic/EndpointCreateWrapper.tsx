@@ -44,7 +44,7 @@ export default function EndpointCreateWrapper({
         })
     }
 
-    useEffect(() => () => abortController.abort(), []);
+    useEffect(() => () => abortController.abort(), [ abortController ]);
 
     return children({
         loading : saving,

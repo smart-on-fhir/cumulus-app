@@ -18,7 +18,7 @@ export function useBackend<T=any>(fn: (signal?: AbortSignal) => Promise<T>, imme
         result: null
     });
 
-    const abortController = useMemo(() => new AbortController(), [fn])
+    const abortController = useMemo(() => new AbortController(), [])
 
     const execute = useCallback(() => {
         dispatch({ loading: true, result: null, error: null });
@@ -34,7 +34,7 @@ export function useBackend<T=any>(fn: (signal?: AbortSignal) => Promise<T>, imme
                 }
             }
         );
-    }, [fn]);
+    }, [fn, abortController.signal]);
     
     useEffect(() => {
         if (immediate) { 
@@ -42,7 +42,7 @@ export function useBackend<T=any>(fn: (signal?: AbortSignal) => Promise<T>, imme
         }
     }, [execute, immediate]);
 
-    useEffect(() => () => abortController.abort(), []);
+    useEffect(() => () => abortController.abort(), [ abortController ]);
 
     return {
         execute,
