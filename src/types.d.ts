@@ -266,6 +266,19 @@ declare module app {
         createdAt  : string
     }
 
+    interface Tag {
+        id         : number
+        name       : string
+        description: string
+        creatorId  : number
+        updatedAt  : string
+        createdAt  : string
+        creator: {
+            id: number
+            email: string
+        }
+    }
+
     namespace ServerResponses {
         
         interface UnStratifiedDataResponse {

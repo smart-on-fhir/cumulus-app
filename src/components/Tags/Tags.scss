@@ -1,0 +1,39 @@
+@import "../../styles/variables.scss";
+
+
+.tags-list {
+    max-width: 100%;
+
+    table {
+        border-collapse: collapse;
+        table-layout: fixed;
+        white-space: nowrap;
+    }
+
+    th {
+        border-bottom: 1px solid #CCC;
+    }
+
+    // tbody {
+    //     background: #FFF;
+    // }
+
+    tbody td {
+        border-bottom: 1px solid #DDD;
+    }
+
+    td, th {
+        padding: 0.2em 0.4em;
+        vertical-align: middle;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    thead {
+        background: #EEE;
+    }
+
+    tbody tr:hover {
+        background-color: fade-out($color-blue, 0.9);
+    }
+}

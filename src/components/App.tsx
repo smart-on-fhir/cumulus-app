@@ -19,17 +19,22 @@ import DataSiteCreateForm                       from "./DataSites/CreateForm";
 import RequestDataForm                          from "./Dashboard/RequestDataForm";
 import Navigation                               from "./Navigation"
 import TODO                                     from "./TODO";
-import Projects                                 from "./Projects";
 import Views                                    from "./Views";
 import Users                                    from "./Users";
 import Invite                                   from "./Users/Invite";
 import Account                                  from "./Users/Account";
 import Activate                                 from "./Users/Activate";
+import Projects                                 from "./Projects";
 import EditProject                              from "./Projects/Edit";
 import CreateProject                            from "./Projects/Create";
 import ViewProject                              from "./Projects/View";
 import DeleteProject                            from "./Projects/Delete";
 import LogViewer                                from "./LogViewer";
+import Tags                                     from "./Tags";
+import DeleteTag                                from "./Tags/Delete";
+import CreateTag                                from "./Tags/Create";
+import EditTag                                  from "./Tags/Edit";
+import ViewTag                                  from "./Tags/View";
 import "../styles/main.scss";
 
 export default function App()
@@ -94,7 +99,9 @@ export default function App()
                                     <Route index element={ <RequireAuth><Users /></RequireAuth> } />
                                     <Route path="invite" element={ <RequireAuth><Invite /></RequireAuth> } />
                                 </Route>
+
                                 <Route path="permissions" element={ <TODO /> } />                                
+
                                 <Route path="projects">
                                     <Route index element={ <Projects /> } />
                                     <Route path="new" element={ <CreateProject /> } />
@@ -102,12 +109,14 @@ export default function App()
                                     <Route path=":id/edit" element={ <EditProject /> } />
                                     <Route path=":id/delete" element={ <DeleteProject /> } />
                                 </Route>
-                                <Route path="tags" element={ <TODO /> } />
 
-
-
-
-
+                                <Route path="tags">
+                                    <Route index element={ <Tags /> } />
+                                    <Route path="new" element={ <CreateTag /> } />
+                                    <Route path=":id" element={ <ViewTag /> } />
+                                    <Route path=":id/edit" element={ <EditTag /> } />
+                                    <Route path=":id/delete" element={ <DeleteTag/> } />
+                                </Route>
                                 
                                 <Route path="*" element="Page Not Found" />
                             </Route>
