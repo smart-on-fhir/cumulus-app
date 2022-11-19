@@ -8,16 +8,24 @@ import Loader          from "../Loader"
 
 export default function EndpointViewWrapper({
     endpoint,
+    query,
     children
 }: {
     endpoint: string
+    query?: string
     children: (data: any) => JSX.Element
 })
 {
     const { id } = useParams()
+
+    let url = `${endpoint}/${id}`
+
+    if (query) {
+        url += "?" + encodeURI(query.replace(/^\?/, ""))
+    }
     
     let { result: data, loading, error } = useBackend(
-        useCallback(signal => request(`${endpoint}/${id}`, { signal }), [id, endpoint]),
+        useCallback(signal => request(url, { signal }), [url]),
         true
     )
 
