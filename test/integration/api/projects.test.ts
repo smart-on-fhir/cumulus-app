@@ -17,7 +17,7 @@ describe("Projects", () => {
         
         it ("guest cannot list projects", async () => {
             const res = await fetch(`${server.baseUrl}/api/projects`)
-            expect(res.status).to.equal(403)
+            expect(res.status).to.equal(401)
         })
 
         it ("user can list projects", async () => {
@@ -26,7 +26,7 @@ describe("Projects", () => {
             expect(await res.json()).to.be.an.instanceOf(Array)
         })
 
-        it ("manager cannot list projects", async () => {
+        it ("manager can list projects", async () => {
             const res = await fetch(`${server.baseUrl}/api/projects`, { headers: { Cookie: "sid=" + manager.sid } })
             expect(res.status).to.equal(200)
             expect(await res.json()).to.be.an.instanceOf(Array)
@@ -41,7 +41,6 @@ describe("Projects", () => {
         it ("handles bad parameter errors", async () => {
             const res = await fetch(`${server.baseUrl}/api/projects?order=x`, { headers: { Cookie: "sid=" + admin.sid }})
             expect(res.status).to.equal(400)
-            expect(await res.text()).to.equal("Error reading projects")
         })
     })
 
@@ -49,7 +48,7 @@ describe("Projects", () => {
         
         it ("guest cannot view project", async () => {
             const res = await fetch(`${server.baseUrl}/api/projects/1`)
-            expect(res.status).to.equal(403)
+            expect(res.status).to.equal(401)
         })
 
         it ("user can view project", async () => {
@@ -73,7 +72,6 @@ describe("Projects", () => {
         it ("handles bad parameter errors", async () => {
             const res1 = await fetch(`${server.baseUrl}/api/projects/100`, { headers: { Cookie: "sid=" + admin.sid }})
             expect(res1.status).to.equal(404)
-            expect(await res1.text()).to.equal("Project not found")
 
             const res = await fetch(`${server.baseUrl}/api/projects/x`, { headers: { Cookie: "sid=" + admin.sid }})
             expect(res.status).to.equal(400)
@@ -136,7 +134,7 @@ describe("Projects", () => {
                     "content-type": "application/json"
                 }
             })
-            expect(res.status).to.equal(403)
+            expect(res.status).to.equal(401)
         })
 
         it ("user cannot update projects", async () => {
@@ -197,7 +195,7 @@ describe("Projects", () => {
 
         it ("guest cannot delete projects", async () => {
             const res = await fetch(`${server.baseUrl}/api/projects/1`, { method: "DELETE" });
-            expect(res.status).to.equal(403);
+            expect(res.status).to.equal(401);
         })
 
         it ("user cannot delete projects", async () => {
@@ -220,7 +218,6 @@ describe("Projects", () => {
         it ("handles bad parameter errors", async () => {
             const res1 = await fetch(`${server.baseUrl}/api/projects/10`, { method: "DELETE", headers: { Cookie: "sid=" + admin.sid }})
             expect(res1.status).to.equal(404)
-            expect(await res1.text()).to.equal("Project not found")
 
             const res2 = await fetch(`${server.baseUrl}/api/projects/x`, { method: "DELETE", headers: { Cookie: "sid=" + admin.sid }})
             expect(res2.status).to.equal(400)

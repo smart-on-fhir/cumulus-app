@@ -35,6 +35,14 @@ const ACL = {
     projects_delete          :[ 0, 0, 1,  , 1 ], // delete project
     // -------------------------------------------------------------------------
 
+    // tags --------------------------------------------------------------------
+    tags_list                :[ 0, 1, 1,  , 1 ], // view all tags
+    tags_view                :[ 0, 1, 1, 1, 1 ], // view single tag
+    tags_create              :[ 0, 0, 1,  , 1 ], // create new tag
+    tags_update              :[ 0, 0, 1, 1, 1 ], // update tag
+    tags_delete              :[ 0, 0, 1, 1, 1 ], // delete tag
+    // -------------------------------------------------------------------------
+
     // views/graphs ------------------------------------------------------------
     views_list               :[ 0, 1, 1,  , 1 ], // view all graphs
     views_view               :[ 0, 1, 1,  , 1 ], // view one graph by id

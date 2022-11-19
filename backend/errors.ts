@@ -47,6 +47,7 @@ export class HttpError extends Error
     public name: string
     public message: string
     public data?: ErrorData
+    public cause?: any
 
     constructor(code: number, message?: string, data?: ErrorData) {
         super()

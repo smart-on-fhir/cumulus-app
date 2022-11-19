@@ -1,22 +1,25 @@
-const Path                      = require("path");
-const { readdirSync, statSync } = require("fs");
-const { Op }                    = require("sequelize");
-const { validationResult }      = require("express-validator");
-const { logger }                = require("./logger");
+import Path                      from "path"
+import { readdirSync, statSync } from "fs"
+import { Op, Sequelize }                    from "sequelize"
+import { ValidationChain, validationResult }      from "express-validator"
+import { logger }                from "../logger"
+import { NextFunction, Request, Response } from "express-serve-static-core"
+import { app } from "../.."
+
 
 const RE_FALSE = /^(0|no|false|off|null|undefined|NaN|)$/i;
 
-function wait(ms) {
+export function wait(ms: number) {
     return new Promise(resolve => {
         setTimeout(resolve, ms);
     });
 }
 
-function bool(x) {
+export function bool(x: any) {
     return !RE_FALSE.test(String(x).trim());
 }
 
-function uInt(x, defaultValue = 0) {
+export function uInt(x: any, defaultValue = 0) {
     x = parseInt(x + "", 10);
     if (isNaN(x) || !isFinite(x) || x < 0) {
         x = uInt(defaultValue, 0);
@@ -28,7 +31,7 @@ function uInt(x, defaultValue = 0) {
  * @param {import("express").Request} req
  * @returns {import("sequelize").FindOptions}
  */
-function getFindOptions(req)
+export function getFindOptions(req)
 {
     /**
      * @type {any} //{import("sequelize").FindOptions}
@@ -155,21 +158,16 @@ function getFindOptions(req)
  *   next: import("express").NextFunction
  * ) => Promise<void>}
  */
-function rw(fn) {
+export function rw(fn) {
     return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 }
 
-/**
- * @param {any} condition 
- * @param {Error | string} error
- * @param {ErrorConstructor} ctor Error constructor
- * @type {import("../index").app.assert}
- */
-function assert(condition, error, ctor = Error) {
+export function assert(condition: any, error?: string | ErrorConstructor, ctor = Error): asserts condition {
     if (!(condition)) {
-        if (error instanceof Error) {
-            throw error
-        } else {
+        if (typeof error === "function") {
+            throw new error()
+        }
+        else {
             throw new ctor(error || "Assertion failed")
         }
     }
@@ -178,11 +176,8 @@ function assert(condition, error, ctor = Error) {
 /**
  * Walk a directory recursively and find files that match the @filter if its a
  * RegExp, or for which @filter returns true if its a function.
- * @param {string} dir Path to directory
- * @param {RegExp|Function} [filter]
- * @returns {IterableIterator<String>}
  */
-function* filterFiles(dir, filter) {
+export function* filterFiles(dir: string, filter: RegExp|Function): IterableIterator<String> {
     const files = walkSync(dir);
     for (const file of files) {
         if (filter instanceof RegExp && !filter.test(file)) {
@@ -197,10 +192,8 @@ function* filterFiles(dir, filter) {
 
 /**
  * List all files in a directory recursively in a synchronous fashion.
- * @param {String} dir
- * @returns {IterableIterator<String>}
  */
-function* walkSync(dir) {
+export function* walkSync(dir: string): IterableIterator<string> {
     const files = readdirSync(dir);
 
     for (const file of files) {
@@ -218,17 +211,14 @@ function* walkSync(dir) {
  * Splits the line into cells using the provided delimiter (or by comma by
  * default) and returns the cells array. supports quoted strings and escape
  * sequences.
- * @param {string} line The line to parse
- * @param {string[]} [delimiters=[","]] The delimiter to use (defaults to ",")
- * @param {string} [stringDelimiter='"']
- * @returns {string[]} The cells as array of strings
+ * @param line The line to parse
+ * @param [delimiters=[","]] The delimiter to use (defaults to ",")
+ * @param [stringDelimiter='"']
+ * @returns The cells as array of strings
  */
-function parseDelimitedLine(line, delimiters = [","], stringDelimiter = '"')
+export function parseDelimitedLine(line: string, delimiters: string[] = [","], stringDelimiter: string = '"'): string[]
 {   
-    /**
-     * @type {string[]}
-     */
-    const out = [];
+    const out: string[] = [];
     
     const len = line.length;
 
@@ -292,32 +282,22 @@ function parseDelimitedLine(line, delimiters = [","], stringDelimiter = '"')
     return out//.map(s => s.trim());
 }
 
-/**
- * 
- * @param {string}   input 
- * @param {object}   [options = {}]
- * @param {string[]} options.separators = [","]
- * @param {string}   options.stringDelimiter Defaults to '"'
- * @returns {import("../index").app.DataRequestData}
- */
-function parseDelimitedString(input, options = {
-    separators     : [","],
-    stringDelimiter: '"'
-}) {
-    /**
-     * @type {any[][]}
-     */
-    let rows = []
-
-    /**
-     * @type {import("../index").app.DataRequestDataColumn[]}
-     */
-    let cols = []
+export function parseDelimitedString(
+    input: string,
+    options: {
+        separators: string[],
+        stringDelimiter: string
+    } = {
+        separators     : [","],
+        stringDelimiter: '"'
+    }
+): app.DataRequest {
     
-    /**
-     * @type {string[]}
-     */
-    const unParsedRows = input.split("\n").map(s => s.trim()).filter(Boolean);
+    let rows: any[][] = []
+
+    let cols: app.DataRequestDataColumn[] = []
+    
+    const unParsedRows: string[] = input.split("\n").map(s => s.trim()).filter(Boolean);
     
     const { separators, stringDelimiter } = options;
     
@@ -400,24 +380,14 @@ function parseDelimitedString(input, options = {
     }
 }
 
-/**
- * @param {string} str 
- * @returns {string}
- */
-function toTitleCase(str) {
+export function toTitleCase(str: string) {
     return str.replace(/([A-Z])/g, " $1")
         .replace(/[^a-zA-Z0-9]+/g, " ")
         .replace(/\b[a-z]/g, x => x.toUpperCase())
         .trim();
 }
 
-/**
- * 
- * @param {number} i 
- * @param {string[][]} rows 
- * @returns {string}
- */
-function detectDataTypeAt(i, rows) {
+export function detectDataTypeAt(i: number, rows: string[][]) {
     let type = "";
 
     for (let row of rows) {
@@ -450,10 +420,8 @@ function detectDataTypeAt(i, rows) {
  * - If the value starts with NNNN-NN-01 returns "date:YYYY-MM" 
  * - If the value starts with NNNN-01-01 returns "date:YYYY" 
  * - Otherwise returns "string"
- * @param {string} x 
- * @returns {""|"integer"|"float"|"string"|"date:YYYY-MM-DD"|"date:YYYY-MM"|"date:YYYY"}
  */
-function valueToDataType(x) {
+export function valueToDataType(x: string) {
     if (!x) {
         return ""
     }
@@ -477,10 +445,8 @@ function valueToDataType(x) {
 
 /**
  * Rounds the given number @n using the specified precision.
- * @param {number | string} n
- * @param {number} [precision]
  */
-function roundToPrecision(n, precision) {
+export function roundToPrecision(n: string | number, precision?: number) {
     n = parseFloat(n + "");
 
     if ( isNaN(n) || !isFinite(n) ) {
@@ -500,20 +466,14 @@ function roundToPrecision(n, precision) {
 
 /**
  * Given a request object, returns its base URL
- * @param {import("express").Request} req
  */
-function getRequestBaseURL(req) {
+export function getRequestBaseURL(req: Request) {
     const host = req.headers["x-forwarded-host"] || req.headers.host;
     const protocol = req.headers["x-forwarded-proto"] || req.protocol || "http";
     return protocol + "://" + host;
 }
 
-/**
- * @param {import("sequelize").Sequelize} connection
- * @param {string} tableName
- * @param {string} incrementColumnName
- */
-async function fixAutoIncrement(connection, tableName, incrementColumnName) {
+export async function fixAutoIncrement(connection: Sequelize, tableName: string, incrementColumnName: string) {
     await connection.query(
         `select setval(
             '"${tableName}_${incrementColumnName}_seq"',
@@ -523,11 +483,11 @@ async function fixAutoIncrement(connection, tableName, incrementColumnName) {
     );
 }
 
-function validateRequest(...validations) {
-    return async (req, res, next) => {
+export function validateRequest(...validations: ValidationChain[]) {
+    return async (req: Request, res: Response, next: NextFunction) => {
         for (let validation of validations) {
             const result = await validation.run(req);
-            if (result.errors.length) break;
+            if (!result.isEmpty()) break;
         }
 
         const errors = validationResult(req).formatWith(({ location, msg, param, value, nestedErrors }) => {
@@ -544,21 +504,3 @@ function validateRequest(...validations) {
         res.status(400).json({ errors: errors.array() });
     };
 }
-
-module.exports = {
-    bool,
-    uInt,
-    rw,
-    assert,
-    walkSync,
-    filterFiles,
-    wait,
-    parseDelimitedString,
-    parseDelimitedLine,
-    toTitleCase,
-    getFindOptions,
-    roundToPrecision,
-    getRequestBaseURL,
-    fixAutoIncrement,
-    validateRequest
-};
