@@ -8,9 +8,11 @@ import Loader                     from "../Loader"
 
 export default function EndpointDeleteWrapper({
     endpoint,
+    query,
     children
 }: {
     endpoint: string
+    query?: string
     children: (props: {
         loading : boolean
         data    : any
@@ -25,8 +27,14 @@ export default function EndpointDeleteWrapper({
     const [saveError, setSaveError] = useState<Error|string|null>(null)
     const abortController = useMemo(() => new AbortController(), [])
 
+    let url = `${endpoint}/${id}`
+
+    if (query) {
+        url += "?" + encodeURI(query.replace(/^\?/, ""))
+    }
+
     let { result, loading, error } = useBackend(
-        useCallback(signal => request(`${endpoint}/${id}`, { signal }), [id, endpoint]),
+        useCallback(signal => request(url, { signal }), [url]),
         true
     )
 
