@@ -4,10 +4,9 @@ import { useBackend }  from "../../hooks"
 import { request }     from "../../backend"
 import Loader          from "../Loader"
 import { AlertError }  from "../Alert"
+import ViewThumbnail   from "./ViewThumbnail"
 
 import "./ViewsBrowser.scss"
-import { ellipsis, highlight } from "../../utils"
-import { StaticRating } from "../Rating"
 
 
 export default function ViewsBrowser({
@@ -75,30 +74,5 @@ export default function ViewsBrowser({
                 ))
             }
         </div>
-    )
-}
-
-function ViewThumbnail({
-    view,
-    showDescription = 0,
-    search=""
-}: {
-    view: app.View,
-    showDescription?: number,
-    search?: string
-}) {
-    return (
-        <Link to={ "/views/" + view.id } className="view-thumbnail" title={ showDescription ? undefined : view.description || undefined }>
-            <div className="view-thumbnail-image" style={{
-                backgroundImage: `url('${view.screenShot ? `/api/views/${ view.id }/screenshot` : "/view.png"}')`
-            }}/>
-            <div className="view-thumbnail-title">
-                <span dangerouslySetInnerHTML={{
-                        __html: search ? highlight(view.name, search) : view.name
-                }}/>
-                { showDescription > 0 && <div className="view-thumbnail-description color-muted" title={ view.description || undefined }>{ ellipsis(view.description || "No description provided", showDescription) }</div> }
-                { showDescription > 0 && <StaticRating value={ view.normalizedRating } votes={ view.votes } /> }
-            </div>            
-        </Link>
     )
 }
