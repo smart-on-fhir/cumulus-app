@@ -124,7 +124,7 @@
     margin: 0;
     // height   : ($font-size * $line-height) + round($font-size * 0.8);
   
-    &:focus {
+    &:focus, &:focus-within {
         border-color: rgb(37, 139, 255);
         box-shadow: 0 0 0 3px rgba(37, 139, 255, 0.3);
     }

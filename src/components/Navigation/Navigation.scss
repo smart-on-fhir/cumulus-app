@@ -135,7 +135,7 @@
         top: 5rem;
         bottom: 1rem;
         left: 1rem;
-        z-index: 100;
+        z-index: 10000;
         width: 2em;
         padding-bottom: 1rem;
         
@@ -154,11 +154,6 @@
         }
     }
 
-    #app-header {
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
 
     #main {
         padding: 1rem 1rem 1rem 3.5rem !important;
