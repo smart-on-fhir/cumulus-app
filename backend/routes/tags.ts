@@ -1,4 +1,5 @@
 import { Response, Router } from "express"
+import { Includeable }      from "sequelize/types"
 import Tag                  from "../db/models/Tag"
 import * as lib             from "../lib"
 import * as auth            from "../controllers/Auth"
@@ -6,7 +7,6 @@ import { NotFound }         from "../errors"
 import { assert }           from "../lib"
 import { route }            from "../lib/route"
 import { AppRequest }       from ".."
-import { Includeable } from "sequelize/types"
 
 const router = Router({ mergeParams: true });
 
@@ -46,31 +46,66 @@ route(router, {
                 isBoolean: true
             },
 
-            // TODO: If set include the graphs count
+            // If set include the graphs count
             graphs: {
                 in: ["query"],
                 optional: true,
-                isBoolean: true
+                isBoolean: true,
+                toBoolean: true
             },
 
-            // TODO: If set include the subscriptions count
+            // If set include the subscriptions count
             subscriptions: {
                 in: ["query"],
                 optional: true,
-                isBoolean: true
+                isBoolean: true,
+                toBoolean: true
             }
         }
     },
     handler: async (req: AppRequest, res: Response) => {
+        
+        const permissions = ["tags_view"];
+
         const include: Includeable[] = [];
 
         if (req.query.creator) {
             include.push({ association: "creator", attributes: ["id", "email"] })
         }
 
+        if (req.query.graphs) {
+            permissions.push("views_list")
+            include.push({
+                association: "graphs",
+                attributes: [
+                    "id",
+                    "name",
+                    "description",
+                    "rating",
+                    "votes",
+                    "normalizedRating",
+                    "DataRequestId"
+                ]
+            })
+        }
+
+        if (req.query.subscriptions) {
+            permissions.push("data_request_list")
+            include.push({
+                association: "subscriptions",
+                attributes: [
+                    "id",
+                    "name",
+                    "description",
+                    "completed",
+                    "refresh"
+                ]
+            })
+        }
+
         const model = await Tag.findByPk(req.params.id, { include });
         assert(model, NotFound);
-        auth.requestPermission("tags_view", req, req.user?.id === model.creatorId)
+        permissions.forEach(p => auth.requestPermission(p as any, req, req.user?.id === model.creatorId))
         res.json(model)
     }
 });

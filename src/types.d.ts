@@ -5,18 +5,34 @@ declare module app {
      * The current user of the app
      */
     interface User {
-        // username: string
         id: number
-        name: string
+        name: string | null
         email: string
         role: string
         remember: boolean
-        // lastLogin: string | null
-        // createdAt: string | null
-        // updatedAt: string | null
-        // sid: string | null
-        // email: string
+        password: string | null // null for pending accounts
+        sid: string | null // string is logged in
+        activationCode: string | null // null for system users
+        lastLogin: string | null // Date | null
+        invitedBy: number | null // Ref User ID
+        createdAt: string // Date
+        updatedAt: string // Date
     }
+
+    interface Tag {
+        id            : number
+        name          : string
+        description   : string
+        creatorId     : number | null
+        updatedAt     : string
+        createdAt     : string
+        creator      ?: Pick<User, "id" | "email">
+        graphs       ?: Pick<View, "id" | "name" | "description" | "rating" | "votes" | "normalizedRating" | "DataRequestId">[]
+        subscriptions?: Pick<DataRequest, "id" | "name" | "description" | "completed" | "refresh">[]
+    }
+
+    type CurrentUser = Omit<User, "password" | "sid">
+
 
     interface ColumnDescriptor {
         name: string
@@ -121,6 +137,8 @@ declare module app {
             cols : DataRequestDataColumn[],
             total: number
         } | null
+
+        Tags?: Pick<Tag, "id" | "name" | "description">[]
     }
 
     interface RequestedData {
@@ -266,18 +284,7 @@ declare module app {
         createdAt  : string
     }
 
-    interface Tag {
-        id         : number
-        name       : string
-        description: string
-        creatorId  : number
-        updatedAt  : string
-        createdAt  : string
-        creator: {
-            id: number
-            email: string
-        }
-    }
+    
 
     namespace ServerResponses {
         

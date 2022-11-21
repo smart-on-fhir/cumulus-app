@@ -2,13 +2,15 @@ import moment                     from "moment"
 import { Helmet, HelmetProvider } from "react-helmet-async"
 import { Link }                   from "react-router-dom"
 import Breadcrumbs                from "../Breadcrumbs"
+import DataRequestLink from "../DataRequests/DataRequestLink"
 import EndpointViewWrapper        from "../generic/EndpointViewWrapper"
+import ViewThumbnail from "../Views/ViewThumbnail"
 
 
 export default function ViewTag() {
     return (
         <div className="container">
-            <EndpointViewWrapper endpoint="/api/tags" query="creator=true">
+            <EndpointViewWrapper endpoint="/api/tags" query="creator=true&graphs=true&subscriptions=true">
                 { (data: app.Tag) => <>
                     <HelmetProvider>
                         <Helmet>
@@ -61,18 +63,41 @@ export default function ViewTag() {
                         <div className="col responsive mb-2">
                             <h5><i className="fa-solid fa-chart-pie color-brand-2" /> Graphs</h5>
                             <hr/>
-                            {/* <p>This tag is assigned to the following graphs</p> */}
-                            <p className="color-brand-2">This tag is not assigned to any graphs</p>
-                            <br/>
-                            <Link to="/views" className="link">Browse all graphs</Link>
+                            { data.graphs?.length ?
+                                <>
+                                    <p className="color-muted">This tag is assigned to the following graphs:</p>
+                                    <div className="view-browser view-browser-column" style={{ minHeight: 0 }}>
+                                    { data.graphs.map((v, i) => (
+                                        <ViewThumbnail key={i} view={v} showDescription={200} />
+                                    ))}
+                                    </div>
+                                </> :
+                                <>
+                                    <p className="color-brand-2">This tag is not assigned with any graphs</p>
+                                    <br/>
+                                    <Link to="/views" className="link">Browse all graphs</Link>
+                                </>
+                                
+                            }
                         </div>
                         <div className="col responsive mb-2">
                             <h5><i className="fa-solid fa-database color-brand-2" /> Subscriptions</h5>
                             <hr/>
-                            {/* <p>This tag is assigned to the following data subscriptions:</p> */}
-                            <p className="color-brand-2">This tag is not assigned to any data subscriptions</p>
-                            <br/>
-                            <Link to="/requests" className="link">Browse all data subscriptions</Link>
+                            { data.subscriptions?.length ?
+                                <>
+                                    <p className="color-muted">This tag is assigned to the following data subscriptions:</p>
+                                    { data.subscriptions.map((s, i) => (
+                                        // @ts-ignore
+                                        <DataRequestLink key={i} request={s} href={"/requests/" + s.id}/>
+                                    ))}
+                                </> :
+                                <>
+                                    <p className="color-brand-2">This tag is not assigned with any data subscriptions</p>
+                                    <br/>
+                                    <Link to="/requests" className="link">Browse all data subscriptions</Link>
+                                </>
+                                
+                            }
                         </div>
                     </div>
                 </> }
