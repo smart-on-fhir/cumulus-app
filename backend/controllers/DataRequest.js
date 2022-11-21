@@ -13,6 +13,7 @@ const { requireAuth }  = require("./Auth");
 const createRestRoutes = require("./BaseController");
 const ImportJob        = require("../DataManager/ImportJob");
 const { logger }       = require("../logger");
+const { route }        = require("../lib/route");
 const {
     getFindOptions,
     assert,
@@ -359,12 +360,77 @@ router.get("/:id/api", rw(async (req, res) => {
 }));
 
 createRestRoutes(router, Model, {
-    create : "views_create",
-    destroy: "views_delete",
-    getAll : "views_delete",
-    getOne : "views_view",
-    update : "views_update"
+    create : "data_request_create",
+    destroy: "data_request_delete",
+    getAll : "data_request_delete",
+    // getOne : "views_view",
+    update : "data_request_update"
 });
+
+// Get single subscription -----------------------------------------------------
+route(router, {
+    path: "/:id",
+    method: "get",
+    permission: "data_request_list",
+    request: {
+        schema: {
+            id: {
+                in: ["params"],
+                isInt: {
+                    errorMessage: "The 'id' parameter must be integer"
+                },
+                custom: {
+                    options: x => x > 0,
+                    errorMessage: "The 'id' parameter must be a positive integer"
+                },
+                toInt: true
+            },
+
+            // If set include the group id, name and description
+            group: {
+                in: ["query"],
+                optional: true,
+                isBoolean: true
+            },
+
+            // If set include related tags with id, name and description
+            tags: {
+                in: ["query"],
+                optional: true,
+                isBoolean: true,
+                toBoolean: true
+            },
+
+            // If set include related Views
+            graphs: {
+                in: ["query"],
+                optional: true,
+                isBoolean: true,
+                toBoolean: true
+            }
+        }
+    },
+    handler: async (req, res) => {
+
+        const include = []
+
+        if (req.query.group) {
+            include.push({ association: "group", attributes: ["id", "name", "description"] })
+        }
+
+        if (req.query.tags) {
+            include.push({ association: "Tags", attributes: ["id", "name", "description"] })
+        }
+
+        if (req.query.graphs) {
+            include.push({ association: "Views" })
+        }
+
+        const model = await Model.findByPk(req.params.id, { include })
+        assert(model, HttpError.NotFound)
+        res.json(model)
+    }
+})
 
 /**
  * @param {{ cols: { name: string }[], rows: any[][] }} data 
