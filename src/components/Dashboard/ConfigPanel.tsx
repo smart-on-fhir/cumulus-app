@@ -1,5 +1,6 @@
 
 import { merge }         from "highcharts"
+import { useState }      from "react"
 import Select            from "../Select"
 import ColumnSelector    from "./ColumnSelector"
 import FilterUI          from "./FilterUI"
@@ -8,7 +9,7 @@ import Checkbox          from "../Checkbox"
 import AnnotationsUI     from "./AnnotationsUI"
 import Rating            from "../Rating"
 import { request }       from "../../backend"
-import { useState }      from "react"
+import TagSelector       from "../Tags/TagSelector"
 import {
     SupportedChartTypes,
     ChartIcons
@@ -110,6 +111,7 @@ interface ChartConfigPanelState {
     column2type    : string
     annotations    : app.Annotation[]
     xCol           : app.DataRequestDataColumn
+    tags           : Pick<app.Tag, "id"|"name"|"description">[]
 }
 
 export default function ConfigPanel({
@@ -193,6 +195,11 @@ export default function ConfigPanel({
                     onClear={ resetRating }
                 />
             }
+
+            <div className="mb-1">
+                <label>Tags</label>
+                <TagSelector selected={state.tags} onChange={tags => onChange({ ...state, tags })} />
+            </div>
             <Collapse collapsed header="Chart">
                 <div className="mt-1">
                     <label>Chart Type</label>

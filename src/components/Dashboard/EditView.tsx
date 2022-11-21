@@ -15,7 +15,7 @@ export default function EditView()
     // Fetch the subscription by ID
     const { loading, error, result } = useBackend(
         useCallback(() => {
-            return request("/api/views/" + id).then(view => {
+            return request("/api/views/" + id + "?tags=true").then(view => {
                 return request("/api/requests/" + view.DataRequestId).then(request => ({
                     request,
                     view

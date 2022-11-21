@@ -63,6 +63,7 @@ declare module app {
         rating: number
         normalizedRating: number
         settings?: ViewSettings
+        Tags?: Pick<Tag, "id" | "name" | "description">[]
     }
 
     interface ViewSettings {
