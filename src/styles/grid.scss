@@ -70,7 +70,6 @@
 .col {
     display       : flex;
     flex-direction: column;
-    // padding       : 0 1rem;
     flex          : 1 1 0;
     // box-shadow  : 0 0 1px 0 #000;
     max-width: 100%;
@@ -100,5 +99,8 @@
     &.col-9  { flex-grow: 9 ; flex-basis: 90% ; max-width: 90%;  }
     &.col-10 { flex-grow: 10; flex-basis: 100%; max-width: 100%; }
 
-    // &.col-min-4 {  }
+    &.responsive {
+        min-width: min-content;
+        max-width: unset;
+    }
 }
