@@ -36,12 +36,12 @@ export default function CreateView()
 
     // Eventually render a Breadcrumbs and the dashboard
     return (
-        <>
+        <div className="container">
             <Breadcrumbs links={[
                 { name: "Home" , href: "/" },
                 { name: "Create New View" }
             ]}/>
             <Dashboard view={{}} dataRequest={result as app.DataRequest} />
-        </>
+        </div>
     )
 }
