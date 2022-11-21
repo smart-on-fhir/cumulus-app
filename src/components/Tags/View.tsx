@@ -58,7 +58,7 @@ export default function ViewTag() {
                     </div>
                     <div className="mt-2 mb-2" style={{ whiteSpace: "pre-wrap" }}>{ data.description }</div>
                     <div className="row gap-2 mt-2">
-                        <div className="col mb-2" style={{ minWidth: "20em", flex: 3 }}>
+                        <div className="col responsive mb-2">
                             <h5><i className="fa-solid fa-chart-pie color-brand-2" /> Graphs</h5>
                             <hr/>
                             {/* <p>This tag is assigned to the following graphs</p> */}
@@ -66,7 +66,7 @@ export default function ViewTag() {
                             <br/>
                             <Link to="/views" className="link">Browse all graphs</Link>
                         </div>
-                        <div className="col mb-2" style={{ minWidth: "20em", flex: 2 }}>
+                        <div className="col responsive mb-2">
                             <h5><i className="fa-solid fa-database color-brand-2" /> Subscriptions</h5>
                             <hr/>
                             {/* <p>This tag is assigned to the following data subscriptions:</p> */}

@@ -27,7 +27,7 @@ export default function DeleteTag()
                     ]} />
                     <h1 className="color-brand-2 center mt-2 mb-2">Please Confirm!</h1>
                     { error && <AlertError>{ error }</AlertError> }
-                    <div className="panel mt-1">
+                    <div className="panel panel-danger mt-1">
                         <h4><i className="fa-solid fa-tag color-brand-2" /> { data.name }</h4>
                         <hr/>
                         <div className="row gap mb-2 mt-05">

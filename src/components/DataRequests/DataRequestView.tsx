@@ -103,7 +103,7 @@ export default function DataRequestView(): JSX.Element
     } = requestedData.fields;
 
     return (
-        <div>
+        <div className="container">
             <HelmetProvider>
                 <Helmet>
                     <title>Data Subscription: {model.name}</title>
@@ -117,8 +117,8 @@ export default function DataRequestView(): JSX.Element
             <h3><i className="fas fa-database" /> { model.name }</h3>
             <p className="color-muted" dangerouslySetInnerHTML={{ __html: model.description || "" }}/>
             <br/>
-            <div className="row gap">
-                <div className="col col-6">
+            <div className="row gap-2">
+                <div className="col col-6 responsive">
                     <h5>Status</h5>
                     <hr/>
                     <div className="left">
@@ -219,7 +219,7 @@ export default function DataRequestView(): JSX.Element
                     </div>
                     <br/>
                 </div>
-                <div className="col col-4">
+                <div className="col col-4 responsive" style={{ minWidth: "20rem" }}>
                     { model.completed && <><h5>Dependent Views</h5>
                     <hr/>
                     <ViewsBrowser layout="column" requestId={ model.id } />
