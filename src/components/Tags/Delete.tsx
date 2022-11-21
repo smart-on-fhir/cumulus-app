@@ -1,18 +1,20 @@
 import { Helmet, HelmetProvider } from "react-helmet-async"
 import { Link }                   from "react-router-dom"
+import moment                     from "moment"
 import EndpointDeleteWrapper      from "../generic/EndpointDeleteWrapper"
 import { AlertError }             from "../Alert"
 import Breadcrumbs                from "../Breadcrumbs"
 import Loader                     from "../Loader"
 import Clip                       from "../generic/Clip"
-import moment from "moment"
+import DataRequestLink            from "../DataRequests/DataRequestLink"
+import ViewThumbnail              from "../Views/ViewThumbnail"
 
 
 export default function DeleteTag()
 {
     return (
         <div className="container">
-            <EndpointDeleteWrapper endpoint="/api/tags" query="creator=true">
+            <EndpointDeleteWrapper endpoint="/api/tags" query="creator=true&graphs=true&subscriptions=true">
                 {({ loading, data, onSubmit, error }) => <>
                     <HelmetProvider>
                         <Helmet>
@@ -43,29 +45,50 @@ export default function DeleteTag()
                                     <span className="color-brand-2">{ moment(data.updatedAt).format("M/D/Y") }</span>
                                 </i>
                             </div>
-                            <div className="col col-0">
+                            { data.creator && <div className="col col-0">
                                 <i>
                                     <span className="color-muted">Created by: </span>
-                                    <span className="color-brand-2">{ data.creator?.email }</span>
+                                    <span className="color-brand-2">{ data.creator.email }</span>
                                 </i>
-                            </div>
+                            </div> }
                         </div>
                         <div className="mt-2 mb-2" style={{ whiteSpace: "pre-wrap" }}>
                             <Clip max={400} txt={ data.description } />
                         </div>
-                        <hr/>
-                        <div className="mt-05">
-                            <div>
-                                <i className="fa-solid fa-link color-muted" /> <span className="color-muted">
-                                This tag will be removed from </span>
-                                <span className="link">10 graphs</span>
-                            </div>
-                            <div>
-                                <i className="fa-solid fa-link color-muted" /> <span className="color-muted">
-                                This tag will be removed from </span>
-                                <span className="link">6 data subscriptions</span>
-                            </div>
-                        </div>
+                        { (data.graphs?.length > 0 || data.subscriptions?.length > 0) && (
+                            <>
+                                <div className="mt-05 row gap">
+                                    { data.graphs?.length &&
+                                        <div className="col responsive" style={{ flexBasis: "20em" }}>
+                                            <h6>
+                                                <i className="fa-solid fa-link-slash color-brand-2" /> This tag will be removed from the following graphs:
+                                            </h6>
+                                            <hr/>
+                                            <div className="view-browser view-browser-column" style={{ minHeight: 0 }}>
+                                            { data.graphs.map((v: any, i: number) => (
+                                                <ViewThumbnail
+                                                    key={i}
+                                                    view={ v }
+                                                    showDescription={200}
+                                                />
+                                            ))}
+                                            </div>
+                                        </div>
+                                    }
+                                    { data.subscriptions?.length &&
+                                        <div className="col responsive" style={{ flexBasis: "20em" }}>
+                                            <h6>
+                                                <i className="fa-solid fa-link-slash color-brand-2" /> This tag will be removed from the following data subscriptions:
+                                            </h6>
+                                            <hr/>
+                                            { data.subscriptions.map((s: any, i: number) => (
+                                                <DataRequestLink key={i} request={s} href={"/requests/" + s.id} />
+                                            ))}
+                                        </div>
+                                    }
+                                </div>
+                            </>
+                        )}
                     </div>
                     
                     <div className="center pt-2 pb-1">

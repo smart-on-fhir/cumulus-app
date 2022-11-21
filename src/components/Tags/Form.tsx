@@ -42,7 +42,8 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
                         id="description"
                         name="description"
                         placeholder="Project description"
-                        rows={10}
+                        rows={8}
+                        maxLength={200}
                         required
                         value={description}
                         onChange={e => setDescription(e.target.value)}
