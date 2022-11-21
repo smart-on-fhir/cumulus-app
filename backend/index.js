@@ -80,7 +80,7 @@ function setupStaticContent(app)
 {
     app.get("/favicon.ico", (req, res) => res.status(404).end());
     app.use(express.static(Path.join(__dirname, "../build/")));
-    app.get("*", (req, res) => res.sendFile("index.html", { root: "../build" }));
+    app.get("*", (req, res) => res.sendFile("index.html", { root: Path.join(__dirname, "../build/") }));
     logger.verbose("✔ Static content hosted");
 }
 
