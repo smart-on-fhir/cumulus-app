@@ -22,10 +22,10 @@ export function route(router: Router, options: {
 
     // body parsing --------------------------------------------------------
     middlewares.push(
-        express.raw(),
-        express.json(),
-        express.urlencoded({ extended: true }),
-        express.text()
+        express.raw({ limit: "5MB" }),
+        express.json({ limit: "5MB" }),
+        express.urlencoded({ extended: true, limit: "5MB" }),
+        express.text({ limit: "5MB" })
     )
 
     // Authentication ------------------------------------------------------
