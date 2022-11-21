@@ -98,7 +98,7 @@ export default function EditDataRequestForm()
     const { groups, sites } = data
 
     return (
-        <div>
+        <div className="container">
             <HelmetProvider>
                 <Helmet>
                     <title>Edit Data Subscription</title>

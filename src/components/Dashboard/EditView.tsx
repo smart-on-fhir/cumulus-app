@@ -41,13 +41,13 @@ export default function EditView()
     }
 
     return (
-        <>
+        <div className="container">
             <Breadcrumbs links={[
                 { name: "Home"  , href: "/" },
                 { name: "Graphs", href: "/views" },
                 { name: result.view.name }
             ]}/>
             <Dashboard view={ result.view } dataRequest={result.request} />
-        </>
+        </div>
     )
 }
