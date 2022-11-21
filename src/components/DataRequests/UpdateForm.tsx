@@ -40,7 +40,7 @@ export default function EditDataRequestForm()
         error
     } = useBackend<app.DataRequest>(
         useCallback(
-            () => request("/api/requests/" + id).then(x => {
+            () => request(`/api/requests/${id}?tags=true`).then(x => {
                 setState(x);
                 return x;
             }),

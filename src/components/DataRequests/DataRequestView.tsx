@@ -12,6 +12,7 @@ import ViewsBrowser               from "../Views/ViewsBrowser"
 import Loader                     from "../Loader"
 import { AlertError }             from "../Alert"
 import { classList }              from "../../utils"
+import Tag                        from "../Tags/Tag"
 
 // import GoogleMapReact from "google-map-react"
 
@@ -164,9 +165,7 @@ export default function DataRequestView(): JSX.Element
                                 { model.Tags && (
                                     <tr>
                                         <th className="right pr-1 pl-1">Tags:</th>
-                                        <td>{ model.Tags.map((t, i) => (
-                                            <span className="tag" key={i} title={ t.description }>{ t.name }</span>
-                                        )) }</td>
+                                        <td>{ model.Tags.map((t, i) => <Tag tag={t} key={i} />) }</td>
                                     </tr>
                                 )}
                             </tbody>

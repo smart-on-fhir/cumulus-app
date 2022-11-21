@@ -5,6 +5,7 @@ import Checkbox        from "../Checkbox";
 import { Format }      from "../Format"
 import Panel           from "../Panel";
 import Select          from "../Select"
+import TagSelector     from "../Tags/TagSelector";
 
 import "./form.scss";
 
@@ -336,9 +337,9 @@ export default function DataRequestForm({
                     <b className="nowrap">Data Inserted</b> <Format value={ completed } format="date-time" />
                 </div>
             </div> }
-            <div className="row gap mt-1">
+            <div className="row gap-2">
                 
-                <div className="col col-6">
+                <div className="col mt-1" style={{ flex: "1 0 16em" }}>
                     <div className="row gap middle">
                         <label className="col">Name</label>
                         <span className="col right color-muted small">Up to 100 characters&nbsp;</span>
@@ -355,7 +356,7 @@ export default function DataRequestForm({
                         <div className="col middle">
                             <label>Group</label>
                         </div>
-                        <div className="col right middle color-blue">
+                        <div className="col col-0 right middle color-blue small">
                             <Link to="/groups">
                                 Manage Groups <i className="fa-solid fa-up-right-from-square" />
                             </Link>
@@ -367,9 +368,24 @@ export default function DataRequestForm({
                             <option key={i} value={g.id}>{g.name}</option>
                         ))}
                     </select>
+                    <div className="mt-1">
+                        <div className="row gap middle">
+                            <div className="col middle">
+                                <label className="col">Tags</label>
+                            </div>
+                            <div className="col col-0 right middle color-blue small">
+                                <Link to="/tags">
+                                    Manage Tags <i className="fa-solid fa-up-right-from-square" />
+                                </Link>
+                            </div>
+                        </div>
+                        <div>
+                            <TagSelector selected={record.Tags} onChange={tags => onChange({ ...record, Tags: tags })} />
+                        </div>
+                    </div>
                 </div>
                 
-                <div className="col">
+                <div className="col mt-1" style={{ flex: "1 0 12em" }}>
                     <div className="row gap top">
                         <label className="col col-0">Description</label>
                         <span className="col color-muted small" style={{ padding: "1em 0 0.2em 0" }}>(HTML enabled)</span>
@@ -488,8 +504,8 @@ export default function DataRequestForm({
                 }
             </div>
 
-            <div className="row gap mt-2 mb-2">
-                <div className="col col-6">
+            <div className="row gap-2 mt-2">
+                <div className="col mb-2" style={{ flex: "1 0 16em" }}>
                     <h4>Included Fields</h4>
                     <hr/>
                     <FieldsEditor fields={requestedData.fields} onChange={ fields => onChange({
@@ -500,7 +516,7 @@ export default function DataRequestForm({
                         }
                     }) }/>
                 </div>
-                <div className="col col-4">
+                <div className="col mb-2" style={{ flex: "1 0 12em" }}>
                     <Panel title="Included Data Sites" menu={[
                         <Link to="/sites">Manage Data Sites</Link>
                     ]}>
