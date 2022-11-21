@@ -1,5 +1,5 @@
 const { DataTypes, Model } = require("sequelize");
-const Activity = require("./Activity");
+// const Activity = require("./Activity");
 
 module.exports = class RequestGroup extends Model
 {
@@ -30,27 +30,14 @@ module.exports = class RequestGroup extends Model
             sequelize,
             modelName: "RequestGroup",
             hooks: {
-                async afterCreate(model, { user }) {
-                    await Activity.create({
-                        message: `${model} created by ${user ? user.name || "user #" + user.id : "system"}`,
-                        tags   : "requests"
-                    })
-                }
+                // async afterCreate(model, { user }) {
+                //     await Activity.create({
+                //         message: `${model} created by ${user ? user.name || "user #" + user.id : "system"}`,
+                //         tags   : "requests"
+                //     })
+                // }
             }
         });
     };
 
-    /**
-     * @param {import("sequelize").Sequelize} sequelize
-     */
-    static associate(sequelize) {
-        sequelize.models.RequestGroup.hasMany(
-            sequelize.models.DataRequest,
-            {
-                as: "requests",
-                foreignKey: "groupId",
-                onDelete: "SET NULL"
-            }
-        );
-    }
 }

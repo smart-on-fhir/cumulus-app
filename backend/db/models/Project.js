@@ -1,6 +1,6 @@
 const { DataTypes, Model } = require("sequelize");
 const { logger } = require("../../logger");
-const Activity = require("./Activity");
+// const Activity = require("./Activity");
 
 
 class Project extends Model
