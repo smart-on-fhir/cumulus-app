@@ -360,11 +360,8 @@ router.get("/:id/api", rw(async (req, res) => {
 }));
 
 createRestRoutes(router, Model, {
-    create : "data_request_create",
     destroy: "data_request_delete",
-    getAll : "data_request_delete",
-    // getOne : "views_view",
-    update : "data_request_update"
+    getAll : "data_request_delete"
 });
 
 // Get single subscription -----------------------------------------------------
@@ -431,6 +428,83 @@ route(router, {
         res.json(model)
     }
 })
+
+// update ----------------------------------------------------------------------
+route(router, {
+    path: "/:id",
+    method: "put",
+    permission: "data_request_update",
+    request: {
+        schema: {
+            id: {
+                in: ['params'],
+                errorMessage: 'ID is wrong',
+                isInt: {
+                    errorMessage: "The 'id' parameter must be integer"
+                },
+                custom: {
+                    options: x => x > 0,
+                    errorMessage: "The 'id' parameter must be a positive integer"
+                },
+                toInt: true,
+            }
+        }
+    },
+    handler: async (req, res) => {
+        const model = await Model.findByPk(+req.params?.id, {
+            include: {
+                association: "Tags",
+                attributes: ["id", "name", "description"]
+            }
+        });
+        assert(model, HttpError.NotFound);
+        const transaction = await model.sequelize.transaction()
+        try {
+            await model.update(req.body, { user: req.user, transaction })
+            await model.setTags(req.body.Tags.map(t => t.id))
+            await transaction.commit()
+            res.json(model)
+        } catch (ex) {
+            await transaction.rollback()
+            const error = new HttpError.InternalServerError("Updating subscription failed", { tags: ["DATA"] })
+            error.cause = ex
+            throw error
+        }
+    }
+});
+
+// create ----------------------------------------------------------------------
+route(router, {
+    path: "/",
+    method: "post",
+    permission: "data_request_create",
+    request: {
+        schema: {
+            name: {
+                in: ['body'],
+                exists: true,
+                notEmpty: true,
+                isLength: {
+                    options: {
+                        max: 100
+                    }
+                },
+                custom: {
+                    options: x => x.length <= 50,
+                    errorMessage: "The name cannot be longer than 50 characters"
+                }
+            },
+            description: {
+                in: ['body']
+            }
+        }
+    },
+    handler: async (req, res) => {
+        const model = await Model.create(req.body, { user: req.user })
+        await model.setTags(req.body.Tags.map(t => t.id))
+        res.json(model)
+    }
+});
 
 /**
  * @param {{ cols: { name: string }[], rows: any[][] }} data 
