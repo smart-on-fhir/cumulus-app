@@ -374,6 +374,11 @@ table {
   border-radius: 0.5rem;
   padding: 2rem;
 
+  &.panel-danger {
+    border-color: fade-out($color-brand-2, 0.5);
+    box-shadow: 0 0 0 0.4em fade-out($color-brand-2, 0.9);
+  }
+
   > h3, > h4 {
       margin-top: 0;
   }
