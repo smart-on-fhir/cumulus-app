@@ -1,26 +1,26 @@
 export default [
     {
         id: 1,
-        name: "Tag 1",
-        description: "Tag 1 description",
+        name: "COVID-19",
+        description: "Some description for the COVID-19 tag",
         creatorId: 1
     },
     {
         id: 2,
-        name: "Tag 2",
-        description: "Tag 2 description",
+        name: "Influenza",
+        description: "Short description for the Influenza tag",
         creatorId: 1
     },
     {
         id: 3,
-        name: "Tag 3",
-        description: "Tag 3 description",
+        name: "Suicidal Study",
+        description: "Some description for the Suicidal Study tag",
         creatorId: null
     },
     {
         id: 4,
-        name: "Tag 4",
-        description: "Tag 4 description",
+        name: "Quality Measures",
+        description: "Some description for the Quality Measures tag",
         creatorId: 2
     }
 ]
