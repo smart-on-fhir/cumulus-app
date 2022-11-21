@@ -1,10 +1,9 @@
-import Path                        from "path"
 import { Sequelize }               from "sequelize"
 import { Umzug, SequelizeStorage } from "umzug"
 import { Config }                  from ".."
 import { getDockerContainer }      from "./Docker"
-import { walkSync }                from "../lib"
 import { logger }                  from "../logger"
+import { init as initModels }      from "./models"
 
 
 let connection: Sequelize;
@@ -35,14 +34,6 @@ async function connectToDatabase(options: Config)
     } catch (ex) {
         logger.error("✘ Failed to connected to the database", { ...ex, tags: ["DATA"] });
         throw ex;
-    }
-}
-
-async function initializeModels()
-{
-    for (let path of walkSync(Path.join(__dirname, "./models"))) {
-        logger.verbose(`  - Initializing model from ${path.replace(__dirname, "backend/db")}`, { tags: ["DATA"] })
-        require(path).initialize(connection);
     }
 }
 
@@ -163,16 +154,13 @@ export default async function setupDB(options: Config): Promise<Sequelize>
     connection = await connectToDatabase(options)
 
     // Load models and call their init method
-    await initializeModels()
+    initModels(connection)
 
     // Run pending migrations (if any)
     await applyMigrations(options, connection)
     
     // Create missing tables (or recreate all of them if sync = 'force')
     await syncModels(options)
-
-    // Once all models and their tables are ready, create links
-    await applyAssociations()
 
     // Insert seeds (if enabled)
     await applySeeds(options, connection)

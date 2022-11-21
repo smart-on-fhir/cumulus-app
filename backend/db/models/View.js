@@ -17,13 +17,6 @@ class View extends Model
     /**
      * @param {import("sequelize").Sequelize} sequelize
      */
-    static associate(sequelize) {
-        sequelize.models.View.belongsTo(sequelize.models.DataRequest)
-    }
-
-    /**
-     * @param {import("sequelize").Sequelize} sequelize
-     */
     static initialize(sequelize) {
         View.init({
             id: {
@@ -76,7 +69,9 @@ class View extends Model
                 type        : DataTypes.FLOAT,
                 defaultValue: 0,
                 allowNull   : false
-            }
+            },
+
+            DataRequestId: DataTypes.INTEGER
         }, {
             sequelize,
             modelName: "View",

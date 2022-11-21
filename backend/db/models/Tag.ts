@@ -1,4 +1,4 @@
-import User from "./User"
+// import User from "./User"
 import {
     Model,
     InferAttributes,
@@ -26,7 +26,7 @@ import { ModelDestroyOptions } from "../..";
 
 
 
-class Tag extends Model<InferAttributes<Tag>, InferCreationAttributes<Tag>>
+export default class Tag extends Model<InferAttributes<Tag>, InferCreationAttributes<Tag>>
 {
     declare id: CreationOptional<number>;
     declare name: string;
@@ -48,7 +48,10 @@ class Tag extends Model<InferAttributes<Tag>, InferCreationAttributes<Tag>>
     // declare hasProjects: HasManyHasAssociationsMixin<Tag, number>;
     // declare countProjects: HasManyCountAssociationsMixin;
     // declare createProject: HasManyCreateAssociationMixin<Tag, 'creatorId'>;
-    declare getCreator: BelongsToGetAssociationMixin<User>
+    
+    // declare getCreator: BelongsToGetAssociationMixin<User>
+    // declare countGraphs: HasManyCountAssociationsMixin;
+    // declare countSubscriptions: HasManyCountAssociationsMixin;
 
     declare destroy: (options?: ModelDestroyOptions) => Promise<void>;
 
@@ -63,9 +66,9 @@ class Tag extends Model<InferAttributes<Tag>, InferCreationAttributes<Tag>>
     //     return this.name;
     // }
 
-    declare static associations: {
-        owner: Association<Tag, User>;
-    };
+    // declare static associations: {
+    //     owner: Association<Tag, User>;
+    // };
 
     static initialize(sequelize: Sequelize) {
         return Tag.init(
@@ -83,7 +86,14 @@ class Tag extends Model<InferAttributes<Tag>, InferCreationAttributes<Tag>>
                     type: new DataTypes.STRING(200),
                     allowNull: false
                 },
-                creatorId: DataTypes.INTEGER,
+                // creatorId: {
+                //     type: DataTypes.INTEGER,
+                //     // allowNull: false,
+                //     references: {
+                //         model: "Users",
+                //         key: "id"
+                //     }
+                // },
                 createdAt: DataTypes.DATE,
                 updatedAt: DataTypes.DATE,
             },
@@ -98,15 +108,8 @@ class Tag extends Model<InferAttributes<Tag>, InferCreationAttributes<Tag>>
             }
         )
     }
-
-    static associate(sequelize: Sequelize) {
-        Tag.belongsTo(User, {
-            as: "creator",
-            foreignKey: "creatorId",
-            onDelete: "SET NULL"
-        })
-    }
 }
 
 // @ts-ignore
-export = Tag
+// export = Tag
+// module.exports = Tag
