@@ -43,6 +43,7 @@ interface ViewState
     loadingData     : boolean
     fullChartOptions: Partial<Highcharts.Options>
     dataTabIndex    : number
+    tags            : Pick<app.Tag, "id"|"name"|"description">[]
 }
 
 interface ViewAction
@@ -239,7 +240,9 @@ export default function Dashboard({
         fullChartOptions: {},
 
         // Which is the active tab in the data view
-        dataTabIndex: 0
+        dataTabIndex: 0,
+
+        tags: view.Tags || []
 
     } as ViewState, initViewState);
 
@@ -260,7 +263,8 @@ export default function Dashboard({
         data2,
         fullChartOptions,
         loadingData,
-        dataTabIndex
+        dataTabIndex,
+        tags
     } = state;
 
     function onSeriesToggle(map: Record<string, boolean>) {
@@ -315,6 +319,7 @@ export default function Dashboard({
                 name: viewName,
                 description: viewDescription,
                 screenShot,
+                Tags: tags,
                 settings: {
                     ...view.settings,
                     groupBy: viewGroupBy?.name,
@@ -338,6 +343,7 @@ export default function Dashboard({
                 description: viewDescription,
                 DataRequestId: dataRequest.id,
                 screenShot,
+                Tags: tags,
                 settings: {
                     ...view.settings,
                     groupBy: viewGroupBy?.name,
@@ -485,7 +491,8 @@ export default function Dashboard({
                                 // chartOptions: finalChartOptions,
                                 denominator,
                                 column2: column2?.name || "",
-                                column2type
+                                column2type,
+                                tags
                             }}
                             onChange={state => {
                                 dispatch({ type: "UPDATE", payload: {
@@ -498,7 +505,8 @@ export default function Dashboard({
                                     chartOptions   : state.chartOptions,
                                     denominator    : state.denominator,
                                     column2        : cols.find(c => c.name === state.column2),
-                                    column2type    : state.column2type
+                                    column2type    : state.column2type,
+                                    tags           : state.tags
                                 }});
                             }}
                         />
