@@ -1,15 +1,13 @@
-const { DataTypes } = require('sequelize');
+import { DataTypes, QueryInterface } from "sequelize"
 
-async function up(queryInterface) {
+export async function up(queryInterface: QueryInterface) {
     await queryInterface.changeColumn('DataRequests', 'description', {
         type: DataTypes.TEXT
     });
 }
 
-async function down(queryInterface) {
+export async function down(queryInterface: QueryInterface) {
 	await queryInterface.changeColumn('DataRequests', 'description', {
         type: DataTypes.STRING(500)
     });
 }
-
-module.exports = { up, down };
