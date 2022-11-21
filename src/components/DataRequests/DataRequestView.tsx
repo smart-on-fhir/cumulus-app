@@ -55,7 +55,7 @@ export default function DataRequestView(): JSX.Element
     const { user } = useAuth();
 
     const { loading, error, result: model, execute: fetch } = useBackend<app.DataRequest>(
-        useCallback(() => request("/api/requests/" + id + "?include=group:name&omit=rows"), [id]),
+        useCallback(() => request("/api/requests/" + id + "?group=true&graphs=true&tags=true"), [id]),
         true
     )
 
@@ -155,10 +155,20 @@ export default function DataRequestView(): JSX.Element
                                     </td>
                                 </tr>
                                 <tr><th className="right pr-1 pl-1">Created:</th><td><Format value={ model.createdAt } format="date-time" /></td></tr>
-                                { model.dataURL && (<tr>
-                                    <th className="right pr-1 pl-1 top">Data&nbsp;URL:</th>
-                                    <td className="color-muted" style={{ wordBreak: "break-all" }}>{ model.dataURL }</td>
-                                </tr>) }
+                                { model.dataURL && (
+                                    <tr>
+                                        <th className="right pr-1 pl-1 top">Data&nbsp;URL:</th>
+                                        <td className="color-muted" style={{ wordBreak: "break-all" }}>{ model.dataURL }</td>
+                                    </tr>
+                                )}
+                                { model.Tags && (
+                                    <tr>
+                                        <th className="right pr-1 pl-1">Tags:</th>
+                                        <td>{ model.Tags.map((t, i) => (
+                                            <span className="tag" key={i} title={ t.description }>{ t.name }</span>
+                                        )) }</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
