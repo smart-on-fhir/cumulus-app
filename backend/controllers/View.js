@@ -1,5 +1,6 @@
 const express                            = require("express")
-const HttpError                          = require("../errors");
+const Path                               = require("path")
+const { NotFound }                       = require("../errors");
 const Model                              = require("../db/models/View");
 const { rw, assert, roundToPrecision }   = require("../lib");
 const { logger }                         = require("../logger");
@@ -24,9 +25,14 @@ router.get("/:id/screenshot", rw(async (req, res) => {
 
     const model = await Model.findByPk(req.params.id);
 
-    assert(model, HttpError.NotFound("Model not found"))
+    assert(model, "Model not found", NotFound)
     
     const data  = model.getDataValue("screenShot");
+
+    if (!data) {
+        return res.sendFile("view.png", { root: Path.join(__dirname, "../../public") })
+    }
+
     const match = (/^data:(.+?);base64,(.+)$/).exec(data || "");
 
     if (!match) {
@@ -49,7 +55,7 @@ router.put("/:id/vote", express.urlencoded({ extended: false }), rw(async (req, 
     const model = await Model.findByPk(req.params.id);
     
     if (!model) {
-        throw new HttpError.NotFound("Model not found");
+        throw new NotFound("Model not found");
     }
 
     const rating = model.getDataValue("rating") + parseFloat(req.body.rating || 0);
@@ -71,7 +77,7 @@ router.put("/:id/reset-rating", requireAuth("admin"), rw(async (req, res) => {
     const model = await Model.findByPk(req.params.id);
 
     if (!model) {
-        throw new HttpError.NotFound("Model not found");
+        throw new NotFound("Model not found");
     }
 
     await model.update({ rating: 0, votes : 0, normalizedRating: 0 }, { user: req.user });
