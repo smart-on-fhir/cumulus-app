@@ -14,9 +14,10 @@
         font-weight: 500;
         cursor: pointer;
         color: #777;
+        text-indent: 0.25em;
 
         &::marker {
-            color: #999;
+            color: #AAA;
             font-size: 13px;
         }
     }
@@ -26,6 +27,10 @@
 
         summary {
             color: $color-brand-2;
+            &::marker {
+                color: #666;
+                font-size: 13px;
+            }
         }
     }
 }
