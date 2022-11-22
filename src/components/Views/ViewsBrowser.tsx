@@ -85,6 +85,9 @@ export default function ViewsBrowser({
         if (groupBy === "subscription") {
             return renderBySubscription()
         }
+        if (groupBy === "tag") {
+            return renderByTag()
+        }
         return (
             <div className={ classList({
                 ["view-browser view-browser-" + layout] : true,
@@ -127,12 +130,43 @@ export default function ViewsBrowser({
             group.push(item)
         });
 
+        return renderGroups(groups, "database")
+    }
+
+    function renderByTag() {
+        const groups: Record<string, any[]> = {};
+        
+        const unTagged: any[] = [];
+        
+        (result || []).forEach(item => {
+            if (item.Tags && item.Tags.length) {
+                item.Tags.forEach(tag => {
+                    let label = tag.name;
+                    let group = groups[label];
+                    if (!group) {
+                        group = groups[label] = [];
+                    }
+                    group.push(item)
+                })
+            } else {
+                unTagged.push(item)
+            }
+        });
+
+        if (unTagged.length) {
+            groups["NO TAGS"] = unTagged
+        }
+
+        return renderGroups(groups, "sell")
+    }
+
+    function renderGroups(groups: Record<string, any[]>, icon: string) {
         return <>
             {
                 Object.keys(groups).map((k, i) => (
                     <details open className="graph-group" key={i}>
                         <summary className="graph-group-header">
-                            <i className="material-symbols-rounded bottom">database</i> {k}
+                            <i className="material-symbols-rounded bottom">{icon}</i> {k}
                         </summary>
                         <div className={ classList({
                             ["view-browser view-browser-" + layout] : true,
