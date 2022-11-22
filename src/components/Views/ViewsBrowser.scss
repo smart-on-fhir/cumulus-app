@@ -128,7 +128,7 @@
 }
 // -----------------------------------------------------------------------------
 .view-browser.view-browser-column {
-    display: block;
+    display: flex;
     // flex-direction: column;
     // flex-wrap: wrap;
 
@@ -140,11 +140,13 @@
         // align-items: center;
         align-items: stretch;
         // justify-content: flex-start;
-        max-width: 100%;
+        // max-width: 100%;
         // width: 100%;
         // // // flex: 1 1 100%;
         // // // background: lightyellow;
         padding: 0.5em 0;
+        flex: 1 1 30em;
+        overflow: hidden;
         // // // margin: 1rem;
         // flex: 1 0 110px;
         
