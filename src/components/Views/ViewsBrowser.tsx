@@ -12,23 +12,52 @@ import "./ViewsBrowser.scss"
 export default function ViewsBrowser({
     layout = "grid",
     requestId,
-    search = ""
+    search = "",
+    sort = ""
 }: {
     layout?: "grid" | "column",
     requestId?: string | number,
     showDescription?: boolean,
     search?: string
+    sort?: "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | "rating-asc" | "rating-desc" | ""
 }) {
 
+    const query = new URLSearchParams()
+
+    switch (sort) {
+        case "mod-asc":
+            query.set("order", "updatedAt:asc");
+        break;
+        case "mod-desc":
+            query.set("order", "updatedAt:desc");
+        break;
+        case "name-asc":
+            query.set("order", "name:asc");
+        break;
+        case "name-desc":
+            query.set("order", "name:desc");
+        break;
+        case "rating-asc":
+            query.set("order", "normalizedRating:asc");
+        break;
+        case "rating-desc":
+            query.set("order", "normalizedRating:desc");
+        break;
+        default:
+            if (requestId) {
+                query.set("order", "normalizedRating:desc,createdAt:asc")
+            } else {
+                query.set("order", "normalizedRating:desc,name:asc,createdAt:asc")
+            }
+        break;
+    }
+
+    const url = requestId ?
+        `/api/requests/${requestId}/views?${query.toString()}` :
+        `/api/views?${query.toString()}`;
+
     let { result, loading, error } = useBackend(
-        useCallback(
-            () => request<app.View[]>(
-                requestId ?
-                    `/api/requests/${requestId}/views?order=normalizedRating:desc,createdAt:asc` :
-                    "/api/views?order=normalizedRating:desc,name:asc,createdAt:asc"
-            ),
-            [requestId]
-        ),
+        useCallback(() => request<app.View[]>(url), [url]),
         true
     );
 
