@@ -471,7 +471,8 @@ export default function Dashboard({
                         opacity      : showOptions ? 1 : 0,
                         pointerEvents: showOptions ? "all" : "none",
                         zIndex       : showOptions ? 1 : -1,
-                        transition   : "all 0.2s ease-in-out"
+                        transition   : "all 0.2s ease-in-out",
+                        marginRight  : showOptions ? "1rem" : 0
                     }}>
                         <ConfigPanel
                             dataRequest={dataRequest}
@@ -512,7 +513,7 @@ export default function Dashboard({
                         />
                     </div>
                 </div>
-                <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start" }}>
+                <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start", minWidth: "32rem" }}>
                     <div style={{ position: "sticky", top: 2 }}>
                         <h2 style={{ margin: "0 0 0.5ex", lineHeight: 1.2 }}>
                             <EditInPlace
@@ -530,8 +531,8 @@ export default function Dashboard({
                                 onChange={ viewDescription => dispatch({ type: "UPDATE", payload: { viewDescription }}) }
                             />
                         </div>
-                        <div className="row mb-1">
-                            <div className="col col-0">
+                        <div className="row wrap">
+                            <div className="col col-0 mb-1">
                                 <div className="toolbar flex">
                                     <button
                                         className={"btn" + (viewType === "overview" ? " active" : "")}
@@ -549,8 +550,8 @@ export default function Dashboard({
                                         ><i className="fas fa-th" /> Data</button>
                                 </div>
                             </div>
-                            <div className="col"></div>
-                            <div className="col col-0 right">
+                            <div className="col mb-1"></div>
+                            <div className="col col-0 mb-1">
                                 <div className="toolbar flex">
                                     <button
                                         className="btn"
@@ -620,13 +621,13 @@ export default function Dashboard({
                         <br/>
                         <CaptionEditor html={caption} onChange={caption => dispatch({ type: "UPDATE", payload: { caption }})}/>
                         <br/>
-                        <div className="row mb-1 wrap middle half-gap">
-                            <div className="col" style={{ minWidth: "15em" }}>
+                        <div className="row mb-1 middle half-gap wrap">
+                            <div className="col col-5 mb-05 responsive">
                                 <DataRequestLink request={ dataRequest } />
                             </div>
-                            <div className="col col-0">
-                                <div className="row half-gap nowrap">
-                                    <div className="col col-0" style={{ minWidth: "17em" }}>
+                            <div className="col col-5 mb-05 responsive">
+                                <div className="row half-gap wrap">
+                                    <div className="col col-4 mb-05 responsive">
                                         <a
                                             className={ "btn btn-blue" + (process.env.REACT_APP_BACKEND_HOST ? " grey-out" : "") }
                                             href={`https://cumulusdemo.notebook.us-east-1.sagemaker.aws/notebooks/cumulus/demo.ipynb?fileLoc=${
@@ -641,8 +642,7 @@ export default function Dashboard({
                                             <b> Open in Analytic Environment </b>
                                         </a>
                                     </div>
-                                    <div className="col col-0" style={{ minWidth: "14em" }}>
-                                        
+                                    <div className="col col-4 mb-05 responsive">
                                         <Link to="./request-data" className="btn btn-blue"><b> Request Line-level Data </b></Link>
                                     </div>
                                 </div>

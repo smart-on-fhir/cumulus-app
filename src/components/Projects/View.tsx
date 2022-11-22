@@ -49,12 +49,12 @@ export default function ViewProject() {
                     </div>
                     <div className="mt-2 mb-1" style={{ whiteSpace: "pre-wrap" }}>{ data.description }</div>
                     <div className="row gap-2 mt-2">
-                        <div className="col mb-2" style={{ minWidth: "20em", flex: 2 }}>
+                        <div className="col mb-2">
                             <h5><i className="fa-solid fa-chart-pie color-brand-2" /> Graphs</h5>
                             <hr/>
                             <p className="color-muted">TODO...</p>
                         </div>
-                        <div className="col mb-2" style={{ minWidth: "20em" }}>
+                        <div className="col mb-2">
                             <h5><i className="fa-solid fa-database color-brand-2" /> Subscriptions</h5>
                             <hr/>
                             <p className="color-muted">TODO...</p>

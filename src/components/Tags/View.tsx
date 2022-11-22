@@ -59,8 +59,8 @@ export default function ViewTag() {
                         </div>
                     </div>
                     <div className="mt-2 mb-2" style={{ whiteSpace: "pre-wrap" }}>{ data.description }</div>
-                    <div className="row gap-2 mt-2">
-                        <div className="col responsive mb-2">
+                    <div className="row gap-2 mt-2 wrap">
+                        <div className="col col-6 responsive mb-2">
                             <h5><i className="fa-solid fa-chart-pie color-brand-2" /> Graphs</h5>
                             <hr/>
                             { data.graphs?.length ?
@@ -80,7 +80,7 @@ export default function ViewTag() {
                                 
                             }
                         </div>
-                        <div className="col responsive mb-2">
+                        <div className="col col-4 responsive mb-2">
                             <h5><i className="fa-solid fa-database color-brand-2" /> Subscriptions</h5>
                             <hr/>
                             { data.subscriptions?.length ?

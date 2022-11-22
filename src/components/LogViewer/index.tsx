@@ -83,7 +83,7 @@ export default function LogViewer()
     return (
         <div className="row gap" style={{ flex: 1, maxHeight: "calc(100vh - 6.5rem)", margin: "-1rem" }}>
             <div className="col" style={{ maxHeight: "100%" }}>
-                <div className="row gap" style={{ fontSize: 12 }}>
+                <div className="row gap wrap" style={{ fontSize: 12 }}>
                     <div className="col col-0">
                         <div className="row half-gap middle mb-05">
                             <div className="col col-0"><b>Tags</b></div>

@@ -331,14 +331,15 @@ select option.empty-option {
     background: $color-grey;
     border-radius: $border-radius + 1px;
     white-space: nowrap;
+    margin: -1px;
     
     > .btn {
         border       : 1px solid rgba(0, 0, 0, 0);
         border-radius: 0;
         margin       : 1px 1px 1px 0;
         font-size    : inherit;
-        padding      : 0.3em 0.6em;
-        line-height  : 1.2em;
+        // padding      : 0.46em 0.6em;
+        // line-height  : 1.2em;
         // text-shadow: 0 -1px 0 #FFF, 0 1px 2px rgba(0, 0, 0, .2);
         
         // &:active:not(:disabled, .disabled), &.active:not(:disabled, .disabled) {

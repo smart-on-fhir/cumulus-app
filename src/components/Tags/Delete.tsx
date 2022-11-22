@@ -57,9 +57,9 @@ export default function DeleteTag()
                         </div>
                         { (data.graphs?.length > 0 || data.subscriptions?.length > 0) && (
                             <>
-                                <div className="mt-05 row gap">
+                                <div className="mt-05 row gap wrap">
                                     { data.graphs?.length &&
-                                        <div className="col responsive" style={{ flexBasis: "20em" }}>
+                                        <div className="col col-6 responsive">
                                             <h6>
                                                 <i className="fa-solid fa-link-slash color-brand-2" /> This tag will be removed from the following graphs:
                                             </h6>
@@ -76,7 +76,7 @@ export default function DeleteTag()
                                         </div>
                                     }
                                     { data.subscriptions?.length &&
-                                        <div className="col responsive" style={{ flexBasis: "20em" }}>
+                                        <div className="col col-4 responsive">
                                             <h6>
                                                 <i className="fa-solid fa-link-slash color-brand-2" /> This tag will be removed from the following data subscriptions:
                                             </h6>

@@ -96,7 +96,7 @@ export default class ActivityPage extends Component<any, State>
                     { name: "Home", href: "/" },
                     { name: "Activity Logs" }
                 ]} />
-                <div className="row mb-1 middle">
+                <div className="row mb-1 middle wrap">
                     <div className="col col-0">
                         <div className="toolbar">
                             <button className={"btn"+(tags.requests ? " active" : "")} onClick={() => this.tag("requests")}>

@@ -169,7 +169,7 @@ function UserEditor({
 
     return (
         <div className="row wrap">
-            <div className="col" style={{ flexBasis: "28em" }}>
+            <div className="col col-6 responsive">
                 <div className="row gap mb-05">
                     <b className="col col-4 right color-blue-dark">Display name: </b>
                     <div className="col"><DisplayName user={user} /></div>
@@ -212,7 +212,7 @@ function UserEditor({
                 </div>
             </div>
             { user.id !== auth.user?.id && (
-            <div className="col center middle" style={{ flexBasis: "28em" }}>
+            <div className="col col-4 center middle responsive">
                 <br />
                 {
                     editing ?
