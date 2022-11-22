@@ -89,7 +89,22 @@ export default function ViewsBrowser({
             <div className={ classList({
                 ["view-browser view-browser-" + layout] : true,
                 "nested": !!requestId
-            })}>{
+            })}>
+                { requestId && <Link to={`/requests/${requestId}/create-view`} className="view-thumbnail view-thumbnail-add-btn">
+                    <div className="view-thumbnail-image">
+                        <div className="plus-icon-wrapper">
+                            <i className="fas fa-plus"/>
+                        </div>
+                    </div>
+                    <div className="view-thumbnail-title color-blue">
+                        Create New View
+                        <div className="view-thumbnail-description grey-out" style={{ whiteSpace: "normal"}}>
+                            Click here to create new view from the data provided
+                            by this data subscription
+                        </div>
+                    </div>
+                </Link> }
+                {
                 (result || []).map((v, i) => (
                     <ViewThumbnail
                         key={i}
@@ -115,10 +130,10 @@ export default function ViewsBrowser({
         return <>
             {
                 Object.keys(groups).map((k, i) => (
-                    <div className="graph-group" key={i}>
-                        <h5 className="graph-group-header color-brand-2">
+                    <details open className="graph-group" key={i}>
+                        <summary className="graph-group-header">
                             <i className="material-symbols-rounded bottom">database</i> {k}
-                        </h5>
+                        </summary>
                         <div className={ classList({
                             ["view-browser view-browser-" + layout] : true,
                             "nested": !!requestId
@@ -134,7 +149,7 @@ export default function ViewsBrowser({
                             ))
                         }
                         </div>
-                    </div>
+                    </details>
                 ))
             }
         </>
@@ -142,20 +157,6 @@ export default function ViewsBrowser({
 
     return (
         <div>
-            { requestId && <Link to={`/requests/${requestId}/create-view`} className="view-thumbnail view-thumbnail-add-btn">
-                <div className="view-thumbnail-image">
-                    <div className="plus-icon-wrapper">
-                        <i className="fas fa-plus"/>
-                    </div>
-                </div>
-                <div className="view-thumbnail-title color-blue">
-                    Create New View
-                    <div className="view-thumbnail-description grey-out" style={{ whiteSpace: "normal"}}>
-                        Click here to create new view from the data provided
-                        by this data subscription
-                    </div>
-                </div>
-            </Link> }
             { !result.length ?
                 <p className="color-muted pt-2 pb-2">No Views found!</p> :
                 renderItems()
