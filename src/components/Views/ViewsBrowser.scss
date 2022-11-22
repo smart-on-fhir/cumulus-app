@@ -4,6 +4,17 @@
     max-height: calc(100vh - 310px);
 }
 
+.graph-group {
+    margin-bottom: 3rem;
+    .graph-group-header {
+        padding: 0 0 0.5em;
+        border-bottom: 1px dashed #BBB;
+        box-shadow: 0 1px 0 0 #FFF;
+        font-size: 115%;
+        font-weight: 500;
+    }
+}
+
 .view-browser {
     margin-top: $gap;
     margin-bottom: $gap;
@@ -120,7 +131,7 @@
     .view-thumbnail {
         display: flex;
         flex-direction: row;
-        align-items: flex-start;
+        align-items: center;
         flex: 1 1 30em;
         overflow: hidden;
         
@@ -135,6 +146,7 @@
             display: block;
             max-width: none;
             border-radius: 6px;
+            align-self: flex-start;
         }
 
         .view-thumbnail-title {
@@ -151,7 +163,7 @@
 
             .view-thumbnail-description {
                 overflow     : hidden;
-                -webkit-line-clamp: 3;
+                -webkit-line-clamp: 2;
                 display: -webkit-box;
                 -webkit-box-orient: vertical;
             }

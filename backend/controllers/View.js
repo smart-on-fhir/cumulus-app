@@ -12,10 +12,49 @@ const { route }                          = require("../lib/route");
 const router = module.exports = express.Router({ mergeParams: true });
 
 createRestRoutes(router, Model, {
-    getAll : "views_list",
+    // getAll : "views_list",
     destroy: "views_delete"
 });
 
+// list ------------------------------------------------------------------------
+route(router, {
+    path: "/",
+    method: "get",
+    permission: "views_list",
+    request: {
+        schema: {
+            order: {
+                in: ["query"],
+                optional: true,
+                matches: {
+                    errorMessage: "Invalid order parameter",
+                    options: /^\w+\:(asc|desc)(,\w+\:asc|desc)*$/i
+                }
+            }
+        }
+    },
+    handler: async (req, res) => {
+
+        /** @type {import("sequelize").FindOptions} */
+        const options = {
+            include: [
+                { association: "Tags", attributes: ["id", "name", "description"] },
+                { association: "DataRequest", attributes: ["id", "name"] }
+            ]
+        };
+
+        if (req.query.order) {
+            options.order = [];
+            String(req.query.order).split(",").forEach(x => {
+                options.order.push(x.split(":"))
+            });
+        }
+
+        res.json(await Model.findAll(options))
+    }
+})
+
+// update ----------------------------------------------------------------------
 route(router, {
     path: "/:id",
     method: "get",
