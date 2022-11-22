@@ -19,11 +19,13 @@ export default function ViewThumbnail({
                 <span dangerouslySetInnerHTML={{ __html: search ? highlight(view.name, search) : view.name }}/>
                 
                 { showDescription > 0 && <div className="view-thumbnail-description color-muted" title={ view.description || undefined }>
-                    <span dangerouslySetInnerHTML={{
-                        __html: search ?
-                            highlight(ellipsis(view.description, showDescription), search) :
-                            ellipsis(view.description, showDescription)
-                    }}/>
+                    { view.description ?
+                        <span dangerouslySetInnerHTML={{
+                            __html: search ?
+                                highlight(ellipsis(view.description, showDescription), search) :
+                                ellipsis(view.description, showDescription)
+                        }}/> :
+                        "No description" }
                 </div> }
                 
                 { showDescription > 0 && <StaticRating value={ view.normalizedRating } votes={ view.votes } /> }

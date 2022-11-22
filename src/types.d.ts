@@ -64,6 +64,7 @@ declare module app {
         normalizedRating: number
         settings?: ViewSettings
         Tags?: Pick<Tag, "id" | "name" | "description">[]
+        DataRequest?: Pick<DataRequest, "id" | "name">
     }
 
     interface ViewSettings {

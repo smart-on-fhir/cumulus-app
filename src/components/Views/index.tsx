@@ -8,6 +8,7 @@ import ViewsBrowser from "./ViewsBrowser";
 
 type SortType = "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | "rating-asc" | "rating-desc" | ""
 type ViewType = "grid" | "column" | "list"
+type GroupBy  = "tag" | "subscription" | ""
 
 export default function Views()
 {
@@ -15,7 +16,7 @@ export default function Views()
 
     const [ viewType, setViewType ] = useState<ViewType>(String(url.searchParams.get("view") || "grid") as ViewType)
     const [ search  , setSearch   ] = useState(url.searchParams.get("q") || "")
-    const [ groupBy , setGroupBy  ] = useState(url.searchParams.get("group") || "")
+    const [ groupBy , setGroupBy  ] = useState<GroupBy>(String(url.searchParams.get("group") || "") as GroupBy)
     const [ sort    , setSort     ] = useState<SortType>(String(url.searchParams.get("sort") || "") as SortType)
 
     const onSearch = (q: string) => {
@@ -152,6 +153,7 @@ export default function Views()
                 layout={ viewType || "grid" }
                 search={search}
                 sort={sort}
+                groupBy={groupBy}
             />
         </div>
     )

@@ -14,13 +14,15 @@ export default function ViewsBrowser({
     layout = "grid",
     requestId,
     search = "",
-    sort = ""
+    sort = "",
+    groupBy
 }: {
     layout?: "grid" | "column" | "list",
     requestId?: string | number,
     showDescription?: boolean,
     search?: string
-    sort?: "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | "rating-asc" | "rating-desc" | ""
+    sort?: "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | "rating-asc" | "rating-desc" | "",
+    groupBy?: "tag" | "subscription" | ""
 }) {
 
     const query = new URLSearchParams()
@@ -79,11 +81,67 @@ export default function ViewsBrowser({
         });
     }
 
+    function renderItems() {
+        if (groupBy === "subscription") {
+            return renderBySubscription()
+        }
+        return (
+            <div className={ classList({
+                ["view-browser view-browser-" + layout] : true,
+                "nested": !!requestId
+            })}>{
+                (result || []).map((v, i) => (
+                    <ViewThumbnail
+                        key={i}
+                        view={ v }
+                        showDescription={layout === "grid" ? 0 : requestId ? 120 : 500}
+                        search={search}
+                    />
+                ))
+            }</div>)
+    }
+
+    function renderBySubscription() {
+        const groups: Record<string, any[]> = {};
+        (result || []).forEach(item => {
+            let label = item.DataRequest!.name;
+            let group = groups[label];
+            if (!group) {
+                group = groups[label] = [];
+            }
+            group.push(item)
+        });
+
+        return <>
+            {
+                Object.keys(groups).map((k, i) => (
+                    <div className="graph-group" key={i}>
+                        <h5 className="graph-group-header color-brand-2">
+                            <i className="material-symbols-rounded bottom">database</i> {k}
+                        </h5>
+                        <div className={ classList({
+                            ["view-browser view-browser-" + layout] : true,
+                            "nested": !!requestId
+                        })}>
+                        {
+                            groups[k].map((v, y) => (
+                                <ViewThumbnail
+                                    key={y}
+                                    view={ v }
+                                    showDescription={layout === "grid" ? 0 : requestId ? 120 : 500}
+                                    search={search}
+                                />
+                            ))
+                        }
+                        </div>
+                    </div>
+                ))
+            }
+        </>
+    }
+
     return (
-        <div className={ classList({
-            ["view-browser view-browser-" + layout] : true,
-            "nested": !!requestId
-        })}>
+        <div>
             { requestId && <Link to={`/requests/${requestId}/create-view`} className="view-thumbnail view-thumbnail-add-btn">
                 <div className="view-thumbnail-image">
                     <div className="plus-icon-wrapper">
@@ -100,14 +158,7 @@ export default function ViewsBrowser({
             </Link> }
             { !result.length ?
                 <p className="color-muted pt-2 pb-2">No Views found!</p> :
-                (result || []).map((v, i) => (
-                    <ViewThumbnail
-                        key={i}
-                        view={ v }
-                        showDescription={layout === "grid" ? 0 : requestId ? 120 : 500}
-                        search={search}
-                    />
-                ))
+                renderItems()
             }
         </div>
     )
