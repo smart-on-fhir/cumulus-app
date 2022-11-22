@@ -7,12 +7,13 @@ import ViewsBrowser from "./ViewsBrowser";
 
 
 type SortType = "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | "rating-asc" | "rating-desc" | ""
+type ViewType = "grid" | "column" | "list"
 
 export default function Views()
 {
     const url = new URL(window.location.href)
 
-    const [ viewType, setViewType ] = useState(url.searchParams.get("view") || "grid")
+    const [ viewType, setViewType ] = useState<ViewType>(String(url.searchParams.get("view") || "grid") as ViewType)
     const [ search  , setSearch   ] = useState(url.searchParams.get("q") || "")
     const [ groupBy , setGroupBy  ] = useState(url.searchParams.get("group") || "")
     const [ sort    , setSort     ] = useState<SortType>(String(url.searchParams.get("sort") || "") as SortType)
@@ -23,7 +24,7 @@ export default function Views()
         setSearch(q)
     };
 
-    const onSetViewType = (t: "grid" | "list") => {
+    const onSetViewType = (t: "grid" | "column" | "list") => {
         url.searchParams.set("view", t)
         window.history.replaceState(null, "", url.href)
         setViewType(t)
@@ -78,8 +79,8 @@ export default function Views()
                             <Checkbox onChange={() => onSetSort("name-asc"   )} checked={ sort === "name-asc"   } name="sort" type="radio" label={<>Sort by Name <span className="color-muted">(A-Z)</span></>} />,
                             <Checkbox onChange={() => onSetSort("name-desc"  )} checked={ sort === "name-desc"  } name="sort" type="radio" label={<>Sort by Name <span className="color-muted">(Z-A)</span></>} />,
                             "separator",
-                            <Checkbox onChange={() => onSetSort("mod-desc"   )} checked={ sort === "mod-desc"   } name="sort" type="radio" label={<>Sort by Modification <span className="color-muted">(newest first)</span></>} />,
-                            <Checkbox onChange={() => onSetSort("mod-asc"    )} checked={ sort === "mod-asc"    } name="sort" type="radio" label={<>Sort by Modification <span className="color-muted">(oldest first)</span></>} />,
+                            <Checkbox onChange={() => onSetSort("mod-desc"   )} checked={ sort === "mod-desc"   } name="sort" type="radio" label={<>Sort by Date <span className="color-muted">(newest first)</span></>} />,
+                            <Checkbox onChange={() => onSetSort("mod-asc"    )} checked={ sort === "mod-asc"    } name="sort" type="radio" label={<>Sort by Date <span className="color-muted">(oldest first)</span></>} />,
                             "separator",
                             <Checkbox onChange={() => onSetSort("rating-desc")} checked={ sort === "rating-desc"} name="sort" type="radio" label={<>Sort by Rating <span className="color-muted">(highest first)</span></>} />,
                             <Checkbox onChange={() => onSetSort("rating-asc" )} checked={ sort === "rating-asc" } name="sort" type="radio" label={<>Sort by Rating <span className="color-muted">(lowest first)</span></>} />,
@@ -87,10 +88,9 @@ export default function Views()
                             <Checkbox onChange={() => onSetSort("")} checked={ !sort } name="sort" type="radio" label={ <><b>Default Sort</b> <span className="color-muted">(rating, name, date)</span></> } />
                         ]}>
                             <i className={ classList({
-                                "fa-solid fa-sort": true,
-                                "color-muted": !sort,
+                                "material-symbols-rounded": true,
                                 "color-brand-2": !!sort
-                             }) } /> Sort
+                             }) }>sort_by_alpha</i> Sort
                             <span className="color-muted"> ▾</span>
                         </MenuButton>
                         <MenuButton right title="Group By" items={[
@@ -118,10 +118,9 @@ export default function Views()
                             />
                         ]}>
                             <i className={ classList({
-                                "fa-solid fa-layer-group": true,
-                                "color-muted": !groupBy,
+                                "material-symbols-rounded": true,
                                 "color-brand-2": !!groupBy
-                            })} /> Group
+                            })}>layers</i> Group
                             <span className="color-muted"> ▾</span>                            
                         </MenuButton>
                     </div>
@@ -132,18 +131,25 @@ export default function Views()
                             className={"btn" + (viewType === "grid" ? " active" : "")}
                             onClick={() => onSetViewType("grid")}
                             title="Grid View"
-                        ><i className="fa-solid fa-grip" /></button>
+                        ><i className="material-symbols-rounded">grid_view</i></button>
+                        <button
+                            className={"btn" + (viewType === "column" ? " active" : "")}
+                            onClick={() => onSetViewType("column")}
+                            title="Column View"
+                            ><i className="material-symbols-rounded">view_week</i></button>
                         <button
                             className={"btn" + (viewType === "list" ? " active" : "")}
                             onClick={() => onSetViewType("list")}
                             title="List View"
-                            ><i className="fa-solid fa-list" /></button>
+                            ><i className="material-symbols-rounded">table_rows</i>
+                            </button>
+                        
                     </div>    
                 </div>
             </div>
             <hr className="mt-05 mb-1"/>
             <ViewsBrowser
-                layout={ viewType === "grid" ? "grid" : "column" }
+                layout={ viewType || "grid" }
                 search={search}
                 sort={sort}
             />

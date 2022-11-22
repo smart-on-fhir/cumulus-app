@@ -5,6 +5,7 @@ import { request }     from "../../backend"
 import Loader          from "../Loader"
 import { AlertError }  from "../Alert"
 import ViewThumbnail   from "./ViewThumbnail"
+import { classList }   from "../../utils"
 
 import "./ViewsBrowser.scss"
 
@@ -15,7 +16,7 @@ export default function ViewsBrowser({
     search = "",
     sort = ""
 }: {
-    layout?: "grid" | "column",
+    layout?: "grid" | "column" | "list",
     requestId?: string | number,
     showDescription?: boolean,
     search?: string
@@ -72,11 +73,17 @@ export default function ViewsBrowser({
     result = result || [];
 
     if (search) {
-        result = result.filter(view => view.name.toLowerCase().includes(search.toLowerCase()));
+        result = result.filter(view => {
+            return view.name.toLowerCase().includes(search.toLowerCase()) ||
+                view.description.toLowerCase().includes(search.toLowerCase())
+        });
     }
 
     return (
-        <div className={"view-browser view-browser-" + layout}>
+        <div className={ classList({
+            ["view-browser view-browser-" + layout] : true,
+            "nested": !!requestId
+        })}>
             { requestId && <Link to={`/requests/${requestId}/create-view`} className="view-thumbnail view-thumbnail-add-btn">
                 <div className="view-thumbnail-image">
                     <div className="plus-icon-wrapper">
@@ -97,7 +104,7 @@ export default function ViewsBrowser({
                     <ViewThumbnail
                         key={i}
                         view={ v }
-                        showDescription={layout === "grid" ? 0 : requestId ? 120 : 200}
+                        showDescription={layout === "grid" ? 0 : requestId ? 120 : 500}
                         search={search}
                     />
                 ))

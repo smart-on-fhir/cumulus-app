@@ -10,19 +10,8 @@
     display: flex;
     flex-wrap: wrap;
     overflow: auto;
-    min-height: 200px;
+    
     // justify-content: space-evenly;
-
-    &.view-browser-grid {
-        // margin-left: -$gap;
-        // margin-right: -$gap;
-        // max-height: $font-size * 37;
-        overflow: auto;
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-        column-gap: 1em;
-        font-size: 0.9rem;
-    }
 
     .view-thumbnail-image {
         border: 2px solid $color-grey;
@@ -63,6 +52,7 @@
     .view-thumbnail-description {
         font-size  : 90%;
         font-weight: normal;
+        white-space: normal;
     }
 
     // a .view-thumbnail-title {
@@ -107,61 +97,39 @@
     }
 }
 
-@media (max-width: 50em) {
-    .view-browser.view-browser-grid {
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-    }
+.view-browser.view-browser-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    column-gap: 1em;
 }
-
-@media (max-width: 40em) {
-    .view-browser.view-browser-grid {
-        grid-template-columns: 1fr 1fr 1fr;
-        // font-size: calc(9px + 1vw);
-    }
-}
-
-@media (max-width: 30em) {
-    .view-browser.view-browser-grid {
-        grid-template-columns: 1fr 1fr;
-        // font-size: calc(10px + 1vw);
-    }
-}
-// -----------------------------------------------------------------------------
 .view-browser.view-browser-column {
-    display: flex;
-    // flex-direction: column;
-    // flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 1rem;
+}
+.view-browser.view-browser-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 1rem;
+}
 
+// -----------------------------------------------------------------------------
+.view-browser.view-browser-column,
+.view-browser.view-browser-list {
+    
     .view-thumbnail {
         display: flex;
         flex-direction: row;
-        // // flex-wrap: nowrap;
-        // align-content: center;
-        // align-items: center;
-        align-items: stretch;
-        // justify-content: flex-start;
-        // max-width: 100%;
-        // width: 100%;
-        // // // flex: 1 1 100%;
-        // // // background: lightyellow;
-        padding: 0.5em 0;
+        align-items: flex-start;
         flex: 1 1 30em;
         overflow: hidden;
-        // // // margin: 1rem;
-        // flex: 1 0 110px;
         
-        
-        // &:first-of-type {
-        //     margin-top: 0.5rem;
-        // }
-
-        // &:last-of-type {
-        //     margin-bottom: 0.5rem;
-        // }
-
         .view-thumbnail-image {
-            flex   : 0 0 120px;
-            height : 72px;
+            flex   : 0 0 8em;
+            // height : 72px;
+            height : 5em;
+            // padding: 75% 0 0;
+
             // width  : 100px;
             padding: 0;
             display: block;
@@ -180,14 +148,53 @@
             overflow: hidden;
             padding: 1px;
             flex: 1;
-            // font-size: $font-size * 1.1;
 
             .view-thumbnail-description {
-                white-space  : nowrap;
-                font-weight  : 400;
                 overflow     : hidden;
-                text-overflow: ellipsis;
+                -webkit-line-clamp: 3;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
             }
         }
     }
 }
+
+.view-browser.view-browser-column .view-thumbnail .view-thumbnail-title .view-thumbnail-description {
+    -webkit-line-clamp: 2;
+}
+
+@media (min-width: 50em) {
+    .view-browser.view-browser-column {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 100em) {
+    .view-browser.view-browser-column {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+@media (max-width: 50em) {
+    .view-browser.view-browser-grid {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+}
+
+@media (max-width: 40em) {
+    .view-browser.view-browser-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+@media (max-width: 30em) {
+    .view-browser.view-browser-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.view-browser.nested {
+    grid-template-columns: 1fr;
+    min-height: 200px;
+}
+
