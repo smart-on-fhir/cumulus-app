@@ -71,8 +71,8 @@ export default function Home() {
             />
             <br/>
             <br/>
-            <div className="row gap">
-                <div className="col col-6">
+            <div className="row gap wrap">
+                <div className="col col-6 responsive">
                     <Panel
                         title="Data Subscriptions"
                         icon={<i className="fa-solid fa-database" style={{ color: "#999" }} />}
@@ -89,7 +89,7 @@ export default function Home() {
                         <DataRequestsList />
                     </Panel>
                 </div>
-                <div className="col col-4">
+                <div className="col col-4 responsive">
                     <Panel
                         title="Data Sites"
                         icon={<i className="fa-solid fa-location-dot" style={{ color: "#999" }} />}

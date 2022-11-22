@@ -34,7 +34,7 @@ export default function Projects()
                     }
 
                     return (
-                        <div className="row" style={{ margin: "0 -1rem" }}>
+                        <div className="row wrap" style={{ margin: "0 -1rem" }}>
                             { data.map((project, i) => (
                                 <div className="col project" key={i}>
                                     <h3>{ project.name }</h3>

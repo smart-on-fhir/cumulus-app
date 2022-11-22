@@ -118,7 +118,7 @@ export default function DataRequestView(): JSX.Element
             <h3><i className="fas fa-database" /> { model.name }</h3>
             <p className="color-muted" dangerouslySetInnerHTML={{ __html: model.description || "" }}/>
             <br/>
-            <div className="row gap-2">
+            <div className="row gap-2 wrap">
                 <div className="col col-6 responsive">
                     <h5>Status</h5>
                     <hr/>
@@ -165,7 +165,11 @@ export default function DataRequestView(): JSX.Element
                                 { model.Tags && (
                                     <tr>
                                         <th className="right pr-1 pl-1">Tags:</th>
-                                        <td>{ model.Tags.map((t, i) => <Tag tag={t} key={i} />) }</td>
+                                        <td>{
+                                            model.Tags.length ?
+                                                model.Tags.map((t, i) => <Tag tag={t} key={i} />) :
+                                                <span className="color-muted">no tag assigned</span>
+                                        }</td>
                                     </tr>
                                 )}
                             </tbody>

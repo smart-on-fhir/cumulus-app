@@ -9,13 +9,13 @@
         background   : transparent;
         color        : inherit;
         border       : 0;
-        line-height  : 2;
+        line-height  : 1.45;
         min-width    : 2em;
         text-align   : center;
         appearance   : none;
         cursor       : pointer;
         border-radius: 4px;
-        padding      : 0.2em 1em;
+        padding      : 0.4em 0.8em;
         box-shadow   : none;
 
         i {
@@ -89,7 +89,10 @@
         
         > * {
             display: block;
-            padding: 0.4em 1.2em;
+            padding-top: 0.4em;
+            padding-bottom: 0.4em;
+            padding-right: 1.2em;
+            text-indent: 1.2em;
             // cursor: default;
             outline: 0 none;
         }
@@ -102,6 +105,7 @@
             &, * {
                 background: $color-blue !important;
                 color: #FFF !important;
+                box-shadow: none;
             }
         }
     }

@@ -215,7 +215,7 @@ class FieldsEditor extends React.Component<FieldsEditorProps>
                     </div>
                 </div>
                 <hr/>
-                <div className="row gap mt-1">
+                <div className="row gap mt-1 wrap">
                     { AVAILABLE_DEMOGRAPHICS.map((item, i) => (
                         <div key={i} className="col col-0 col-5">
                             <DataListItemCheckbox
@@ -337,9 +337,9 @@ export default function DataRequestForm({
                     <b className="nowrap">Data Inserted</b> <Format value={ completed } format="date-time" />
                 </div>
             </div> }
-            <div className="row gap-2">
+            <div className="row gap-2 wrap">
                 
-                <div className="col mt-1" style={{ flex: "1 0 16em" }}>
+                <div className="col col-6 mt-1 responsive">
                     <div className="row gap middle">
                         <label className="col">Name</label>
                         <span className="col right color-muted small">Up to 100 characters&nbsp;</span>
@@ -385,7 +385,7 @@ export default function DataRequestForm({
                     </div>
                 </div>
                 
-                <div className="col mt-1" style={{ flex: "1 0 12em" }}>
+                <div className="col col-4 mt-1 responsive">
                     <div className="row gap top">
                         <label className="col col-0">Description</label>
                         <span className="col color-muted small" style={{ padding: "1em 0 0.2em 0" }}>(HTML enabled)</span>
@@ -504,8 +504,8 @@ export default function DataRequestForm({
                 }
             </div>
 
-            <div className="row gap-2 mt-2">
-                <div className="col mb-2" style={{ flex: "1 0 16em" }}>
+            <div className="row gap-2 mt-2 wrap">
+                <div className="col col-6 mb-2 responsive">
                     <h4>Included Fields</h4>
                     <hr/>
                     <FieldsEditor fields={requestedData.fields} onChange={ fields => onChange({
@@ -516,7 +516,7 @@ export default function DataRequestForm({
                         }
                     }) }/>
                 </div>
-                <div className="col mb-2" style={{ flex: "1 0 12em" }}>
+                <div className="col col-4 mb-2 responsive">
                     <Panel title="Included Data Sites" menu={[
                         <Link to="/sites">Manage Data Sites</Link>
                     ]}>

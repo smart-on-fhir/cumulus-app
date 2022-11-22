@@ -97,7 +97,7 @@ export default function CreateDataRequestForm()
     const { groups, sites } = data;
 
     return (
-        <div>
+        <div className="container">
             <HelmetProvider>
                 <Helmet>
                     <title>Create Data Subscription</title>
