@@ -13,15 +13,18 @@ export default function ViewThumbnail({
 }) {
     return (
         <Link to={ "/views/" + view.id } className="view-thumbnail" title={ showDescription ? undefined : view.description || undefined }>
-            {/* <div className="view-thumbnail-image" style={{
-                backgroundImage: `url('${view.screenShot ? `/api/views/${ view.id }/screenshot` : "/view.png"}')`
-            }}/> */}
             <div className="view-thumbnail-image" style={{ backgroundImage: `url('/api/views/${ view.id }/screenshot` }}/>
             <div className="view-thumbnail-title">
                 
                 <span dangerouslySetInnerHTML={{ __html: search ? highlight(view.name, search) : view.name }}/>
                 
-                { showDescription > 0 && <div className="view-thumbnail-description color-muted" title={ view.description || undefined }>{ ellipsis(view.description || "No description provided", showDescription) }</div> }
+                { showDescription > 0 && <div className="view-thumbnail-description color-muted" title={ view.description || undefined }>
+                    <span dangerouslySetInnerHTML={{
+                        __html: search ?
+                            highlight(ellipsis(view.description, showDescription), search) :
+                            ellipsis(view.description, showDescription)
+                    }}/>
+                </div> }
                 
                 { showDescription > 0 && <StaticRating value={ view.normalizedRating } votes={ view.votes } /> }
             </div>            
