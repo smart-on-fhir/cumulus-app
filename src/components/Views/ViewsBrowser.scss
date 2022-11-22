@@ -5,13 +5,28 @@
 }
 
 .graph-group {
-    margin-bottom: 3rem;
+    
     .graph-group-header {
-        padding: 0 0 0.5em;
-        border-bottom: 1px dashed #BBB;
+        padding: 0.5em 0;
+        border-bottom: 1.5px dashed #BBB;
         box-shadow: 0 1px 0 0 #FFF;
-        font-size: 115%;
+        font-size: 110%;
         font-weight: 500;
+        cursor: pointer;
+        color: #777;
+
+        &::marker {
+            color: #999;
+            font-size: 13px;
+        }
+    }
+
+    &[open] {
+        margin-bottom: 3rem;
+
+        summary {
+            color: $color-brand-2;
+        }
     }
 }
 
@@ -134,39 +149,38 @@
         align-items: center;
         flex: 1 1 30em;
         overflow: hidden;
-        
-        .view-thumbnail-image {
-            flex   : 0 0 8em;
-            // height : 72px;
-            height : 5em;
-            // padding: 75% 0 0;
+    }
+    .view-thumbnail-image {
+        flex   : 0 0 8em;
+        // height : 72px;
+        height : 5em;
+        // padding: 75% 0 0;
 
-            // width  : 100px;
-            padding: 0;
-            display: block;
-            max-width: none;
-            border-radius: 6px;
-            align-self: flex-start;
-        }
+        // width  : 100px;
+        padding: 0;
+        display: block;
+        max-width: none;
+        border-radius: 6px;
+        align-self: flex-start;
+    }
 
-        .view-thumbnail-title {
-            margin: 0 10px;
-            font-weight: bold;
-            text-align: left;
-            font-size: 100%;
-            text-shadow: none;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            padding: 1px;
-            flex: 1;
+    .view-thumbnail-title {
+        margin: 0 10px;
+        font-weight: bold;
+        text-align: left;
+        font-size: 100%;
+        text-shadow: none;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        padding: 1px;
+        flex: 1;
 
-            .view-thumbnail-description {
-                overflow     : hidden;
-                -webkit-line-clamp: 2;
-                display: -webkit-box;
-                -webkit-box-orient: vertical;
-            }
+        .view-thumbnail-description {
+            overflow     : hidden;
+            -webkit-line-clamp: 2;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
         }
     }
 }
