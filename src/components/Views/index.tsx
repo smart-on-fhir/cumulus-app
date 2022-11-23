@@ -61,7 +61,7 @@ export default function Views()
             <div className="row half-gap middle wrap">
                 <div className="col col-0 mb-05 nowrap">
                     <h4 className="m-0">
-                        <i className="icon fa-solid fa-chart-pie color-blue-dark" /> Graphs
+                        <i className="icon fa-solid fa-chart-pie color-brand-2" /> Graphs
                     </h4>
                 </div>
                 <div className="col col-0 responsive"/>
