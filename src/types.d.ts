@@ -141,6 +141,8 @@ declare module app {
         } | null
 
         Tags?: Pick<Tag, "id" | "name" | "description">[]
+
+        Views?: View[]
     }
 
     interface RequestedData {

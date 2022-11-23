@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react"
-import Checkbox from "../Checkbox"
 import Loader from "../Loader"
+import LinkWidget from "./LinkWidget"
 
 export default function Form({ data = {}, onSubmit, loading, error }: {
     data?: Record<string, any>
@@ -11,8 +11,6 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
 {
     const [ name       , setName        ] = useState(data.name        || "")
     const [ description, setDescription ] = useState(data.description || "")
-    const [ graphs     , setGraphs      ] = useState("")
-    const [ subs       , setSubs        ] = useState("")
 
     const valid = name && description
 
@@ -23,102 +21,50 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
 
     return (
         <form onSubmit={ submit } autoComplete="off">
-            <div className="row gap mt-2">
-                <div className="col">
-                    <label htmlFor="name">Name</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        placeholder="Project name"
-                        required
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        disabled={ !!loading }
-                    />
+            <div className="row gap-2 mt-2 wrap stretch" style={{
+                minHeight: "calc(100vh - 22rem)",
+                // minHeight: "20rem",
+                // maxHeight: "max-content"
+            }}>
+                <div className="col col-6 responsive">
+                    <div className="row">
+                        <div className="col mb-1">
+                            <label htmlFor="name">Name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                placeholder="Project name"
+                                required
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                                disabled={ !!loading }
+                            />
+                        </div>
+                    </div>
+                    <div className="row row-10">
+                        <div className="col mb-1 stretch">
+                            <label htmlFor="description">Description</label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                placeholder="Project description"
+                                // rows={8}
+                                style={{ height: "100%", minHeight: "10em" }}
+                                required
+                                value={description}
+                                onChange={e => setDescription(e.target.value)}
+                                disabled={ !!loading }
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="col col-6 mb-1 responsive">
+                    <label>Included Subscriptions</label>
+                    <LinkWidget />
                 </div>
             </div>
-            <div className="row gap mt-1">
-                <div className="col">
-                    <label htmlFor="description">Description</label>
-                    <textarea
-                        id="description"
-                        name="description"
-                        placeholder="Project description"
-                        rows={8}
-                        required
-                        value={description}
-                        onChange={e => setDescription(e.target.value)}
-                        disabled={ !!loading }
-                    />
-                </div>
-            </div>
-            <div className="row gap">
-                <div className="col mt-1">
-                    <b>Included Subscriptions</b>
-                    <Checkbox
-                        type="radio"
-                        label="Select Manually"
-                        name="subs"
-                        checked={subs === "manual"}
-                        onChange={() => setSubs("manual")}
-                        description="Select one or more Data Subscriptions to be included in this project"
-                    />
-                    <Checkbox
-                        type="radio"
-                        label="Data Subscription Group"
-                        name="subs"
-                        checked={subs === "group"}
-                        onChange={() => setSubs("group")}
-                        description="ALL Data Subscriptions belonging to the specified group will be included in this project"
-                    />
-                    <Checkbox
-                        type="radio"
-                        label="Subscriptions by Tags"
-                        name="subs"
-                        checked={subs === "tag"}
-                        onChange={() => setSubs("tag")}
-                        description="Only data subscriptions having some of the selected tags will be included in this project"
-                    />
-                    <br/>
-                    <select disabled>
-                        <option>TODO: UI depends on the selection above</option>
-                    </select>
-                </div>
-                <div className="col mt-1">
-                    <b>Included Graphs</b>
-                    <Checkbox
-                        type="radio"
-                        label="Select Manually"
-                        name="graphs"
-                        disabled
-                        checked={graphs === "manual"}
-                        onChange={() => setGraphs("manual")}
-                        description="Select one or more Graphs to be included in this project"
-                    />
-                    <Checkbox
-                        type="radio"
-                        label="Use Subscription Graphs"
-                        name="graphs"
-                        checked={graphs === "sub"}
-                        onChange={() => setGraphs("sub")}
-                        description="Only Graphs that belong to the included subscriptions will be included in this project"
-                    />
-                    <Checkbox
-                        type="radio"
-                        label="Use Tags"
-                        name="graphs"
-                        checked={graphs === "tag"}
-                        onChange={() => setGraphs("tag")}
-                        description="Only graphs having some of the selected tags will be included in this project"
-                    />
-                    <br/>
-                    <select disabled>
-                        <option>TODO: UI depends on the selection above</option>
-                    </select>
-                </div>
-            </div>
-            <hr className="mb-2 mt-2" />
+            <hr className="mb-2 mt-1" />
             <div className="mb-2 center">
                 <button
                     type="submit"
