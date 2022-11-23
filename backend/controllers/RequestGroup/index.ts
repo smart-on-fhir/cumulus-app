@@ -1,5 +1,6 @@
 import express        from "express"
 import { Includeable } from "sequelize/types";
+import DataRequest from "../../db/models/DataRequest";
 import Model          from "../../db/models/RequestGroup"
 import * as HttpError from "../../errors";
 import { route }      from "../../lib/route";
@@ -50,7 +51,23 @@ route(router, {
         
         try {
             const models = await Model.findAll({ include });
-            res.json(models);
+            const general = await DataRequest.findAll({
+                where: {
+                    "groupId": null
+                },
+                attributes: [
+                    "id",
+                    "name",
+                    "completed"
+                ],
+                include: [
+                    { association: "Views", attributes: ["name"] }
+                ]
+            });
+            res.json([ ...models, {
+                name: "GENERAL",
+                requests: general
+            } ]);
         } catch(error) {
             throw new HttpError.InternalServerError(`Error reading ${Model.name} models`);
         }

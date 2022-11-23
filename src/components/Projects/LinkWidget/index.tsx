@@ -60,6 +60,7 @@ function Root({ data }: { data: app.RequestGroup[] })
 
     return (
         <div tabIndex={0} className="form-control link-widget" style={{ maxHeight: "none" }}>
+            <div>
             { data.map((group, i) => (
                 <SubscriptionGroup
                     key={i}
@@ -71,6 +72,7 @@ function Root({ data }: { data: app.RequestGroup[] })
                     onChange={onChange}
                 />
             )) }
+            </div>
         </div>
     )
 }
