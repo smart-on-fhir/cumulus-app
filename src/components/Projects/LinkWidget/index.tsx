@@ -100,7 +100,7 @@ function SubscriptionGroup({
                         SelectionState.UNSELECTED :
                         SelectionState.SELECTED,
                     group.data.id
-                )}>
+                )} title="Click to automatically include/exclude all data subscriptions in this group">
                     <span className="icon material-symbols-rounded color-blue">{
                         group.selected === SelectionState.SELECTED_INHERIT ||
                         group.selected === SelectionState.UNSELECTED_INHERIT ?
