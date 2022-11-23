@@ -3,12 +3,16 @@
 
 .link-widget {
     line-height: 1.4;
-    padding    : 0.2em !important;
+    padding    : 0 !important;
     white-space: nowrap;
     overflow   : scroll;
     height     : 100%;
     user-select: none;
     max-height : 60vh !important;
+
+    > div {
+        min-width: max-content;
+    }
 
     label { margin: 0; padding: 1px 0; }
 
@@ -16,28 +20,28 @@
         padding: 1px 0;
 
         &::marker {
-            // font-size: 90%;
             color: #666;
         }
     }
 
+    > details {
+        display: block;
+        min-width: 100%;
+    }
+
     .badge {
-        // float: right;
         margin: 3px 0.5em 2px;
         vertical-align: top;
-        background: fade-out($color-blue, .5);
-        // color: #000;
+        background: fade-out(#000, .75);
     }
 
     .icon {
         line-height: 1 !important;
         height: 1em !important;
         vertical-align: top;
-        // text-align: left;
         margin: 0 0.2em 0 0.1em;
         color: #999;
         overflow: hidden;
-        // box-shadow: 0 0 0 1px red inset;
         &.color-blue { color: $color-blue; }
         &.color-red { color: $color-red; }
         &.color-green { color: $color-green; }
@@ -48,14 +52,15 @@
     .icon-2 {
         margin: 0 0.14em 0 -0.12em;
     }
+
     .icon-3 {
         margin: 0 0.14em 0 2.86em;
         text-indent: 0;
-        // opacity: 0.7;
     }
 
     details {
         text-indent: 0.4em;
+        
         label { font-weight: 600; }
         details {
             text-indent: 1.8em;
@@ -72,9 +77,6 @@
                     background: mix($color-blue, #FFF, 15);
                 }
                 color: #000;
-                // &:hover {
-                //     background: mix($color-blue, #FFF, 25);
-                // }
             }
 
             &.disabled {
@@ -88,50 +90,9 @@
             
         }
     }
-    // > details > summary {
-    //     font-weight: 600;
-    //     padding: 0 0.5em;
 
-    //     .icon:last-of-type {
-    //         color: $color-brand-2;
-    //     }
-    // }
-
-    .subscription {
-        // text-indent: 1.4em;
-    //     padding: 0 0 0 2.0em;
-    //     display: block;
-    //     font-weight: normal;
-    //     cursor: pointer;
-        
-    //     // input {
-    //     //     margin-right: 0.5em;
-    //     //     vertical-align: text-bottom;
-    //     // }
-    //     div div {
-    //         padding: 0 0 0 2.2em;    
-    //     }
-    }
     label {
         text-indent: 0;
         font-weight: normal;
-    }
-
-    summary, .subscription {
-    //     line-height: 1.6;
-        // &:hover {
-        //     background: #EEE;
-        // }
-    //     &.selected {
-    //         background: mix($color-blue, #FFF, 15);
-    //         color: #000;
-    //         &:hover {
-    //             background: mix($color-blue, #FFF, 25);
-    //         }
-    //     }
-    //     &.disabled {
-    //         color: #999;
-    //         pointer-events: none;
-    //     }
     }
 }
