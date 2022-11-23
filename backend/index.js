@@ -64,7 +64,7 @@ function setupAuth(app)
 
 function setupAPI(app)
 {
-    app.use("/api/request-groups", require("./controllers/RequestGroup"));
+    app.use("/api/request-groups", require("./controllers/RequestGroup").default);
     app.use("/api/requests"      , require("./controllers/DataRequest" ));
     app.use("/api/views"         , require("./controllers/View"        ));
     app.use("/api/users"         , require("./routes/users"            ));
