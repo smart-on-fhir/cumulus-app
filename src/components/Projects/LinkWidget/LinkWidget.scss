@@ -3,7 +3,7 @@
 
 .link-widget {
     line-height: 1.4;
-    padding    : 0 !important;
+    padding    : 0.2em !important;
     white-space: nowrap;
     overflow   : scroll;
     height     : 100%;
@@ -14,10 +14,14 @@
         min-width: max-content;
     }
 
-    label { margin: 0; padding: 1px 0; }
+    label {
+        margin: 0;
+        text-indent: 0;
+        font-weight: normal;
+    }
 
     summary {
-        padding: 1px 0;
+        padding: 1px 0.2em 1px 0;
 
         &::marker {
             color: #666;
@@ -61,7 +65,7 @@
     details {
         text-indent: 0.4em;
         
-        label { font-weight: 600; }
+        > summary > label { font-weight: 600; color: #000; }
         details {
             text-indent: 1.8em;
             
@@ -80,7 +84,7 @@
             }
 
             &.disabled {
-                color: #999;
+                color: #888;
                 label { pointer-events: none; }
                 ::marker {
                     color: #999;
@@ -89,10 +93,5 @@
             
             
         }
-    }
-
-    label {
-        text-indent: 0;
-        font-weight: normal;
     }
 }
