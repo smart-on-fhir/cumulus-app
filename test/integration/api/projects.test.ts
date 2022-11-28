@@ -16,10 +16,10 @@ describe("Projects", () => {
 
         testEndpoint("Projects.read", "GET", "/api/projects")
         
-        it ("handles bad parameter errors", async () => {
-            const res = await fetch(`${server.baseUrl}/api/projects?order=x`, { headers: { Cookie: "sid=" + admin.sid }})
-            expect(res.status).to.equal(400)
-        })
+        // it ("handles bad parameter errors", async () => {
+        //     const res = await fetch(`${server.baseUrl}/api/projects?order=x`, { headers: { Cookie: "sid=" + admin.sid }})
+        //     expect(res.status).to.equal(400)
+        // })
     })
 
     describe("view (GET /api/projects/:id)", () => {
