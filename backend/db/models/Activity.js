@@ -1,7 +1,8 @@
-const { DataTypes, Model, Op } = require("sequelize");
+const { DataTypes, Op } = require("sequelize");
 const moment = require("moment");
+const { default: BaseModel } = require("./BaseModel");
 
-module.exports = class Activity extends Model
+module.exports = class Activity extends BaseModel
 {
 
     /**

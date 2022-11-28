@@ -4,7 +4,6 @@ const Bcrypt         = require("bcryptjs")
 const { Op }         = require("sequelize")
 const User           = require("../db/models/User")
 const { wait }       = require("../lib")
-const { ACL, roles } = require("../acl")
 const { logger }     = require("../logger")
 const HttpError      = require("../errors")
 
@@ -25,17 +24,21 @@ const router = express.Router({ mergeParams: true });
  * @param {import("express").NextFunction} next
  */
 async function authenticate(req, res, next) {
+    const dbConnection = req.app.get("dbConnection")
+    dbConnection.user = { role: "guest" }; 
     const { sid } = req.cookies;
     if (sid) {
         try {
-            const user = await User.findOne({ where: { sid }});
+            const user = await User.findOne({ where: { sid }, __role__: "system" });
             if (user) {
-                req.user = user.toJSON()    
+                req.user = user.toJSON()   
+                dbConnection.user = user; 
             }
         } catch (ex) {
             logger.error(ex, { tags: ["AUTH"] });
         }
     }
+    // console.log(dbConnection.user?.email)
     next();
 }
 
@@ -44,7 +47,7 @@ async function authenticate(req, res, next) {
  * Checks `req.user?.role`.
  * - if the user does not exist throws HttpError.Unauthorized
  * - if the user does not have one of the required roles throws HttpError.Forbidden
- * @param {(keyof roles)[]} roles The roles to require
+ * @param {import("..").Role[]} roles The roles to require
  * @returns {(
  *  req: import("../..").app.UserRequest,
  *  res: import("express").Response,
@@ -64,67 +67,6 @@ function requireAuth(...roles) {
 
         next();
     }
-}
-
-/**
- * Require permission middleware -----------------------------------------------
- * Checks if the user is allowed to perform the specified action and if not,
- * throws HttpError.Forbidden.
- * @param {keyof ACL} action 
- * @param {(req: import("../../index").app.UserRequest) => boolean} [isOwner] In
- *  some cases the user might also be considered an owner of the resource. To
- *  determine that, a callback function can be passed. For example, if we are
- *  trying to read one user and we want to say that the current user is the
- *  owner of that record if it has the same id, then we can pass
- * `req => req.user.id === +req.params.id`.
- */
-function requirePermission(action, isOwner) {
-    return (req, res, next) => {
-        requestPermission(action, req, isOwner && isOwner(req))
-        next()
-    }
-}
-
-/**
- * @param { keyof ACL } action 
- * @param { import("../index").AppRequest } req 
- */
-function requestPermission(action, req, isOwner = false) {
-    const role = req.user?.role || "guest";
-
-    if (isOwner && hasPermission(action, "owner")) {
-        return true
-    }
-
-    if (!hasPermission(action, role)) {
-        throw new HttpError[role === "guest" ? "Unauthorized" : "Forbidden"]({
-            message: `Permission denied`,
-            tags   : ["AUTH"],
-            reason : `Permission denied for "${role}" to perform "${action}" action!`,
-            owner  : isOwner
-        })
-    }
-}
-
-/**
- * @param { keyof ACL } action 
- * @param { keyof roles } role  
- * @returns { boolean }
- */
-function hasPermission(action, role) {
-    const row = ACL[action];
-    if (!row) {
-        logger.warn(`Unknown action "${action}"!`, { tags: ["AUTH"], action, role });
-        return false;
-    }
-
-    const index = roles[role];
-    if (!index && index !== 0) {
-        logger.warn(`Unknown role "${role}"!`, { tags: ["AUTH"], action, role });
-        return false;
-    }
-
-    return !!row[index];
 }
 
 /**
@@ -222,8 +164,5 @@ router.get("/logout", logout);
 module.exports = {
     router,
     authenticate,
-    requireAuth,
-    requirePermission,
-    requestPermission,
-    hasPermission
+    requireAuth
 };

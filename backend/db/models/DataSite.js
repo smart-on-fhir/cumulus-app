@@ -1,12 +1,8 @@
-const { DataTypes, Model } = require("sequelize");
-const Activity = require("./Activity");
+const { DataTypes } = require("sequelize");
+const { default: BaseModel } = require("./BaseModel");
 
-module.exports = class DataSite extends Model
+module.exports = class DataSite extends BaseModel
 {
-    toString() {
-        return `DataSite #${this.get("id")} ("${this.get("name")}")`;
-    }
-
     /**
      * @param {import("sequelize").Sequelize} sequelize
      */
@@ -41,27 +37,7 @@ module.exports = class DataSite extends Model
             }
         }, {
             sequelize,
-            modelName: "DataSite",
-            hooks: {
-                async afterCreate(model, { user }) {
-                    await Activity.create({
-                        message: `${model} created by ${user ? user.name || "user #" + user.id : "system"}`,
-                        tags   : "requests"
-                    });
-                },
-                async afterUpdate(model, { user }) {
-                    await Activity.create({
-                        message: `${model} updated by ${user ? user.name || "user #" + user.id : "system"}`,
-                        tags   : "requests"
-                    });
-                },
-                async afterDestroy(model, { user }) {
-                    await Activity.create({
-                        message: `${model} deleted by ${user ? user.name || "user #" + user.id : "system"}`,
-                        tags   : "requests"
-                    });
-                }
-            }
+            modelName: "DataSite"
         });
     };
 }

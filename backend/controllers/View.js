@@ -5,22 +5,21 @@ const Model                              = require("../db/models/View");
 const { rw, assert, roundToPrecision }   = require("../lib");
 const { logger }                         = require("../logger");
 const { requestLineLevelData }           = require("../mail");
-const { requireAuth, requestPermission } = require("./Auth");
-const createRestRoutes                   = require("./BaseController");
+const { requireAuth }                    = require("./Auth");
+const { requestPermission }              = require("../acl");
+const createRestRoutes                   = require("./BaseController").default;
 const { route }                          = require("../lib/route");
 
 const router = module.exports = express.Router({ mergeParams: true });
 
 createRestRoutes(router, Model, {
-    // getAll : "views_list",
-    destroy: "views_delete"
+    destroy: true
 });
 
 // list ------------------------------------------------------------------------
 route(router, {
     path: "/",
     method: "get",
-    permission: "views_list",
     request: {
         schema: {
             order: {
@@ -58,7 +57,6 @@ route(router, {
 route(router, {
     path: "/:id",
     method: "get",
-    permission: "views_view",
     request: {
         schema: {
             id: {
@@ -123,7 +121,6 @@ route(router, {
 route(router, {
     path: "/:id",
     method: "put",
-    permission: "views_update",
     request: {
         schema: {
             id: {
@@ -195,8 +192,8 @@ route(router, {
             res.json(model)
         } catch (ex) {
             await transaction.rollback()
-            const error = new InternalServerError("Updating graph failed", { tags: ["DATA"] })
-            error.cause = ex
+            const error = new InternalServerError("Updating graph failed. " + ex.message, { tags: ["DATA"] })
+            error.cause = ex.stack
             throw error
         }
     }
@@ -206,7 +203,6 @@ route(router, {
 route(router, {
     path: "/",
     method: "post",
-    permission: "views_create",
     request: {
         schema: {
             name: {
@@ -260,8 +256,6 @@ route(router, {
 
 router.get("/:id/screenshot", rw(async (req, res) => {
 
-    requestPermission("views_get_screenshot", req)
-
     const model = await Model.findByPk(req.params.id);
 
     assert(model, "Model not found", NotFound)
@@ -289,8 +283,6 @@ router.get("/:id/screenshot", rw(async (req, res) => {
 
 router.put("/:id/vote", express.urlencoded({ extended: false }), rw(async (req, res) => {
 
-    requestPermission("views_vote", req)
-
     const model = await Model.findByPk(req.params.id);
     
     if (!model) {
@@ -304,14 +296,12 @@ router.put("/:id/vote", express.urlencoded({ extended: false }), rw(async (req, 
         rating,
         votes,
         normalizedRating: roundToPrecision(rating / (votes || 1), 2)
-    }, { user: req.user });
+    });
 
     res.json(model)
 }));
 
 router.put("/:id/reset-rating", requireAuth("admin"), rw(async (req, res) => {
-
-    requestPermission("views_reset_rating", req)
 
     const model = await Model.findByPk(req.params.id);
 
@@ -319,13 +309,14 @@ router.put("/:id/reset-rating", requireAuth("admin"), rw(async (req, res) => {
         throw new NotFound("Model not found");
     }
 
-    await model.update({ rating: 0, votes : 0, normalizedRating: 0 }, { user: req.user });
+    await model.update({ rating: 0, votes : 0, normalizedRating: 0 });
 
     res.json(model)
 }));
 
 router.post("/:id/request-linelevel-data", express.json(), (req, res) => {
-    requestPermission("views_request_line_data", req)
+    requestPermission(req.user.role, "DataRequests.requestLineLevelData")
+
     requestLineLevelData(req.body).then(
         () => res.end(),
         e  => {

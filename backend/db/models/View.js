@@ -1,18 +1,13 @@
-const { DataTypes, Model } = require("sequelize");
-const { logger } = require("../../logger");
-// const Activity = require("./Activity");
+const { DataTypes }          = require("sequelize");
+const { default: BaseModel } = require("./BaseModel");
 
 
-class View extends Model
+class View extends BaseModel
 {
     /**
      * @type {string | undefined}
      */
     _screenShot;
-
-    toString() {
-        return `View #${this.get("id")} ("${this.get("name")}")`;
-    }
 
     /**
      * @param {import("sequelize").Sequelize} sequelize
@@ -74,32 +69,7 @@ class View extends Model
             DataRequestId: DataTypes.INTEGER
         }, {
             sequelize,
-            modelName: "View",
-            hooks: {
-                async afterCreate(model, { user }) {
-                    logger.info(`${model} created by ${user ? user.email : "system"}`, { tags: ["ACTIVITY", "GRAPHS"] })
-                    // await Activity.create({
-                    //     message: `${model} created by ${user ? user.email : "system"}`,
-                    //     tags   : "views"
-                    // });
-                },
-
-                async afterUpdate(model, { user }) {
-                    logger.info(`${model} updated by ${user ? user.email : "system"}`, { tags: ["ACTIVITY", "GRAPHS"] })
-                    // await Activity.create({
-                    //     message: `${model} updated by ${user ? user.email : "system"}`,
-                    //     tags   : "views"
-                    // });
-                },
-
-                async afterDestroy(model, { user }) {
-                    logger.info(`${model} deleted by ${user ? user.email : "system"}`, { tags: ["ACTIVITY", "GRAPHS"] })
-                    // await Activity.create({
-                    //     message: `${model} deleted by ${user ? user.email : "system"}`,
-                    //     tags   : "views"
-                    // });
-                }
-            }
+            modelName: "View"
         });
     }
 }

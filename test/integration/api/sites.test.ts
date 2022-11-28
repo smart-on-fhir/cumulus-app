@@ -1,18 +1,29 @@
-import { testCRUDEndpointPermissions, server } from "../../test-lib"
-import DataSites from "../../fixtures/DataSites"
+// import { expect }                   from "chai"
+import DataSites                    from "../../fixtures/DataSites"
+import { resetTable, testEndpoint } from "../../test-lib"
 
 
 describe("DataSites", () => {
     
-    // before(async () => await server.start())
+    beforeEach(async () => await resetTable("DataSite", DataSites))
 
-    // after(async () => await server.stop())
+    describe("list", () => {
+        testEndpoint("DataSites.read", "GET", "/api/data-sites")
+    })
 
-    testCRUDEndpointPermissions("/api/data-sites", "DataSite", DataSites, {
-        getAll : "data_sites_list",
-        getOne : "data_sites_view",
-        create : "data_sites_create",
-        update : "data_sites_update",
-        destroy: "data_sites_delete"
+    describe("view", () => {
+        testEndpoint("DataSites.read", "GET", "/api/data-sites/1")
+    })
+
+    describe("create", () => {
+        testEndpoint("DataSites.create", "POST", "/api/data-sites", { name: "Record name", description: "Record description" })
+    })
+
+    describe("update", () => {
+        testEndpoint("DataSites.update", "PUT", "/api/data-sites/1", { name: "Record name 2", description: "Record description 2" })
+    })
+
+    describe("delete", () => {
+        testEndpoint("DataSites.delete", "DELETE", "/api/data-sites/1")
     })
 });

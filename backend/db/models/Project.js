@@ -1,12 +1,11 @@
-const { DataTypes, Model } = require("sequelize");
-const { logger } = require("../../logger");
-// const Activity = require("./Activity");
+const { DataTypes } = require("sequelize");
+const { default: BaseModel } = require("./BaseModel");
 
 
-class Project extends Model
+module.exports = class Project extends BaseModel
 {
-    toString() {
-        return `Project #${this.get("id")} ("${this.get("name")}")`;
+    isOwnedBy(user) {
+        return user && user.id && user.id === this.get("creatorId")
     }
 
     /**
@@ -41,22 +40,7 @@ class Project extends Model
             }
         }, {
             sequelize,
-            modelName: "Project",
-            hooks: {
-                async afterCreate(model, { user }) {
-                    logger.info(`${model} created by ${user ? user.email : "system"}`, { tags: ["ACTIVITY"] })
-                },
-
-                async afterUpdate(model, { user }) {
-                    logger.info(`${model} updated by ${user ? user.email : "system"}`, { tags: ["ACTIVITY"] })
-                },
-
-                async afterDestroy(model, { user }) {
-                    logger.info(`${model} deleted by ${user ? user.email : "system"}`, { tags: ["ACTIVITY"] })
-                }
-            }
+            modelName: "Project"
         });
     }
 }
-
-module.exports = Project;

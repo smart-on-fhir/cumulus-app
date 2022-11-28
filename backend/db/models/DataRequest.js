@@ -1,15 +1,11 @@
-const { DataTypes, Model } = require("sequelize");
-const { sendDataRequest }  = require("../../mail");
-const Activity             = require("./Activity");
+const { DataTypes }          = require("sequelize");
+const { sendDataRequest }    = require("../../mail");
+const { default: BaseModel } = require("./BaseModel");
 
 
 
-module.exports = class DataRequest extends Model
+module.exports = class DataRequest extends BaseModel
 {
-    toString() {
-        return `DataRequest #${this.get("id")} ("${this.get("name")}")`;
-    }
-
     /**
      * @param {import("sequelize").Sequelize} sequelize
      */
@@ -118,28 +114,10 @@ module.exports = class DataRequest extends Model
                     }
                 },
 
-                async afterCreate(model, { user }) {
-                    await Activity.create({
-                        message: `${model} created by ${user ? user.name || "user #" + user.id : "system"}`,
-                        tags   : "requests"
-                    });
+                async afterCreate(model) {
                     // Note that we don't wait for this to complete
                     sendDataRequest(model.toJSON()).catch(console.error);
 
-                },
-
-                async afterUpdate(model, { user }) {
-                    await Activity.create({
-                        message: `${model} updated by ${user ? user.name || "user #" + user.id : "system"}`,
-                        tags   : "requests"
-                    });
-                },
-
-                async afterDestroy(model, { user }) {
-                    await Activity.create({
-                        message: `${model} deleted by ${user ? user.name || "user #" + user.id : "system"}`,
-                        tags   : "requests"
-                    });
                 }
             }
         });

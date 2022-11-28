@@ -1,8 +1,8 @@
-const { DataTypes, Model } = require("sequelize");
-const Bcrypt               = require("bcryptjs");
-const moment               = require("moment");
-// const Activity             = require("./Activity");
-const { logger } = require("../../logger");
+const { DataTypes }          = require("sequelize");
+const Bcrypt                 = require("bcryptjs");
+const moment                 = require("moment");
+const { logger }             = require("../../logger");
+const { default: BaseModel } = require("./BaseModel");
 
 
 /**
@@ -29,10 +29,14 @@ function validatePassword(pass) {
     }
 }
 
-module.exports = class User extends Model
+module.exports = class User extends BaseModel
 {
     toString() {
-        return `User "${this.get("name") || this.get("email")}"`;
+        return `User "${this.get("email")}"`;
+    }
+
+    isOwnedBy(user) {
+        return user && user.id && user.id === this.get("id")
     }
 
     /**
@@ -74,7 +78,9 @@ module.exports = class User extends Model
                         this.setDataValue("password", null)
                     } else {
                         validatePassword(pass + "")
-                        this.setDataValue("password", Bcrypt.hashSync(pass, Bcrypt.genSaltSync(10)))
+                        this.setDataValue("password", Bcrypt.hashSync(pass, Bcrypt.genSaltSync(
+                            process.env.NODE_ENV === "test" ? 1 : 10 // speed up tests
+                        )))
                     }
                 },
                 validate: {
@@ -144,10 +150,6 @@ module.exports = class User extends Model
                 async afterUpdate(model) {
                     if (model.changed("sid")) {
                         logger.info(`${model} ${model.sid ? "logged in" : "logged out"}`, { tags: ["AUTH", "ACTIVITY"] })
-                        // await Activity.create({
-                        //     message: `${model} ${model.sid ? "logged in" : "logged out"}`,
-                        //     tags: "auth"
-                        // })
                     }
                 }
             }

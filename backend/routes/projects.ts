@@ -1,18 +1,17 @@
 import express                    from "express"
-import auth                       from "../controllers/Auth"
 import Model                      from "../db/models/Project"
 import { route }                  from "../lib/route"
-import { NotFound }               from "../errors"
+import { NotFound, Unauthorized } from "../errors"
 import { assert, getFindOptions } from "../lib"
+import { AppRequest } from ".."
 
 
-const router = module.exports = express.Router({ mergeParams: true });
+const router = express.Router({ mergeParams: true });
 
 // List all --------------------------------------------------------------------
 route(router, {
     path: "/",
     method: "get",
-    permission: "projects_list",
     handler: async (req, res) => {
         res.json(await Model.findAll(getFindOptions(req)))
     }
@@ -26,13 +25,11 @@ route(router, {
         schema: {
             id: {
                 in: ['params'],
-                errorMessage: 'ID is wrong',
                 isInt: {
-                    errorMessage: "The 'id' parameter must be integer"
-                },
-                custom: {
-                    options: x => x > 0,
-                    errorMessage: "The 'id' parameter must be a positive integer"
+                    errorMessage: "The 'id' parameter must be a positive integer",
+                    options: {
+                        gt: 0
+                    }
                 },
                 toInt: true,
             }
@@ -41,7 +38,6 @@ route(router, {
     handler: async (req, res) => {
         const model = await Model.findByPk(+req.params?.id);
         assert(model, NotFound);
-        auth.requestPermission("projects_view", req, req.user?.id === model.creatorId)
         res.json(model)
     }
 })
@@ -54,13 +50,11 @@ route(router, {
         schema: {
             id: {
                 in: ['params'],
-                errorMessage: 'ID is wrong',
                 isInt: {
-                    errorMessage: "The 'id' parameter must be integer"
-                },
-                custom: {
-                    options: x => x > 0,
-                    errorMessage: "The 'id' parameter must be a positive integer"
+                    errorMessage: "The 'id' parameter must be a positive integer",
+                    options: {
+                        gt: 0
+                    }
                 },
                 toInt: true,
             },
@@ -77,10 +71,9 @@ route(router, {
         }
     },
     handler: async (req, res) => {
-        const model = await Model.findByPk(+req.params?.id);
+        const model = await Model.findByPk(req.params.id);
         assert(model, NotFound);
-        auth.requestPermission("projects_update", req, req.user?.id === model.creatorId)
-        res.json(await model.update(req.body, { user: req.user }))
+        res.json(await model.update(req.body))
     }
 });
 
@@ -88,7 +81,6 @@ route(router, {
 route(router, {
     path: "/",
     method: "post",
-    permission: "projects_create",
     request: {
         schema: {
             name: {
@@ -103,9 +95,12 @@ route(router, {
             }
         }
     },
-    handler: async (req, res) => {
-        const attributes = { ...req.body, creatorId: req.user?.id }
-        res.json(await Model.create(attributes, { user: req.user } as any))
+    handler: async (req: AppRequest, res) => {
+        assert(req.user?.id, "Guest cannot create projects", Unauthorized)
+        res.json(await Model.create({
+            ...req.body,
+            creatorId: req.user?.id
+        }))
     }
 });
 
@@ -117,13 +112,11 @@ route(router, {
         schema: {
             id: {
                 in: ['params'],
-                errorMessage: 'ID is wrong',
                 isInt: {
-                    errorMessage: "The 'id' parameter must be integer"
-                },
-                custom: {
-                    options: x => x > 0,
-                    errorMessage: "The 'id' parameter must be a positive integer"
+                    errorMessage: "The 'id' parameter must be a positive integer",
+                    options: {
+                        gt: 0
+                    }
                 },
                 toInt: true,
             }
@@ -132,8 +125,9 @@ route(router, {
     handler: async (req, res) => {
         const model = await Model.findByPk(+req.params?.id);
         assert(model, NotFound);
-        auth.requestPermission("projects_delete", req, req.user?.id === model.creatorId)
-        await model.destroy({ user: req.user })
+        await model.destroy()
         res.json(model)
     }
 });
+
+export default router

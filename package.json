@@ -50,7 +50,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "test:server": "DOTENV_CONFIG_PATH=backend/test.env nyc --reporter=lcov ts-mocha -p test/tsconfig.json --exit"
+    "test:server": "DOTENV_CONFIG_PATH=backend/test.env nyc --reporter=lcov ts-mocha -p test/tsconfig.json"
   },
   "eslintConfig": {
     "extends": [
