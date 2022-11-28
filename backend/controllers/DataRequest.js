@@ -10,7 +10,7 @@ const Model            = require("../db/models/DataRequest");
 const GroupModel       = require("../db/models/RequestGroup");
 const ViewModel        = require("../db/models/View");
 const { requireAuth }  = require("./Auth");
-const createRestRoutes = require("./BaseController");
+const createRestRoutes = require("./BaseController").default;
 const ImportJob        = require("../DataManager/ImportJob");
 const { logger }       = require("../logger");
 const { route }        = require("../lib/route");
@@ -107,7 +107,7 @@ router.get("/:id/refresh", requireAuth("admin"), rw(async (req, res) => {
     const model = await Model.findByPk(req.params.id, getFindOptions(req))
     assert(model, "Model not found", HttpError.NotFound)
     const data = await fetchData(model)
-    await model.set({ data, completed: new Date() }).save({ user: req.user })
+    await model.set({ data, completed: new Date() }).save()
     res.json(model)
 }));
 
@@ -360,15 +360,14 @@ router.get("/:id/api", rw(async (req, res) => {
 }));
 
 createRestRoutes(router, Model, {
-    destroy: "data_request_delete",
-    getAll : "data_request_delete"
+    destroy: true,
+    getAll : true
 });
 
 // Get single subscription -----------------------------------------------------
 route(router, {
     path: "/:id",
     method: "get",
-    permission: "data_request_list",
     request: {
         schema: {
             id: {
@@ -433,7 +432,6 @@ route(router, {
 route(router, {
     path: "/:id",
     method: "put",
-    permission: "data_request_update",
     request: {
         schema: {
             id: {
@@ -467,7 +465,7 @@ route(router, {
         } catch (ex) {
             await transaction.rollback()
             const error = new HttpError.InternalServerError("Updating subscription failed", { tags: ["DATA"] })
-            error.cause = ex
+            error.cause = ex.stack
             throw error
         }
     }
@@ -477,7 +475,6 @@ route(router, {
 route(router, {
     path: "/",
     method: "post",
-    permission: "data_request_create",
     request: {
         schema: {
             name: {
@@ -500,7 +497,7 @@ route(router, {
         }
     },
     handler: async (req, res) => {
-        const model = await Model.create(req.body, { user: req.user })
+        const model = await Model.create(req.body)
         await model.setTags(req.body.Tags.map(t => t.id))
         res.json(model)
     }

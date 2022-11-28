@@ -1,4 +1,4 @@
-import { InstanceDestroyOptions, Options } from "sequelize"
+import { InstanceDestroyOptions, ModelStatic, Options } from "sequelize"
 import { ParsedQs } from "qs"
 import {
     Request,
@@ -8,6 +8,25 @@ import {
     NextFunction
 } from "express-serve-static-core"
 
+type Role = "guest" | "user" | "manager" | "admin" | "owner" | "system"
+
+declare module 'sequelize' {
+    interface Sequelize {
+        user: CurrentUser
+    }
+    interface InstanceUpdateOptions {
+        __role__?: Role
+    }
+    interface InstanceDestroyOptions {
+        __role__?: Role
+    }
+    interface FindOptions {
+        __role__?: Role
+    }
+    interface CreateOptions {
+        __role__?: Role
+    }
+}
 
 interface ModelDestroyOptions extends InstanceDestroyOptions {
     user?: CurrentUser
@@ -46,9 +65,10 @@ interface Config {
 }
 
 interface CurrentUser {
-    id: number
+    id   : number
     email: string
-    [key: string]: any
+    role : Role
+    [key : string]: any
 }
 
 interface AppRequest<

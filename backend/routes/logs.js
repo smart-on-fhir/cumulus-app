@@ -1,12 +1,14 @@
 const express = require("express");
 const moment  = require("moment");
-const { requirePermission } = require("../controllers/Auth");
+const { requirePermissionMiddleware } = require("../acl");
 const { combinedLogger }  = require("../logger");
 
 
 const router = module.exports = express.Router({ mergeParams: true });
 
-router.get("/", requirePermission("logs_list"), (req, res, next) => {
+router.get("/",
+    requirePermissionMiddleware("Logs.read"),
+    (req, res, next) => {
 
     const levels = String(req.query.levels || "").trim().split(/\s*,\s*/).filter(Boolean);
 

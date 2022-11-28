@@ -6,7 +6,6 @@ const { debuglog }  = require("util");
 const User          = require("../db/models/User");
 const mail          = require("../mail");
 const { assert }    = require("../lib");
-const { roles }     = require("../acl");
 
 const debug = debuglog("app");
 
@@ -17,11 +16,11 @@ const debug = debuglog("app");
  * @see lib.getFindOptions
  */
 async function getAllUsers(options = {}) {
-    try {
+    // try {
         return await User.findAll(options);
-    } catch {
-        throw new HttpError.BadRequest("Error reading users");
-    }
+    // } catch (cause) {
+        // throw new HttpError.BadRequest("Error reading users", { cause });
+    // }
 }
 
 /**
@@ -50,11 +49,11 @@ async function deleteUser(id) {
  * @param {Record<string, any>} payload
  */
 async function createUser(payload) {
-    try {
+    // try {
         return await User.create(payload)
-    } catch {
-        throw new HttpError.BadRequest("Error creating user");
-    }
+    // } catch {
+    //     throw new HttpError.BadRequest("Error creating user");
+    // }
 }
 
 /**
@@ -65,13 +64,13 @@ async function createUser(payload) {
 async function updateUser(id, payload) {
     const model = await User.findByPk(id);
     assert(model, "User not found", HttpError.NotFound);
-    try {
+    // try {
         delete payload.id
         delete payload.email
         return await model.update(payload);
-    } catch {
-        throw new HttpError.BadRequest("Error updating user");
-    }
+    // } catch {
+    //     throw new HttpError.BadRequest("Error updating user");
+    // }
 }
 
 /**
@@ -112,7 +111,9 @@ async function updateAccount(sid, payload) {
             role : model.getDataValue("role")
         };
     } catch (e) {
-        throw new HttpError.BadRequest("Error updating account")
+        const error = new HttpError.BadRequest("Error updating account")
+        error.cause = e.stack
+        throw error
     }
 }
 
@@ -126,7 +127,7 @@ async function updateAccount(sid, payload) {
  */
 async function activateAccount({ code, name, newPassword1, newPassword2 }) {
 
-    const user = await User.findOne({ where: { activationCode: code }})
+    const user = await User.findOne({ where: { activationCode: code }, __role__: "system" })
 
     // No such user. Perhaps the invitation expired and the temp. user was deleted
     assert(user, "Invalid or expired invitation", HttpError.NotFound);
@@ -143,11 +144,12 @@ async function activateAccount({ code, name, newPassword1, newPassword2 }) {
     assert(newPassword1 === newPassword2, "Passwords do not match", HttpError.BadRequest);
 
     try {
-        await user.update({ name, password: newPassword1 })
+        await user.update({ name, password: newPassword1 }, { __role__: "owner" })
         // @ts-ignore 
         return { name: user.name }
-    } catch {
-        throw new HttpError.BadRequest("Error activating account")
+    } catch (cause) {
+        // console.error(cause)
+        throw new HttpError.BadRequest("Error activating account", { cause })
     }
 }
 
@@ -157,7 +159,7 @@ async function activateAccount({ code, name, newPassword1, newPassword2 }) {
  */
 async function checkActivation(activationCode) {
     
-    const user = await User.findOne({ where: { activationCode }})
+    const user = await User.findOne({ where: { activationCode }, __role__: "system" })
 
     // No such user. Perhaps the invitation expired and the temp. user was deleted
     assert(user, "Invalid or expired invitation", HttpError.NotFound);
@@ -177,7 +179,7 @@ async function checkActivation(activationCode) {
  * Invite new user
  * @param {object} options 
  * @param {string} options.email      New user's email 
- * @param {keyof roles} options.role  New user's role 
+ * @param {"user"|"manager"|"admin"} options.role  New user's role 
  * @param {string} [options.message]  Personal message to include in the invitation email
  * @param {string} invitedBy The email of the user who invites this one 
  * @param {string} baseUrl Used to build the activation link in the email
@@ -198,7 +200,7 @@ async function handleUserInvite({ email, role, message }, invitedBy, baseUrl) {
             transaction
         });
     } catch (e) {
-
+        // console.error(e)
         debug(e)
 
         await transaction.rollback()
@@ -207,7 +209,7 @@ async function handleUserInvite({ email, role, message }, invitedBy, baseUrl) {
             throw new HttpError.BadRequest("User already invited")
         }
 
-        throw new HttpError.InternalServerError("Error crating new user")
+        throw e//new HttpError.InternalServerError("Error crating new user")
     }
 
     try {

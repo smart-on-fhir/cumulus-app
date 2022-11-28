@@ -3,8 +3,7 @@ import { Router }                                from "express-serve-static-core
 import { checkSchema, Schema, validationResult } from "express-validator"
 import { logger }                                from "../logger"
 import { HttpError, BadRequest }                 from "../errors"
-import { requirePermission }                     from "../controllers/Auth"
-import { ACL }                                   from "../acl"
+import { requirePermissionMiddleware, ACL }      from "../acl"
 import { AppRequestHandler }                     from ".."
 
 
@@ -12,7 +11,7 @@ export function route(router: Router, options: {
     path: string
     method: "get" | "post" | "put" | "delete"
     handler: AppRequestHandler
-    permission?: keyof typeof ACL | (keyof typeof ACL)[]
+    permission?: string[]
     request?: {
         schema?: Schema
     }
@@ -32,10 +31,10 @@ export function route(router: Router, options: {
     if (options.permission) {
         if (Array.isArray(options.permission)) {
             options.permission.forEach(permission => {
-                middlewares.push(requirePermission(permission))
+                middlewares.push(requirePermissionMiddleware(permission))
             })
         } else {
-            middlewares.push(requirePermission(options.permission))
+            middlewares.push(requirePermissionMiddleware(options.permission))
         }
     }
 

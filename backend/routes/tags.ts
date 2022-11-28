@@ -2,7 +2,6 @@ import { Response, Router } from "express"
 import { Includeable }      from "sequelize/types"
 import Tag                  from "../db/models/Tag"
 import * as lib             from "../lib"
-import * as auth            from "../controllers/Auth"
 import { NotFound }         from "../errors"
 import { assert }           from "../lib"
 import { route }            from "../lib/route"
@@ -15,8 +14,7 @@ const router = Router({ mergeParams: true });
 route(router, {
     path: "/",
     method: "get",
-    permission: ["tags_list"],
-    handler: async (req: AppRequest, res: Response) => {
+    async handler(req: AppRequest, res: Response) {
         res.json(await Tag.findAll(lib.getFindOptions(req)));
     }
 })
@@ -28,15 +26,14 @@ route(router, {
     request: {
         schema: {
             id: {
-                in: ["params"],
+                in: ['params'],
                 isInt: {
-                    errorMessage: "The 'id' parameter must be integer"
+                    errorMessage: "The 'id' parameter must be a positive integer",
+                    options: {
+                        gt: 0
+                    }
                 },
-                custom: {
-                    options: x => x > 0,
-                    errorMessage: "The 'id' parameter must be a positive integer"
-                },
-                toInt: true
+                toInt: true,
             },
 
             // If set include the creator id and email
@@ -63,10 +60,8 @@ route(router, {
             }
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
+    async handler(req: AppRequest, res: Response) {
         
-        const permissions = ["tags_view"];
-
         const include: Includeable[] = [];
 
         if (req.query.creator) {
@@ -74,7 +69,6 @@ route(router, {
         }
 
         if (req.query.graphs) {
-            permissions.push("views_list")
             include.push({
                 association: "graphs",
                 attributes: [
@@ -90,7 +84,6 @@ route(router, {
         }
 
         if (req.query.subscriptions) {
-            permissions.push("data_request_list")
             include.push({
                 association: "subscriptions",
                 attributes: [
@@ -105,7 +98,6 @@ route(router, {
 
         const model = await Tag.findByPk(req.params.id, { include });
         assert(model, NotFound);
-        permissions.forEach(p => auth.requestPermission(p as any, req, req.user?.id === model.creatorId))
         res.json(model)
     }
 });
@@ -118,13 +110,11 @@ route(router, {
         schema: {
             id: {
                 in: ['params'],
-                errorMessage: 'ID is wrong',
                 isInt: {
-                    errorMessage: "The 'id' parameter must be integer"
-                },
-                custom: {
-                    options: x => x > 0,
-                    errorMessage: "The 'id' parameter must be a positive integer"
+                    errorMessage: "The 'id' parameter must be a positive integer",
+                    options: {
+                        gt: 0
+                    }
                 },
                 toInt: true,
             },
@@ -148,11 +138,10 @@ route(router, {
             }
         }
     },
-    handler: async (req, res) => {
-        const model = await Tag.findByPk(+req.params?.id);
+    async handler(req: AppRequest, res: Response) {
+        const model = await Tag.findByPk(req.params.id);
         assert(model, NotFound);
-        auth.requestPermission("tags_update", req, req.user?.id === model.creatorId)
-        res.json(await model.update(req.body, { user: req.user }))
+        res.json(await model.update(req.body))
     }
 });
 
@@ -160,33 +149,34 @@ route(router, {
 route(router, {
     path: "/",
     method: "post",
-    permission: "tags_create",
     request: {
         schema: {
             name: {
                 in: ['body'],
                 exists: true,
                 notEmpty: true,
-                custom: {
-                    options: x => x.length <= 50,
-                    errorMessage: "The name cannot be longer than 50 characters"
+                isLength: {
+                    errorMessage: "The name cannot be longer than 50 characters",
+                    options: {
+                        max: 50
+                    }
                 }
             },
             description: {
                 in: ['body'],
                 exists: true,
                 notEmpty: true,
-                custom: {
-                    options: x => x.length <= 200,
-                    errorMessage: "The description cannot be longer than 200 characters"
+                isLength: {
+                    errorMessage: "The description cannot be longer than 200 characters",
+                    options: {
+                        max: 200
+                    }
                 }
             }
         }
     },
-    handler: async (req, res) => {
-        const attributes = { ...req.body, creatorId: req.user?.id }
-        const model = await Tag.create(attributes, { user: req.user } as any)
-        res.json(model)
+    async handler(req: AppRequest, res: Response) {
+        res.json(await Tag.create({ ...req.body, creatorId: req.user?.id }))
     }
 });
 
@@ -198,26 +188,22 @@ route(router, {
         schema: {
             id: {
                 in: ['params'],
-                errorMessage: 'ID is wrong',
                 isInt: {
-                    errorMessage: "The 'id' parameter must be integer"
-                },
-                custom: {
-                    options: x => x > 0,
-                    errorMessage: "The 'id' parameter must be a positive integer"
+                    errorMessage: "The 'id' parameter must be a positive integer",
+                    options: {
+                        gt: 0
+                    }
                 },
                 toInt: true,
             }
         }
     },
-    handler: async (req, res) => {
-        const model = await Tag.findByPk(+req.params?.id);
+    async handler(req: AppRequest, res: Response) {
+        const model = await Tag.findByPk(req.params.id);
         assert(model, NotFound);
-        auth.requestPermission("tags_delete", req, req.user?.id === model.creatorId)
-        await model.destroy({ user: req.user })
+        await model.destroy()
         res.json(model)
     }
 });
 
-// @ts-ignore
-export = router
+export default router

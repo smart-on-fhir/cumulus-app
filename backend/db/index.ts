@@ -3,7 +3,7 @@ import { Umzug, SequelizeStorage } from "umzug"
 import { Config }                  from ".."
 import { getDockerContainer }      from "./Docker"
 import { logger }                  from "../logger"
-import { init as initModels }      from "./models"
+import { attachHooks, init as initModels }      from "./models"
 
 
 let connection: Sequelize;
@@ -35,23 +35,6 @@ async function connectToDatabase(options: Config)
         logger.error("✘ Failed to connected to the database", { ...ex, tags: ["DATA"] });
         throw ex;
     }
-}
-
-async function applyAssociations()
-{
-    Object.keys(connection.models).forEach(modelName => {
-        // @ts-ignore
-        const associate = connection.models[modelName].associate;
-        if (associate) {
-            try {
-                associate(connection);
-            } catch (e) {
-                logger.error(`Activating the associations of model "${modelName}" FAILED!`, { ...e, tags: ["DATA"] })
-                throw e
-            }
-        }
-    });
-    logger.verbose("✔ Activated model associations", { tags: ["DATA"] });
 }
 
 async function syncModels(options: Config)
@@ -91,7 +74,7 @@ async function applyMigrations(options: Config, dbConnection: Sequelize)
     const umzug = new Umzug({
         context: dbConnection.getQueryInterface(),
         migrations: {
-            glob: ["migrations/*.js", { cwd: __dirname }],
+            glob: ["migrations/*.ts", { cwd: __dirname }],
             resolve: ({ name, path, context }) => {
 
                 // @ts-ignore
@@ -164,6 +147,8 @@ export default async function setupDB(options: Config): Promise<Sequelize>
 
     // Insert seeds (if enabled)
     await applySeeds(options, connection)
+
+    attachHooks(connection)
 
     require("../Scheduler");
     

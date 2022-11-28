@@ -67,10 +67,10 @@ function setupAPI(app)
     app.use("/api/request-groups", require("./controllers/RequestGroup").default);
     app.use("/api/requests"      , require("./controllers/DataRequest" ));
     app.use("/api/views"         , require("./controllers/View"        ));
-    app.use("/api/users"         , require("./routes/users"            ));
-    app.use("/api/projects"      , require("./routes/projects"         ));
+    app.use("/api/users"         , require("./routes/users"            ).default);
+    app.use("/api/projects"      , require("./routes/projects"         ).default);
     app.use("/api/logs"          , require("./routes/logs"             ));
-    app.use("/api/tags"          , require("./routes/tags"             ));
+    app.use("/api/tags"          , require("./routes/tags"             ).default);
     app.use("/api/activity"      , require("./controllers/Activity"    ));
     app.use("/api/data-sites"    , require("./controllers/DataSites"   ));
     logger.verbose("✔ REST API set up");
@@ -106,6 +106,7 @@ function setUpErrorHandlers(app)
             }
             logger.error(`${error.status} ${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => `, error)
             const msg = error.message.replace(/^\s*\w*Error:\s+/, "")
+            // console.error(error)
             res.status(error.status).send(msg)
         }
 

@@ -3,12 +3,13 @@ import { Express }              from "express-serve-static-core"
 import { expect }               from "chai"
 import { Sequelize }            from "sequelize"
 import main                     from "../backend/index"
-import { ACL, roles }           from "../backend/acl"
+// import { ACL, roles }           from "../backend/acl"
 import Users                    from "./fixtures/Users"
 import { fixAutoIncrement }     from "../backend/lib"
+import { getPermissionsForRole } from "../backend/acl"
 
-type Action = keyof typeof ACL
-type Role   = keyof typeof roles
+// type Action = keyof typeof ACL
+// type Role   = keyof typeof roles
 
 
 export const admin = Users.find(u => u.role === "admin")!
@@ -87,7 +88,7 @@ const SERVER = new Server();
 
 export const server = SERVER
 
-function getCookie(role: "guest" | "admin" | "manager" | "user" | string) {
+export function getCookie(role: "guest" | "admin" | "manager" | "user" | string) {
     if (role === "guest") {
         return ""
     }
@@ -103,99 +104,6 @@ function getCookie(role: "guest" | "admin" | "manager" | "user" | string) {
     return ""
 }
 
-export function testCRUDEndpointPermissions(mountPoint: string, modelName: string, data: Record<string, any>[], {
-    getAll  = "",
-    getOne  = "",
-    create  = "",
-    update  = "",
-    destroy = ""
-}: {
-    getAll ?: string,
-    getOne ?: string
-    create ?: string
-    update ?: string
-    destroy?: string
-}) {
-
-    describe("ACL tests for " + mountPoint, () => {
-    
-        afterEach(async () => await resetTable(modelName, data))
-
-        if (getAll) {
-            for (const role in roles) {
-                const allowed = !!ACL[getAll as Action][roles[role as Role]];
-                it (`${allowed ? "Allows" : "Does NOT allow"} "${role}" to GET ${mountPoint}`, async () => {
-                    const headers: Record<string, any> = {};
-                    const cookie = getCookie(role)
-                    if (cookie) headers.cookie = cookie
-                    const res = await fetch(`${SERVER.baseUrl}${mountPoint}`, { headers })
-                    expect(res.status === (role === "guest" || !cookie ? 401 : 403)).to.equal(!allowed)
-                })
-            }
-        }
-
-        if (getOne) {
-            for (const role in roles) {
-                const allowed = !!ACL[getOne as Action][roles[role as Role]];
-                it (`${allowed ? "Allows" : "Does NOT allow"} "${role}" to GET ${mountPoint}/1`, async () => {
-                    const headers: Record<string, any> = {};
-                    const cookie = getCookie(role)
-                    if (cookie) headers.cookie = cookie
-                    const res = await fetch(`${SERVER.baseUrl}${mountPoint}/1`, { headers })
-                    expect(res.status === (role === "guest" || !cookie ? 401 : 403)).to.equal(!allowed)
-                })
-            }
-        }
-
-        if (create) {
-            for (const role in roles) {
-                const allowed = !!ACL[create as Action][roles[role as Role]];
-                it (`${allowed ? "Allows" : "Does NOT allow"} "${role}" to POST ${mountPoint}`, async () => {
-                    const headers: Record<string, any> = { "content-type": "application/json" };
-                    const cookie = getCookie(role)
-                    if (cookie) headers.cookie = cookie
-                    const res = await fetch(`${SERVER.baseUrl}${mountPoint}`, {
-                        method: "POST",
-                        body: "{}",
-                        headers
-                    })
-                    expect(res.status === (role === "guest" || !cookie ? 401 : 403)).to.equal(!allowed)
-                })
-            }
-        }
-
-        if (update) {
-            for (const role in roles) {
-                const allowed = !!ACL[update as Action][roles[role as Role]];
-                it (`${allowed ? "Allows" : "Does NOT allow"} "${role}" to PUT ${mountPoint}/1`, async () => {
-                    const headers: Record<string, any> = {};
-                    const cookie = getCookie(role)
-                    if (cookie) headers.cookie = cookie
-                    const res = await fetch(`${SERVER.baseUrl}${mountPoint}/1`, { method: "PUT", headers })
-                    expect(res.status === (role === "guest" || !cookie ? 401 : 403)).to.equal(!allowed)
-                })
-            }
-        }
-
-        if (destroy) {
-            for (const role in roles) {
-                const allowed = !!ACL[destroy as Action][roles[role as Role]];
-                it (`${allowed ? "Allows" : "Does NOT allow"} "${role}" to DELETE ${mountPoint}/1`, async () => {
-                    const headers: Record<string, any> = {};
-                    const cookie = getCookie(role)
-                    if (cookie) headers.cookie = cookie
-                    const res = await fetch(`${SERVER.baseUrl}${mountPoint}/1`, { method: "DELETE", headers })
-                    // console.log(res.status, await res.text())
-                    if (allowed) {
-                        expect([401, 403]).to.not.include(res.status)    
-                    } else {
-                        expect(res.status).to.equal(role === "guest" || !cookie ? 401 : 403)
-                    }
-                })
-            }
-        }
-    })
-}
 
 export async function resetTable(modelName: string, data: Record<string, any>[]) {
     const dbConnection: Sequelize = SERVER.app.get("dbConnection")
@@ -203,6 +111,40 @@ export async function resetTable(modelName: string, data: Record<string, any>[])
     await ModelConstructor.sync({ force: true })
     await ModelConstructor.bulkCreate(data)
     await fixAutoIncrement(dbConnection, ModelConstructor.tableName, "id")
+}
+
+export function testEndpoint(permission: string, method: "GET" | "PUT" | "POST" | "DELETE", uri: string, payload?: any) {
+    ["guest", "user", "manager", "admin"].forEach(role => {
+        const permissions = getPermissionsForRole(role as any);
+
+        const options: RequestInit = { method }
+        const headers: Record<string, any> = {};
+        const cookie = getCookie(role)
+        if (cookie) {
+            headers.cookie = cookie
+        }
+        if (payload) {
+            headers["content-type"] = "application/json"
+            options.body = JSON.stringify(payload)
+        }
+        options.headers = headers
+
+        if (permissions.includes(permission)) {
+            it (`${role} can ${method} ${uri}`, async () => {
+                const res = await fetch(`${server.baseUrl}${uri}`, options)
+                expect(res.status).to.equal(200)
+                if (payload) {
+                    const json = await res.json()
+                    expect(json).to.include(payload)
+                }
+            })
+        } else {
+            it (`${role} cannot ${method} ${uri}`, async () => {
+                const res = await fetch(`${server.baseUrl}${uri}`, options)
+                expect(res.status).to.equal(role === "guest" ? 401 : 403)
+            })
+        }
+    })
 }
 
 before(async function() {

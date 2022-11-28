@@ -1,10 +1,9 @@
 // import User from "./User"
 import {
-    Model,
     InferAttributes,
     InferCreationAttributes,
     CreationOptional,
-    // HasManyGetAssociationsMixin,
+    HasManyGetAssociationsMixin,
     // HasManyAddAssociationMixin,
     // HasManyAddAssociationsMixin,
     // HasManySetAssociationsMixin,
@@ -21,12 +20,14 @@ import {
     BelongsToGetAssociationMixin
 } from "sequelize"
 import { ModelDestroyOptions } from "../..";
-// import { hasPermission, requestPermission } from "../../controllers/Auth";
+import BaseModel from "./BaseModel";
+import DataRequest from "./DataRequest";
+import View from "./View";
 
 
 
 
-export default class Tag extends Model<InferAttributes<Tag>, InferCreationAttributes<Tag>>
+export default class Tag extends BaseModel<InferAttributes<Tag>, InferCreationAttributes<Tag>>
 {
     declare id: CreationOptional<number>;
     declare name: string;
@@ -38,7 +39,8 @@ export default class Tag extends Model<InferAttributes<Tag>, InferCreationAttrib
     // Since TS cannot determine model association at compile time
     // we have to declare them here purely virtually
     // these will not exist until `Model.init` was called.
-    // declare getProjects: HasManyGetAssociationsMixin<Tag>; // Note the null assertions!
+    declare getGraphs: HasManyGetAssociationsMixin<View>; // Note the null assertions!
+    declare getSubscriptions: HasManyGetAssociationsMixin<DataRequest>;
     // declare addProject: HasManyAddAssociationMixin<Tag, number>;
     // declare addProjects: HasManyAddAssociationsMixin<Tag, number>;
     // declare setProjects: HasManySetAssociationsMixin<Tag, number>;
@@ -70,6 +72,10 @@ export default class Tag extends Model<InferAttributes<Tag>, InferCreationAttrib
     //     owner: Association<Tag, User>;
     // };
 
+    public isOwnedBy(user: any): boolean {
+        return user.id === this.creatorId
+    }
+
     static initialize(sequelize: Sequelize) {
         return Tag.init(
             {
@@ -86,25 +92,12 @@ export default class Tag extends Model<InferAttributes<Tag>, InferCreationAttrib
                     type: new DataTypes.STRING(200),
                     allowNull: false
                 },
-                // creatorId: {
-                //     type: DataTypes.INTEGER,
-                //     // allowNull: false,
-                //     references: {
-                //         model: "Users",
-                //         key: "id"
-                //     }
-                // },
                 createdAt: DataTypes.DATE,
                 updatedAt: DataTypes.DATE,
             },
             {
                 sequelize,
-                tableName: 'Tags',
-                // hooks: {
-                //     beforeUpdate: async(model, options) => {
-                //         hasPermission("tags_update", options.)
-                //     }
-                // }
+                tableName: 'Tags'
             }
         )
     }

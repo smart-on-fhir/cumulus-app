@@ -11,7 +11,7 @@ async function getAll(options = {}) {
     try {
         return await Project.findAll(options);
     } catch (e) {
-        throw new HttpError.BadRequest("Error reading projects", { options });
+        throw new HttpError.BadRequest("Error reading projects", { options, cause: e });
     }
 }
 
