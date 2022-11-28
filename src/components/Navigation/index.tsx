@@ -71,7 +71,7 @@ export default function Navigation()
                 
                 <NavGroup icon="fa-solid fa-database" label="Data">
                     <NavLink to="/requests" end><i className="icon fa-solid fa-database" /> Data Subscriptions</NavLink>
-                    <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Data Request Groups</NavLink>
+                    <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Subscription Groups</NavLink>
                     <NavLink to="/requests/new"><i className="icon fa-solid fa-calendar-plus" /> New Data Subscription</NavLink>
                 </NavGroup>
                 
