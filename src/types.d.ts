@@ -286,6 +286,7 @@ declare module app {
         creatorId  : number
         updatedAt  : string
         createdAt  : string
+        Subscriptions?: DataRequest[]
     }
 
     

@@ -5,6 +5,7 @@ import Breadcrumbs                from "../Breadcrumbs"
 import Clip                       from "../generic/Clip"
 import MenuButton                 from "../MenuButton"
 import EndpointListWrapper        from "../generic/EndpointListWrapper"
+import Grid                       from "../generic/Grid"
 import "./Projects.scss"
 
 
@@ -34,44 +35,55 @@ export default function Projects()
                     }
 
                     return (
-                        <div className="row wrap" style={{ margin: "0 -1rem" }}>
-                            { data.map((project, i) => (
-                                <div className="col project" key={i}>
-                                    <h3>{ project.name }</h3>
-                                    <p style={{ whiteSpace: "pre-wrap" }}><Clip max={600} txt={ project.description } /></p>
-                                    <br/>
-                                    <br/>
-                                    <div style={{ flex: 1 }}/>
-                                    <div className="row gap color-muted small mb-1" style={{ justifyContent: "space-around" }}>
-                                        <div className="col col-0">
-                                            <i>Graphs: <span className="color-brand-2">0</span></i>
-                                        </div>
-                                        <div className="col col-0">
-                                            <i>Created: <span className="color-brand-2">{ moment(project.createdAt).format("M/D/Y") }</span></i>
-                                        </div>
-                                        <div className="col col-0">
-                                            <i>Updated: <span className="color-brand-2">{ moment(project.updatedAt).format("M/D/Y") }</span></i>
+                        <Grid cols="25em" gap="2rem">
+                            { data.map((project, i) => {
+
+                                const graphsCount = project.Subscriptions?.reduce((prev, cur) => {
+                                    return prev + (cur.Views?.length || 0)
+                                }, 0) || 0
+                                
+                                return (
+                                    <div className="col project" key={i}>
+                                        <h3>{ project.name }</h3>
+                                        <p style={{ whiteSpace: "pre-wrap" }}><Clip max={600} txt={ project.description } /></p>
+                                        <br/>
+                                        <br/>
+                                        <div style={{ flex: 1 }}/>
+                                        <Grid cols="1fr 5fr 1fr" className="small center mb-05">
+                                            <i className="nowrap">
+                                                <span className="color-muted">Graphs: </span>
+                                                <span className="color-brand-2">{ graphsCount }</span>
+                                            </i>
+                                            <i className="nowrap">
+                                                <span className="color-muted">Subscriptions: </span>
+                                                <span className="color-brand-2">{ project.Subscriptions?.length || 0 }</span>
+                                            </i>
+                                            <i className="nowrap">
+                                                <span className="color-muted">Updated: </span>
+                                                <span className="color-brand-2">{ moment(project.updatedAt).format("M/D/Y") }</span>
+                                            </i>
+                                        </Grid>
+                                        <hr/>
+                                        <div className="center">
+                                            <div className="btn btn-blue mt-2 p-0">
+                                                <Link to={`/projects/${project.id}`} className="pl-2 pr-2"><b>Explore</b></Link>
+                                                <MenuButton right items={[
+                                                    <Link to={ `/projects/${project.id}/edit` }>
+                                                        <i className="fa-solid fa-pen-to-square color-blue-dark" /> Edit Project
+                                                    </Link>,
+                                                    <Link to={ `/projects/${project.id}/delete` }>
+                                                        <i className="fa-solid fa-trash-can color-red" /> Delete Project
+                                                    </Link>
+                                                ]}>
+                                                    <i className="fa-solid fa-caret-down small" />
+                                                </MenuButton>
+                                            </div>
                                         </div>
                                     </div>
-                                    <hr/>
-                                    <div className="center">
-                                        <div className="btn btn-blue mt-2 p-0">
-                                            <Link to={`/projects/${project.id}`} className="pl-2 pr-2"><b>Explore</b></Link>
-                                            <MenuButton right items={[
-                                                <Link to={ `/projects/${project.id}/edit` }>
-                                                    <i className="fa-solid fa-pen-to-square color-blue-dark" /> Edit Project
-                                                </Link>,
-                                                <Link to={ `/projects/${project.id}/delete` }>
-                                                    <i className="fa-solid fa-trash-can color-red" /> Delete Project
-                                                </Link>
-                                            ]}>
-                                                <i className="fa-solid fa-caret-down small" />
-                                            </MenuButton>
-                                        </div>
-                                    </div>
-                                </div>
-                            )) }
-                        </div>
+                                )
+                                
+                            }) }
+                        </Grid>
                     )
                 }}
             </EndpointListWrapper>

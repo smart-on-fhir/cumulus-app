@@ -57,7 +57,7 @@ export default function DataRequestsListPage()
                 <div key={i} className="mb-2 mt-2">
                     <h5 className="color-brand-2"><i className="fa-regular fa-folder"/> { group.name }</h5>
                     <hr className="dashed mb-05"/>
-                    <Grid colMinWidth="22em" key={i} className="link-list">
+                    <Grid cols="22em" key={i} className="link-list">
                         { group.requests.map((item, y) => (
                             <DataRequestLink request={item} href="/requests/:id" key={y} />
                         ))}

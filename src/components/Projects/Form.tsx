@@ -9,14 +9,21 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
     error?: Error | string | null
 })
 {
-    const [ name       , setName        ] = useState(data.name        || "")
-    const [ description, setDescription ] = useState(data.description || "")
+    const [ name         , setName          ] = useState(data.name        || "")
+    const [ description  , setDescription   ] = useState(data.description || "")
+    const [ subscriptions, setSubscriptions ] = useState(
+        (data.Subscriptions || []).map((s: app.DataRequest) => s.id).join(",")
+    )
 
     const valid = name && description
 
     function submit(ev: FormEvent) {
         ev.preventDefault()
-        onSubmit({ name, description })
+        onSubmit({
+            name,
+            description,
+            Subscriptions: subscriptions.split(",").filter(Boolean).map(parseFloat)
+        })
     }
 
     return (
@@ -61,7 +68,10 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
                 </div>
                 <div className="col col-6 mb-1 responsive">
                     <label>Included Subscriptions</label>
-                    <LinkWidget />
+                    <LinkWidget
+                        value={subscriptions}
+                        onChange={setSubscriptions}
+                    />
                 </div>
             </div>
             <hr className="mb-2 mt-1" />
