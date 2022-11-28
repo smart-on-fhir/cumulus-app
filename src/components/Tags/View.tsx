@@ -66,7 +66,7 @@ export default function ViewTag() {
                             { data.graphs?.length ?
                                 <>
                                     <p className="color-muted">This tag is assigned to the following graphs:</p>
-                                    <div className="view-browser view-browser-column" style={{ minHeight: 0 }}>
+                                    <div className="view-browser view-browser-list">
                                     { data.graphs.map((v, i) => (
                                         <ViewThumbnail key={i} view={v} showDescription={200} />
                                     ))}
@@ -86,10 +86,12 @@ export default function ViewTag() {
                             { data.subscriptions?.length ?
                                 <>
                                     <p className="color-muted">This tag is assigned to the following data subscriptions:</p>
+                                    <div className="link-list mt-05">
                                     { data.subscriptions.map((s, i) => (
                                         // @ts-ignore
                                         <DataRequestLink key={i} request={s} href={"/requests/" + s.id}/>
                                     ))}
+                                    </div>
                                 </> :
                                 <>
                                     <p className="color-brand-2">This tag is not assigned with any data subscriptions</p>
