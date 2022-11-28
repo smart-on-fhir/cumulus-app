@@ -1,10 +1,9 @@
 import { Component }              from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link }                   from "react-router-dom";
-import { deleteOne, request }     from "../../backend";
-import { AlertError }             from "../Alert";
+import { deleteOne }              from "../../backend";
 import Breadcrumbs                from "../Breadcrumbs";
-import Loader                     from "../Loader";
+import Wrapper                    from "../generic/EndpointListWrapper"
 import "./RequestGroups.scss";
 
 interface State {
@@ -23,14 +22,6 @@ export default class RequestGroupList extends Component<any, State>
             error  : null
         };
     }
-
-    componentDidMount() {
-        request<app.RequestGroup[]>("/api/request-groups").then(
-            records => this.setState({ loading: false, records }),
-            error   => this.setState({ loading: false, error   })
-        );
-    }
-
     
     deleteGroup(id: number) {
         if (window.confirm("If you delete this group, all the subscriptions that " +
@@ -45,9 +36,8 @@ export default class RequestGroupList extends Component<any, State>
     }
         
     render() {
-        const { records, loading, error } = this.state;
         return (
-            <div className="request-groups-list">
+            <div className="request-groups-list container">
                 <HelmetProvider>
                     <Helmet>
                         <title>Data Subscription Groups</title>
@@ -59,7 +49,7 @@ export default class RequestGroupList extends Component<any, State>
                 ]} />
                 <div className="row gap middle">
                     <div className="col">
-                        <h4><i className="fa-solid fa-folder color-blue-dark" /> Data Subscription Groups</h4>
+                        <h4><i className="fa-solid fa-folder color-brand-2" /> Data Subscription Groups</h4>
                     </div>
                     <div className="col col-0">
                         <Link to="new" className="btn color-blue btn-virtual">
@@ -69,41 +59,41 @@ export default class RequestGroupList extends Component<any, State>
                 </div>
                 <hr className="mb-1" />
                 <div className="color-muted mb-3">
-                    Subscriptions can be assigned to certain group. Otherwise they are considered part of the "GENERAL" group.
+                    Subscriptions can be assigned to certain group, otherwise they are considered part of the "GENERAL" group.
                 </div>
-                { loading && <Loader/> }
-                { error && <AlertError>{ error + "" }</AlertError> }
-                { !loading && !error && records.length > 0 && <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Created At</th>
-                            <th>Updated At</th>
-                            <th/>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {records.map((row, i) => (
-                            <tr key={i}>
-                                <td>{row.id}</td>
-                                <td><b>{row.name}</b></td>
-                                <td>{row.description}</td>
-                                <td className="small">{row.createdAt}</td>
-                                <td className="small">{row.updatedAt}</td>
-                                <td className="right nowrap">
-                                    <Link title="Edit" className="btn small color-brand-2 btn-virtual" to={ row.id + "/edit" }>
-                                        <i className="fa-solid fa-pen-to-square" />
-                                    </Link>
-                                    <button title="Delete" className="btn small color-red btn-virtual" onClick={() => this.deleteGroup(row.id)}>
-                                        <i className="fa-solid fa-trash-can" />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table> }
+                <Wrapper endpoint="/api/request-groups">{
+                    (data: app.RequestGroup[]) => (
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style={{ width: "2em" }}>ID</th>
+                                    <th style={{ width: "30%em" }}>Name</th>
+                                    <th style={{ width: "30%em" }}>Description</th>
+                                    <th style={{ width: "11em" }}>Updated</th>
+                                    <th style={{ width: "4.4em"  }}/>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.map((row, i) => (
+                                    <tr key={i}>
+                                        <td>{row.id}</td>
+                                        <td><b>{row.name}</b></td>
+                                        <td>{row.description || ""}</td>
+                                        <td className="small">{new Date(row.updatedAt).toLocaleString()}</td>
+                                        <td className="right nowrap">
+                                            <Link title="Edit" className="btn small color-brand-2 btn-virtual" to={ row.id + "/edit" }>
+                                                <i className="fa-solid fa-pen-to-square" />
+                                            </Link>
+                                            <Link title="Delete" className="btn small color-red btn-virtual" to={ row.id + "/delete" }>
+                                                <i className="fa-solid fa-trash-can" />
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )
+                }</Wrapper>
                 <br/>
                 <br/>
             </div>
