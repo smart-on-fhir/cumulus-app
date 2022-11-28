@@ -25,6 +25,11 @@ body {
   white-space: nowrap;
   flex-wrap: nowrap;
 }
+.wrap {
+  white-space: normal;
+  flex-wrap: wrap;
+  word-break: break-all;
+}
 
 .pull-right { float: right; }
 .pull-left { float: left; }
@@ -169,6 +174,12 @@ hr {
   border: none;
   background: $color-grey;
   margin: 2px 0;
+
+  &.dashed {
+    border-bottom: 1.5px dashed #BBB;
+    box-shadow: 0 1px 0 0 #FFF;
+    height: 0;
+  }
 }
 
 ul {
@@ -196,7 +207,7 @@ ul {
 .icon-item {
     position: relative;
     padding: 0.5em 0.5em 0.5em 2.75em;
-    margin: 0 -0.5em; // -1em;
+    // margin: 0 -0.5em; // -1em;
     display: inline-block;
 
     .icon {
@@ -384,7 +395,8 @@ table {
   }
 }
 
-.material-symbols-rounded {
-  font-size: 1.3em !important;
-  line-height: 1 !important;
+.material-symbols-rounded, .material-icons, .material-icons-round {
+  font-size: 130% !important;
+  line-height: 0.9em !important;
+  vertical-align: text-bottom;
 }

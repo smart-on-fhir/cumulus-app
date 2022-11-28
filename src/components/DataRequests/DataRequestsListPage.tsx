@@ -1,37 +1,18 @@
-import { useCallback }            from "react";
+import { useCallback }            from "react"
 import { HelmetProvider, Helmet } from "react-helmet-async"
-import { Link }                   from "react-router-dom";
-import DataRequestLink            from "./DataRequestLink";
-import { useBackend }             from "../../hooks";
-import { request }                from "../../backend";
-import Breadcrumbs                from "../Breadcrumbs";
-import { useAuth }                from "../../auth";
-import Loader                     from "../Loader";
-import { AlertError }             from "../Alert";
+import { Link }                   from "react-router-dom"
+import DataRequestLink            from "./DataRequestLink"
+import { useBackend }             from "../../hooks"
+import { request }                from "../../backend"
+import Breadcrumbs                from "../Breadcrumbs"
+import { useAuth }                from "../../auth"
+import Loader                     from "../Loader"
+import { AlertError }             from "../Alert"
+import Grid                       from "../generic/Grid"
 
 import "./DataRequestsListPage.scss";
 
 
-function List({
-    items,
-    href = "/requests/:id"
-}: {
-    items: app.DataRequest[]
-    href?: string
-})
-{
-    return (
-        <ul className="icon-list link-list mb-2">
-            { items.map((item, i) => {
-                return (
-                    <li key={i}>
-                        <DataRequestLink request={item} href={href} />
-                    </li>
-                )
-            })}
-        </ul>
-    );
-}
 
 export default function DataRequestsListPage()
 {
@@ -72,14 +53,17 @@ export default function DataRequestsListPage()
                 </div>) }
             </div>
             <hr/>
-            <div className="requests-grid">
-                { groups?.filter(g => g.requests.length > 0).map((group, i) => (
-                    <div key={i}>
-                        <h5 className="color-brand-2"><i className="fa-regular fa-folder"/> { group.name }</h5>
-                        <List items={ group.requests }/>
-                    </div>
-                )) }
-            </div>
+            { groups?.filter(g => g.requests.length > 0).map((group, i) => (
+                <div key={i} className="mb-2 mt-2">
+                    <h5 className="color-brand-2"><i className="fa-regular fa-folder"/> { group.name }</h5>
+                    <hr className="dashed mb-05"/>
+                    <Grid colMinWidth="22em" key={i} className="link-list">
+                        { group.requests.map((item, y) => (
+                            <DataRequestLink request={item} href="/requests/:id" key={y} />
+                        ))}
+                    </Grid>
+                </div>
+            )) }
         </div>
     )
 }
