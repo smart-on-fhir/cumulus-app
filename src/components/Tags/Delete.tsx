@@ -59,31 +59,33 @@ export default function DeleteTag()
                             <>
                                 <div className="mt-05 row gap wrap">
                                     { data.graphs?.length &&
-                                        <div className="col col-6 responsive">
+                                        <div className="col col-5 responsive">
                                             <h6>
                                                 <i className="fa-solid fa-link-slash color-brand-2" /> This tag will be removed from the following graphs:
                                             </h6>
                                             <hr/>
-                                            <div className="view-browser view-browser-column" style={{ minHeight: 0 }}>
-                                            { data.graphs.map((v: any, i: number) => (
-                                                <ViewThumbnail
-                                                    key={i}
-                                                    view={ v }
-                                                    showDescription={200}
-                                                />
-                                            ))}
+                                            <div className="view-browser view-browser-list">
+                                                { data.graphs.map((v: any, i: number) => (
+                                                    <ViewThumbnail
+                                                        key={i}
+                                                        view={ v }
+                                                        showDescription={200}
+                                                    />
+                                                ))}
                                             </div>
                                         </div>
                                     }
                                     { data.subscriptions?.length &&
-                                        <div className="col col-4 responsive">
+                                        <div className="col col-5 responsive">
                                             <h6>
                                                 <i className="fa-solid fa-link-slash color-brand-2" /> This tag will be removed from the following data subscriptions:
                                             </h6>
                                             <hr/>
+                                            <div className="link-list mt-05">
                                             { data.subscriptions.map((s: any, i: number) => (
                                                 <DataRequestLink key={i} request={s} href={"/requests/" + s.id} />
                                             ))}
+                                            </div>
                                         </div>
                                     }
                                 </div>
