@@ -66,7 +66,7 @@ export default function DeleteSubscriptionGroup()
                                                 <i className="fa-solid fa-link-slash color-brand-2" /> The following subscriptions will be reassigned to the default group:
                                             </h6>
                                             <hr/>
-                                            <Grid gap="0 1rem" colMinWidth="22em" className="link-list mt-05">{
+                                            <Grid gap="0 1rem" cols="22em" className="link-list mt-05">{
                                                 data.requests?.map((s, i) => (
                                                     <DataRequestLink key={i} request={s} href={"/requests/" + s.id} />
                                                 ))

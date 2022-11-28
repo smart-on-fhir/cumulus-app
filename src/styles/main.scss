@@ -28,7 +28,7 @@ body {
 .wrap {
   white-space: normal;
   flex-wrap: wrap;
-  word-break: break-all;
+  // word-break: keep-all;
 }
 
 .pull-right { float: right; }

@@ -45,7 +45,12 @@ export function attachHooks(connection: Sequelize) {
         const role = options.__role__ || connection.user?.role || "guest"
         if (role !== "system") {
             if (Array.isArray(model)) {
-                model.forEach(m => m.requestPermissionToRead(options))
+                model.forEach(m => {
+                    // filter out runtime models from connecting tables
+                    if (m instanceof BaseModel) {
+                        m.requestPermissionToRead(options)
+                    }
+                })
             } else if (model) {
                 model.requestPermissionToRead(options)
             } else {
@@ -82,38 +87,96 @@ export function init(connection: Sequelize) {
     // The possible choices for onDelete and onUpdate are:
     // RESTRICT, CASCADE, NO ACTION, SET DEFAULT and SET NULL.
 
-    // graphs :: subscriptions -------------------------------------------------
-    
-    // Graphs have one subscription as View.DataRequest
-    View.belongsTo(DataRequest, { foreignKey: "DataRequestId", targetKey: "id" });
-    
-    // Subscriptions have many graphs as DataRequest.Views. 
-    // When a subscription is deleted all its graphs are also deleted!
-    DataRequest.hasMany(View, { foreignKey: "DataRequestId", onDelete: "CASCADE" });
+    // -------------------------------------------------------------------------
+    //                        graphs :: subscriptions
+    // 
+    // - Graphs have one subscription as View.DataRequest
+    // - Subscriptions have many graphs as DataRequest.Views
+    // - When a subscription is deleted all its graphs are also deleted!
+    // -------------------------------------------------------------------------    
+    View.belongsTo(DataRequest, {
+        foreignKey: "DataRequestId",
+        targetKey: "id"
+    });
+    DataRequest.hasMany(View, {
+        foreignKey: "DataRequestId",
+        onDelete: "CASCADE"
+    });
 
 
 
-    // subscription-groups :: subscriptions ------------------------------------
+    // -------------------------------------------------------------------------
+    //                 subscription-groups :: subscriptions
+    // 
+    // - Subscriptions have one RequestGroup as DataRequest.group
+    // - RequestGroups have many Subscriptions as RequestGroup.requests
+    // - When a RequestGroups is deleted all its Subscriptions are moved to the
+    //   default group (which might also be none)
+    // -------------------------------------------------------------------------
+    DataRequest.belongsTo(RequestGroup, {
+        as: "group",
+        onDelete: "SET NULL"
+    });
+    RequestGroup.hasMany(DataRequest, {
+        as: "requests",
+        foreignKey: "groupId",
+        onDelete: "SET DEFAULT"
+    });
 
-    // Subscriptions have one RequestGroup as DataRequest.group
-    DataRequest.belongsTo(RequestGroup, { as: "group", onDelete: "SET NULL" });
-
-    // RequestGroups have many Subscriptions as RequestGroup.requests. 
-    // When a RequestGroups is deleted all its Subscriptions are moved to the
-    // default group (which might also be none)
-    RequestGroup.hasMany(DataRequest, { as: "requests", foreignKey: "groupId", onDelete: "SET DEFAULT"});
 
 
+    // -------------------------------------------------------------------------
+    //                        projects :: subscription
+    // -------------------------------------------------------------------------
+    Project.belongsToMany(DataRequest, {
+        through: "ProjectsSubscriptions",
+        as: "Subscriptions",
+        timestamps: false
+    });
+    DataRequest.belongsToMany(Project, {
+        through: "ProjectsSubscriptions",
+        as: "Projects",
+        timestamps: false
+    });
 
-    // users :: tags -----------------------------------------------------------
-    User.hasMany(Tag,   { foreignKey: "creatorId" });
-    Tag.belongsTo(User, { foreignKey: "creatorId", as: "creator", onDelete: "SET NULL" });
 
-    // graphs:tags
-    View.belongsToMany(Tag, { through: "ViewsTags", timestamps: false });
-    Tag.belongsToMany(View, { through: "ViewsTags", timestamps: false, as: "graphs" });
+    // -------------------------------------------------------------------------
+    //                              users :: tags
+    // -------------------------------------------------------------------------
+    User.hasMany(Tag, {
+        foreignKey: "creatorId"
+    });
+    Tag.belongsTo(User, {
+        foreignKey: "creatorId",
+        as: "creator",
+        onDelete: "SET NULL"
+    });
 
-    // subscriptions:tags
-    DataRequest.belongsToMany(Tag, { through: "DataRequestsTags", timestamps: false });
-    Tag.belongsToMany(DataRequest, { through: "DataRequestsTags", timestamps: false, as: "subscriptions" });
+
+    // -------------------------------------------------------------------------
+    //                              graphs :: tags
+    // -------------------------------------------------------------------------
+    View.belongsToMany(Tag, {
+        through: "ViewsTags",
+        timestamps: false
+    });
+    Tag.belongsToMany(View, {
+        through: "ViewsTags",
+        timestamps: false,
+        as: "graphs"
+    });
+
+
+    // -------------------------------------------------------------------------
+    //                           subscriptions :: tags
+    // -------------------------------------------------------------------------
+    DataRequest.belongsToMany(Tag, {
+        through: "DataRequestsTags",
+        timestamps: false
+    });
+    Tag.belongsToMany(DataRequest, {
+        through: "DataRequestsTags",
+        timestamps: false,
+        as: "subscriptions"
+    });
 }

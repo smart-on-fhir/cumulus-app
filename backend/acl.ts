@@ -63,6 +63,11 @@ export const ACL: Acl = {
         manager: { read: true, create: true, update: true, delete: true },
         user   : { read: true }
     },
+    ProjectsSubscriptions: {
+        admin  : { read: true, create: true, update: true, delete: true },
+        manager: { read: true, create: true, update: true, delete: true },
+        user   : { read: true }
+    },
     Logs: {
         admin: { read: true }
     }
