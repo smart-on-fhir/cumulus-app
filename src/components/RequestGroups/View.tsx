@@ -1,18 +1,18 @@
-import { createDeletePage } from "../generic/EndpointDeleteWrapper"
-import Clip                 from "../generic/Clip"
-import DataRequestLink      from "../DataRequests/DataRequestLink"
-import Grid                 from "../generic/Grid"
+import { createViewPage } from "../generic/EndpointViewWrapper"
+import Clip               from "../generic/Clip"
+import Grid from "../generic/Grid"
+import DataRequestLink from "../DataRequests/DataRequestLink"
 
 
-export default function DeleteRequestGroup()
+export default function RequestGroupView()
 {
-    return createDeletePage<app.RequestGroup>({
+    return createViewPage<app.RequestGroup>({
+        basePath: "/groups",
         endpoint: "/api/request-groups",
-        namePlural: "Subscription Groups",
-        nameSingular: "Subscription Group",
+        namePlural: "Request Groups",
         icon: <i className="fa-solid fa-folder color-brand-2" />,
         query: "subscriptions=true",
-        renderView: data => <>
+        renderView : data => <>
             <div className="mt-2 mb-1" style={{ whiteSpace: "pre-wrap" }}>
                 <b>Description:</b> {
                     data.description ?
@@ -20,13 +20,12 @@ export default function DeleteRequestGroup()
                         <span className="color-muted">No description provided</span>
                 }
             </div>
-            <div className="mt-05 row gap wrap">
+            <div className="mt-2 row gap wrap">
                 <div className="col col-4 responsive">
-                    
                     { data.requests && data.requests.length ?
                         <>
                             <h6 className="color-brand-2">
-                                <i className="fa-solid fa-link-slash color-brand-2" /> The following subscriptions will be reassigned to the default group:
+                                <i className="fa-solid fa-link color-brand-2" /> Associated Data Subscriptions
                             </h6>
                             <hr/>
                             <Grid gap="0 1rem" cols="22em" className="link-list mt-05">{
@@ -37,10 +36,9 @@ export default function DeleteRequestGroup()
                         </> :
                         <div>
                             <hr className="mb-1"/>
-                            <span className="material-icons-round color-green">
+                            <span className="material-icons-round color-blue">
                                 info_outline
                             </span> No subscriptions are associated with this group.
-                            It can be safely deleted.
                         </div>
                     }
                 </div>

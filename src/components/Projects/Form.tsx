@@ -55,7 +55,7 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
                             <textarea
                                 id="description"
                                 name="description"
-                                placeholder="Project description"
+                                placeholder="Project description (reason for the study, types of intended analyses)"
                                 // rows={8}
                                 style={{ height: "100%", minHeight: "10em" }}
                                 required

@@ -54,19 +54,21 @@ export function createViewPage<T extends { createdAt: string, updatedAt: string 
     basePath,
     nameField = "name",
     renderView,
-    icon = null
+    icon = null,
+    query
 }: {
     namePlural       : string
     endpoint         : string
     basePath         : string
     nameField       ?: string
+    query           ?: string
     icon            ?: JSX.Element | null
     renderView       : (data: T) => JSX.Element
 })
 {
     return (
         <div className="container">
-            <EndpointViewWrapper endpoint={ endpoint }>
+            <EndpointViewWrapper endpoint={ endpoint } query={ query }>
                 {(data: T) => {
                     const name = data[nameField as keyof T] + ""
                     return (
@@ -82,8 +84,11 @@ export function createViewPage<T extends { createdAt: string, updatedAt: string 
                                 { name }
                             ]} />
                             <div className="row gap mt-2">
+                                { icon && <div className="col col-0 top">
+                                    <h4>{icon}</h4>
+                                </div> }
                                 <div className="col middle">
-                                    <h4>{icon} { name }</h4>
+                                    <h4>{ name }</h4>
                                 </div>
                                 <div className="col col-0 right nowrap middle">
                                     <div>
@@ -97,19 +102,16 @@ export function createViewPage<T extends { createdAt: string, updatedAt: string 
                                 </div>
                             </div>
                             <hr className="mb-1" />
-                            <div className="row gap mb-2 mt-05">
-                                <div className="col col-0">
-                                    <i>
-                                        <span className="color-muted">Created: </span>
-                                        <span className="color-brand-2">{ new Date(data.createdAt).toLocaleString() }</span>
-                                    </i>
-                                </div>
-                                <div className="col col-0">
-                                    <i>
-                                        <span className="color-muted">Updated: </span>
-                                        <span className="color-brand-2">{ new Date(data.updatedAt).toLocaleString() }</span>
-                                    </i>
-                                </div>
+                            <div className="mb-2">
+                                <i className="nowrap mr-1">
+                                    <span className="color-muted">Created: </span>
+                                    <span className="color-brand-2">{ new Date(data.createdAt).toLocaleString() }</span>
+                                </i>
+                                { " " }
+                                <i className="nowrap">
+                                    <span className="color-muted">Updated: </span>
+                                    <span className="color-brand-2">{ new Date(data.updatedAt).toLocaleString() }</span>
+                                </i>
                             </div>
                             { renderView(data) }
                         </>

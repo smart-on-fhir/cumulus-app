@@ -89,21 +89,21 @@ export function createEditPage<T = unknown>({
     nameSingular,
     namePlural,
     endpoint,
-    basePath,
-    primaryKeyField = "id",
     nameField = "name",
     renderForm
 }: {
     nameSingular     : string
     namePlural       : string
     endpoint         : string
+    /** @deprecated */
     basePath         : string
+    /** @deprecated */
     primaryKeyField ?: string
     nameField       ?: string
     renderForm       : (props: {
         loading : boolean
         data    : T
-        onSubmit: (data: T) => void
+        onSubmit: (data: Partial<T>) => void
     }) => JSX.Element
 })
 {
@@ -119,8 +119,8 @@ export function createEditPage<T = unknown>({
                     <>
                         <Breadcrumbs links={[
                             { name: "Home", href: "/" },
-                            { name: namePlural, href: basePath },
-                            { name: data[nameField], href: basePath + data[primaryKeyField] },
+                            { name: namePlural, href: "./../.." },
+                            { name: data[nameField], href: "./.." },
                             { name: "Edit " + nameSingular }
                         ]} />
                         <div className="row gap mt-2">
@@ -136,19 +136,16 @@ export function createEditPage<T = unknown>({
                             </div>
                         </div>
                         <hr className="mb-1" />
-                        <div className="row gap mb-2 mt-05">
-                            <div className="col col-0">
-                                <i>
-                                    <span className="color-muted">Created: </span>
-                                    <span className="color-brand-2">{ new Date(data.createdAt).toLocaleString() }</span>
-                                </i>
-                            </div>
-                            <div className="col col-0">
-                                <i>
-                                    <span className="color-muted">Updated: </span>
-                                    <span className="color-brand-2">{ new Date(data.updatedAt).toLocaleString() }</span>
-                                </i>
-                            </div>
+                        <div className="mb-2 mt-05">
+                            <i className="nowrap mr-1">
+                                <span className="color-muted">Created: </span>
+                                <span className="color-brand-2">{ new Date(data.createdAt).toLocaleString() }</span>
+                            </i>
+                            { " " }
+                            <i className="nowrap">
+                                <span className="color-muted">Updated: </span>
+                                <span className="color-brand-2">{ new Date(data.updatedAt).toLocaleString() }</span>
+                            </i>
                         </div>
                         { error && <AlertError>{ error }</AlertError> }
                         { renderForm({ data: data as T, onSubmit, loading }) }
