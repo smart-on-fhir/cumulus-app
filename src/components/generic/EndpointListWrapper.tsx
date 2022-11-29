@@ -44,7 +44,7 @@ export function createListPage<T = unknown>({
 }: {
     namePlural  : string
     /** @deprecated */
-    nameSingular: string
+    nameSingular?: string
     endpoint    : string
     icon       ?: JSX.Element | null
     renderList  : (data: T) => JSX.Element

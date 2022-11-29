@@ -96,7 +96,7 @@ export function createEditPage<T = unknown>({
     namePlural       : string
     endpoint         : string
     /** @deprecated */
-    basePath         : string
+    basePath        ?: string
     /** @deprecated */
     primaryKeyField ?: string
     nameField       ?: string
@@ -129,7 +129,7 @@ export function createEditPage<T = unknown>({
                             </div>
                             <div className="col col-0 right nowrap middle">
                                 <div>
-                                    <Link to="../delete" className="btn btn-virtual" title="Delete">
+                                    <Link to="./../delete" className="btn btn-virtual" title="Delete">
                                         <i className="fa-solid fa-trash-can color-blue" />
                                     </Link>
                                 </div>
