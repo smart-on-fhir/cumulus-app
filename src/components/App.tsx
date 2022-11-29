@@ -21,10 +21,6 @@ import Invite                                   from "./Users/Invite";
 import Account                                  from "./Users/Account";
 import Activate                                 from "./Users/Activate";
 import Projects                                 from "./Projects";
-import EditProject                              from "./Projects/Edit";
-import CreateProject                            from "./Projects/Create";
-import ViewProject                              from "./Projects/View";
-import DeleteProject                            from "./Projects/Delete";
 import LogViewer                                from "./LogViewer";
 import Tags                                     from "./Tags";
 import "../styles/main.scss";
@@ -81,13 +77,7 @@ export default function App()
 
                                 <Route path="permissions" element={ <TODO /> } />                                
 
-                                <Route path="projects">
-                                    <Route index element={ <Projects /> } />
-                                    <Route path="new" element={ <CreateProject /> } />
-                                    <Route path=":id" element={ <ViewProject /> } />
-                                    <Route path=":id/edit" element={ <EditProject /> } />
-                                    <Route path=":id/delete" element={ <DeleteProject /> } />
-                                </Route>
+                                <Route path="projects/*" element={ <Projects /> } />
 
                                 <Route path="tags/*" element={ <Tags /> } />
                                 

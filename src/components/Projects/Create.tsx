@@ -1,31 +1,14 @@
-import { Helmet, HelmetProvider } from "react-helmet-async"
-import { AlertError }             from "../generic/Alert"
-import Breadcrumbs                from "../generic/Breadcrumbs"
-import EndpointCreateWrapper      from "../generic/EndpointCreateWrapper"
-import Form                       from "./Form"
+import { createCreatePage } from "../generic/EndpointCreateWrapper"
+import Form                 from "./Form"
 
-export default function CreateProject()
+
+export default function Create()
 {
-    return (
-        <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>Create Study Area</title>
-                </Helmet>
-            </HelmetProvider>
-            <Breadcrumbs links={[
-                { name: "Home"    , href: "/" },
-                { name: "Projects", href: "/projects" },
-                { name: "Create Project" }
-            ]} />
-            <h4><i className="fa-solid fa-circle-plus color-blue-dark" /> Create Study Area</h4>
-            <hr/>
-            <EndpointCreateWrapper endpoint="/api/projects">
-                {({ loading, data, onSubmit, error }) => <>
-                    { error && <AlertError>{ error }</AlertError> }
-                    <Form onSubmit={ onSubmit } data={ data } loading={ loading } />
-                </>}
-            </EndpointCreateWrapper>
-        </div>
-    )
+    return createCreatePage<app.Project>({
+        basePath    : "/projects",
+        endpoint    : "/api/projects",
+        namePlural  : "Study Areas",
+        nameSingular: "Study Area",
+        renderForm  : props => <Form { ...props } />
+    })
 }
