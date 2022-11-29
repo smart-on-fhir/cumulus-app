@@ -1,6 +1,6 @@
 import { merge } from "highcharts"
 import { Component, FocusEvent, KeyboardEvent, useState } from "react"
-import { classList } from "../../utils"
+import { classList } from "../../../utils"
 import "./editors.scss"
 
 

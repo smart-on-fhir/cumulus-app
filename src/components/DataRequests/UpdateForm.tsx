@@ -3,9 +3,9 @@ import { Navigate, useParams }    from "react-router"
 import { HelmetProvider, Helmet } from "react-helmet-async"
 import { request, updateOne, deleteOne } from "../../backend"
 import { useBackend }             from "../../hooks"
-import Breadcrumbs                from "../Breadcrumbs"
-import Loader                     from "../Loader"
-import { AlertError }             from "../Alert"
+import Breadcrumbs                from "../generic/Breadcrumbs"
+import Loader                     from "../generic/Loader"
+import { AlertError }             from "../generic/Alert"
 import DataRequestForm            from "./form"
 
 import "./form.scss";

@@ -1,18 +1,24 @@
+import moment from "moment"
 import { useCallback, useEffect, useMemo, useState }  from "react"
+import { Helmet, HelmetProvider } from "react-helmet-async"
 import { useNavigate, useParams } from "react-router"
+import { Link } from "react-router-dom"
 import { request }                from "../../backend"
 import { useBackend }             from "../../hooks"
-import { AlertError }             from "../Alert"
-import Loader                     from "../Loader"
+import { AlertError }             from "./Alert"
+import Breadcrumbs from "./Breadcrumbs"
+import Loader                     from "./Loader"
 
 
 export default function EndpointDeleteWrapper({
     endpoint,
     query,
-    children
+    children,
+    redirect = ".."
 }: {
     endpoint: string
     query?: string
+    redirect?: string
     children: (props: {
         loading : boolean
         data    : any
@@ -44,7 +50,7 @@ export default function EndpointDeleteWrapper({
         request(`${endpoint}/${id}`, { method: "DELETE", signal: abortController.signal })
         .then(() => {
             if (!abortController.signal.aborted) {
-                navigate("..")
+                navigate(redirect)
             }
         })
         .catch(error => {
@@ -77,3 +83,71 @@ export default function EndpointDeleteWrapper({
     })
 }
 
+export function createDeletePage<T = unknown>({
+    namePlural,
+    nameSingular,
+    endpoint,
+    nameField = "name",
+    renderView,
+    icon = null
+}: {
+    namePlural       : string
+    nameSingular     : string
+    endpoint         : string
+    nameField       ?: string
+    icon            ?: JSX.Element | null
+    renderView       : (data: T) => JSX.Element
+})
+{
+    return (
+        <div className="container">
+            <EndpointDeleteWrapper endpoint={ endpoint } redirect="../..">
+                {({ loading, data, onSubmit, error }) => {
+                    const name = data[nameField as keyof T] + ""
+                    return (
+                        <>
+                            <HelmetProvider>
+                                <Helmet>
+                                    <title>Delete { nameSingular }</title>
+                                </Helmet>
+                            </HelmetProvider>
+                            <Breadcrumbs links={[
+                                { name: "Home"    , href: "/" },
+                                { name: namePlural, href: "../.." },
+                                { name: name      , href: ".." },
+                                { name: "Delete " + nameSingular }
+                            ]} />
+                            <h1 className="color-brand-2 center mt-2 mb-2">Please Confirm!</h1>
+                            { error && <AlertError>{ error }</AlertError> }
+                            <div className="panel panel-danger mt-1">
+                                <h4>{icon} { data.name }</h4>
+                                <hr/>
+                                <div className="row gap mb-2 mt-05">
+                                    <div className="col col-0">
+                                        <i>
+                                            <span className="color-muted">Created: </span>
+                                            <span className="color-brand-2">{ moment(data.createdAt).format("M/D/Y") }</span>
+                                        </i>
+                                    </div>
+                                    <div className="col col-0">
+                                        <i>
+                                            <span className="color-muted">Updated: </span>
+                                            <span className="color-brand-2">{ moment(data.updatedAt).format("M/D/Y") }</span>
+                                        </i>
+                                    </div>
+                                </div>
+                                { renderView(data) }
+                            </div>
+                            <div className="center pt-2 pb-1">
+                                <Link style={{ minWidth: "12em" }} className="btn pl-2 pr-2 mr-1 color-green" to="..">Cancel</Link>
+                                <button style={{ minWidth: "12em" }} className="btn btn-brand-2 pl-2 pr-2" onClick={() => onSubmit()} disabled={loading}>
+                                    Delete{ loading && <>&nbsp;<Loader msg="" /></> }
+                                </button>
+                            </div>                            
+                        </>
+                    )
+                }}
+            </EndpointDeleteWrapper>
+        </div>
+    )
+}

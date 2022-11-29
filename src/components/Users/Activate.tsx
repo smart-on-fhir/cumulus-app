@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useAuth }    from "../../auth";
 import { request }    from "../../backend";
-import { AlertError } from "../Alert";
+import { AlertError } from "../generic/Alert";
 
 function Check({ condition, label }: { condition: any, label: any }) {
     return condition ?

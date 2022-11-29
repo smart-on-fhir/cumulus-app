@@ -217,7 +217,8 @@ declare module app {
         description: string | null
         lat        : number | null // 0° to 90°
         long       : number | null // -180° to 180°
-        updatedAt  : string | null
+        setting    : string | null
+        updatedAt  : string
         createdAt  : string
     }
 

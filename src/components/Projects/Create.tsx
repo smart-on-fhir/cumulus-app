@@ -1,6 +1,6 @@
 import { Helmet, HelmetProvider } from "react-helmet-async"
-import { AlertError }             from "../Alert"
-import Breadcrumbs                from "../Breadcrumbs"
+import { AlertError }             from "../generic/Alert"
+import Breadcrumbs                from "../generic/Breadcrumbs"
 import EndpointCreateWrapper      from "../generic/EndpointCreateWrapper"
 import Form                       from "./Form"
 

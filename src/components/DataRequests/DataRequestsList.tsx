@@ -2,8 +2,8 @@ import { useCallback } from "react";
 import DataRequestLink from "./DataRequestLink";
 import { useBackend }  from "../../hooks";
 import { request }     from "../../backend";
-import { AlertError }  from "../Alert";
-import Loader          from "../Loader";
+import { AlertError }  from "../generic/Alert";
+import Loader          from "../generic/Loader";
 import { Link } from "react-router-dom";
 
 

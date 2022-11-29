@@ -1,5 +1,5 @@
 import { Component, createRef, MouseEvent, useMemo } from "react"
-import { defer, format } from "../../utils";
+import { defer, format } from "../../../utils";
 import "./DataGrid.scss"
 
 

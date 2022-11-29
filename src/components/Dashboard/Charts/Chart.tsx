@@ -1,7 +1,7 @@
 import React                         from "react";
 import { Color, merge, Series }      from "highcharts"
 import { defer }                     from "../../../utils";
-import Loader                        from "../../Loader";
+import Loader                        from "../../generic/Loader";
 import {
     SupportedNativeChartTypes,
     SupportedChartTypes,

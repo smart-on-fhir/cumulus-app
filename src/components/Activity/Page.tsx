@@ -2,8 +2,8 @@ import { Component }  from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { request }    from "../../backend";
 import { classList }  from "../../utils";
-import { AlertError } from "../Alert";
-import Breadcrumbs from "../Breadcrumbs";
+import { AlertError } from "../generic/Alert";
+import Breadcrumbs from "../generic/Breadcrumbs";
 import "./Activity.scss"
 
 interface State {

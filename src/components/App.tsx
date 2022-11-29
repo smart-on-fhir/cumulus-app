@@ -15,8 +15,6 @@ import RequestGroupEditForm                     from "./RequestGroups/Edit";
 import RequestGroupCreateForm                   from "./RequestGroups/Create";
 import DeleteSubscriptionGroup                  from "./RequestGroups/Delete";
 import DataSiteListPage                         from "./DataSites";
-import DataSiteEditForm                         from "./DataSites/EditForm";
-import DataSiteCreateForm                       from "./DataSites/CreateForm";
 import RequestDataForm                          from "./Dashboard/RequestDataForm";
 import Navigation                               from "./Navigation"
 import TODO                                     from "./TODO";
@@ -70,11 +68,7 @@ export default function App()
                                     </Route>
                                 </Route>
 
-                                <Route path="sites">
-                                    <Route index element={<RequireAuth><DataSiteListPage/></RequireAuth>} />
-                                    <Route path="new" element={ <RequireAuth><DataSiteCreateForm /></RequireAuth> } />
-                                    <Route path=":id/edit" element={ <RequireAuth><DataSiteEditForm/></RequireAuth> } />
-                                </Route>
+                                <Route path="sites/*" element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
 
                                 <Route path="activity" element={<RequireAuth><ActivityPage /></RequireAuth>} />
                                 <Route path="logs" element={<RequireAuth><LogViewer /></RequireAuth>} />

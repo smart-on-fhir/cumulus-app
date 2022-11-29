@@ -1,7 +1,7 @@
 import moment                     from "moment"
 import { Helmet, HelmetProvider } from "react-helmet-async"
 import { Link }                   from "react-router-dom"
-import Breadcrumbs                from "../Breadcrumbs"
+import Breadcrumbs                from "../generic/Breadcrumbs"
 import DataRequestLink from "../DataRequests/DataRequestLink"
 import EndpointViewWrapper        from "../generic/EndpointViewWrapper"
 import ViewThumbnail from "../Views/ViewThumbnail"

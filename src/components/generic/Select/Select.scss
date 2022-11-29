@@ -1,4 +1,4 @@
-@import "../../styles/variables.scss";
+@import "../../../styles/variables.scss";
 
 
 .select-component {
@@ -10,43 +10,27 @@
     display: inline-block;
 
     .select-component-value {
-        // white-space  : nowrap;
-        overflow     : hidden;
-        // text-overflow: ellipsis;
-        // position: relative;
-        // min-width: 100%;
+        overflow: hidden;
         display: flex;
         max-height: 1.4em;
         flex: 1 1 0;
-        // width: 100%;
         align-items: baseline;
-        // justify-content: center;
-        // justify-content: space-between;
-        // flex-wrap: nowrap;
-        // white-space: nowrap;
-        // justify-content: space-between;
-        // padding: 0 0 0 1.6em;
-        // margin: 0 0 0 -0.6em;
 
         .select-component-option-icon {
             position: relative;
-            // margin: 0 0.25em 0 -1.25em;
             width: 1.2em;
             height: 1.2em;
             min-width: 1.2em;
             max-width: 1.2em;
-            // top: 50%;
             margin: 0 0.2em 0 0;
             overflow: visible;
             font-size: 1.2em;
             line-height: 1.2em;
-            // background: rgba(128, 255, 0, 0.5);
             text-align: center;
             vertical-align: middle;
             display: flex;
             flex: 0 0 1.2em;
             align-self: center;
-            // background: skyblue;
         }
 
         img.select-component-option-icon {
@@ -63,33 +47,16 @@
         }
 
         span {
-            // white-space  : nowrap;
-            // overflow     : hidden;
-            // text-overflow: ellipsis;
-            // background: orange;
             flex: 1 1 auto;
-            // display: block;
-            // flex: 1 1 0;
-            // justify-items: space-between;
-            // display: block;
-            // width: 100%;
-            // display: flex;
-            // flex: 0 1 auto;
-            // justify-content: space-between;
         }
         > span {
             flex: 10 1 0;
             white-space  : nowrap;
             overflow     : hidden;
             text-overflow: ellipsis;
-            // min-width: 2em;
             &.right {
                 flex: 0 0 auto;
                 text-align: right;
-                // white-space  : nowrap;
-                // overflow     : hidden;
-                // text-overflow: clip;
-
             }
 
             span {
@@ -111,9 +78,6 @@
         top: 100%;
         right: auto;
         left: 0;
-        // margin-bottom: 5px;
-        // margin-left: max-content;
-        
         min-width: 100%;
         margin-top: 1px;
         background: #FFF;
@@ -145,16 +109,13 @@
 
         .select-component-option-icon {
             position: absolute;
-            // margin: 0 0.25em 0 -1.25em;
             width: 1.2em;
             height: 1.2em;
             min-width: 1.2em;
             top: 0.2em;
             margin: -0em 0 0 -1.6em;
-            // overflow: hidden;
             font-size: inherit;
             line-height: 1.2em;
-            // background: rgba(128, 255, 0, 0.5);
             text-align: center;
         }
 
@@ -165,10 +126,6 @@
         }
 
         &.selected {
-            // background: linear-gradient(90deg, #EEE, #DDD);
-            // box-shadow: 0 0 0 0.75px #BBB inset;
-            // text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
-
             background: linear-gradient(90deg, #369, rgb(28, 79, 129));
             box-shadow: 0 0 0 0.75px #036 inset;
             color: #FFF;
@@ -191,14 +148,7 @@
 
     .right {
         text-align: right;
-        // vertical-align: middle;
-        // line-height: $font-size * $line-height;
-        // display: flex;
         flex: 1 1 0;
-        // justify-content: flex-end;
         padding: 0 2px 0 0.6em;
-        // background: rgb(209, 98, 86);
-        // align-self: flex-end;
-        // font-style: italic;
     }
 }

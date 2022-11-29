@@ -1,7 +1,7 @@
 import { useState }          from "react";
 import { Link }              from "react-router-dom";
 import { request }           from "../../backend";
-import Alert, { AlertError } from "../Alert";
+import Alert, { AlertError } from "../generic/Alert";
 
 export default function Invite()
 {

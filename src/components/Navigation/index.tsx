@@ -65,15 +65,14 @@ export default function Navigation()
 
                 <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" /> Graphs</NavLink>
 
-                <NavGroup to="/sites" icon="fa-solid fa-location-dot" label="Sites">
-                    <NavLink to="/sites/new"><i className="icon fa-solid fa-circle-plus" /> Add Site</NavLink>
-                </NavGroup>
+                <NavLink to="/sites"><i className="icon fa-solid fa-location-dot" /> Data Sites</NavLink>
                 
-                <NavGroup icon="fa-solid fa-database" label="Data">
-                    <NavLink to="/requests" end><i className="icon fa-solid fa-database" /> Data Subscriptions</NavLink>
-                    <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Subscription Groups</NavLink>
+                <NavLink to="/requests"><i className="icon fa-solid fa-database" /> Data Subscriptions</NavLink>
+                <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Subscription Groups</NavLink>
+                {/* <NavGroup icon="fa-solid fa-database" label="Data">
                     <NavLink to="/requests/new"><i className="icon fa-solid fa-calendar-plus" /> New Data Subscription</NavLink>
-                </NavGroup>
+                </NavGroup> */}
+                <NavLink to="/tags"><i className="icon fa-solid fa-tag" /> Tags</NavLink>
                 
                 { user.role === "admin" && (
                     <NavGroup icon="fa-solid fa-screwdriver-wrench" label="Administration">
@@ -83,7 +82,7 @@ export default function Navigation()
                         {/* <NavLink to="/permissions"><i className="icon fa-solid fa-user-shield" /> Roles &amp; Permissions</NavLink> */}
                         <NavLink to="/activity"><i className="icon fa-solid fa-clipboard-list" /> Activity</NavLink>
                         <NavLink to="/logs"><i className="icon fa-solid fa-clipboard-list" /> View Logs</NavLink>
-                        <NavLink to="/tags"><i className="icon fa-solid fa-tag" /> Manage Tags</NavLink>
+                        {/* <NavLink to="/tags"><i className="icon fa-solid fa-tag" /> Manage Tags</NavLink> */}
                     </NavGroup>
                 )}
 

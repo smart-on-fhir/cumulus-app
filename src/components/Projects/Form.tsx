@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react"
-import Loader from "../Loader"
+import Loader from "../generic/Loader"
 import LinkWidget from "./LinkWidget"
 
 export default function Form({ data = {}, onSubmit, loading, error }: {

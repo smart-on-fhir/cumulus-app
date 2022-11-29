@@ -1,10 +1,10 @@
 import React           from "react"
 import { Link }        from "react-router-dom"
 import ContentEditable from "react-contenteditable";
-import Checkbox        from "../Checkbox";
+import Checkbox        from "../generic/Checkbox";
 import { Format }      from "../Format"
-import Panel           from "../Panel";
-import Select          from "../Select"
+import Panel           from "../generic/Panel";
+import Select          from "../generic/Select"
 import TagSelector     from "../Tags/TagSelector";
 
 import "./form.scss";

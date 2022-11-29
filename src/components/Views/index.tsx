@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { classList } from "../../utils";
-import Checkbox from "../Checkbox";
-import MenuButton from "../MenuButton";
+import Checkbox from "../generic/Checkbox";
+import MenuButton from "../generic/MenuButton";
 import ViewsBrowser from "./ViewsBrowser";
 
 

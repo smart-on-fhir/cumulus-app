@@ -2,12 +2,13 @@ import { useCallback } from "react"
 import { Link }        from "react-router-dom"
 import { useBackend }  from "../../hooks"
 import { request }     from "../../backend"
-import Loader          from "../Loader"
-import { AlertError }  from "../Alert"
+import Loader          from "../generic/Loader"
+import { AlertError }  from "../generic/Alert"
 import ViewThumbnail   from "./ViewThumbnail"
 import { classList }   from "../../utils"
 
 import "./ViewsBrowser.scss"
+import Collapse from "../generic/Collapse"
 
 
 export default function ViewsBrowser({
@@ -164,13 +165,13 @@ export default function ViewsBrowser({
         return <>
             {
                 Object.keys(groups).map((k, i) => (
-                    <details open className="graph-group" key={i}>
-                        <summary className="graph-group-header">
-                            <i className="material-symbols-rounded bottom">{icon}</i> {k}
-                        </summary>
+                    <Collapse header={
+                        <><i className="material-symbols-rounded bottom">{icon}</i> {k}</>
+                    }>
                         <div className={ classList({
                             ["view-browser view-browser-" + layout] : true,
-                            "nested": !!requestId
+                            "nested": !!requestId,
+                            "mb-2": true
                         })}>
                         {
                             groups[k].map((v, y) => (
@@ -183,7 +184,7 @@ export default function ViewsBrowser({
                             ))
                         }
                         </div>
-                    </details>
+                    </Collapse>
                 ))
             }
         </>

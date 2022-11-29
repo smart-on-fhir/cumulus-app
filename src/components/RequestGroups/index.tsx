@@ -2,7 +2,7 @@ import { Component }              from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Link }                   from "react-router-dom";
 import { deleteOne }              from "../../backend";
-import Breadcrumbs                from "../Breadcrumbs";
+import Breadcrumbs                from "../generic/Breadcrumbs";
 import Wrapper                    from "../generic/EndpointListWrapper"
 import "./RequestGroups.scss";
 
