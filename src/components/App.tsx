@@ -27,10 +27,6 @@ import ViewProject                              from "./Projects/View";
 import DeleteProject                            from "./Projects/Delete";
 import LogViewer                                from "./LogViewer";
 import Tags                                     from "./Tags";
-import DeleteTag                                from "./Tags/Delete";
-import CreateTag                                from "./Tags/Create";
-import EditTag                                  from "./Tags/Edit";
-import ViewTag                                  from "./Tags/View";
 import "../styles/main.scss";
 
 export default function App()
@@ -74,11 +70,6 @@ export default function App()
 
                                 <Route path="login" element={ <LoginPage /> } />
 
-
-
-
-
-
                                 <Route path="activate" element={ <Activate/> } />
                                 <Route path="user" element={ <RequireAuth><Account /></RequireAuth> } />
                                 <Route path="activity" element={ <TODO /> } />
@@ -98,13 +89,7 @@ export default function App()
                                     <Route path=":id/delete" element={ <DeleteProject /> } />
                                 </Route>
 
-                                <Route path="tags">
-                                    <Route index element={ <Tags /> } />
-                                    <Route path="new" element={ <CreateTag /> } />
-                                    <Route path=":id" element={ <ViewTag /> } />
-                                    <Route path=":id/edit" element={ <EditTag /> } />
-                                    <Route path=":id/delete" element={ <DeleteTag/> } />
-                                </Route>
+                                <Route path="tags/*" element={ <Tags /> } />
                                 
                                 <Route path="*" element="Page Not Found" />
                             </Route>
