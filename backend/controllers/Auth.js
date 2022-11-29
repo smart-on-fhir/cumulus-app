@@ -86,7 +86,7 @@ async function login(req, res) {
         const { username, password, remember } = req.body;
 
         // Search for user by username
-        const user = await User.findOne({ where: { email: { [Op.iLike]: username }}});
+        const user = await User.findOne({ where: { email: { [Op.iLike]: username }}, __role__: "system" });
 
         // No such username
         // Do NOT specify what is wrong in the error message!
@@ -105,7 +105,7 @@ async function login(req, res) {
         const sid = Crypto.randomBytes(32).toString("hex");
         
         // Update user's lastLogin and sid properties
-        await user.update({ sid, lastLogin: new Date() });
+        await user.update({ sid, lastLogin: new Date() }, { __role__: "system" });
 
         // Use session cookies by default
         let expires = undefined
@@ -148,7 +148,7 @@ async function logout(req, res) {
             await User.findOne({ where: { sid: user.sid }})
                 .then(model => {
                     if (model) {
-                        return model.update({ sid: null });
+                        return model.update({ sid: null }, { __role__: "system" });
                     }
                 });
         } catch (ex) {
