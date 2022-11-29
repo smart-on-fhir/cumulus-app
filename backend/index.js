@@ -84,7 +84,6 @@ function setupStaticContent(app)
     logger.verbose("✔ Static content hosted");
 }
 
-
 function setUpErrorHandlers(app)
 {
     // Global error 404 handler
