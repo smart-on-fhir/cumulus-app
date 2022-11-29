@@ -71,7 +71,7 @@ export function createCreatePage<T = unknown>({
     renderForm       : (props: {
         loading : boolean
         data    : T
-        onSubmit: (data: T) => void
+        onSubmit: (data: Partial<T>) => void
     }) => JSX.Element
 })
 {

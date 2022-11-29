@@ -78,7 +78,7 @@ export default function ViewProject() {
                         <div className="mt-2 mb-1" style={{ whiteSpace: "pre-wrap" }}>{ data.description }</div>
                         
                         <div className="row gap-2 mt-2 wrap">
-                            <div className="col col-4 mb-2 responsive">
+                            <div className="col col-5 mb-2 responsive">
                                 <h5>
                                     <i className="fa-solid fa-database color-brand-2" />
                                     <span className="color-muted"> Subscriptions</span>
@@ -93,14 +93,14 @@ export default function ViewProject() {
                                     <p className="color-muted">No subscriptions attached yet</p>
                                 }
                             </div>
-                            <div className="col col-6 mb-2 responsive">
+                            <div className="col col-10 mb-2 responsive">
                                 <h5>
                                     <i className="fa-solid fa-chart-pie color-brand-2" />
                                     <span className="color-muted"> Graphs</span>
                                 </h5>
                                 <hr/>
                                 { graphs.length ? 
-                                    <Grid className="view-browser view-browser-column" cols="20em">
+                                    <Grid className="view-browser view-browser-column" cols="18em">
                                         { graphs.map((g, i) => <ViewThumbnail key={i} view={g} showDescription={200} />) }
                                     </Grid> :
                                     <p className="color-muted">No graphs attached yet</p>

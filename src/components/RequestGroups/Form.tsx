@@ -23,20 +23,6 @@ export default function Form({
 
     return (
         <form onSubmit={ _onSubmit }>
-            { record.createdAt && record.updatedAt && <div className="row gap mb-2 mt-05">
-                <div className="col small color-muted">
-                    <div>
-                        <b>Created at </b>
-                        <span className="nowrap">{ new Date(record.createdAt).toLocaleString() }</span>
-                    </div>
-                </div>
-                <div className="col small color-muted right">
-                    <div>
-                        <b>Updated at </b>
-                        <span className="nowrap">{ new Date(record.updatedAt).toLocaleString() }</span>
-                    </div>
-                </div>
-            </div> }
             <fieldset className="mt-1">
                 <label>Name</label>
                 <input type="text" name="requestGroupName" defaultValue={ record.name } required />
