@@ -12,7 +12,7 @@ export default function Truncate({ children }: { children: string })
     return <span
         className="truncated"
         title={children}
-        data-content-start={children.substr(0,middle)}
-        data-content-end={children.substr(middle)}
+        data-content-start={children.substring(0,middle)}
+        data-content-end={children.substring(middle)}
     />
 }

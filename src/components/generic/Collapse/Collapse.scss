@@ -1,0 +1,65 @@
+@import "../../../styles/variables.scss";
+
+.collapse {
+
+    $color-2: mix($color-blue, #000, 50%);
+
+    display: block;
+    
+    .collapse-header {
+        // box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.075) inset;
+        // border-radius: 3px;
+        margin: 0;
+        font-weight: bold;
+        color: $color-2;
+        cursor: pointer;
+        padding: 0.2em 0;
+        text-shadow: 0 1px 0 #FFF;
+        user-select: none;
+        // background: fade-out($color: mix($color-blue, #FFF, 50%), $amount: 0.5);
+        border-bottom: 0.15ch dashed fade-out(#000, 0.7);
+        box-shadow: 0 1px 0 #FFF;
+        // border-bottom: 1px solid fade-out(#000, 0.85);
+        // box-shadow: 0 1px 0 fade-out(#000, 0.9);
+        text-indent: 0;
+
+        .fa-solid {
+            width: 0.7em;
+            color: fade-out(#000, 0.65);
+        }
+    }
+
+    .collapse-body {
+        opacity: 1;
+        overflow: visible;
+        transform: none;
+        transform-origin: 50% 0;
+        transition: all .3s ease-in-out;
+        min-height: 2px !important;
+        height: auto;
+
+        &.animating {
+            overflow: hidden !important;
+        }
+    }
+
+    &.collapsed {
+        .collapse-header {
+
+            color: fade-out(#000, 0.4);
+            // background: fade-out($color: mix($color-blue, #FFF, 30%), $amount: 0.5);
+
+            &:hover {
+                color: $color-brand-2;
+            //     background: fade-out($color: mix($color-blue, #FFF, 45%), $amount: 0.5);
+            }
+        }
+
+        .collapse-body {
+            transform: scaleY(0.8);
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+        }
+    }
+}

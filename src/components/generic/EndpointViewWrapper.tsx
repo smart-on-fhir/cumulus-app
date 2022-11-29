@@ -1,9 +1,13 @@
+
 import { useCallback } from "react"
+import { Helmet, HelmetProvider } from "react-helmet-async"
 import { useParams }   from "react-router"
+import { Link } from "react-router-dom"
 import { request }     from "../../backend"
 import { useBackend }  from "../../hooks"
-import { AlertError }  from "../Alert"
-import Loader          from "../Loader"
+import { AlertError }  from "./Alert"
+import Breadcrumbs from "./Breadcrumbs"
+import Loader          from "./Loader"
 
 
 export default function EndpointViewWrapper({
@@ -44,3 +48,74 @@ export default function EndpointViewWrapper({
     return children(data)
 }
 
+export function createViewPage<T extends { createdAt: string, updatedAt: string }>({
+    namePlural,
+    endpoint,
+    basePath,
+    nameField = "name",
+    renderView,
+    icon = null
+}: {
+    namePlural       : string
+    endpoint         : string
+    basePath         : string
+    nameField       ?: string
+    icon            ?: JSX.Element | null
+    renderView       : (data: T) => JSX.Element
+})
+{
+    return (
+        <div className="container">
+            <EndpointViewWrapper endpoint={ endpoint }>
+                {(data: T) => {
+                    const name = data[nameField as keyof T] + ""
+                    return (
+                        <>
+                            <HelmetProvider>
+                                <Helmet>
+                                    <title>{ name }</title>
+                                </Helmet>
+                            </HelmetProvider>
+                            <Breadcrumbs links={[
+                                { name: "Home", href: "/" },
+                                { name: namePlural, href: basePath },
+                                { name }
+                            ]} />
+                            <div className="row gap mt-2">
+                                <div className="col middle">
+                                    <h4>{icon} { name }</h4>
+                                </div>
+                                <div className="col col-0 right nowrap middle">
+                                    <div>
+                                        <Link to="./edit" className="btn btn-virtual">
+                                            <i className="fa-solid fa-pen-to-square color-blue" title="Edit" />
+                                        </Link>
+                                        <Link to="./delete" className="btn btn-virtual" title="Delete">
+                                            <i className="fa-solid fa-trash-can color-blue" />
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr className="mb-1" />
+                            <div className="row gap mb-2 mt-05">
+                                <div className="col col-0">
+                                    <i>
+                                        <span className="color-muted">Created: </span>
+                                        <span className="color-brand-2">{ new Date(data.createdAt).toLocaleString() }</span>
+                                    </i>
+                                </div>
+                                <div className="col col-0">
+                                    <i>
+                                        <span className="color-muted">Updated: </span>
+                                        <span className="color-brand-2">{ new Date(data.updatedAt).toLocaleString() }</span>
+                                    </i>
+                                </div>
+                            </div>
+                            { renderView(data) }
+                        </>
+                    )
+                }}
+            </EndpointViewWrapper>
+        </div>
+    )
+}

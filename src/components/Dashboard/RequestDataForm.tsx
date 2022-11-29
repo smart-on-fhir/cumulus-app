@@ -5,10 +5,10 @@ import { Link }                             from "react-router-dom";
 import { useAuth }                          from "../../auth";
 import { request }                          from "../../backend";
 import { useBackend }                       from "../../hooks";
-import Alert, { AlertError }                from "../Alert";
-import Breadcrumbs                          from "../Breadcrumbs";
-import Checkbox                             from "../Checkbox";
-import Loader                               from "../Loader";
+import Alert, { AlertError }                from "../generic/Alert";
+import Breadcrumbs                          from "../generic/Breadcrumbs";
+import Checkbox                             from "../generic/Checkbox";
+import Loader                               from "../generic/Loader";
 
 type DataElementNeed = "required" | "preferred" | "optional"
 

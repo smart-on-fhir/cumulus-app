@@ -4,13 +4,14 @@ import { Link }                   from "react-router-dom"
 import DataRequestLink            from "./DataRequestLink"
 import { useBackend }             from "../../hooks"
 import { request }                from "../../backend"
-import Breadcrumbs                from "../Breadcrumbs"
+import Breadcrumbs                from "../generic/Breadcrumbs"
 import { useAuth }                from "../../auth"
-import Loader                     from "../Loader"
-import { AlertError }             from "../Alert"
+import Loader                     from "../generic/Loader"
+import { AlertError }             from "../generic/Alert"
 import Grid                       from "../generic/Grid"
 
 import "./DataRequestsListPage.scss";
+import Collapse from "../generic/Collapse"
 
 
 
@@ -44,7 +45,7 @@ export default function DataRequestsListPage()
             ]} />
             <div className="row gap">
                 <div className="col middle">
-                    <h3><i className="icon fa-solid fa-database color-blue-dark" /> Data Subscriptions</h3>
+                    <h3><i className="icon fa-solid fa-database color-brand-2" /> Data Subscriptions</h3>
                 </div>
                 { user?.role === "admin" && (<div className="col col-0 middle">
                     <Link className="btn color-blue-dark btn-virtual" to="/requests/new">
@@ -52,17 +53,18 @@ export default function DataRequestsListPage()
                     </Link>
                 </div>) }
             </div>
-            <hr/>
+            <hr className="mb-2"/>
             { groups?.filter(g => g.requests.length > 0).map((group, i) => (
-                <div key={i} className="mb-2 mt-2">
-                    <h5 className="color-brand-2"><i className="fa-regular fa-folder"/> { group.name }</h5>
-                    <hr className="dashed mb-05"/>
-                    <Grid cols="22em" key={i} className="link-list">
+
+                <Collapse key={i} header={
+                    <><i className="fa-regular fa-folder"/> { group.name }</>
+                }>
+                    <Grid cols="22em" key={i} className="link-list mt-05 mb-2">
                         { group.requests.map((item, y) => (
                             <DataRequestLink request={item} href="/requests/:id" key={y} />
                         ))}
                     </Grid>
-                </div>
+                </Collapse>
             )) }
         </div>
     )

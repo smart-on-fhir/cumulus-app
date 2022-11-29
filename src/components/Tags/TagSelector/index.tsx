@@ -1,8 +1,8 @@
 import { classList }       from "../../../utils"
-import Checkbox            from "../../Checkbox"
+import Checkbox            from "../../generic/Checkbox"
 import EndpointListWrapper from "../../generic/EndpointListWrapper"
 import Tag                 from "../Tag"
-import "../../Select/Select.scss"
+import "../../generic/Select/Select.scss"
 import "./TagSelector.scss"
 
 

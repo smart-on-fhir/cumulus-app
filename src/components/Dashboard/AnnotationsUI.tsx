@@ -1,6 +1,6 @@
 import { AnnotationMockPointOptionsObject, AnnotationsLabelsOptions } from "highcharts";
 import moment from "moment";
-import Checkbox from "../Checkbox";
+import Checkbox from "../generic/Checkbox";
 
 
 const emptyAnnotation: AnnotationsLabelsOptions = {

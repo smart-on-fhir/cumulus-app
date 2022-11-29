@@ -6,8 +6,8 @@ import {
   Navigate
 } from "react-router-dom";
 import { auth } from "./backend" 
-import { AlertError } from "./components/Alert";
-import MenuButton from "./components/MenuButton";
+import { AlertError } from "./components/generic/Alert";
+import MenuButton from "./components/generic/MenuButton";
 
 
 interface AuthContextType {

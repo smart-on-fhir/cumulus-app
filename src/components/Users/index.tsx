@@ -2,9 +2,9 @@ import { Component, useState } from "react";
 import { Link }                from "react-router-dom";
 import { useAuth }             from "../../auth";
 import { request }             from "../../backend";
-import { AlertError }          from "../Alert";
+import { AlertError }          from "../generic/Alert";
 import { Format }              from "../Format";
-import Loader                  from "../Loader";
+import Loader                  from "../generic/Loader";
 import "./Users.scss"
 
 interface State {

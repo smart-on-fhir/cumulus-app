@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth }    from "../../auth";
 import { request }    from "../../backend";
-import { AlertError } from "../Alert";
+import { AlertError } from "../generic/Alert";
 
 export default function Account()
 {

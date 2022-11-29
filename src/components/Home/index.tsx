@@ -4,8 +4,8 @@ import { useAuth }                from "../../auth";
 import DataRequestsList           from "../DataRequests/DataRequestsList"
 import ViewsBrowser               from "../Views/ViewsBrowser"
 import ActivityPanel              from "../Activity/Panel";
-import Panel                      from "../Panel";
-import DataSiteList               from "../DataSites/List";
+import Panel                      from "../generic/Panel";
+import DataSiteList               from "../DataSites/LinkList";
 import { useState }               from "react";
 
 

@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react"
+import { Helmet, HelmetProvider } from "react-helmet-async"
 import { useNavigate }                  from "react-router"
 import { request }                      from "../../backend"
+import { AlertError } from "./Alert"
+import Breadcrumbs from "./Breadcrumbs"
 
 
 export default function EndpointCreateWrapper({
@@ -52,4 +55,50 @@ export default function EndpointCreateWrapper({
         onSubmit,
         error   : saveError
     })
+}
+
+export function createCreatePage<T = unknown>({
+    nameSingular,
+    namePlural,
+    endpoint,
+    basePath,
+    renderForm
+}: {
+    nameSingular     : string
+    namePlural       : string
+    endpoint         : string
+    basePath         : string
+    renderForm       : (props: {
+        loading : boolean
+        data    : T
+        onSubmit: (data: T) => void
+    }) => JSX.Element
+})
+{
+    return (
+        <div className="container">
+            <HelmetProvider>
+                <Helmet>
+                    <title>Create { nameSingular }</title>
+                </Helmet>
+            </HelmetProvider>
+            <EndpointCreateWrapper endpoint={ endpoint }>
+                {({ data, error, loading, onSubmit }) => (
+                    <>
+                        <Breadcrumbs links={[
+                            { name: "Home", href: "/" },
+                            { name: namePlural, href: basePath },
+                            { name: "Create " + nameSingular }
+                        ]} />
+                        <h4>
+                            <i className="fa-solid fa-circle-plus color-brand-2" /> Create { nameSingular }
+                        </h4>
+                        <hr className="mb-1" />
+                        { error && <AlertError>{ error }</AlertError> }
+                        { renderForm({ data: data as T, onSubmit, loading }) }
+                    </>
+                )}
+            </EndpointCreateWrapper>
+        </div>
+    )
 }

@@ -4,8 +4,8 @@ import { Link }                   from "react-router-dom"
 import { request }                from "../../backend"
 import { useBackend }             from "../../hooks"
 import { ellipsis }               from "../../utils"
-import { AlertError }             from "../Alert"
-import Panel                      from "../Panel"
+import { AlertError }             from "../generic/Alert"
+import Panel                      from "../generic/Panel"
 import "./Activity.scss"
 
 

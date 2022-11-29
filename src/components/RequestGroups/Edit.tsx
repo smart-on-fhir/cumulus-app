@@ -1,5 +1,5 @@
 import { Helmet, HelmetProvider } from "react-helmet-async"
-import Breadcrumbs                from "../Breadcrumbs"
+import Breadcrumbs                from "../generic/Breadcrumbs"
 import Wrapper                    from "../generic/EndpointEditWrapper"
 import Form                       from "./Form";
 import "./RequestGroups.scss";

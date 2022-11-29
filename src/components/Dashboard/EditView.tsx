@@ -3,9 +3,9 @@ import { useParams }   from "react-router";
 import Dashboard       from ".";
 import { request }     from "../../backend";
 import { useBackend }  from "../../hooks";
-import { AlertError }  from "../Alert";
-import Breadcrumbs     from "../Breadcrumbs";
-import Loader          from "../Loader";
+import { AlertError }  from "../generic/Alert";
+import Breadcrumbs     from "../generic/Breadcrumbs";
+import Loader          from "../generic/Loader";
 
 export default function EditView()
 {

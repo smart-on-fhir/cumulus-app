@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react"
-import Loader from "../Loader"
+import Loader from "../generic/Loader"
 
 export default function Form({ data = {}, onSubmit, loading, error }: {
     data?: Record<string, any>
