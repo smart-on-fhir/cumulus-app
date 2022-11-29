@@ -10,7 +10,7 @@ export default function CreateProject()
         <div className="container">
             <HelmetProvider>
                 <Helmet>
-                    <title>Create Project</title>
+                    <title>Create Study Area</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
@@ -18,7 +18,7 @@ export default function CreateProject()
                 { name: "Projects", href: "/projects" },
                 { name: "Create Project" }
             ]} />
-            <h4><i className="fa-solid fa-circle-plus color-blue-dark" /> Create Project</h4>
+            <h4><i className="fa-solid fa-circle-plus color-blue-dark" /> Create Study Area</h4>
             <hr/>
             <EndpointCreateWrapper endpoint="/api/projects">
                 {({ loading, data, onSubmit, error }) => <>

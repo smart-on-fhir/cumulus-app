@@ -59,8 +59,8 @@ export default function Navigation()
             <div className="navigation-wrap">
                 <NavLink to="/"><i className="icon fa-solid fa-house-chimney"></i> Home</NavLink>
                 
-                <NavGroup to="/projects" label="Projects" icon="fa-solid fa-book" end={ /^\/projects(\/\d+.*?)?$/ }>
-                    <NavLink to="/projects/new"><i className="icon fa-solid fa-circle-plus" /> New Project</NavLink>
+                <NavGroup to="/projects" label="Study Areas" icon="fa-solid fa-book" end={ /^\/projects(\/\d+.*?)?$/ }>
+                    <NavLink to="/projects/new"><i className="icon fa-solid fa-circle-plus" /> New Study Area</NavLink>
                 </NavGroup>
 
                 <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" /> Graphs</NavLink>

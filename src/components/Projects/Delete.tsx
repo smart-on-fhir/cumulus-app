@@ -35,14 +35,14 @@ export default function DeleteProject()
                     return <>
                         <HelmetProvider>
                             <Helmet>
-                                <title>Delete Project</title>
+                                <title>Delete Study Area</title>
                             </Helmet>
                         </HelmetProvider>
                         <Breadcrumbs links={[
                             { name: "Home"    , href: "/" },
-                            { name: "Projects", href: "/projects" },
+                            { name: "Study Area", href: "/projects" },
                             { name: data.name , href: "/projects/" + data.id },
-                            { name: "Delete Project" }
+                            { name: "Delete Study Area" }
                         ]} />
                         <h1 className="color-brand-2 center mt-2 mb-2">Please Confirm!</h1>
                         { error && <AlertError>{ error }</AlertError> }
@@ -88,7 +88,7 @@ export default function DeleteProject()
                                     <hr className="mb-05"/>
                                     { data.Subscriptions?.length ?
                                         <>
-                                            <div className="color-muted mb-05">These data subscriptions will no longer be linked to this project:</div>
+                                            <div className="color-muted mb-05">These data subscriptions will no longer be linked to this study area:</div>
                                             <div className="link-list">
                                                 { data.Subscriptions?.map((s, i) => (
                                                     <DataRequestLink key={i} request={s} href={"/requests/" + s.id}/>
@@ -106,7 +106,7 @@ export default function DeleteProject()
                                     <hr className="mb-05"/>
                                     { graphs.length ? 
                                         <>
-                                            <div className="color-muted">These graphs will no longer be linked to this project:</div>
+                                            <div className="color-muted">These graphs will no longer be linked to this study area:</div>
                                             <Grid className="view-browser view-browser-column" cols="20em">
                                                 { graphs.map((g, i) => <ViewThumbnail key={i} view={g} showDescription={200} />) }
                                             </Grid>
@@ -119,7 +119,7 @@ export default function DeleteProject()
                         <div className="center pt-2 pb-1">
                             <Link style={{ minWidth: "12em" }} className="btn pl-2 pr-2 mr-1 color-green" to="..">Cancel</Link>
                             <button style={{ minWidth: "12em" }} className="btn btn-brand-2 pl-2 pr-2" onClick={() => onSubmit()} disabled={loading}>
-                                Delete Project{ loading && <>&nbsp;<Loader msg="" /></> }
+                                Delete Study Area{ loading && <>&nbsp;<Loader msg="" /></> }
                             </button>
                         </div>
                     </>

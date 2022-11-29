@@ -15,12 +15,12 @@ export default function Projects()
         <>
             <HelmetProvider>
                 <Helmet>
-                    <title>Cumulus Projects</title>
+                    <title>Cumulus Study Areas</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Projects" }
+                { name: "Study Areas" }
             ]} />
             <EndpointListWrapper endpoint="/api/projects?order=createdAt:asc">
                 { (data: app.Project[]) => {
@@ -28,9 +28,9 @@ export default function Projects()
                     if (!data.length) {
                         return <div className="center">
                             <br/>
-                            <p>No projects found in the database! You can start by creating a new project.</p>
+                            <p>No study areas found in the database! You can start by creating a new study area.</p>
                             <br/>
-                            <Link to="./new" className="btn btn-blue-dark pl-2 pr-2">Create Project</Link>
+                            <Link to="./new" className="btn btn-blue-dark pl-2 pr-2">Create Study Area</Link>
                         </div>
                     }
 
@@ -69,10 +69,10 @@ export default function Projects()
                                                 <Link to={`/projects/${project.id}`} className="pl-2 pr-2"><b>Explore</b></Link>
                                                 <MenuButton right items={[
                                                     <Link to={ `/projects/${project.id}/edit` }>
-                                                        <i className="fa-solid fa-pen-to-square color-blue-dark" /> Edit Project
+                                                        <i className="fa-solid fa-pen-to-square color-blue-dark" /> Edit Study Area
                                                     </Link>,
                                                     <Link to={ `/projects/${project.id}/delete` }>
-                                                        <i className="fa-solid fa-trash-can color-red" /> Delete Project
+                                                        <i className="fa-solid fa-trash-can color-red" /> Delete Study Area
                                                     </Link>
                                                 ]}>
                                                     <i className="fa-solid fa-caret-down small" />
