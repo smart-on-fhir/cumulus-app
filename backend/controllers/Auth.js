@@ -25,7 +25,6 @@ const router = express.Router({ mergeParams: true });
  */
 async function authenticate(req, res, next) {
     const dbConnection = req.app.get("dbConnection")
-    dbConnection.user = { role: "guest" }; 
     const { sid } = req.cookies;
     if (sid) {
         try {
@@ -35,8 +34,11 @@ async function authenticate(req, res, next) {
                 dbConnection.user = user; 
             }
         } catch (ex) {
+            dbConnection.user = { role: "guest" }; 
             logger.error(ex, { tags: ["AUTH"] });
         }
+    } else {
+        dbConnection.user = { role: "guest" }; 
     }
     // console.log(dbConnection.user?.email)
     next();

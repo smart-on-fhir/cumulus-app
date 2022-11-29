@@ -47,11 +47,11 @@ export function attachHooks(connection: Sequelize) {
             if (Array.isArray(model)) {
                 model.forEach(m => {
                     // filter out runtime models from connecting tables
-                    if (m instanceof BaseModel) {
+                    if (m && m instanceof BaseModel) {
                         m.requestPermissionToRead(options)
                     }
                 })
-            } else if (model) {
+            } else if (model && model instanceof BaseModel) {
                 model.requestPermissionToRead(options)
             } else {
                 // TODO: model might be null
