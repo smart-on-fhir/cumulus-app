@@ -28,11 +28,7 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
 
     return (
         <form onSubmit={ submit } autoComplete="off">
-            <div className="row gap-2 mt-2 wrap stretch" style={{
-                minHeight: "calc(100vh - 22rem)",
-                // minHeight: "20rem",
-                // maxHeight: "max-content"
-            }}>
+            <div className="row gap-2 mt-2 wrap stretch">
                 <div className="col col-6 responsive">
                     <div className="row">
                         <div className="col mb-1">
