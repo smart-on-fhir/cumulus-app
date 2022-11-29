@@ -13,16 +13,16 @@ export default function EditProject()
                 {({ loading, data, onSubmit, error }) => <>
                     <HelmetProvider>
                         <Helmet>
-                            <title>Edit Project</title>
+                            <title>Edit Study Area</title>
                         </Helmet>
                     </HelmetProvider>
                     <Breadcrumbs links={[
                         { name: "Home"    , href: "/" },
-                        { name: "Projects", href: "/projects" },
+                        { name: "Study Areas", href: "/projects" },
                         { name: data.name , href: "/projects/" + data.id },
-                        { name: "Edit Project" }
+                        { name: "Edit Study Area" }
                     ]} />
-                    <h4><i className="fa-solid fa-pen-to-square color-blue-dark" /> Edit Project</h4>
+                    <h4><i className="fa-solid fa-pen-to-square color-blue-dark" /> Edit Study Area</h4>
                     { error && <AlertError>{ error }</AlertError> }
                     <Form loading={loading} data={data} onSubmit={onSubmit} />
                 </> }

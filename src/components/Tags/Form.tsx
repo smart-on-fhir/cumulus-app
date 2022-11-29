@@ -27,7 +27,7 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
                         type="text"
                         id="name"
                         name="name"
-                        placeholder="Project name"
+                        placeholder="Tag name"
                         required
                         value={name}
                         onChange={e => setName(e.target.value)}
@@ -41,7 +41,7 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
                     <textarea
                         id="description"
                         name="description"
-                        placeholder="Project description"
+                        placeholder="Tag description"
                         rows={8}
                         maxLength={200}
                         required
