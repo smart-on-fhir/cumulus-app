@@ -35,7 +35,6 @@ interface ModelDestroyOptions extends InstanceDestroyOptions {
 interface Config {
     port    : number
     host    : string
-    verbose : boolean
     throttle: number
     appEmail: string
 

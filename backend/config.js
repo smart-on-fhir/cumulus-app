@@ -13,7 +13,6 @@ const {
     DB_USER                = "postgres",
     DB_PASS                = "",
     DB_DATABASE            = "cumulus",
-    VERBOSE                = "false",
     THROTTLE               = "0",
     DB_SSL                 = "true",
     DB_DOCKER_CONTAINER    = "",
@@ -32,7 +31,6 @@ const {
 module.exports = {
     port    : uInt(PORT),
     host    : HOST,
-    verbose : bool(VERBOSE),
     throttle: uInt(THROTTLE),
     
     
