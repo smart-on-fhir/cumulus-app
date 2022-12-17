@@ -53,7 +53,7 @@ route(router, {
     }
 })
 
-// update ----------------------------------------------------------------------
+// view ------------------------------------------------------------------------
 route(router, {
     path: "/:id",
     method: "get",
@@ -187,7 +187,9 @@ route(router, {
             delete req.body.updatedAt
 
             await model.update(req.body, { transaction, user: req.user })
-            await model.setTags(req.body.Tags.map(t => t.id))
+            if (Array.isArray(req.body.Tags)) {
+                await model.setTags(req.body.Tags.map(t => t.id))
+            }
             await transaction.commit()
             res.json(model)
         } catch (ex) {

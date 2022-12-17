@@ -2,6 +2,7 @@ import HttpError from "./HttpError";
 
 
 export async function request<T=any>(path: string, options: RequestInit = {}): Promise<T> {
+    path = path.replace(/^\//, (process.env.REACT_APP_BACKEND_HOST || "") + "/");
     const res = await fetch(path, {
         mode: "cors",
         credentials: "include",
@@ -56,7 +57,7 @@ export async function deleteOne<T=any>(table: string, id: string | number) {
 
 export const auth = {
     async login(username: string, password: string, remember = false): Promise<app.User> {
-        return fetch(`/api/auth/login`, {
+        return request(`/api/auth/login`, {
             mode   : "cors",
             method : "POST",
             body   : JSON.stringify({ username, password, remember }),
@@ -64,22 +65,13 @@ export const auth = {
             headers: {
                 "content-type": "application/json"
             }
-        }).then(res => {
-            if (res.ok) {
-                return res.json()
-            }
-
-            return res.text().then(txt => {
-                throw new Error(txt)
-            })
-            
         });                
     },
     async logout(): Promise<{ message: string }> {
-        return fetch(`/api/auth/logout`, {
+        return request(`/api/auth/logout`, {
             mode   : "cors",
             method : "GET",
             credentials: "include"
-        }).then(res => res.json());                
+        });
     }
 };

@@ -8,7 +8,7 @@ export default function List()
 {
     return createListPage<app.Tag[]>({
         namePlural: "Tags",
-        endpoint  : "api/tags",
+        endpoint  : "/api/tags",
         icon      : <i className="fa-solid fa-tag color-brand-2" />,
         renderList: data => {
             
