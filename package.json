@@ -45,12 +45,17 @@
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
     "start:prod": "ts-node --skipProject --transpile-only -r dotenv/config backend",
-    "start:server": "DOTENV_CONFIG_PATH=backend/.env ts-node --skipProject --transpile-only -r dotenv/config backend",
+    "start:server": "if-env NODE_ENV=production && npm run start:server:prod || npm run start:server:dev",
+    "start:server:dev": "cd docker && docker-compose --env-file='../.env' --env-file='../.env.development' --env-file='../.env.local' up",
+    "start:server:prod": "cd docker && docker-compose --env-file='../.env' --env-file='../.env.local' up",
+    "run:server": "if-env NODE_ENV=production && npm run run:server:prod || npm run run:server:dev",
+    "run:server:dev": "nodemon -e js,ts,json -x 'npm run run:server:prod'",
+    "run:server:prod": "./node_modules/.bin/ts-node --skipProject --transpile-only -r dotenv/config backend",
     "start:dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "test:server": "DOTENV_CONFIG_PATH=backend/test.env nyc --reporter=lcov ts-mocha -p test/tsconfig.json"
+    "test:server": "DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov ts-mocha -p test/tsconfig.json"
   },
   "eslintConfig": {
     "extends": [
@@ -82,10 +87,11 @@
     "@types/sequelize": "^4.28.14",
     "chai": "^4.3.7",
     "mocha": "^10.1.0",
+    "nodemon": "^2.0.20",
     "nyc": "^15.1.0",
     "ts-mocha": "^10.0.0"
   },
-  "proxy": "http://127.0.0.1:4000",
+  "proxy": "http://127.0.0.1:4001",
   "engines": {
     "node": ">=18"
   }
