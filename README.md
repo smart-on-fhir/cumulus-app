@@ -1,46 +1,37 @@
-# Getting Started with Create React App
+# Cumulus
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Install
 
-## Available Scripts
+First make sure you have an unix system (Linux or Mac) with Git, Docker and NodeJS 18+.
+Then do:
+```sh
+git clone https://github.com/smart-on-fhir/cumulus-app.git
+cd cumulus-app
+npm i
+```
 
-In the project directory, you can run:
+## Configure
+The configuration is done via `.env` files. In the project root folder there is 
+a file called `.env` which contains all the environment variables and their
+descriptions. However, most of these variables are have their default values, or
+are empty and are supposed to be overridden. When the application is started,
+several configuration files will be loaded and override each other's variables:
+    1. `.env` - base values for all variables
+    2. `.env.development` - some overrides for development if started via `npm run start:server:dev`
+    3. `.env.local` - most variables are set here. Secrets are OK here as this file is git-ignored
 
-### `npm start`
+To configure new installation make a copy of the file `.env` and rename it to `.env.local`. Then add
+your configurations to `.env.local`.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Run
+In one terminal run `npm run start:server`. Then open http://localhost:4000/ and
+login with one of the following credentials:
+- email: `user@cumulus.dev`, password: `User@12345`
+- email: `manager@cumulus.dev`, password: `Manager@12345`
+- email: `admin@cumulus.dev`, password: `Admin@12345`
 
-### `npm test`
+If you want to do doe React development using hot-reload server, in a separate terminal run `npm start` and then use `http://localhost:3001/` instead. Keep in mind that any changes you make to the front-end code will not be visible on http://localhost:4000/, until you run `npm run build`.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).

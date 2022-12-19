@@ -1,0 +1,74 @@
+version: '3.1'
+
+services:
+
+  # NginX Server for the dashboard frontend static content
+  # This uses minimal NginX configuration from ./nginx.conf. 
+  # TODO: Add config to cache static assets (images, css...)
+  # TODO: Expose nginx logs?
+  web:
+    container_name: cumulus-dashboard-frontend
+    build:
+      context: ..
+      dockerfile: ./docker/frontend.Dockerfile
+    ports:
+      - $FRONTEND_PORT:80
+    volumes:
+      - ../build:/usr/share/nginx/html 
+    depends_on:
+      - db
+
+  api:
+    container_name: cumulus-dashboard-backend
+    build:
+      context: ..
+      dockerfile: docker/backend.Dockerfile
+    ports:
+      - $BACKEND_PORT:80
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=$DB_PORT
+      - DB_USER=$DB_USER
+      - DB_PASS=$DB_PASS
+      - DB_DATABASE=$DB_DATABASE
+      - DB_SYNC=$DB_SYNC
+      - DB_SEED=$DB_SEED
+      - DB_SSL=$DB_SSL
+      - DATABASE_URL=postgres://$DB_USER:$DB_PASS@db:$DB_PORT/$DB_DATABASE
+      - NODE_ENV=$NODE_ENV
+    volumes:
+      - ../backend:/app/backend
+      - ../build:/app/build
+      - ../logs:/app/logs
+
+  db:
+    container_name: cumulus-dashboard-db
+    image: postgres:14
+    restart: on-failure
+    ports:
+      - $DB_PORT:5432
+    environment:
+      - POSTGRES_PASSWORD=$DB_PASS
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_DB=$DB_DATABASE
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - PGPORT=$DB_PORT
+    # volumes:
+    #   - cumulus-dashboard-database:/var/lib/postgresql/data/pgdata
+
+  pgadmin:
+    container_name: cumulus-dashboard-pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=$PGADMIN_EMAIL
+      - PGADMIN_DEFAULT_PASSWORD=$PGADMIN_PASSWORD
+      - PGADMIN_CONFIG_CONSOLE_LOG_LEVEL=$PGADMIN_CONFIG_CONSOLE_LOG_LEVEL
+    ports:
+      - $PGADMIN_PORT:80
+    depends_on:
+      - db
+
+# volumes:
+#   cumulus-dashboard-database:
