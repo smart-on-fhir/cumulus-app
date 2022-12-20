@@ -21,7 +21,7 @@ function NavGroup({ to, label, icon, children, end }: {
             { to ?
                 <NavLink to={ to } end={ end ? !end.test(pathname) : true }>
                     <i className={ "icon " + icon } /><label>{ label }</label>
-                    <i
+                    { children && <i
                         className={ "fas chevron " + (isOpen ? "fa-chevron-down" : "fa-chevron-right") }
                         title={ isOpen ? "Collapse Group" : "Expand Group" }
                         onClick={ e => {
@@ -29,7 +29,7 @@ function NavGroup({ to, label, icon, children, end }: {
                             e.stopPropagation()
                             setOpen(!isOpen)
                         }}
-                    />
+                    /> }
                 </NavLink> :
                 <div
                     className={ "link" + (isOpen ? " open" : "") }
@@ -37,7 +37,7 @@ function NavGroup({ to, label, icon, children, end }: {
                     onClick={() => setOpen(!isOpen)}
                 >
                     <i className={ "icon " + icon } /><label>{ label }</label>
-                    <i className={ "fas chevron " + (isOpen ? "fa-chevron-down" : "fa-chevron-right") } />
+                    { children && <i className={ "fas chevron " + (isOpen ? "fa-chevron-down" : "fa-chevron-right") } /> }
                 </div>
             }
             { isOpen && <div className="group active">{ children }</div> }
@@ -54,13 +54,16 @@ export default function Navigation()
         return null
     }
 
+    const canCreateProjects = user.permissions.includes("Projects.create")
+
     return (
         <div className="navigation">
             <div className="navigation-wrap">
                 <NavLink to="/"><i className="icon fa-solid fa-house-chimney"></i> Home</NavLink>
                 
+                
                 <NavGroup to="/projects" label="Study Areas" icon="fa-solid fa-book" end={ /^\/projects(\/\d+.*?)?$/ }>
-                    <NavLink to="/projects/new"><i className="icon fa-solid fa-circle-plus" /> New Study Area</NavLink>
+                    { canCreateProjects && <NavLink to="/projects/new"><i className="icon fa-solid fa-circle-plus" /> New Study Area</NavLink> }
                 </NavGroup>
 
                 <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" /> Graphs</NavLink>
