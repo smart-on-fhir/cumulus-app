@@ -1,3 +1,4 @@
+import { useAuth }        from "../../auth"
 import DataRequestLink    from "../DataRequests/DataRequestLink"
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import Grid               from "../generic/Grid"
@@ -5,11 +6,16 @@ import ViewThumbnail      from "../Views/ViewThumbnail"
 
 
 export default function View() {
+
+    const { user } = useAuth();
+
     return createViewPage<app.Project>({
         basePath  : "/projects",
         endpoint  : "/api/projects",
         namePlural: "Study Areas",
         icon      : <i className="fa-solid fa-book color-brand-2" />,
+        canUpdate : user?.permissions.includes("Tags.update"),
+        canDelete : user?.permissions.includes("Tags.delete"),
         renderView: data => {
 
             const graphs: app.View[] = [];

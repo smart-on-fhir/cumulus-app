@@ -6,11 +6,17 @@ import Clip                       from "../generic/Clip"
 import MenuButton                 from "../generic/MenuButton"
 import EndpointListWrapper        from "../generic/EndpointListWrapper"
 import Grid                       from "../generic/Grid"
+import { useAuth }                from "../../auth"
 import "./Projects.scss"
 
 
 export default function List()
 {
+    const { user } = useAuth();
+
+    const canUpdate = user?.permissions.includes("Projects.update")
+    const canDelete = user?.permissions.includes("Projects.delete")
+
     return (
         <>
             <HelmetProvider>
@@ -65,18 +71,18 @@ export default function List()
                                         </Grid>
                                         <hr/>
                                         <div className="center">
-                                            <div className="btn btn-blue mt-2 p-0">
+                                            <div className="btn btn-blue mt-2">
                                                 <Link to={`/projects/${project.id}`} className="pl-2 pr-2"><b>Explore</b></Link>
-                                                <MenuButton right items={[
-                                                    <Link to={ `/projects/${project.id}/edit` }>
+                                                { (canUpdate || canDelete) && <MenuButton right items={[
+                                                    canUpdate ? <Link to={ `/projects/${project.id}/edit` }>
                                                         <i className="fa-solid fa-pen-to-square color-blue-dark" /> Edit Study Area
-                                                    </Link>,
-                                                    <Link to={ `/projects/${project.id}/delete` }>
+                                                    </Link> : null,
+                                                    canDelete ? <Link to={ `/projects/${project.id}/delete` }>
                                                         <i className="fa-solid fa-trash-can color-red" /> Delete Study Area
-                                                    </Link>
+                                                    </Link> : null
                                                 ]}>
                                                     <i className="fa-solid fa-caret-down small" />
-                                                </MenuButton>
+                                                </MenuButton> }
                                             </div>
                                         </div>
                                     </div>
