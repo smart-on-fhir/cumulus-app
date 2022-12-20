@@ -17,6 +17,7 @@ declare module app {
         invitedBy: number | null // Ref User ID
         createdAt: string // Date
         updatedAt: string // Date
+        permissions: string[]
     }
 
     interface Tag {

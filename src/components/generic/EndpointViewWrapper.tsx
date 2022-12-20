@@ -55,15 +55,19 @@ export function createViewPage<T extends { createdAt: string, updatedAt: string 
     nameField = "name",
     renderView,
     icon = null,
+    canUpdate = true,
+    canDelete = true,
     query
 }: {
-    namePlural       : string
-    endpoint         : string
-    basePath         : string
-    nameField       ?: string
-    query           ?: string
-    icon            ?: JSX.Element | null
-    renderView       : (data: T) => JSX.Element
+    namePlural  : string
+    endpoint    : string
+    basePath    : string
+    nameField  ?: string
+    query      ?: string
+    icon       ?: JSX.Element | null
+    renderView  : (data: T) => JSX.Element
+    canUpdate  ?: boolean
+    canDelete  ?: boolean
 })
 {
     return (
@@ -90,16 +94,16 @@ export function createViewPage<T extends { createdAt: string, updatedAt: string 
                                 <div className="col middle">
                                     <h4>{ name }</h4>
                                 </div>
-                                <div className="col col-0 right nowrap middle">
+                                { (canUpdate || canDelete) && <div className="col col-0 right nowrap middle">
                                     <div>
-                                        <Link to="./edit" className="btn btn-virtual">
+                                        { canUpdate && <Link to="./edit" className="btn btn-virtual">
                                             <i className="fa-solid fa-pen-to-square color-blue" title="Edit" />
-                                        </Link>
-                                        <Link to="./delete" className="btn btn-virtual" title="Delete">
+                                        </Link> }
+                                        { canDelete && <Link to="./delete" className="btn btn-virtual" title="Delete">
                                             <i className="fa-solid fa-trash-can color-blue" />
-                                        </Link>
+                                        </Link> }
                                     </div>
-                                </div>
+                                </div> }
                             </div>
                             <hr className="mb-1" />
                             <div className="mb-2">

@@ -1,13 +1,11 @@
-import * as React from "react";
-import { NavLink } from "react-router-dom";
+import * as React     from "react"
+import { auth }       from "./backend" 
+import { AlertError } from "./components/generic/Alert"
 import {
   useNavigate,
   useLocation,
   Navigate
-} from "react-router-dom";
-import { auth } from "./backend" 
-import { AlertError } from "./components/generic/Alert";
-import MenuButton from "./components/generic/MenuButton";
+} from "react-router-dom"
 
 
 interface AuthContextType {
@@ -157,30 +155,3 @@ export function LoginPage() {
     );
 }
 
-export function AuthStatus() {
-    let auth = useAuth();
-    let navigate = useNavigate();
-  
-    if (!auth.user) {
-      return <p>You are not logged in.</p>;
-    }
-
-    return (
-        <>
-            <MenuButton right items={[
-                <NavLink to="/requests">Data Subscriptions</NavLink>,
-                <NavLink to="/groups">Data Subscription Groups</NavLink>,
-                <NavLink to="/sites">Data Sites</NavLink>,
-                <NavLink to="/activity">Activity Log</NavLink>,
-                "separator",
-                <span onMouseDown={() => { auth.logout().then(() => navigate("/")); }}><b>SIGN OUT</b></span>
-            ]}>
-                <span style={{ fontSize: "120%" }}> 
-                    <i className="fas fa-user-circle" style={{ fontSize: "200%", margin: 5, lineHeight: 1 }}/>
-                    <b>{auth.user.name || auth.user.email} &nbsp;<i className="fa-solid fa-caret-down"/></b>
-                </span>
-                {/* <span className="ml-1 underline" style={{ cursor: "pointer" }} onClick={() => { auth.logout().then(() => navigate("/")); }}><b>SIGN OUT</b></span> */}
-            </MenuButton>
-        </>
-    )
-}

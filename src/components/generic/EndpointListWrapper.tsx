@@ -40,14 +40,16 @@ export function createListPage<T = unknown>({
     namePlural,
     endpoint,
     renderList,
-    icon = null
+    icon = null,
+    canCreate = true
 }: {
-    namePlural  : string
+    namePlural   : string
     /** @deprecated */
     nameSingular?: string
-    endpoint    : string
-    icon       ?: JSX.Element | null
-    renderList  : (data: T) => JSX.Element
+    endpoint     : string
+    icon        ?: JSX.Element | null
+    renderList   : (data: T) => JSX.Element
+    canCreate   ?: boolean
 })
 {
     return (
@@ -71,7 +73,7 @@ export function createListPage<T = unknown>({
                             <div className="col middle">
                                 <h4>{ namePlural }</h4>
                             </div>
-                            <div className="col col-0 right nowrap bottom">
+                            { canCreate && <div className="col col-0 right nowrap bottom">
                                 <div>
                                     <Link to="new" className="btn btn-virtual">
                                         <b className="color-green">
@@ -79,7 +81,7 @@ export function createListPage<T = unknown>({
                                         </b>
                                     </Link>
                                 </div>
-                            </div>
+                            </div> }
                         </div>
                         <hr className="mt-05 mb-2" />
                         { renderList(data) }

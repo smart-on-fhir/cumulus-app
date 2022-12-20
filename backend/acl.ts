@@ -27,7 +27,10 @@ export const ACL: Acl = {
     Views: {
         admin  : { read: true, create: true, update: true, delete: true },
         manager: { read: true, create: true, update: true, delete: true },
-        user   : { owner: true }
+        user   : {
+            read: true,
+            owner: true
+        }
     },
     DataRequests: {
         admin  : { read: true, create: true, update: true, delete: true, export: true, requestLineLevelData: true, refresh: true },

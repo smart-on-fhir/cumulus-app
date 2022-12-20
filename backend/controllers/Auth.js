@@ -6,6 +6,7 @@ const User           = require("../db/models/User")
 const { wait }       = require("../lib")
 const { logger }     = require("../logger")
 const HttpError      = require("../errors")
+const { getPermissionsForRole } = require("../acl")
 
 
 
@@ -125,7 +126,8 @@ async function login(req, res) {
             name : user.get("name"),
             email: user.get("email"),
             role : user.get("role"),
-            remember
+            remember,
+            permissions: getPermissionsForRole(user.get("role"))
         });
 
     } catch (ex) {
