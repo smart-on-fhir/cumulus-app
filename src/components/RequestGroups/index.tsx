@@ -1,4 +1,5 @@
 import { Route, Routes }  from "react-router"
+import IfAllowed          from "../generic/IfAllowed"
 import RequestGroupCreate from "./Create"
 import DeleteRequestGroup from "./Delete"
 import RequestGroupEdit   from "./Edit"
@@ -10,12 +11,12 @@ export default function Endpoint() {
     return (
         <Routes>
             <Route path="/">
-                <Route index element={ <RequestGroupList /> } />
-                <Route path="new" element={ <RequestGroupCreate /> } />
+                <Route index element={ <IfAllowed element={ <RequestGroupList /> } permissions="RequestGroups.read" /> } />
+                <Route path="new" element={ <IfAllowed element={ <RequestGroupCreate /> } permissions="RequestGroups.create" /> } />
                 <Route path=":id">
-                    <Route index element={ <RequestGroupView /> } />
-                    <Route path="edit" element={ <RequestGroupEdit /> } />
-                    <Route path="delete" element={ <DeleteRequestGroup /> } />
+                    <Route index element={ <IfAllowed element={ <RequestGroupView /> } permissions="RequestGroups.read" /> } />
+                    <Route path="edit" element={ <IfAllowed element={ <RequestGroupEdit /> } permissions="RequestGroups.update" /> } />
+                    <Route path="delete" element={ <IfAllowed element={ <DeleteRequestGroup /> } permissions="RequestGroups.delete" /> } />
                 </Route>
             </Route>
         </Routes>
