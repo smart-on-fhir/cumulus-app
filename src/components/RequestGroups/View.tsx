@@ -1,17 +1,25 @@
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import Clip               from "../generic/Clip"
-import Grid from "../generic/Grid"
-import DataRequestLink from "../DataRequests/DataRequestLink"
+import Grid               from "../generic/Grid"
+import DataRequestLink    from "../DataRequests/DataRequestLink"
+import { useAuth }        from "../../auth"
 
 
 export default function RequestGroupView()
 {
+    const { user } = useAuth();
+
+    const canUpdate = user?.permissions.includes("RequestGroups.update")
+    const canDelete = user?.permissions.includes("RequestGroups.delete")
+
     return createViewPage<app.RequestGroup>({
         basePath: "/groups",
         endpoint: "/api/request-groups",
         namePlural: "Request Groups",
         icon: <i className="fa-solid fa-folder color-brand-2" />,
         query: "subscriptions=true",
+        canDelete,
+        canUpdate,
         renderView : data => <>
             <div className="mt-2 mb-1" style={{ whiteSpace: "pre-wrap" }}>
                 <b>Description:</b> {
