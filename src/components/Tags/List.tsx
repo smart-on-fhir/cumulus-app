@@ -1,15 +1,20 @@
 import { Link }           from "react-router-dom"
 import { createListPage } from "../generic/EndpointListWrapper"
 import Alert              from "../generic/Alert"
+import { useAuth }        from "../../auth"
+import IfAllowed          from "../generic/IfAllowed"
 import "../generic/EndpointListTable.scss"
 
 
 export default function List()
 {
+    const { user } = useAuth();
+
     return createListPage<app.Tag[]>({
         namePlural: "Tags",
         endpoint  : "/api/tags",
         icon      : <i className="fa-solid fa-tag color-brand-2" />,
+        canCreate : user?.permissions.includes("Tags.create"),
         renderList: data => {
             
             if (!data.length) {
@@ -35,7 +40,8 @@ export default function List()
                             <th>Description</th>
                             <th style={{ width: "6em" }}>Created</th>
                             <th style={{ width: "6em" }}>Updated</th>
-                            <th style={{ width: "5.4em" }} />
+                            <IfAllowed showError={false} permissions="Tags.update" element={ <th style={{ width: "2.5em" }} /> } />
+                            <IfAllowed showError={false} permissions="Tags.delete" element={ <th style={{ width: "2.5em" }} /> } />
                         </tr>
                     </thead>
                     <tbody>
@@ -46,14 +52,16 @@ export default function List()
                             <td>{ record.description }</td>
                             <td className="color-muted">{ new Date(record.createdAt).toLocaleDateString() }</td>
                             <td className="color-muted">{ new Date(record.updatedAt).toLocaleDateString() }</td>
-                            <td className="right nowrap">
+                            <IfAllowed showError={false} permissions="Tags.update" element={ <td className="right nowrap">
                                 <Link className="btn small btn-virtual" to={ `./${record.id}/edit` }>
                                     <i className="fa-solid fa-pen-to-square color-blue-dark" />
                                 </Link>
+                            </td> } />
+                            <IfAllowed showError={false} permissions="Tags.delete" element={ <td className="right nowrap">
                                 <Link className="btn small btn-virtual" to={ `./${record.id}/delete` }>
                                     <i className="fa-solid fa-trash-can color-red" />
                                 </Link>
-                            </td>
+                            </td> } />
                         </tr>
                     )) }
                     </tbody>
