@@ -1,4 +1,5 @@
 import { Route, Routes }  from "react-router"
+import IfAllowed          from "../generic/IfAllowed"
 import DataSiteCreateForm from "./Create"
 import Delete             from "./Delete"
 import EditDataSite       from "./Edit"
@@ -10,12 +11,12 @@ export default function Endpoint() {
     return (
         <Routes>
             <Route path="/">
-                <Route index element={ <ListPage /> } />
-                <Route path="new" element={ <DataSiteCreateForm /> } />
+                <Route index element={ <IfAllowed element={ <ListPage /> } permissions="DataSites.read" /> } />
+                <Route path="new" element={ <IfAllowed element={ <DataSiteCreateForm /> } permissions="DataSites.create" /> } />
                 <Route path=":id">
-                    <Route index element={ <View /> } />
-                    <Route path="edit" element={ <EditDataSite /> } />
-                    <Route path="delete" element={ <Delete /> } />
+                    <Route index element={ <IfAllowed element={ <View /> } permissions="DataSites.read" /> } />
+                    <Route path="edit" element={ <IfAllowed element={ <EditDataSite /> } permissions="DataSites.update" /> } />
+                    <Route path="delete" element={ <IfAllowed element={ <Delete /> } permissions="DataSites.delete" /> } />
                 </Route>
             </Route>
         </Routes>
