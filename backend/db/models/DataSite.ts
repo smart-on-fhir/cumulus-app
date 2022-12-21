@@ -1,12 +1,24 @@
-const { DataTypes } = require("sequelize");
-const { default: BaseModel } = require("./BaseModel");
+import BaseModel from "./BaseModel"
+import {
+    Sequelize,
+    DataTypes,
+    InferCreationAttributes,
+    InferAttributes,
+    CreationOptional
+} from "sequelize"
 
-module.exports = class DataSite extends BaseModel
+
+export default class DataSite extends BaseModel<InferAttributes<DataSite>, InferCreationAttributes<DataSite>>
 {
-    /**
-     * @param {import("sequelize").Sequelize} sequelize
-     */
-    static initialize(sequelize) {
+    declare id: CreationOptional<number>;
+    declare name: string;
+    declare description: string;
+    declare lat: number | null;
+    declare long: number | null;
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
+
+    static initialize(sequelize: Sequelize) {
         DataSite.init({
             id: {
                 type         : DataTypes.INTEGER,
@@ -34,7 +46,9 @@ module.exports = class DataSite extends BaseModel
             // -180° to 180°
             long: {
                 type: DataTypes.INTEGER
-            }
+            },
+            createdAt: DataTypes.DATE,
+            updatedAt: DataTypes.DATE,
         }, {
             sequelize,
             modelName: "DataSite"
