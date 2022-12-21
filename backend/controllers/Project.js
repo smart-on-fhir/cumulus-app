@@ -1,5 +1,5 @@
 const HttpError  = require("../errors");
-const Project    = require("../db/models/Project");
+const Project    = require("../db/models/Project").default;
 const { assert } = require("../lib");
 
 
