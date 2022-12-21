@@ -1,11 +1,11 @@
-import React           from "react"
-import { Link }        from "react-router-dom"
-import ContentEditable from "react-contenteditable";
-import Checkbox        from "../generic/Checkbox";
-import { Format }      from "../Format"
-import Panel           from "../generic/Panel";
-import Select          from "../generic/Select"
-import TagSelector     from "../Tags/TagSelector";
+import React              from "react"
+import { Link }           from "react-router-dom"
+import ContentEditable    from "react-contenteditable"
+import { Format }         from "../Format"
+import Panel              from "../generic/Panel"
+import Select             from "../generic/Select"
+import TagSelector        from "../Tags/TagSelector"
+import CheckboxList       from "../generic/CheckboxList"
 
 import "./form.scss";
 
@@ -520,14 +520,11 @@ export default function DataRequestForm({
                     <Panel title="Included Data Sites" menu={[
                         <Link to="/sites">Manage Data Sites</Link>
                     ]}>
-                    { sites.map((site, i) => (
-                        <DataListItemCheckbox
-                            key={i}
-                            item={site as app.DataListItem}
-                            checked={!!requestedData.dataSites.find(x => x.name === site.name)}
-                            onChange={() => toggleDataSite(site as app.DataListItem)}
+                        <CheckboxList
+                            items={ sites }
+                            toggle={ item => toggleDataSite(item) }
+                            isSelected={ item => !!requestedData.dataSites.find(x => x.id === item.id) }
                         />
-                    ))}
                     </Panel>
                 </div>
             </div>
