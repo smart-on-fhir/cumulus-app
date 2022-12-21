@@ -1,17 +1,28 @@
-const { DataTypes } = require("sequelize");
-const { default: BaseModel } = require("./BaseModel");
+import BaseModel from "./BaseModel"
+import {
+    Sequelize,
+    DataTypes,
+    CreationOptional,
+    InferAttributes,
+    InferCreationAttributes
+} from "sequelize"
 
 
-module.exports = class Project extends BaseModel
+
+export default class Project extends BaseModel<InferAttributes<Project>, InferCreationAttributes<Project>>
 {
-    isOwnedBy(user) {
-        return user && user.id && user.id === this.get("creatorId")
+    declare id: CreationOptional<number>;
+    declare name: string;
+    declare description: string;
+    declare creatorId?: number | null;
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
+
+    public isOwnedBy(user: any): boolean {
+        return user && user.id && user.id === this.creatorId;
     }
 
-    /**
-     * @param {import("sequelize").Sequelize} sequelize
-     */
-    static initialize(sequelize) {
+    static initialize(sequelize: Sequelize) {
         Project.init({
             id: {
                 type         : DataTypes.INTEGER,
@@ -27,7 +38,7 @@ module.exports = class Project extends BaseModel
                 type     : DataTypes.TEXT,
                 allowNull: false,
                 validate: {
-                    isValid: (value) => {
+                    isValid: (value: string) => {
                         if (!String(value).trim()) {
                             throw new Error("description cannot be empty")
                         }
@@ -37,7 +48,9 @@ module.exports = class Project extends BaseModel
             creatorId: {
                 type     : DataTypes.INTEGER,
                 allowNull: false
-            }
+            },
+            createdAt: DataTypes.DATE,
+            updatedAt: DataTypes.DATE
         }, {
             sequelize,
             modelName: "Project"
