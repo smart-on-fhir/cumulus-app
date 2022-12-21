@@ -82,7 +82,7 @@ function DataElementsEditor({
 
     return (
         <>
-            <label>Additional Data Elements</label>
+            <label>Data Elements</label>
             <div className="color-muted">
                 List the data elements you are requesting and
                 whether each element is requires or preferred
@@ -180,7 +180,7 @@ export default function Preload() {
 
     const { view, subscription } = result || {};
 
-    const dataElements = subscription.data.cols.map(col => ({
+    const dataElements = (subscription.metadata?.cols || []).map(col => ({
         name: col.name,
         need: "required"
     })) as DataElement[];
@@ -310,7 +310,7 @@ export function RequestDataForm({
     }
 
     return (
-        <div>
+        <div className="container">
             <HelmetProvider>
                 <Helmet>
                     <title>Request Line-level Data</title>
@@ -322,7 +322,7 @@ export function RequestDataForm({
                 { name: "Request Line-level Data" }
             ]}/>
             <h1>Request Line-level Data</h1>
-            <hr />
+            <hr className="mb-1" />
             { content }
         </div>
     )
