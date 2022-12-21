@@ -47,7 +47,7 @@ export default function DataRequestsListPage()
                 <div className="col middle">
                     <h3><i className="icon fa-solid fa-database color-brand-2" /> Data Subscriptions</h3>
                 </div>
-                { user?.role === "admin" && (<div className="col col-0 middle">
+                { user?.permissions.includes("DataRequests.create") && (<div className="col col-0 middle">
                     <Link className="btn color-blue-dark btn-virtual" to="/requests/new">
                         <b className="color-green"><i className="fa-solid fa-circle-plus" /> New Data Subscription</b>
                     </Link>

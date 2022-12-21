@@ -162,8 +162,9 @@ declare module app {
     }
 
     interface DataListItem {
+        id?: string | number
         name: string
-        description: string
+        description?: string | null
         label?: string
     }
 

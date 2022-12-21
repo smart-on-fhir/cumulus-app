@@ -6,47 +6,10 @@ import Panel              from "../generic/Panel"
 import Select             from "../generic/Select"
 import TagSelector        from "../Tags/TagSelector"
 import CheckboxList       from "../generic/CheckboxList"
+import DemographicsEditor from "./DemographicsEditor"
 
 import "./form.scss";
-
-
-const AVAILABLE_DEMOGRAPHICS = [
-    {
-        name: "age",
-        label: "Age",
-        description: "Short description of the field"
-    },
-    {
-        name: "cdcAgeGroup",
-        label: "CDC Age Group",
-        description: "Short description of the field"
-    },
-    {
-        name: "race",
-        label: "Race",
-        description: "Short description of the field"
-    },
-    {
-        name: "ethnicity",
-        label: "Ethnicity",
-        description: "Short description of the field"
-    },
-    {
-        name: "deceased",
-        label: "Deceased",
-        description: "Short description of the field"
-    },
-    {
-        name: "zip",
-        label: "ZIP Code",
-        description: "Short description of the field"
-    },
-    {
-        name: "gender",
-        label: "Gender",
-        description: "Short description of the field"
-    }
-];
+import { useAuth } from "../../auth"
 
 // const RE_URL = /^(http|https):\/\/[^ "]+$/;
 
@@ -79,7 +42,7 @@ function FieldEditor({
                 <input
                     type="text"
                     placeholder={ descriptionPlaceHolder }
-                    value={ field.description }
+                    value={ field.description || "" }
                     onChange={ e => onChange({ description: e.target.value }) }
                 />
             </div>
@@ -125,7 +88,7 @@ class FieldEditorList extends React.Component<FieldEditorListProps>
         const { label, namePlaceHolder, descriptionPlaceHolder, list } = this.props
 
         return (
-            <div>
+            <div className="field-editor-list">
                 <div className="row">
                     <div className="col middle">
                         <label>{ label } {  list.length > 0 && <b className="badge">{ list.length }</b> }</label>
@@ -208,54 +171,14 @@ class FieldsEditor extends React.Component<FieldsEditorProps>
                 <FieldEditorList list={ medications   } onChange={ list => this.onChange("medications"  , list) } label="Medications" />
                 <FieldEditorList list={ procedures    } onChange={ list => this.onChange("procedures"   , list) } label="Procedures" />
                 <FieldEditorList list={ phenotypes    } onChange={ list => this.onChange("phenotypes"   , list) } label="Computable Phenotypes" />
-
-                <div className="row">
-                    <div className="col middle">
-                        <label>Demographics</label>
-                    </div>
-                </div>
-                <hr/>
-                <div className="row gap mt-1 wrap">
-                    { AVAILABLE_DEMOGRAPHICS.map((item, i) => (
-                        <div key={i} className="col col-0 col-5">
-                            <DataListItemCheckbox
-                                checked={!!demographics.find(x => x.name === item.name)}
-                                item={item}
-                                onChange={on => this.onChange(
-                                    "demographics",
-                                    AVAILABLE_DEMOGRAPHICS.filter(
-                                        d => d.name === item.name ?
-                                            on :
-                                            !!demographics.find(x => x.name === d.name)
-                                        )
-                                )}
-                            />
-                        </div>    
-                    ))}
-                </div>
+                <DemographicsEditor
+                    demographics={demographics}
+                    onChange={ demographics => this.onChange("demographics", demographics) }
+                />
             </div>
         )
     }
 }
-
-function DataListItemCheckbox({ item, checked, onChange }: {
-    item    : app.DataListItem
-    checked : boolean
-    onChange: (checked: boolean) => void
-}) {
-    return (
-        <Checkbox
-            checked={checked}
-            onChange={onChange}
-            name={item.name}
-            label={item.label}
-            description={item.description}
-            className="mb-1"
-        />
-    )
-}
-
-
 
 export default function DataRequestForm({
     saveRequest,
@@ -275,6 +198,11 @@ export default function DataRequestForm({
     working?: "deleting" | "saving"
 })
 {
+    const { user } = useAuth();
+
+    const canUpdate = user?.permissions.includes("DataRequests.update")
+    const canDelete = user?.permissions.includes("DataRequests.delete")
+
     function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         saveRequest()
@@ -532,7 +460,7 @@ export default function DataRequestForm({
             <hr/>
 
             <div className="row gap">
-                { id && <>
+                { id && canDelete && <>
                     <div className="col">
                         <div className="row gap">
                             { deleteRequest &&
@@ -549,12 +477,12 @@ export default function DataRequestForm({
                 </> }
 
                 { !id && <div className="col"/> }
-                <div className="col mt-1 mb-1">
+                { canUpdate && <div className="col mt-1 mb-1">
                     <button className="btn btn-green" type="submit">
                         { working === "saving" && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
                         { id ? "Save Changes" : "Create Subscription" }
                     </button>
-                </div>
+                </div> }
                 { !id && <div className="col"/> }
             </div>
             

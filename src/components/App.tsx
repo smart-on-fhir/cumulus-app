@@ -3,18 +3,12 @@ import { AuthProvider, RequireAuth, LoginPage } from "../auth";
 import Header                                   from "./Header";
 import Home                                     from "./Home";
 import EditView                                 from "./Dashboard/EditView";
-import CreateView                               from "./Dashboard/CreateView";
-import DataUploader                             from "./DataRequests/DataUploader";
-import DataRequestView                          from "./DataRequests/DataRequestView";
-import EditDataRequestForm                      from "./DataRequests/UpdateForm";
-import DataRequestsListPage                     from "./DataRequests/DataRequestsListPage";
-import CreateDataRequestForm                    from "./DataRequests/CreateForm";
+import Subscriptions                            from "./DataRequests"
 import ActivityPage                             from "./Activity/Page";
 import RequestGroups                            from "./RequestGroups";
 import DataSiteListPage                         from "./DataSites";
 import RequestDataForm                          from "./Dashboard/RequestDataForm";
-import Navigation                               from "./Navigation"
-import TODO                                     from "./TODO";
+import Navigation                               from "./Navigation";
 import Views                                    from "./Views";
 import Users                                    from "./Users";
 import Invite                                   from "./Users/Invite";
@@ -41,45 +35,23 @@ export default function App()
                                 <Route path="views">
                                     <Route index element={ <Views /> } />
                                     <Route path=":id">
-                                        <Route index element={ <RequireAuth><EditView /></RequireAuth> } />
+                                        <Route index               element={ <RequireAuth><EditView /></RequireAuth> } />
                                         <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />
                                     </Route>
                                 </Route>
 
-                                <Route path="requests">
-                                    <Route index element={ <RequireAuth><DataRequestsListPage /></RequireAuth> } />
-                                    <Route path="new" element={ <RequireAuth><CreateDataRequestForm /></RequireAuth> } />
-                                    <Route path=":id">
-                                        <Route index element={ <RequireAuth><DataRequestView /></RequireAuth> } />
-                                        <Route path="edit" element={ <RequireAuth><EditDataRequestForm /></RequireAuth> } />
-                                        <Route path="import" element={ <RequireAuth><DataUploader /></RequireAuth> } />
-                                        <Route path="create-view" element={ <RequireAuth><CreateView /></RequireAuth> } />
-                                    </Route>
-                                </Route>
-
-                                <Route path="sites/*" element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
-
-                                <Route path="activity" element={<RequireAuth><ActivityPage /></RequireAuth>} />
-                                <Route path="logs" element={<RequireAuth><LogViewer /></RequireAuth>} />
-
-                                <Route path="groups/*" element={<RequireAuth><RequestGroups /></RequireAuth>}/>
-
-                                <Route path="login" element={ <LoginPage /> } />
-
-                                <Route path="activate" element={ <Activate/> } />
-                                <Route path="user" element={ <RequireAuth><Account /></RequireAuth> } />
-                                <Route path="activity" element={ <TODO /> } />
-                                <Route path="settings" element={ <TODO /> } />
-                                <Route path="users">
-                                    <Route index element={ <RequireAuth><Users /></RequireAuth> } />
-                                    <Route path="invite" element={ <RequireAuth><Invite /></RequireAuth> } />
-                                </Route>
-
-                                <Route path="permissions" element={ <TODO /> } />                                
-
-                                <Route path="projects/*" element={ <Projects /> } />
-
-                                <Route path="tags/*" element={ <Tags /> } />
+                                <Route path="requests/*"   element={ <RequireAuth><Subscriptions /></RequireAuth> } />
+                                <Route path="sites/*"      element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
+                                <Route path="groups/*"     element={ <RequireAuth><RequestGroups /></RequireAuth> } />
+                                <Route path="projects/*"   element={ <RequireAuth><Projects /></RequireAuth> } />
+                                <Route path="tags/*"       element={ <RequireAuth><Tags /></RequireAuth> } />
+                                <Route path="activity"     element={ <RequireAuth><ActivityPage /></RequireAuth> } />
+                                <Route path="logs"         element={ <RequireAuth><LogViewer /></RequireAuth>} />
+                                <Route path="login"        element={ <LoginPage /> } />
+                                <Route path="activate"     element={ <Activate/> } />
+                                <Route path="user"         element={ <RequireAuth><Account /></RequireAuth> } />
+                                <Route path="users/invite" element={ <RequireAuth><Invite /></RequireAuth> } />
+                                <Route path="users"        element={ <RequireAuth><Users /></RequireAuth> } />
                                 
                                 <Route path="*" element="Page Not Found" />
                             </Route>

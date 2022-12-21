@@ -1,10 +1,11 @@
-import { useCallback } from "react";
-import DataRequestLink from "./DataRequestLink";
-import { useBackend }  from "../../hooks";
-import { request }     from "../../backend";
-import { AlertError }  from "../generic/Alert";
-import Loader          from "../generic/Loader";
-import { Link } from "react-router-dom";
+import { useCallback } from "react"
+import { Link }        from "react-router-dom"
+import DataRequestLink from "./DataRequestLink"
+import { AlertError }  from "../generic/Alert"
+import Loader          from "../generic/Loader"
+import { request }     from "../../backend"
+import { useBackend }  from "../../hooks"
+import { useAuth } from "../../auth"
 
 
 function List({
@@ -30,6 +31,8 @@ function List({
 
 export default function DataRequestsList()
 {
+    const { user } = useAuth();
+
     const { loading, error, result: groups } = useBackend(
         useCallback(() => request<app.RequestGroup[]>(
             "/api/requests/by-group?groupLimit=4&requestLimit=3"
@@ -49,7 +52,7 @@ export default function DataRequestsList()
         return <>
             <p className="color-muted">No Data Subscriptions found.</p>
             <br/>
-            <Link to="/requests/new" className="color-blue underline">Create New Data Subscription</Link>
+            { user?.permissions.includes("DataRequests.create") && <Link to="/requests/new" className="color-blue underline">Create New Data Subscription</Link> }
         </>
     }
 
