@@ -40,7 +40,7 @@ function Annotation({
     const { x, y, xAxis, yAxis } = point;
 
     return (
-        <div className="mb-1" style={{ background: "#EAEAEA", padding: 3, borderRadius: 7, border: "1px solid #D9D9D9" }}>
+        <div className="mb-1" style={{ background: "#EAEAEA", padding: 5, borderRadius: 7, border: "1px solid #D9D9D9" }}>
             <div className="row small">
                 <div className="col">
                     <textarea
@@ -105,7 +105,7 @@ function Annotation({
                     <div className="row">
                         <b className="col middle col-0" style={{ margin: "0 1px" }}>+</b>
                         <div className="col">
-                            <input type="number" value={ annotation.y } onChange={e => onChange({ ...annotation, y: e.target.valueAsNumber })}/>
+                            <input type="number" value={ annotation.y || 0 } onChange={e => onChange({ ...annotation, y: e.target.valueAsNumber })}/>
                         </div>
                         <b className="col middle col-0" style={{ margin: "0 2px 0 1px" }}>px</b>
                     </div>
@@ -126,7 +126,7 @@ function Annotation({
                         <option value="triangle">Triangle</option>
                     </select>
                 </div>
-                <div className="col col-1 right" style={{ maxWidth: "5em" }}>
+                <div className="col col-2 right" style={{ maxWidth: "5em" }}>
                     <b>&nbsp;Position:&nbsp;</b>
                 </div>
                 <div className="col col-3">
