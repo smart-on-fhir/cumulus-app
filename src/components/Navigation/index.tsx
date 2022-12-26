@@ -50,7 +50,7 @@ export default function Navigation()
     let { loading, user, logout } = useAuth();
     let navigate = useNavigate();
 
-    if (!user) {
+    if (!user || !user.permissions) {
         return null
     }
 
