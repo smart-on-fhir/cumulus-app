@@ -10,9 +10,11 @@ const DefaultChartOptions = {
         panning: {
             enabled: true
         },
+        zooming: {
+            type: "x"
+        },
         panKey: 'shift',
         spacingBottom: 25,
-        zoomType: "xy",
         animation: {
             duration: 400,
             defer: 0,
