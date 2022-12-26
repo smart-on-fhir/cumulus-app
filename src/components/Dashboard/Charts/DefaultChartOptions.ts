@@ -39,12 +39,24 @@ const DefaultChartOptions = {
     exporting: {
         buttons: {
             contextButton: {
-                menuItems: ["viewFullscreen", "printChart", "separator", "downloadPNG", "downloadJPEG", "downloadPDF", "downloadSVG", "separator", "downloadCSV", "downloadXLS"]
+                menuItems: [
+                    "viewFullscreen",
+                    "printChart",
+                    "separator",
+                    // "downloadPNG",
+                    // "downloadJPEG",
+                    // "downloadPDF",
+                    "downloadSVG",
+                    // "separator",
+                    "downloadCSV",
+                    // "downloadXLS"
+                ]
             }
         },
         sourceWidth: 1000,
         sourceHeight: 600,
-        scale: 3
+        scale: 3,
+        fallbackToExportServer: false
     }, 
     credits: {
         enabled: true,
