@@ -465,6 +465,63 @@ export default function Dashboard({
 
     const turbo = data && isTurbo(data, data2);
 
+    function annotatePoints(chart: Chart) {
+    
+        const points = chart.getSelectedPoints()
+
+        const labels: any[] = [];
+
+        points.forEach((point, i) => {
+            const text = prompt(
+                `Enter the text of the annotation for selected point ${points.length> 1 ? `(#${i + 1})` : ""}` +
+                "\nYou can edit this annotation later in the options sidebar.",
+                point.name
+            );
+
+            if (text) {
+                labels.push({
+                    text,
+                    overflow: "allow",
+                    style: {
+                        textAlign: "center",
+                        fontFamily: "inherit",
+                    },
+                    point: {
+                        x: point.x,
+                        y: point.y,
+                        xAxis: 0,
+                        yAxis: 0
+                    }
+                })
+            }
+        });
+
+        if (labels.length) {
+            dispatch({
+                type: "UPDATE",
+                payload: {
+                    chartOptions: {
+                        ...fullChartOptions,
+                        annotations: [{
+                            visible: true,
+                            draggable: '',
+                            crop: false,
+                            labelOptions: {
+                                overflow: "justify",
+                                allowOverlap: true,
+                                className: "chart-annotation"
+                            },
+                            labels: [
+                                ...(fullChartOptions.annotations?.[0]?.labels || []),
+                                ...labels
+                            ]
+                        }]
+                    }
+                }
+            })
+        }
+    }
+
     return (
         <div className={ saving || deleting ? "grey-out" : undefined }>
             <HelmetProvider>
