@@ -1,6 +1,7 @@
 import { AnnotationMockPointOptionsObject, AnnotationsLabelsOptions } from "highcharts";
 import moment from "moment";
 import Checkbox from "../generic/Checkbox";
+import { DATE_BOOKMARKS } from "./config";
 
 
 const emptyAnnotation: AnnotationsLabelsOptions = {
@@ -58,7 +59,22 @@ function Annotation({
                         <input type="date" value={moment(x).utc().format("YYYY-MM-DD")} onChange={e => {
                             point.x = +(e.target.valueAsDate || 0)
                             onChange({ ...annotation, point })
-                        }} /> :
+                        }} onContextMenu={e => {
+
+                            // @ts-ignore
+                            e.nativeEvent.menuItems = DATE_BOOKMARKS.map(item => ({
+                                label: <>{ item.date }  -  <b>{ item.name }</b></>,
+                                icon : <i className="fa-regular fa-calendar-check color-blue-dark" />,
+                                active: moment(x).utc().isSame(moment(item.date).utc(), "day"),
+                                command: () => {
+                                    point.x = +(new Date(item.date))
+                                    onChange({ ...annotation, point })
+                                }
+                            }));
+
+                            // @ts-ignore
+                            e.nativeEvent.menuItems.unshift({ label: "Well Known Dates" })
+                        }}/> :
                         <input type="number" value={x} onChange={e => {
                             point.x = e.target.valueAsNumber
                             onChange({ ...annotation, point })
