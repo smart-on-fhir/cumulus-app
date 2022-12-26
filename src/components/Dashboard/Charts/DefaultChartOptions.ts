@@ -199,13 +199,26 @@ const DefaultChartOptions = {
             },
         },
         areaspline: {
-            allowPointSelect: false,
+            allowPointSelect: true,
+            trackByArea: true,
             marker: {
-                radius: 0,
-                enabled: true,
+                enabled: false,
+                radius: 4,
+                lineColor: "#000",
+                fillColor: "#FFF",
+                lineWidth: 1,
                 states: {
                     hover: {
-                        radius: 4
+                        lineWidth: 1,
+                        lineWidthPlus: 0,
+                        radius: 4,
+                    },
+                    select: {
+                        enabled: true,
+                        lineWidth: 2,
+                        fillColor: "#FFF",
+                        radius: 5,
+                        lineWidthPlus: 1
                     }
                 }
             },
@@ -247,16 +260,28 @@ const DefaultChartOptions = {
     //         dashStyle: "Solid",
     //     },
         spline: {
-            allowPointSelect: false,
+            allowPointSelect: true,
             cursor: "default",
             marker: {
-            //     radius: 2,
                 enabled: false,
-            //     states: {
-            //         hover: {
-            //             radius: 4
-            //         }
-            //     }
+                radius: 4,
+                lineColor: "#000",
+                fillColor: "#FFF",
+                lineWidth: 1,
+                states: {
+                    hover: {
+                        lineWidth: 1,
+                        lineWidthPlus: 0,
+                        radius: 4,
+                    },
+                    select: {
+                        enabled: true,
+                        lineWidth: 2,
+                        fillColor: "#FFF",
+                        radius: 5,
+                        lineWidthPlus: 1
+                    }
+                }
             },
             lineWidth: 1.5,
             states: {
