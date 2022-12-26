@@ -17,12 +17,14 @@ import Activate                                 from "./Users/Activate";
 import Projects                                 from "./Projects";
 import LogViewer                                from "./LogViewer";
 import Tags                                     from "./Tags";
+import { ContextMenu }                          from "./generic/Menu";
 import "../styles/main.scss";
 
 export default function App()
 {
     return (
         <AuthProvider>
+            <ContextMenu />
             <BrowserRouter>
                 <Header/>
                 <div className="container container-fluid row p-1">
