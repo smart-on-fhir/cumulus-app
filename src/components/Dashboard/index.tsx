@@ -1,21 +1,21 @@
 import { useCallback, useEffect, useReducer } from "react"
-import html2canvas                          from "html2canvas"
-import { useNavigate }                      from "react-router-dom"
-import { HelmetProvider, Helmet }           from "react-helmet-async"
-import Highcharts                           from "highcharts"
-import { Link }                             from "react-router-dom"
-import { useBackend }                       from "../../hooks"
+import html2canvas, { Options }               from "html2canvas"
+import { useNavigate }                        from "react-router-dom"
+import { HelmetProvider, Helmet }             from "react-helmet-async"
+import Highcharts, { Chart }                  from "highcharts"
+import { Link }                               from "react-router-dom"
+import { useBackend }                         from "../../hooks"
 import { createOne, updateOne, deleteOne, request } from "../../backend"
-import { useAuth }                          from "../../auth"
-import DataRequestLink                      from "../DataRequests/DataRequestLink"
-import { AlertError }                       from "../generic/Alert"
-import ConfigPanel                          from "./ConfigPanel"
+import { useAuth }                            from "../../auth"
+import DataRequestLink                        from "../DataRequests/DataRequestLink"
+import { AlertError }                         from "../generic/Alert"
+import ConfigPanel                            from "./ConfigPanel"
 import {buildChartOptions, default as BaseChart} from "./Charts/Chart"
-import CaptionEditor                        from "./CaptionEditor"
-import EditInPlace                          from "../generic/EditInPlace"
+import CaptionEditor                          from "./CaptionEditor"
+import EditInPlace                            from "../generic/EditInPlace"
 import { ReadOnlyPaths, SupportedChartTypes, SupportedNativeChartTypes, TURBO_THRESHOLD } from "./config"
-import { defer, Json, strip }               from "../../utils"
-import { getDefaultChartOptions }           from "./Charts/DefaultChartOptions"
+import { defer, Json, strip }                 from "../../utils"
+import { getDefaultChartOptions }             from "./Charts/DefaultChartOptions"
 
 import "./Dashboard.scss"
 
@@ -673,7 +673,72 @@ export default function Dashboard({
                         { viewColumn && viewType === "overview" && <BaseChart
                             loading={ loadingData }
                             options={ fullChartOptions }
-
+                            contextMenuItems={[
+                                {
+                                    label: "Save Changes",
+                                    command: save,
+                                    icon: <i className="fas fa-save color-green" />
+                                },
+                                {
+                                    label: <span className="color-red">Delete This Graph</span>,
+                                    command: destroy,
+                                    enabled: !!view.id,
+                                    icon: <i className="fas fa-trash-alt color-red" />
+                                },
+                                {
+                                    label: "Update Graph Thumbnail",
+                                    command: takeScreenshot,
+                                    enabled: !!view.id,
+                                    icon: <i className="fa-solid fa-camera color-orange" />
+                                },
+                                {
+                                    label: showOptions ? "Hide Chart Options" : "Show Chart Options",
+                                    command: () => dispatch({ type: "TOGGLE_OPTIONS" }),
+                                    icon: <i className="fas fa-cog color-blue-dark" />
+                                },
+                                "-",
+                                {
+                                    label: "Show Chart Data",
+                                    command: () => dispatch({ type: "SET_VIEW_TYPE", payload: "data"}),
+                                    icon: <i className="fas fa-th color-blue-dark" />
+                                },
+                                {
+                                    label: "Download PNG Image",
+                                    command: () => downloadScreenshot(),
+                                    icon: <span className="material-icons-round color-blue">insert_photo</span>
+                                },
+                                {
+                                    label: "Download JPEG Image",
+                                    command: () => downloadScreenshot({ type: "image/jpeg", quality: 0.8 }),
+                                    icon: <span className="material-icons-round color-brand-2">insert_photo</span>
+                                },
+                                {
+                                    label: "Print Chart",
+                                    // @ts-ignore
+                                    command: e => e.context?.chart.print(),
+                                    // @ts-ignore
+                                    enabled: e => !!e.context?.chart,
+                                    icon: <span className="material-icons-round color-blue-dark">print</span>
+                                },
+                                {
+                                    label: "Toggle Fullscreen",
+                                    // @ts-ignore
+                                    enabled: e => !!e.context?.chart,
+                                    // @ts-ignore
+                                    command: e => e.context?.chart.fullscreen.toggle(),
+                                    icon: <span className="material-icons-round color-blue-dark">fullscreen</span>
+                                },
+                                "-",
+                                {
+                                    label: "Annotate Selected Points ...",
+                                    icon: <i className="fa-regular fa-comment color-blue-dark"/>,
+                                    // @ts-ignore
+                                    enabled: e => e.context?.chart.getSelectedPoints().length > 0,
+                                    // @ts-ignore
+                                    command: e => annotatePoints(e.context?.chart),
+                                    available: !chartType.startsWith("pie") && !chartType.startsWith("donut")
+                                }
+                            ]}
                             // This key controls in which cases the chart should be re-created rather than updated!
                             key={ [
                                 chartType,

@@ -64,6 +64,10 @@
         border: 0;
         height: 1px;
         margin: 5px 0;
+
+        &:first-child, &:last-child, & + & {
+            display: none;
+        }
     }
 
     .menu-header {

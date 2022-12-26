@@ -1,13 +1,15 @@
-import React                         from "react";
-import { Color, merge, Series }      from "highcharts"
-import { defer }                     from "../../../utils";
-import Loader                        from "../../generic/Loader";
+import React                    from "react";
+import { Color, merge, Series } from "highcharts"
+import moment                   from "moment";
+import { defer }                from "../../../utils";
+import Loader                   from "../../generic/Loader";
+import { MenuItemConfig }       from "../../generic/Menu";
 import {
     SupportedNativeChartTypes,
     SupportedChartTypes,
     DEFAULT_COLORS
 } from "../config";
-import moment from "moment";
+
 
 declare var Highcharts: any
 
@@ -426,6 +428,7 @@ export function buildChartOptions({
 interface ChartProps {
     options : Highcharts.Options
     loading?: boolean
+    contextMenuItems?: (MenuItemConfig | "-")[]
 }
 
 export default class Chart extends React.Component<ChartProps>
@@ -460,7 +463,21 @@ export default class Chart extends React.Component<ChartProps>
     render() {
         const { loading } = this.props
         return <div style={{ position: "relative" }} className={ loading ? "loading" : undefined }>
-            <div id="chart" className="main-chart"/>
+            <div id="chart" className="main-chart" onContextMenu={e => {
+
+                // @ts-ignore
+                let menuItems = [...(e.nativeEvent?.menuItems || [])];
+
+                if (this.props.contextMenuItems) {
+                    menuItems = menuItems.concat(this.props.contextMenuItems)
+                }
+
+                // @ts-ignore
+                e.nativeEvent.menuItems = menuItems
+
+                // @ts-ignore
+                e.nativeEvent.context = { ...e.nativeEvent.context, chart: this.chart }
+            }}/>
             <div className="chart-loader"><Loader/></div>
         </div>
     }
