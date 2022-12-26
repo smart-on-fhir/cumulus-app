@@ -282,15 +282,18 @@ export default function Dashboard({
         window.Highcharts.charts.forEach(c => c?.reflow())
     };
 
-    async function getScreenShot()
+    async function getScreenShot(options: Partial<Options> = {}, { type = "image/png", quality = 0.75 }: { type?: "image/jpeg" | "image/png", quality?: number } = {})
     {
         const el = document.querySelector("#chart .highcharts-container") as HTMLElement;
-        const canvas: any = await html2canvas(el, {
+        const canvas: HTMLCanvasElement = await html2canvas(el, {
             scale: 1,
-            ignoreElements: el => el.classList.contains("highcharts-exporting-group"),
-            logging: false
+            logging: false,
+            ...options,
+            ignoreElements: el => el.classList.contains("highcharts-exporting-group")
         });
-        return canvas.toDataURL();
+        return canvas.toDataURL(type, quality);
+    }
+
     }
 
     // Save
