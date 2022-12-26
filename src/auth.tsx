@@ -23,6 +23,19 @@ export function AuthProvider({ children }: { children: React.ReactNode })
 {
     const storedUser = JSON.parse(localStorage.getItem("user") || "null") as app.User | null;
 
+    // transition for users logged in before permissions were implemented
+    if (storedUser && !storedUser.permissions) {
+        storedUser.permissions = []
+    }
+
+    React.useEffect(() => {
+        if (storedUser && !storedUser.permissions?.length) {
+            auth.logout();
+            localStorage.removeItem("user");
+            setUser(null);
+        }
+    }, [storedUser])
+
     const [user , setUser ] = React.useState<app.User|null>(storedUser);
     const [error, setError] = React.useState<Error|null>(null);
     const [loading, setLoading] = React.useState(false);
