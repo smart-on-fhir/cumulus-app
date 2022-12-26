@@ -294,6 +294,13 @@ export default function Dashboard({
         return canvas.toDataURL(type, quality);
     }
 
+    async function downloadScreenshot({ type = "image/png", quality = 0.75 }: { type?: "image/jpeg" | "image/png", quality?: number } = {})
+    {
+        const screenShot = await getScreenShot({ scale: 4 }, { type, quality });
+        const a = document.createElement("a");
+        a.href = screenShot;
+        a.download = viewName || fullChartOptions.title?.text || "chart.png";
+        a.click();
     }
 
     // Save
