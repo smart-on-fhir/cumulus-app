@@ -75,11 +75,9 @@ export const ReadOnlyPaths = [
 ];
 
 export const DATE_BOOKMARKS = [
-    { date: "2020-03-01", name: "COVID Start" },
-    { date: "2020-04-01", name: "COVID BA.1"  },
-    { date: "2020-08-01", name: "COVID BA.2"  },
-    { date: "2021-03-09", name: "COVID BA.5"  },
-    { date: "2022-08-01", name: "COVID BQ1"   },
+    { date: "2020-03-01", name: "Start of COVID Pre-Delta era" },
+    { date: "2021-06-21", name: "Start of COVID Delta era"     },
+    { date: "2021-12-20", name: "Start of COVID Omicron era"   },
 ];
 
 type ColData = string|number|boolean|null
