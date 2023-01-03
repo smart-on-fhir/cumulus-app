@@ -1,13 +1,16 @@
-const HttpError  = require("../errors");
-const Project    = require("../db/models/Project").default;
-const { assert } = require("../lib");
+import * as HttpError  from "../errors"
+import Project         from "../db/models/Project"
+import { assert }      from "../lib"
+import {
+    CreateOptions,
+    CreationAttributes,
+    FindOptions,
+    InstanceDestroyOptions,
+    InstanceUpdateOptions
+} from "sequelize"
 
 
-/**
- * @param {import("sequelize").FindOptions} [options]
- * @see lib.getFindOptions
- */
-async function getAll(options = {}) {
+export async function getAll(options: FindOptions = {}) {
     try {
         return await Project.findAll(options);
     } catch (e) {
@@ -15,31 +18,20 @@ async function getAll(options = {}) {
     }
 }
 
-/**
- * @param {number} id
- */
-async function getOne(id) {
+export async function getOne(id: number) {
     const user = await Project.findByPk(id);
     assert(user, "Project not found", HttpError.NotFound);
     return user;
 }
 
-/**
- * @param {number} id 
- * @param {import("sequelize").InstanceDestroyOptions} [options]
- */
-async function destroy(id, options) {
+export async function destroy(id: number, options: InstanceDestroyOptions) {
     const user = await Project.findByPk(id);
     assert(user, "Project not found", HttpError.NotFound);
     await user.destroy(options);
     return user;
 }
 
-/**
- * @param {Record<string, any>} payload
- * @param {import("sequelize").CreateOptions} [options]
- */
-async function create(payload, options) {
+export async function create(payload: CreationAttributes<Project>, options: CreateOptions) {
     try {
         return await Project.create(payload, options)
     } catch {
@@ -47,12 +39,7 @@ async function create(payload, options) {
     }
 }
 
-/**
- * @param {number} id
- * @param {Record<string, any>} payload
- * @param {import("sequelize").InstanceUpdateOptions} [options]
- */
-async function update(id, payload, options) {
+export async function update(id: number, payload: Record<string, any>, options: InstanceUpdateOptions) {
     const model = await Project.findByPk(id);
     assert(model, "Project not found", HttpError.NotFound);
     try {
@@ -62,13 +49,3 @@ async function update(id, payload, options) {
         throw new HttpError.BadRequest("Error updating project");
     }
 }
-
-
-module.exports = {
-    getAll,
-    getOne,
-    create,
-    update,
-    destroy
-};
-
