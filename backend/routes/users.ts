@@ -1,11 +1,21 @@
 import express        from "express"
 import { body }       from "express-validator"
 import * as lib       from "../lib"
-import userController from "../controllers/User"
 import User           from "../db/models/User"
 import { route }      from "../lib/route"
 import { AppRequest } from ".."
 import { Unauthorized } from "../errors"
+import {
+    getAllUsers,
+    checkActivation,
+    getUser,
+    updateAccount,
+    updateUser,
+    createUser,
+    handleUserInvite,
+    activateAccount,
+    deleteUser
+} from "../controllers/User"
 
 
 const router = express.Router({ mergeParams: true });
@@ -14,9 +24,9 @@ const router = express.Router({ mergeParams: true });
  * Strip some fields from user JSON for security reasons
  */
 function secure(user: User|object) {
-    const out = user instanceof User ? user.toJSON() : user
-    delete out.password // for security reasons
-    delete out.sid // for security reasons
+    const out: Record<string, any> = user instanceof User ? user.toJSON() : user
+    delete out.password // remove for security reasons
+    delete out.sid      // remove for security reasons
     return out
 }
 
@@ -44,7 +54,7 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const users = await userController.getAllUsers(lib.getFindOptions(req))
+        const users = await getAllUsers(lib.getFindOptions(req))
         res.json(users.map(user => secure(user)))
     }
 })
@@ -63,7 +73,7 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const result = await userController.checkActivation(req.params.code)
+        const result = await checkActivation(req.params.code)
         res.end(result)
     }
 })
@@ -87,7 +97,7 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const user = await userController.getUser(+req.params?.id)
+        const user = await getUser(+req.params?.id)
         res.json(secure(user))
     }
 });
@@ -122,7 +132,7 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const user = await userController.updateAccount(req.cookies.sid, req.body)
+        const user = await updateAccount(req.cookies.sid, req.body)
         res.json(secure(user))
     }
 })
@@ -146,7 +156,7 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const user = await userController.updateUser(+req.params?.id, req.body)
+        const user = await updateUser(+req.params?.id, req.body)
         res.json(secure(user))
     }
 });
@@ -171,7 +181,7 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const user = await userController.createUser(req.body)
+        const user = await createUser(req.body)
         res.json(secure(user))
     }
 });
@@ -206,7 +216,7 @@ route(router, {
     },
     async handler(req: AppRequest, res) {
         lib.assert(req.user?.email, "Guest cannot invite users", Unauthorized)
-        const user = await userController.handleUserInvite(req.body, req.user.email, lib.getRequestBaseURL(req))
+        const user = await handleUserInvite(req.body, req.user.email, lib.getRequestBaseURL(req))
         res.json(secure(user))
     }
 });
@@ -240,7 +250,7 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const user = await userController.activateAccount(req.body)
+        const user = await activateAccount(req.body)
         res.json(secure(user))
     }
 });
@@ -264,7 +274,7 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const user = await userController.deleteUser(+req.params?.id)
+        const user = await deleteUser(+req.params?.id)
         res.json(secure(user))
     }
 });

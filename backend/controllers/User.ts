@@ -1,84 +1,51 @@
-const Crypto        = require("crypto");
-const Bcrypt        = require("bcryptjs");
-const HttpError     = require("../errors");
-const moment        = require("moment");
-const { debuglog }  = require("util");
-const User          = require("../db/models/User");
-const mail          = require("../mail");
-const { assert }    = require("../lib");
+import Crypto         from "crypto"
+import Bcrypt         from "bcryptjs"
+import * as HttpError from "../errors"
+import moment         from "moment"
+import { debuglog }   from "util"
+import User           from "../db/models/User"
+import mail           from "../mail"
+import { assert }     from "../lib"
+import { CreationAttributes, FindOptions, InferAttributes } from "sequelize"
+
 
 const debug = debuglog("app");
 
-
-/**
- * Get all users
- * @param {import("sequelize").FindOptions} [options]
- * @see lib.getFindOptions
- */
-async function getAllUsers(options = {}) {
-    // try {
-        return await User.findAll(options);
-    // } catch (cause) {
-        // throw new HttpError.BadRequest("Error reading users", { cause });
-    // }
+export async function getAllUsers(options: FindOptions = {}) {
+    return await User.findAll(options);
 }
 
-/**
- * Get user by id
- * @param {number} id
- */
-async function getUser(id) {
-    const user = await User.findByPk(id);
-    assert(user, "User not found", HttpError.NotFound);
-    return user;
-}
-
-/**
- * Delete user by ID
- * @param {number} id 
- */
-async function deleteUser(id) {
-    const user = await User.findByPk(id);
-    assert(user, "User not found", HttpError.NotFound);
-    await user.destroy();
-    return user;
-}
-
-/**
- * Creates new user
- * @param {Record<string, any>} payload
- */
-async function createUser(payload) {
-    // try {
-        return await User.create(payload)
-    // } catch {
-    //     throw new HttpError.BadRequest("Error creating user");
-    // }
-}
-
-/**
- * Updates the user with the given ID
- * @param {number} id User ID
- * @param {Record<string, any>} payload
- */
-async function updateUser(id, payload) {
+export async function getUser(id: number) {
     const model = await User.findByPk(id);
     assert(model, "User not found", HttpError.NotFound);
-    // try {
-        delete payload.id
-        delete payload.email
-        return await model.update(payload);
-    // } catch {
-    //     throw new HttpError.BadRequest("Error updating user");
-    // }
+    return model;
 }
 
-/**
- * Updates user account
- * @param {string} sid Session ID
- * @param {Record<string, any>} payload 
- */
-async function updateAccount(sid, payload) {
+export async function deleteUser(id: number) {
+    const model = await User.findByPk(id);
+    assert(model, "User not found", HttpError.NotFound);
+    await model.destroy();
+    return model;
+}
+
+export async function createUser(payload: CreationAttributes<User>) {
+    return await User.create(payload)
+}
+
+export async function updateUser(id: number, payload: Record<string, any>) {
+    const model = await User.findByPk(id);
+    assert(model, "User not found", HttpError.NotFound);
+    delete payload.id;
+    delete payload.email;
+    return await model.update(payload);
+}
+
+export async function updateAccount(sid: string, payload: {
+    password: string
+    newPassword1: string
+    newPassword2: string
+    name: string
+}) {
 
     // Find the logged-in user
     const model = await User.findOne({ where: { sid }})
@@ -88,12 +55,12 @@ async function updateAccount(sid, payload) {
     const { password, newPassword1, newPassword2, name } = payload;
 
     // Check password
-    if (!Bcrypt.compareSync(password, model.get("password") + "")) {
+    if (!Bcrypt.compareSync(password, model.password || "")) {
         throw new HttpError.Forbidden("Invalid password");
     }
 
     // Initialize the patch object
-    const patch = { name };
+    const patch: Partial<InferAttributes<User>> = { name };
 
     // Update password if needed
     if (newPassword1) {
@@ -106,9 +73,9 @@ async function updateAccount(sid, payload) {
     try {
         await model.update(patch);
         return {
-            email: model.getDataValue("email"),
-            name : model.getDataValue("name"),
-            role : model.getDataValue("role")
+            email: model.email,
+            name : model.name,
+            role : model.role
         };
     } catch (e) {
         const error = new HttpError.BadRequest("Error updating account")
@@ -117,15 +84,17 @@ async function updateAccount(sid, payload) {
     }
 }
 
-/**
- * Activates a pending account
- * @param {object} options 
- * @param {string} options.code
- * @param {string} options.name
- * @param {string} options.newPassword1
- * @param {string} options.newPassword2
- */
-async function activateAccount({ code, name, newPassword1, newPassword2 }) {
+export async function activateAccount({
+    code,
+    name,
+    newPassword1,
+    newPassword2
+}: {
+    code        : string
+    name        : string
+    newPassword1: string
+    newPassword2: string
+}) {
 
     const user = await User.findOne({ where: { activationCode: code }, __role__: "system" })
 
@@ -153,11 +122,7 @@ async function activateAccount({ code, name, newPassword1, newPassword2 }) {
     }
 }
 
-/**
- * Check activation code
- * @param {string} activationCode 
- */
-async function checkActivation(activationCode) {
+export async function checkActivation(activationCode: string) {
     
     const user = await User.findOne({ where: { activationCode }, __role__: "system" })
 
@@ -175,20 +140,39 @@ async function checkActivation(activationCode) {
     return "Pending activation"
 }
 
-/**
- * Invite new user
- * @param {object} options 
- * @param {string} options.email      New user's email 
- * @param {"user"|"manager"|"admin"} options.role  New user's role 
- * @param {string} [options.message]  Personal message to include in the invitation email
- * @param {string} invitedBy The email of the user who invites this one 
- * @param {string} baseUrl Used to build the activation link in the email
- * @returns 
- */
-async function handleUserInvite({ email, role, message }, invitedBy, baseUrl) {
+export async function handleUserInvite(
+    options: {
+        /**
+         * New user's email
+         */
+        email: string
+
+        /**
+         * New user's role
+         */
+        role: "user" | "manager" | "admin"
+
+        /**
+         * Personal message to include in the invitation email
+         */
+        message?: string
+    },
+
+    /**
+     * The email of the user who invites this one
+     */
+    invitedBy: string,
+
+    /**
+     * Used to build the activation link in the email
+     */
+    baseUrl: string
+) {
     
     // @ts-ignore 
-    const transaction = await User.sequelize.transaction()
+    const transaction = await User.sequelize.transaction();
+
+    const { email, role, message } = options;
 
     try {
         var user = await User.create({
@@ -214,8 +198,8 @@ async function handleUserInvite({ email, role, message }, invitedBy, baseUrl) {
 
     try {
         await mail.inviteUser({
-            email  : user.getDataValue("email"),
-            code   : user.getDataValue("activationCode"),
+            email  : user.email,
+            code   : user.activationCode!,
             baseUrl,
             message
         })
@@ -228,17 +212,3 @@ async function handleUserInvite({ email, role, message }, invitedBy, baseUrl) {
     await transaction.commit()
     return { message: "User invited" }
 }
-
-
-module.exports = {
-    getAllUsers,
-    getUser,
-    createUser,
-    updateUser,
-    updateAccount,
-    deleteUser,
-    activateAccount,
-    checkActivation,
-    handleUserInvite
-};
-

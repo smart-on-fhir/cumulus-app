@@ -1,14 +1,17 @@
-const { DataTypes }          = require("sequelize");
-const Bcrypt                 = require("bcryptjs");
-const moment                 = require("moment");
-const { logger }             = require("../../logger");
-const { default: BaseModel } = require("./BaseModel");
+import Bcrypt     from "bcryptjs"
+import moment     from "moment"
+import { logger } from "../../logger"
+import BaseModel  from "./BaseModel"
+import {
+    CreationOptional,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Sequelize
+} from "sequelize"
 
 
-/**
- * @param {string|null} pass 
- */
-function validatePassword(pass) {
+function validatePassword(pass: string|null) {
     if (!pass) {
         return true;
     }
@@ -29,20 +32,30 @@ function validatePassword(pass) {
     }
 }
 
-module.exports = class User extends BaseModel
+export default class User extends BaseModel<InferAttributes<User>, InferCreationAttributes<User>>
 {
+    declare email         : string;
+    declare role          : string;
+    declare id            : CreationOptional<number>;
+    declare name          : CreationOptional<string | null>;
+    declare password      : CreationOptional<string | null>;
+    declare sid           : CreationOptional<string | null>;
+    declare lastLogin     : CreationOptional<Date>;
+    declare activationCode: CreationOptional<string | null>;
+    declare invitedBy     : CreationOptional<string | null>;
+    declare status        : CreationOptional<string | null>;
+    declare createdAt     : CreationOptional<Date>;
+    declare updatedAt     : CreationOptional<Date>;
+
     toString() {
-        return `User "${this.get("email")}"`;
+        return `User "${this.email}"`
     }
 
-    isOwnedBy(user) {
-        return user && user.id && user.id === this.get("id")
+    isOwnedBy(user: User) {
+        return user && user.id && user.id === this.id
     }
 
-    /**
-     * @param {import("sequelize").Sequelize} sequelize
-     */
-    static initialize(sequelize) {
+    static initialize(sequelize: Sequelize) {
 
         return User.init({
 
@@ -53,7 +66,6 @@ module.exports = class User extends BaseModel
                 autoIncrement: true
             },
 
-            // The email also acts as primary key
             email: {
                 type     : DataTypes.STRING(100),
                 allowNull: false,
@@ -63,7 +75,6 @@ module.exports = class User extends BaseModel
                 }
             },
 
-            // Display name (optional)
             name: {
                 type     : DataTypes.STRING(100),
                 allowNull: true
@@ -88,7 +99,6 @@ module.exports = class User extends BaseModel
                 }
             },
             
-            // "user" or "admin"
             role: {
                 type: DataTypes.ENUM('user', 'manager', 'admin'),
                 allowNull: false,
@@ -101,7 +111,7 @@ module.exports = class User extends BaseModel
             // Session ID
             sid: {
                 type: DataTypes.STRING,
-                set(value) {
+                set(value: string | null) {
                     this.setDataValue('sid', value);
                     if (value) {
                         this.setDataValue('lastLogin', new Date());
@@ -142,7 +152,10 @@ module.exports = class User extends BaseModel
                 validate: {
                     isEmail: true
                 }
-            }
+            },
+
+            createdAt: DataTypes.DATE,
+            updatedAt: DataTypes.DATE
         }, {
             sequelize,
             modelName: "User",

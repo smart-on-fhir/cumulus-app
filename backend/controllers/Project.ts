@@ -19,16 +19,16 @@ export async function getAll(options: FindOptions = {}) {
 }
 
 export async function getOne(id: number) {
-    const user = await Project.findByPk(id);
-    assert(user, "Project not found", HttpError.NotFound);
-    return user;
+    const model = await Project.findByPk(id);
+    assert(model, "Project not found", HttpError.NotFound);
+    return model;
 }
 
 export async function destroy(id: number, options: InstanceDestroyOptions) {
-    const user = await Project.findByPk(id);
-    assert(user, "Project not found", HttpError.NotFound);
-    await user.destroy(options);
-    return user;
+    const model = await Project.findByPk(id);
+    assert(model, "Project not found", HttpError.NotFound);
+    await model.destroy(options);
+    return model;
 }
 
 export async function create(payload: CreationAttributes<Project>, options: CreateOptions) {
