@@ -1,14 +1,14 @@
 require("dotenv").config();
 
-const HTTP                        = require("http")
-const Path                        = require("path")
-const express                     = require("express")
-const cors                        = require("cors")
-const cookieParser                = require("cookie-parser")
-const Auth                        = require("./controllers/Auth")
-const setupDB                     = require("./db").default
-const settings                    = require("./config")
-const { logger }                  = require("./logger");
+const HTTP         = require("http")
+const Path         = require("path")
+const express      = require("express")
+const cors         = require("cors")
+const cookieParser = require("cookie-parser")
+const Auth         = require("./controllers/Auth")
+const setupDB      = require("./db").default
+const settings     = require("./config")
+const { logger }   = require("./logger");
 
 
 function createServer(config)
@@ -72,7 +72,7 @@ function setupAPI(app)
     app.use("/api/logs"          , require("./routes/logs"             ));
     app.use("/api/tags"          , require("./routes/tags"             ).default);
     app.use("/api/activity"      , require("./controllers/Activity"    ));
-    app.use("/api/data-sites"    , require("./controllers/DataSites"   ));
+    app.use("/api/data-sites"    , require("./routes/sites"            ).default);
     logger.verbose("✔ REST API set up");
 }
 

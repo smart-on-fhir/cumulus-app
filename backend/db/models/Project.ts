@@ -1,10 +1,14 @@
 import BaseModel from "./BaseModel"
+import DataRequest from "./DataRequest"
 import {
     Sequelize,
     DataTypes,
     CreationOptional,
     InferAttributes,
-    InferCreationAttributes
+    InferCreationAttributes,
+    Association,
+    HasManySetAssociationsMixin,
+    NonAttribute
 } from "sequelize"
 
 
@@ -17,6 +21,14 @@ export default class Project extends BaseModel<InferAttributes<Project>, InferCr
     declare creatorId?: number | null;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
+
+    declare projects?: NonAttribute<DataRequest[]>;
+
+    declare setSubscriptions: HasManySetAssociationsMixin<DataRequest, number>;
+
+    declare static associations: {
+        Subscriptions: Association<DataRequest, Project>;
+    };
 
     public isOwnedBy(user: any): boolean {
         return user && user.id && user.id === this.creatorId;

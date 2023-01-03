@@ -1,8 +1,8 @@
 import express, { Response }      from "express"
-import Model                      from "../db/models/Project"
+import Model                      from "../db/models/DataSite"
 import { route }                  from "../lib/route"
 import { NotFound, Unauthorized } from "../errors"
-import { assert }                 from "../lib"
+import { assert, getFindOptions } from "../lib"
 import { AppRequest }             from ".."
 
 
@@ -12,20 +12,8 @@ const router = express.Router({ mergeParams: true });
 route(router, {
     path: "/",
     method: "get",
-    handler: async (req: AppRequest, res: Response) => {
-        // res.json(await Model.findAll(getFindOptions(req)))
-        res.json(await Model.findAll({
-            include: [
-                {
-                    association: "Subscriptions",
-                    include: [
-                        {
-                            association: "Views"
-                        }
-                    ]
-                }
-            ]
-        }))
+    async handler(req: AppRequest, res: Response) {
+        res.json(await Model.findAll(getFindOptions(req)))
     }
 })
 
@@ -47,24 +35,9 @@ route(router, {
             }
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
-        // const model = await Model.findByPk(+req.params?.id, getFindOptions(req));
-        const model = await Model.findByPk(+req.params?.id, {
-            include: [
-                {
-                    association: "Subscriptions",
-                    // attributes: {
-                    //     exclude: [""]
-                    // },
-                    include: [
-                        {
-                            association: "Views"
-                        }
-                    ]
-                }
-            ]
-        });
-        assert(model, NotFound);
+    async handler(req: AppRequest, res: Response) {
+        const model = await Model.findByPk(+req.params?.id, getFindOptions(req))
+        assert(model, NotFound)
         res.json(model)
     }
 })
@@ -95,28 +68,38 @@ route(router, {
                 optional: true,
                 notEmpty: true
             },
-            Subscriptions: {
-                in: "body",
+            lat: {
+                in: [ "body" ],
                 optional: true,
-                isArray: {
-                    errorMessage: "Subscriptions should be an array of Subscription IDs",
+                isInt: {
+                    errorMessage: "'lat' must be an integer",
+                    options: {
+                        min: 0,
+                        max: 90
+                    }
+                }
+            },
+            long: {
+                in: [ "body" ],
+                optional: true,
+                isInt: {
+                    errorMessage: "'long' must be an integer",
+                    options: {
+                        min: -180,
+                        max: 180
+                    }
                 }
             }
+            // TODO: Add "setting" ?
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
+    async handler(req: AppRequest, res: Response) {
         const model = await Model.findByPk(req.params.id);
         assert(model, NotFound);
         await model.update(req.body)
-        
-        if (Array.isArray(req.body.Subscriptions)) {
-            await model.setSubscriptions(req.body.Subscriptions)
-            await model.reload({ include: [{ association: "Subscriptions" }] })
-        }
-
         res.json(model)
     }
-});
+})
 
 // create ----------------------------------------------------------------------
 route(router, {
@@ -134,25 +117,37 @@ route(router, {
                 exists: true,
                 notEmpty: true
             },
-            Subscriptions: {
-                in: "body",
+            lat: {
+                in: [ "body" ],
                 optional: true,
-                isArray: {
-                    errorMessage: "Subscriptions should be an array of Subscription IDs",
+                isInt: {
+                    errorMessage: "'lat' must be an integer",
+                    options: {
+                        min: 0,
+                        max: 90
+                    }
+                }
+            },
+            long: {
+                in: [ "body" ],
+                optional: true,
+                isInt: {
+                    errorMessage: "'long' must be an integer",
+                    options: {
+                        min: -180,
+                        max: 180
+                    }
                 }
             }
+            // TODO: Add "setting" ?
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
+    async handler(req: AppRequest, res: Response) {
         assert(req.user?.id, "Guest cannot create projects", Unauthorized)
         const model = await Model.create({ ...req.body, creatorId: req.user?.id })
-        if (Array.isArray(req.body.Subscriptions)) {
-            await model.setSubscriptions(req.body.Subscriptions)
-            await model.reload({ include: [{ association: "Subscriptions" }] })
-        }
         res.json(model)
     }
-});
+})
 
 // Delete ----------------------------------------------------------------------
 route(router, {
@@ -172,12 +167,12 @@ route(router, {
             }
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
+    async handler(req: AppRequest, res: Response) {
         const model = await Model.findByPk(+req.params?.id);
         assert(model, NotFound);
         await model.destroy()
         res.json(model)
     }
-});
+})
 
 export default router
