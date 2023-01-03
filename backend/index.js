@@ -8,7 +8,7 @@ const cookieParser = require("cookie-parser")
 const Auth         = require("./controllers/Auth")
 const setupDB      = require("./db").default
 const settings     = require("./config")
-const { logger }   = require("./logger");
+const { logger }   = require("./logger")
 
 
 function createServer(config)
@@ -69,7 +69,7 @@ function setupAPI(app)
     app.use("/api/views"         , require("./controllers/View"        ));
     app.use("/api/users"         , require("./routes/users"            ).default);
     app.use("/api/projects"      , require("./routes/projects"         ).default);
-    app.use("/api/logs"          , require("./routes/logs"             ));
+    app.use("/api/logs"          , require("./routes/logs"             ).default);
     app.use("/api/tags"          , require("./routes/tags"             ).default);
     app.use("/api/activity"      , require("./controllers/Activity"    ));
     app.use("/api/data-sites"    , require("./routes/sites"            ).default);
