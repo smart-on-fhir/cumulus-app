@@ -84,7 +84,7 @@ export default class User extends BaseModel<InferAttributes<User>, InferCreation
             password: {
                 type     : DataTypes.STRING(100),
                 allowNull: true,
-                set(pass) {
+                set(pass: string) {
                     if (!pass) {
                         this.setDataValue("password", null)
                     } else {

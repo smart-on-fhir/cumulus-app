@@ -1,6 +1,6 @@
 import { Response, Router } from "express"
 import { Includeable }      from "sequelize/types"
-import Tag                  from "../db/models/Tag"
+import Model                from "../db/models/Tag"
 import * as lib             from "../lib"
 import { NotFound }         from "../errors"
 import { assert }           from "../lib"
@@ -15,7 +15,7 @@ route(router, {
     path: "/",
     method: "get",
     async handler(req: AppRequest, res: Response) {
-        res.json(await Tag.findAll(lib.getFindOptions(req)));
+        res.json(await Model.findAll(lib.getFindOptions(req)));
     }
 })
 
@@ -96,7 +96,7 @@ route(router, {
             })
         }
 
-        const model = await Tag.findByPk(req.params.id, { include });
+        const model = await Model.findByPk(req.params.id, { include });
         assert(model, NotFound);
         res.json(model)
     }
@@ -139,7 +139,7 @@ route(router, {
         }
     },
     async handler(req: AppRequest, res: Response) {
-        const model = await Tag.findByPk(req.params.id);
+        const model = await Model.findByPk(req.params.id);
         assert(model, NotFound);
         res.json(await model.update(req.body))
     }
@@ -176,7 +176,7 @@ route(router, {
         }
     },
     async handler(req: AppRequest, res: Response) {
-        res.json(await Tag.create({ ...req.body, creatorId: req.user?.id }))
+        res.json(await Model.create({ ...req.body, creatorId: req.user?.id }))
     }
 });
 
@@ -199,7 +199,7 @@ route(router, {
         }
     },
     async handler(req: AppRequest, res: Response) {
-        const model = await Tag.findByPk(req.params.id);
+        const model = await Model.findByPk(req.params.id);
         assert(model, NotFound);
         await model.destroy()
         res.json(model)

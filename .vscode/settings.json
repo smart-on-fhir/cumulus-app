@@ -6,6 +6,7 @@
         "geometricprecision",
         "ILIKE",
         "Includeable",
+        "linelevel",
         "mocharc",
         "Xrange"
     ]
