@@ -86,7 +86,7 @@ route(router, {
     },
     async handler(req: AppRequest, res: Response) {
 
-        const include = []
+        const include: any[] = []
 
         // if (req.query.group) {
         //     include.push({ association: "group", attributes: ["id", "name", "description"] })
@@ -183,7 +183,7 @@ route(router, {
 
             await model.update(req.body, { transaction, user: req.user })
             if (Array.isArray(req.body.Tags)) {
-                await model.setTags(req.body.Tags.map(t => t.id))
+                await model.setTags(req.body.Tags.map((t: any) => t.id))
             }
             await transaction.commit()
             res.json(model)
