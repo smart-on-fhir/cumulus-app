@@ -41,28 +41,25 @@ route(router, {
             })
         }
         
-        try {
-            const models = await Model.findAll({ include });
-            const general = await DataRequest.findAll({
-                where: {
-                    "groupId": null
-                },
-                attributes: [
-                    "id",
-                    "name",
-                    "completed"
-                ],
-                include: [
-                    { association: "Views", attributes: ["name"] }
-                ]
-            });
-            res.json([ ...models, {
-                name: "GENERAL",
-                requests: general
-            } ]);
-        } catch(error) {
-            throw new HttpError.InternalServerError(`Error reading ${Model.name} models`);
-        }
+        const models = await Model.findAll({ include });
+        const general = await DataRequest.findAll({
+            where: {
+                "groupId": null
+            },
+            attributes: [
+                "id",
+                "name",
+                "completed"
+            ],
+            include: [
+                { association: "Views", attributes: ["name"] }
+            ]
+        });
+
+        res.json([ ...models, {
+            name: "GENERAL",
+            requests: general
+        }]);
     }
 });
 

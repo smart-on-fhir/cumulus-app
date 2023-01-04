@@ -1,5 +1,5 @@
 
-module.exports = [
+export default [
     {
         id         : 1,
         name       : "Project 1",

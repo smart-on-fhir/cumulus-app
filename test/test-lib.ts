@@ -135,7 +135,9 @@ export function testEndpoint(permission: string, method: "GET" | "PUT" | "POST" 
                 expect(res.status).to.equal(200)
                 if (payload) {
                     const json = await res.json()
-                    expect(json).to.include(payload)
+                    for (const x in payload) {
+                        expect(json).to.haveOwnProperty(x).that.deep.equals(payload[x])
+                    }
                 }
             })
         } else {
