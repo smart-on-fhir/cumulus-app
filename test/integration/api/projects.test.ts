@@ -1,10 +1,13 @@
-import { expect } from "chai"
-import Projects   from "../../fixtures/Projects"
+import { expect }                from "chai"
+import { getPermissionsForRole } from "../../../backend/acl";
+import Projects                  from "../../fixtures/Projects"
+import Subscriptions             from "../../fixtures/DataRequests"
 import {
     server,
     resetTable,
     admin,
-    testEndpoint
+    testEndpoint,
+    getCookie
 } from "../../test-lib"
 
 
@@ -37,7 +40,37 @@ describe("Projects", () => {
 
     describe("create (POST /api/projects)", () => {
 
-        testEndpoint("Projects.create", "POST", "/api/projects", { name: "Project name", description: "Project description" })
+        testEndpoint("Projects.create", "POST", "/api/projects", { name: "Project name", description: "Project description" });
+        // testEndpoint("Projects.create", "POST", "/api/projects", { name: "Project name", description: "Project description", Subscriptions });
+
+        ["guest", "user", "manager", "admin"].forEach(role => {
+            const permissions = getPermissionsForRole(role as any);
+    
+            const options: RequestInit = { method: "POST" }
+            const headers: Record<string, any> = {};
+            const cookie = getCookie(role)
+            if (cookie) {
+                headers.cookie = cookie
+            }
+            headers["content-type"] = "application/json"
+            options.body = JSON.stringify({ name: "Record name", description: "Record description", Subscriptions: Subscriptions.map(s => s.id) })
+            options.headers = headers
+    
+            if (permissions.includes("Tags.create")) {
+                it (`${role} can create projects with subscriptions`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/projects`, options)
+                    expect(res.status).to.equal(200)
+                    const json = await res.json()
+                    expect(json).to.include({ name: "Record name", description: "Record description" })
+                    expect(json).to.haveOwnProperty("Subscriptions").that.is.an("array")
+                })
+            } else {
+                it (`${role} cannot create projects with subscriptions`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/projects`, options)
+                    expect(res.status).to.equal(role === "guest" ? 401 : 403)
+                })
+            }
+        })
 
         it ("handles bad parameter errors", async () => {
             const res = await fetch(`${server.baseUrl}/api/projects`, {
@@ -54,7 +87,36 @@ describe("Projects", () => {
     
     describe("update (PUT /api/projects/:id)", () => {
 
-        testEndpoint("Projects.update", "PUT", "/api/projects/1", { name: "Project name 2", description: "Project description 2" })
+        testEndpoint("Projects.update", "PUT", "/api/projects/1", { name: "Project name 2", description: "Project description 2" });
+
+        ["guest", "user", "manager", "admin"].forEach(role => {
+            const permissions = getPermissionsForRole(role as any);
+    
+            const options: RequestInit = { method: "PUT" }
+            const headers: Record<string, any> = {};
+            const cookie = getCookie(role)
+            if (cookie) {
+                headers.cookie = cookie
+            }
+            headers["content-type"] = "application/json"
+            options.body = JSON.stringify({ name: "Record name 2", description: "Record description 2", Subscriptions: Subscriptions.map(s => s.id) })
+            options.headers = headers
+    
+            if (permissions.includes("Tags.update")) {
+                it (`${role} can update projects with subscriptions`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/projects/1`, options)
+                    expect(res.status).to.equal(200)
+                    const json = await res.json()
+                    expect(json).to.include({ name: "Record name 2", description: "Record description 2" })
+                    expect(json).to.haveOwnProperty("Subscriptions").that.is.an("array")
+                })
+            } else {
+                it (`${role} cannot update projects with subscriptions`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/projects/1`, options)
+                    expect(res.status).to.equal(role === "guest" ? 401 : 403)
+                })
+            }
+        })
 
         it ("handles bad parameter errors", async () => {
             const res = await fetch(`${server.baseUrl}/api/projects/1`, {

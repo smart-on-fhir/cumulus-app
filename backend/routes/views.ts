@@ -2,7 +2,7 @@ import Path                              from "path"
 import { Response, Router }              from "express"
 import { FindOptions }                   from "sequelize"
 import { AppRequest }                    from ".."
-import { NotFound, InternalServerError } from "../errors"
+import { NotFound, InternalServerError, HttpError } from "../errors"
 import Model                             from "../db/models/View"
 import { route }                         from "../lib/route"
 import { assert, roundToPrecision }      from "../lib"
@@ -184,12 +184,18 @@ route(router, {
             await model.update(req.body, { transaction, user: req.user })
             if (Array.isArray(req.body.Tags)) {
                 await model.setTags(req.body.Tags.map((t: any) => t.id))
+                await model.reload({ include: [{ association: "Tags" }] })
             }
             await transaction.commit()
             res.json(model)
         } catch (ex) {
-            const { message, stack } = ex as Error
             await transaction.rollback()
+            if (ex instanceof HttpError) {
+                ex.data = { tags: ["DATA"] }
+                ex.cause = ex.stack
+                throw ex
+            }
+            const { message, stack } = ex as Error
             const error = new InternalServerError("Updating graph failed. " + message, { tags: ["DATA"] })
             error.cause = stack
             throw error
@@ -246,7 +252,10 @@ route(router, {
     },
     async handler(req: AppRequest, res: Response) {
         const model = await Model.create(req.body)
-        await model.setTags(req.body.Tags.map((t: any) => t.id))
+        if (Array.isArray(req.body.Tags)) {
+            await model.setTags(req.body.Tags)
+            await model.reload({ include: [{ association: "Tags" }] })
+        }
         res.json(model)
     }
 });
