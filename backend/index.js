@@ -64,9 +64,9 @@ function setupAuth(app)
 
 function setupAPI(app)
 {
-    app.use("/api/request-groups", require("./controllers/RequestGroup").default);
+    app.use("/api/request-groups", require("./routes/groups"           ).default);
     app.use("/api/requests"      , require("./controllers/DataRequest" ));
-    app.use("/api/views"         , require("./controllers/View"        ));
+    app.use("/api/views"         , require("./routes/views"            ).default);
     app.use("/api/users"         , require("./routes/users"            ).default);
     app.use("/api/projects"      , require("./routes/projects"         ).default);
     app.use("/api/logs"          , require("./routes/logs"             ).default);

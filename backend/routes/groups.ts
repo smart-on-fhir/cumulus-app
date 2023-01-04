@@ -1,10 +1,10 @@
 import express         from "express"
 import { Includeable } from "sequelize/types"
-import DataRequest     from "../../db/models/DataRequest"
-import Model           from "../../db/models/RequestGroup"
-import * as HttpError  from "../../errors"
-import { assert }      from "../../lib"
-import { route }       from "../../lib/route"
+import DataRequest     from "../db/models/DataRequest"
+import Model           from "../db/models/RequestGroup"
+import * as HttpError  from "../errors"
+import { assert }      from "../lib"
+import { route }       from "../lib/route"
 
 
 const router = express.Router({ mergeParams: true })
