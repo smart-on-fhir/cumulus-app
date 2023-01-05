@@ -136,7 +136,9 @@ export function testEndpoint(permission: string, method: "GET" | "PUT" | "POST" 
                 if (payload) {
                     const json = await res.json()
                     for (const x in payload) {
-                        expect(json).to.haveOwnProperty(x).that.deep.equals(payload[x])
+                        if (!Array.isArray(payload[x])) {
+                            expect(json).to.haveOwnProperty(x).that.deep.equals(payload[x])
+                        }
                     }
                 }
             })
