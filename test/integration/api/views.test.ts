@@ -23,7 +23,8 @@ describe("Graphs", () => {
                 name: "Record name",
                 description: "Record description",
                 DataRequestId: 1,
-                settings: {}
+                settings: {},
+                Tags: [1]
             }
         )
     })
@@ -37,7 +38,8 @@ describe("Graphs", () => {
                 name: "Record name 2",
                 description: "Record description 2",
                 DataRequestId: 1,
-                settings: {}
+                settings: {},
+                Tags: [{ id: 2 }]
             }
         )
     })
