@@ -117,7 +117,6 @@ export async function activateAccount({
         // @ts-ignore 
         return { name: user.name }
     } catch (cause) {
-        // console.error(cause)
         throw new HttpError.BadRequest("Error activating account", { cause })
     }
 }
@@ -184,7 +183,6 @@ export async function handleUserInvite(
             transaction
         });
     } catch (e) {
-        // console.error(e)
         debug(e)
 
         await transaction.rollback()
