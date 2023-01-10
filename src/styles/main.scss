@@ -84,7 +84,9 @@ b {
   border: 0;
 
   &:hover {
-    text-decoration: underline;
+    text-decoration: underline 1px solid;
+    text-decoration-color: fade-out($color-brand-2, 0.25);
+    text-underline-offset: 2px;
   }
 }
 
