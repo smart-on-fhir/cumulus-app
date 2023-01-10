@@ -1,19 +1,21 @@
-const http             = require("http");
-const https            = require("https");
-const { URL }          = require("url");
-const express          = require("express");
-const slug             = require("slug");
-const HttpError        = require("../errors");
-const crypto           = require("crypto");
-const { QueryTypes }   = require("sequelize");
-const Model            = require("../db/models/DataRequest");
-const GroupModel       = require("../db/models/RequestGroup").default;
-const ViewModel        = require("../db/models/View").default;
+import { ClientRequest, IncomingMessage, request as httpRequest } from "http"
+import { request as httpsRequest }                                from "https"
+import { URL }                                                    from "url"
+import crypto                                                     from "crypto"
+import express, { Response }                                      from "express"
+import slug                                                       from "slug"
+import { QueryTypes }                                             from "sequelize"
+import { NotFound, InternalServerError, HttpError }               from "../errors"
+import Model                                                      from "../db/models/DataRequest"
+import { AppRequest }                                             from ".."
+import { route }                                                  from "../lib/route"
+import GroupModel                                                 from "../db/models/RequestGroup"
+import { requestPermission }                                      from "../acl"
+import ViewModel                                                  from "../db/models/View"
 const { requireAuth }  = require("./Auth");
 const createRestRoutes = require("./BaseController").default;
 const ImportJob        = require("../DataManager/ImportJob");
 const { logger }       = require("../logger");
-const { route }        = require("../lib/route");
 const {
     getFindOptions,
     assert,
@@ -25,7 +27,7 @@ const {
 
 const router = module.exports = express.Router({ mergeParams: true });
 
-const FilterConfig = {
+const FilterConfig: Record<string, (col: string) => string> = {
     
     // Text -------------------------------------------------------------------
     strEq             : col => `"${col}" LIKE ?`,
@@ -85,7 +87,7 @@ const FilterConfig = {
 
 
 // Views ----------------------------------------------------------------------
-router.get("/:id/views", rw(async (req, res) => {
+router.get("/:id/views", rw(async (req: AppRequest, res: Response) => {
     const options = getFindOptions(req);
     options.where = { DataRequestId: +req.params.id };
     const views = await ViewModel.findAll(options);
@@ -93,53 +95,81 @@ router.get("/:id/views", rw(async (req, res) => {
 }));
 
 // Export Data endpoint -------------------------------------------------------
-router.get("/:id/data", rw(async (req, res) => {
+router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
+    requestPermission(req.user?.role || "guest", "DataRequests.export")
     const model = await Model.findByPk(req.params.id, getFindOptions(req))
-    assert(model, "Model not found", HttpError.NotFound)
+    assert(model, "Model not found", NotFound)
     const data = model.get("data")
     const name = model.get("name")
-    // @ts-ignore
     exportData(data || { cols: [], rows: [] }, name, req, res)
 }));
 
 // Refresh Data endpoint ------------------------------------------------------
 router.get("/:id/refresh", requireAuth("admin"), rw(async (req, res) => {
     const model = await Model.findByPk(req.params.id, getFindOptions(req))
-    assert(model, "Model not found", HttpError.NotFound)
+    assert(model, "Model not found", NotFound)
     const data = await fetchData(model)
     await model.set({ data, completed: new Date() }).save()
     res.json(model)
 }));
 
 // By Group -------------------------------------------------------------------
-router.get("/by-group", rw(async (req, res) => {
+route(router, {
+    method: "get",
+    path: "/by-group",
+    request: {
+        schema: {
+            groupLimit: {
+                in: ["query"],
+                optional: true,
+                toInt: true,
+                isInt: {
+                    options: {
+                        min: 2
+                    }
+                }
+            },
+            requestLimit: {
+                in: ["query"],
+                optional: true,
+                toInt: true,
+                isInt: {
+                    options: {
+                        min: 1
+                    }
+                }
+            }
+        }
+    },
+    async handler(req: AppRequest, res: Response) {
     
-    const groupLimit   = uInt(req.query.groupLimit); // >= 2!
-    const requestLimit = uInt(req.query.requestLimit);
+        const groupLimit   = uInt(req.query.groupLimit); // >= 2!
+        const requestLimit = uInt(req.query.requestLimit);
 
-    const test = await GroupModel.findAll({
-        attributes: ["id", "name", "description", "createdAt"],
-        include: {
-            association: "requests",
-            attributes : ["id", "name", "description", "refresh", "completed"],
-            right      : true
-        },
-        order: [["name", "asc"]],
-        limit: groupLimit ? Math.max(groupLimit, 2) : undefined
-    });
-    
-    res.json(test.map(rec => {
-        const out = rec.toJSON();
-        if (requestLimit > 0) {
-            out.requests = out.requests.slice(0, requestLimit)
-        }
-        if (out.id === null) {
-            out.name = "GENERAL"
-            out.description = "Contains requests that are not assigned to any specific group"
-        }
-        return out
-    }));
-}));
+        const recs = await GroupModel.findAll({
+            attributes: ["id", "name", "description", "createdAt"],
+            include: {
+                association: "requests",
+                attributes : ["id", "name", "description", "refresh", "completed"],
+                right      : true
+            },
+            order: [["name", "asc"]],
+            limit: groupLimit ? Math.max(groupLimit, 2) : undefined
+        });
+        
+        res.json(recs.map(rec => {
+            const out: any = rec.toJSON();
+            if (requestLimit > 0) {
+                out.requests = out.requests.slice(0, requestLimit)
+            }
+            if (out.id === null) {
+                out.name = "GENERAL"
+                out.description = "Contains requests that are not assigned to any specific group"
+            }
+            return out
+        }));
+    }
+});
 
 // Import Data endpoint -------------------------------------------------------
 /**
@@ -174,7 +204,7 @@ router.get("/:id/api", rw(async (req, res) => {
     /** @type {any} */
     const subscription = await Model.findByPk(req.params.id)
 
-    assert(subscription, "Subscription not found", HttpError.NotFound)
+    assert(subscription, "Subscription not found", NotFound)
 
     const table = "subscription_data_" + req.params.id;
 
@@ -423,7 +453,7 @@ route(router, {
         }
 
         const model = await Model.findByPk(req.params.id, { include })
-        assert(model, HttpError.NotFound)
+        assert(model, NotFound)
         res.json(model)
     }
 })
@@ -455,16 +485,23 @@ route(router, {
                 attributes: ["id", "name", "description"]
             }
         });
-        assert(model, HttpError.NotFound);
+        assert(model, NotFound);
         const transaction = await model.sequelize.transaction()
         try {
             await model.update(req.body, { user: req.user, transaction })
-            await model.setTags(req.body.Tags.map(t => t.id))
+            if (Array.isArray(req.body.Tags)) {
+                await model.setTags(req.body.Tags.map(t => t.id))
+            }
             await transaction.commit()
             res.json(model)
         } catch (ex) {
             await transaction.rollback()
-            const error = new HttpError.InternalServerError("Updating subscription failed", { tags: ["DATA"] })
+            if (ex instanceof HttpError) {
+                ex.data = { tags: ["DATA"] }
+                ex.cause = ex.stack
+                throw ex
+            }
+            const error = new InternalServerError("Updating subscription failed", { tags: ["DATA"] })
             error.cause = ex.stack
             throw error
         }
@@ -498,7 +535,9 @@ route(router, {
     },
     handler: async (req, res) => {
         const model = await Model.create(req.body)
-        await model.setTags(req.body.Tags.map(t => t.id))
+        if (Array.isArray(req.body.Tags)) {
+            await model.setTags(req.body.Tags.map(t => t.id))
+        }
         res.json(model)
     }
 });
@@ -561,7 +600,7 @@ function exportData(data, name, req, res)
 /**
  * @param {Model} model
  */
-async function fetchData(model) {
+async function fetchData(model: Model) {
 
     // Will throw if model.dataURL is not valid URL
     const url = new URL(model.getDataValue("dataURL"))
@@ -590,20 +629,15 @@ async function fetchData(model) {
     throw new Error(`Unsupported content type "${type}"`)
 }
 
-/**
- * 
- * @param {URL} url 
- * @returns {Promise<{
- *   request : http.ClientRequest
- *   response: http.IncomingMessage
- *   result  : string
- * }>}
- */
-async function request(url) {
+async function request(url: URL): Promise<{
+    request : ClientRequest
+    response: IncomingMessage
+    result  : string
+}> {
 
     return new Promise((resolve, reject) => {
 
-        const requestFn = url.protocol === "https:" ? https.request : http.request;
+        const requestFn = url.protocol === "https:" ? httpsRequest : httpRequest;
 
         const req = requestFn(url, {
             headers: {
@@ -611,16 +645,14 @@ async function request(url) {
             }
         });
 
-        req.once("error", e => {
+        req.once("error", (e: Error) => {
             console.error(`problem with request: ${e.message}`);
             reject(e)
         });
 
-        req.once("response", res => {
-            // console.log(`STATUS: ${res.statusCode}`);
-            // console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+        req.once("response", (res: IncomingMessage) => {
 
-            req.once("error", e => {
+            req.once("error", (e: Error) => {
                 console.error(`problem with response: ${e.message}`);
                 reject(e)
             });
