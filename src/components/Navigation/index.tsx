@@ -56,7 +56,8 @@ export default function Navigation()
 
     const canReadSites         = user.permissions.includes("DataSites.read")
     const canReadSubscriptions = user.permissions.includes("DataRequests.read")
-    const canReadGroups        = user.permissions.includes("RequestGroups.read")
+    const canCreateGroups      = user.permissions.includes("RequestGroups.create")
+    const canUpdateGroups      = user.permissions.includes("RequestGroups.update")
     const canReadTags          = user.permissions.includes("Tags.read")
     const canReadGraphs        = user.permissions.includes("Views.read")
     const canReadProjects      = user.permissions.includes("Projects.read")
@@ -79,7 +80,7 @@ export default function Navigation()
                 { canReadGraphs && <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" /> Graphs</NavLink> }
                 { canReadSites && <NavLink to="/sites"><i className="icon fa-solid fa-location-dot" /> Data Sites</NavLink> }
                 { canReadSubscriptions && <NavLink to="/requests"><i className="icon fa-solid fa-database" /> Data Subscriptions</NavLink> }
-                { canReadGroups && <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Subscription Groups</NavLink> }
+                { (canCreateGroups || canUpdateGroups) && <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Subscription Groups</NavLink> }
                 { canReadTags && <NavLink to="/tags"><i className="icon fa-solid fa-tag" /> Tags</NavLink> }
                 
                 { (canReadUsers || canReadLogs || canReadUsers) && (
