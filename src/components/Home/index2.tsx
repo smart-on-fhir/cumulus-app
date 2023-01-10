@@ -48,7 +48,7 @@ function Graphs() {
     const [selected, setSelected] = useState(0)
 
     return (
-        <EndpointListWrapper endpoint="/api/views?order=updatedAt:desc&limit=8">
+        <EndpointListWrapper endpoint="/api/views?order=updatedAt:desc&limit=7">
             { (data: app.Project[]) => {
                 if (!selected && data.length) {
                     setTimeout(() => setSelected(data[0].id))
