@@ -1,0 +1,161 @@
+import { expect }                from "chai"
+import { getPermissionsForRole } from "../../../backend/acl";
+import DataRequests              from "../../fixtures/DataRequests"
+import Tags                      from "../../fixtures/Tags"
+import {
+    getCookie,
+    resetTable,
+    server,
+    testEndpoint
+} from "../../test-lib"
+
+
+describe("Subscriptions", () => {
+    
+    beforeEach(async () => {
+        await resetTable("Tag", Tags)
+        await resetTable("DataRequest", DataRequests)
+    })
+
+    describe("list", () => {
+        testEndpoint("DataRequests.read", "GET", "/api/requests")
+    })
+
+    describe("view", () => {
+        testEndpoint("DataRequests.read", "GET", "/api/requests/1?group=true&tags=true&graphs=true")
+    })
+
+    describe("create", () => {
+        testEndpoint(
+            "DataRequests.create",
+            "POST",
+            "/api/requests",
+            {
+                name: "Record name",
+                description: "Record description",
+                Tags: [{ id: 1 }]
+            }
+        )
+    })
+
+    describe("update", () => {
+        testEndpoint(
+            "DataRequests.update",
+            "PUT",
+            "/api/requests/1",
+            {
+                name: "Record name 2",
+                description: "Record description 2",
+                Tags: [{ id: 1 }]
+            }
+        )
+    })
+
+    describe("delete", () => {
+        testEndpoint("DataRequests.delete", "DELETE", "/api/requests/1")
+    })
+
+    describe("by-group", () => {
+        ["guest", "user", "manager", "admin"].forEach(role => {
+            const permissions = getPermissionsForRole(role as any);
+    
+            const options: RequestInit = { method: "GET" }
+            const headers: Record<string, any> = {};
+            const cookie = getCookie(role)
+            if (cookie) {
+                headers.cookie = cookie
+            }
+            options.headers = headers
+    
+            if (permissions.includes("DataRequests.read")) {
+                it (`${role} can read subscriptions by group`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/requests/by-group?requestLimit=2`, options);
+                    expect(res.status).to.equal(200)
+                })
+            } else {
+                it (`${role} cannot read subscriptions by group`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/requests/by-group`, options)
+                    expect(res.status).to.equal(role === "guest" ? 401 : 403)
+                })
+            }
+        })
+    })
+
+    describe("get subscription graphs", () => {
+        ["guest", "user", "manager", "admin"].forEach(role => {
+            const permissions = getPermissionsForRole(role as any);
+    
+            const options: RequestInit = { method: "GET" }
+            const headers: Record<string, any> = {};
+            const cookie = getCookie(role)
+            if (cookie) {
+                headers.cookie = cookie
+            }
+            options.headers = headers
+    
+            if (permissions.includes("DataRequests.read") && permissions.includes("Views.read")) {
+                it (`${role} can read subscription graphs`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/requests/1/views`, options);
+                    expect(res.status).to.equal(200)
+                })
+            } else {
+                it (`${role} cannot read subscription graphs`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/requests/1/views`, options)
+                    expect(res.status).to.equal(role === "guest" ? 401 : 403)
+                })
+            }
+        })
+    })
+
+    describe("export subscription data", () => {
+        ["guest", "user", "manager", "admin"].forEach(role => {
+            const permissions = getPermissionsForRole(role as any);
+    
+            const options: RequestInit = { method: "GET" }
+            const headers: Record<string, any> = {};
+            const cookie = getCookie(role)
+            if (cookie) {
+                headers.cookie = cookie
+            }
+            options.headers = headers
+    
+            if (permissions.includes("DataRequests.export")) {
+                it (`${role} can export subscription data`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/requests/1/data`, options);
+                    expect(res.status).to.equal(200)
+                })
+            } else {
+                it (`${role} cannot export subscription data`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/requests/1/data`, options)
+                    expect(res.status).to.equal(role === "guest" ? 401 : 403)
+                })
+            }
+        })
+    })
+
+    describe.skip("refresh subscription data", () => {
+        ["guest", "user", "manager", "admin"].forEach(role => {
+            const permissions = getPermissionsForRole(role as any);
+    
+            const options: RequestInit = { method: "GET" }
+            const headers: Record<string, any> = {};
+            const cookie = getCookie(role)
+            if (cookie) {
+                headers.cookie = cookie
+            }
+            options.headers = headers
+    
+            if (permissions.includes("DataRequests.refresh")) {
+                it (`${role} can refresh subscription data`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, options);
+                    expect(res.status).to.equal(200)
+                })
+            } else {
+                it (`${role} cannot refresh subscription data`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, options)
+                    expect(res.status).to.equal(role === "guest" ? 401 : 403)
+                })
+            }
+        })
+    })
+});

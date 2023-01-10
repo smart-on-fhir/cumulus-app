@@ -109,7 +109,7 @@ export async function resetTable(modelName: string, data: Record<string, any>[])
     const dbConnection: Sequelize = SERVER.app.get("dbConnection")
     const ModelConstructor = dbConnection.models[modelName]
     await ModelConstructor.sync({ force: true })
-    await ModelConstructor.bulkCreate(data)
+    await ModelConstructor.bulkCreate(data, { ignoreDuplicates: true })
     await fixAutoIncrement(dbConnection, ModelConstructor.tableName, "id")
 }
 

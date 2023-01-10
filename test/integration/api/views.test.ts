@@ -1,10 +1,14 @@
 import Views                        from "../../fixtures/Views"
+import DataRequests                 from "../../fixtures/DataRequests"
 import { resetTable, testEndpoint } from "../../test-lib"
 
 
 describe("Graphs", () => {
     
-    beforeEach(async () => await resetTable("View", Views))
+    beforeEach(async () => {
+        await resetTable("DataRequest", DataRequests)
+        await resetTable("View", Views)
+    })
 
     describe("list", () => {
         testEndpoint("Views.read", "GET", "/api/views?order=name:asc")

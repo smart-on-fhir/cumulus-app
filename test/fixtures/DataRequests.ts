@@ -18,7 +18,6 @@ export default [
         name: 'Demo Data Subscription 3',
         description: 'Demo Data Subscription 3 description',
         refresh: 'manually',
-        metadata: {}, 
-        groupId: 1
+        metadata: {}
     }
 ]
