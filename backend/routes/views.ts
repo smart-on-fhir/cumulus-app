@@ -27,6 +27,21 @@ route(router, {
                     errorMessage: "Invalid order parameter",
                     options: /^\w+\:(asc|desc)(,\w+\:asc|desc)*$/i
                 }
+            },
+            limit: {
+                in: ["query"],
+                optional: {
+                    options: {
+                        checkFalsy: true
+                    }
+                },
+                toInt: true,
+                isInt: {
+                    errorMessage: "'limit' must be an integer",
+                    options: {
+                        min: 1
+                    }
+                }
             }
         }
     },
@@ -44,6 +59,10 @@ route(router, {
             String(req.query.order).split(",").forEach(x => {
                 (options.order as any).push(x.split(":"))
             });
+        }
+
+        if (req.query.limit) {
+            options.limit = +req.query.limit
         }
 
         res.json(await Model.findAll(options))
