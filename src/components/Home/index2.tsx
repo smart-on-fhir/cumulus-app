@@ -57,7 +57,7 @@ function Graphs() {
                     <div className="graphs-row card">
                         <div className="graphs">
                             { selected && <Link to={`/views/${selected}`}>
-                                <img src={`/api/views/${selected}/screenshot`} />
+                                <img alt="Current Graph" src={`/api/views/${selected}/screenshot`} />
                             </Link> }
                         </div>
                         <div className="graphs-list">
