@@ -105,7 +105,6 @@ function setUpErrorHandlers(app)
             }
             logger.error(`${error.status} ${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => `, error)
             const msg = error.message.replace(/^\s*\w*Error:\s+/, "")
-            // console.error(error)
             res.status(error.status).send(msg)
         }
 

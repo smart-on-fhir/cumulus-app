@@ -41,7 +41,6 @@ async function authenticate(req, res, next) {
     } else {
         dbConnection.user = { role: "guest" }; 
     }
-    // console.log(dbConnection.user?.email)
     next();
 }
 

@@ -113,24 +113,30 @@ route(router, {
                 notEmpty: true
             },
             description: {
-                in: ['body'],
-                exists: true,
-                notEmpty: true
+                in: ['body']
             },
             lat: {
                 in: [ "body" ],
-                optional: true,
+                optional: {
+                    options: {
+                        checkFalsy: true
+                    }
+                },
                 isInt: {
                     errorMessage: "'lat' must be an integer",
                     options: {
                         min: 0,
-                        max: 90
+                        max: 90,
                     }
                 }
             },
             long: {
                 in: [ "body" ],
-                optional: true,
+                optional: {
+                    options: {
+                        checkFalsy: true
+                    }
+                },
                 isInt: {
                     errorMessage: "'long' must be an integer",
                     options: {

@@ -79,14 +79,12 @@ route(router, {
             // fields: [],
         };
 
-        // console.log(options)
-        
         combinedLogger.query(options, (err, results) => {
             if (err) {
                 return next(err);
             }
 
-            let items = results.dailyRotateFile
+            let items = results.dailyRotateFile || [];
 
             if (levels.length) {
                 items = items.filter((item: any) => levels.includes(item.level))
