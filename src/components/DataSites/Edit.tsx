@@ -5,8 +5,8 @@ import DataSiteForm       from "./Form"
 export default function EditDataSite()
 {
     return createEditPage<app.DataSite>({
-        nameSingular   : "Data Site",
-        namePlural     : "Data Sites",
+        nameSingular   : "Healthcare Site",
+        namePlural     : "Healthcare Sites",
         endpoint       : "/api/data-sites/",
         basePath       : "/sites/",
         primaryKeyField: "id",

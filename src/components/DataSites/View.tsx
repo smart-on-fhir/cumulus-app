@@ -10,7 +10,7 @@ export default function View()
     return createViewPage<app.DataSite>({
         basePath  : "/sites",
         endpoint  : "/api/data-sites",
-        namePlural: "Data Sites",
+        namePlural: "Healthcare Sites",
         icon      : <i className="fa-solid fa-location-dot color-brand-2" />,
         canDelete : user?.permissions.includes("DataSites.delete"),
         canUpdate : user?.permissions.includes("DataSites.update"),

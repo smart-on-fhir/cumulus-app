@@ -7,8 +7,8 @@ export default function DataSiteCreateForm()
     return createCreatePage<app.DataSite>({
         basePath    : "/sites/",
         endpoint    : "/api/data-sites/",
-        namePlural  : "Data Sites",
-        nameSingular: "Data Site",
+        namePlural  : "Healthcare Sites",
+        nameSingular: "Healthcare Site",
         renderForm  : props => <DataSiteForm { ...props } />
     })
 }

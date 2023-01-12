@@ -6,8 +6,8 @@ export default function Delete()
 {
     return createDeletePage<app.DataSite>({
         endpoint: "/api/data-sites",
-        namePlural: "Data Sites",
-        nameSingular: "Data Site",
+        namePlural: "Healthcare Sites",
+        nameSingular: "Healthcare Site",
         icon: <i className="fa-solid fa-location-dot color-brand-2" />,
         renderView: data => <>
             <div className="mt-05">

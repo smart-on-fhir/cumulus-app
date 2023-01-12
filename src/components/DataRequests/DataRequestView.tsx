@@ -201,7 +201,7 @@ export default function DataRequestView(): JSX.Element
                         </div>
                         {/* <div className="row mt-1">
                             <div className="col">
-                                <label>Data Sites</label>
+                                <label>Healthcare Sites</label>
                                 { requestedData.dataSites.map((item, i) => (
                                     <div key={i}><i className="fa-regular fa-square-check color-blue icon" /> { item.name || item.label }</div>
                                 )) }
@@ -238,7 +238,7 @@ export default function DataRequestView(): JSX.Element
                     <ViewsBrowser layout="column" requestId={ model.id } />
                     <br/>
                     </> }
-                    <h5 className="grey-out">Data Sites</h5>
+                    <h5 className="grey-out">Healthcare Sites</h5>
                     {/* <SimpleMap center={{ lat: 42.346710208505826, lng: -71.08435192324642 }} zoom={10} /> */}
                     <img src={ map } alt="Sites Map" className="grey-out" />
                 </div>

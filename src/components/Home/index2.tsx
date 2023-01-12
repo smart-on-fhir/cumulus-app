@@ -118,7 +118,7 @@ function Sites() {
         { (data: app.DataSite[]) => {
             return (
                 <div className="card sites">
-                    <h4><i className="icon fa-solid fa-location-dot" /> Data Sites</h4>
+                    <h4><i className="icon fa-solid fa-location-dot" /> Healthcare Sites</h4>
                     <hr/>
                     { data.map((item, i) => (
                         <li key={i}>
