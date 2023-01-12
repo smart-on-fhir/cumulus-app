@@ -9,8 +9,8 @@ export default function ListPage()
     const { user } = useAuth();
 
     return createListPage<app.DataSite[]>({
-        namePlural  : "Data Sites",
-        nameSingular: "Data Site",
+        namePlural  : "Healthcare Sites",
+        nameSingular: "Healthcare Site",
         endpoint    : "/api/data-sites",
         icon        : <i className="fa-solid fa-location-dot color-brand-2" />,
         canCreate   : user?.permissions.includes("DataSites.create"),

@@ -445,8 +445,8 @@ export default function DataRequestForm({
                     }) }/>
                 </div>
                 <div className="col col-4 mb-2 responsive">
-                    <Panel title="Included Data Sites" menu={[
-                        <Link to="/sites">Manage Data Sites</Link>
+                    <Panel title="Included Healthcare Sites" menu={[
+                        <Link to="/sites">Manage Healthcare Sites</Link>
                     ]}>
                         <CheckboxList
                             items={ sites }

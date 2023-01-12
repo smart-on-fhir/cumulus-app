@@ -91,10 +91,10 @@ export default function Home() {
                 </div>
                 <div className="col col-4 responsive">
                     <Panel
-                        title="Data Sites"
+                        title="Healthcare Sites"
                         icon={<i className="fa-solid fa-location-dot" style={{ color: "#999" }} />}
                         menu={[
-                            <Link to="/sites">Manage Data Sites</Link>
+                            <Link to="/sites">Manage Healthcare Sites</Link>
                         ]}
                     >
                         <DataSiteList />
