@@ -97,6 +97,11 @@ module.exports = class DataRequest extends BaseModel
 
             dataURL: {
                 type: DataTypes.STRING(500)
+            },
+
+            transmissions: {
+                type: DataTypes.JSONB,
+                defaultValue: null
             }
         }, {
             sequelize,

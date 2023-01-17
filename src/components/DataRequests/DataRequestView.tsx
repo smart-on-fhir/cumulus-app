@@ -13,6 +13,7 @@ import Loader                     from "../generic/Loader"
 import { AlertError }             from "../generic/Alert"
 import { classList }              from "../../utils"
 import Tag                        from "../Tags/Tag"
+import TransmissionView           from "./Transmissions/TransmissionView"
 
 // import GoogleMapReact from "google-map-react"
 
@@ -175,6 +176,22 @@ export default function DataRequestView(): JSX.Element
                             </tbody>
                         </table>
                     </div>
+
+                    { model.transmissions && (
+                        <>
+                            <h5 className="mt-3">Data Transmissions</h5>
+                            <hr/>
+                            <div className="row gap">
+                                <div className="col mt-1 mb-1">
+                                    <TransmissionView
+                                        sites={ model.requestedData?.dataSites || [] }
+                                        transmissions={ model.transmissions }
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
+
                     { model.requestedData && <>
                         <h5 className="mt-3">Requested Data</h5>
                         <hr/>
