@@ -22,6 +22,7 @@ export default function TransmissionEditor({
                     value={ data.date ? moment(data.date).utc().format("YYYY-MM-DD") : undefined }
                     min={ data.dataEnd ? moment(data.dataEnd).utc().format("YYYY-MM-DD") : undefined }
                     onChange={ e => onChange({ date: e.target.valueAsDate || undefined }) }
+                    required
                 />
             </div>
             <div className="col col-1 small middle right nowrap">Site</div>
@@ -45,6 +46,7 @@ export default function TransmissionEditor({
                     value={ data.dataStart ? moment(data.dataStart).utc().format("YYYY-MM-DD") : undefined }
                     max={ data.dataEnd ? moment(data.dataEnd).utc().format("YYYY-MM-DD") : undefined }
                     onChange={ e => onChange({ dataStart: e.target.valueAsDate || undefined }) }
+                    required
                 />
             </div>
             <div className="col col-2 small middle right nowrap">Data end</div>
@@ -54,6 +56,7 @@ export default function TransmissionEditor({
                     value={ data.dataEnd ? moment(data.dataEnd).utc().format("YYYY-MM-DD") : undefined }
                     min={ data.dataStart ? moment(data.dataStart).utc().format("YYYY-MM-DD") : undefined }
                     onChange={ e => onChange({ dataEnd: e.target.valueAsDate || undefined }) }
+                    required
                 />
             </div>
         </div>
