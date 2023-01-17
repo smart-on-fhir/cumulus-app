@@ -10,7 +10,8 @@ export default function Checkbox({
     description,
     type,
     className,
-    disabled
+    disabled,
+    labelLeft
 }: {
     checked     : boolean
     onChange    : (checked: boolean) => void
@@ -20,20 +21,23 @@ export default function Checkbox({
     type       ?: "checkbox" | "radio"
     className  ?: string
     disabled   ?: boolean
+    labelLeft  ?: boolean
 }) {
     return (
         <label className={ classList({
             "checkbox-label": true,
             [className || ""]: !!className,
-            "grey-out": !!disabled
+            "grey-out": !!disabled,
+            "label-left": !!labelLeft
         })}>
+            { labelLeft && (label || name) }
             <input
                 type={ type || "checkbox" }
                 checked={ checked }
                 disabled={ !!disabled }
                 onChange={ e => onChange(e.target.checked) }
             /><span className="checkbox-label-focus-highlight"/>
-            { label || name }
+            { !labelLeft && (label || name) }
             <div className="checkbox-label-description color-muted">
                 { description }
             </div>
