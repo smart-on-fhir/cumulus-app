@@ -234,7 +234,7 @@ export default function DataRequestForm({
         }
     } as app.RequestedData;
 
-    function toggleDataSite(site: app.DataListItem) {
+    function toggleDataSite(site: app.DataSite) {
         const sites = [...requestedData.dataSites];
         const siteIndex = sites.findIndex(x => x.name === site.name)
         if (siteIndex < 0) {
@@ -450,7 +450,7 @@ export default function DataRequestForm({
                     ]}>
                         <CheckboxList
                             items={ sites }
-                            toggle={ item => toggleDataSite(item) }
+                            toggle={ item => toggleDataSite(item as app.DataSite) }
                             isSelected={ item => !!requestedData.dataSites.find(x => x.id === item.id) }
                         />
                     </Panel>

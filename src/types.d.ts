@@ -148,7 +148,7 @@ declare module app {
 
     interface RequestedData {
         fields: RequestedDataFields
-        dataSites: DataListItem[]
+        dataSites: DataSite[]
     }
 
     interface RequestedDataFields {
