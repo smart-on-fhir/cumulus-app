@@ -7,9 +7,11 @@ import Select             from "../generic/Select"
 import TagSelector        from "../Tags/TagSelector"
 import CheckboxList       from "../generic/CheckboxList"
 import DemographicsEditor from "./DemographicsEditor"
+import TransmissionEditor from "./Transmissions/TransmissionEditor"
+import EditorList         from "../generic/EditorList"
+import { useAuth }        from "../../auth"
 
 import "./form.scss";
-import { useAuth } from "../../auth"
 
 // const RE_URL = /^(http|https):\/\/[^ "]+$/;
 
@@ -454,6 +456,21 @@ export default function DataRequestForm({
                             isSelected={ item => !!requestedData.dataSites.find(x => x.id === item.id) }
                         />
                     </Panel>
+
+                    <br />
+                    <EditorList
+                        label="Transmission History"
+                        list={ record.transmissions || [] }
+                        onAdd={() => ({})}
+                        onChange={ transmissions => onChange({ ...record, transmissions }) }
+                        editor={ (data, onChange) => (
+                            <TransmissionEditor
+                                data={ data }
+                                onChange={ onChange }
+                                sites={ sites }
+                            />
+                        )}
+                    />
                 </div>
             </div>
 

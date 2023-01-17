@@ -144,6 +144,17 @@ declare module app {
         Tags?: Pick<Tag, "id" | "name" | "description">[]
 
         Views?: View[]
+
+        transmissions: Transmission[] | null
+    }
+
+    interface Transmission {
+        date     ?: Date
+        siteId   ?: number
+        comment  ?: string
+        failed   ?: boolean
+        dataStart?: Date
+        dataEnd  ?: Date
     }
 
     interface RequestedData {
