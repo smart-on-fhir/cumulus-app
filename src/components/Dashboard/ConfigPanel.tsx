@@ -7,8 +7,6 @@ import FilterUI          from "./FilterUI"
 import Collapse          from "../generic/Collapse"
 import Checkbox          from "../generic/Checkbox"
 import AnnotationsUI     from "./AnnotationsUI"
-import Rating            from "../Rating"
-import { request }       from "../../backend"
 import TagSelector       from "../Tags/TagSelector"
 import {
     SupportedChartTypes,
@@ -117,60 +115,18 @@ interface ChartConfigPanelState {
 export default function ConfigPanel({
     dataRequest,
     state,
-    onChange,
-    view
+    onChange
 } : {
     dataRequest: app.DataRequest
-    view: Partial<app.View>
+    view?: Partial<app.View>
     state: ChartConfigPanelState
     viewType: "overview" | "data"
     onChange: (state: ChartConfigPanelState) => void
 }) {
-    let [ rating  , setRating   ] = useState(view.normalizedRating || 0)
-    let [ votes   , setVotes    ] = useState(view.votes || 0)
-    let [ voting  , setVoting   ] = useState(false)
     let [ tabIndex, setTabIndex ] = useState(0)
 
     const { cols } = dataRequest.metadata || { cols: [] }
 
-    const vote = async (n: number) => {
-        setVoting(true)
-        await request<app.View>(`/api/views/${view.id}/vote`, {
-            method : "PUT",
-            body   : "rating=" + n,
-            headers: {
-                "content-type": "application/x-www-form-urlencoded"
-            }
-        }).then(
-            v => {
-                setRating(v.normalizedRating)
-                setVotes(v.votes)
-                setVoting(false)
-            },
-            e  => {
-                setVoting(false)
-                alert(e.message)
-            }
-        );
-    }
-
-    const resetRating = async () => {
-        setVoting(true)
-        await request<app.View>(`/api/views/${view.id}/reset-rating`, {
-            method : "PUT"
-        }).then(
-            v => {
-                setRating(v.normalizedRating)
-                setVotes(v.votes)
-                setVoting(false)
-            },
-            e  => {
-                setVoting(false)
-                alert(e.message)
-            }
-        );
-    }
-    
     const { chartOptions } = state;
 
     const isBar    = state.chartType.startsWith("bar")
@@ -187,14 +143,6 @@ export default function ConfigPanel({
             width: 330,
             marginRight: "1em"
         }}>
-            { view.id && <Rating
-                    value={ rating }
-                    votes={ votes }
-                    loading={ voting }
-                    onVote={ vote }
-                    onClear={ resetRating }
-                />
-            }
 
             <div className="mb-1">
                 <label>Tags</label>

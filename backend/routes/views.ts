@@ -193,9 +193,6 @@ route(router, {
         const transaction = await model.sequelize.transaction()
 
         try {
-            delete req.body.rating
-            delete req.body.normalizedRating
-            delete req.body.votes
             delete req.body.DataRequestId
             delete req.body.createdAt
             delete req.body.updatedAt
@@ -347,69 +344,6 @@ route(router, {
         res.append("Content-Length", file.length + "")
 
         res.send(file);
-    }
-});
-
-// Vote (rate) a graph ---------------------------------------------------------
-route(router, {
-    method: "put",
-    path  : "/:id/vote",
-    request: {
-        schema: {
-            id: {
-                in: ['params'],
-                isInt: {
-                    errorMessage: "The 'id' parameter must be a positive integer",
-                    options: {
-                        gt: 0
-                    }
-                },
-                toInt: true,
-            },
-            rating: {
-                in: ["body"],
-                isInt: {
-                    options: {
-                        min: 0,
-                        max: 5
-                    }
-                },
-                toInt: true
-            }
-        }
-    },
-    async handler(req: AppRequest, res: Response) {
-
-        const model = await Model.findByPk(req.params.id);
-        
-        if (!model) {
-            throw new NotFound("Model not found");
-        }
-
-        const rating = model.getDataValue("rating") + req.body.rating;
-        const votes  = model.getDataValue("votes") + 1;
-
-        await model.update({
-            rating,
-            votes,
-            normalizedRating: roundToPrecision(rating / (votes || 1), 2)
-        });
-
-        res.json(model)
-    }
-});
-
-// Reset graph rating ----------------------------------------------------------
-route(router, {
-    method: "put",
-    path  : "/:id/reset-rating",
-    async handler(req: AppRequest, res: Response) {
-        const model = await Model.findByPk(req.params.id);
-        if (!model) {
-            throw new NotFound("Model not found");
-        }
-        await model.update({ rating: 0, votes : 0, normalizedRating: 0 });
-        res.json(model)
     }
 });
 

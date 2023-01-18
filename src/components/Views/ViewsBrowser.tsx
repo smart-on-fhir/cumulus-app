@@ -22,7 +22,7 @@ export default function ViewsBrowser({
     requestId?: string | number,
     showDescription?: boolean,
     search?: string
-    sort?: "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | "rating-asc" | "rating-desc" | "",
+    sort?: "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | "",
     groupBy?: "tag" | "subscription" | ""
 }) {
 
@@ -41,17 +41,11 @@ export default function ViewsBrowser({
         case "name-desc":
             query.set("order", "name:desc");
         break;
-        case "rating-asc":
-            query.set("order", "normalizedRating:asc");
-        break;
-        case "rating-desc":
-            query.set("order", "normalizedRating:desc");
-        break;
         default:
             if (requestId) {
-                query.set("order", "normalizedRating:desc,createdAt:asc")
+                query.set("order", "createdAt:asc")
             } else {
-                query.set("order", "normalizedRating:desc,name:asc,createdAt:asc")
+                query.set("order", "name:asc,createdAt:asc")
             }
         break;
     }

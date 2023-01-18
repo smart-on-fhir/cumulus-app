@@ -191,7 +191,7 @@ export async function handleUserInvite(
             throw new HttpError.BadRequest("User already invited")
         }
 
-        throw e//new HttpError.InternalServerError("Error crating new user")
+        throw e
     }
 
     try {
