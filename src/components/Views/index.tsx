@@ -6,7 +6,7 @@ import MenuButton from "../generic/MenuButton";
 import ViewsBrowser from "./ViewsBrowser";
 
 
-type SortType = "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | "rating-asc" | "rating-desc" | ""
+type SortType = "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | ""
 type ViewType = "grid" | "column" | "list"
 type GroupBy  = "tag" | "subscription" | ""
 
@@ -83,10 +83,7 @@ export default function Views()
                             <Checkbox onChange={() => onSetSort("mod-desc"   )} checked={ sort === "mod-desc"   } name="sort" type="radio" label={<>Sort by Date <span className="color-muted">(newest first)</span></>} />,
                             <Checkbox onChange={() => onSetSort("mod-asc"    )} checked={ sort === "mod-asc"    } name="sort" type="radio" label={<>Sort by Date <span className="color-muted">(oldest first)</span></>} />,
                             "separator",
-                            <Checkbox onChange={() => onSetSort("rating-desc")} checked={ sort === "rating-desc"} name="sort" type="radio" label={<>Sort by Rating <span className="color-muted">(highest first)</span></>} />,
-                            <Checkbox onChange={() => onSetSort("rating-asc" )} checked={ sort === "rating-asc" } name="sort" type="radio" label={<>Sort by Rating <span className="color-muted">(lowest first)</span></>} />,
-                            "separator",
-                            <Checkbox onChange={() => onSetSort("")} checked={ !sort } name="sort" type="radio" label={ <><b>Default Sort</b> <span className="color-muted">(rating, name, date)</span></> } />
+                            <Checkbox onChange={() => onSetSort("")} checked={ !sort } name="sort" type="radio" label={ <><b>Default Sort</b> <span className="color-muted">(name, date)</span></> } />
                         ]}>
                             <i className={ classList({
                                 "material-symbols-rounded": true,

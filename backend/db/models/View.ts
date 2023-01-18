@@ -19,9 +19,6 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
     declare description     : CreationOptional<string | null>;
     declare screenShot      : CreationOptional<string | null>;
     declare settings        : CreationOptional<Record<string, any> | null>;
-    declare rating          : CreationOptional<number>;
-    declare votes           : CreationOptional<number>;
-    declare normalizedRating: CreationOptional<number>;
     declare createdAt       : CreationOptional<Date>;
     declare updatedAt       : CreationOptional<Date>;
 
@@ -63,24 +60,6 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
 
             settings: {
                 type: DataTypes.JSONB
-            },
-
-            rating: {
-                type        : DataTypes.FLOAT,
-                defaultValue: 0,
-                allowNull   : false
-            },
-
-            votes: {
-                type        : DataTypes.INTEGER,
-                defaultValue: 0,
-                allowNull   : false
-            },
-
-            normalizedRating: {
-                type        : DataTypes.FLOAT,
-                defaultValue: 0,
-                allowNull   : false
             },
 
             DataRequestId: DataTypes.INTEGER,

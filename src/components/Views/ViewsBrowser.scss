@@ -174,7 +174,7 @@
 
         .view-thumbnail-description {
             overflow     : hidden;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 3;
             display: -webkit-box;
             -webkit-box-orient: vertical;
         }
@@ -182,7 +182,7 @@
 }
 
 .view-browser.view-browser-column .view-thumbnail .view-thumbnail-title .view-thumbnail-description {
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
 }
 
 @media (min-width: 50em) {

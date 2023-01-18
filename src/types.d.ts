@@ -28,7 +28,7 @@ declare module app {
         updatedAt     : string
         createdAt     : string
         creator      ?: Pick<User, "id" | "email">
-        graphs       ?: Pick<View, "id" | "name" | "description" | "rating" | "votes" | "normalizedRating" | "DataRequestId">[]
+        graphs       ?: Pick<View, "id" | "name" | "description" | "DataRequestId">[]
         subscriptions?: Pick<DataRequest, "id" | "name" | "description" | "completed" | "refresh">[]
     }
 
@@ -60,9 +60,6 @@ declare module app {
         description: string
         DataRequestId: number | null
         screenShot?: string
-        votes: number
-        rating: number
-        normalizedRating: number
         settings?: ViewSettings
         Tags?: Pick<Tag, "id" | "name" | "description">[]
         DataRequest?: Pick<DataRequest, "id" | "name">

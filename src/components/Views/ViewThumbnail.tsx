@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ellipsis, highlight } from "../../utils";
-import { StaticRating } from "../Rating";
+
 
 export default function ViewThumbnail({
     view,
@@ -27,8 +27,6 @@ export default function ViewThumbnail({
                         }}/> :
                         "No description" }
                 </div> }
-                
-                { showDescription > 0 && <StaticRating value={ view.normalizedRating } votes={ view.votes } /> }
             </div>            
         </Link>
     )

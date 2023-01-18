@@ -75,9 +75,6 @@ route(router, {
                     "id",
                     "name",
                     "description",
-                    "rating",
-                    "votes",
-                    "normalizedRating",
                     "DataRequestId"
                 ]
             })
