@@ -217,7 +217,7 @@ class CSV2DB extends Transform
                     value = "NULL"
                 }
                 else if (typeof value === "string") {
-                    value = "'" + value + "'"
+                    value = this.#client.escapeLiteral(value)
                 }
                 return value
             }).join(", ")

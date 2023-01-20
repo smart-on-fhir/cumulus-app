@@ -27,7 +27,7 @@ function createServer(config)
             const meta = {
                 tags     : ["WEB"],
                 userAgent: req.headers["user-agent"],
-                ip       : req.ip,
+                ip       : req.socket ? req.ip : undefined,
                 user     : req.user?.email || "guest"
             }
             
