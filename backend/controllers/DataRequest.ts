@@ -4,7 +4,7 @@ import { URL }                                                    from "url"
 import crypto                                                     from "crypto"
 import express, { Response }                                      from "express"
 import slug                                                       from "slug"
-import { QueryTypes }                                             from "sequelize"
+import { Includeable, QueryTypes }                                from "sequelize"
 import { NotFound, InternalServerError, HttpError }               from "../errors"
 import Model                                                      from "../db/models/DataRequest"
 import { AppRequest }                                             from ".."
@@ -12,6 +12,7 @@ import { route }                                                  from "../lib/r
 import GroupModel                                                 from "../db/models/RequestGroup"
 import { requestPermission }                                      from "../acl"
 import ViewModel                                                  from "../db/models/View"
+import ColumnsMetadata                                            from  "../cumulus_library_columns.json"
 const { requireAuth }  = require("./Auth");
 const createRestRoutes = require("./BaseController").default;
 const ImportJob        = require("../DataManager/ImportJob");
@@ -438,7 +439,7 @@ route(router, {
     },
     handler: async (req, res) => {
 
-        const include = []
+        const include: Includeable[] = []
 
         if (req.query.group) {
             include.push({ association: "group", attributes: ["id", "name", "description"] })
@@ -454,7 +455,31 @@ route(router, {
 
         const model = await Model.findByPk(req.params.id, { include })
         assert(model, NotFound)
-        res.json(model)
+
+        const json = model!.toJSON()
+
+        if (json.metadata?.cols?.length) {
+            json.metadata.cols = json.metadata.cols.map(col => {
+
+                if (col.name === "cnt") {
+                    col.meta = {
+                        datatype: "Number",
+                        display: "Aggregate count"
+                    }
+                }
+
+                else {
+                    const meta = ColumnsMetadata.find(item => item.hasOwnProperty(col.name));
+                    if (meta) {
+                        col.meta = meta[col.name];
+                    }
+                }
+
+                return col
+            })
+        }
+
+        res.json(json)
     }
 })
 

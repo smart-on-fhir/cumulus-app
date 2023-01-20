@@ -182,6 +182,42 @@ export default function DataRequestView(): JSX.Element
                         </table>
                     </div>
 
+                    <h5 className="mt-3">Included Fields</h5>
+                    <hr/>
+                    <table>
+                        <tbody>
+                            {
+                                model.metadata?.cols?.length ?
+                                model.metadata?.cols.map((col, i) => (
+                                    <Collapse key={i} collapsed={true} header={
+                                        <span>
+                                            <img src="/icons/column.png" alt="icon" width="16" style={{ verticalAlign: "middle" }}/> {
+                                                col.name
+                                            } <span className="color-muted small">- { col.meta?.display || col.description || "No description provided" }</span>
+                                            </span>
+                                    }>
+                                        <div className="mt-05 mb-1 ml-2">
+                                            { col.meta?.datatype && <div className="mb-05">
+                                                <label>FHIR Type:</label> { col.meta.datatype }
+                                            </div>}
+                                            <div className="mb-05">
+                                                <label>Data Type:</label> <span className={col.dataType}>
+                                                    { col.dataType }
+                                                </span>
+                                            </div>
+                                            { col.meta?.system && <div className="mb-05">
+                                                <label>System:</label> { col.meta.system }
+                                            </div>}
+                                            { col.meta?.values && <div className="mb-05">
+                                                <label>Values:</label> <CoddingValuesTable values={col.meta.values} />
+                                            </div> }
+                                        </div>
+                                    </Collapse>
+                                )) :
+                                <p className="col col-10 color-muted">No data available yet</p>
+                            }
+                        </tbody>
+                    </table>
                     <br/>
                     { model.requestedData && <div className="mt-2">
                         <Collapse header="Requested Data" collapsed>
@@ -213,8 +249,21 @@ export default function DataRequestView(): JSX.Element
                     { model.completed && <><h5>Dependent Views</h5>
                     <hr/>
                     <ViewsBrowser layout="column" requestId={ model.id } />
-                    <br/>
                     </> }
+                    { model.transmissions && (
+                        <>
+                            <h5 className="mt-3">Data Transmissions</h5>
+                            <hr/>
+                            <div className="row gap">
+                                <div className="col mt-1 mb-1">
+                                    <TransmissionView
+                                        sites={ model.requestedData?.dataSites || [] }
+                                        transmissions={ model.transmissions }
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
                     {/* <h5 className="grey-out">Healthcare Sites</h5> */}
                     {/* <SimpleMap center={{ lat: 42.346710208505826, lng: -71.08435192324642 }} zoom={10} /> */}
                     {/* <img src={ map } alt="Sites Map" className="grey-out" /> */}
@@ -242,5 +291,42 @@ export default function DataRequestView(): JSX.Element
                 }
             </div>
         </div>
+    )
+}
+
+function CoddingValuesTable({
+    values
+}: {
+    values: {
+        code   : string
+        display: string
+        system?: string
+    }[]
+})
+{
+    const limit = 10;
+    const remainder = Math.max(values.length - limit, 0);
+    const rows = remainder ? values.slice(0, limit) : values;
+    return (
+        <table className="small nowrap">
+            <tr className="color-muted">
+                <th>Code</th>
+                <th>Display</th>
+                <th>{ rows.some(v => !!v.system) && "System" }</th>
+            </tr>
+            { rows.map((x, i) => (
+                <tr key={i}>
+                    <td className="color-green nowrap"><b>{ x.code }</b></td>
+                    <td>{ x.display }</td>
+                    <td>{ x.system && <a href={x.system} target="_blank" rel="noopener" className="link">{x.system.split("/").pop()}</a> }</td>
+                </tr>
+            )) }
+            { remainder > 0 && <tr>
+                <td colSpan={3}>
+                    <hr style={{ height: 1 }} />
+                    <div className="color-muted">{remainder} more values not shown...</div>
+                </td>
+            </tr>}
+        </table>
     )
 }
