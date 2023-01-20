@@ -318,7 +318,7 @@ function CoddingValuesTable({
                 <tr key={i}>
                     <td className="color-green nowrap"><b>{ x.code }</b></td>
                     <td>{ x.display }</td>
-                    <td>{ x.system && <a href={x.system} target="_blank" rel="noopener" className="link">{x.system.split("/").pop()}</a> }</td>
+                    <td>{ x.system && <a href={x.system} target="_blank" rel="noreferrer noopener" className="link">{x.system.split("/").pop()}</a> }</td>
                 </tr>
             )) }
             { remainder > 0 && <tr>
