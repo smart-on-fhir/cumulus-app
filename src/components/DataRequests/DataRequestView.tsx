@@ -173,6 +173,10 @@ export default function DataRequestView(): JSX.Element
                                         }</td>
                                     </tr>
                                 )}
+                                { model.metadata?.total && <tr>
+                                    <th className="right pr-1 pl-1">Total rows:</th>
+                                    <td>{ Number(model.metadata.total).toLocaleString()}</td>
+                                </tr>}
                             </tbody>
                         </table>
                     </div>
