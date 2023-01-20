@@ -14,6 +14,7 @@ import { AlertError }             from "../generic/Alert"
 import { classList }              from "../../utils"
 import Tag                        from "../Tags/Tag"
 import TransmissionView           from "./Transmissions/TransmissionView"
+import Collapse                   from "../generic/Collapse"
 
 // import GoogleMapReact from "google-map-react"
 
@@ -181,77 +182,32 @@ export default function DataRequestView(): JSX.Element
                         </table>
                     </div>
 
-                    { model.transmissions && (
-                        <>
-                            <h5 className="mt-3">Data Transmissions</h5>
-                            <hr/>
-                            <div className="row gap">
-                                <div className="col mt-1 mb-1">
-                                    <TransmissionView
-                                        sites={ model.requestedData?.dataSites || [] }
-                                        transmissions={ model.transmissions }
-                                    />
-                                </div>
-                            </div>
-                        </>
-                    )}
-
-                    { model.requestedData && <>
-                        <h5 className="mt-3">Requested Data</h5>
-                        <hr/>
-                        <div className="row mt-1">
-                            <div className="col">
-                                <label>Demographics</label>
-                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "age"        ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Age</div>
-                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "cdcAgeGroup") ? " fa-square-check color-blue" : " fa-square grey-out") } /> CDC Age Group</div>
-                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "race"       ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Race</div>
-                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "ethnicity"  ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Ethnicity</div>
-                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "deceased"   ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Deceased</div>
-                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "zip"        ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> ZIP Code</div>
-                                <div><i className={ "fa-regular" + (demographics.find(x => x.name === "gender"     ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Gender</div>
-                            </div>
-                            <div className="col">
-                                <label>Other</label>
-                                <div><b className={ "badge" + (labs.length          ? " bg-blue" : " grey-out") }>{ labs.length          }</b> Labs</div>
-                                <div><b className={ "badge" + (diagnoses.length     ? " bg-blue" : " grey-out") }>{ diagnoses.length     }</b> Diagnoses</div>
-                                <div><b className={ "badge" + (immunizations.length ? " bg-blue" : " grey-out") }>{ immunizations.length }</b> Immunizations</div>
-                                <div><b className={ "badge" + (medications.length   ? " bg-blue" : " grey-out") }>{ medications.length   }</b> Medications</div>
-                                <div><b className={ "badge" + (procedures.length    ? " bg-blue" : " grey-out") }>{ procedures.length    }</b> Procedures</div>
-                                <div><b className={ "badge" + (phenotypes.length    ? " bg-blue" : " grey-out") }>{ phenotypes.length    }</b> Computable Phenotypes</div>
-                            </div>
-                        </div>
-                        {/* <div className="row mt-1">
-                            <div className="col">
-                                <label>Healthcare Sites</label>
-                                { requestedData.dataSites.map((item, i) => (
-                                    <div key={i}><i className="fa-regular fa-square-check color-blue icon" /> { item.name || item.label }</div>
-                                )) }
-                            </div>
-                        </div> */}
-                    </> }
-                    <h5 className="mt-3">Included Fields</h5>
-                    <hr/>
-                    <div className="row gap">
-                    { model.data ? model.data.cols.map((col, i) => (
-                        <div className="col col-5 mb-1 mt-1" key={i}>
-                            <div>
-                                <label>{ col.label || col.name }</label> <span className="small color-muted">
-                                    (<span className={col.dataType}>{ col.dataType }</span>)
-                                </span>
-                                {/* <div className="small color-muted">
-                                    <i>Label: </i>{ col.label }                    
-                                </div> */}
-                                { col.label !== col.name && <div className="small color-muted">
-                                    <i>Column name: </i><b>{ col.name }</b>
-                                </div> }
-                                <div className="small color-muted">
-                                    <i>Description: </i>{ col.description || "No description provided"}
-                                </div>
-                            </div>
-                        </div>
-                    )) : <p className="col col-10 color-muted">No data available yet</p> }
-                    </div>
                     <br/>
+                    { model.requestedData && <div className="mt-2">
+                        <Collapse header="Requested Data" collapsed>
+                            <div className="row mt-1">
+                                <div className="col">
+                                    <label>Demographics</label>
+                                    <div><i className={ "fa-regular" + (demographics.find(x => x.name === "age"        ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Age</div>
+                                    <div><i className={ "fa-regular" + (demographics.find(x => x.name === "cdcAgeGroup") ? " fa-square-check color-blue" : " fa-square grey-out") } /> CDC Age Group</div>
+                                    <div><i className={ "fa-regular" + (demographics.find(x => x.name === "race"       ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Race</div>
+                                    <div><i className={ "fa-regular" + (demographics.find(x => x.name === "ethnicity"  ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Ethnicity</div>
+                                    <div><i className={ "fa-regular" + (demographics.find(x => x.name === "deceased"   ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Deceased</div>
+                                    <div><i className={ "fa-regular" + (demographics.find(x => x.name === "zip"        ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> ZIP Code</div>
+                                    <div><i className={ "fa-regular" + (demographics.find(x => x.name === "gender"     ) ? " fa-square-check color-blue" : " fa-square grey-out") } /> Gender</div>
+                                </div>
+                                <div className="col">
+                                    <label>Other</label>
+                                    <div><b className={ "badge" + (labs.length          ? " bg-blue" : " grey-out") }>{ labs.length          }</b> Labs</div>
+                                    <div><b className={ "badge" + (diagnoses.length     ? " bg-blue" : " grey-out") }>{ diagnoses.length     }</b> Diagnoses</div>
+                                    <div><b className={ "badge" + (immunizations.length ? " bg-blue" : " grey-out") }>{ immunizations.length }</b> Immunizations</div>
+                                    <div><b className={ "badge" + (medications.length   ? " bg-blue" : " grey-out") }>{ medications.length   }</b> Medications</div>
+                                    <div><b className={ "badge" + (procedures.length    ? " bg-blue" : " grey-out") }>{ procedures.length    }</b> Procedures</div>
+                                    <div><b className={ "badge" + (phenotypes.length    ? " bg-blue" : " grey-out") }>{ phenotypes.length    }</b> Computable Phenotypes</div>
+                                </div>
+                            </div>
+                        </Collapse>
+                    </div> }
                 </div>
                 <div className="col col-4 responsive" style={{ minWidth: "20rem" }}>
                     { model.completed && <><h5>Dependent Views</h5>
