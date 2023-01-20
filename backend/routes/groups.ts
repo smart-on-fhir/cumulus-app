@@ -100,7 +100,7 @@ route(router, {
                 ]
             })
         }
-        const model = await Model.findByPk(req.params.id, { include });
+        const model = await Model.findByPk(+req.params.id, { include });
         assert(model, HttpError.NotFound);
         res.json(model)
     }

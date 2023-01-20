@@ -33,7 +33,7 @@ export default function RequestGroupList()
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((row, i) => (
+                    {data.filter((g: any) => !!g.id).map((row, i) => (
                         <tr key={i}>
                             <td>{row.id}</td>
                             <td><Link title={row.name} to={"./" + row.id} className="link">{row.name}</Link></td>
