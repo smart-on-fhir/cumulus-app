@@ -208,6 +208,8 @@ declare module app {
          */
         dataType: supportedDataType
 
+        meta?: any
+
     }
 
     type supportedDataType = "string" | "integer" | "float" | "boolean" | "date:YYYY-MM-DD" | "date:YYYY-MM" | "date:YYYY"

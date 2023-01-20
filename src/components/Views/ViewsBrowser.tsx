@@ -103,7 +103,7 @@ export default function ViewsBrowser({
                         </div>
                     </Link>
                 }
-                { !result?.length ? <p className="color-muted pt-2 pb-2">No Views found!</p> : (result || []).map((v, i) => (
+                { !!result?.length && (result || []).map((v, i) => (
                         <ViewThumbnail
                             key={i}
                             view={ v }
