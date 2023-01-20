@@ -7,7 +7,7 @@ import { request }                from "../../backend"
 import { useBackend }             from "../../hooks"
 import Breadcrumbs                from "../generic/Breadcrumbs"
 import { Format }                 from "../Format"
-import map                        from "../Home/map.png"
+// import map                        from "../Home/map.png"
 import ViewsBrowser               from "../Views/ViewsBrowser"
 import Loader                     from "../generic/Loader"
 import { AlertError }             from "../generic/Alert"
@@ -255,9 +255,10 @@ export default function DataRequestView(): JSX.Element
                     <ViewsBrowser layout="column" requestId={ model.id } />
                     <br/>
                     </> }
-                    <h5 className="grey-out">Healthcare Sites</h5>
+                    {/* <h5 className="grey-out">Healthcare Sites</h5> */}
                     {/* <SimpleMap center={{ lat: 42.346710208505826, lng: -71.08435192324642 }} zoom={10} /> */}
-                    <img src={ map } alt="Sites Map" className="grey-out" />
+                    {/* <img src={ map } alt="Sites Map" className="grey-out" /> */}
+                    <br/>
                 </div>
             </div>
             <hr className="center mt-1"/>
