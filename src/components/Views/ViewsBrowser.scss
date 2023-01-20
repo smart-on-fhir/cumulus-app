@@ -217,6 +217,7 @@
 
 .view-browser.nested {
     grid-template-columns: 1fr;
-    min-height: 200px;
+    max-height: 375px; // 112px * count
+    overflow: auto;
 }
 
