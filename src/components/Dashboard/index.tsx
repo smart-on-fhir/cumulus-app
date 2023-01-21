@@ -148,7 +148,7 @@ function isTurbo(primaryData: app.ServerResponses.DataResponse, secondaryData?: 
     let out = false
 
     if (!primaryData.stratifier) {
-        out = primaryData.data[0].rows.length > TURBO_THRESHOLD
+        out = primaryData.data?.[0]?.rows?.length > TURBO_THRESHOLD
     } else {
         out = (primaryData as app.ServerResponses.StratifiedDataResponse).data.some(g => g.rows.length > TURBO_THRESHOLD)
     }
