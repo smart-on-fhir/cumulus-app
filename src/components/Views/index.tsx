@@ -68,7 +68,7 @@ export default function Views()
                 <div className="col col-3 mb-05 right responsive">
                     <input
                         type="search"
-                        placeholder="Search Views by Name"
+                        placeholder="Search Graphs by Name"
                         value={search}
                         onChange={e => onSearch(e.target.value)}
                     />

@@ -246,7 +246,7 @@ export default function DataRequestView(): JSX.Element
                     </div> }
                 </div>
                 <div className="col col-4 responsive" style={{ minWidth: "20rem" }}>
-                    { model.completed && <><h5>Dependent Views</h5>
+                    { model.completed && <><h5>Dependent Graphs</h5>
                     <hr/>
                     <ViewsBrowser layout="column" requestId={ model.id } />
                     </> }
