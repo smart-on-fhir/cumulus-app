@@ -238,7 +238,7 @@ route(router, {
                 in: ['body'],
                 isLength: {
                     options: {
-                        max: 100
+                        max: 500
                     }
                 }
             },

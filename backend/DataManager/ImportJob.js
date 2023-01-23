@@ -127,10 +127,12 @@ class ImportJob
 
         try {
         
-            await pipeline(req, new Text2Lines(), new Line2CSV(), csv2db).catch(err => {
-                // @ts-ignore
-                throw new Error(err.original ? err.original.detail || err.message : err.message)
-            });
+            await pipeline(req, new Text2Lines(), new Line2CSV(), csv2db)
+            
+            // .catch(err => {
+            //     // @ts-ignore
+            //     throw new Error(err.original ? err.original.detail || err.message : err.message)
+            // });
 
             this.columnNames = csv2db.columnNames
 
