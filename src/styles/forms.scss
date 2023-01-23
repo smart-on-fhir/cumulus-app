@@ -367,13 +367,13 @@ select option.empty-option {
             color: mix($color-blue, #000, 50%)
         }
 
-        &:first-of-type {
+        &:first-child {
             border-top-left-radius: $border-radius;
             border-bottom-left-radius: $border-radius;
             margin-left: 1px;
         }
 
-        &:last-of-type {
+        &:last-child {
             border-top-right-radius: $border-radius;
             border-bottom-right-radius: $border-radius;
         }
