@@ -245,7 +245,11 @@ export default function Dashboard({
         // Which is the active tab in the data view
         dataTabIndex: 0,
 
-        tags: view.Tags || []
+        tags: (view.Tags || []).map(tag => {
+            // @ts-ignore
+            if (copy) delete tag.ViewsTags
+            return tag
+        })
 
     } as ViewState, initViewState);
 

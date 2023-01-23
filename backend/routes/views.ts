@@ -268,7 +268,7 @@ route(router, {
     async handler(req: AppRequest, res: Response) {
         const model = await Model.create(req.body)
         if (Array.isArray(req.body.Tags)) {
-            await model.setTags(req.body.Tags)
+            await model.setTags(req.body.Tags.map(t => t.id))
             await model.reload({ include: [{ association: "Tags" }] })
         }
         res.json(model)
