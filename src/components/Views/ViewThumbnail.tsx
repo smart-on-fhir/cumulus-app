@@ -13,7 +13,9 @@ export default function ViewThumbnail({
 }) {
     return (
         <Link to={ "/views/" + view.id } className="view-thumbnail" title={ showDescription ? undefined : view.description || undefined }>
-            <div className="view-thumbnail-image" style={{ backgroundImage: `url('${(process.env.REACT_APP_BACKEND_HOST || "")}/api/views/${ view.id }/screenshot` }}/>
+            <div className="view-thumbnail-image" style={{
+                backgroundImage: `url('${(process.env.REACT_APP_BACKEND_HOST || "")}/api/views/${ view.id }/screenshot?v=${+new Date(view.updatedAt!)}` }}
+            />
             <div className="view-thumbnail-title">
                 
                 <span dangerouslySetInnerHTML={{ __html: search ? highlight(view.name, search) : view.name }}/>

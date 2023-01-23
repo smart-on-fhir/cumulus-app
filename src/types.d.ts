@@ -63,6 +63,8 @@ declare module app {
         settings?: ViewSettings
         Tags?: Pick<Tag, "id" | "name" | "description">[]
         DataRequest?: Pick<DataRequest, "id" | "name">
+        createdAt?: Date
+        updatedAt?: Date
     }
 
     interface ViewSettings {
