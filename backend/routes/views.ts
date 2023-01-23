@@ -1,6 +1,7 @@
 import Path                              from "path"
 import { Response, Router }              from "express"
 import { FindOptions }                   from "sequelize"
+import crypto                            from "crypto"
 import { AppRequest }                    from ".."
 import { NotFound, InternalServerError, HttpError } from "../errors"
 import Model                             from "../db/models/View"
@@ -339,7 +340,19 @@ route(router, {
 
         const file = Buffer.from(match[2], "base64");
 
-        res.append("Last-Modified" , new Date(model.updatedAt).toUTCString());
+        const cacheKey = crypto.createHash("sha1").update(file).digest("hex");
+
+        res.setHeader('Cache-Control', `max-age=31536000, no-cache`)
+        res.setHeader('Vary', 'Origin, ETag')
+        res.setHeader('ETag', cacheKey)
+
+        let ifNoneMatchValue = req.headers['if-none-match']
+        if (ifNoneMatchValue && ifNoneMatchValue === cacheKey) {
+            res.statusCode = 304
+            return res.end()
+        }
+
+        // res.append("Last-Modified" , new Date(model.updatedAt).toUTCString());
         res.append("Content-Type"  , match[1])
         res.append("Content-Length", file.length + "")
 
