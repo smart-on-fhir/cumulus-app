@@ -28,7 +28,7 @@ describe("Graphs", () => {
                 description: "Record description",
                 DataRequestId: 1,
                 settings: {},
-                Tags: [1]
+                Tags: [{ id: 1 }]
             }
         )
     })
