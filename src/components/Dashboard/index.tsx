@@ -162,7 +162,8 @@ function isTurbo(primaryData: app.ServerResponses.DataResponse, secondaryData?: 
 
 export default function Dashboard({
     view,
-    dataRequest
+    dataRequest,
+    copy
 }: {
     /**
      * The view object that we are editing. If this is an empty object
@@ -175,7 +176,9 @@ export default function Dashboard({
      * The data subscription that this view is (or is going to be)
      * assigned to.
      */
-    dataRequest: app.DataRequest
+    dataRequest: app.DataRequest,
+    
+    copy?: boolean
 }) {
 
     const navigate = useNavigate();
@@ -463,6 +466,16 @@ export default function Dashboard({
 
     useEffect(() => { loadData() }, [loadData])
 
+    useEffect(() => {
+        if (copy) {
+            const el = document.getElementById("view-name") as HTMLTextAreaElement;
+            if (el) {
+                el.focus()
+                el.select()
+            }
+        }
+    }, [copy])
+
     const turbo = data && isTurbo(data, data2);
 
     function annotatePoints(chart: Chart) {
@@ -588,6 +601,7 @@ export default function Dashboard({
                                 maxLength={100}
                                 text={state.viewName}
                                 onChange={ viewName => dispatch({ type: "UPDATE", payload: { viewName }}) }
+                                id="view-name"
                             />
                         </h2>
                         <hr/>
@@ -626,12 +640,17 @@ export default function Dashboard({
                                         title="Save Changes">
                                         <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
                                     </button>
+                                    { view.id && <Link
+                                        to={`/views/${view.id}/copy`}
+                                        className="btn"
+                                        title="Create a copy of this chart to modify and save it later"
+                                    ><i className="fa-regular fa-copy" /></Link> }
                                     <button
                                         className="btn"
                                         onClick={ destroy }
                                         title="Delete this View"
                                         disabled={!view.id || !isAdmin}>
-                                        <i className={ deleting ? "fas fa-circle-notch fa-spin" : "fas fa-trash-alt" } /> Delete
+                                        <i className={ deleting ? "fas fa-circle-notch fa-spin" : "fas fa-trash-alt" } />
                                     </button>
                                     <button
                                         className="btn"
@@ -686,10 +705,18 @@ export default function Dashboard({
                                     icon: <i className="fas fa-trash-alt color-red" />
                                 },
                                 {
+                                    label: "Copy Chart",
+                                    enabled: !!view.id && auth!.user?.permissions?.includes("Views.create"),
+                                    icon: <i className="fa-regular fa-copy color-blue-dark" />,
+                                    command: () => navigate(`/views/${view.id}/copy`),
+                                    title: "Create a copy of this chart to modify and save it later"
+                                },
+                                {
                                     label: "Update Graph Thumbnail",
                                     command: takeScreenshot,
                                     enabled: !!view.id,
-                                    icon: <i className="fa-solid fa-camera color-orange" />
+                                    icon: <i className="fa-solid fa-camera color-orange" />,
+                                    title: "Take new screenshot of this graph as it currently looks"
                                 },
                                 {
                                     label: showOptions ? "Hide Chart Options" : "Show Chart Options",

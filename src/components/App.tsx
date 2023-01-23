@@ -39,6 +39,7 @@ export default function App()
                                     <Route path=":id">
                                         <Route index               element={ <RequireAuth><EditView /></RequireAuth> } />
                                         <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />
+                                        <Route path="copy"         element={ <RequireAuth><EditView copy /></RequireAuth> } />
                                     </Route>
                                 </Route>
 

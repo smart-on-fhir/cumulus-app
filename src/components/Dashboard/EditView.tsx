@@ -7,7 +7,7 @@ import { AlertError }  from "../generic/Alert";
 import Breadcrumbs     from "../generic/Breadcrumbs";
 import Loader          from "../generic/Loader";
 
-export default function EditView()
+export default function EditView({ copy }: { copy?: boolean })
 {
     // The subscription ID from the URL params
     const { id } = useParams()
@@ -47,7 +47,11 @@ export default function EditView()
                 { name: "Graphs", href: "/views" },
                 { name: result.view.name }
             ]}/>
-            <Dashboard view={ result.view } dataRequest={result.request} />
+            <Dashboard key={ copy ? "copy" : result.view.id } copy={copy} view={{
+                ...result.view,
+                name: copy ? result.view.name.replace(/(\s*\(copy\)\s*)?$/, " (copy)") : result.view.name,
+                id: copy ? undefined : result.view.id
+            }} dataRequest={result.request} />
         </div>
     )
 }
