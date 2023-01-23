@@ -294,16 +294,22 @@ export default function DataRequestView(): JSX.Element
     )
 }
 
+interface CoddingValue {
+    code   : string
+    display: string
+    system?: string
+}
+
 function CoddingValuesTable({
     values
 }: {
-    values: {
-        code   : string
-        display: string
-        system?: string
-    }[]
+    values: CoddingValue | CoddingValue[]
 })
 {
+    if (!Array.isArray(values)) {
+        return <CoddingValueTable value={values} />
+    }
+
     const limit = 10;
     const remainder = Math.max(values.length - limit, 0);
     const rows = remainder ? values.slice(0, limit) : values;
@@ -327,6 +333,27 @@ function CoddingValuesTable({
                     <div className="color-muted">{remainder} more values not shown...</div>
                 </td>
             </tr>}
+        </table>
+    )
+}
+
+function CoddingValueTable({ value }: { value: CoddingValue })
+{
+    return (
+        <table className="small nowrap">
+            <tr className="color-muted">
+                <th>Code</th>
+                <th>Display</th>
+                <th>{ !!value.system && "System" }</th>
+            </tr>
+            <tr>
+                <td className="color-green nowrap"><b>{ value.code }</b></td>
+                <td>{ value.display }</td>
+                <td>{
+                    value.system &&
+                    <a href={value.system} target="_blank" rel="noreferrer noopener" className="link">{value.system.split("/").pop()}</a>
+                }</td>
+            </tr>
         </table>
     )
 }
