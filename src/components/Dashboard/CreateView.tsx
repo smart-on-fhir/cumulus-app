@@ -39,7 +39,7 @@ export default function CreateView()
         <div className="container">
             <Breadcrumbs links={[
                 { name: "Home" , href: "/" },
-                { name: "Create New View" }
+                { name: "Create New Graph" }
             ]}/>
             <Dashboard view={{}} dataRequest={result as app.DataRequest} />
         </div>

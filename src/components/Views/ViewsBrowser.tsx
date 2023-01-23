@@ -60,11 +60,11 @@ export default function ViewsBrowser({
     );
 
     if (loading) {
-        return <Loader msg="Loading views..." />
+        return <Loader msg="Loading graphs..." />
     }
 
     if (error) {
-        return <AlertError><b>Error loading views</b>: { error + "" }</AlertError>
+        return <AlertError><b>Error loading graphs</b>: { error + "" }</AlertError>
     }
 
     result = result || [];
@@ -95,7 +95,7 @@ export default function ViewsBrowser({
                             </div>
                         </div>
                         <div className="view-thumbnail-title color-blue">
-                            Create New View
+                            Create New Graph
                             <div className="view-thumbnail-description grey-out" style={{ whiteSpace: "normal"}}>
                                 Click here to create new view from the data provided
                                 by this data subscription

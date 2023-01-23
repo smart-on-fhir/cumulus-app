@@ -39,12 +39,12 @@ export default function Home() {
             </HelmetProvider>
             <div className="row gap middle" style={{ marginTop: "-1em", padding: "6px 0 4px 0" }}>
                 <div className="col col-0">
-                    <h4 className="m-0">Browse Views</h4>
+                    <h4 className="m-0">Browse Graphs</h4>
                 </div>
                 <div className="col center">
                     <input
                         type="search"
-                        placeholder="Search Views by Name"
+                        placeholder="Search Graphs by Name"
                         value={search}
                         onChange={e => onSearch(e.target.value)}
                     />

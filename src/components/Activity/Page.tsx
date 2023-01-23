@@ -103,7 +103,7 @@ export default class ActivityPage extends Component<any, State>
                                 <i className="fa-solid fa-database"/> Data Subscriptions
                             </button>
                             <button className={"btn"+(tags.views ? " active" : "")} onClick={() => this.tag("views")}>
-                                <i className="fa-solid fa-chart-pie" /> Views
+                                <i className="fa-solid fa-chart-pie" /> Graphs
                             </button>
                             <button className={"btn"+(tags.auth ? " active" : "")} onClick={() => this.tag("auth")}>
                                 <i className="fa-solid fa-user-shield" /> Authentication

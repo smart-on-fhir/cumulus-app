@@ -195,7 +195,7 @@ export default function Dashboard({
         showOptions: !view.id,
 
         // View name
-        viewName: view.name || "Untitled View",
+        viewName: view.name || "Untitled Graph",
 
         // View description
         viewDescription: view.description || "",
@@ -307,7 +307,7 @@ export default function Dashboard({
     const { execute: save, loading: saving } = useBackend(async () => {
         
         if (!isAdmin) {
-            return alert("You don't have permission to save views")
+            return alert("You don't have permission to save graphs")
         }
 
         const screenShot = viewType === "overview" ?

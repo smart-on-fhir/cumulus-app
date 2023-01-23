@@ -32,7 +32,7 @@ export default function EditView()
 
     // If the subscription failed to load exit with an error message
     if (error) {
-        return <AlertError>{`Error fetching view with id "${id}": ${error}`}</AlertError>
+        return <AlertError>{`Error fetching graph with id "${id}": ${error}`}</AlertError>
     }
 
      // If the subscription request was successful but did not return the expected data exit with an error message

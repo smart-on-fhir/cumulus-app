@@ -66,7 +66,7 @@ export default function EditDataRequestForm()
         useCallback(
             async () => {
                 if (window.confirm(
-                    "Deleting this subscription will also delete all the views " +
+                    "Deleting this subscription will also delete all the graphs " +
                     "associated with it! Are you sure?")) {
                     deleteOne("requests", id + "").then(() => setDeleted(true))
                 }
