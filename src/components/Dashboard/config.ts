@@ -55,7 +55,7 @@ export const DEFAULT_COLORS = generateColors(36)
 // These are computed at runtime and will not be saved on the server
 export const ReadOnlyPaths = [
     "exporting",
-    "plotOptions",
+    // "plotOptions",
     "tooltip",
     "chart.marginTop",
     "chart.type",
@@ -69,6 +69,7 @@ export const ReadOnlyPaths = [
     "yAxis.allowDecimals",
     "yAxis.labels.format",
     "plotOptions.series.animation.easing",
+    "plotOptions.series.events.legendItemClick",
     "plotOptions.pie.dataLabels.formatter",
     "tooltip.formatter",
     "xAxis.type",
