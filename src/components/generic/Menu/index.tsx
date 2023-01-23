@@ -11,6 +11,7 @@ export interface MenuItemConfig {
     available?: boolean | ((e: MouseEvent) => boolean)
     icon?: JSX.Element
     children?: MenuItemConfig[]
+    title?: string
 }
 
 export class ContextMenu extends React.Component
@@ -80,7 +81,7 @@ export class ContextMenu extends React.Component
                     }
 
                     if (!item.command) {
-                        return <div className="menu-header" key={i}>
+                        return <div className="menu-header" key={i} title={item.title}>
                             <span className="menu-item-icon">{ item.icon || "" }</span>
                             { item.label }
                         </div>
@@ -94,7 +95,7 @@ export class ContextMenu extends React.Component
                         "menu-item": true,
                         disabled: enabled === false,
                         selected: active === true
-                    })} key={i} onMouseDown={(ev) => {
+                    })} key={i} title={item.title} onMouseDown={(ev) => {
                         if (enabled !== false) {
                             ev.stopPropagation()
                             this.hideMenu()
