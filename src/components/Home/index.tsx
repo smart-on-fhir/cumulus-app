@@ -74,14 +74,14 @@ export default function Home() {
             <div className="row gap wrap">
                 <div className="col col-6 responsive">
                     <Panel
-                        title="Data Subscriptions"
+                        title="Subscriptions"
                         icon={<i className="fa-solid fa-database" style={{ color: "#999" }} />}
                         menu={[
-                            // <Link to="/requests">View All Data Subscriptions</Link>,
-                            <Link to="/requests">View All Data Subscriptions</Link>,
+                            // <Link to="/requests">View All Subscriptions</Link>,
+                            <Link to="/requests">View All Subscriptions</Link>,
                             (user?.role === "admin" ? "separator" : null),
-                            // (user?.role === "admin" ? <Link to="/requests/new">Create New Data Subscription</Link> : null),
-                            (user?.role === "admin" ? <Link to="/requests/new">Create New Data Subscription</Link> : null),
+                            // (user?.role === "admin" ? <Link to="/requests/new">Create New Subscription</Link> : null),
+                            (user?.role === "admin" ? <Link to="/requests/new">Create New Subscription</Link> : null),
                             // (user?.role === "admin" ? <Link to="/groups">Manage Subscription Groups</Link> : null)
                             (user?.role === "admin" ? <Link to="/groups">Manage Subscription Groups</Link> : null)
                         ]}

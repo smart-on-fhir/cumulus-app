@@ -91,7 +91,7 @@ function Subscriptions() {
         { (data: app.DataSite[]) => {
             return (
                 <div className="card subscriptions">
-                    <h4><i className="icon fa-solid fa-database" /> Data Subscriptions</h4>
+                    <h4><i className="icon fa-solid fa-database" /> Subscriptions</h4>
                     <hr/>
                     { data.map((item, i) => (
                         <li key={i}>

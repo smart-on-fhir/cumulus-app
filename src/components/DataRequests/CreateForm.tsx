@@ -61,15 +61,15 @@ export default function CreateDataRequestForm()
         <div className="container">
             <HelmetProvider>
                 <Helmet>
-                    <title>Create Data Subscription</title>
+                    <title>Create Subscription</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Data Subscriptions", href: "/requests" },
-                { name: "Create Data Subscription" }
+                { name: "Subscriptions", href: "/requests" },
+                { name: "Create Subscription" }
             ]} />
-            <h3>Create Data Subscription</h3>
+            <h3>Create Subscription</h3>
             <hr/>
             <div className="row gap color-muted small">
                 <div className="col">

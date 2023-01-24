@@ -54,7 +54,7 @@ export default function View() {
                     <hr/>
                     { data.subscriptions?.length ?
                         <>
-                            <p className="color-muted">This tag is assigned to the following data subscriptions:</p>
+                            <p className="color-muted">This tag is assigned to the following subscriptions:</p>
                             <div className="link-list mt-05">
                             { data.subscriptions.map((s, i) => (
                                 // @ts-ignore
@@ -63,9 +63,9 @@ export default function View() {
                             </div>
                         </> :
                         <>
-                            <p className="color-brand-2">This tag is not assigned with any data subscriptions</p>
+                            <p className="color-brand-2">This tag is not assigned with any subscriptions</p>
                             <br/>
-                            <Link to="/requests" className="link">Browse all data subscriptions</Link>
+                            <Link to="/requests" className="link">Browse all subscriptions</Link>
                         </>
                         
                     }

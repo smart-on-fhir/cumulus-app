@@ -279,7 +279,7 @@ export default function DataRequestForm({
                         value={ name || "" }
                         onChange={e => onChange({ ...record, name: e.target.value })}
                         name="DataRequestName"
-                        placeholder="Data Subscription Name"
+                        placeholder="Subscription Name"
                         required
                     />
                     <div className="row gap mt-1">
@@ -376,7 +376,7 @@ export default function DataRequestForm({
                                 <div className="col"/>
                             </> :
                             <div className="col">
-                                You can upload data once this data subscription is saved 
+                                You can upload data once this subscription is saved 
                             </div> :
                         null
                 }

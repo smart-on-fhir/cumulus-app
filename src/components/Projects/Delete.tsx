@@ -30,12 +30,12 @@ export default function Delete()
                     <div className="col col-4 mb-2 responsive">
                         <h6>
                             <i className="fa-solid fa-link-slash color-brand-2" />
-                            <span className="color-muted"> Linked Data Subscriptions</span>
+                            <span className="color-muted"> Linked Subscriptions</span>
                         </h6>
                         <hr className="mb-05"/>
                         { data.Subscriptions?.length ?
                             <>
-                                <div className="color-muted mb-05">These data subscriptions will no longer be linked to this study area:</div>
+                                <div className="color-muted mb-05">These subscriptions will no longer be linked to this study area:</div>
                                 <div className="link-list">
                                     { data.Subscriptions?.map((s, i) => (
                                         <DataRequestLink key={i} request={s} href={"/requests/" + s.id}/>

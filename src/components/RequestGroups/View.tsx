@@ -33,7 +33,7 @@ export default function RequestGroupView()
                     { data.requests && data.requests.length ?
                         <>
                             <h6 className="color-brand-2">
-                                <i className="fa-solid fa-link color-brand-2" /> Associated Data Subscriptions
+                                <i className="fa-solid fa-link color-brand-2" /> Associated Subscriptions
                             </h6>
                             <hr/>
                             <Grid gap="0 1rem" cols="22em" className="link-list mt-05">{

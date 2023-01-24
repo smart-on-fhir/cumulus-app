@@ -79,7 +79,7 @@ export default function Navigation()
 
                 { canReadGraphs && <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" /> Graphs</NavLink> }
                 { canReadSites && <NavLink to="/sites"><i className="icon fa-solid fa-location-dot" /> Healthcare Sites</NavLink> }
-                { canReadSubscriptions && <NavLink to="/requests"><i className="icon fa-solid fa-database" /> Data Subscriptions</NavLink> }
+                { canReadSubscriptions && <NavLink to="/requests"><i className="icon fa-solid fa-database" /> Subscriptions</NavLink> }
                 { (canCreateGroups || canUpdateGroups) && <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Subscription Groups</NavLink> }
                 { canReadTags && <NavLink to="/tags"><i className="icon fa-solid fa-tag" /> Tags</NavLink> }
                 

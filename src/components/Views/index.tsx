@@ -97,7 +97,7 @@ export default function Views()
                                 checked={ groupBy === "subscription"}
                                 name="groupBy"
                                 type="radio"
-                                label="Group by Data Subscription"
+                                label="Group by Subscription"
                             />,
                             <Checkbox
                                 onChange={() => onSetGroupBy("tag")}
