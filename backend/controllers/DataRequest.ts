@@ -599,8 +599,8 @@ route(router, {
                     }
                 },
                 custom: {
-                    options: x => x.length <= 50,
-                    errorMessage: "The name cannot be longer than 50 characters"
+                    options: x => x.length <= 100,
+                    errorMessage: "The name cannot be longer than 100 characters"
                 }
             },
             description: {
