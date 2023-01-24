@@ -173,7 +173,7 @@ export default function Dashboard({
     view: Partial<app.View>
 
     /**
-     * The data subscription that this view is (or is going to be)
+     * The subscription that this view is (or is going to be)
      * assigned to.
      */
     dataRequest: app.DataRequest,

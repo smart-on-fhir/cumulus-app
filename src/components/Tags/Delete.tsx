@@ -47,7 +47,7 @@ export default function Delete()
                         { data.subscriptions!.length &&
                             <div className="col col-5 responsive">
                                 <h6>
-                                    <i className="fa-solid fa-link-slash color-brand-2" /> This tag will be removed from the following data subscriptions:
+                                    <i className="fa-solid fa-link-slash color-brand-2" /> This tag will be removed from the following subscriptions:
                                 </h6>
                                 <hr/>
                                 <div className="link-list mt-05">

@@ -600,7 +600,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
         if (requestError) {
             return (
                 <AlertError>
-                    <b>Error Loading Data Subscription</b> - { requestError + "" }
+                    <b>Error Loading Subscription</b> - { requestError + "" }
                 </AlertError>
             )
         }
@@ -608,7 +608,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
         if (!requestResult) {
             return (
                 <AlertError>
-                    <b>Error Loading Data Subscription</b> - Failed to fetch data
+                    <b>Error Loading Subscription</b> - Failed to fetch data
                 </AlertError>
             )
         }
@@ -635,7 +635,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
                 </HelmetProvider>
                 <Breadcrumbs links={[
                     { name: "Home", href: "/" },
-                    { name: "Data Subscriptions", href: "/requests" },
+                    { name: "Subscriptions", href: "/requests" },
                     { name: requestResult.name, href: `/requests/${requestResult.id}` },
                     { name: "Edit Subscription", href: `/requests/${requestResult.id}/edit` },
                     { name: "Import Data" }

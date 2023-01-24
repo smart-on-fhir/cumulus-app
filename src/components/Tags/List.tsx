@@ -28,7 +28,7 @@ export default function List()
 
             return <>
                 <Alert color="blue" icon="fa-solid fa-info-circle">
-                    Tags can be used to classify things like graphs or data subscriptions.
+                    Tags can be used to classify things like graphs or subscriptions.
                     The Cumulus Dashboard can use the assigned tags for display purposes
                     like sorting, grouping, filtering and more.
                 </Alert>

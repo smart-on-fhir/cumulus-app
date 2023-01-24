@@ -98,7 +98,7 @@ export default function ViewsBrowser({
                             Create New Graph
                             <div className="view-thumbnail-description grey-out" style={{ whiteSpace: "normal"}}>
                                 Click here to create new view from the data provided
-                                by this data subscription
+                                by this subscription
                             </div>
                         </div>
                     </Link>

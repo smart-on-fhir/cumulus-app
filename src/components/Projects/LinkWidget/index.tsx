@@ -86,7 +86,7 @@ function SubscriptionGroup({
             <summary className={classList({
                 selected: false
             })}>
-                <label onMouseDown={() => toggle()} title="Click to automatically include/exclude all data subscriptions in this group">
+                <label onMouseDown={() => toggle()} title="Click to automatically include/exclude all subscriptions in this group">
                     <span className="icon material-symbols-rounded color-blue">{
                         isIndeterminate ?
                             "indeterminate_check_box" :

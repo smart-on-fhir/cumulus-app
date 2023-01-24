@@ -101,21 +101,21 @@ export default function EditDataRequestForm()
         <div className="container">
             <HelmetProvider>
                 <Helmet>
-                    <title>Edit Data Subscription</title>
+                    <title>Edit Subscription</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Data Subscriptions", href: "/requests" },
+                { name: "Subscriptions", href: "/requests" },
                 { name: state.name + "", href: `/requests/${state.id}` },
                 { name: "Edit Subscription" }
             ]}/>
             <div className="row middle">
                 <div className="col col-0">
-                    <h3>Edit Data Subscription</h3>
+                    <h3>Edit Subscription</h3>
                 </div>
                 <div className="col right color-muted small">
-                    { loading  && <Loader msg="Loading Data Subscription..." /> }
+                    { loading  && <Loader msg="Loading Subscription..." /> }
                     { saving   && <Loader msg="Saving..." /> }
                     { deleting && <Loader msg="Deleting..." /> }
                 </div>

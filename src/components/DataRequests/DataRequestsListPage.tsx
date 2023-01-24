@@ -25,31 +25,31 @@ export default function DataRequestsListPage()
     );
 
     if (loading) {
-        return <Loader msg="Loading Data Subscriptions..."/>
+        return <Loader msg="Loading Subscriptions..."/>
     }
 
     if (error) {
-        return <AlertError><b>Error Loading Data Subscriptions: </b>{ error + "" }</AlertError>
+        return <AlertError><b>Error Loading Subscriptions: </b>{ error + "" }</AlertError>
     }
 
     return (
         <div>
             <HelmetProvider>
                 <Helmet>
-                    <title>Data Subscriptions</title>
+                    <title>Subscriptions</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Data Subscriptions" }
+                { name: "Subscriptions" }
             ]} />
             <div className="row gap">
                 <div className="col middle">
-                    <h3><i className="icon fa-solid fa-database color-brand-2" /> Data Subscriptions</h3>
+                    <h3><i className="icon fa-solid fa-database color-brand-2" /> Subscriptions</h3>
                 </div>
                 { user?.permissions.includes("DataRequests.create") && (<div className="col col-0 middle">
                     <Link className="btn color-blue-dark btn-virtual" to="/requests/new">
-                        <b className="color-green"><i className="fa-solid fa-circle-plus" /> New Data Subscription</b>
+                        <b className="color-green"><i className="fa-solid fa-circle-plus" /> New Subscription</b>
                     </Link>
                 </div>) }
             </div>

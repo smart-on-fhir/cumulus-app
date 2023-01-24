@@ -109,12 +109,12 @@ export default function DataRequestView(): JSX.Element
         <div className="container">
             <HelmetProvider>
                 <Helmet>
-                    <title>Data Subscription: {model.name}</title>
+                    <title>Subscription: {model.name}</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Data Subscriptions", href: "/requests" },
+                { name: "Subscriptions", href: "/requests" },
                 { name: model.name }
             ]}/>
             <h3><i className="fas fa-database" /> { model.name }</h3>
@@ -287,7 +287,7 @@ export default function DataRequestView(): JSX.Element
                 { user?.role === "admin" && <Link
                     className="btn btn-blue pl-1 pr-1 mt-1 mb-1"
                     to={`/requests/${model.id}/edit`}
-                    ><b> Edit this Data Subscription </b></Link>
+                    ><b> Edit Subscription </b></Link>
                 }
             </div>
         </div>
