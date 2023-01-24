@@ -136,11 +136,17 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
     // Header ------------------------------------------------------------------
     res.write(colNames.join(delimiter));
 
+    
+    const countRow = await model.sequelize.query<any>(`SELECT COUNT(*) as "cnt" FROM "${table}"`, { type: QueryTypes.SELECT });
+    const total = +countRow[0].cnt
+    const limit = 1000
     // Rows --------------------------------------------------------------------
+
+
     async function loop(offset = 0) {
 
         const data = await model!.sequelize.query<any>(
-            `SELECT * FROM ${table} OFFSET ${offset} LIMIT 100`,
+            `SELECT * FROM ${table} OFFSET ${offset} LIMIT ${limit}`,
             { type: QueryTypes.SELECT }
         );
 
@@ -150,8 +156,9 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
             )
         });
 
-        if (offset + 100 < model!.metadata!.total) {
-            await loop(offset + 100)
+
+        if (offset + limit < total) {
+            await loop(offset + limit)
         } else {
             res.end()
         }
