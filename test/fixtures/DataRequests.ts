@@ -4,7 +4,13 @@ export default [
         name: 'Demo Data Subscription 1',
         description: 'Demo Data Subscription 1 description',
         refresh: 'manually',
-        metadata: {}
+        metadata: {
+            cols: [
+                {"name": "gender", "label": "Gender", "dataType": "string", "description": "Gender"},
+                {"name": "cnt", "label": "Cnt", "dataType": "integer", "description": "Cnt"}
+            ],
+            total: 3
+        }
     },
     {
         id: 2,

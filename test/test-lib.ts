@@ -1,15 +1,12 @@
-import { Server as HTTPServer } from "http"
-import { Express }              from "express-serve-static-core"
-import { expect }               from "chai"
-import { Sequelize }            from "sequelize"
-import main                     from "../backend/index"
-// import { ACL, roles }           from "../backend/acl"
-import Users                    from "./fixtures/Users"
-import { fixAutoIncrement }     from "../backend/lib"
+import { Server as HTTPServer }  from "http"
+import { Express }               from "express-serve-static-core"
+import { expect }                from "chai"
+import { Sequelize }             from "sequelize"
+import main                      from "../backend/index"
+import Users                     from "./fixtures/Users"
+import { fixAutoIncrement }      from "../backend/lib"
 import { getPermissionsForRole } from "../backend/acl"
 
-// type Action = keyof typeof ACL
-// type Role   = keyof typeof roles
 
 
 export const admin = Users.find(u => u.role === "admin")!

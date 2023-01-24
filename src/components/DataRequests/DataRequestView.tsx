@@ -273,7 +273,7 @@ export default function DataRequestView(): JSX.Element
             <hr className="center mt-1"/>
             <div className="center mt-1 mb-1">
                 <a
-                    aria-disabled={!model.data}
+                    aria-disabled={!model.metadata}
                     className="btn btn-blue pl-1 pr-1 mt-1 mb-1"
                     // https://smart-cumulus.herokuapp.com/requests/undefined/api/requests/10/data?format=csv
                     href={`${process.env.REACT_APP_BACKEND_HOST || ""}/api/requests/${id}/data?format=csv`}>

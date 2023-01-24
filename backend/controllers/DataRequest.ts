@@ -12,18 +12,18 @@ import { route }                                                  from "../lib/r
 import GroupModel                                                 from "../db/models/RequestGroup"
 import { requestPermission }                                      from "../acl"
 import ViewModel                                                  from "../db/models/View"
-import ColumnsMetadata                                            from  "../cumulus_library_columns.json"
+import ColumnsMetadata                                            from "../cumulus_library_columns.json"
+import createRestRoutes                                           from "./BaseController"
 const { requireAuth }  = require("./Auth");
-const createRestRoutes = require("./BaseController").default;
 const ImportJob        = require("../DataManager/ImportJob");
 const { logger }       = require("../logger");
-const {
+import {
     getFindOptions,
     assert,
     rw,
     parseDelimitedString,
     uInt
-} = require("../lib");
+} from "../lib"
 
 
 const router = module.exports = express.Router({ mergeParams: true });
@@ -100,9 +100,59 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
     requestPermission(req.user?.role || "guest", "DataRequests.export")
     const model = await Model.findByPk(req.params.id, getFindOptions(req))
     assert(model, "Model not found", NotFound)
-    const data = model.get("data")
-    const name = model.get("name")
-    exportData(data || { cols: [], rows: [] }, name, req, res)
+    assert(model.metadata, "Subscription data not found", NotFound)
+    const table = "subscription_data_" + req.params.id
+    const data = await model.sequelize.query<any>(`SELECT * FROM ${table}`, { type: QueryTypes.SELECT });
+
+    const fileName = model.get("name")
+    
+    const cols = model.metadata.cols;
+
+    // format ------------------------------------------------------------------
+    const format = String(req.query.format || "json");
+    if (!["csv","tsv","json"].includes(format)) {
+        throw new Error(`Unsupported format "${format}"`);
+    }
+
+    // Reply inline or download a file -----------------------------------------
+    if (req.query.inline) {
+        res.type("text/plain")
+    } else {
+        res.setHeader("Content-disposition", `attachment; filename=${slug(fileName)}.${format}`);
+        res.type(format)
+    }
+    
+    // cols --------------------------------------------------------------------
+    let colNames = String(req.query.cols || "").split(",").map(s => s.trim()).filter(Boolean);
+    if (!colNames.length) {
+        colNames = cols.map(c => c.name);
+    } else {
+        colNames = colNames.filter(x => cols.find(c => c.name === x));
+    }
+
+    res.status(200);
+
+
+    // Delimited ---------------------------------------------------------------
+    if (format === "csv" || format === "tsv") {
+
+        const delimiter = format === "tsv" ? "\t" : ",";
+        
+        let out = [colNames.join(delimiter)];
+
+        data.forEach(row => out.push(
+            colNames.map(name => row[name] === null ? "" : JSON.stringify(row[name])).join(delimiter)
+        ));
+
+        
+        return res.send(out.join("\n"));
+    }
+
+    // JSON --------------------------------------------------------------------
+    return res.json({
+        cols,
+        rows: data.map(row => cols.map(col => row[col.name]))
+    });
 }));
 
 // Refresh Data endpoint ------------------------------------------------------
@@ -202,20 +252,20 @@ router.put("/:id/data", rw(async (req, res) => {
 // Data API endpoint ----------------------------------------------------------
 router.get("/:id/api", rw(async (req, res) => {
 
-    /** @type {any} */
     const subscription = await Model.findByPk(req.params.id)
 
     assert(subscription, "Subscription not found", NotFound)
+    assert(subscription.metadata, "Subscription data not found", NotFound)
 
-    const table = "subscription_data_" + req.params.id;
+    const table = "subscription_data_" + req.params.id
 
-    const column = String(req.query.column || "");
+    const column = String(req.query.column || "")
 
-    const stratifier = String(req.query.stratifier || "");
+    const stratifier = String(req.query.stratifier || "")
 
     const filtersParams = (Array.isArray(req.query.filter) ?
         req.query.filter :
-        [req.query.filter || ""]).map(String).filter(Boolean);
+        [req.query.filter || ""]).map(String).filter(Boolean)
 
     const cacheKey = crypto.createHash("sha1").update([
         table,
@@ -568,64 +618,9 @@ route(router, {
 });
 
 /**
- * @param {{ cols: { name: string }[], rows: any[][] }} data 
- * @param {string} name
- * @param {express.Request} req
- * @param {express.Response} res
- */
-function exportData(data, name, req, res)
-{
-    // format ------------------------------------------------------------------
-    const format = req.query.format || "json"
-    
-    // cols --------------------------------------------------------------------
-    let colNames = String(req.query.cols || "").split(",").map(s => s.trim()).filter(Boolean);
-    if (!colNames.length) {
-        colNames = data.cols.map(c => c.name);
-    } else {
-        colNames = colNames.filter(x => data.cols.find(c => c.name === x));
-    }
-
-    const indexes = colNames.map(name => data.cols.findIndex(c => c.name === name));
-
-    // Delimited ---------------------------------------------------------------
-    if (format === "csv" || format === "tsv") {
-
-        const delimiter = format === "tsv" ? "\t" : ",";
-        
-        let out = [colNames.join(delimiter)];
-
-        data.rows.forEach(row => out.push(
-            indexes.map(i => row[i] === null ? "" : JSON.stringify(row[i])).join(delimiter)
-        ));
-
-        res.status(200);
-
-        if (req.query.inline) {
-            res.set("Content-Type", "text/plain");    
-        } else {
-            res.setHeader("Content-disposition", `attachment; filename=${slug(name)}.${format}`);
-            res.setHeader("Content-Type", "text/" + format);
-        }
-
-        return res.send(out.join("\n"));
-    }
-
-    // JSON --------------------------------------------------------------------
-    if (format === "json") {
-        return res.json({
-            cols: colNames.map(name => data.cols.find(x => x.name === name)),
-            rows: data.rows.map(row => indexes.map(i => row[i]))
-        })
-    }
-
-    throw new Error(`Unsupported format "${format}"`);
-}
-
-/**
  * @param {Model} model
  */
-async function fetchData(model: Model) {
+export async function fetchData(model: Model) {
 
     // Will throw if model.dataURL is not valid URL
     const url = new URL(model.getDataValue("dataURL"))
@@ -702,4 +697,3 @@ async function request(url: URL): Promise<{
     })
 }
 
-module.exports.fetchData = fetchData;

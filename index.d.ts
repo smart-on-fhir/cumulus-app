@@ -94,13 +94,23 @@ declare module app {
          */
         completed: string | null
         
+        /**
+         * @deprecated
+         */
         data: DataRequestData
+
+        metadata: SubscriptionMetaData | null
 
         requestedData: RequestedData | null
 
         dataURL: string | null
 
         dataSourceType: "file" | "url"
+    }
+
+    interface SubscriptionMetaData {
+        cols : DataRequestDataColumn[]
+        total: number
     }
 
     interface RequestedData {

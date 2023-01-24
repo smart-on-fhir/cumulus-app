@@ -1,15 +1,35 @@
-const { DataTypes }          = require("sequelize");
-const { sendDataRequest }    = require("../../mail");
-const { default: BaseModel } = require("./BaseModel");
+import { sendDataRequest } from "../../mail"
+import BaseModel           from "./BaseModel"
+import {
+    CreationOptional,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Sequelize
+} from "sequelize"
+import { app } from "../../..";
 
 
 
-module.exports = class DataRequest extends BaseModel
+export default class DataRequest extends BaseModel<InferAttributes<DataRequest>, InferCreationAttributes<DataRequest>>
 {
-    /**
-     * @param {import("sequelize").Sequelize} sequelize
-     */
-    static initialize(sequelize) {
+    declare id           : CreationOptional<number>;
+    declare name         : string;
+    declare description  : CreationOptional<string | null>;
+    declare refresh      : 'manually' | 'yearly' | 'monthly' | 'weekly' | 'daily';
+    declare completed    : CreationOptional<Date | null>;
+    declare requestedData: CreationOptional<Record<string, any> | null>;
+    declare metadata     : CreationOptional<app.SubscriptionMetaData | null>;
+    declare groupId      : CreationOptional<number | null>;
+    declare dataURL      : CreationOptional<string | null>;
+    declare transmissions: CreationOptional<Record<string, any> | null>;
+    declare createdAt    : CreationOptional<Date>;
+    declare updatedAt    : CreationOptional<Date>;
+
+    /** @deprecated */
+    declare data         : CreationOptional<Record<string, any> | null>;
+
+    static initialize(sequelize: Sequelize) {
         DataRequest.init({
             id: {
                 type         : DataTypes.INTEGER,
@@ -102,6 +122,16 @@ module.exports = class DataRequest extends BaseModel
             transmissions: {
                 type: DataTypes.JSONB,
                 defaultValue: null
+            },
+
+            createdAt: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
+    
+            updatedAt: {
+                type: DataTypes.DATE,
+                allowNull: true
             }
         }, {
             sequelize,
@@ -121,7 +151,7 @@ module.exports = class DataRequest extends BaseModel
 
                 async afterCreate(model) {
                     // Note that we don't wait for this to complete
-                    sendDataRequest(model.toJSON()).catch(console.error);
+                    sendDataRequest(model.toJSON() as any).catch(console.error);
 
                 }
             }
