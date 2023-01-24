@@ -6,7 +6,7 @@ const Text2Lines           = require("../DataManager/Text2Lines");
 const Line2CSV             = require("../DataManager/Line2CSV");
 const CSV2DB               = require("../DataManager/CSV2DB");
 const { DATA_TYPES }       = require("../DataManager/dataTypes");
-const Subscription         = require("../db/models/DataRequest");
+const Subscription         = require("../db/models/DataRequest").default;
 const { assert }           = require("../lib");
 const { Pool, PoolClient } = require('pg')
 

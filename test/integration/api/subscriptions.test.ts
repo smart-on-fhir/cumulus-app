@@ -1,5 +1,6 @@
 import { expect }                from "chai"
-import { getPermissionsForRole } from "../../../backend/acl";
+import { Sequelize }             from "sequelize"
+import { getPermissionsForRole } from "../../../backend/acl"
 import DataRequests              from "../../fixtures/DataRequests"
 import Tags                      from "../../fixtures/Tags"
 import {
@@ -15,6 +16,19 @@ describe("Subscriptions", () => {
     beforeEach(async () => {
         await resetTable("Tag", Tags)
         await resetTable("DataRequest", DataRequests)
+
+        const dbConnection: Sequelize = server.app.get("dbConnection")
+        await dbConnection.query(`DROP table if exists "subscription_data_1"`)
+        await dbConnection.query(
+            `CREATE table "subscription_data_1" (
+                "cnt" Integer,
+                "gender" Text
+            )`
+        )
+        await dbConnection.query(
+            `INSERT INTO "subscription_data_1" ("gender", "cnt") VALUES
+            ('M', 100), ('F', 200), (NULL, 300)`
+        )
     })
 
     describe("list", () => {
@@ -121,12 +135,12 @@ describe("Subscriptions", () => {
     
             if (permissions.includes("DataRequests.export")) {
                 it (`${role} can export subscription data`, async () => {
-                    const res = await fetch(`${server.baseUrl}/api/requests/1/data`, options);
+                    const res = await fetch(`${server.baseUrl}/api/requests/1/data?inline=true`, options);
                     expect(res.status).to.equal(200)
                 })
             } else {
                 it (`${role} cannot export subscription data`, async () => {
-                    const res = await fetch(`${server.baseUrl}/api/requests/1/data`, options)
+                    const res = await fetch(`${server.baseUrl}/api/requests/1/data?inline=true`, options)
                     expect(res.status).to.equal(role === "guest" ? 401 : 403)
                 })
             }

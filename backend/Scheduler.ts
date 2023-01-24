@@ -1,8 +1,8 @@
-const moment        = require("moment")
-const { Op }        = require("sequelize");
-const { fetchData } = require("./controllers/DataRequest");
-const Activity      = require("./db/models/Activity");
-const DataRequest   = require("./db/models/DataRequest")
+import moment        from "moment"
+import { Op }        from "sequelize"
+import Activity      from "./db/models/Activity"
+import DataRequest   from "./db/models/DataRequest"
+import { fetchData } from "./controllers/DataRequest"
 
 
 async function run() {
