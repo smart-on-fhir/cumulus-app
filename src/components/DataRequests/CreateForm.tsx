@@ -71,7 +71,7 @@ export default function CreateDataRequestForm()
             ]} />
             <h3>Create Subscription</h3>
             <hr/>
-            <div className="row gap color-muted small">
+            <div className="row gap">
                 <div className="col">
                     { savingError && <AlertError><b>Error saving subscription:</b> { savingError + "" }</AlertError> }
                     { saving && <Loader msg="Saving..."/> }
