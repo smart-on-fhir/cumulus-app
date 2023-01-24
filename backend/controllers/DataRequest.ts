@@ -102,15 +102,14 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
     assert(model, "Model not found", NotFound)
     assert(model.metadata, "Subscription data not found", NotFound)
     const table = "subscription_data_" + req.params.id
-    const data = await model.sequelize.query<any>(`SELECT * FROM ${table}`, { type: QueryTypes.SELECT });
 
     const fileName = model.get("name")
     
     const cols = model.metadata.cols;
 
     // format ------------------------------------------------------------------
-    const format = String(req.query.format || "json");
-    if (!["csv","tsv","json"].includes(format)) {
+    const format = String(req.query.format || "csv");
+    if (!["csv","tsv"].includes(format)) {
         throw new Error(`Unsupported format "${format}"`);
     }
 
@@ -132,27 +131,33 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
 
     res.status(200);
 
+    const delimiter = format === "tsv" ? "\t" : ",";
 
-    // Delimited ---------------------------------------------------------------
-    if (format === "csv" || format === "tsv") {
+    // Header ------------------------------------------------------------------
+    res.write(colNames.join(delimiter));
 
-        const delimiter = format === "tsv" ? "\t" : ",";
-        
-        let out = [colNames.join(delimiter)];
+    // Rows --------------------------------------------------------------------
+    async function loop(offset = 0) {
 
-        data.forEach(row => out.push(
-            colNames.map(name => row[name] === null ? "" : JSON.stringify(row[name])).join(delimiter)
-        ));
+        const data = await model!.sequelize.query<any>(
+            `SELECT * FROM ${table} OFFSET ${offset} LIMIT 100`,
+            { type: QueryTypes.SELECT }
+        );
 
-        
-        return res.send(out.join("\n"));
+        data.forEach(row => {
+            res.write(
+                "\n" + colNames.map(name => row[name] === null ? "" : JSON.stringify(row[name])).join(delimiter)
+            )
+        });
+
+        if (offset + 100 < model!.metadata!.total) {
+            await loop(offset + 100)
+        } else {
+            res.end()
+        }
     }
+    loop()
 
-    // JSON --------------------------------------------------------------------
-    return res.json({
-        cols,
-        rows: data.map(row => cols.map(col => row[col.name]))
-    });
 }));
 
 // Refresh Data endpoint ------------------------------------------------------
