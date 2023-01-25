@@ -250,7 +250,7 @@ function getSeries({
                 }
             })
         })
-        keys.sort();
+        keys.sort((a,b) => a - b);
         // end test
         
         data.data.forEach(group => {
