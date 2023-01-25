@@ -250,7 +250,16 @@ function getSeries({
                 }
             })
         })
-        keys.sort((a,b) => a - b);
+
+        if (xType === "linear") {
+            keys.sort((a, b) => a - b);
+        }
+        else if (xType === "datetime") {
+            keys.sort((a, b) => +new Date(a) - +new Date(b));
+        }
+        else {
+            keys.sort((a, b) => String(a).localeCompare(b + ""));
+        }
         // end test
         
         data.data.forEach(group => {
@@ -262,7 +271,9 @@ function getSeries({
                     const entry = group.rows.find(row => row[0] === key)
                     return entry ?
                         pointFromRow(entry) :
-                        null //pointFromRow([key, 0])
+                        data.data.length > 1 ?
+                            pointFromRow([key, 0]) :
+                            null
                 }).filter(Boolean)
             }, secondary)
             // end test
