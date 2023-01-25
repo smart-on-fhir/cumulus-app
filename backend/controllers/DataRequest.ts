@@ -86,6 +86,15 @@ const FilterConfig: Record<string, (col: string) => string> = {
     lte               : col => `"${col}" <= ?`,
 };
 
+const filtersWithoutParams = [
+    "isTrue",
+    "isNotTrue",
+    "isFalse",
+    "isNotFalse",
+    "isNull",
+    "isNotNull"
+];
+
 
 // Views ----------------------------------------------------------------------
 router.get("/:id/views", rw(async (req: AppRequest, res: Response) => {
@@ -331,6 +340,10 @@ router.get("/:id/api", rw(async (req, res) => {
             }
             
             const [column, operator, right] = parts;
+
+            if (!right && !filtersWithoutParams.includes(operator)) {
+                throw new Error(`Missing filter value for "${cond}"`);
+            }
             
             if (typeof FilterConfig[operator] !== "function") {
                 throw new Error(`Filter operator "${operator}" is not implemented`);
