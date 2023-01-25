@@ -260,8 +260,10 @@ function getSeries({
                 name: group.stratifier,
                 data: keys.map(key => {
                     const entry = group.rows.find(row => row[0] === key)
-                    return entry ? pointFromRow(entry) : pointFromRow([key, 0])
-                })
+                    return entry ?
+                        pointFromRow(entry) :
+                        null //pointFromRow([key, 0])
+                }).filter(Boolean)
             }, secondary)
             // end test
 
