@@ -271,7 +271,7 @@ function getSeries({
                     const entry = group.rows.find(row => row[0] === key)
                     return entry ?
                         pointFromRow(entry) :
-                        data.data.length > 1 ?
+                        (type === "column" || type === "bar") && data.data.length > 1 ?
                             pointFromRow([key, 0]) :
                             null
                 }).filter(Boolean)
