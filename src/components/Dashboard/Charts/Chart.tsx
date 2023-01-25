@@ -401,7 +401,7 @@ export function buildChartOptions({
 
                 rows.push(
                     `<tr><td style="text-align:right">${denominator ? "Computed Value:" : "Count:"}</td>`,
-                    `<td style="width: 100%"><b>${denominator ? this.point.y?.toPrecision(3) + "%" : this.point.y}</b></td></tr>`
+                    `<td style="width: 100%"><b>${denominator ? this.point.y?.toPrecision(3) + "%" : Number(this.point.y).toLocaleString()}</b></td></tr>`
                 )
 
                 // @ts-ignore
