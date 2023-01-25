@@ -119,7 +119,7 @@ function getPoint({
 
     // For datetime axes, the X value is the timestamp in milliseconds since 1970.
     if (xType === "datetime") {
-        point.x = +new Date(row[0])
+        point.x = moment(row[0]).utc().valueOf()
     }
 
     // For linear (numeric) axes, the X value is the numeric value or 0.
@@ -240,13 +240,36 @@ function getSeries({
         const _type = secondary ?
             column2type!.replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes :
             type;
+
+        // start test
+        let keys: any[] = [];
+        data.data.forEach(group => {
+            group.rows.forEach(row => {
+                if (!keys.includes(row[0])) {
+                    keys.push(row[0])
+                }
+            })
+        })
+        keys.sort();
+        // end test
         
         data.data.forEach(group => {
+            // start test
             addSeries({
                 type: _type,
                 name: group.stratifier,
-                data: group.rows.map(pointFromRow)
+                data: keys.map(key => {
+                    const entry = group.rows.find(row => row[0] === key)
+                    return entry ? pointFromRow(entry) : pointFromRow([key, 0])
+                })
             }, secondary)
+            // end test
+
+            // addSeries({
+            //     type: _type,
+            //     name: group.stratifier,
+            //     data: group.rows.map(pointFromRow)
+            // }, secondary)
         })
     }
 
