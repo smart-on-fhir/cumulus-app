@@ -82,28 +82,28 @@ export default function DataRequestView(): JSX.Element
         return <AlertError>Failed to load DataRequest</AlertError>
     }
 
-    const requestedData = model.requestedData || {
-        dataSites: [],
-        fields: {
-            demographics : [],
-            diagnoses    : [],
-            immunizations: [],
-            labs         : [],
-            medications  : [],
-            phenotypes   : [],
-            procedures   : []
-        }
-    };
+    // const requestedData = model.requestedData || {
+    //     dataSites: [],
+    //     fields: {
+    //         demographics : [],
+    //         diagnoses    : [],
+    //         immunizations: [],
+    //         labs         : [],
+    //         medications  : [],
+    //         phenotypes   : [],
+    //         procedures   : []
+    //     }
+    // };
     
-    const {
-        demographics,
-        diagnoses,
-        immunizations,
-        labs,
-        medications,
-        phenotypes,
-        procedures
-    } = requestedData.fields;
+    // const {
+    //     demographics,
+    //     diagnoses,
+    //     immunizations,
+    //     labs,
+    //     medications,
+    //     phenotypes,
+    //     procedures
+    // } = requestedData.fields;
 
     return (
         <div className="container">
