@@ -175,7 +175,7 @@ route(router, {
             role: {
                 in: "body",
                 isIn: {
-                    options: ["user", "manager", "admin"]
+                    options: [["user", "manager", "admin"]],
                 }
             }
         }
@@ -208,7 +208,7 @@ route(router, {
                     errorMessage: "Missing role property"
                 },
                 isIn: {
-                    options: ["user", "manager", "admin"],
+                    options: [["user", "manager", "admin"]],
                     errorMessage: "Invalid role"
                 }
             }

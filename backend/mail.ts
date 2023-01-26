@@ -1,7 +1,8 @@
-const formData     = require("form-data");
-const Mailgun      = require("mailgun.js");
-const { debuglog } = require("util");
-const config       = require("./config");
+import formData     from "form-data"
+import Mailgun      from "mailgun.js"
+import { debuglog } from "util"
+import { app }      from ".."
+import config       from "./config"
 
 const debug = debuglog("app:email");
 
@@ -12,13 +13,7 @@ const client = mailgun.client({
     url: 'https://api.mailgun.net'
 });
 
-/**
- * @param {string[]} html
- * @param {string} name 
- * @param {{label?:string, name: string, description?: string}[]} [items] 
- * @returns 
- */
-function list(html, name, items) {
+function list(html: string[], name: string, items?: { label?: string, name: string, description?: string }[]) {
     if (items && items.length > 0) {
         html.push(
             `<h3>${name}</h3>`,
@@ -30,10 +25,7 @@ function list(html, name, items) {
     }
 }
 
-/**
- * @param { import("../").app.DataRequest } dataRequest
- */
-async function sendDataRequest(dataRequest) {
+export async function sendDataRequest(dataRequest: app.DataRequest) {
     
     let html = [
         `<h2>New Data Request</h2>`,
@@ -59,20 +51,21 @@ async function sendDataRequest(dataRequest) {
     })
 }
 
-/**
- * @param { object } options
- * @param { object } options.subscription subscription
- * @param { number } options.subscription.id subscription ID
- * @param { string } options.subscription.name subscription name
- * @param { object } options.view view
- * @param { number } options.view.id view ID
- * @param { string } options.view.name view name
- * @param { string } options.type "required" | "preferred" | "optional"
- * @param { string } options.reason
- * @param {{ username: string }} options.user
- * @param {{ name: string, need: string }[]} options.dataElements
- */
-async function requestLineLevelData({ subscription, view, user, dataElements, reason, type }) {
+export async function requestLineLevelData({
+    subscription,
+    view,
+    user,
+    dataElements,
+    reason,
+    type
+}: {
+    subscription: { id: number; name: string }
+    view: { id: number; name: string }
+    type: "required" | "preferred" | "optional"
+    reason: string
+    user: { username: string }
+    dataElements: { name: string, need: string }[]
+}) {
 
     let html = [
         `<h2>New Line-level Data Request</h2>`,
@@ -104,14 +97,19 @@ async function requestLineLevelData({ subscription, view, user, dataElements, re
     })
 }
 
-/**
- * @param { object } options
- * @param { string } options.email Recipient email
- * @param { string } options.baseUrl
- * @param { string } options.code activation code
- * @param { string } [options.message = ""]
- */
-async function inviteUser({ email, baseUrl, code, message = "" }) {
+export async function inviteUser({
+    email,
+    baseUrl,
+    code,
+    message = ""
+}: {
+    /** Recipient email */
+    email: string
+    baseUrl: string
+    /** Activation code */
+    code: string
+    message?: string
+}) {
 
     const href = new URL("/activate", baseUrl)
     href.searchParams.set("code", code)
@@ -145,10 +143,3 @@ async function inviteUser({ email, baseUrl, code, message = "" }) {
         html   : html.join("\n")
     })
 }
-
-
-module.exports = {
-    sendDataRequest,
-    requestLineLevelData,
-    inviteUser
-};
