@@ -1,6 +1,6 @@
 import moment                     from "moment"
 import { Helmet, HelmetProvider } from "react-helmet-async"
-import { Link }                   from "react-router-dom"
+import { Link, useNavigate }      from "react-router-dom"
 import Breadcrumbs                from "../generic/Breadcrumbs"
 import Clip                       from "../generic/Clip"
 import MenuButton                 from "../generic/MenuButton"
@@ -13,6 +13,7 @@ import "./Projects.scss"
 export default function List()
 {
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const canUpdate = user?.permissions.includes("Projects.update")
     const canDelete = user?.permissions.includes("Projects.delete")
@@ -49,7 +50,7 @@ export default function List()
                                 }, 0) || 0
                                 
                                 return (
-                                    <div className="col project" key={i}>
+                                    <div className="col project" key={i} onClick={() => navigate(`/projects/${project.id}`)}>
                                         <h3>{ project.name }</h3>
                                         <p style={{ whiteSpace: "pre-wrap" }}><Clip max={600} txt={ project.description } /></p>
                                         <br/>
@@ -71,7 +72,10 @@ export default function List()
                                         </Grid>
                                         <hr/>
                                         <div className="center">
-                                            <div className="btn btn-blue mt-2">
+                                            <div className="btn btn-blue mt-2" onClick={e => {
+                                                e.stopPropagation()
+                                                e.preventDefault()
+                                            }}>
                                                 <Link to={`/projects/${project.id}`} className="pl-2 pr-2"><b>Explore</b></Link>
                                                 { (canUpdate || canDelete) && <MenuButton right items={[
                                                     canUpdate ? <Link to={ `/projects/${project.id}/edit` }>
