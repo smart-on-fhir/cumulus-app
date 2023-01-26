@@ -219,7 +219,7 @@ export default function DataRequestView(): JSX.Element
                         </tbody>
                     </table>
                     <br/>
-                    { model.requestedData && <div className="mt-2">
+                    {/* { model.requestedData && <div className="mt-2">
                         <Collapse header="Requested Data" collapsed>
                             <div className="row mt-1">
                                 <div className="col">
@@ -243,7 +243,7 @@ export default function DataRequestView(): JSX.Element
                                 </div>
                             </div>
                         </Collapse>
-                    </div> }
+                    </div> } */}
                 </div>
                 <div className="col col-4 responsive" style={{ minWidth: "20rem" }}>
                     { model.completed && <><h5>Dependent Graphs</h5>
