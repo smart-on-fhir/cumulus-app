@@ -38,6 +38,8 @@ services:
       - DB_SSL=$DB_SSL
       - DATABASE_URL=postgres://$DB_USER:$DB_PASS@db:$DB_PORT/$DB_DATABASE
       - NODE_ENV=$NODE_ENV
+      - MAILGUN_API_KEY=$MAILGUN_API_KEY
+      - MAILGUN_DOMAIN=$MAILGUN_DOMAIN
     volumes:
       - ../backend:/app/backend
       - ../build:/app/build

@@ -219,7 +219,7 @@ function UserEditor({
                     <div className="row bottom" style={{ width: "14em" }}>
                         <div className="col col-6 left mr-05">
                             <label>Role</label>
-                            <select value={user.role} onChange={e => setRole(e.target.value)}>
+                            <select value={role} onChange={e => setRole(e.target.value)}>
                                 <option value="user">user</option>
                                 <option value="manager">manager</option>
                                 <option value="admin">admin</option>

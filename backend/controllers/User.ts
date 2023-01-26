@@ -4,7 +4,7 @@ import * as HttpError from "../errors"
 import moment         from "moment"
 import { debuglog }   from "util"
 import User           from "../db/models/User"
-import mail           from "../mail"
+import * as mail      from "../mail"
 import { assert }     from "../lib"
 import { CreationAttributes, FindOptions, InferAttributes } from "sequelize"
 
