@@ -171,6 +171,12 @@ b {
 .middle { vertical-align: middle; }
 .bottom { vertical-align: bottom; }
 
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 hr {
   height: 2px;
   border: none;
@@ -181,6 +187,10 @@ hr {
     border-bottom: 1.5px dashed #BBB;
     box-shadow: 0 1px 0 0 #FFF;
     height: 0;
+  }
+
+  &.small {
+    height: 1px;
   }
 }
 

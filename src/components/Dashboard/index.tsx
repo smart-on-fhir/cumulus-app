@@ -7,7 +7,6 @@ import { Link }                               from "react-router-dom"
 import { useBackend }                         from "../../hooks"
 import { createOne, updateOne, deleteOne, request } from "../../backend"
 import { useAuth }                            from "../../auth"
-import DataRequestLink                        from "../DataRequests/DataRequestLink"
 import { AlertError }                         from "../generic/Alert"
 import ConfigPanel                            from "./ConfigPanel"
 import {buildChartOptions, default as BaseChart} from "./Charts/Chart"
@@ -16,6 +15,8 @@ import EditInPlace                            from "../generic/EditInPlace"
 import { ReadOnlyPaths, SupportedChartTypes, SupportedNativeChartTypes, TURBO_THRESHOLD } from "./config"
 import { defer, Json, strip }                 from "../../utils"
 import { getDefaultChartOptions }             from "./Charts/DefaultChartOptions"
+import Tag                                    from "../Tags/Tag"
+import Grid                                   from "../generic/Grid"
 
 import "./Dashboard.scss"
 
@@ -784,31 +785,72 @@ export default function Dashboard({
                         <br/>
                         <CaptionEditor html={caption} onChange={caption => dispatch({ type: "UPDATE", payload: { caption }})}/>
                         <br/>
-                        <div className="row mb-1 middle half-gap wrap">
-                            <div className="col col-5 mb-05 responsive">
-                                <DataRequestLink request={ dataRequest } />
+                        <Grid cols="24em" gap="2em">
+                        
+                            <div className="col">
+                                <b>Subscription</b>
+                                <hr className="small"/>
+                                <Link className="link mt-05" to={`/requests/${dataRequest.id}`}>
+                                    <i className="fa-solid fa-database color-brand-2" /> { dataRequest.name }
+                                </Link>
                             </div>
-                            <div className="col col-5 mb-05 responsive">
-                                <div className="row half-gap wrap">
-                                    <div className="col col-4 mb-05 responsive">
-                                        <a
-                                            className={ "btn btn-blue" + (process.env.REACT_APP_BACKEND_HOST ? " grey-out" : "") }
-                                            href={`https://cumulusdemo.notebook.us-east-1.sagemaker.aws/notebooks/cumulus/demo.ipynb?fileLoc=${
-                                                encodeURIComponent(
-                                                    // dataRequest.data.src ||
-                                                    window.location.origin + "/api/requests/" + dataRequest.id + "/data?format=csv"
-                                                )
-                                            }`}
-                                            target="_blank"
-                                            rel="noreferrer noopener"
-                                        >
-                                            <b> Open in Analytic Environment </b>
-                                        </a>
-                                    </div>
-                                    <div className="col col-4 mb-05 responsive">
-                                        <Link to="./request-data" className="btn btn-blue"><b> Request Line-level Data </b></Link>
-                                    </div>
+                        
+                            <div className="col">
+                                <b>Subscription Group</b>
+                                <hr className="small"/>
+                                { dataRequest.group ?
+                                    <Link className="link mt-05 ellipsis" to={`/groups/${dataRequest.group.id}`} title={ dataRequest.group.description }>
+                                        <i className="fa-solid fa-folder color-brand-2" /> { dataRequest.group.name }
+                                    </Link> :
+                                    <span className="color-muted">GENERAL</span> }
+                            </div>
+
+                            <div className="col">
+                                <b>Study Areas</b>
+                                <hr className="small"/>
+                                <div className="mt-05">
+                                { dataRequest.Projects?.length ?
+                                    dataRequest.Projects.map((p, i) => (
+                                        <div key={i} className="ellipsis">
+                                            <Link className="link" to={`/projects/${p.id}`}>
+                                                <i className="fa-solid fa-book color-brand-2" /> { p.name }
+                                            </Link>
+                                        </div>
+                                    )) :
+                                    <span className="color-muted">None</span>
+                                }
                                 </div>
+                            </div>
+
+                            <div className="col">
+                                <b>Tags</b>
+                                <hr className="small"/>
+                                <div className="mt-05">{ tags.length ? 
+                                    tags.map((t, i) => <Tag tag={t} key={i} />) :
+                                    <span className="color-muted">None</span>
+                                }</div>
+                            </div>
+                        </Grid>
+                        <br/>
+                        
+                        <div className="row mb-1 mt-2 middle half-gap wrap">
+                            <div className="col col-5 mb-1 ml-2 mr-2 responsive">
+                                <a
+                                    className={ "btn btn-blue" + (process.env.REACT_APP_BACKEND_HOST ? " grey-out" : "") }
+                                    href={`https://cumulusdemo.notebook.us-east-1.sagemaker.aws/notebooks/cumulus/demo.ipynb?fileLoc=${
+                                        encodeURIComponent(
+                                            // dataRequest.data.src ||
+                                            window.location.origin + "/api/requests/" + dataRequest.id + "/data?format=csv"
+                                        )
+                                    }`}
+                                    target="_blank"
+                                    rel="noreferrer noopener"
+                                >
+                                    <b> Open in Analytic Environment </b>
+                                </a>
+                            </div>
+                            <div className="col col-5 mb-1 ml-2 mr-2 responsive">
+                                <Link to="./request-data" className="btn btn-blue"><b> Request Line-level Data </b></Link>
                             </div>
                         </div>
                     </div>

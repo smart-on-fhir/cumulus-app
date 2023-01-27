@@ -95,8 +95,24 @@ route(router, {
                 toBoolean: true
             },
 
-            // TODO: If set include the subscription
+            // If set include the subscription
             subscription: {
+                in       : [ "query" ],
+                optional : true,
+                isBoolean: true,
+                toBoolean: true
+            },
+
+            // If set include the subscription and its group
+            group: {
+                in       : [ "query" ],
+                optional : true,
+                isBoolean: true,
+                toBoolean: true
+            },
+
+            // If set include the subscription and its projects
+            projects: {
                 in       : [ "query" ],
                 optional : true,
                 isBoolean: true,
@@ -108,17 +124,27 @@ route(router, {
 
         const include: any[] = []
 
-        // if (req.query.group) {
-        //     include.push({ association: "group", attributes: ["id", "name", "description"] })
-        // }
-
         if (req.query.tags) {
             include.push({ association: "Tags", attributes: ["id", "name", "description"] })
         }
 
-        // if (req.query.graphs) {
-        //     include.push({ association: "Views" })
-        // }
+        if (req.query.subscription || req.query.group || req.query.projects) {
+            const subscriptionIncludes: any[] = [];
+
+            if (req.query.group) {
+                subscriptionIncludes.push({ association: "group" })
+            }
+            if (req.query.projects) {
+                subscriptionIncludes.push({ association: "Projects" })
+            }
+
+            const association: any = { association: "DataRequest" }
+            if (subscriptionIncludes.length) {
+                association.include = subscriptionIncludes
+            }
+
+            include.push(association)
+        }
 
         const model = await Model.findByPk(req.params.id, { include })
         assert(model, NotFound)

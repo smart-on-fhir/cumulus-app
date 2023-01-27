@@ -13,14 +13,9 @@ export default function EditView({ copy }: { copy?: boolean })
     const { id } = useParams()
 
     // Fetch the subscription by ID
-    const { loading, error, result } = useBackend(
+    const { loading, error, result: view } = useBackend(
         useCallback(() => {
-            return request("/api/views/" + id + "?tags=true").then(view => {
-                return request("/api/requests/" + view.DataRequestId).then(request => ({
-                    request,
-                    view
-                }));
-            })
+            return request("/api/views/" + id + "?tags=true&subscription=true&group=true&projects=true");
         }, [id]),
         true
     );
@@ -36,8 +31,8 @@ export default function EditView({ copy }: { copy?: boolean })
     }
 
      // If the subscription request was successful but did not return the expected data exit with an error message
-    if (!result) {
-        return <AlertError>{`Fetching subscription with id "${id}" produced empty response`}</AlertError>
+    if (!view) {
+        return <AlertError>{`Fetching graph with id "${id}" produced empty response`}</AlertError>
     }
 
     return (
@@ -45,13 +40,13 @@ export default function EditView({ copy }: { copy?: boolean })
             <Breadcrumbs links={[
                 { name: "Home"  , href: "/" },
                 { name: "Graphs", href: "/views" },
-                { name: result.view.name }
+                { name: view.name }
             ]}/>
-            <Dashboard key={ copy ? "copy" : result.view.id } copy={copy} view={{
-                ...result.view,
-                name: copy ? result.view.name.replace(/(\s*\(copy\)\s*)?$/, " (copy)") : result.view.name,
-                id: copy ? undefined : result.view.id
-            }} dataRequest={result.request} />
+            <Dashboard key={ copy ? "copy" : view.id } copy={copy} view={{
+                ...view,
+                name: copy ? view.name.replace(/(\s*\(copy\)\s*)?$/, " (copy)") : view.name,
+                id: copy ? undefined : view.id
+            }} dataRequest={view.DataRequest} />
         </div>
     )
 }

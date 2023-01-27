@@ -145,6 +145,8 @@ declare module app {
         Views?: View[]
 
         transmissions: Transmission[] | null
+
+        Projects?: Project[]
     }
 
     interface Transmission {
