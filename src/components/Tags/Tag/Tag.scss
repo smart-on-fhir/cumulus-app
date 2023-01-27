@@ -33,3 +33,9 @@
         box-shadow: 0 0 0 0.5px fade-out($color-fg, 0.6);
     }
 }
+
+a.tag:hover {
+    color: #008;
+    // text-decoration: underline;
+    cursor: pointer;
+}
