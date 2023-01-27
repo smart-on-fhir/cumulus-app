@@ -31,7 +31,7 @@ export default function TagSelector({
 
     const len = selected.length
     const value = len ?
-        <>{ selected.map((t, i) => <Tag tag={t} key={i} /> )}</> :
+        <>{ selected.map((t, i) => <Tag tag={t} key={i} noLink /> )}</> :
         "No tags selected"
 
     return (
