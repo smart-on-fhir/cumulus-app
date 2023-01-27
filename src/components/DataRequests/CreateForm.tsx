@@ -1,6 +1,7 @@
 import { useCallback, useState }  from "react"
 import { HelmetProvider, Helmet } from "react-helmet-async"
 import { Navigate }               from "react-router"
+import { useSearchParams }        from "react-router-dom"
 import { request, createOne }     from "../../backend"
 import { useBackend }             from "../../hooks"
 import { AlertError }             from "../generic/Alert"
@@ -13,7 +14,10 @@ import "./form.scss";
 
 export default function CreateDataRequestForm()
 {
-    const [ state, setState ] = useState<Partial<app.DataRequest>>({})
+    const [ searchParams ] = useSearchParams()
+    const [ state, setState ] = useState<Partial<app.DataRequest>>({
+        groupId: +(searchParams.get("groupId") || 0) || undefined
+    })
     const [ savedRecord, setSavedRecord ] = useState<app.DataRequest|null>(null)
 
     // onSubmit create new DataRequest and redirect to its edit page
