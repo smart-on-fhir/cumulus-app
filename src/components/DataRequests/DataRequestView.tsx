@@ -127,7 +127,15 @@ export default function DataRequestView(): JSX.Element
                     <div className="left">
                         <table>
                             <tbody>
-                                <tr><th className="right pr-1 pl-1">Group:</th><td>{ model.group?.name || "GENERAL" }</td></tr>
+                                <tr>
+                                    <th className="right pr-1 pl-1">Group:</th>
+                                    <td>{
+                                        model.group ?
+                                            <Link to={`/groups/${model.group.id}`} className="link" title={model.group.description}>{ model.group.name }</Link> :
+                                            "GENERAL"
+                                        }
+                                    </td>
+                                </tr>
                                 {/* <tr><th className="right pr-1 pl-1">Type:</th><td>{ model.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION" }</td></tr> */}
                                 <tr><th className="right pr-1 pl-1">Status:</th><td>{
                                         model.completed ?
