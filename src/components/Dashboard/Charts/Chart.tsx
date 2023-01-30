@@ -286,19 +286,20 @@ function getSeries({
         })
     }
 
-    if (!data.stratifier) {
-        addSeries({
-            type,
-            name: column.label || column.name,
-            data: data.data[0].rows.map(pointFromRow)
-        });
-        
-    }
-    else {
-        stratify(data as app.ServerResponses.StratifiedDataResponse)
+    if (data.rowCount) {
+        if (!data.stratifier) {
+            addSeries({
+                type,
+                name: column.label || column.name,
+                data: data.data[0].rows.map(pointFromRow)
+            });
+        }
+        else {
+            stratify(data as app.ServerResponses.StratifiedDataResponse)
+        }
     }
 
-    if (data2) {
+    if (data2 && data2.rowCount) {
         getDenominator = getDenominatorFactory(data2)
         stratify(data2, true)
     }
