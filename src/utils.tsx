@@ -161,14 +161,14 @@ export function formatArray(
 }
 
 const dictionaryMap = new Map([
-    [/\bicd(\s+|\-)?10\b/gi     , "ICD10"    ],
-    [/\bcnt\b/gi                , "Count"    ],
-    [/\bcovid((\s+|\-)?19)?\b/gi, "COVID-19" ],
-    [/\benct\b/gi               , "Encounter"],
-    [/\bcat\b/gi                , "Category" ],
-    [/\bpcr\b/gi                , "PCR"      ],
-    [/\bnlp\b/gi                , "NLP"      ],
-    [/\bdx\b/gi                 , "Diagnosis"]
+    [/\bicd(\s+|-)?10\b/gi     , "ICD10"    ],
+    [/\bcnt\b/gi               , "Count"    ],
+    [/\bcovid((\s+|-)?19)?\b/gi, "COVID-19" ],
+    [/\benct\b/gi              , "Encounter"],
+    [/\bcat\b/gi               , "Category" ],
+    [/\bpcr\b/gi               , "PCR"      ],
+    [/\bnlp\b/gi               , "NLP"      ],
+    [/\bdx\b/gi                , "Diagnosis"]
 ]);
 
 export function humanizeColumnName(str: string) {
