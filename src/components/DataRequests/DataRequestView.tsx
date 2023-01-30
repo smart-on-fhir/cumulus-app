@@ -1,4 +1,4 @@
-import { useCallback }            from "react"
+import { useCallback, useState }            from "react"
 import { useParams }              from "react-router"
 import { Link }                   from "react-router-dom"
 import { HelmetProvider, Helmet } from "react-helmet-async"
@@ -11,10 +11,9 @@ import { Format }                 from "../Format"
 import ViewsBrowser               from "../Views/ViewsBrowser"
 import Loader                     from "../generic/Loader"
 import { AlertError }             from "../generic/Alert"
-import { classList }              from "../../utils"
+import { classList, toTitleCase }              from "../../utils"
 import Tag                        from "../Tags/Tag"
 import TransmissionView           from "./Transmissions/TransmissionView"
-import Collapse                   from "../generic/Collapse"
 
 // import GoogleMapReact from "google-map-react"
 
@@ -192,41 +191,7 @@ export default function DataRequestView(): JSX.Element
 
                     <h5 className="mt-3">Included Fields</h5>
                     <hr/>
-                    <table>
-                        <tbody>
-                            {
-                                model.metadata?.cols?.length ?
-                                model.metadata?.cols.map((col, i) => (
-                                    <Collapse key={i} collapsed={true} header={
-                                        <span>
-                                            <img src="/icons/column.png" alt="icon" width="16" style={{ verticalAlign: "middle" }}/> {
-                                                col.name
-                                            } <span className="color-muted small">- { col.meta?.display || col.description || "No description provided" }</span>
-                                            </span>
-                                    }>
-                                        <div className="mt-05 mb-1 ml-2">
-                                            { col.meta?.datatype && <div className="mb-05">
-                                                <label>FHIR Type:</label> { col.meta.datatype }
-                                            </div>}
-                                            <div className="mb-05">
-                                                <label>Data Type:</label> <span className={col.dataType}>
-                                                    { col.dataType }
-                                                </span>
-                                            </div>
-                                            { col.meta?.system && <div className="mb-05">
-                                                <label>System:</label> { col.meta.system }
-                                            </div>}
-                                            { col.meta?.values && <div className="mb-05">
-                                                <label>Values:</label> <CoddingValuesTable values={col.meta.values} />
-                                            </div> }
-                                        </div>
-                                    </Collapse>
-                                )) :
-                                <p className="col col-10 color-muted">No data available yet</p>
-                            }
-                        </tbody>
-                    </table>
-                    <br/>
+                    <ColumnsTable model={model} />
                     {/* { model.requestedData && <div className="mt-2">
                         <Collapse header="Requested Data" collapsed>
                             <div className="row mt-1">
@@ -302,6 +267,60 @@ export default function DataRequestView(): JSX.Element
     )
 }
 
+function ColumnsTable({ model }: { model: app.DataRequest })
+{
+    if (!model.metadata?.cols?.length) {
+        return <p className="col col-10 color-muted">No data available yet</p>
+    }
+
+    return (
+        <table className="columns-table">
+            <tbody>
+                <tr>
+                    <th>Variable Name</th>
+                    <th>Description</th>
+                </tr>
+                { model.metadata?.cols.map((col, i) => <ColumnsTableItem key={i} col={col}/>) }
+            </tbody>
+        </table>
+    )
+}
+
+function ColumnsTableItem({ col }: { col: app.DataRequestDataColumn })
+{
+    const [open, setOpen] = useState(false);
+
+    return (
+        <>
+            <tr>
+                <td className="col-name" onClick={() => setOpen(!open)}>
+                    <span className="arrow">{ open ? "▿" : "▹" }</span> <img src="/icons/column.png" alt="icon" width="16" style={{ verticalAlign: "middle" }}/> { toTitleCase(col.name) }
+                </td>
+                <td className="col-description">{ col.meta?.display || col.description || "No description provided" }</td>
+            </tr>
+            { open && <tr>
+                <td colSpan={2} className="col-details">
+                    { col.meta?.datatype && <div>
+                            <label>FHIR Type:</label> { col.meta.datatype }
+                        </div>}
+                        <div>
+                            <label>Data Type:</label> <span className={col.dataType}>
+                                { col.dataType }
+                            </span>
+                        </div>
+                        { col.meta?.system && <div>
+                            <label>System:</label> { col.meta.system }
+                        </div>}
+                        { col.meta?.values && <div>
+                            <label>Values:</label> <CoddingValuesTable values={col.meta.values} />
+                        </div> }
+                </td>
+            </tr> }
+        </>
+    )
+}
+
+
 interface CoddingValue {
     code   : string
     display: string
@@ -322,7 +341,7 @@ function CoddingValuesTable({
     const remainder = Math.max(values.length - limit, 0);
     const rows = remainder ? values.slice(0, limit) : values;
     return (
-        <table className="small nowrap">
+        <table className="nowrap">
             <tr className="color-muted">
                 <th>Code</th>
                 <th>Display</th>
@@ -348,7 +367,7 @@ function CoddingValuesTable({
 function CoddingValueTable({ value }: { value: CoddingValue })
 {
     return (
-        <table className="small nowrap">
+        <table className="nowrap">
             <tr className="color-muted">
                 <th>Code</th>
                 <th>Display</th>
