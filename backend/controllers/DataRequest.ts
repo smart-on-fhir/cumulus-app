@@ -54,18 +54,23 @@ const FilterConfig: Record<string, (col: string) => string> = {
     
     // Dates ------------------------------------------------------------------
     sameDay           : col => `date_trunc('day'  , "${col}") =  date_trunc('day'  , TIMESTAMP ?)`,
+    sameWeek          : col => `date_trunc('week' , "${col}") =  date_trunc('week' , TIMESTAMP ?)`,
     sameMonth         : col => `date_trunc('month', "${col}") =  date_trunc('month', TIMESTAMP ?)`,
     sameYear          : col => `date_trunc('year' , "${col}") =  date_trunc('year' , TIMESTAMP ?)`,
     sameDayOrBefore   : col => `date_trunc('day'  , "${col}") <= date_trunc('day'  , TIMESTAMP ?)`,
+    sameWeekOrBefore  : col => `date_trunc('week' , "${col}") <= date_trunc('week' , TIMESTAMP ?)`,
     sameMonthOrBefore : col => `date_trunc('month', "${col}") <= date_trunc('month', TIMESTAMP ?)`,
     sameYearOrBefore  : col => `date_trunc('year' , "${col}") <= date_trunc('year' , TIMESTAMP ?)`,
     sameDayOrAfter    : col => `date_trunc('day'  , "${col}") >= date_trunc('day'  , TIMESTAMP ?)`,
+    sameWeekOrAfter   : col => `date_trunc('week' , "${col}") >= date_trunc('week' , TIMESTAMP ?)`,
     sameMonthOrAfter  : col => `date_trunc('month', "${col}") >= date_trunc('month', TIMESTAMP ?)`,
     sameYearOrAfter   : col => `date_trunc('year' , "${col}") >= date_trunc('year' , TIMESTAMP ?)`,
     beforeDay         : col => `date_trunc('day'  , "${col}") <  date_trunc('day'  , TIMESTAMP ?)`,
+    beforeWeek        : col => `date_trunc('week' , "${col}") <  date_trunc('week' , TIMESTAMP ?)`,
     beforeMonth       : col => `date_trunc('month', "${col}") <  date_trunc('month', TIMESTAMP ?)`,
     beforeYear        : col => `date_trunc('year' , "${col}") <  date_trunc('year' , TIMESTAMP ?)`,
     afterDay          : col => `date_trunc('day'  , "${col}") >  date_trunc('day'  , TIMESTAMP ?)`,
+    afterWeek         : col => `date_trunc('week' , "${col}") >  date_trunc('week' , TIMESTAMP ?)`,
     afterMonth        : col => `date_trunc('month', "${col}") >  date_trunc('month', TIMESTAMP ?)`,
     afterYear         : col => `date_trunc('year' , "${col}") >  date_trunc('year' , TIMESTAMP ?)`,
 
