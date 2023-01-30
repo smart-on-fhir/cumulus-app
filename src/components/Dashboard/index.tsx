@@ -555,7 +555,7 @@ export default function Dashboard({
                         width        : showOptions ? 330 : 0,
                         opacity      : showOptions ? 1 : 0,
                         pointerEvents: showOptions ? "all" : "none",
-                        zIndex       : showOptions ? 1 : -1,
+                        zIndex       : showOptions ? "unset" : -1,
                         transition   : "all 0.2s ease-in-out",
                         marginRight  : showOptions ? "1rem" : 0
                     }}>

@@ -106,13 +106,13 @@ class ImportJob
         if (this.timer) clearTimeout(this.timer);
 
         /** @ts-ignore @type {(keyof typeof DATA_TYPES)[]} */
-        let dataTypes = String(req.query.types || req.headers["x-data-types"] || "").trim().split(/\s*,\s*/);
+        let dataTypes = String(req.query.types || req.headers["x-data-types"] || "").trim().split(/\s*,\s*/).map(decodeURIComponent);
 
         /** @type { string[] } */
-        const labels = String(req.query.labels || "").split(/\s*,\s*/).filter(Boolean);
+        const labels = String(req.query.labels || "").split(/\s*,\s*/).filter(Boolean).map(decodeURIComponent);
 
         /** @type { string[] } */
-        const descriptions = String(req.query.descriptions || "").split(/\s*,\s*/).filter(Boolean);
+        const descriptions = String(req.query.descriptions || "").split(/\s*,\s*/).filter(Boolean).map(decodeURIComponent);
 
         const csv2db = new CSV2DB(
             this.client,
