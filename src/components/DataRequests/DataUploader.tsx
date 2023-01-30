@@ -6,7 +6,7 @@ import Breadcrumbs                       from "../generic/Breadcrumbs"
 import Alert, { AlertError }             from "../generic/Alert"
 import Loader                            from "../generic/Loader"
 import { request }                       from "../../backend"
-import { classList, defer, toTitleCase } from "../../utils"
+import { classList, defer, humanizeColumnName } from "../../utils"
 import "./DataUploader.scss"
 
 
@@ -394,7 +394,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
             rows = rows.map(row => parseDelimitedLine(row, separators))
 
             cols = parseDelimitedLine(header, separators).map((col, i) => {
-                const title = toTitleCase(col)
+                const title = humanizeColumnName(col)
                 return {
                     name : col,
                     label: title,
