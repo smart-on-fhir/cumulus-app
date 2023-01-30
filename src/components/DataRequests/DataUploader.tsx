@@ -457,9 +457,9 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
         let _cols = cols.filter(col => col.dataType !== "hidden");
         
         let params = new URLSearchParams();
-        params.set("types", _cols.map(c => c.dataType).join(","))
-        params.set("labels", _cols.map(c => c.label).join(","))
-        params.set("descriptions", _cols.map(c => c.description).join(","))
+        params.set("types", _cols.map(c => encodeURIComponent(c.dataType)).join(","))
+        params.set("labels", _cols.map(c => encodeURIComponent(c.label)).join(","))
+        params.set("descriptions", _cols.map(c => encodeURIComponent(c.description)).join(","))
         
         let url = "/api/requests/" + this.props.requestID + "/data?" + params.toString();
         
