@@ -11,7 +11,7 @@ import { Format }                 from "../Format"
 import ViewsBrowser               from "../Views/ViewsBrowser"
 import Loader                     from "../generic/Loader"
 import { AlertError }             from "../generic/Alert"
-import { classList, toTitleCase }              from "../../utils"
+import { classList, humanizeColumnName } from "../../utils"
 import Tag                        from "../Tags/Tag"
 import TransmissionView           from "./Transmissions/TransmissionView"
 
@@ -294,7 +294,7 @@ function ColumnsTableItem({ col }: { col: app.DataRequestDataColumn })
         <>
             <tr>
                 <td className="col-name" onClick={() => setOpen(!open)}>
-                    <span className="arrow">{ open ? "▿" : "▹" }</span> <img src="/icons/column.png" alt="icon" width="16" style={{ verticalAlign: "middle" }}/> { toTitleCase(col.name) }
+                    <span className="arrow">{ open ? "▿" : "▹" }</span> <img src="/icons/column.png" alt="icon" width="16" style={{ verticalAlign: "middle" }}/> { humanizeColumnName(col.name) }
                 </td>
                 <td className="col-description">{ col.meta?.display || col.description || "No description provided" }</td>
             </tr>

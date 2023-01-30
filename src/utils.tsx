@@ -160,6 +160,25 @@ export function formatArray(
     )
 }
 
+const dictionaryMap = new Map([
+    [/\bicd(\s+|\-)?10\b/gi     , "ICD10"    ],
+    [/\bcnt\b/gi                , "Count"    ],
+    [/\bcovid((\s+|\-)?19)?\b/gi, "COVID-19" ],
+    [/\benct\b/gi               , "Encounter"],
+    [/\bcat\b/gi                , "Category" ],
+    [/\bpcr\b/gi                , "PCR"      ],
+    [/\bnlp\b/gi                , "NLP"      ],
+    [/\bdx\b/gi                 , "Diagnosis"]
+]);
+
+export function humanizeColumnName(str: string) {
+    let out = toTitleCase(str)
+    dictionaryMap.forEach((replacement, re) => {
+        out = out.replace(re, replacement)
+    })
+    return out
+}
+
 export function toTitleCase(str: string) {
     return str.replace(/([A-Z])/g, " $1")
         .replace(/[^a-zA-Z0-9]+/g, " ")
