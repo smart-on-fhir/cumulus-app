@@ -549,9 +549,10 @@ route(router, {
                 }
 
                 else {
-                    const meta = ColumnsMetadata.find(item => item.hasOwnProperty(col.name));
+                    // const meta = ColumnsMetadata.find(item => item.hasOwnProperty(col.name));
+                    const meta = ColumnsMetadata[col.name];
                     if (meta) {
-                        col.meta = meta[col.name];
+                        col.meta = meta//[col.name];
                     }
                 }
 
