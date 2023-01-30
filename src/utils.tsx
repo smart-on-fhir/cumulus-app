@@ -165,10 +165,13 @@ const dictionaryMap = new Map([
     [/\bcnt\b/gi               , "Count"    ],
     [/\bcovid((\s+|-)?19)?\b/gi, "COVID-19" ],
     [/\benct\b/gi              , "Encounter"],
+    [/\benc\b/gi               , "Encounter"],
+    [/\bcond\b/gi              , "Condition"],
     [/\bcat\b/gi               , "Category" ],
     [/\bpcr\b/gi               , "PCR"      ],
     [/\bnlp\b/gi               , "NLP"      ],
-    [/\bdx\b/gi                , "Diagnosis"]
+    [/\bdx\b/gi                , "Diagnosis"],
+    [/\bed\b/gi                , "ED"       ]
 ]);
 
 export function humanizeColumnName(str: string) {
