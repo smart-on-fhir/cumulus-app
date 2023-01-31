@@ -84,6 +84,12 @@
     }
 }
 
+@media (max-width: 960px) {
+    .dashboard-sidebar {
+        display: none;
+    }
+}
+
 .json-null { color: #C60; font-weight: bold; }
 .json-bool { color: #606; font-weight: bold; }
 .json-number { color: #C00 }
