@@ -550,7 +550,7 @@ export default function Dashboard({
             </HelmetProvider>
             <div className="row">
                 <div className="col col-0">
-                    <div onTransitionEnd={onTransitionEnd} style={{
+                    <div onTransitionEnd={onTransitionEnd} className="dashboard-sidebar" style={{
                         position     : "relative",
                         width        : showOptions ? 330 : 0,
                         opacity      : showOptions ? 1 : 0,
@@ -850,7 +850,7 @@ export default function Dashboard({
                                 </a>
                             </div>
                             <div className="col col-5 mb-1 ml-2 mr-2 responsive">
-                                <Link to="./request-data" className="btn btn-blue"><b> Request Line-level Data </b></Link>
+                                <Link to="./request-data" className="btn btn-blue"><b> Request Line Level Data (future) </b></Link>
                             </div>
                         </div>
                     </div>
