@@ -131,6 +131,7 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
             const nextState = Highcharts.merge(state, action.payload);
             if (nextState.chartType.startsWith("pie") || nextState.chartType.startsWith("donut")) {
                 nextState.viewGroupBy = undefined
+                nextState.denominator = ""
             }
 
             // @ts-ignore
