@@ -86,6 +86,9 @@ const DefaultChartOptions = {
         enabled: true,
         // margin: 0,
         // padding: 0,
+        itemStyle: {
+            fontSize: "14px"
+        }
     },
     colors: generateColors(16),
     yAxis: {
@@ -295,7 +298,10 @@ const DefaultChartOptions = {
         }
     },
     tooltip: {
-        useHTML: true
+        useHTML: true,
+        style: {
+            fontSize: "14px"
+        }
     },
     xAxis: {
         crosshair: true,
