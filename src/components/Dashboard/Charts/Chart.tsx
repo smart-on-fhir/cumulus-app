@@ -386,6 +386,9 @@ export function buildChartOptions({
             },
             pie: {
                 dataLabels: {
+                    style: {
+                        fontSize: "14px"
+                    },
                     formatter(): any {
                         if (this.point) {
                             return `<b>${this.point.name}</b><span style="opacity:0.5;font-weight:400">` +
