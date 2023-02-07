@@ -1,5 +1,5 @@
-import { Component, createRef } from "react"
 import ContentEditable from "react-contenteditable"
+import { stripTags }   from "../../utils"
 
 
 interface CaptionEditorProps {
@@ -8,34 +8,12 @@ interface CaptionEditorProps {
     onChange: (html: string) => void
 }
 
-interface CaptionEditorState {
-    html: string
-}
-
-export default class CaptionEditor extends Component<CaptionEditorProps, CaptionEditorState> {
-    
-    contentEditable: React.RefObject<HTMLDivElement>;
-
-    constructor(props: CaptionEditorProps) {
-        super(props);
-        this.contentEditable = createRef();
-        this.state = { html: String(props.html || "").trim() };
-    };
-  
-    handleChange = (evt: any) => {
-        const { onChange } = this.props
-        this.setState({ html: evt.target.value });
-        onChange && onChange(evt.target.value)
-    };
-  
-    render() {
-        return <ContentEditable
-            innerRef={this.contentEditable}
-            html={this.state.html}
-            disabled={!!this.props.disabled}
-            onChange={this.handleChange}
-            className="chart-caption"
-            tagName='div'
-        />
-    }
+export default function CaptionEditor({ html, disabled, onChange }: CaptionEditorProps) {
+    return <ContentEditable
+        html={ stripTags(html || "") ? html || "" : "" }
+        disabled={ !!disabled }
+        onChange={ e => onChange(e.target.value) }
+        className="chart-caption"
+        tagName="div"
+    />
 }

@@ -27,6 +27,7 @@
     line-height: inherit;
     // font           : inherit;
     font-size      : 1rem; // $font-size;
+    font-weight    : inherit;
     color          : $color;
     border-radius  : $border-radius;
     // vertical-align : top;
@@ -76,9 +77,13 @@
     }
 
     &:disabled, &.disabled {
-        color         : #CCC;
-        filter        : grayscale(1);
+        
         pointer-events: none;
+
+        &, & * {
+            color         : #BBB;
+            filter        : grayscale(1);
+        }
     }
 }
 

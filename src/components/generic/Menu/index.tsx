@@ -1,22 +1,35 @@
 import React from "react";
 import { render } from "react-dom"
 import { classList } from "../../../utils";
+import { Command } from "../../../commands/Command";
 import "./Menu.scss"
 
 export interface MenuItemConfig {
-    label: string | JSX.Element
-    command?: (e: MouseEvent) => void
-    enabled?: boolean | ((e: MouseEvent) => boolean)
-    active?: boolean | ((e: MouseEvent) => boolean)
-    available?: boolean | ((e: MouseEvent) => boolean)
-    icon?: JSX.Element
-    children?: MenuItemConfig[]
-    title?: string
+    label        : string | JSX.Element
+    execute     ?: (e: MouseEvent) => void
+    enabled     ?: boolean | ((e: MouseEvent) => boolean)
+    active      ?: boolean | ((e: MouseEvent) => boolean)
+    available   ?: boolean | ((e: MouseEvent) => boolean)
+    icon        ?: JSX.Element
+    children    ?: MenuItemConfig[]
+    description ?: string
 }
 
 export class ContextMenu extends React.Component
 {
+    target: any = null
+
+    constructor(props: any) {
+        super(props)
+        this.hideMenu = this.hideMenu.bind(this)
+    }
+
     hideMenu() {
+        if (this.target) {
+            this.target.classList?.remove("focus")
+            this.target = null
+        }
+
         const menu = document.querySelector<HTMLDivElement>("#context-menu > .menu");
         if (menu) {
             menu.blur()
@@ -33,6 +46,7 @@ export class ContextMenu extends React.Component
             menu.style.display = "block"
             menu.style.opacity = "0"
             menu.focus()
+            menu.addEventListener("blur", this.hideMenu, { once: true })
             requestAnimationFrame(() => {
                 const menuRect = menu.getBoundingClientRect()
 
@@ -50,7 +64,7 @@ export class ContextMenu extends React.Component
         }
     }
 
-    renderMenu(e: MouseEvent, menuItems: (MenuItemConfig | "-")[]) {
+    renderMenu(e: MouseEvent, menuItems: (MenuItemConfig | Command | "-")[]) {
 
         const access = (obj: Record<string, any>, prop: keyof typeof obj, ...args: any[]) => {
             const val = obj[prop];
@@ -63,7 +77,7 @@ export class ContextMenu extends React.Component
         return (
             <div
                 className="menu"
-                tabIndex={-1}
+                tabIndex={0}
                 style={{
                     left: e.clientX,
                     top : e.clientY,
@@ -80,8 +94,8 @@ export class ContextMenu extends React.Component
                         return null
                     }
 
-                    if (!item.command) {
-                        return <div className="menu-header" key={i} title={item.title}>
+                    if (!item.execute) {
+                        return <div className="menu-header" key={i} title={access(item, "description")}>
                             <span className="menu-item-icon">{ item.icon || "" }</span>
                             { item.label }
                         </div>
@@ -95,16 +109,19 @@ export class ContextMenu extends React.Component
                         "menu-item": true,
                         disabled: enabled === false,
                         selected: active === true
-                    })} key={i} title={item.title} onMouseDown={(ev) => {
+                    })} key={i} title={access(item, "description")} onMouseDown={(ev) => {
                         if (enabled !== false) {
                             ev.stopPropagation()
                             this.hideMenu()
-                            setTimeout(() => item.command!(e), 10)
+                            setTimeout(() => item.execute!(e))
                         }
                     }}>
                         <span className="menu-item-icon">{ item.icon || "" }</span>
                         { item.label }
-                        { item.children && this.renderMenu(e, item.children) }
+                        {
+                            // @ts-ignore
+                            item.children && this.renderMenu(e, item.children)
+                        }
                     </div>
                 })}
             </div>
@@ -113,7 +130,8 @@ export class ContextMenu extends React.Component
 
     componentDidMount() {
 
-        document.addEventListener("mousedown", this.hideMenu)
+        document.removeEventListener("mousedown", this.hideMenu, { capture: true })
+        document.addEventListener("mousedown", this.hideMenu, { capture: true })
 
         document.addEventListener("contextmenu", e => {
             // @ts-ignore
@@ -124,6 +142,13 @@ export class ContextMenu extends React.Component
             }
 
             e.preventDefault()
+
+            if (this.target) this.target.classList?.remove("focus")
+
+            // @ts-ignore
+            this.target = e.customTarget || null
+
+            if (this.target) this.target.classList?.add("focus")
 
             render(
                 this.renderMenu(e, menuItems),

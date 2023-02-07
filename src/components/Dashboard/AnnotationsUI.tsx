@@ -66,7 +66,7 @@ function Annotation({
                                 label: <>{ item.date }  -  <b>{ item.name }</b></>,
                                 icon : <i className="fa-regular fa-calendar-check color-blue-dark" />,
                                 active: moment(x).utc().isSame(moment(item.date).utc(), "day"),
-                                command: () => {
+                                execute: () => {
                                     point.x = +(new Date(item.date))
                                     onChange({ ...annotation, point })
                                 }
@@ -187,10 +187,18 @@ function Annotation({
                 <div className="col col-2 right">
                     <b>Color:&nbsp;</b>
                 </div>
-                <div className="col">
-                    <input type="color" value={ annotation.style?.color || "#FFFFFF" } onChange={e => {
-                        onChange({ ...annotation, style: { ...annotation.style, color: e.target.value }})
-                    }} />
+                <div className="col col-0">
+                    <input
+                        type="color"
+                        value={
+                            annotation.style?.color === "contrast" ?
+                            annotation.backgroundColor ===  "#EEEEEEDD" ? "#000000" : "#FFFFFF" :
+                            annotation.style?.color || "#888888"
+                        }
+                        onChange={e => {
+                            onChange({ ...annotation, style: { ...annotation.style, color: e.target.value }})
+                        }}
+                    />
                 </div>
             </div>
             <div className="row middle small" style={{ margin: "3px 0 0" }}>

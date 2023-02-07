@@ -7,15 +7,8 @@
 .collapse {
     
     .collapse-header {
-        // padding: 0.5em 0;
-        // border-bottom: 1.5px dashed #BBB;
-        // box-shadow: 0 1px 0 0 #FFF;
         font-size: 110%;
         font-weight: 500;
-        // cursor: pointer;
-        // color: #777;
-        // text-indent: 0.25em;
-        // text-shadow: 0 1px 0 #FFF;
     }
 
     &:not(.collapsed) {
@@ -31,31 +24,50 @@
     margin-bottom: $gap;
     display: flex;
     flex-wrap: wrap;
-    overflow: auto;
     
-    // justify-content: space-evenly;
+    .view-thumbnail {
+
+        &.selected, &.focus, &:focus-visible  {
+            border-radius: 10px;
+            background-color: #FFF;
+            outline: 0 none;
+
+            .view-thumbnail-image {
+                border-color: transparent;
+                background: transparent;
+            }
+        }
+
+        &.focus {
+            box-shadow: 0 0 2px 1px $color-blue-dark inset,
+                        0 0 1px 3px #CF0A inset,
+                        0 0 0px 4px $color-blue-dark inset;
+        }
+
+        &.selected, &.selected.focus {
+            box-shadow: 0 0 2px 1px $color-blue-dark inset,
+                        0 0 1px 3px #FFF8 inset,
+                        0 0 0px 4px $color-blue-dark inset;
+        }
+
+        &:focus-visible {
+            box-shadow: 0 0 2px 1px $color-blue-dark inset,
+                        0 0 1px 3px #CF0A inset,
+                        0 0 0px 4px $color-blue-dark inset;
+        }
+    }
 
     .view-thumbnail-image {
         border: 2px solid $color-grey;
         border-radius: 10px;
-        padding: 0 0 60%;
         background: #FFF;
-        position: relative;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: auto 94%;
-        image-rendering: optimizeQuality;
+        overflow: hidden;
+        padding: 4px;
 
-        // img {
-        //     display: block;
-        //     width: 100%;
-        //     // height: auto;
-        //     // max-width: 162px;
-        //     // max-height: 162px;
-        //     position: absolute;
-        //     object-position: center;
-        //     object-fit: cover;
-        // }
+        img {
+            display: block;
+            image-rendering: optimizeQuality;
+        }
     }
 
     .plus-icon-wrapper {
@@ -65,10 +77,11 @@
 
     .view-thumbnail-title {
         text-align: center;
-        margin: 5px 0 20px;
+        margin: 5px 0 9px;
         text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
         word-break: break-all;
         word-break: break-word;
+        padding: 0 5px;
     }
 
     .view-thumbnail-description {
@@ -114,7 +127,7 @@
 
     a:hover {
         .view-thumbnail-image {
-            border-color: darken($color: $color-blue, $amount: 15%);
+            border-color: #BBB;
         }
     }
 }
@@ -122,7 +135,7 @@
 .view-browser.view-browser-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    column-gap: 1em;
+    gap: 1em;
 }
 .view-browser.view-browser-column {
     display: grid;
@@ -144,20 +157,14 @@
         flex-direction: row;
         align-items: center;
         flex: 1 1 30em;
-        overflow: hidden;
     }
     .view-thumbnail-image {
         flex   : 0 0 8em;
-        // height : 72px;
-        height : 5em;
-        // padding: 75% 0 0;
-
-        // width  : 100px;
-        padding: 0;
+        height : 5.1em;
         display: block;
         max-width: none;
         border-radius: 6px;
-        align-self: flex-start;
+        align-self: center;
     }
 
     .view-thumbnail-title {
@@ -169,7 +176,7 @@
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
-        padding: 1px;
+        padding: 0.5em 4px 0.5em 0;
         flex: 1;
 
         .view-thumbnail-description {
