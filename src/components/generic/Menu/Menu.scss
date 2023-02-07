@@ -1,3 +1,5 @@
+@import "../../../styles/variables.scss";
+
 #context-menu {
     position: fixed;
     z-index: 100000;
@@ -5,6 +7,7 @@
     left: 0;
     width: 0;
     height: 0;
+    pointer-events: none;
 
     &.open {
         width: 100%;
@@ -38,8 +41,8 @@
 
         &:hover, &.selected {
             background: linear-gradient(90deg, rgba(129, 171, 214, 0.3), rgba(129, 171, 214, 0.32));
-            box-shadow: 0 0 0 1px rgba(91, 128, 165, 0.4) inset;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 0 1px rgba(91, 128, 165, 0.3) inset;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
             border-radius: 3px;
         }
         &.selected {
@@ -57,6 +60,7 @@
             width: 1.4em;
             text-align: center;
             margin: 0 0.4em 0 0;
+            color: fade-out($color-blue-dark, 0.3);
         }
     }
 
@@ -79,8 +83,13 @@
         padding: 1px 0.8em 2px 0.8em;
         text-align: center;
         font-size: 90%;
-        background: #EEE;
+        // background: #EEE;
         text-shadow: 0 1px 0 #FFF;
+        cursor: default;
+    }
+
+    .menu-item + .menu-header {
+        margin-top: 15px;
     }
 }
 

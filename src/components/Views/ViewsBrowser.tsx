@@ -6,9 +6,10 @@ import Loader          from "../generic/Loader"
 import { AlertError }  from "../generic/Alert"
 import ViewThumbnail   from "./ViewThumbnail"
 import { classList }   from "../../utils"
+import Collapse        from "../generic/Collapse"
+import { CustomSelection, WithSelection } from "../generic/WithSelection"
 
 import "./ViewsBrowser.scss"
-import Collapse from "../generic/Collapse"
 
 
 export default function ViewsBrowser({
@@ -76,12 +77,12 @@ export default function ViewsBrowser({
         });
     }
 
-    function renderItems() {
+    function renderItems(selection: CustomSelection<number>) {
         if (groupBy === "subscription") {
-            return renderBySubscription()
+            return renderBySubscription(selection)
         }
         if (groupBy === "tag") {
-            return renderByTag()
+            return renderByTag(selection)
         }
         return (
             <div className={ classList({
@@ -109,6 +110,7 @@ export default function ViewsBrowser({
                             view={ v }
                             showDescription={layout === "grid" ? 0 : requestId ? 120 : 500}
                             search={search}
+                            selection={selection}
                         />
                     ))
                 }
@@ -116,7 +118,7 @@ export default function ViewsBrowser({
         )
     }
 
-    function renderBySubscription() {
+    function renderBySubscription(selection: CustomSelection<number>) {
         const groups: Record<string, any[]> = {};
         (result || []).forEach(item => {
             let label = item.DataRequest!.name;
@@ -127,10 +129,10 @@ export default function ViewsBrowser({
             group.push(item)
         });
 
-        return renderGroups(groups, "database")
+        return renderGroups(groups, "database", selection)
     }
 
-    function renderByTag() {
+    function renderByTag(selection: CustomSelection<number>) {
         const groups: Record<string, any[]> = {};
         
         const unTagged: any[] = [];
@@ -154,14 +156,14 @@ export default function ViewsBrowser({
             groups["NO TAGS"] = unTagged
         }
 
-        return renderGroups(groups, "sell")
+        return renderGroups(groups, "sell", selection)
     }
 
-    function renderGroups(groups: Record<string, any[]>, icon: string) {
+    function renderGroups(groups: Record<string, any[]>, icon: string, selection: CustomSelection<number>) {
         return <>
             {
                 Object.keys(groups).map((k, i) => (
-                    <Collapse header={
+                    <Collapse key={i} header={
                         <><i className="material-symbols-rounded bottom">{icon}</i> {k}</>
                     }>
                         <div className={ classList({
@@ -176,6 +178,7 @@ export default function ViewsBrowser({
                                     view={ v }
                                     showDescription={layout === "grid" ? 0 : requestId ? 120 : 500}
                                     search={search}
+                                    selection={selection}
                                 />
                             ))
                         }
@@ -186,9 +189,7 @@ export default function ViewsBrowser({
         </>
     }
 
-    return (
-        <div>
-            { renderItems() }
-        </div>
-    )
+    return <WithSelection<number>>{(selection) => {
+        return <div>{ renderItems(selection) }</div>
+    }}</WithSelection>
 }

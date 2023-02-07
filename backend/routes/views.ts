@@ -1,12 +1,12 @@
 import Path                              from "path"
 import { Response, Router }              from "express"
-import { FindOptions }                   from "sequelize"
+import { FindOptions, Op }               from "sequelize"
 import crypto                            from "crypto"
 import { AppRequest }                    from ".."
 import { NotFound, InternalServerError, HttpError } from "../errors"
 import Model                             from "../db/models/View"
 import { route }                         from "../lib/route"
-import { assert, roundToPrecision }      from "../lib"
+import { assert }                        from "../lib"
 import { logger }                        from "../logger"
 import { requestLineLevelData }          from "../mail"
 import { requestPermission }             from "../acl"
@@ -325,6 +325,36 @@ route(router, {
         assert(model, NotFound);
         await model.destroy()
         res.json(model)
+    }
+});
+
+// Bulk Delete -----------------------------------------------------------------
+route(router, {
+    path: "/",
+    method: "delete",
+    request: {
+        schema: {
+            id: {
+                in: ['query'],
+                isString: {
+                    errorMessage: "The 'id' parameter must be a comma-separated list of IDs to delete"
+                }
+            }
+        }
+    },
+    handler: async (req: AppRequest, res: Response) => {
+
+        const ids = String(req.query.id).trim().split(",").map(parseFloat)
+
+        const result = await Model.destroy({
+            where: {
+                id: {
+                  [Op.in]: ids,
+                },
+            },
+        });
+
+        res.json({ message: `Deleted ${result} graphs` })
     }
 });
 

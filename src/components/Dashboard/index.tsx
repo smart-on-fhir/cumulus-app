@@ -1,29 +1,44 @@
-import { useCallback, useEffect, useReducer } from "react"
-import html2canvas, { Options }               from "html2canvas"
-import { useNavigate }                        from "react-router-dom"
-import { HelmetProvider, Helmet }             from "react-helmet-async"
-import Highcharts, { Chart }                  from "highcharts"
-import { Link }                               from "react-router-dom"
-import { useBackend }                         from "../../hooks"
-import { createOne, updateOne, deleteOne, request } from "../../backend"
-import { useAuth }                            from "../../auth"
-import { AlertError }                         from "../generic/Alert"
-import ConfigPanel                            from "./ConfigPanel"
+import { useCallback, useEffect, useReducer }    from "react"
+import { useNavigate }                           from "react-router-dom"
+import { HelmetProvider, Helmet }                from "react-helmet-async"
+import Highcharts, { Chart }                     from "highcharts"
+import { Link }                                  from "react-router-dom"
+import { useBackend, useCommand }                from "../../hooks"
+import { createOne, updateOne, request }         from "../../backend"
+import { useAuth }                               from "../../auth"
+import { AlertError }                            from "../generic/Alert"
+import ConfigPanel                               from "./ConfigPanel"
 import {buildChartOptions, default as BaseChart} from "./Charts/Chart"
-import CaptionEditor                          from "./CaptionEditor"
-import EditInPlace                            from "../generic/EditInPlace"
-import { ReadOnlyPaths, SupportedChartTypes, SupportedNativeChartTypes, TURBO_THRESHOLD } from "./config"
-import { defer, Json, strip }                 from "../../utils"
-import { getDefaultChartOptions }             from "./Charts/DefaultChartOptions"
-import Tag                                    from "../Tags/Tag"
-import Grid                                   from "../generic/Grid"
+import CaptionEditor                             from "./CaptionEditor"
+import EditInPlace                               from "../generic/EditInPlace"
+import { defer, Json, strip }                    from "../../utils"
+import { getDefaultChartOptions }                from "./Charts/DefaultChartOptions"
+import Tag                                       from "../Tags/Tag"
+import Grid                                      from "../generic/Grid"
+import { getScreenShot }                         from "../../commands/lib"
+import CommandButton                             from "../../commands/CommandButton"
+import { DownloadScreenshotAsPNG }               from "../../commands/Graphs/DownloadScreenshotAsPNG"
+import { DownloadScreenshotAsJPG }               from "../../commands/Graphs/DownloadScreenshotAsJPG"
+import { ToggleFullscreen }                      from "../../commands/Graphs/ToggleFullscreen"
+import { CopyGraph }                             from "../../commands/Graphs/CopyGraph"
+import { PrintChart }                            from "../../commands/Graphs/PrintChart"
+import { DeleteGraph }                           from "../../commands/Graphs/DeleteGraph"
+import { RequestLineLevelData }                  from "../../commands/Graphs/RequestLineLevelData"
+import { GenerateCaption }                       from "../../commands/Graphs/GenerateCaption"
+import { OpenInAnalyticEnvironment }             from "../../commands/Subscriptions/OpenInAnalyticEnvironment"
+import {
+    ReadOnlyPaths,
+    SupportedChartTypes,
+    SupportedNativeChartTypes,
+    TURBO_THRESHOLD
+} from "./config"
 
 import "./Dashboard.scss"
 
 
 // =============================================================================
 
-interface ViewState
+export interface ViewState
 {
     viewType        : "overview" | "data",
     showOptions     : boolean
@@ -291,27 +306,6 @@ export default function Dashboard({
         window.Highcharts.charts.forEach(c => c?.reflow())
     };
 
-    async function getScreenShot(options: Partial<Options> = {}, { type = "image/png", quality = 0.75 }: { type?: "image/jpeg" | "image/png", quality?: number } = {})
-    {
-        const el = document.querySelector("#chart .highcharts-container") as HTMLElement;
-        const canvas: HTMLCanvasElement = await html2canvas(el, {
-            scale: 1,
-            logging: false,
-            ...options,
-            ignoreElements: el => el.classList.contains("highcharts-exporting-group")
-        });
-        return canvas.toDataURL(type, quality);
-    }
-
-    async function downloadScreenshot({ type = "image/png", quality = 0.75 }: { type?: "image/jpeg" | "image/png", quality?: number } = {})
-    {
-        const screenShot = await getScreenShot({ scale: 4 }, { type, quality });
-        const a = document.createElement("a");
-        a.href = screenShot;
-        a.download = viewName || fullChartOptions.title?.text || "chart.png";
-        a.click();
-    }
-
     // Save
     const { execute: save, loading: saving } = useBackend(async () => {
         
@@ -386,14 +380,6 @@ export default function Dashboard({
     const { execute: takeScreenshot, loading: takingScreenshot } = useBackend(async () => {
         const screenShot = await getScreenShot();
         await updateOne("views", view.id!, { screenShot }).catch(e  => alert(e.message));
-    });
-
-    // Delete
-    const { execute: destroy, loading: deleting } = useBackend(() => {
-        if (window.confirm("Yre you sure you want to delete this view?")) {
-            return deleteOne("views", view.id + "").then(() => navigate("/"))
-        }
-        return Promise.resolve()
     });
 
     // Convert filters to search parameters
@@ -541,8 +527,18 @@ export default function Dashboard({
         }
     }
 
+    const deleteCommand    = useCommand(new DeleteGraph(view.id || 0, auth.user, navigate));
+    const copyCommand      = useCommand(new CopyGraph(view.id || 0, auth.user, navigate));
+    const downloadPNG      = useCommand(new DownloadScreenshotAsPNG(view));
+    const downloadJPG      = useCommand(new DownloadScreenshotAsJPG(view));
+    const toggleFullscreen = useCommand(new ToggleFullscreen());
+    const printChart       = useCommand(new PrintChart());
+    const requestLineData  = useCommand(new RequestLineLevelData(view.id || 0, auth.user, navigate))
+    const openInAE         = useCommand(new OpenInAnalyticEnvironment(view.DataRequestId || 0, auth.user))
+    const generateCaption  = useCommand(new GenerateCaption(fullChartOptions, state, c => dispatch({ type: "UPDATE", payload: { caption: c }})))
+
     return (
-        <div className={ saving || deleting ? "grey-out" : undefined }>
+        <div className={ saving || deleteCommand.working ? "grey-out" : undefined }>
             <HelmetProvider>
                 <Helmet>
                     <title>{viewName}</title>
@@ -646,18 +642,8 @@ export default function Dashboard({
                                         title="Save Changes">
                                         <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
                                     </button>
-                                    { view.id && <Link
-                                        to={`/views/${view.id}/copy`}
-                                        className="btn"
-                                        title="Create a copy of this chart to modify and save it later"
-                                    ><i className="fa-regular fa-copy" /></Link> }
-                                    <button
-                                        className="btn"
-                                        onClick={ destroy }
-                                        title="Delete this View"
-                                        disabled={!view.id || !isAdmin}>
-                                        <i className={ deleting ? "fas fa-circle-notch fa-spin" : "fas fa-trash-alt" } />
-                                    </button>
+                                    <CommandButton { ...copyCommand } label={ "" } />
+                                    <CommandButton { ...deleteCommand } label={ "" } />
                                     <button
                                         className="btn"
                                         onClick={ takeScreenshot }
@@ -701,66 +687,34 @@ export default function Dashboard({
                             contextMenuItems={[
                                 {
                                     label: "Save Changes",
-                                    command: save,
+                                    execute: save,
                                     icon: <i className="fas fa-save color-green" />
                                 },
-                                {
-                                    label: <span className="color-red">Delete This Graph</span>,
-                                    command: destroy,
-                                    enabled: !!view.id,
-                                    icon: <i className="fas fa-trash-alt color-red" />
-                                },
-                                {
-                                    label: "Copy Chart",
-                                    enabled: !!view.id && auth!.user?.permissions?.includes("Views.create"),
-                                    icon: <i className="fa-regular fa-copy color-blue-dark" />,
-                                    command: () => navigate(`/views/${view.id}/copy`),
-                                    title: "Create a copy of this chart to modify and save it later"
-                                },
+                                deleteCommand,
+                                copyCommand,
                                 {
                                     label: "Update Graph Thumbnail",
-                                    command: takeScreenshot,
+                                    execute: takeScreenshot,
                                     enabled: !!view.id,
                                     icon: <i className="fa-solid fa-camera color-orange" />,
-                                    title: "Take new screenshot of this graph as it currently looks"
+                                    description: "Take new screenshot of this graph as it currently looks"
                                 },
                                 {
                                     label: showOptions ? "Hide Chart Options" : "Show Chart Options",
-                                    command: () => dispatch({ type: "TOGGLE_OPTIONS" }),
+                                    execute: () => dispatch({ type: "TOGGLE_OPTIONS" }),
                                     icon: <i className="fas fa-cog color-blue-dark" />
                                 },
                                 "-",
                                 {
                                     label: "Show Chart Data",
-                                    command: () => dispatch({ type: "SET_VIEW_TYPE", payload: "data"}),
+                                    execute: () => dispatch({ type: "SET_VIEW_TYPE", payload: "data"}),
                                     icon: <i className="fas fa-th color-blue-dark" />
                                 },
-                                {
-                                    label: "Download PNG Image",
-                                    command: () => downloadScreenshot(),
-                                    icon: <span className="material-icons-round color-blue">insert_photo</span>
-                                },
-                                {
-                                    label: "Download JPEG Image",
-                                    command: () => downloadScreenshot({ type: "image/jpeg", quality: 0.8 }),
-                                    icon: <span className="material-icons-round color-brand-2">insert_photo</span>
-                                },
-                                {
-                                    label: "Print Chart",
-                                    // @ts-ignore
-                                    command: e => e.context?.chart.print(),
-                                    // @ts-ignore
-                                    enabled: e => !!e.context?.chart,
-                                    icon: <span className="material-icons-round color-blue-dark">print</span>
-                                },
-                                {
-                                    label: "Toggle Fullscreen",
-                                    // @ts-ignore
-                                    enabled: e => !!e.context?.chart,
-                                    // @ts-ignore
-                                    command: e => e.context?.chart.fullscreen.toggle(),
-                                    icon: <span className="material-icons-round color-blue-dark">fullscreen</span>
-                                },
+                                downloadPNG,
+                                downloadJPG,
+                                toggleFullscreen,
+                                printChart,
+                                generateCaption,
                                 "-",
                                 {
                                     label: "Annotate Selected Points ...",
@@ -768,7 +722,7 @@ export default function Dashboard({
                                     // @ts-ignore
                                     enabled: e => e.context?.chart.getSelectedPoints().length > 0,
                                     // @ts-ignore
-                                    command: e => annotatePoints(e.context?.chart),
+                                    execute: e => annotatePoints(e.context?.chart),
                                     available: !chartType.startsWith("pie") && !chartType.startsWith("donut")
                                 }
                             ]}
@@ -835,23 +789,11 @@ export default function Dashboard({
                         <br/>
                         
                         <div className="row mb-1 mt-2 middle half-gap wrap">
-                            <div className="col col-5 mb-1 ml-2 mr-2 responsive">
-                                <a
-                                    className={ "btn btn-blue" + (process.env.REACT_APP_BACKEND_HOST ? " grey-out" : "") }
-                                    href={`https://cumulusdemo.notebook.us-east-1.sagemaker.aws/notebooks/cumulus/demo.ipynb?fileLoc=${
-                                        encodeURIComponent(
-                                            // dataRequest.data.src ||
-                                            window.location.origin + "/api/requests/" + dataRequest.id + "/data?format=csv"
-                                        )
-                                    }`}
-                                    target="_blank"
-                                    rel="noreferrer noopener"
-                                >
-                                    <b> Open in Analytic Environment </b>
-                                </a>
+                            <div className="col col-5 mb-1 ml-2 mr-2 responsive bold">
+                                <CommandButton { ...openInAE } className="btn-blue"/>
                             </div>
-                            <div className="col col-5 mb-1 ml-2 mr-2 responsive">
-                                <Link to="./request-data" className="btn btn-blue"><b> Request Line Level Data (future) </b></Link>
+                            <div className="col col-5 mb-1 ml-2 mr-2 responsive bold">
+                                <CommandButton { ...requestLineData } className="btn-blue"/>
                             </div>
                         </div>
                     </div>

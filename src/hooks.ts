@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useReducer } from "react"
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react"
+import { Command } from "./commands/Command";
 
 interface State<T = any> {
     loading: boolean
@@ -50,4 +51,33 @@ export function useBackend<T=any>(fn: (signal?: AbortSignal) => Promise<T>, imme
         result: state.result as (T | null),
         error: state.error
     };
+}
+
+export function useCommand(command: Command) {
+    const [working, setWorking] = useState(false)
+    const [error  , setError  ] = useState<Error | null>(null);
+
+    const execute = useCallback(async () => {
+        setError(null)
+        setWorking(true)
+        try {
+            await command.execute()
+        } catch (error) {
+            setError(error as Error)
+        } finally {
+            setWorking(false)
+        }
+    }, [command]);
+
+    return {
+        working,
+        error,
+        execute,
+        label      : command.label      ({ working, error }),
+        icon       : command.icon       ({ working, error }),
+        available  : command.available  ({ working, error }),
+        enabled    : command.enabled    ({ working, error }),
+        active     : command.active     ({ working, error }),
+        description: command.description({ working, error })
+    }
 }
