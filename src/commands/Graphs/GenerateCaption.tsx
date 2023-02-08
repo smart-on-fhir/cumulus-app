@@ -56,7 +56,7 @@ export class GenerateCaption extends Command
             let s = "";
 
             this.chartOptions.series![0].data!.forEach((x: any, i) => {
-                const color = this.chartOptions.colors![this.chartOptions.colors!.length % i];
+                const color = this.chartOptions.colors![i % this.chartOptions.colors!.length];
                 s += `<div>${this.generateBullet(color)} `
                 let name  = this.chartOptions.series![0]!.name!;
                 let value = x.name
