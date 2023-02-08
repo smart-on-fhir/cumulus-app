@@ -16,7 +16,7 @@ export class RequestLineLevelData extends Command
     }
 
     label() {
-        return "Request Line Level Data (future)..."
+        return <>Request Line Level Data <span className="color-muted">(future)</span>...</>
     }
 
     description() {

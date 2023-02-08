@@ -21,7 +21,7 @@ export class DownloadScreenshotAsPNG extends Command
     }
 
     icon() {
-        return <span className="material-icons-round color-blue">insert_photo</span>
+        return <span className="material-icons-round">insert_photo</span>
     }
 
     available() {

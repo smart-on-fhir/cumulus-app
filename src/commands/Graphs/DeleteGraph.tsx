@@ -17,7 +17,7 @@ export class DeleteGraph extends Command
     }
 
     label() {
-        return <span className="color-red">Delete This Graph</span>
+        return "Delete This Graph"
     }
 
     icon(ctx?: Record<string, any>) {

@@ -16,15 +16,15 @@ export class CopyGraph extends Command
     }
 
     label() {
-        return "Copy Chart"
+        return "Duplicate Graph"
     }
 
     description() {
-        return "Create a copy of this chart to modify and save it later"
+        return "Create a copy of this graph to modify and save it later"
     }
 
     icon() {
-        return <i className="fa-regular fa-copy color-blue-dark" />
+        return <i className="fa-regular fa-copy" />
     }
 
     available() {

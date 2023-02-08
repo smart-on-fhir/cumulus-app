@@ -10,7 +10,7 @@ export class PrintChart extends Command
     }
 
     icon() {
-        return <span className="material-icons-round color-blue-dark">print</span>
+        return <span className="material-icons-round">print</span>
     }
 
     available() {
