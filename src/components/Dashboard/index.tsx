@@ -688,7 +688,7 @@ export default function Dashboard({
                                 {
                                     label: "Save Changes",
                                     execute: save,
-                                    icon: <i className="fas fa-save color-green" />
+                                    icon: <i className="fas fa-save" />
                                 },
                                 deleteCommand,
                                 copyCommand,
@@ -696,35 +696,35 @@ export default function Dashboard({
                                     label: "Update Graph Thumbnail",
                                     execute: takeScreenshot,
                                     enabled: !!view.id,
-                                    icon: <i className="fa-solid fa-camera color-orange" />,
+                                    icon: <i className="fa-solid fa-camera" />,
                                     description: "Take new screenshot of this graph as it currently looks"
                                 },
-                                {
-                                    label: showOptions ? "Hide Chart Options" : "Show Chart Options",
-                                    execute: () => dispatch({ type: "TOGGLE_OPTIONS" }),
-                                    icon: <i className="fas fa-cog color-blue-dark" />
-                                },
+                                // {
+                                //     label: showOptions ? "Hide Chart Options" : "Show Chart Options",
+                                //     execute: () => dispatch({ type: "TOGGLE_OPTIONS" }),
+                                //     icon: <i className="fas fa-cog" />
+                                // },
                                 "-",
                                 {
                                     label: "Show Chart Data",
                                     execute: () => dispatch({ type: "SET_VIEW_TYPE", payload: "data"}),
-                                    icon: <i className="fas fa-th color-blue-dark" />
+                                    icon: <i className="fas fa-th" />
                                 },
                                 downloadPNG,
                                 downloadJPG,
                                 toggleFullscreen,
                                 printChart,
-                                generateCaption,
                                 "-",
                                 {
                                     label: "Annotate Selected Points ...",
-                                    icon: <i className="fa-regular fa-comment color-blue-dark"/>,
+                                    icon: <i className="fa-regular fa-comment"/>,
                                     // @ts-ignore
                                     enabled: e => e.context?.chart.getSelectedPoints().length > 0,
                                     // @ts-ignore
                                     execute: e => annotatePoints(e.context?.chart),
                                     available: !chartType.startsWith("pie") && !chartType.startsWith("donut")
-                                }
+                                },
+                                generateCaption
                             ]}
                             // This key controls in which cases the chart should be re-created rather than updated!
                             key={ [
