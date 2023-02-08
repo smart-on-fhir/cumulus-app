@@ -10,7 +10,7 @@ export class ToggleFullscreen extends Command
     }
 
     icon() {
-        return <span className="material-icons-round color-blue-dark">fullscreen</span>
+        return <span className="material-icons-round">fullscreen</span>
     }
 
     available() {
