@@ -6,8 +6,8 @@ set -euo pipefail
 # if `--env-file` was not passed, load .env and .env.local
 if [[ "$*" != *"--env-file"* ]]; then
     set -o allexport
-    if [[ -f .env ]]; then
-        source .env
+    if [[ -f .env.docker ]]; then
+        source .env.docker
     fi
     if [[ -f .env.local ]]; then
         source .env.local
@@ -16,4 +16,4 @@ if [[ "$*" != *"--env-file"* ]]; then
 fi
 
 cd docker
-/usr/local/bin/docker-compose "$@" up 
+docker compose "$@" up 
