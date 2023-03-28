@@ -11,7 +11,11 @@ if [[ "$*" != *"--env-file"* ]]; then
     fi
     if [[ -f .env.local ]]; then
         source .env.local
+    else
+        echo ".env.local was not found. See documentation for details." 
+        exit 1
     fi
+
     set +o allexport
 fi
 
