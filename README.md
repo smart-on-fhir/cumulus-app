@@ -31,24 +31,6 @@ Example `.env.local` vars:
 ```
 
 
-## Docker Cheat Sheet
-
-Remove all Cumulus Containers
-```
-docker ps -a | grep "cumulus" | awk '{print $1}' | xargs docker rm
-```
-
-Remove Cumulus Postgres Data Volume
-
-```
-docker volume ls | grep "cumulus" | awk '{print $2}' | xargs docker volume rm 
-```
-
-Stop and Remove All Containers
-```
-docker stop $(docker ps -a -q)
-docker rm $(docker ps -a -q)
-```
 
 
 ## Running Tests 
