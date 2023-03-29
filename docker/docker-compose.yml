@@ -58,8 +58,7 @@ services:
       - POSTGRES_DB=$DB_DATABASE
       - PGDATA=/var/lib/postgresql/data/pgdata
       - PGPORT=$DB_PORT
-    # volumes:
-    #   - cumulus-dashboard-database:/var/lib/postgresql/data/pgdata
-
-# volumes:
-#   cumulus-dashboard-database:
+    volumes:
+       - cumulus-dashboard-db-data:/var/lib/postgresql/data/pgdata
+volumes:
+   cumulus-dashboard-db-data:
