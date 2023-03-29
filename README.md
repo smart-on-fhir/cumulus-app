@@ -1,4 +1,4 @@
-# Cumulus System
+# Cumulus Dashboard
 
 ## Quick Start
 
