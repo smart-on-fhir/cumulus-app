@@ -1,0 +1,19 @@
+@import "../../styles/variables.scss";
+
+.project, .col.project {
+    border: 1px solid #DDD;
+    background: #FFF;
+    border-radius: 1rem;
+    padding: 2rem;
+    cursor: pointer;
+
+    &:hover {
+        box-shadow: 0 0 0 5px fade-out($color-blue-dark, 0.8);
+        border-color: $color-blue-dark;
+    }
+
+    > h3 {
+        margin: 0 0 1em;
+        text-align: center;
+    }
+}

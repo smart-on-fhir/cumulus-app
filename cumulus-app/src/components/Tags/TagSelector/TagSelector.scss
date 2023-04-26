@@ -1,0 +1,41 @@
+.tag-selector {
+    max-height: none !important;
+    
+    .select-component-value {
+        display: block;
+        max-height: none;
+        padding-left: 0 !important;
+        line-height: 1.5;
+        margin: -0.1em 0;
+
+        .tag {
+            line-height: 1.200;
+            margin: 0.1em 0.25em 0.05em 0 !important;
+            display: inline-block;
+            vertical-align: top;
+        }
+    }
+    .select-component-menu {
+        max-width      : 100%;
+        padding        : 0.6em;
+        flex-direction : row;
+        flex-wrap      : wrap;
+        justify-content: flex-start;
+        max-height     : 20em;
+
+        overflow: auto;
+
+        .tag-item {
+            flex       : 1 0 15em;
+            margin     : 0.1em;
+            font-weight: 500;
+            max-width  : 100%;
+        }
+    }
+
+    &:focus, &:focus-within {
+        .select-component-menu {
+            display: flex !important;
+        }
+    }
+}

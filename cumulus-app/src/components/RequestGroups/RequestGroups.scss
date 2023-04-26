@@ -1,0 +1,44 @@
+@import "../../styles/variables.scss";
+
+
+.request-groups-list {
+
+    table {
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    th {
+        border-bottom: 1px solid #CCC;
+        color: $color-blue-dark;
+    }
+
+    tbody {
+        td {
+            border-bottom: 1px solid #DDD;
+            a {
+                font-size: 90%;
+                padding: 0.2em;
+            }
+        }
+    }
+
+    td, th {
+        padding: 0.1em 0.4em;
+        vertical-align: middle;
+        max-width: 30%;
+        &, div {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    }
+
+    thead {
+        background: #EEE;
+    }
+
+    tbody tr:hover {
+        background-color: fade-out($color-blue, 0.9);
+    }
+}

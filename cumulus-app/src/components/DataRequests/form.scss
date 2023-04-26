@@ -1,0 +1,38 @@
+@import "../../styles/variables.scss";
+
+.description-editor {
+    min-height: 100%;
+    max-height: 15em;
+    overflow: auto;
+
+    &:empty:before {
+        content: "Subscription Description";
+        color: #CCC;
+    }
+}
+
+.fields-table {
+    // border-top: 2px solid $color-grey;
+    width: 100%;
+    border-spacing: 0;
+    
+    th, td {
+        padding: 0.5em 0;
+    }
+
+    th {
+        padding-right: 1em;
+        vertical-align: text-top;
+    }
+
+    tr + tr {
+        th, td {
+            border-top: 2px solid $color-grey;
+        }
+    }
+}
+
+.field-editor-list .row {
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+}

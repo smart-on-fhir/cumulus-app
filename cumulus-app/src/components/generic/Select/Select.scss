@@ -1,0 +1,154 @@
+@import "../../../styles/variables.scss";
+
+
+.select-component {
+    position   : relative;
+    user-select: none;
+    padding    : 0.4em 22px 0.4em 0.6em !important;
+    min-height : $font-size * $line-height + $font-size * 0.8 + 2;
+    text-align : left;
+    display: inline-block;
+
+    .select-component-value {
+        overflow: hidden;
+        display: flex;
+        max-height: 1.4em;
+        flex: 1 1 0;
+        align-items: baseline;
+
+        .select-component-option-icon {
+            position: relative;
+            width: 1.2em;
+            height: 1.2em;
+            min-width: 1.2em;
+            max-width: 1.2em;
+            margin: 0 0.2em 0 0;
+            overflow: visible;
+            font-size: 1.2em;
+            line-height: 1.2em;
+            text-align: center;
+            vertical-align: middle;
+            display: flex;
+            flex: 0 0 1.2em;
+            align-self: center;
+        }
+
+        img.select-component-option-icon {
+            width    : 0.55em;
+            height   : 0.55em;
+            min-width: 0.55em;
+            max-width: 0.55em;
+            margin   : 0 1em 0 0;
+            line-height: 0;
+            vertical-align: top;
+            transform-origin: 0 50%;
+            transform: scale(1.81);
+            overflow: visible;
+        }
+
+        span {
+            flex: 1 1 auto;
+        }
+        > span {
+            flex: 10 1 0;
+            white-space  : nowrap;
+            overflow     : hidden;
+            text-overflow: ellipsis;
+            &.right {
+                flex: 0 0 auto;
+                text-align: right;
+            }
+
+            span {
+                padding: 0;
+            }
+        }
+    }
+
+    .select-component-placeholder {
+        color: #999;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .select-component-menu {
+        position: absolute;
+        z-index: 1000;
+        top: 100%;
+        right: auto;
+        left: 0;
+        min-width: 100%;
+        margin-top: 1px;
+        background: #FFF;
+        border-radius: 3px;
+        padding: 1px;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0px 5px 10px -5px rgba(0, 0, 0, 0.5);
+        display: none;
+
+        &.open {
+            display: block;
+        }
+    }
+
+    &.right {
+        text-align: left;
+        .select-component-menu {
+            right: 0;
+            left: auto;
+        }
+    }
+
+    .select-component-option {
+        padding: 0.2em 1em 0.2em 2.1em;
+        white-space: nowrap;
+        cursor: default;
+        border-radius: 2px;
+        position: relative;
+        display: flex;
+
+        .select-component-option-icon {
+            position: absolute;
+            width: 1.2em;
+            height: 1.2em;
+            min-width: 1.2em;
+            top: 0.2em;
+            margin: -0em 0 0 -1.6em;
+            font-size: inherit;
+            line-height: 1.2em;
+            text-align: center;
+        }
+
+        &.highlighted {
+            background: linear-gradient(90deg, rgba(129, 171, 214, 0.3), rgba(129, 171, 214, 0.32));
+            box-shadow: 0 0 0 0.5px rgb(154, 178, 201) inset;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        &.selected {
+            background: linear-gradient(90deg, #369, rgb(28, 79, 129));
+            box-shadow: 0 0 0 0.75px #036 inset;
+            color: #FFF;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+
+            .select-component-option-icon {
+                color: #FFF;
+            }
+
+            .right {
+                color: #FFF;
+            }
+        }
+
+        &.disabled {
+            color: #999;
+            pointer-events: none;
+        }
+    }
+
+    .right {
+        text-align: right;
+        flex: 1 1 0;
+        padding: 0 2px 0 0.6em;
+    }
+}

@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.a571e6f3.css",
+    "main.js": "/static/js/main.5aa2d9e4.js",
+    "static/js/787.b3746862.chunk.js": "/static/js/787.b3746862.chunk.js",
+    "index.html": "/index.html",
+    "static/media/caret-down.svg": "/static/media/caret-down.f01e159a8905d8a05435.svg",
+    "main.a571e6f3.css.map": "/static/css/main.a571e6f3.css.map",
+    "main.5aa2d9e4.js.map": "/static/js/main.5aa2d9e4.js.map",
+    "787.b3746862.chunk.js.map": "/static/js/787.b3746862.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a571e6f3.css",
+    "static/js/main.5aa2d9e4.js"
+  ]
+}

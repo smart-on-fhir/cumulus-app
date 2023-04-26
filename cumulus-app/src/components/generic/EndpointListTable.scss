@@ -1,0 +1,33 @@
+@import "../../styles/variables.scss";
+
+
+table.endpoint-list-table {
+
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    thead {
+        background: #EEE;
+    }
+
+    tbody tr:hover {
+        background-color: fade-out($color-blue, 0.9);
+    }
+
+    td, th {
+        padding: 0.2em 0.3em;
+        vertical-align: middle;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    th {
+        border-bottom: 1px solid #CCC;
+        color: $color-blue-dark;
+    }
+
+    td {
+        border-bottom: 1px solid #DDD;
+    }
+}

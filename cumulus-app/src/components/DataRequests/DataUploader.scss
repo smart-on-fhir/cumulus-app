@@ -1,0 +1,77 @@
+.import-preview-wrap {
+    overflow: auto;
+    border: 1px solid #CCC;
+}
+table.import-preview {
+    table-layout: fixed;
+    border-spacing: 0;
+    border-collapse: collapse;
+    min-width: 100%;
+    font-size: 12px;
+
+    tbody {
+        background: #FFF;
+
+        tr:hover td {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+    }
+
+    thead {
+        font-weight: bold;
+    }
+
+    td, th {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 0.1em 0.4em;
+        white-space: pre;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+        cursor: default;
+        font-family: monospace;
+        text-align: left;
+
+        &.selected {
+            background: rgb(218, 233, 250);
+        }
+    }
+}
+
+.data-uploader {
+    .progress {
+        width: 100%;
+        margin: 1em 0;
+        text-align: left;
+        line-height: 1.6;
+    }
+    .progress-bar-wrap {
+        overflow: hidden;
+        width: 100%;
+        border: 1px solid rgba(0, 0, 0, 0.3);
+        border-radius: 3px;
+        // padding: 1px;
+        box-shadow: 0 0 0 1px #fff, 0 10px 10px -10px rgba(0, 0, 0, 0.2) inset;
+    }
+    .progress-bar {
+        height: 10px;
+        background-color: #2fff00;
+        // border-radius: 2px;
+        transition: all 1s linear;
+        box-shadow: 0 -20px 10px -10px rgba(0, 0, 0, 0.1) inset, 0 0 0 1px rgba(0, 0, 0, 0.3);
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+    td, th {
+        padding: 2px;
+    }
+    tr.selected {
+        background: rgb(218, 233, 250);
+
+        input, select {
+            background-color: rgba(255, 255, 255, 0.75);
+        }
+    }
+}

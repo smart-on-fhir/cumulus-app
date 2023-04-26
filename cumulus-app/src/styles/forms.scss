@@ -1,0 +1,622 @@
+@use "sass:math";
+@import "./variables.scss";
+
+@function contrast($color, $threshold: 50%, $light: #FFF, $dark: #000) {
+    @if (lightness($color) < $threshold) {
+        @return $light;
+    }
+    @else {
+        @return $dark;
+    }
+}
+
+@mixin button($bg, $hoverBg: darken($bg, 5%)) {
+    $paddingTop    : 0.4em;
+    $paddingRight  : 0.8em;
+    $paddingBottom : 0.4em;
+    $paddingLeft   : 0.8em;
+    $contrast      : 70;
+    $color         : contrast($bg, 60%, lighten($bg, $contrast), darken($bg, $contrast));
+
+    // background     : $bg linear-gradient(lighten($bg, 5%), darken($bg, 5%));
+    background     : $bg;
+    border         : 1px solid darken($bg, 10%);
+    
+    // line-height    : normal;//$line-height;//$font-size - ($paddingTop + $paddingBottom);
+    // vertical-align: middle;
+    line-height: inherit;
+    // font           : inherit;
+    font-size      : 1rem; // $font-size;
+    font-weight    : inherit;
+    color          : $color;
+    border-radius  : $border-radius;
+    // vertical-align : top;
+    text-align     : center;
+    text-decoration: none !important;
+    cursor         : default;
+    display        : inline-flex;
+    align-items    : center;
+    justify-content: center;
+    // min-height     : 4.4ex;
+    outline        : 0;
+    padding        : $paddingTop $paddingRight $paddingBottom $paddingLeft;
+    white-space    : pre;// normal;
+    // overflow       : hidden;
+    // text-overflow  : ellipsis;
+    // text-shadow    : contrast-text-shadow($color);
+    // box-shadow     : 0 0 1px lighten($bg, 10%) inset,
+    //                  0 2px 0 -1px lighten($bg, 10%) inset;
+    // height       : 2em;
+    user-select   : none;
+    min-width     : 2em;
+    margin        : 0;
+    vertical-align: middle;
+    box-shadow    : 0px 1px 2px -1px #fff inset;
+
+    * {
+        line-height    : inherit;
+        font-size      : inherit;
+    }
+  
+    &:hover:not(:disabled, .disabled) {
+        background: $hoverBg;
+        color     : contrast($hoverBg, 60%, lighten($hoverBg, $contrast), darken($hoverBg, $contrast));
+    }
+
+    &:active:not(:disabled, .disabled), &.active:not(:disabled, .disabled) {
+        $color    : contrast($hoverBg, 60, lighten($hoverBg, $contrast), darken($hoverBg, $contrast));
+        background: darken($hoverBg, 5);
+        color     : $color;
+        // padding   : ($paddingTop + 0.05) ($paddingRight - 0.05) ($paddingBottom - 0.05) ($paddingLeft + 0.05);
+    }
+
+    &:focus {
+        // box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.99), 0 0 0 3px fade-out($color-blue, 0.25);
+        border-color: rgba(0, 99, 212, 0.746);
+        box-shadow: 0 0 0 3px rgba(37, 139, 255, 0.3);
+    }
+
+    &:disabled, &.disabled {
+        
+        pointer-events: none;
+
+        &, & * {
+            color         : #BBB;
+            filter        : grayscale(1);
+        }
+    }
+}
+
+@mixin file-selector-button {
+    // line-height       : 1;
+    -webkit-appearance: none;
+    display           : inline-block;
+    border            : none;
+    border-radius     : $border-radius - 1;
+    // padding           : round($font-size * 0.5);
+    // pointer-events    : none;
+    background        : $color-grey;
+    color             : $color-grey-dark;
+    padding           : 0.2rem 0.5rem;
+    // margin: 0;
+    margin            : -0.2rem 0.5em -0.2rem -0.5rem;
+    // vertical-align    : middle;
+    vertical-align    : top;
+    line-height: $line-height;
+    // position: absolute;
+}
+
+@mixin disabled-file-selector-button {
+    @include file-selector-button();
+    background  : #DDD;
+    color       : #888;
+    text-shadow : 0 1px 0 #EEE;
+    box-shadow  : 0 0 1px 0 #666 inset;
+    opacity     : 1;
+}
+
+@mixin form-control() {
+    background   : #FFF;
+    border       : 1px solid $color-grey;
+    border-radius: $border-radius;
+    padding      : 0.4em 0.8em;
+    outline      : none;
+    font         : inherit;
+    width        : 100%;
+    line-height  : $line-height;
+    color        : inherit;
+    max-height   : (1rem * ($line-height + 0.8)) + 2;
+    margin: 0;
+    // height   : ($font-size * $line-height) + round($font-size * 0.8);
+  
+    &:focus, &:focus-within, &:active {
+        border-color: rgb(37, 139, 255);
+        box-shadow: 0 0 0 3px rgba(37, 139, 255, 0.3);
+    }
+  
+    &:invalid, &.invalid {
+        border-color: rgb(204, 41, 0);  
+        &:focus {
+            box-shadow: 0 0 0 3px rgba(204, 41, 0, 0.3);
+        }
+    }
+
+    &[readonly] {
+        color: #777;
+        border-color: #CCC;
+    }
+
+    &:disabled {
+        background  : #EEE !important;
+        border-color: #CCC;
+        color       : #888;
+        text-shadow : 0 1px 0 #FFF;
+        box-shadow  : 0 0 0 1px #FFF inset;
+        opacity     : 1;
+    }
+}
+
+
+input[type="text"],
+input[type="url"],
+input[type="password"],
+input[type="email"],
+input[type="search"],
+input[type="file"],
+input[type="phone"],
+input[type="number"],
+input[type="date"],
+select,
+textarea,
+.form-control {
+    @include form-control();
+}
+
+input[type="search"] {
+    border-radius: 10em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3C!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --%3E%3Cpath fill-opacity='0.3' d='M500.3 443.7l-119.7-119.7c27.22-40.41 40.65-90.9 33.46-144.7C401.8 87.79 326.8 13.32 235.2 1.723C99.01-15.51-15.51 99.01 1.724 235.2c11.6 91.64 86.08 166.7 177.6 178.9c53.8 7.189 104.3-6.236 144.7-33.46l119.7 119.7c15.62 15.62 40.95 15.62 56.57 0C515.9 484.7 515.9 459.3 500.3 443.7zM79.1 208c0-70.58 57.42-128 128-128s128 57.42 128 128c0 70.58-57.42 128-128 128S79.1 278.6 79.1 208z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 8px 8px;
+    background-size: 18px;
+    padding-left: 32px;
+    max-width: 20em;
+}
+
+input[type="number"] {
+    padding-right: 3px;
+}
+
+input[type="date"] {
+    padding-right: 3px;
+    padding-left: 3px;
+    line-height: 1;
+}
+
+input[type="color"] {
+    border: 1px solid rgba(0, 0, 0, 0.75);
+    box-shadow: 0 0 0 1px #FFF;
+    padding: 0;
+    margin: 3px;
+    display: inline-block;
+    line-height: 1;
+    font-size: 1px;
+    vertical-align: top;
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+    overflow: hidden;
+
+    &:focus {
+        box-shadow: 0 0 0 1px #000;
+    }
+
+    &:disabled {
+        border: 1px solid rgba(0, 0, 0, 0.5);
+        opacity: 0.5;
+        filter: grayscale(1);
+    }
+
+    &::-webkit-color-swatch-wrapper {
+        padding: 0;
+        display: block;
+        border-radius: 1px;
+    }
+    &::-webkit-color-swatch {
+        display: block;
+        height: 100%;
+        border: 0;
+        border-radius: 1px;
+    }
+
+    /* Firefox styles */
+    &::-moz-color-swatch {
+        padding: 0;
+        display: block;
+        border-radius: 1px;
+        margin: 0;
+        border: 0;
+    }
+    &::-moz-focus-inner {
+        display: block;
+        height: 100%;
+        border: 0;
+        border-radius: 1px;
+        padding: 0;
+        margin: 0;
+    }
+}
+
+::-webkit-file-upload-button {
+    @include file-selector-button();
+}
+::-ms-browse {
+    @include file-selector-button();
+}
+::file-selector-button {
+    @include file-selector-button();
+}
+:disabled::-webkit-file-upload-button {
+    @include disabled-file-selector-button();
+}
+:disabled::-ms-browse {
+    @include disabled-file-selector-button();
+}
+:disabled::file-selector-button {
+    @include disabled-file-selector-button();
+}
+:disabled .file-input-value {
+    background  : #EEE !important;
+    color       : #888;
+    text-shadow : 0 1px 0 #FFF;
+}
+fieldset:disabled * {
+    color       : #888;
+}
+::placeholder,
+::-webkit-input-placeholder {
+    color: #999;
+}
+
+textarea {
+    height: auto;
+    resize: vertical;
+    min-height: 2.1em;
+    max-height: none;
+}
+
+select:not([size]), .select-component {
+    background: #FFF url(caret-down.svg) 100% center no-repeat;
+    background-size: auto;
+    padding-right: 22px;
+    background-size: 22px 14px;
+    appearance: none;
+}
+
+select[size] {
+    padding: 1px;
+    height: 100%;
+    min-height: 100%;
+}
+
+select option.empty-option {
+    color: #888;
+}
+
+.btn {
+    @include button(#FFF);
+}
+
+.btn-blue {
+    @include button($color-blue);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+.btn-blue-dark {
+    @include button($color-blue-dark);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+.btn-green {
+    @include button($color-green);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+.btn-brand-2 {
+    @include button($color-brand-2);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.btn-virtual {
+    &:not(:hover,:focus) {
+        background  : transparent;
+        border-color: transparent;
+        box-shadow: none;
+    }
+}
+
+
+.toolbar {
+    background: $color-grey;
+    border-radius: $border-radius + 1px;
+    white-space: nowrap;
+    margin: -1px;
+    
+    > .btn {
+        border       : 1px solid rgba(0, 0, 0, 0);
+        border-radius: 0;
+        margin       : 1px 1px 1px 0;
+        font-size    : inherit;
+        // padding      : 0.46em 0.6em;
+        // line-height  : 1.2em;
+        // text-shadow: 0 -1px 0 #FFF, 0 1px 2px rgba(0, 0, 0, .2);
+        
+        // &:active:not(:disabled, .disabled), &.active:not(:disabled, .disabled) {
+        //     padding: (round($font-size * 0.4) + 3px)
+        //              (round($font-size * 0.4) + 3px)
+        //              (round($font-size * 0.4) + 1px)
+        //              (round($font-size * 0.4) + 5px);
+        // }
+
+        &:active, &:focus {
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 1px 0 #FFF;
+        }
+
+        &:focus-visible {
+            outline: 1px dotted;
+            outline-offset: -3px;
+        }
+
+        &.active:not(:disabled, .disabled) {
+            background: fade-out($color: mix($color-blue, #FFF, 25%), $amount: 0.5);
+            // color: #FFF;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 1px 0 #ffffff88;
+            color: mix($color-blue, #000, 50%)
+        }
+
+        &:first-child {
+            border-top-left-radius: $border-radius;
+            border-bottom-left-radius: $border-radius;
+            margin-left: 1px;
+        }
+
+        &:last-child {
+            border-top-right-radius: $border-radius;
+            border-bottom-right-radius: $border-radius;
+        }
+
+        &.disabled {
+            background: #FFF;
+            opacity: 1;
+            color: #CCC;
+        }
+    }
+
+    &.flex {
+        display: flex;
+        flex: 1 1 100%;
+
+        .btn {
+            display: flex;
+            flex: 1 1 0;
+            white-space: pre;
+            // flex-wrap: wrap;
+            min-width: auto;
+        }
+    }
+}
+
+label {
+    padding: 0.6em 0 0.2em 0;
+
+    + hr {
+        margin-top: 0.4ex;
+    }
+
+    &.inline {
+        padding: 0
+    }
+}
+
+.tab-panel {
+
+    position: relative;
+    z-index: 2;
+    border-bottom: 1px solid $color-grey;
+    padding: 3px 0 0;
+    text-shadow: 0 1px 0 #FFF;
+    // background: linear-gradient(rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.04));
+    border-radius: 5px 5px 0 0;
+
+    .tab {
+        border-color : transparent;
+        border-style : solid;
+        border-width : 1px 1px 0 1px;
+        border-radius: $border-radius $border-radius 0 0;
+        padding: 0.2em 1em;
+        margin: 0 0 -1px 4px;
+        background: transparent;
+        font-family: inherit;
+        color: inherit;
+        opacity: 0.65;
+        cursor: pointer;
+        font-weight: bold;
+        display: inline-block;
+
+        &.active {
+            background: #FFF;
+            border-color : $color-grey;
+            opacity: 1;
+            padding: 0.2em 1em;
+        }
+
+        &:focus-visible {
+            outline: 1px dotted;
+            outline-offset: -0.3em;
+        }
+    }
+
+    &.bottom {
+
+        box-shadow: 0 1px 0 0 $color-grey inset;
+        margin: -1px 0 0 0;
+
+        .tab {
+            border-width : 0 1px 1px 1px;
+            border-radius: 0 0 $border-radius $border-radius;
+            padding: 0.3em 1em 0.2em 1em;
+        }
+    }
+}
+
+fieldset {
+    margin: 0 0 1em;
+    padding: 0;
+    border: 0;
+
+    &:disabled {
+        label {
+            color: #999
+        }
+    }
+}
+
+
+// Sliders - based on https://github.com/darlanrod/input-range-scss
+$track-color: #e2e2e2 !default;
+$thumb-color: #FFF !default;
+
+$thumb-radius: 10px !default;
+$thumb-height: 20px !default;
+$thumb-width: 20px !default;
+$thumb-shadow-size: 2px !default;
+$thumb-shadow-blur: 4px !default;
+$thumb-shadow-color: rgba(0, 0, 0, .2) !default;
+$thumb-border-width: 1px !default;
+$thumb-border-color: rgba(0, 0, 0, .4) !default;
+
+$track-width       : 100% !default;
+$track-height      : 6px !default;
+$track-shadow-size : 0px !default;
+$track-shadow-blur : 0px !default;
+$track-shadow-color: rgba(0, 0, 0, .2) !default;
+$track-border-width: 1px !default;
+$track-border-color: rgba(0, 0, 0, .1) !default;
+
+$track-radius: 5px !default;
+$contrast: 15% !default;
+
+$ie-bottom-track-color: darken($track-color, $contrast) !default;
+
+@mixin shadow($shadow-size, $shadow-blur, $shadow-color) {
+  box-shadow: $shadow-size $shadow-size $shadow-blur $shadow-color, 0 0 $shadow-size lighten($shadow-color, 5%);
+}
+
+@mixin track {
+  cursor: default;
+  height: $track-height;
+  transition: all .2s ease;
+  width: $track-width;
+}
+
+@mixin thumb {
+  @include shadow($thumb-shadow-size, $thumb-shadow-blur, $thumb-shadow-color);
+  background: $thumb-color;
+  border: $thumb-border-width solid $thumb-border-color;
+  border-radius: $thumb-radius;
+  box-sizing: border-box;
+  cursor: default;
+  height: $thumb-height;
+  width: $thumb-width;
+}
+
+[type='range'] {
+  -webkit-appearance: none;
+  background: transparent;
+  margin: math.div($thumb-height, 2) 0;
+  width: $track-width;
+
+  &::-moz-focus-outer {
+    border: 0;
+  }
+
+  &::-webkit-slider-runnable-track {
+    @include track;
+    @include shadow($track-shadow-size, $track-shadow-blur, $track-shadow-color);
+    background: $track-color;
+    border: $track-border-width solid $track-border-color;
+    border-radius: $track-radius;
+  }
+
+  &::-webkit-slider-thumb {
+    @include thumb;
+    -webkit-appearance: none;
+    margin-top: math.div(-$track-border-width * 2 + $track-height, 2) - math.div($thumb-height, 2);
+  }
+
+  &::-moz-range-track {
+    @include shadow($track-shadow-size, $track-shadow-blur, $track-shadow-color);
+    @include track;
+    background: $track-color;
+    border: $track-border-width solid $track-border-color;
+    border-radius: $track-radius;
+    height: math.div($track-height, 2);
+  }
+
+  &::-moz-range-thumb {
+    @include thumb;
+  }
+
+  &::-ms-track {
+    @include track;
+    background: transparent;
+    border-color: transparent;
+    border-width: math.div($thumb-height, 2) 0;
+    color: transparent;
+  }
+
+  &::-ms-fill-lower {
+    @include shadow($track-shadow-size, $track-shadow-blur, $track-shadow-color);
+    background: $ie-bottom-track-color;
+    border: $track-border-width solid $track-border-color;
+    border-radius: ($track-radius * 2);
+  }
+
+  &::-ms-fill-upper {
+    @include shadow($track-shadow-size, $track-shadow-blur, $track-shadow-color);
+    background: $track-color;
+    border: $track-border-width solid $track-border-color;
+    border-radius: ($track-radius * 2);
+  }
+
+  &::-ms-thumb {
+    @include thumb;
+    margin-top: math.div($track-height, 4);
+  }
+
+  &:focus, &:focus-within, &:focus-visible {
+    outline: 0;
+
+    &::-webkit-slider-runnable-track {
+      background: lighten($color-blue, $contrast);
+    }
+
+    &::-ms-fill-lower {
+      background: $track-color;
+    }
+
+    &::-ms-fill-upper {
+      background: lighten($track-color, $contrast);
+    }
+  }
+
+  &:disabled {
+    &::-webkit-slider-thumb,
+    &::-moz-range-thumb,
+    &::-ms-thumb,
+    &::-webkit-slider-runnable-track,
+    &::-ms-fill-lower,
+    &::-ms-fill-upper {
+      cursor: not-allowed;
+    }
+  }
+}
+
