@@ -21,8 +21,6 @@ services:
     build: ./app/
     ports:
       - $BACKEND_PORT:80
-    depends_on:
-      - db
     # TODO: we may be able to replace this with new envfile loading
     # https://github.com/docker/compose/issues/7326
     environment:
