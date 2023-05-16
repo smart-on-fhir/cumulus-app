@@ -4,11 +4,11 @@ alias cmls_rm-all='docker ps -a | grep "cumulus" | awk '{print $1}' | xargs dock
 
 cmls_setenv() {
     set -o allexport
-    if [[ -f .env.docker ]]; then
-        source .env.docker
+    if [[ -f ./app/.env.docker ]]; then
+        source ./app/.env.docker
     fi
-    if [[ -f .env.local ]]; then
-        source .env.local
+    if [[ -f ./app/.env.local ]]; then
+        source ./app/.env.local
     else
         echo ".env.local was not found. See documentation for details." 
         exit 1

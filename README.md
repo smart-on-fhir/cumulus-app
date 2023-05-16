@@ -11,9 +11,6 @@ You can get a demo of this app running out of the box with one command: `./build
 |Password   |  `Admin@12345`         |
 
 
-
-
-
 ## Setup Your Environment
 
 The `.env` file with this repo includes everything you need to get a demo of the Cumulus System up and running. 
@@ -31,12 +28,7 @@ Example `.env.local` vars:
 ```
 
 
-
-
 ## Running Tests 
-
-
-
 
 ## Local Development (No Docker)
 

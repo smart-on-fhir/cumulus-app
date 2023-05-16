@@ -8,25 +8,23 @@ services:
   # TODO: Expose nginx logs?
   web:
     container_name: cumulus-dashboard-frontend
-    build:
-      context: ..
-      dockerfile: ./docker/frontend.Dockerfile
+    build: ./nginx
     ports:
       - $FRONTEND_PORT:80
     volumes:
-      - ../build:/usr/share/nginx/html 
+      - ./app/build:/usr/share/nginx/html 
     depends_on:
-      - db
+      - api
 
   api:
     container_name: cumulus-dashboard-backend
-    build:
-      context: ..
-      dockerfile: docker/backend.Dockerfile
+    build: ./app/
     ports:
       - $BACKEND_PORT:80
     depends_on:
       - db
+    # TODO: we may be able to replace this with new envfile loading
+    # https://github.com/docker/compose/issues/7326
     environment:
       - DB_HOST=db
       - DB_PORT=$DB_PORT
@@ -38,13 +36,19 @@ services:
       - DB_SSL=$DB_SSL
       - DATABASE_URL=postgres://$DB_USER:$DB_PASS@db:$DB_PORT/$DB_DATABASE
       - NODE_ENV=$NODE_ENV
+      - PORT=80
+      - REACT_APP_BACKEND_HOST=http://localhost:4001
       - MAILGUN_API_KEY=$MAILGUN_API_KEY
       - MAILGUN_DOMAIN=$MAILGUN_DOMAIN
       - THROTTLE=$THROTTLE
     volumes:
-      - ../backend:/app/backend
-      - ../build:/app/build
-      - ../logs:/app/logs
+      - ./app/backend:/app/backend
+      - ./app/build:/app/build
+      - ./app/logs:/app/logs
+      - ./app/src:/app/src      
+      - ./app/public:/app/public   
+    depends_on:
+      - db   
 
   db:
     container_name: cumulus-dashboard-db
@@ -59,6 +63,7 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - PGPORT=$DB_PORT
     volumes:
-       - cumulus-dashboard-db-data:/var/lib/postgresql/data/pgdata
+      - ./postgres/sql:/docker-entrypoint-initdb.d
+      - cumulus-dashboard-db-data:/var/lib/postgresql/data/pgdata
 volumes:
    cumulus-dashboard-db-data:
