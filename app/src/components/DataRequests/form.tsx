@@ -10,6 +10,7 @@ import DemographicsEditor from "./DemographicsEditor"
 import TransmissionEditor from "./Transmissions/TransmissionEditor"
 import EditorList         from "../generic/EditorList"
 import { useAuth }        from "../../auth"
+import { OpenAPI, DefaultService } from "../../openapi/aggregator"
 
 import "./form.scss";
 
@@ -182,6 +183,46 @@ class FieldsEditor extends React.Component<FieldsEditorProps>
     }
 }
 
+function getAggDataPackageList(){
+    function prettifyPackageName(name:string){
+        return (name.charAt(0).toUpperCase() 
+            + name.slice(1)).replace("__"," - ").replace(/_/g," ")
+
+    }
+    OpenAPI.HEADERS={"Access-Control-Allow-Origin":"*",
+        "Access-Control-Allow-Credentials": "true"
+    }
+    let packageList:any[] = []
+    DefaultService.getSubscriptions()
+    // @ts-ignore
+    .then((res:string) => { 
+        const resArray = JSON.parse(res)
+        for(let i=0; i<resArray.length;i++) {
+            packageList.push({
+                value: resArray[i],
+                label: <div>
+                    {prettifyPackageName(resArray[i])}
+                </div>
+            })
+        }
+    })
+    .catch(() =>{
+        packageList.push({
+            value: null,
+            label: <div>
+                Unable to retrieve data from aggregator
+            </div>
+        })
+    })
+    return packageList
+}
+
+let aggPackageList:any[] = []
+
+if(process.env.REACT_APP_ENABLE_AGGREGATOR_API){
+    aggPackageList = getAggDataPackageList()
+}
+
 export default function DataRequestForm({
     saveRequest,
     deleteRequest,
@@ -210,6 +251,18 @@ export default function DataRequestForm({
         saveRequest()
     }
 
+    function getDataSourceType(){
+        if (record.dataURL){
+            return "url"
+        }
+        else if (record.aggDataPackage) {
+            return "aggregator"
+        }
+        else {
+            return "file"
+        }
+    }
+
     const {
         id,
         createdAt,
@@ -220,7 +273,8 @@ export default function DataRequestForm({
         groupId,
         refresh = "manually",
         dataURL = "",
-        dataSourceType = record.dataURL ? "url" : "file"
+//        aggDataPackage = "",
+        dataSourceType = getDataSourceType()
     } = record
 
     let requestedData = record.requestedData || {
@@ -252,6 +306,44 @@ export default function DataRequestForm({
                 dataSites: sites
             }
         })
+    }
+
+    function getDataSourceOptions(){
+        let options = [
+            {
+                value: "file",
+                icon: "fa-regular fa-file color-blue",
+                label: (
+                    <div>
+                        <div>File</div>
+                        <div className="color-muted small">Data is inserted by manually uploading a CSV or TSV file</div>
+                    </div>
+                )
+            },
+            {
+                value: "url",
+                icon: "fa-solid fa-earth-americas color-blue",
+                label: (
+                    <div>
+                        <div>URL</div>
+                        <div className="color-muted small">The application pulls the data from the provided URL</div>
+                    </div>
+                )
+            },
+        ]
+        if (process.env.REACT_APP_ENABLE_AGGREGATOR_API){
+            options.push({
+                value: "aggregator",
+                icon: "fa-solid fa-network-wired color-blue",
+                label: (
+                    <div>
+                        <div>Aggregator</div>
+                        <div className="color-muted small">The application pulls the data from the Cumulus Aggregator</div>
+                    </div>
+                )
+            })
+        }
+        return options
     }
 
     return (
@@ -339,28 +431,7 @@ export default function DataRequestForm({
                 
                 <div className="col col-2">
                     <Select
-                        options={[
-                            {
-                                value: "file",
-                                icon: "fa-regular fa-file color-blue",
-                                label: (
-                                    <div>
-                                        <div>File</div>
-                                        <div className="color-muted small">Data is inserted by manually uploading a CSV or TSV file</div>
-                                    </div>
-                                )
-                            },
-                            {
-                                value: "url",
-                                icon: "fa-solid fa-earth-americas color-blue",
-                                label: (
-                                    <div>
-                                        <div>URL</div>
-                                        <div className="color-muted small">The application pulls the data from the provided URL</div>
-                                    </div>
-                                )
-                            }
-                        ]}
+                        options={getDataSourceOptions()}
                         value={dataSourceType}
                         onChange={dataSourceType => onChange({ ...record, dataSourceType })}
                     />
@@ -426,6 +497,19 @@ export default function DataRequestForm({
                                     icon : "/icons/date_3.png"
                                 }
                             ]}
+                            onChange={value => {
+                                onChange({ ...record, refresh: value })
+                            }}
+                        />
+                    </div>
+                }
+
+                { dataSourceType === "aggregator" && <div className="col col-4">
+                    <Select
+                            right
+                            placeholder="Select a dataset from the list"
+                            value={ null }
+                            options={aggPackageList}
                             onChange={value => {
                                 onChange({ ...record, refresh: value })
                             }}

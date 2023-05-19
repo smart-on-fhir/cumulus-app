@@ -133,7 +133,9 @@ declare module app {
 
         dataURL: string | null
 
-        dataSourceType: "file" | "url"
+        aggDataPackage: string | null
+
+        dataSourceType: "file" | "url" | "aggregator"
 
         metadata: {
             cols : DataRequestDataColumn[],
