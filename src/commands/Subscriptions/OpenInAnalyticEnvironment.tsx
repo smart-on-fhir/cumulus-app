@@ -25,18 +25,23 @@ export class OpenInAnalyticEnvironment extends Command
     }
 
     available() {
-        return !!this.subscriptionId && !!this.user;
+        return (
+            !!this.subscriptionId &&
+            !!this.user &&
+            !!process.env.REACT_APP_NOTEBOOK_URL
+        );
     }
 
     enabled() {
         return (
             !!this.subscriptionId &&
-            !!this.user?.permissions?.includes("DataRequests.export")
+            !!this.user?.permissions?.includes("DataRequests.export") &&
+            !!process.env.REACT_APP_NOTEBOOK_URL
         );
     }
     
     execute() {
-        const url = new URL("https://cumulusdemo.notebook.us-east-1.sagemaker.aws/notebooks/cumulus/demo.ipynb")
+        const url = new URL(process.env.REACT_APP_NOTEBOOK_URL!)
         url.searchParams.set("fileLoc", window.location.origin + "/api/requests/" + this.subscriptionId + "/data?format=csv")
         window.open(url.href, "_blank")
     }
