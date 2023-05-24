@@ -1,6 +1,6 @@
 {
   "name": "cumulus-app",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.1",
@@ -43,20 +43,14 @@
     "winston-daily-rotate-file": "^4.7.1"
   },
   "scripts": {
-    "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
-    "start:prod": "ts-node --skipProject --transpile-only -r dotenv/config backend",
-    "start:server": "if-env NODE_ENV=production && npm run start:server:prod || npm run start:server:dev",
-    "start:docker": "if-env NODE_ENV=production && npm run run::docker:prod || npm run run:docker:dev",
-    "run:server": "if-env NODE_ENV=production && npm run run:server:prod || npm run run:server:dev",
-    "run:server:dev": "nodemon -e js,ts,json -x 'npm run run:server:prod'",
-    "run:server:prod": "./node_modules/.bin/ts-node --skipProject --transpile-only -r dotenv/config backend",
-    "run:docker:dev": "nodemon -e js,ts,json --watch src --watch public -x 'npm run build && npm run run:server:prod'",
-    "run:docker:prod:": "npm run build && npm run run:server:prod",
-    "start:dev": "react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "test:server": "DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov ts-mocha -p test/tsconfig.json"
+    "test": "react-scripts test",
+    "test:server": "DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov ts-mocha -p test/tsconfig.json",
+    "serve:docker": "if-env NODE_ENV=production && npm run build && npm run serve || npm run serve:dev",
+    "serve": "./node_modules/.bin/ts-node --skipProject --transpile-only -r dotenv/config backend",
+    "serve:dev": "nodemon -e js,ts,json --watch backend -x 'npm run serve'"
   },
   "eslintConfig": {
     "extends": [
