@@ -1,0 +1,7 @@
+{
+  "name": "cumulus-app",
+  "description": "This package.json is only used by Heroku",
+  "scripts": {
+    "start": "app/node_modules/.bin/ts-node --skipProject --transpile-only -r dotenv/config app/backend"
+  }
+}
