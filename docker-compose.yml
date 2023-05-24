@@ -35,7 +35,7 @@ services:
       - DATABASE_URL=postgres://$DB_USER:$DB_PASS@db:$DB_PORT/$DB_DATABASE
       - NODE_ENV=$NODE_ENV
       - PORT=80
-      - REACT_APP_BACKEND_HOST=http://localhost:4001
+      # - REACT_APP_BACKEND_HOST=http://localhost:$BACKEND_PORT
       - MAILGUN_API_KEY=$MAILGUN_API_KEY
       - MAILGUN_DOMAIN=$MAILGUN_DOMAIN
       - THROTTLE=$THROTTLE
@@ -63,5 +63,9 @@ services:
     volumes:
       - ./postgres/sql:/docker-entrypoint-initdb.d
       - cumulus-dashboard-db-data:/var/lib/postgresql/data/pgdata
+
 volumes:
    cumulus-dashboard-db-data:
+      # run `docker volume create cumulus-dashboard-db-data` first
+      # external: true
+

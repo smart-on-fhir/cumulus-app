@@ -27,6 +27,6 @@ fi
 
 docker compose down
 # If there's already a DB volume, we'll remove it; otherwise, ignore this failing
-docker volume rm cumulus-app_cumulus-dashboard-db-data || true
+# docker volume rm cumulus-app_cumulus-dashboard-db-data || true
 docker compose build
 docker compose "$@" up
