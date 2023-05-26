@@ -111,14 +111,20 @@ async function applySeeds(options: Config, dbConnection: Sequelize)
 {
     const seedPath = options.db.seed;
     if (seedPath) {
-        const seed = require(seedPath);
-        try {
-            await seed(dbConnection);
-        } catch (error) {
-            logger.error("Applying seeds failed %o", error)
-            process.exit(1)
+        // If we have 0 users then the the entire DB should be empty
+        const count = await dbConnection.models.User.count()
+        if (count > 0) {
+            logger.verbose("- Seeding the database SKIPPED because the users table is not empty");
+        } else {
+            const seed = require(seedPath);
+            try {
+                await seed(dbConnection);
+            } catch (error) {
+                logger.error("Applying seeds failed %o", error)
+                process.exit(1)
+            }
+            logger.verbose(`✔ Applied seeds from ${seedPath.replace(__dirname, "")}`);
         }
-        logger.verbose(`✔ Applied seeds from ${seedPath.replace(__dirname, "")}`);
     } else {
         logger.verbose("- Seeding the database SKIPPED because config.db.seedPath is not set!");
     }
