@@ -288,6 +288,7 @@ ul {
   a.icon-item {
     display: block;
     border-radius: 4px;
+    word-wrap: break-word;
 
     &:hover {
       background: lighten($color: $color-blue, $amount: 36%);
