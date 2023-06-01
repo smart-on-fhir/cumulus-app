@@ -203,7 +203,7 @@ export default function ConfigPanel({
                             }
                         }))}
                     />
-                    <Checkbox
+                    { !isPie && <Checkbox
                         name="editableLegend"
                         label="Editable legend"
                         disabled={!chartOptions.legend?.enabled}
@@ -216,7 +216,7 @@ export default function ConfigPanel({
                                 }
                             }
                         }))}
-                    />
+                    /> }
                 </div>
 
                 { isBarOrColumn && state.stratifyBy && 
