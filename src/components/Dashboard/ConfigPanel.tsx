@@ -203,6 +203,20 @@ export default function ConfigPanel({
                             }
                         }))}
                     />
+                    <Checkbox
+                        name="editableLegend"
+                        label="Editable legend"
+                        disabled={!chartOptions.legend?.enabled}
+                        // @ts-ignore
+                        checked={!chartOptions.legend?._readonly}
+                        onChange={on => onChange(merge(state, {
+                            chartOptions: {
+                                legend: {
+                                    _readonly: !on
+                                }
+                            }
+                        }))}
+                    />
                 </div>
 
                 { isBarOrColumn && state.stratifyBy && 
