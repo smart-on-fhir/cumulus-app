@@ -179,6 +179,8 @@ function getSeries({
             opacity: S?.opacity,
             color,
             visible,
+            // @ts-ignore
+            showInLegend: visible ? true : !serverOptions.legend?._readonly,
             id
         }
 
@@ -368,6 +370,10 @@ export function buildChartOptions({
                 events: {
                     legendItemClick(e) {
                         e.preventDefault()
+                        // @ts-ignore
+                        if (options.legend?._readonly) {
+                            return false
+                        }
                         const visMap: Record<string, boolean> = {};
                         e.target.chart.series.forEach((s: Series) => visMap[s.userOptions.id!] = s === e.target ? !s.visible : s.visible)
                         onSeriesToggle(visMap)
