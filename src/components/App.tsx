@@ -3,8 +3,7 @@ import { AuthProvider, RequireAuth, LoginPage } from "../auth";
 import Header                                   from "./Header";
 import Home                                     from "./Home/index2";
 import EditView                                 from "./Dashboard/EditView";
-import Subscriptions                            from "./DataRequests"
-import ActivityPage                             from "./Activity/Page";
+import Subscriptions                            from "./DataRequests";
 import RequestGroups                            from "./RequestGroups";
 import DataSiteListPage                         from "./DataSites";
 import RequestDataForm                          from "./Dashboard/RequestDataForm";
@@ -48,7 +47,6 @@ export default function App()
                                 <Route path="groups/*"     element={ <RequireAuth><RequestGroups /></RequireAuth> } />
                                 <Route path="projects/*"   element={ <RequireAuth><Projects /></RequireAuth> } />
                                 <Route path="tags/*"       element={ <RequireAuth><Tags /></RequireAuth> } />
-                                <Route path="activity"     element={ <RequireAuth><ActivityPage /></RequireAuth> } />
                                 <Route path="logs"         element={ <RequireAuth><LogViewer /></RequireAuth>} />
                                 <Route path="login"        element={ <LoginPage /> } />
                                 <Route path="activate"     element={ <Activate/> } />
