@@ -14,12 +14,12 @@ import {
     // HasManyCountAssociationsMixin,
     // HasManyCreateAssociationMixin,
     // NonAttribute,
-    Association,
+    // Association,
     Sequelize,
     DataTypes,
-    BelongsToGetAssociationMixin
+    // BelongsToGetAssociationMixin
 } from "sequelize"
-import { ModelDestroyOptions } from "../..";
+import { ModelDestroyOptions } from "../../types";
 import BaseModel from "./BaseModel";
 import DataRequest from "./DataRequest";
 import View from "./View";

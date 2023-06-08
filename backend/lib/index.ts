@@ -1,10 +1,11 @@
-import Path                      from "path"
+import Path from "path"
 import { readdirSync, statSync } from "fs"
-import { Op, Sequelize }                    from "sequelize"
-import { ValidationChain, validationResult }      from "express-validator"
-import { logger }                from "../logger"
+import { FindAttributeOptions, FindOptions, Op, Order, Sequelize } from "sequelize"
+import { ValidationChain, validationResult } from "express-validator"
+import { logger } from "../logger"
 import { NextFunction, Request, Response } from "express-serve-static-core"
 import { app } from "../.."
+import { IncludeOptions } from "sequelize"
 
 
 const RE_FALSE = /^(0|no|false|off|null|undefined|NaN|)$/i;
@@ -33,10 +34,7 @@ export function uInt(x: any, defaultValue = 0) {
  */
 export function getFindOptions(req)
 {
-    /**
-     * @type {any} //{import("sequelize").FindOptions}
-     */
-    const options = {
+    const options: FindOptions = {
         where: {},
         attributes: {
 
@@ -78,10 +76,7 @@ export function getFindOptions(req)
     // pick & omit -------------------------------------------------------------
     if (req.query.pick || req.query.omit) {
         
-        /**
-         * @type {import("sequelize").FindAttributeOptions}
-         */
-        const attributes = {
+        const attributes: FindAttributeOptions = {
             include: []
         };
 
@@ -98,7 +93,7 @@ export function getFindOptions(req)
     // include -----------------------------------------------------------------
     if (req.query.include) { // table:col|col,table:col|col...
         String(req.query.include).split(",").forEach(x => {
-            const include = {}
+            const include: IncludeOptions = {}
             let [association, alias, attrs] = x.split(":")
             include.association = association
             if (!attrs) {
@@ -109,7 +104,7 @@ export function getFindOptions(req)
             if (attrs) {
                 include.attributes = attrs.split("|")
             }
-            options.include.push(include)
+            (options.include as IncludeOptions[]).push(include)
         })
     }
 
@@ -117,7 +112,7 @@ export function getFindOptions(req)
     if (req.query.order) {
         options.order = [];
         String(req.query.order).split(",").forEach(x => {
-            options.order.push(x.split(":"))
+            (options.order! as Order[]).push(x.split(":"))
         });
     }
 
@@ -131,7 +126,7 @@ export function getFindOptions(req)
                 options.limit = uInt(tokens[0])
             }
             else if (tokens.length === 2) {
-                const model = options.include.find(o => o.association === tokens[0])
+                const model = (options.include as IncludeOptions[]).find(o => o.association === tokens[0])
                 if (model) {
                     model.separate = true
                     model.limit = uInt(tokens[1])
@@ -224,7 +219,7 @@ export function parseDelimitedLine(line: string, delimiters: string[] = [","], s
 
     let idx    = 0,
         char   = "",
-        expect = null,
+        expect: string | null = null,
         buffer = "";
 
     while (idx < len) {
@@ -291,7 +286,10 @@ export function parseDelimitedString(
         separators     : [","],
         stringDelimiter: '"'
     }
-): app.DataRequest {
+): {
+    rows: string[][]
+    cols: app.DataRequestDataColumn[]
+} {
     
     let rows: any[][] = []
 
@@ -327,8 +325,8 @@ export function parseDelimitedString(
                 return {
                     name       : col,
                     label      : title,
-                    description: title.charAt(0) + title.substr(1).toLowerCase(),
-                    dataType   : detectDataTypeAt(i, rows)
+                    description: title.charAt(0) + title.substring(1).toLowerCase(),
+                    dataType   : detectDataTypeAt(i, rows) as app.DataRequestDataColumn["dataType"]
                 }
             }
         );

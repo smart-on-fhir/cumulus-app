@@ -3,7 +3,7 @@ import moment                              from "moment"
 import { requestPermission }               from "../acl"
 import { combinedLogger }                  from "../logger"
 import { route }                           from "../lib/route"
-import { AppRequest }                      from ".."
+import { AppRequest }                      from "../types"
 
 
 const router = express.Router({ mergeParams: true });

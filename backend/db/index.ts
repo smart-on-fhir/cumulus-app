@@ -1,6 +1,6 @@
 import { Sequelize }               from "sequelize"
 import { Umzug, SequelizeStorage } from "umzug"
-import { Config }                  from ".."
+import { Config }                  from "../types"
 import { getDockerContainer }      from "./Docker"
 import { logger }                  from "../logger"
 import { attachHooks, init as initModels }      from "./models"

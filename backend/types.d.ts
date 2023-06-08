@@ -1,4 +1,4 @@
-import { InstanceDestroyOptions, ModelStatic, Options } from "sequelize"
+import { InstanceDestroyOptions, Options } from "sequelize"
 import { ParsedQs } from "qs"
 import {
     Request,
@@ -50,16 +50,24 @@ interface Config {
     docker: {
         containerName: string
         dataDir: string
-    },
+    }
+
     db: {
         sync: "none" | "normal" | "force" | "alter"
         seed: string
         options: Options
-    },
+    }
+
     mailGun: {
         apiKey: string
         domain: string
         [key: string]: any
+    }
+
+    aggregator: {
+        baseUrl: string
+        apiKey : string
+        enabled: boolean
     }
 }
 

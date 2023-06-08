@@ -1,6 +1,7 @@
-const { bool } = require("../lib");
+import { bool } from "../lib"
+export { bool } from "../lib"
 
-const DATA_TYPES = {
+export const DATA_TYPES = {
     "integer"        : int,
     "float"          : float,
     "string"         : String,
@@ -15,11 +16,7 @@ const DATA_TYPES = {
     "date:YYYY"      : year
 };
 
-/**
- * @param {any} x 
- * @returns {number}
- */
-function int(x) {
+export function int(x: any): number | null {
     x = parseInt(x + "", 10);
     if (isNaN(x) || !isFinite(x)) {
         x = null;
@@ -27,11 +24,7 @@ function int(x) {
     return x
 }
 
-/**
- * @param {any} x 
- * @returns {number}
- */
-function float(x) {
+export function float(x: any): number | null {
     x = parseFloat(x + "");
     if (isNaN(x) || !isFinite(x)) {
         x = null;
@@ -40,38 +33,38 @@ function float(x) {
 }
 
 /**
- * @param {string} dateString YYYY-MM-DD
- * @returns {string | null} YYYY-MM-DD string or null
+ * @param dateString YYYY-MM-DD
+ * @returns YYYY-MM-DD string or null
  */
-function day(dateString) {
-    return dateString || null
-}
-
-function week(dateString) {
+export function day(dateString: string): string | null {
     return dateString || null
 }
 
 /**
- * @param {string} dateString YYYY-MM-DD
- * @returns {string | null} YYYY-MM-01 string or null
+ * @param dateString YYYY-MM-DD
+ * @returns YYYY-MM-DD string or null
  */
-function month(dateString) {
+export function week(dateString: string) {
     return dateString || null
 }
 
 /**
- * @param {string} dateString YYYY-MM-DD
- * @returns {string | null} YYYY-01-01 string or null
+ * @param dateString YYYY-MM-DD
+ * @returns YYYY-MM-01 string or null
  */
-function year(dateString) {
+export function month(dateString: string) {
     return dateString || null
 }
 
 /**
- * @param {string} value 
- * @param {keyof typeof DATA_TYPES} dataType 
+ * @param dateString YYYY-MM-DD
+ * @returns YYYY-01-01 string or null
  */
-function evaluate(value, dataType) {
+export function year(dateString: string) {
+    return dateString || null
+}
+
+export function evaluate(value: string, dataType: keyof typeof DATA_TYPES) {
     const fn = DATA_TYPES[dataType];
     if (!fn) {
         throw new Error(`Unknown data type "${dataType}"`)
@@ -79,15 +72,4 @@ function evaluate(value, dataType) {
     return fn(value)
 }
 
-module.exports = {
-    DATA_TYPES,
-    int,
-    float,
-    bool,
-    string: String,
-    day,
-    week,
-    month,
-    year,
-    evaluate
-};
+export const string = String

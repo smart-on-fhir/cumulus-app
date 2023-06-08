@@ -1,14 +1,15 @@
-const { QueryTypes }       = require("sequelize");
-const { pipeline }         = require('stream/promises');
-const { randomUUID }       = require("crypto");
-const HttpError            = require("../errors");
-const Text2Lines           = require("../DataManager/Text2Lines");
-const Line2CSV             = require("../DataManager/Line2CSV");
-const CSV2DB               = require("../DataManager/CSV2DB");
-const { DATA_TYPES }       = require("../DataManager/dataTypes");
-const Subscription         = require("../db/models/DataRequest").default;
-const { assert }           = require("../lib");
-const { Pool, PoolClient } = require('pg')
+import { QueryTypes }        from "sequelize"
+import { pipeline }          from "stream/promises"
+import { randomUUID }        from "crypto"
+import { Pool, PoolClient }  from "pg"
+import * as HttpError        from "../errors"
+import Text2Lines            from "../DataManager/Text2Lines"
+import Line2CSV              from "../DataManager/Line2CSV"
+import CSV2DB                from "../DataManager/CSV2DB"
+import { DATA_TYPES }        from "../DataManager/dataTypes"
+import Subscription          from "../db/models/DataRequest"
+import { assert }            from "../lib"
+import { Request, Response } from "express"
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -18,32 +19,17 @@ const pool = new Pool({
 const JOBS = {};
 
 
-class ImportJob
+export default class ImportJob
 {
-    /**
-     * @type {string}
-     */
-    id;
+    id: string;
 
-    /**
-     * @type {PoolClient}
-     */
-    client;
+    client: PoolClient;
 
-    /**
-     * @type {NodeJS.Timeout}
-     */
-    timer;
+    timer: NodeJS.Timeout;
 
-    /**
-     * @type {string[]}
-     */
-    columnNames;
+    columnNames: string[];
 
-    /**
-     * @param {string} id 
-     */
-    static find(id) {
+    static find(id: string) {
         return JOBS[id];
     }
 
@@ -67,20 +53,13 @@ class ImportJob
         }
     }
 
-    /**
-     * @param {string} id 
-     * @param {PoolClient} client 
-     */
-    constructor(id, client) {
+    constructor(id: string, client: PoolClient) {
         this.id = id
         this.client = client
         this.columnNames = []
     }
 
-    /**
-     * @param {Error} error 
-     */
-    async handleError(error) {
+    async handleError(error: Error) {
         await this.rollback();
         this.client.release();
         delete JOBS[this.id];
@@ -95,24 +74,24 @@ class ImportJob
         }
     }
 
-    /**
-     * @param {import("express").Request} req 
-     * @param {import("express").Response} res 
-     */
-    async handle(req, res) {
+    async handle(req: Request, res: Response) {
         res.setTimeout(0);
         req.setTimeout(0);
 
         if (this.timer) clearTimeout(this.timer);
 
-        /** @ts-ignore @type {(keyof typeof DATA_TYPES)[]} */
-        let dataTypes = String(req.query.types || req.headers["x-data-types"] || "").trim().split(/\s*,\s*/).map(decodeURIComponent);
+        /** @ts-ignore */
+        let dataTypes: (keyof typeof DATA_TYPES)[] = String(
+            req.query.types || req.headers["x-data-types"] || ""
+        ).trim().split(/\s*,\s*/).map(decodeURIComponent);
 
-        /** @type { string[] } */
-        const labels = String(req.query.labels || "").split(/\s*,\s*/).filter(Boolean).map(decodeURIComponent);
+        const labels: string[] = String(
+            req.query.labels || ""
+        ).split(/\s*,\s*/).filter(Boolean).map(decodeURIComponent);
 
-        /** @type { string[] } */
-        const descriptions = String(req.query.descriptions || "").split(/\s*,\s*/).filter(Boolean).map(decodeURIComponent);
+        const descriptions: string[] = String(
+            req.query.descriptions || ""
+        ).split(/\s*,\s*/).filter(Boolean).map(decodeURIComponent);
 
         const csv2db = new CSV2DB(
             this.client,
@@ -154,7 +133,7 @@ class ImportJob
         }
     }
 
-    async writeCounts(subscriptionID) {
+    async writeCounts(subscriptionID: number) {
         const subscription = await Subscription.findByPk(subscriptionID);
         
         assert(subscription, "Subscription not found", HttpError.NotFound)
@@ -176,5 +155,3 @@ class ImportJob
         });
     }
 }
-
-module.exports = ImportJob;

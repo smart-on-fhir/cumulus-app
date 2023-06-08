@@ -1,6 +1,7 @@
-const { Transform }  = require("stream");
-const { DATA_TYPES, evaluate } = require("./dataTypes");
-const { logger } = require("../logger");
+import { Transform } from"stream"
+import { DATA_TYPES, evaluate } from "./dataTypes"
+import { logger } from "../logger"
+import { PoolClient } from "pg";
 
 
 // TODO: org_id column special?
@@ -11,56 +12,34 @@ const { logger } = require("../logger");
  * "create table" statement and the rest is converted to insert
  * statements.
  */
-class CSV2DB extends Transform
+export default class CSV2DB extends Transform
 {
-    /**
-     * @type {import("pg").PoolClient}
-     */
-    #client;
+    private client: PoolClient;
 
-    /**
-     * @type {number}
-     */
-    #subscriptionID;
+    private subscriptionID: number;
 
-    /**
-     * @type {string}
-     */
-    #tableName;
+    private tableName: string;
 
-    /**
-     * @type {(keyof typeof DATA_TYPES)[]}
-     */
-    #dataTypes;
+    private dataTypes: (keyof typeof DATA_TYPES)[];
 
-    /**
-     * @type {string[]}
-     */
-    #labels;
+    private labels: string[];
 
-    /**
-     * @type {string[]}
-     */
-    #descriptions;
+    private descriptions: string[];
 
-    /**
-     * @type {string[]}
-     */
-    columnNames;
+    public columnNames: string[];
 
-    #insertRowsBuffer;
+    private insertRowsBuffer: string[];
 
-    #insertRowsBufferMaxLength = 1000;
+    private insertRowsBufferMaxLength = 1000;
 
-    /**
-     * @param {import("pg").PoolClient} client
-     * @param {number} subscriptionID
-     * @param {(keyof typeof DATA_TYPES)[]} dataTypes
-     * @param {string[]} [labels = []]
-     * @param {string[]} [descriptions = []]
-     * @param {string[]} [columnNames = []]
-     */
-    constructor(client, subscriptionID, dataTypes, labels = [], descriptions = [], columnNames = [])
+    constructor(
+        client: PoolClient,
+        subscriptionID: number,
+        dataTypes: (keyof typeof DATA_TYPES)[],
+        labels: string[] = [],
+        descriptions: string[] = [],
+        columnNames: string[] = []
+    )
     {
         if (!subscriptionID) {
             throw new Error("No subscription ID provided")
@@ -75,47 +54,47 @@ class CSV2DB extends Transform
             readableObjectMode: true,
         });
 
-        this.#subscriptionID   = subscriptionID
-        this.#dataTypes        = dataTypes
-        this.#labels           = labels
-        this.#descriptions     = descriptions
-        this.#client           = client;
-        this.columnNames       = columnNames
-        this.#insertRowsBuffer = []
+        this.subscriptionID   = subscriptionID
+        this.dataTypes        = dataTypes
+        this.labels           = labels
+        this.descriptions     = descriptions
+        this.client           = client;
+        this.columnNames      = columnNames
+        this.insertRowsBuffer = []
 
-        this.#tableName = "subscription_data_" + this.#subscriptionID
+        this.tableName = "subscription_data_" + this.subscriptionID
     }
 
-    async query(sql, params)
+    async query(sql: string, params?: any)
     {
         try {
-            return await this.#client.query(sql, params)
+            return await this.client.query(sql, params)
         } catch (e) {
             logger.info(sql, { params, tags: ["SQL", "DATA"] })
             throw e
         }
     }
 
-    _transform(line, _encoding, next)
+    _transform(line: string[], _encoding: any, next: (err?: Error | null) => void)
     {
         if (!this.columnNames.length) {
             this.columnNames = line
-            this.#writeMetaData()
-            .then(() => this.#createDataTable(this.columnNames))
+            this.writeMetaData()
+            .then(() => this.createDataTable(this.columnNames))
             .then(() => next(), next);
         } else {
-            const len = this.#insertRowsBuffer.push(this.#valueList(line));
-            if (len >= this.#insertRowsBufferMaxLength) {
-                this.#insertData(next);
+            const len = this.insertRowsBuffer.push(this.valueList(line));
+            if (len >= this.insertRowsBufferMaxLength) {
+                this.insertData(next);
             } else {
                 next()
             }
         }
     }
 
-    _flush(next) {
-        if (this.#insertRowsBuffer.length > 0) {
-            this.#insertData(next);
+    _flush(next: (err?: Error | null) => void) {
+        if (this.insertRowsBuffer.length > 0) {
+            this.insertData(next);
         } else {
             next()
         }
@@ -125,35 +104,32 @@ class CSV2DB extends Transform
      * Prepare a metadata object and write it to the corresponding data
      * subscription table
      */
-    async #writeMetaData()
+    private async writeMetaData()
     {
-        if (this.#dataTypes.length !== this.columnNames.length) {
+        if (this.dataTypes.length !== this.columnNames.length) {
             throw new Error("The number of data types does not match the number of columns")
         }
 
         const metadata = {
             cols: this.columnNames.map((name, i) => ({
                 name,
-                dataType   : this.#dataTypes[i],
-                label      : this.#labels[i] ?? name,
-                description: this.#descriptions[i] || ""
+                dataType   : this.dataTypes[i],
+                label      : this.labels[i] ?? name,
+                description: this.descriptions[i] || ""
             }))
         };
 
         await this.query(
             `UPDATE "DataRequests" SET "metadata" = $1 WHERE id = $2`,
-            [ JSON.stringify(metadata), this.#subscriptionID ]
+            [ JSON.stringify(metadata), this.subscriptionID ]
         );
     }
 
-    /**
-     * @param {string[]} columnNames 
-     */
-    async #createDataTable(columnNames) {
-        let sql = `CREATE TABLE "${this.#tableName}" `;
+    private async createDataTable(columnNames: string[]) {
+        let sql = `CREATE TABLE "${this.tableName}" `;
 
         sql += "(\n" + columnNames.map((name, i) => {
-            switch (this.#dataTypes[i]) {
+            switch (this.dataTypes[i]) {
                 case "boolean":
                     return JSON.stringify(name) + " BOOLEAN";
                 case "integer":
@@ -173,56 +149,51 @@ class CSV2DB extends Transform
                 case "year":
                     return JSON.stringify(name) + " DATE";
                 default:
-                    throw new Error(`Invalid data type "${this.#dataTypes[i]}"`)
+                    throw new Error(`Invalid data type "${this.dataTypes[i]}"`)
             }
         }).join(",\n") + ");"
 
         // Drop the table if exists
-        await this.query(`DROP TABLE IF EXISTS "${this.#tableName}"`);
+        await this.query(`DROP TABLE IF EXISTS "${this.tableName}"`);
         
         // Drop the index if exists
-        await this.query(`DROP INDEX IF EXISTS "${this.#tableName}_unique"`);
+        await this.query(`DROP INDEX IF EXISTS "${this.tableName}_unique"`);
 
         // Create the table
         await this.query(sql);
 
         // Create unique index to reject invalid powersets
-        await this.query(`CREATE UNIQUE INDEX "${this.#tableName}_unique" ON "${this.#tableName
+        await this.query(`CREATE UNIQUE INDEX "${this.tableName}_unique" ON "${this.tableName
             }" USING btree(${columnNames.filter(c => c !== "cnt").map(c => `"${c}" Asc NULLS Last`).join(", ")})`);
     }
 
-    async #insertData(next) {
+    private async insertData(next: (err?: Error | null) => void) {
         try {
-            await this.query(`INSERT INTO "${this.#tableName}" (${
+            await this.query(`INSERT INTO "${this.tableName}" (${
                 this.columnNames.map(x => `"${x}"`).join(",")
-            }) VALUES ${ this.#insertRowsBuffer.join(",\n") }`);
-            this.#insertRowsBuffer = [];
+            }) VALUES ${ this.insertRowsBuffer.join(",\n") }`);
+            this.insertRowsBuffer = [];
             next()
         } catch (ex) {
             next(ex)
         }
     }
 
-    /**
-     * @param {any[]} values
-     */
-    #valueList(values) {
+    private valueList(values: any[]) {
         for (let i = values.length; i < this.columnNames.length; i++) {
             values.push(null)
         }
 
         return `(${values.map((v, i) => {
-                let value = evaluate(v, this.#dataTypes[i])
+                let value = evaluate(v, this.dataTypes[i])
                 if (value === null || v === null || value === "" || v === "") {
                     value = "NULL"
                 }
                 else if (typeof value === "string") {
-                    value = this.#client.escapeLiteral(value)
+                    value = this.client.escapeLiteral(value)
                 }
                 return value
             }).join(", ")
         })`;
     }
 }
-
-module.exports = CSV2DB;

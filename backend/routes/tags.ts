@@ -5,7 +5,7 @@ import * as lib             from "../lib"
 import { NotFound }         from "../errors"
 import { assert }           from "../lib"
 import { route }            from "../lib/route"
-import { AppRequest }       from ".."
+import { AppRequest }       from "../types"
 
 const router = Router({ mergeParams: true });
 

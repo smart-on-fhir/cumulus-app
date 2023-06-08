@@ -1,6 +1,7 @@
-const Path           = require("path");
-const { bool, uInt } = require("./lib");
-const { logger }     = require("./logger");
+import Path           from "path"
+import { bool, uInt } from "./lib"
+import { logger }     from "./logger"
+import { Config } from "./types";
 
 const {
     NODE_ENV               = "production",
@@ -31,7 +32,7 @@ const {
 } = process.env;
 
 
-module.exports = {
+const config: Config = {
     port    : uInt(PORT),
     host    : HOST,
     throttle: uInt(THROTTLE),
@@ -53,7 +54,7 @@ module.exports = {
         dataDir: DB_DOCKER_DATA_DIR //? Path.resolve(__dirname, DB_DOCKER_DATA_DIR) : ""
     },
     db: {
-        sync: DB_SYNC,
+        sync: DB_SYNC as Config["db"]["sync"],
         seed: bool(DB_SEED) ? Path.join(__dirname, DB_SEED) : "",
         options: {
             dialectOptions: {
@@ -69,7 +70,7 @@ module.exports = {
                 false,
             username: DB_USER,
             password: DB_PASS,
-            port    : DB_PORT,
+            port    : +DB_PORT,
             host    : DB_HOST
         }
     },
@@ -117,3 +118,5 @@ module.exports = {
         retry: 2
     }
 };
+
+export default config

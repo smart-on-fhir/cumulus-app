@@ -1,18 +1,20 @@
-const express        = require("express")
-const Crypto         = require("crypto")
-const Bcrypt         = require("bcryptjs")
-const { Op }         = require("sequelize")
-const User           = require("../db/models/User").default
-const { wait }       = require("../lib")
-const { logger }     = require("../logger")
-const HttpError      = require("../errors")
-const { getPermissionsForRole } = require("../acl")
+import express, { NextFunction, Request, Response } from "express"
+import Crypto                                       from "crypto"
+import Bcrypt                                       from "bcryptjs"
+import { Op }                                       from "sequelize"
+import User                                         from "../db/models/User"
+import { wait }                                     from "../lib"
+import { logger }                                   from "../logger"
+import { BadRequest, Forbidden, Unauthorized }      from "../errors"
+import { getPermissionsForRole }                    from "../acl"
+import { app }                                      from "../.."
+import { AppRequest, Role }                         from "../types"
 
 
 
 const AUTH_DELAY = process.env.NODE_ENV === "production" ? 1000 : 1000;
 
-const router = express.Router({ mergeParams: true });
+export const router = express.Router({ mergeParams: true });
 
 
 /**
@@ -20,18 +22,15 @@ const router = express.Router({ mergeParams: true });
  * If the user has a "sid" cookie look it up in the users table. If such user
  * is found store it at `req.user` as an object with username, role and sid
  * properties. Otherwise `req.user` will be undefined.
- * @param {import("../..").app.UserRequest} req
- * @param {import("express").Response} res
- * @param {import("express").NextFunction} next
  */
-async function authenticate(req, res, next) {
+export async function authenticate(req: app.UserRequest, res: Response, next: NextFunction) {
     const dbConnection = req.app.get("dbConnection")
     const { sid } = req.cookies;
     if (sid) {
         try {
             const user = await User.findOne({ where: { sid }, __role__: "system" });
             if (user) {
-                req.user = user.toJSON()   
+                (req as AppRequest).user = user.toJSON()   
                 dbConnection.user = user; 
             }
         } catch (ex) {
@@ -49,38 +48,25 @@ async function authenticate(req, res, next) {
  * Checks `req.user?.role`.
  * - if the user does not exist throws HttpError.Unauthorized
  * - if the user does not have one of the required roles throws HttpError.Forbidden
- * @param {import("..").Role[]} roles The roles to require
- * @returns {(
- *  req: import("../..").app.UserRequest,
- *  res: import("express").Response,
- *  next: import("express").NextFunction
- * ) => void}
  */
-function requireAuth(...roles) {
+export function requireAuth(...roles: Role[]): (req: app.UserRequest, res: Response, next: NextFunction) => void {
     return function(req, res, next) {
         
         if (!req.user) {
-            return next(new HttpError.Unauthorized("Authorization required"));
+            return next(new Unauthorized("Authorization required"));
         }
 
         if (roles.length && !roles.includes(req.user.role)) {
-            return next(new HttpError.Forbidden("Permission denied"));
+            return next(new Forbidden("Permission denied"));
         }
 
         next();
     }
 }
 
-/**
- * WARNING: This is just a temporary solution for demo. Not secure enough for
- * real use!
- * @param {express.Request} req 
- * @param {express.Response} res 
- */
-async function login(req, res) {
+async function login(req: Request, res: Response) {
     
-    // Introduce 1 second artificial delay to protect against automated
-    // brute-force attacks
+    // Introduce 1 second artificial delay to protect against automated brute-force attacks
     await wait(AUTH_DELAY);
 
     try {
@@ -94,13 +80,13 @@ async function login(req, res) {
         // Do NOT specify what is wrong in the error message!
         if (!user) {
             logger.warn("Failed login attempt due to invalid email")
-            throw new HttpError.BadRequest("Invalid email or password", { reason: `Email ${username} not found` });
+            throw new BadRequest("Invalid email or password", { reason: `Email ${username} not found` });
         }
 
         // Wrong password (Do NOT specify what is wrong in the error message!)
         if (!Bcrypt.compareSync(password, user.get("password") + "")) {
             logger.warn("Failed login attempt due to invalid password")
-            throw new HttpError.BadRequest("Invalid email or password", { reason: "Invalid password" });
+            throw new BadRequest("Invalid email or password", { reason: "Invalid password" });
         }
 
         // Generate SID and update the user in DB
@@ -110,7 +96,7 @@ async function login(req, res) {
         await user.update({ sid, lastLogin: new Date() }, { __role__: "system" });
 
         // Use session cookies by default
-        let expires = undefined
+        let expires: Date | undefined = undefined
 
         // If "remember" is set use cookies that expire in one year
         if (remember) {
@@ -135,13 +121,7 @@ async function login(req, res) {
     }
 }
 
-/**
- * WARNING: This is just a temporary solution for demo. Not secure enough for
- * real use!
- * @param {any} req 
- * @param {express.Response} res 
- */
-async function logout(req, res) {
+async function logout(req: AppRequest, res: Response) {
 
     await wait(AUTH_DELAY);
 
@@ -164,8 +144,3 @@ async function logout(req, res) {
 router.post("/login", express.json(), login);
 router.get("/logout", logout);
 
-module.exports = {
-    router,
-    authenticate,
-    requireAuth
-};

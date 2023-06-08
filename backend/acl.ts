@@ -1,5 +1,5 @@
 import { NextFunction } from "express";
-import { AppRequest, AppRequestHandler, Role } from ".";
+import { AppRequest, AppRequestHandler, Role } from "./types";
 import { Forbidden, Unauthorized } from "./errors";
 
 

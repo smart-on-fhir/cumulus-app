@@ -7,23 +7,17 @@ import slug                                                       from "slug"
 import { Includeable, QueryTypes }                                from "sequelize"
 import { NotFound, InternalServerError, HttpError }               from "../errors"
 import Model                                                      from "../db/models/DataRequest"
-import { AppRequest }                                             from ".."
+import { AppRequest }                                             from "../types"
 import { route }                                                  from "../lib/route"
 import GroupModel                                                 from "../db/models/RequestGroup"
 import { requestPermission }                                      from "../acl"
 import ViewModel                                                  from "../db/models/View"
 import ColumnsMetadata                                            from "../cumulus_library_columns.json"
 import createRestRoutes                                           from "./BaseController"
-const { requireAuth }  = require("./Auth");
-const ImportJob        = require("../DataManager/ImportJob");
-const { logger }       = require("../logger");
-import {
-    getFindOptions,
-    assert,
-    rw,
-    parseDelimitedString,
-    uInt
-} from "../lib"
+import { logger }                                                 from "../logger"
+import ImportJob                                                  from "../DataManager/ImportJob"
+import { requireAuth }                                            from "./Auth"
+import { getFindOptions, assert, rw, parseDelimitedString, uInt } from "../lib"
 
 
 const router = module.exports = express.Router({ mergeParams: true });
@@ -182,7 +176,7 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
 }));
 
 // Refresh Data endpoint ------------------------------------------------------
-router.get("/:id/refresh", requireAuth("admin"), rw(async (req, res) => {
+router.get("/:id/refresh", requireAuth("admin"), rw(async (req: AppRequest, res: Response) => {
     const model = await Model.findByPk(req.params.id, getFindOptions(req))
     assert(model, "Model not found", NotFound)
     const data = await fetchData(model)
@@ -256,7 +250,7 @@ route(router, {
  * curl -i -X PUT "http://localhost:4000/api/data/bigdata?types=day,string,string,string,string,integer,integer" --data-binary @./big-data.csv
  * ```
  */
-router.put("/:id/data", rw(async (req, res) => {
+router.put("/:id/data", rw(async (req: AppRequest, res: Response) => {
     const jobId = String(req.headers["x-job-id"] || "");
     
     // if job is passed in - continue
@@ -276,7 +270,7 @@ router.put("/:id/data", rw(async (req, res) => {
 }));
 
 // Data API endpoint ----------------------------------------------------------
-router.get("/:id/api", rw(async (req, res) => {
+router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
 
     const subscription = await Model.findByPk(req.params.id)
 
@@ -328,14 +322,14 @@ router.get("/:id/api", rw(async (req, res) => {
     }
 
     // Replacement values for the SQL query
-    const replacements = [];
+    const replacements: any[] = [];
 
     // Filters ----------------------------------------------------------------
     //  OR: filter=gender:eq:male,age:gt:3
     // AND: filter=gender:eq:male&filter=age:gt:3
     // MIX: filter=gender:eq:male,age:gt:3&filter=year:gt:2022
     // ------------------------------------------------------------------------
-    const filterConditions = [];
+    const filterConditions: any[] = [];
 
     filtersParams.forEach(f => {
         f.split(/\s*,\s*/).filter(Boolean).forEach((cond, i) => {
@@ -403,7 +397,7 @@ router.get("/:id/api", rw(async (req, res) => {
     // BUILD SQL
     // ========================================================================
     function where() {
-        let out = []
+        let out: string[] = []
         if (stratifier) out.push(`"${stratifier}" IS NOT NULL`)
         out.push(`"${column}" IS NOT NULL`)
         if (unusedColumns.length) {
@@ -439,15 +433,15 @@ router.get("/:id/api", rw(async (req, res) => {
     else sql += `ORDER BY x`
 
     // Execute the query
-    const result = await subscription.sequelize.query(sql, {
+    const result = await subscription.sequelize.query<any>(sql, {
         replacements,
         logging: sql => logger.info(sql, { tags: ["SQL", "DATA"] }),
         type: QueryTypes.SELECT
     });
 
     // Do some post-processing
-    let data = [];
-    let group;
+    let data: any[] = [];
+    let group: any;
 
     result.forEach(row => {
         if (!group || group.stratifier !== row.stratifier) {
@@ -536,7 +530,7 @@ route(router, {
         const model = await Model.findByPk(req.params.id, { include })
         assert(model, NotFound)
 
-        const json = model!.toJSON()
+        const json: any = model!.toJSON()
 
         if (json.metadata?.cols?.length) {
             json.metadata.cols = json.metadata.cols.map(col => {
@@ -584,7 +578,7 @@ route(router, {
             }
         }
     },
-    handler: async (req, res) => {
+    handler: async (req: AppRequest, res: Response) => {
         const model = await Model.findByPk(+req.params?.id, {
             include: {
                 association: "Tags",
@@ -639,7 +633,7 @@ route(router, {
             }
         }
     },
-    handler: async (req, res) => {
+    handler: async (req: AppRequest, res: Response) => {
         const model = await Model.create(req.body)
         if (Array.isArray(req.body.Tags)) {
             await model.setTags(req.body.Tags.map(t => t.id))
@@ -648,13 +642,10 @@ route(router, {
     }
 });
 
-/**
- * @param {Model} model
- */
 export async function fetchData(model: Model) {
 
     // Will throw if model.dataURL is not valid URL
-    const url = new URL(model.getDataValue("dataURL"))
+    const url = new URL(model.getDataValue("dataURL")!)
 
     const { result, response } = await request(url)
     
