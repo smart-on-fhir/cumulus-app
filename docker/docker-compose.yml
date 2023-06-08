@@ -41,6 +41,9 @@ services:
       - MAILGUN_API_KEY=$MAILGUN_API_KEY
       - MAILGUN_DOMAIN=$MAILGUN_DOMAIN
       - THROTTLE=$THROTTLE
+      - AGGREGATOR_URL=$AGGREGATOR_URL
+      - AGGREGATOR_API_KEY=$AGGREGATOR_API_KEY
+      - AGGREGATOR_ENABLED=$AGGREGATOR_ENABLED
     volumes:
       - ../backend:/app/backend
       - ../build:/app/build

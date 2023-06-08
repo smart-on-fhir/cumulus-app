@@ -23,6 +23,9 @@ const {
     REGIONAL_CLUSTER_EMAIL = "vlad.ignatov@gmail.com",
     DB_DOCKER_DATA_DIR     = "",
     LOG_SQL                = "false",
+    AGGREGATOR_URL         = "",
+    AGGREGATOR_API_KEY     = "",
+    AGGREGATOR_ENABLED     = "false",
     // BASE_URL               = "./db/postgres-data"
 
 } = process.env;
@@ -69,6 +72,11 @@ module.exports = {
             port    : DB_PORT,
             host    : DB_HOST
         }
+    },
+    aggregator: {
+        baseUrl: AGGREGATOR_URL,
+        apiKey : AGGREGATOR_API_KEY,
+        enabled: bool(AGGREGATOR_ENABLED)
     },
     mailGun: {
         // Your Mailgun API KEY
