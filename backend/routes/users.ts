@@ -3,7 +3,7 @@ import { body }       from "express-validator"
 import * as lib       from "../lib"
 import User           from "../db/models/User"
 import { route }      from "../lib/route"
-import { AppRequest } from ".."
+import { AppRequest } from "../types"
 import { Unauthorized } from "../errors"
 import {
     getAllUsers,

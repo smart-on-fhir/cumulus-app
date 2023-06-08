@@ -1,7 +1,7 @@
 import Docker        from "dockerode"
 import { runSimple } from "run-container"
 import { Sequelize } from "sequelize"
-import { Config }    from ".."
+import { Config }    from "../types"
 import { wait }      from"../lib"
 import { logger }    from "../logger"
 

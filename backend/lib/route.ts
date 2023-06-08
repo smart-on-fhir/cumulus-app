@@ -3,8 +3,8 @@ import { Router }                                from "express-serve-static-core
 import { checkSchema, Schema, validationResult } from "express-validator"
 import { logger }                                from "../logger"
 import { HttpError, BadRequest }                 from "../errors"
-import { requirePermissionMiddleware, ACL }      from "../acl"
-import { AppRequestHandler }                     from ".."
+import { requirePermissionMiddleware }           from "../acl"
+import { AppRequestHandler }                     from "../types"
 
 
 export function route(router: Router, options: {

@@ -3,11 +3,13 @@ import BaseModel           from "./BaseModel"
 import {
     CreationOptional,
     DataTypes,
+    HasManySetAssociationsMixin,
     InferAttributes,
     InferCreationAttributes,
     Sequelize
 } from "sequelize"
 import { app } from "../../..";
+import Tag from "./Tag";
 
 
 
@@ -28,6 +30,8 @@ export default class DataRequest extends BaseModel<InferAttributes<DataRequest>,
 
     /** @deprecated */
     declare data         : CreationOptional<Record<string, any> | null>;
+
+    declare setTags: HasManySetAssociationsMixin<Tag, number>;
 
     static initialize(sequelize: Sequelize) {
         DataRequest.init({

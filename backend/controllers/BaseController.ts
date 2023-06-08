@@ -3,7 +3,7 @@ import { ModelStatic }            from "sequelize"
 import * as HttpError             from "../errors"
 import { getFindOptions, assert } from "../lib"
 import { route }                  from "../lib/route"
-import { AppRequest }             from ".."
+import { AppRequest }             from "../types"
 import BaseModel                  from "../db/models/BaseModel"
 
 

@@ -1,8 +1,8 @@
-const { Transform }          = require("stream");
-const { parseDelimitedLine } = require("../lib");
+import { Transform } from "stream"
+import { parseDelimitedLine } from "../lib"
 
 
-class Line2CSV extends Transform
+export default class Line2CSV extends Transform
 {    
     constructor()
     {
@@ -12,7 +12,7 @@ class Line2CSV extends Transform
         });
     }
 
-    _transform(line, _encoding, next)
+    _transform(line: string, _encoding: any, next: any)
     {
         try {
             let data = parseDelimitedLine(line);
@@ -22,5 +22,3 @@ class Line2CSV extends Transform
         }
     }
 }
-
-module.exports = Line2CSV

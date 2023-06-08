@@ -15,9 +15,8 @@ async function synchronize()
 {
     /**
      * Get all DataRequest models that should be updated (now or in the future)
-     * @type {any[]}
      */
-    const rows = await DataRequest.findAll({
+    const rows: any[] = await DataRequest.findAll({
         order: [["completed", "desc"]],
         where: {
             [Op.and]: {

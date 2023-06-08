@@ -1,17 +1,18 @@
 require("dotenv").config();
 
-const HTTP         = require("http")
-const Path         = require("path")
-const express      = require("express")
-const cors         = require("cors")
-const cookieParser = require("cookie-parser")
-const Auth         = require("./controllers/Auth")
-const setupDB      = require("./db").default
-const settings     = require("./config")
-const { logger }   = require("./logger")
+import HTTP                     from "http"
+import Path                     from "path"
+import express, { Application } from "express"
+import cors                     from "cors"
+import cookieParser             from "cookie-parser"
+import * as Auth                from "./controllers/Auth"
+import setupDB                  from "./db"
+import settings                 from "./config"
+import { logger }               from "./logger"
+import { AppRequest, Config }   from "./types"
 
 
-function createServer(config)
+function createServer(config: Config)
 {
     const app    = express();
     const server = new HTTP.Server(app);
@@ -24,11 +25,11 @@ function createServer(config)
 
     app.use((req, res, next) => {
         res.on("finish", () => {
-            const meta = {
+            const meta: Record<string, any> = {
                 tags     : ["WEB"],
                 userAgent: req.headers["user-agent"],
                 ip       : req.socket ? req.ip : undefined,
-                user     : req.user?.email || "guest"
+                user     : (req as AppRequest).user?.email || "guest"
             }
             
             if (req.method === "POST" || req.method === "PUT") {
@@ -54,15 +55,14 @@ function createServer(config)
     return { app, server };
 }
 
-function setupAuth(app)
+function setupAuth(app: Application)
 {
-    // We use cookies for user sessions
     app.use(cookieParser(), Auth.authenticate);
     app.use("/api/auth", Auth.router);
     logger.verbose("✔ Authentication set up");
 }
 
-function setupAPI(app)
+function setupAPI(app: Application)
 {
     app.use("/api/request-groups", require("./routes/groups"           ).default);
     app.use("/api/requests"      , require("./controllers/DataRequest" ));
@@ -76,7 +76,7 @@ function setupAPI(app)
     logger.verbose("✔ REST API set up");
 }
 
-function setupStaticContent(app)
+function setupStaticContent(app: Application)
 {
     app.get("/favicon.ico", (req, res) => res.status(404).end());
     app.use(express.static(Path.join(__dirname, "../build/")));
@@ -84,7 +84,7 @@ function setupStaticContent(app)
     logger.verbose("✔ Static content hosted");
 }
 
-function setUpErrorHandlers(app)
+function setUpErrorHandlers(app: Application)
 {
     // Global error 404 handler
     app.use((req, res) => {
@@ -128,12 +128,7 @@ function setUpErrorHandlers(app)
     logger.verbose("✔ Error handlers activated");
 }
 
-/**
- * @param {HTTP.Server} server 
- * @param {object} config 
- * @returns {Promise<HTTP.Server>}
- */
-function startServer(server, config)
+function startServer(server: HTTP.Server, config: Config)
 {
     return new Promise(resolve => {
         server.listen(config.port, config.host, () => {
@@ -152,24 +147,16 @@ function startServer(server, config)
     });
 }
 
-async function main(config = settings)
+async function main(config: Config = settings)
 {
     const { app, server } = createServer(config);
-
     const dbConnection = await setupDB(config);
-
     app.set("dbConnection", dbConnection);
-
-    // app.set("db", dbConnection);
-    
     setupAuth(app);
     setupAPI(app);
     setupStaticContent(app);
     setUpErrorHandlers(app);
-
     await startServer(server, config);
-
-    // Start the server --------------------------------------------------------
     return { server, app, config };
 }
 
@@ -178,5 +165,5 @@ if (require.main === module) {
     main();
 }
 
-module.exports = main;
+export default main;
 

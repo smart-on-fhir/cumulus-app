@@ -3,7 +3,7 @@ import Model                      from "../db/models/Project"
 import { route }                  from "../lib/route"
 import { NotFound, Unauthorized } from "../errors"
 import { assert }                 from "../lib"
-import { AppRequest }             from ".."
+import { AppRequest }             from "../types"
 
 
 const router = express.Router({ mergeParams: true });

@@ -35,7 +35,7 @@ function validatePassword(pass: string|null) {
 export default class User extends BaseModel<InferAttributes<User>, InferCreationAttributes<User>>
 {
     declare email         : string;
-    declare role          : string;
+    declare role          : 'user' | 'manager' | 'admin';
     declare id            : CreationOptional<number>;
     declare name          : CreationOptional<string | null>;
     declare password      : CreationOptional<string | null>;
