@@ -72,6 +72,7 @@ function setupAPI(app)
     app.use("/api/logs"          , require("./routes/logs"             ).default);
     app.use("/api/tags"          , require("./routes/tags"             ).default);
     app.use("/api/data-sites"    , require("./routes/sites"            ).default);
+    app.use("/api/aggregator"    , require("./routes/aggregator"       ).default);
     logger.verbose("✔ REST API set up");
 }
 
