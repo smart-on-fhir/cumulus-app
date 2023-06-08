@@ -55,7 +55,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "test:server": "DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov ts-mocha -p test/tsconfig.json"
+    "test:server": "DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov ts-mocha -p test/tsconfig.json",
+    "test:server:watch": "nodemon -w backend -e ts,json -x 'npm run test:server'"
   },
   "eslintConfig": {
     "extends": [
