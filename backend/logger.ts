@@ -1,10 +1,11 @@
-const { transports, format, createLogger } = require("winston");
-const DailyRotateFile = require("winston-daily-rotate-file");
-const { resolve } = require("path")
+import { transports, format, createLogger } from "winston"
+import DailyRotateFile from "winston-daily-rotate-file"
+import { resolve } from "path"
+
 
 const { combine, splat, cli, printf, timestamp, ms, json } = format;
 
-const combinedLogger = createLogger({
+export const combinedLogger = createLogger({
     transports: [
         new DailyRotateFile({
             filename     : resolve(__dirname, '../logs/combined_%DATE%'),
@@ -30,7 +31,7 @@ const combinedLogger = createLogger({
     ]
 })
 
-const defaultLogger = createLogger({
+export const logger = createLogger({
     transports: [
         new transports.Console({
             handleExceptions: true,
@@ -120,7 +121,4 @@ const defaultLogger = createLogger({
 })
 
 
-module.exports = {
-    logger: defaultLogger,
-    combinedLogger
-}
+export default logger
