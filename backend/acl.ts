@@ -14,11 +14,6 @@ interface Acl {
 }
 
 export const ACL: Acl = {
-    Activities: {
-        admin  : { read: true, create: true, update: true, delete: true },
-        manager: { read: true, create: true, update: true, delete: true },
-        user   : { read: true }
-    },
     RequestGroups: {
         admin  : { read: true, create: true, update: true, delete: true },
         manager: { read: true, create: true, update: true, delete: true },

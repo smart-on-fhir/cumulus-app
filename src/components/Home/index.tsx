@@ -3,7 +3,6 @@ import { HelmetProvider, Helmet } from "react-helmet-async"
 import { useAuth }                from "../../auth";
 import DataRequestsList           from "../DataRequests/DataRequestsList"
 import ViewsBrowser               from "../Views/ViewsBrowser"
-import ActivityPanel              from "../Activity/Panel";
 import Panel                      from "../generic/Panel";
 import DataSiteList               from "../DataSites/LinkList";
 import { useState }               from "react";
@@ -101,7 +100,6 @@ export default function Home() {
                         {/* <img src={ map } alt="Sites Map" className="grey-out" /> */}
                     </Panel>
                     <br/>
-                    <ActivityPanel limit={10} />
                 </div>
             </div>
             <br/>

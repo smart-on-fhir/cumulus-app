@@ -71,7 +71,6 @@ function setupAPI(app)
     app.use("/api/projects"      , require("./routes/projects"         ).default);
     app.use("/api/logs"          , require("./routes/logs"             ).default);
     app.use("/api/tags"          , require("./routes/tags"             ).default);
-    app.use("/api/activity"      , require("./controllers/Activity"    ));
     app.use("/api/data-sites"    , require("./routes/sites"            ).default);
     logger.verbose("✔ REST API set up");
 }

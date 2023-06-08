@@ -63,7 +63,6 @@ export default function Navigation()
     const canReadProjects      = user.permissions.includes("Projects.read")
     const canCreateProjects    = user.permissions.includes("Projects.create")
     const canReadUsers         = user.permissions.includes("Users.read")
-    const canReadActivities    = user.permissions.includes("Activities.read")
     const canReadLogs          = user.permissions.includes("Logs.read")
 
     return (
@@ -86,7 +85,6 @@ export default function Navigation()
                 { (canReadUsers || canReadLogs || canReadUsers) && (
                     <NavGroup icon="fa-solid fa-screwdriver-wrench" label="Administration">
                         { canReadUsers && <NavLink to="/users" end><i className="icon fa-solid fa-users" /> Users</NavLink> }
-                        { canReadActivities && <NavLink to="/activity"><i className="icon fa-solid fa-clipboard-list" /> Activity</NavLink> }
                         { canReadLogs && <NavLink to="/logs"><i className="icon fa-solid fa-clipboard-list" /> View Logs</NavLink> }
                     </NavGroup>
                 )}
