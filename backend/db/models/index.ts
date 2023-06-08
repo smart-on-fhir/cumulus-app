@@ -1,6 +1,5 @@
 import { Sequelize } from "sequelize"
 import { logger }    from "../../logger"
-import Activity      from "./Activity"
 import BaseModel     from "./BaseModel"
 import DataRequest   from "./DataRequest"
 import DataSite      from "./DataSite"
@@ -19,11 +18,8 @@ export function attachHooks(connection: Sequelize) {
 
     // Log updates -------------------------------------------------------------
     connection.addHook("afterUpdate", function(model: BaseModel, options) {
-        if ((model.constructor as typeof BaseModel).tableName !== "Activity") {
-            // @ts-ignore
-            const role = options.__role__ || connection.user?.role || "guest"
-            logger.info(`${model} updated by ${connection.user?.email || role}`, { tags: ["ACTIVITY"] })
-        }
+        const role = options.__role__ || connection.user?.role || "guest"
+        logger.info(`${model} updated by ${connection.user?.email || role}`, { tags: ["ACTIVITY"] })
     })
 
     // Request permission to create --------------------------------------------
@@ -33,11 +29,8 @@ export function attachHooks(connection: Sequelize) {
 
     // Log inserts -------------------------------------------------------------
     connection.addHook("afterCreate", function(model: BaseModel, options) {
-        if ((model.constructor as typeof BaseModel).tableName !== "Activity") {
-            // @ts-ignore
-            const role = options.__role__ || connection.user?.role || "guest"
-            logger.info(`${model} created by ${connection.user?.email || role}`, { tags: ["ACTIVITY"] })
-        }
+        const role = options.__role__ || connection.user?.role || "guest"
+        logger.info(`${model} created by ${connection.user?.email || role}`, { tags: ["ACTIVITY"] })
     })
 
     // Request permission to read one record -----------------------------------
@@ -66,18 +59,14 @@ export function attachHooks(connection: Sequelize) {
 
     // Log deletes -------------------------------------------------------------
     connection.addHook("afterDestroy", function(model: BaseModel, options) {
-        if ((model.constructor as typeof BaseModel).tableName !== "Activity") {
-            // @ts-ignore
-            const role = options.__role__ || connection.user?.role || "guest"
-            logger.info(`${model} deleted by ${connection.user?.email || role}`, { tags: ["ACTIVITY"] })
-        }
+        const role = options.__role__ || connection.user?.role || "guest"
+        logger.info(`${model} deleted by ${connection.user?.email || role}`, { tags: ["ACTIVITY"] })
     })
 }
 
 export function init(connection: Sequelize) {
     User.initialize(connection);
     Tag.initialize(connection);
-    Activity.initialize(connection);
     DataSite.initialize(connection);
     DataRequest.initialize(connection);
     Project.initialize(connection);

@@ -291,11 +291,6 @@ declare module app {
         yAxis: number | string | null
     }
 
-    interface Activity {
-        message: string
-        createdAt: string
-    }
-
     interface Project {
         id         : number
         name       : string
