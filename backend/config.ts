@@ -7,7 +7,7 @@ const {
     NODE_ENV               = "production",
     HOST                   = "0.0.0.0",
     PORT                   = "4000",
-    DB_SEED                = "",
+    DB_SEED                = "db/seeds",
     DB_SYNC                = "none", // normal|force|alter|none
     DB_HOST                = "localhost",
     DB_PORT                = "5432",
