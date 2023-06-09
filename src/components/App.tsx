@@ -1,7 +1,7 @@
 import { Routes, Route, BrowserRouter }         from "react-router-dom";
 import { AuthProvider, RequireAuth, LoginPage } from "../auth";
 import Header                                   from "./Header";
-import Home                                     from "./Home/index2";
+import Home                                     from "./Home";
 import EditView                                 from "./Dashboard/EditView";
 import Subscriptions                            from "./DataRequests";
 import RequestGroups                            from "./RequestGroups";

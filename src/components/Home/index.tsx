@@ -1,34 +1,11 @@
-import { Link }                   from "react-router-dom"
+import { useState }               from "react"
 import { HelmetProvider, Helmet } from "react-helmet-async"
-import { useAuth }                from "../../auth";
-import DataRequestsList           from "../DataRequests/DataRequestsList"
-import ViewsBrowser               from "../Views/ViewsBrowser"
-import Panel                      from "../generic/Panel";
-import DataSiteList               from "../DataSites/LinkList";
-import { useState }               from "react";
-
+import { Link }                   from "react-router-dom"
+import EndpointListWrapper        from "../generic/EndpointListWrapper"
+import "./home.scss"
 
 
 export default function Home() {
-
-    const url = new URL(window.location.href)
-
-    const { user } = useAuth();
-    const [ viewType, setViewType ] = useState(url.searchParams.get("view") || "grid")
-    const [ search, setSearch ] = useState(url.searchParams.get("q") || "")
-
-    const onSearch = (q: string) => {
-        url.searchParams.set("q", q)
-        window.history.replaceState(null, "", url.href)
-        setSearch(q)
-    };
-
-    const onSetViewType = (t: "grid" | "list") => {
-        url.searchParams.set("view", t)
-        window.history.replaceState(null, "", url.href)
-        setViewType(t)
-    };
-
     return (
         <>
             <HelmetProvider>
@@ -36,74 +13,131 @@ export default function Home() {
                     <title>Cumulus</title>
                 </Helmet>
             </HelmetProvider>
-            <div className="row gap middle" style={{ marginTop: "-1em", padding: "6px 0 4px 0" }}>
-                <div className="col col-0">
-                    <h4 className="m-0">Browse Graphs</h4>
-                </div>
-                <div className="col center">
-                    <input
-                        type="search"
-                        placeholder="Search Graphs by Name"
-                        value={search}
-                        onChange={e => onSearch(e.target.value)}
-                    />
-                </div>
-                <div className="col col-0 right">
-                    <div className="toolbar flex">
-                        <button
-                            className={"btn" + (viewType === "grid" ? " active" : "")}
-                            onClick={() => onSetViewType("grid")}
-                            title="Grid View"
-                        ><i className="fa-solid fa-grip" /></button>
-                        <button
-                            className={"btn" + (viewType === "list" ? " active" : "")}
-                            onClick={() => onSetViewType("list")}
-                            title="List View"
-                            ><i className="fa-solid fa-list" /></button>
-                    </div>    
-                </div>
+            <div className="home-page container">
+                <Projects />
+                <Graphs />
+                <Subscriptions />
+                <Sites />
             </div>
-            <hr/>
-            <ViewsBrowser
-                layout={ viewType === "grid" ? "grid" : "column" }
-                search={search}
-            />
-            <br/>
-            <br/>
-            <div className="row gap wrap">
-                <div className="col col-6 responsive">
-                    <Panel
-                        title="Subscriptions"
-                        icon={<i className="fa-solid fa-database" style={{ color: "#999" }} />}
-                        menu={[
-                            // <Link to="/requests">View All Subscriptions</Link>,
-                            <Link to="/requests">View All Subscriptions</Link>,
-                            (user?.role === "admin" ? "separator" : null),
-                            // (user?.role === "admin" ? <Link to="/requests/new">Create New Subscription</Link> : null),
-                            (user?.role === "admin" ? <Link to="/requests/new">Create New Subscription</Link> : null),
-                            // (user?.role === "admin" ? <Link to="/groups">Manage Subscription Groups</Link> : null)
-                            (user?.role === "admin" ? <Link to="/groups">Manage Subscription Groups</Link> : null)
-                        ]}
-                    >
-                        <DataRequestsList />
-                    </Panel>
-                </div>
-                <div className="col col-4 responsive">
-                    <Panel
-                        title="Healthcare Sites"
-                        icon={<i className="fa-solid fa-location-dot" style={{ color: "#999" }} />}
-                        menu={[
-                            <Link to="/sites">Manage Healthcare Sites</Link>
-                        ]}
-                    >
-                        <DataSiteList />
-                        {/* <img src={ map } alt="Sites Map" className="grey-out" /> */}
-                    </Panel>
-                    <br/>
-                </div>
-            </div>
-            <br/>
-            <br/>
         </>
     )
 }
+
+function Projects() {
+    return (
+        <EndpointListWrapper endpoint="/api/projects?order=updatedAt:desc">
+            { (data: app.Project[]) => {
+                return (
+                    <div className="projects">
+                        { data.map((project, i) => (
+                            <Link to={ `/projects/${project.id}` } className="card card-project" key={i} title={ project.description || undefined }>
+                                <h4>{ project.name }</h4>
+                                <hr/>
+                                <p>{ project.description }</p>
+                            </Link>
+                        ))}
+                    </div>
+                )
+            }}
+        </EndpointListWrapper>
+    )
+}
+
+function Graphs() {
+
+    const [selected, setSelected] = useState(0)
+
+    return (
+        <EndpointListWrapper endpoint="/api/views?order=updatedAt:desc&limit=7">
+            { (data: app.Project[]) => {
+                if (!selected && data.length) {
+                    setTimeout(() => setSelected(data[0].id))
+                }
+                return (
+                    <div className="graphs-row card">
+                        <div className="graphs">
+                            { selected && <Link to={`/views/${selected}`}>
+                                <img alt="Current Graph" src={`/api/views/${selected}/screenshot`} />
+                            </Link> }
+                        </div>
+                        <div className="graphs-list">
+                            <h4>Latest Graphs</h4>
+                            <hr/>
+                            { data.map((item, i) => (
+                                <li key={i}>
+                                    <Link
+                                        to={ `/views/${item.id}` }
+                                        className={"link" + (selected === item.id ? " color-brand-2" : "")}
+                                        title={ item.description || undefined }
+                                        onMouseEnter={() => setSelected(item.id)}
+                                    >
+                                        { item.name }
+                                    </Link>
+                                </li>
+                            ))}
+                            <li>
+                                <Link to="/views/?view=column&group=subscription" className="link"><b className="color-brand-2">Browse All...</b></Link>
+                            </li>
+                        </div>
+                    </div>
+                )
+            }}
+        </EndpointListWrapper>
+    )
+}
+
+function Subscriptions() {
+    return <EndpointListWrapper endpoint="/api/requests?order=updatedAt:desc&limit=5">
+        { (data: app.DataSite[]) => {
+            return (
+                <div className="card subscriptions">
+                    <h4><i className="icon fa-solid fa-database" /> Subscriptions</h4>
+                    <hr/>
+                    { data.map((item, i) => (
+                        <li key={i}>
+                            <Link
+                                to={`/requests/${ item.id }`}
+                                className="link"
+                                title={ item.description?.replace(/<.*?>/g, "") }
+                            >
+                                { item.name }
+                            </Link>
+                        </li>
+                    ))}
+                    <li>
+                        <Link to="/requests/" className="link"><b className="color-brand-2">Browse All...</b></Link>
+                    </li>
+                </div>
+            )
+        }}
+    </EndpointListWrapper>
+}
+
+function Sites() {
+    return <EndpointListWrapper endpoint="/api/data-sites?order=updatedAt:desc&limit=5">
+        { (data: app.DataSite[]) => {
+            return (
+                <div className="card sites">
+                    <h4><i className="icon fa-solid fa-location-dot" /> Healthcare Sites</h4>
+                    <hr/>
+                    { data.map((item, i) => (
+                        <li key={i}>
+                            <Link
+                                to={`/sites/${ item.id }`}
+                                className="link"
+                                title={ item.description || undefined }
+                            >
+                                { item.name }
+                            </Link>
+                        </li>
+                    ))}
+                    <li>
+                        <Link to="/sites/" className="link"><b className="color-brand-2">Browse All...</b></Link>
+                    </li>
+                </div>
+            )
+        }}
+    </EndpointListWrapper>
+}
+
+
