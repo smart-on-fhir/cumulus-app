@@ -70,11 +70,25 @@ export default function ViewsBrowser({
 
     result = result || [];
 
+    if (!result.length) {
+        return <p className="center">
+            No Graphs found in the database. You can start by selecting one of the
+            existing <Link to="/requests" className="link">subscriptions</Link> and
+            then you can create new graph from it's data.
+        </p>
+    }
+
     if (search) {
         result = result.filter(view => {
             return view.name.toLowerCase().includes(search.toLowerCase()) ||
                 view.description.toLowerCase().includes(search.toLowerCase())
         });
+
+        if (!result.length) {
+            return <p className="center bold color-orange">
+                No Graphs found matching your search!
+            </p>
+        }
     }
 
     function renderItems(selection: CustomSelection<number>) {
