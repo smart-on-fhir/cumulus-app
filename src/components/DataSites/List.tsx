@@ -54,9 +54,10 @@ export default function ListPage()
                                 ))}
                             </tbody>
                         </table> :
-                        <div className="center color-grey-dark bold">
-                            No Healthcare Sites found in the database.
-                            { canCreate && <span> You can start by <Link to="new" className="link">creating one</Link>.</span> }
+                        <div className="center">
+                            <br/>
+                            <p>No Healthcare Sites found in the database. { canCreate && <span> You can start by creating new one.<br/><br/></span> }</p>
+                            { canCreate && <Link to="new" className="btn btn-blue-dark pl-2 pr-2">Create Healthcare Site</Link> }
                         </div>
                     }
                 </div>

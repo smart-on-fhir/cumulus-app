@@ -10,11 +10,13 @@ export default function List()
 {
     const { user } = useAuth();
 
+    const canCreate = user?.permissions.includes("Tags.create")
+
     return createListPage<app.Tag[]>({
         namePlural: "Tags",
         endpoint  : "/api/tags",
         icon      : <i className="fa-solid fa-tag color-brand-2" />,
-        canCreate : user?.permissions.includes("Tags.create"),
+        canCreate,
         renderList: data => {
             
             if (!data.length) {

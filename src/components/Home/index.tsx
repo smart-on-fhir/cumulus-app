@@ -1,6 +1,7 @@
 import { useState }               from "react"
 import { HelmetProvider, Helmet } from "react-helmet-async"
 import { Link }                   from "react-router-dom"
+import { useAuth }                from "../../auth"
 import EndpointListWrapper        from "../generic/EndpointListWrapper"
 import "./home.scss"
 
@@ -87,26 +88,41 @@ function Graphs() {
 }
 
 function Subscriptions() {
+    const { user } = useAuth();
+    const canCreate = user?.permissions.includes("DataRequests.create")
     return <EndpointListWrapper endpoint="/api/requests?order=updatedAt:desc&limit=5">
         { (data: app.DataSite[]) => {
+            data = [];
             return (
                 <div className="card subscriptions">
                     <h4><i className="icon fa-solid fa-database" /> Subscriptions</h4>
                     <hr/>
-                    { data.map((item, i) => (
-                        <li key={i}>
-                            <Link
-                                to={`/requests/${ item.id }`}
-                                className="link"
-                                title={ item.description?.replace(/<.*?>/g, "") }
-                            >
-                                { item.name }
-                            </Link>
-                        </li>
-                    ))}
-                    <li>
-                        <Link to="/requests/" className="link"><b className="color-brand-2">Browse All...</b></Link>
-                    </li>
+                    { data.length ? 
+                        <>
+                            { data.map((item, i) => (
+                                <li key={i}>
+                                    <Link
+                                        to={`/requests/${ item.id }`}
+                                        className="link"
+                                        title={ item.description?.replace(/<.*?>/g, "") }
+                                    >
+                                        { item.name }
+                                    </Link>
+                                </li>
+                            ))}
+                            <li>
+                                <Link to="/requests/" className="link"><b className="color-brand-2">Browse All...</b></Link>
+                            </li>
+                        </> :
+                        <div>
+                            <p>No Subscriptions found in the database.</p>
+                            { canCreate && <div className="center mt-1 mb-1">
+                                <Link to="/sites/new" className="link bold color-green">
+                                    <i className="fa-solid fa-circle-plus" /> Create Subscription
+                                </Link>
+                            </div> }
+                        </div>
+                    }
                 </div>
             )
         }}
@@ -114,26 +130,44 @@ function Subscriptions() {
 }
 
 function Sites() {
+    
+    const { user } = useAuth();
+    const canCreate = user?.permissions.includes("DataSites.create")
+
     return <EndpointListWrapper endpoint="/api/data-sites?order=updatedAt:desc&limit=5">
         { (data: app.DataSite[]) => {
+            data = [];
             return (
                 <div className="card sites">
                     <h4><i className="icon fa-solid fa-location-dot" /> Healthcare Sites</h4>
                     <hr/>
-                    { data.map((item, i) => (
-                        <li key={i}>
-                            <Link
-                                to={`/sites/${ item.id }`}
-                                className="link"
-                                title={ item.description || undefined }
-                            >
-                                { item.name }
-                            </Link>
+                    
+                    { data.length ?
+                        <>
+                        { data.map((item, i) => (
+                            <li key={i}>
+                                <Link
+                                    to={`/sites/${ item.id }`}
+                                    className="link"
+                                    title={ item.description || undefined }
+                                >
+                                    { item.name }
+                                </Link>
+                            </li>
+                        ))}
+                        <li>
+                            <Link to="/sites/" className="link"><b className="color-brand-2">Browse All...</b></Link>
                         </li>
-                    ))}
-                    <li>
-                        <Link to="/sites/" className="link"><b className="color-brand-2">Browse All...</b></Link>
-                    </li>
+                        </> : 
+                            <div>
+                                <p>No Healthcare Sites found in the database.</p>
+                                { canCreate && <div className="center mt-1 mb-1">
+                                    <Link to="/sites/new" className="link bold color-green">
+                                        <i className="fa-solid fa-circle-plus" /> Create Healthcare Site
+                                    </Link>
+                                </div> }
+                            </div>
+                    }
                 </div>
             )
         }}

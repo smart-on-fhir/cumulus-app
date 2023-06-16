@@ -32,6 +32,8 @@ export default function DataRequestsListPage()
         return <AlertError><b>Error Loading Subscriptions: </b>{ error + "" }</AlertError>
     }
 
+    const groupsData = groups?.filter(g => g.requests.length > 0)
+
     return (
         <div>
             <HelmetProvider>
@@ -54,18 +56,27 @@ export default function DataRequestsListPage()
                 </div>) }
             </div>
             <hr className="mb-2"/>
-            { groups?.filter(g => g.requests.length > 0).map((group, i) => (
 
-                <Collapse key={i} header={
-                    <><i className="fa-regular fa-folder"/> { group.name }</>
-                }>
-                    <Grid cols="22em" key={i} className="link-list mt-05 mb-2">
-                        { group.requests.map((item, y) => (
-                            <DataRequestLink request={item} href="/requests/:id" key={y} />
-                        ))}
-                    </Grid>
-                </Collapse>
-            )) }
+            { !groupsData?.length ?
+                <div className="center">
+                    <br/>
+                    <p>No subscriptions found in the database! You can start by creating new subscription.</p>
+                    <br/>
+                    <Link to="./new" className="btn btn-blue-dark pl-2 pr-2">Create Data Subscription</Link>
+                </div> :
+                groupsData.map((group, i) => (
+
+                    <Collapse key={i} header={
+                        <><i className="fa-regular fa-folder"/> { group.name }</>
+                    }>
+                        <Grid cols="22em" key={i} className="link-list mt-05 mb-2">
+                            { group.requests.map((item, y) => (
+                                <DataRequestLink request={item} href="/requests/:id" key={y} />
+                            ))}
+                        </Grid>
+                    </Collapse>
+                ))
+            }
         </div>
     )
 }
