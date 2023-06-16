@@ -25,9 +25,23 @@ export default function Home() {
 }
 
 function Projects() {
+    const { user } = useAuth();
+    const canCreate = user?.permissions.includes("Projects.create")
     return (
         <EndpointListWrapper endpoint="/api/projects?order=updatedAt:desc">
             { (data: app.Project[]) => {
+                if (!data.length) {
+                    return <div className="projects center card">
+                        <div>
+                        <p>No Study Areas found in the database.</p>
+                        { canCreate && <div className="mt-1 mb-1">
+                            <Link to="/projects/new" className="link bold color-green">
+                                <i className="fa-solid fa-circle-plus" /> Create Study Area
+                            </Link>
+                        </div> }
+                        </div>
+                    </div>
+                }
                 return (
                     <div className="projects">
                         { data.map((project, i) => (
@@ -51,34 +65,45 @@ function Graphs() {
     return (
         <EndpointListWrapper endpoint="/api/views?order=updatedAt:desc&limit=7">
             { (data: app.Project[]) => {
+
                 if (!selected && data.length) {
                     setTimeout(() => setSelected(data[0].id))
                 }
+                
                 return (
                     <div className="graphs-row card">
                         <div className="graphs">
-                            { selected && <Link to={`/views/${selected}`}>
+                            { data.length ? !!selected && <Link to={`/views/${selected}`}>
                                 <img alt="Current Graph" src={`/api/views/${selected}/screenshot`} />
-                            </Link> }
+                            </Link> : <p className="color-muted center">No preview available</p> }
                         </div>
                         <div className="graphs-list">
                             <h4>Latest Graphs</h4>
                             <hr/>
-                            { data.map((item, i) => (
-                                <li key={i}>
-                                    <Link
-                                        to={ `/views/${item.id}` }
-                                        className={"link" + (selected === item.id ? " color-brand-2" : "")}
-                                        title={ item.description || undefined }
-                                        onMouseEnter={() => setSelected(item.id)}
-                                    >
-                                        { item.name }
-                                    </Link>
+                            { data.length ?
+                                <>
+                                { data.map((item, i) => (
+                                    <li key={i}>
+                                        <Link
+                                            to={ `/views/${item.id}` }
+                                            className={"link" + (selected === item.id ? " color-brand-2" : "")}
+                                            title={ item.description || undefined }
+                                            onMouseEnter={() => setSelected(item.id)}
+                                        >
+                                            { item.name }
+                                        </Link>
+                                    </li>
+                                ))}
+                                <li>
+                                    <Link to="/views/?view=column&group=subscription" className="link"><b className="color-brand-2">Browse All...</b></Link>
                                 </li>
-                            ))}
-                            <li>
-                                <Link to="/views/?view=column&group=subscription" className="link"><b className="color-brand-2">Browse All...</b></Link>
-                            </li>
+                                </> :
+                                <p>
+                                    No Graphs found in the database. You can start by selecting one of the
+                                    existing <Link to="requests" className="link">subscriptions</Link> and
+                                    then you can create new graph from it's data.
+                                </p>
+                            }
                         </div>
                     </div>
                 )
@@ -92,7 +117,6 @@ function Subscriptions() {
     const canCreate = user?.permissions.includes("DataRequests.create")
     return <EndpointListWrapper endpoint="/api/requests?order=updatedAt:desc&limit=5">
         { (data: app.DataSite[]) => {
-            data = [];
             return (
                 <div className="card subscriptions">
                     <h4><i className="icon fa-solid fa-database" /> Subscriptions</h4>
@@ -136,7 +160,6 @@ function Sites() {
 
     return <EndpointListWrapper endpoint="/api/data-sites?order=updatedAt:desc&limit=5">
         { (data: app.DataSite[]) => {
-            data = [];
             return (
                 <div className="card sites">
                     <h4><i className="icon fa-solid fa-location-dot" /> Healthcare Sites</h4>
