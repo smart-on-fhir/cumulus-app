@@ -1,84 +1,123 @@
 # Cumulus Dashboard
 
-## Quick Start
+## Installation
 
-You can get a demo of this app running out of the box with one command: `./build_and_start.sh` This relies on a modern Docker version installed on the host machine. 
-
-| |Demo Login Info|
-|-----------|------------------------|
-| Site      |  http://localhost:4000 |
-|User       | `admin@cumulus.dev`    |  
-|Password   |  `Admin@12345`         |
-
-
+***Prerequisites***
+1. OS - This app has been only tested on Mac OS and Linux
+2. Git - Needs to be available to pull the source code
+3. NodeJS - The project currently uses NodeJS 18 which needs to be pre-installed.
+   If you use [nvm](https://github.com/nvm-sh/nvm), then `cd` into the project
+   folder and run `nvm use` to automatically select the required node version
+4. Docker - A recent version needs to be installed on the host machine
 
 
-
-## Setup Your Environment
-
-The `.env` file with this repo includes everything you need to get a demo of the Cumulus System up and running. 
-Developers will want to create an `.env.local` file that is not checked into git. This is where you store
-secrets and personalized variables such as email addresses. 
-
-Example `.env.local` vars: 
+Then get the code and install dependencies:
 ```
-    CUMULUS_ADMIN_EMAIL=""
-    REGIONAL_CLUSTER_EMAIL=""
-    MAILGUN_API_KEY=""
-    MAILGUN_DOMAIN="smarthealthit.org"
-    APP_EMAIL_FROM="developer@SomeDomain.org"
-    DB_SYNC="normal"
-```
-
-
-
-
-## Running Tests 
-
-
-
-
-## Local Development (No Docker)
-
-First make sure you have an unix system (Linux or Mac) with Git, Docker and NodeJS 18+.
-Node Version Manager helps: 
-https://github.com/nvm-sh/nvm
-
-Then do:
-```
+cd /path/to/install/the/dashboard/into
 git clone https://github.com/smart-on-fhir/cumulus-app.git
 cd cumulus-app
 npm i
 ```
 
-## Local Environment Configuration
-The configuration is done via `.env` files. In the project root folder there is 
-a file called `.env` which contains all the environment variables and their
-descriptions. However, most of these variables are set to their default values. Many are empty
-and are supposed to be overridden. When the application is started, several configuration files
-will be loaded and override each other's variables:
-
-1. `.env` - base values for all variables
-2. `.env.development` - some overrides for development if started via `npm run start:server:dev`
-3. `.env.local` - most variables are set here. Secrets are OK here as this file is git-ignored
-
-To configure new installation make a copy of the file `.env` and rename it to `.env.local`. Then add
-your configurations to `.env.local`.
-
-
-## Running the App
-In one terminal run `npm run start:server`. Then open http://localhost:4000/ and
-login with one of the following credentials:
-- email: `user@cumulus.dev`, password: `User@12345`
-- email: `manager@cumulus.dev`, password: `Manager@12345`
-- email: `admin@cumulus.dev`, password: `Admin@12345`
-
-For React development using hot-reload server, in a separate terminal run `npm start` and then use `http://localhost:3001/` instead. Keep in mind that any changes you make to the front-end code will appear immediately on http://localhost:3001/, but will not be visible on http://localhost:4000/, until you run `npm run build`.
-
-
-## Running the test suite
-
+## Configuration
+Some environment variables are required and must be set before the app is started.
+To simplify the configuration process we have created a script that will ask you for
+any required information and generate the configuration files for you. All you need
+to do is:
 ```
-npm ci --legacy-peer-deps                
-npm run test:server
+npm run configure
+```
+The configuration script will generate a local config file for you named `.env.production.local`
+or `.env.development.local`. You can run it twice to generate both files, although 
+you don't typically need use production settings on local machine and vice versa.
+
+When you run the configure script for the first time it will create configuration files.
+However, any subsequent runs will NOT override existing config files. Instead, the script
+will just display the proposed file contents and even show a diff of which variables have
+been changed.
+
+
+## Build
+There is a **build** step that needs to be executed before you start the app for
+the first time, as well as after any changes are made to the front-end part of
+the code (under `/src`). To do that `cd` into the project folder and run:
+```
+npm run build
+```
+Note that build is **only** needed to "apply" code changes and there is no need
+to rebuild on every restart.
+
+Another build that happens once is the docker images build. It happens when you
+start the instance via docker-compose for the first time. If for any reason you
+need to rebuild, `cd docker` and run one of these (depending on what your environment
+is and what .env file you have generated):
+
+**for production**
+```
+docker-compose --env-file='../.env.production.local' up --build
+```
+**for development**
+```
+docker-compose --env-file='../.env.development.local' up --build 
+```
+
+## Run
+There are 4 major ways to start the dashboard. Production instances are those deployed for public use.
+Development instances are started by developers on their local machines in order to test the app or
+contribute in some way.
+
+- Run **production** instance via **docker-compose**
+    1. Prepare (see below)
+    2. Make sure a `NODE_ENV` environment variable is set to `production`
+    3. Run `npm run start:docker`
+- Run **production** instance **manually**
+    1. Prepare (see below)
+    2. Make sure a `NODE_ENV` environment variable is set to `production`
+    3. Run `npm start`
+- Run **development** instance via **docker-compose**
+    1. Make sure a `NODE_ENV` environment variable is set to `development`
+    2. Run `npm run start:docker`
+    3. In separate terminal run `npm run start:hmr`
+- Run **development** instance **manually**
+    1. Make sure a `NODE_ENV` environment variable is set to `development`
+    2. Run `npm run start:manual`
+    3. In separate terminal run `npm run start:hmr`
+
+Note that in production there is a formal step that we call "prepare".
+This can include various steps like:
+- Initial deployment setup
+- Pulling latest code
+- Installing (`npm install`)
+- Building (`npm run build`)
+
+## Using the Dashboard
+Once the dashboard is started you can access it at:
+- http://localhost:4000 by default, or whatever your HOST and PORT have been configured to
+- In development you can also run `npm run start:hmr` and use the live app with hot reloading
+  at http://localhost:3000. If port 3000 is not available the number will be incremented and
+  the updated URL should be printed in the terminal.
+- You can also use DB management tools to connect the database. For example, the default
+  connection string for a development database would be `postgres://postgres:cumulus-db-password@localhost:4002/cumulus`.
+
+Upon installation the dashboard app will have some data pre-inserted. This includes a
+few default user accounts, as well as some sample data for testing in case of
+development installation. Here are the default user credentials:
+|role   |email              |password     |
+|-------|-------------------|-------------|
+|admin  |admin@cumulus.dev  |Admin@12345  |
+|manager|manager@cumulus.dev|Manager@12345|
+|user   |user@cumulus.dev   |User@12345   |
+
+
+**IMPORTANT**: On production systems these user accounts will have to removed and
+replaced with real ones. To do so:
+1. Login as the default admin
+2. Invite another "real" admin
+3. Login as the "real" admin
+4. Delete old users and invite new ones as needed
+
+
+## Running Tests
+```            
+npm test
 ```
