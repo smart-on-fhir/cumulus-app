@@ -1,9 +1,10 @@
-FROM node:19
+FROM node:18
 
 WORKDIR /app
 
 ENV PORT 80
 ENV HOST 0.0.0.0
+ENV NODE_ENV $NODE_ENV
 
 COPY package.json /app/package.json
 COPY package-lock.json /app/package-lock.json
@@ -14,4 +15,4 @@ RUN npm install
 
 EXPOSE 80
 
-CMD ["npm", "run", "run:server"]
+CMD ["npm", "run", "start:manual"]
