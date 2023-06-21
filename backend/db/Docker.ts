@@ -77,9 +77,6 @@ export async function createContainer(options: Config): Promise<Docker.Container
         ports: {
             "5432": String(options.db.options.port || "5432")
         },
-        bindMounts: options.docker.dataDir ? {
-            [ options.docker.dataDir ]: "/var/lib/postgresql/data"
-        } : {},
         env: {
             POSTGRES_PASSWORD: options.db.options.password || "",
             POSTGRES_USER    : options.db.options.username || "",

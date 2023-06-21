@@ -4,30 +4,27 @@ import { logger }     from "./logger"
 import { Config } from "./types";
 
 const {
-    NODE_ENV               = "production",
     HOST                   = "0.0.0.0",
     PORT                   = "4000",
     DB_SEED                = "db/seeds",
     DB_SYNC                = "none", // normal|force|alter|none
     DB_HOST                = "localhost",
-    DB_PORT                = "5432",
-    DB_USER                = "postgres",
+    DB_PORT                = 5432,
+    DB_USER                = "",
     DB_PASS                = "",
     DB_DATABASE            = "cumulus",
-    THROTTLE               = "0",
+    THROTTLE               = 0,
     DB_SSL                 = "true",
     DB_DOCKER_CONTAINER    = "",
     MAILGUN_API_KEY        = "missing mailgun api key",
     MAILGUN_DOMAIN         = "smarthealthit.org",
     APP_EMAIL_FROM         = "admin@cumulus.org",
-    CUMULUS_ADMIN_EMAIL    = "vlad.ignatov@gmail.com",
-    REGIONAL_CLUSTER_EMAIL = "vlad.ignatov@gmail.com",
-    DB_DOCKER_DATA_DIR     = "",
+    CUMULUS_ADMIN_EMAIL    = "",
+    REGIONAL_CLUSTER_EMAIL = "",
     LOG_SQL                = "false",
     AGGREGATOR_URL         = "",
     AGGREGATOR_API_KEY     = "",
     AGGREGATOR_ENABLED     = "false",
-    // BASE_URL               = "./db/postgres-data"
 
 } = process.env;
 
@@ -50,8 +47,7 @@ const config: Config = {
     cumulusAdminEmail: CUMULUS_ADMIN_EMAIL,
 
     docker: {
-        containerName: DB_DOCKER_CONTAINER,
-        dataDir: DB_DOCKER_DATA_DIR //? Path.resolve(__dirname, DB_DOCKER_DATA_DIR) : ""
+        containerName: DB_DOCKER_CONTAINER
     },
     db: {
         sync: DB_SYNC as Config["db"]["sync"],

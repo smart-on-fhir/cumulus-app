@@ -49,7 +49,6 @@ interface Config {
 
     docker: {
         containerName: string
-        dataDir: string
     }
 
     db: {
