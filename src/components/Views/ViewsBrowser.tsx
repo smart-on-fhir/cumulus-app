@@ -70,7 +70,7 @@ export default function ViewsBrowser({
 
     result = result || [];
 
-    if (!result.length) {
+    if (!requestId && !result.length) {
         return <p className="center">
             No Graphs found in the database. You can start by selecting one of the
             existing <Link to="/requests" className="link">subscriptions</Link> and
