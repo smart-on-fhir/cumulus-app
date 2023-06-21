@@ -116,11 +116,11 @@ function generateEnvFile() {
     if (STATE.NODE_ENV === "development") {
         vars.NODE_DEBUG = '"app:*"'
         vars.LOG_LEVEL = "debug" // silly, debug, verbose, http, info, warn, error
+        vars.DB_SEED = "db/seeds/development"
         // vars.DANGEROUSLY_DISABLE_HOST_CHECK = "true"
-        vars.DB_SEED = "db/seeds" // TODO:
     } else {
         vars.LOG_LEVEL = "info"
-        vars.DB_SEED = "db/seeds" // TODO:
+        vars.DB_SEED = "db/seeds/production"
     }
 
     // TODO: # REACT_APP_BACKEND_HOST="http://localhost:$INTERNAL_PORT"
