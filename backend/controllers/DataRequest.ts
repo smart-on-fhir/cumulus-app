@@ -250,7 +250,10 @@ route(router, {
  * curl -i -X PUT "http://localhost:4000/api/data/bigdata?types=day,string,string,string,string,integer,integer" --data-binary @./big-data.csv
  * ```
  */
-router.put("/:id/data", rw(async (req: AppRequest, res: Response) => {
+router.put(
+    "/:id/data",
+    express.raw({ limit: "100MB" }),
+    rw(async (req: AppRequest, res: Response) => {
     const jobId = String(req.headers["x-job-id"] || "");
     
     // if job is passed in - continue
