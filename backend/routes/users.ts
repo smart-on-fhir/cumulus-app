@@ -1,22 +1,26 @@
-import express        from "express"
-import { body }       from "express-validator"
-import * as lib       from "../lib"
-import User           from "../db/models/User"
-import { route }      from "../lib/route"
-import { AppRequest } from "../types"
-import { Unauthorized } from "../errors"
+import Crypto              from "crypto"
+import Bcrypt              from "bcryptjs"
+import express             from "express"
+import { body }            from "express-validator"
+import { debuglog }        from "util"
+import { InferAttributes } from "sequelize"
+import moment              from "moment"
+import * as lib            from "../lib"
+import User                from "../db/models/User"
+import { route }           from "../lib/route"
+import * as mail           from "../mail"
+import SystemUser          from "../SystemUser"
 import {
-    getAllUsers,
-    checkActivation,
-    getUser,
-    updateAccount,
-    updateUser,
-    createUser,
-    handleUserInvite,
-    activateAccount,
-    deleteUser
-} from "../controllers/User"
+    BadRequest,
+    Conflict,
+    Forbidden,
+    Gone,
+    InternalServerError,
+    NotFound,
+    Unauthorized
+} from "../errors"
 
+const debug = debuglog("app");
 
 const router = express.Router({ mergeParams: true });
 
@@ -54,7 +58,7 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const users = await getAllUsers(lib.getFindOptions(req))
+        const users = await User.findAll({ ...lib.getFindOptions(req), user: req.user })
         res.json(users.map(user => secure(user)))
     }
 })
@@ -73,8 +77,24 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const result = await checkActivation(req.params.code)
-        res.end(result)
+
+        const user = await User.findOne({
+            where: { activationCode: req.params.code },
+            user: SystemUser
+        })
+
+        // No such user. Perhaps the invitation expired and the temp. user was deleted
+        lib.assert(user, "Invalid or expired invitation", NotFound);
+
+        // @ts-ignore Account already activated
+        lib.assert(!user.password, "Account already activated", Conflict);
+
+        // @ts-ignore User found but created more than a day ago.
+        if (moment().diff(moment(user.createdAt), "days") > 1) {
+            throw new Gone("Expired invitation");
+        }
+
+        res.end("Pending activation")
     }
 })
 
@@ -97,8 +117,9 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const user = await getUser(+req.params?.id)
-        res.json(secure(user))
+        const model = await User.findByPk(+req.params?.id, { user: req.user });
+        lib.assert(model, "User not found", NotFound);
+        res.json(secure(model))
     }
 });
 
@@ -132,8 +153,42 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const user = await updateAccount(req.cookies.sid, req.body)
-        res.json(secure(user))
+
+        // Find the logged-in user
+        const model = await User.findOne({ where: { sid: req.cookies.sid }, user: req.user})
+        lib.assert(model, "User not found", NotFound);
+
+        // Filter out the payload fields we need
+        const { password, newPassword1, newPassword2, name } = req.body;
+
+        // Check password
+        if (!Bcrypt.compareSync(password, model.password || "")) {
+            throw new Forbidden("Invalid password");
+        }
+
+        // Initialize the patch object
+        const patch: Partial<InferAttributes<User>> = { name };
+
+        // Update password if needed
+        if (newPassword1) {
+            if (newPassword1 !== newPassword2) {
+                throw new BadRequest("New passwords do not match");
+            }
+            patch.password = newPassword1
+        }
+
+        try {
+            await model.update(patch, { user: req.user });
+            res.json({
+                email: model.email,
+                name : model.name,
+                role : model.role
+            });
+        } catch (e) {
+            const error = new BadRequest("Error updating account")
+            error.cause = e.stack
+            throw error
+        }
     }
 })
 
@@ -156,8 +211,13 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const user = await updateUser(+req.params?.id, req.body)
-        res.json(secure(user))
+        const model = await User.findByPk(+req.params?.id, { user: req.user });
+        lib.assert(model, "User not found", NotFound);
+        const payload = { ...req.body }
+        delete payload.id;
+        delete payload.email;
+        await model.update(payload, { user: req.user });
+        res.json(secure(model))
     }
 });
 
@@ -181,7 +241,7 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const user = await createUser(req.body)
+        const user = await User.create(req.body, { user: req.user })
         res.json(secure(user))
     }
 });
@@ -214,10 +274,52 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res) {
+    async handler(req, res) {
         lib.assert(req.user?.email, "Guest cannot invite users", Unauthorized)
-        const user = await handleUserInvite(req.body, req.user.email, lib.getRequestBaseURL(req))
-        res.json(secure(user))
+
+        // @ts-ignore 
+        const transaction = await User.sequelize.transaction();
+
+        const { email, role, message } = req.body;
+
+        try {
+            var user = await User.create({
+                email,
+                role,
+                invitedBy: req.user.email,
+                activationCode: Crypto.randomBytes(32).toString("hex")
+            }, {
+                transaction,
+                user: req.user
+            });
+        } catch (e) {
+            debug(e)
+
+            await transaction.rollback()
+
+            if (e.name === "SequelizeUniqueConstraintError") {
+                throw new BadRequest("User already invited")
+            }
+
+            throw e
+        }
+
+        try {
+            await mail.inviteUser({
+                email  : user.email,
+                code   : user.activationCode!,
+                baseUrl: lib.getRequestBaseURL(req),
+                message
+            })
+        } catch (e) {
+            debug(e)
+            await transaction.rollback()
+            throw new InternalServerError("Error sending invitation email")
+        }
+
+        await transaction.commit()
+
+        res.json({ message: "User invited" })
     }
 });
 
@@ -250,8 +352,31 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const user = await activateAccount(req.body)
-        res.json(secure(user))
+        
+        const { code, name, newPassword1, newPassword2 } = req.body
+
+        const user = await User.findOne({ where: { activationCode: code }, user: SystemUser })
+
+        // No such user. Perhaps the invitation expired and the temp. user was deleted
+        lib.assert(user, "Invalid or expired invitation", NotFound);
+
+        // @ts-ignore Account already activated
+        lib.assert(!user.password, "Account already activated", Conflict);
+
+        // @ts-ignore User found but created more than a day ago.
+        if (moment().diff(moment(user.createdAt), "days") > 1) {
+            throw new Gone("Expired invitation");
+        }
+
+        // password confirmation must match
+        lib.assert(newPassword1 === newPassword2, "Passwords do not match", BadRequest);
+
+        try {
+            await user.update({ name, password: newPassword1 }, { user: { ...req.user!, role: "owner" }})
+            res.json({ name: user.name })
+        } catch (cause) {
+            throw new BadRequest("Error activating account", { cause })
+        }
     }
 });
 
@@ -274,8 +399,10 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const user = await deleteUser(+req.params?.id)
-        res.json(secure(user))
+        const model = await User.findByPk(+req.params?.id, { user: req.user });
+        lib.assert(model, "User not found", NotFound);
+        await model.destroy({ user: req.user });
+        res.json(secure(model))
     }
 });
 

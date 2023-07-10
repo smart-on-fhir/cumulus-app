@@ -1,15 +1,18 @@
-import Path                              from "path"
-import { Response, Router }              from "express"
-import { FindOptions, Op }               from "sequelize"
-import crypto                            from "crypto"
-import { AppRequest }                    from "../types"
-import { NotFound, InternalServerError, HttpError } from "../errors"
-import Model                             from "../db/models/View"
-import { route }                         from "../lib/route"
-import { assert }                        from "../lib"
-import { logger }                        from "../logger"
-import { requestLineLevelData }          from "../mail"
-import { requestPermission }             from "../acl"
+import Path                     from "path"
+import { Router }               from "express"
+import { FindOptions, Op }      from "sequelize"
+import crypto                   from "crypto"
+import Model                    from "../db/models/View"
+import { route }                from "../lib/route"
+import { assert }               from "../lib"
+import { logger }               from "../logger"
+import { requestLineLevelData } from "../mail"
+import { requestPermission }    from "../acl"
+import {
+    NotFound,
+    InternalServerError,
+    HttpError
+} from "../errors"
 
 
 const router = Router({ mergeParams: true });
@@ -46,13 +49,14 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res: Response) {
+    async handler(req, res) {
 
         const options: FindOptions = {
             include: [
                 { association: "Tags", attributes: ["id", "name", "description"] },
                 { association: "DataRequest", attributes: ["id", "name"] }
-            ]
+            ],
+            user: req.user
         };
 
         if (req.query.order) {
@@ -120,7 +124,7 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res: Response) {
+    async handler(req, res) {
 
         const include: any[] = []
 
@@ -146,7 +150,7 @@ route(router, {
             include.push(association)
         }
 
-        const model = await Model.findByPk(req.params.id, { include })
+        const model = await Model.findByPk(req.params.id, { include, user: req.user })
         assert(model, NotFound)
         res.json(model)
     }
@@ -206,12 +210,13 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res: Response) {
+    async handler(req, res) {
         const model = await Model.findByPk(+req.params?.id, {
             include: {
                 association: "Tags",
                 attributes: ["id", "name", "description"]
-            }
+            },
+            user: req.user
         });
 
         assert(model, NotFound);
@@ -226,7 +231,7 @@ route(router, {
 
             await model.update(req.body, { transaction, user: req.user })
             if (Array.isArray(req.body.Tags)) {
-                await model.setTags(req.body.Tags.map((t: any) => t.id))
+                await model.setTags(req.body.Tags.map((t: any) => t.id), { user: req.user })
             }
             await transaction.commit()
             res.json(model)
@@ -292,11 +297,11 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res: Response) {
-        const model = await Model.create(req.body)
+    async handler(req, res) {
+        const model = await Model.create(req.body, { user: req.user })
         if (Array.isArray(req.body.Tags)) {
-            await model.setTags(req.body.Tags.map(t => t.id))
-            await model.reload({ include: [{ association: "Tags" }] })
+            await model.setTags(req.body.Tags.map(t => t.id), { user: req.user })
+            await model.reload({ include: [{ association: "Tags" }], user: req.user })
         }
         res.json(model)
     }
@@ -320,10 +325,10 @@ route(router, {
             }
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
-        const model = await Model.findByPk(+req.params?.id);
+    handler: async (req, res) => {
+        const model = await Model.findByPk(+req.params?.id, { user: req.user });
         assert(model, NotFound);
-        await model.destroy()
+        await model.destroy({ user: req.user })
         res.json(model)
     }
 });
@@ -342,7 +347,7 @@ route(router, {
             }
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
+    handler: async (req, res) => {
 
         const ids = String(req.query.id).trim().split(",").map(parseFloat)
 
@@ -352,6 +357,7 @@ route(router, {
                   [Op.in]: ids,
                 },
             },
+            user: req.user
         });
 
         res.json({ message: `Deleted ${result} graphs` })
@@ -376,9 +382,9 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res: Response) {
+    async handler(req, res) {
 
-        const model = await Model.findByPk(req.params.id);
+        const model = await Model.findByPk(req.params.id, { user: req.user });
 
         assert(model, "Model not found", NotFound)
         
@@ -420,7 +426,7 @@ route(router, {
 route(router, {
     method: "post",
     path  : "/:id/request-linelevel-data",
-    async handler(req: AppRequest, res: Response) {
+    async handler(req, res) {
         requestPermission(req.user?.role || "guest", "DataRequests.requestLineLevelData")
         requestLineLevelData(req.body).then(
             () => res.end(),

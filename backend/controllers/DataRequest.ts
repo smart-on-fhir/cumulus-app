@@ -13,7 +13,6 @@ import GroupModel                                                 from "../db/mo
 import { requestPermission }                                      from "../acl"
 import ViewModel                                                  from "../db/models/View"
 import ColumnsMetadata                                            from "../cumulus_library_columns.json"
-import createRestRoutes                                           from "./BaseController"
 import { logger }                                                 from "../logger"
 import ImportJob                                                  from "../DataManager/ImportJob"
 import { requireAuth }                                            from "./Auth"
@@ -95,18 +94,18 @@ const filtersWithoutParams = [
 ];
 
 
-// Views ----------------------------------------------------------------------
+// Views -----------------------------------------------------------------------
 router.get("/:id/views", rw(async (req: AppRequest, res: Response) => {
     const options = getFindOptions(req);
     options.where = { DataRequestId: +req.params.id };
-    const views = await ViewModel.findAll(options);
+    const views = await ViewModel.findAll({ ...options, user: req.user });
     res.json(views);
 }));
 
-// Export Data endpoint -------------------------------------------------------
+// Export Data endpoint --------------------------------------------------------
 router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
     requestPermission(req.user?.role || "guest", "DataRequests.export")
-    const model = await Model.findByPk(req.params.id, getFindOptions(req))
+    const model = await Model.findByPk(req.params.id, { ...getFindOptions(req), user: req.user })
     assert(model, "Model not found", NotFound)
     assert(model.metadata, "Subscription data not found", NotFound)
     const table = "subscription_data_" + req.params.id
@@ -177,14 +176,14 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
 
 // Refresh Data endpoint ------------------------------------------------------
 router.get("/:id/refresh", requireAuth("admin"), rw(async (req: AppRequest, res: Response) => {
-    const model = await Model.findByPk(req.params.id, getFindOptions(req))
+    const model = await Model.findByPk(req.params.id, { ...getFindOptions(req), user: req.user })
     assert(model, "Model not found", NotFound)
     const data = await fetchData(model)
-    await model.set({ data, completed: new Date() }).save()
+    await model.update({ data, completed: new Date() }, { user: req.user })
     res.json(model)
 }));
 
-// By Group -------------------------------------------------------------------
+// By Group --------------------------------------------------------------------
 route(router, {
     method: "get",
     path: "/by-group",
@@ -212,7 +211,7 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res: Response) {
+    async handler(req, res) {
     
         const groupLimit   = uInt(req.query.groupLimit); // >= 2!
         const requestLimit = uInt(req.query.requestLimit);
@@ -225,7 +224,8 @@ route(router, {
                 right      : true
             },
             order: [["name", "asc"]],
-            limit: groupLimit ? Math.max(groupLimit, 2) : undefined
+            limit: groupLimit ? Math.max(groupLimit, 2) : undefined,
+            user: req.user
         });
         
         res.json(recs.map(rec => {
@@ -242,7 +242,7 @@ route(router, {
     }
 });
 
-// Import Data endpoint -------------------------------------------------------
+// Import Data endpoint --------------------------------------------------------
 /**
  * Create (or update?) data by uploading a CSV file in a streaming fashion
  * CURL example:
@@ -254,28 +254,29 @@ router.put(
     "/:id/data",
     express.raw({ limit: "100MB" }),
     rw(async (req: AppRequest, res: Response) => {
-    const jobId = String(req.headers["x-job-id"] || "");
-    
-    // if job is passed in - continue
-    if (jobId) {
-        const job = ImportJob.find(jobId);
-        if (!job) {
-            throw new Error(`No such job "${jobId}"`)
+        const jobId = String(req.headers["x-job-id"] || "");
+        
+        // if job is passed in - continue
+        if (jobId) {
+            const job = ImportJob.find(jobId);
+            if (!job) {
+                throw new Error(`No such job "${jobId}"`)
+            }
+            await job.handle(req, res);
         }
-        await job.handle(req, res);
-    }
 
-    // else use a single-run job
-    else {
-        const job = await ImportJob.create();
-        await job.handle(req, res);
-    }
-}));
+        // else use a single-run job
+        else {
+            const job = await ImportJob.create();
+            await job.handle(req, res);
+        }
+    })
+);
 
-// Data API endpoint ----------------------------------------------------------
+// Data API endpoint -----------------------------------------------------------
 router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
 
-    const subscription = await Model.findByPk(req.params.id)
+    const subscription = await Model.findByPk(req.params.id, { user: req.user })
 
     assert(subscription, "Subscription not found", NotFound)
     assert(subscription.metadata, "Subscription data not found", NotFound)
@@ -467,9 +468,39 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
     });
 }));
 
-createRestRoutes(router, Model, {
-    destroy: true,
-    getAll : true
+// Get one ---------------------------------------------------------------------
+route(router, {
+    path: "/",
+    method: "get",
+    async handler(req, res) {
+        res.json(await Model.findAll({ ...getFindOptions(req), user: req.user }));
+    }
+})
+
+// Delete one ------------------------------------------------------------------
+route(router, {
+    path: "/:id",
+    method: "delete",
+    request: {
+        schema: {
+            id: {
+                in: 'params',
+                isInt: {
+                    errorMessage: "The 'id' parameter must be a positive integer",
+                    options: {
+                        gt: 0
+                    }
+                },
+                toInt: true,
+            }
+        }
+    },
+    async handler(req, res) {
+        const model = await Model.findByPk(req.params.id, { user: req.user });
+        assert(model, NotFound);
+        await model.destroy({ user: req.user })
+        res.json(model)
+    }
 });
 
 // Get single subscription -----------------------------------------------------
@@ -530,7 +561,7 @@ route(router, {
             include.push({ association: "Views" })
         }
 
-        const model = await Model.findByPk(req.params.id, { include })
+        const model = await Model.findByPk(req.params.id, { include, user: req.user })
         assert(model, NotFound)
 
         const json: any = model!.toJSON()
@@ -581,12 +612,13 @@ route(router, {
             }
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
+    handler: async (req, res) => {
         const model = await Model.findByPk(+req.params?.id, {
             include: {
                 association: "Tags",
                 attributes: ["id", "name", "description"]
-            }
+            },
+            user: req.user
         });
         assert(model, NotFound);
         const transaction = await model.sequelize.transaction()
@@ -636,8 +668,8 @@ route(router, {
             }
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
-        const model = await Model.create(req.body)
+    handler: async (req, res) => {
+        const model = await Model.create(req.body, { user: req.user })
         if (Array.isArray(req.body.Tags)) {
             await model.setTags(req.body.Tags.map(t => t.id))
         }

@@ -73,7 +73,7 @@ export default class Tag extends BaseModel<InferAttributes<Tag>, InferCreationAt
     // };
 
     public isOwnedBy(user: any): boolean {
-        return user.id === this.creatorId
+        return user && user.id === this.creatorId
     }
 
     static initialize(sequelize: Sequelize) {

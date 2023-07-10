@@ -1,9 +1,8 @@
-import express, { Response }      from "express"
+import express                    from "express"
 import Model                      from "../db/models/DataSite"
 import { route }                  from "../lib/route"
 import { NotFound, Unauthorized } from "../errors"
 import { assert, getFindOptions } from "../lib"
-import { AppRequest }             from "../types"
 
 
 const router = express.Router({ mergeParams: true });
@@ -12,8 +11,8 @@ const router = express.Router({ mergeParams: true });
 route(router, {
     path: "/",
     method: "get",
-    async handler(req: AppRequest, res: Response) {
-        res.json(await Model.findAll(getFindOptions(req)))
+    async handler(req, res) {
+        res.json(await Model.findAll({ ...getFindOptions(req), user: req.user }))
     }
 })
 
@@ -35,8 +34,8 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res: Response) {
-        const model = await Model.findByPk(+req.params?.id, getFindOptions(req))
+    async handler(req, res) {
+        const model = await Model.findByPk(+req.params?.id, { ...getFindOptions(req), user: req.user })
         assert(model, NotFound)
         res.json(model)
     }
@@ -70,7 +69,12 @@ route(router, {
             },
             lat: {
                 in: [ "body" ],
-                optional: true,
+                optional: {
+                    options: {
+                        checkFalsy: true,
+                        nullable: true
+                    }
+                },
                 isInt: {
                     errorMessage: "'lat' must be an integer",
                     options: {
@@ -81,7 +85,12 @@ route(router, {
             },
             long: {
                 in: [ "body" ],
-                optional: true,
+                optional: {
+                    options: {
+                        checkFalsy: true,
+                        nullable: true
+                    }
+                },
                 isInt: {
                     errorMessage: "'long' must be an integer",
                     options: {
@@ -93,10 +102,10 @@ route(router, {
             // TODO: Add "setting" ?
         }
     },
-    async handler(req: AppRequest, res: Response) {
-        const model = await Model.findByPk(req.params.id);
+    async handler(req, res) {
+        const model = await Model.findByPk(req.params.id, { user: req.user });
         assert(model, NotFound);
-        await model.update(req.body)
+        await model.update(req.body, { user: req.user })
         res.json(model)
     }
 })
@@ -119,7 +128,8 @@ route(router, {
                 in: [ "body" ],
                 optional: {
                     options: {
-                        checkFalsy: true
+                        checkFalsy: true,
+                        nullable: true
                     }
                 },
                 isInt: {
@@ -134,7 +144,8 @@ route(router, {
                 in: [ "body" ],
                 optional: {
                     options: {
-                        checkFalsy: true
+                        checkFalsy: true,
+                        nullable: true
                     }
                 },
                 isInt: {
@@ -148,9 +159,9 @@ route(router, {
             // TODO: Add "setting" ?
         }
     },
-    async handler(req: AppRequest, res: Response) {
+    async handler(req, res) {
         assert(req.user?.id, "Guest cannot create projects", Unauthorized)
-        const model = await Model.create({ ...req.body, creatorId: req.user?.id })
+        const model = await Model.create({ ...req.body, creatorId: req.user?.id }, { user: req.user })
         res.json(model)
     }
 })
@@ -173,10 +184,10 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res: Response) {
-        const model = await Model.findByPk(+req.params?.id);
+    async handler(req, res) {
+        const model = await Model.findByPk(+req.params?.id, { user: req.user });
         assert(model, NotFound);
-        await model.destroy()
+        await model.destroy({ user: req.user })
         res.json(model)
     }
 })

@@ -41,7 +41,7 @@ route(router, {
             })
         }
         
-        const models = await Model.findAll({ include });
+        const models = await Model.findAll({ include, user: req.user });
         const general = await DataRequest.findAll({
             where: {
                 "groupId": null
@@ -53,7 +53,8 @@ route(router, {
             ],
             include: [
                 { association: "Views", attributes: ["name"] }
-            ]
+            ],
+            user: req.user
         });
 
         res.json([ ...models, {
@@ -100,7 +101,7 @@ route(router, {
                 ]
             })
         }
-        const model = await Model.findByPk(+req.params.id, { include });
+        const model = await Model.findByPk(+req.params.id, { include, user: req.user });
         assert(model, HttpError.NotFound);
         res.json(model)
     }
@@ -124,7 +125,7 @@ route(router, {
             }
         }
     },
-    handler: async (req, res) => res.json(await Model.create(req.body))
+    handler: async (req, res) => res.json(await Model.create(req.body, { user: req.user }))
 });
 
 // update ----------------------------------------------------------------------
@@ -158,14 +159,13 @@ route(router, {
         }
     },
     handler: async (req, res) => {
-        const model = await Model.findByPk(req.params.id);
+        const model = await Model.findByPk(req.params.id, { user: req.user });
         assert(model, HttpError.NotFound);
-        res.json(await model.update(req.body))
+        res.json(await model.update(req.body, { user: req.user }))
     }
 });
 
 // destroy ---------------------------------------------------------------------
-// "request_groups_delete"
 route(router, {
     path: "/:id",
     method: "delete",
@@ -184,9 +184,9 @@ route(router, {
         }
     },
     handler: async (req, res) => {
-        const model = await Model.findByPk(req.params.id);
+        const model = await Model.findByPk(req.params.id, { user: req.user });
         assert(model, HttpError.NotFound);
-        await model.destroy()
+        await model.destroy({ user: req.user })
         res.json(model)
     }
 });

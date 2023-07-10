@@ -1,15 +1,16 @@
-import { QueryTypes }        from "sequelize"
-import { pipeline }          from "stream/promises"
-import { randomUUID }        from "crypto"
-import { Pool, PoolClient }  from "pg"
-import * as HttpError        from "../errors"
-import Text2Lines            from "../DataManager/Text2Lines"
-import Line2CSV              from "../DataManager/Line2CSV"
-import CSV2DB                from "../DataManager/CSV2DB"
-import { DATA_TYPES }        from "../DataManager/dataTypes"
-import Subscription          from "../db/models/DataRequest"
-import { assert }            from "../lib"
-import { Request, Response } from "express"
+import { QueryTypes }              from "sequelize"
+import { pipeline }                from "stream/promises"
+import { Response }                from "express"
+import { randomUUID }              from "crypto"
+import { Pool, PoolClient }        from "pg"
+import * as HttpError              from "../errors"
+import Text2Lines                  from "../DataManager/Text2Lines"
+import Line2CSV                    from "../DataManager/Line2CSV"
+import CSV2DB                      from "../DataManager/CSV2DB"
+import { DATA_TYPES }              from "../DataManager/dataTypes"
+import Subscription                from "../db/models/DataRequest"
+import { assert }                  from "../lib"
+import { AppRequest, CurrentUser } from "../types"
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -74,7 +75,7 @@ export default class ImportJob
         }
     }
 
-    async handle(req: Request, res: Response) {
+    async handle(req: AppRequest, res: Response) {
         res.setTimeout(0);
         req.setTimeout(0);
 
@@ -123,7 +124,7 @@ export default class ImportJob
                 res.status(202).end(this.id)
             } else {
                 await this.client.query('COMMIT');
-                await this.writeCounts(+req.params.id)
+                await this.writeCounts(+req.params.id, req.user)
                 this.client.release()
                 delete JOBS[this.id];
                 res.status(200).end("Data imported successfully")
@@ -133,8 +134,8 @@ export default class ImportJob
         }
     }
 
-    async writeCounts(subscriptionID: number) {
-        const subscription = await Subscription.findByPk(subscriptionID);
+    async writeCounts(subscriptionID: number, user?: CurrentUser) {
+        const subscription = await Subscription.findByPk(subscriptionID, { user });
         
         assert(subscription, "Subscription not found", HttpError.NotFound)
 
@@ -147,11 +148,12 @@ export default class ImportJob
                 type: QueryTypes.SELECT
             }
         );
-
+        
+        // @ts-ignore
         await subscription.update({
             // @ts-ignore
             metadata: { ...subscription.metadata, total: countRow[0].cnt },
             completed: new Date()
-        });
+        }, { user });
     }
 }

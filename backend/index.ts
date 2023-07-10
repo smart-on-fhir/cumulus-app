@@ -5,6 +5,7 @@ import Path                     from "path"
 import express, { Application } from "express"
 import cors                     from "cors"
 import cookieParser             from "cookie-parser"
+import { Sequelize }            from "sequelize";
 import * as Auth                from "./controllers/Auth"
 import setupDB                  from "./db"
 import settings                 from "./config"
@@ -55,9 +56,9 @@ function createServer(config: Config)
     return { app, server };
 }
 
-function setupAuth(app: Application)
+function setupAuth(app: Application, dbConnection: Sequelize)
 {
-    app.use(cookieParser(), Auth.authenticate);
+    app.use(cookieParser(), Auth.authenticate(dbConnection));
     app.use("/api/auth", Auth.router);
     logger.verbose("✔ Authentication set up");
 }
@@ -151,8 +152,7 @@ async function main(config: Config = settings)
 {
     const { app, server } = createServer(config);
     const dbConnection = await setupDB(config);
-    app.set("dbConnection", dbConnection);
-    setupAuth(app);
+    setupAuth(app, dbConnection);
     setupAPI(app);
     setupStaticContent(app);
     setUpErrorHandlers(app);

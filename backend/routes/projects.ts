@@ -1,9 +1,8 @@
-import express, { Response }      from "express"
+import express                    from "express"
 import Model                      from "../db/models/Project"
 import { route }                  from "../lib/route"
 import { NotFound, Unauthorized } from "../errors"
 import { assert }                 from "../lib"
-import { AppRequest }             from "../types"
 
 
 const router = express.Router({ mergeParams: true });
@@ -12,8 +11,7 @@ const router = express.Router({ mergeParams: true });
 route(router, {
     path: "/",
     method: "get",
-    handler: async (req: AppRequest, res: Response) => {
-        // res.json(await Model.findAll(getFindOptions(req)))
+    handler: async (req, res) => {
         res.json(await Model.findAll({
             include: [
                 {
@@ -24,7 +22,8 @@ route(router, {
                         }
                     ]
                 }
-            ]
+            ],
+            user: req.user
         }))
     }
 })
@@ -47,7 +46,7 @@ route(router, {
             }
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
+    handler: async (req, res) => {
         // const model = await Model.findByPk(+req.params?.id, getFindOptions(req));
         const model = await Model.findByPk(+req.params?.id, {
             include: [
@@ -62,7 +61,8 @@ route(router, {
                         }
                     ]
                 }
-            ]
+            ],
+            user: req.user
         });
         assert(model, NotFound);
         res.json(model)
@@ -104,14 +104,14 @@ route(router, {
             }
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
-        const model = await Model.findByPk(req.params.id);
+    handler: async (req, res) => {
+        const model = await Model.findByPk(req.params.id, { user: req.user });
         assert(model, NotFound);
-        await model.update(req.body)
+        await model.update(req.body, { user: req.user })
         
         if (Array.isArray(req.body.Subscriptions)) {
-            await model.setSubscriptions(req.body.Subscriptions)
-            await model.reload({ include: [{ association: "Subscriptions" }] })
+            await model.setSubscriptions(req.body.Subscriptions, { user: req.user })
+            await model.reload({ include: [{ association: "Subscriptions" }], user: req.user })
         }
 
         res.json(model)
@@ -143,12 +143,12 @@ route(router, {
             }
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
+    handler: async (req, res) => {
         assert(req.user?.id, "Guest cannot create projects", Unauthorized)
-        const model = await Model.create({ ...req.body, creatorId: req.user?.id })
+        const model = await Model.create({ ...req.body, creatorId: req.user?.id }, { user: req.user })
         if (Array.isArray(req.body.Subscriptions)) {
-            await model.setSubscriptions(req.body.Subscriptions)
-            await model.reload({ include: [{ association: "Subscriptions" }] })
+            await model.setSubscriptions(req.body.Subscriptions, { user: req.user })
+            await model.reload({ include: [{ association: "Subscriptions" }], user: req.user })
         }
         res.json(model)
     }
@@ -172,10 +172,10 @@ route(router, {
             }
         }
     },
-    handler: async (req: AppRequest, res: Response) => {
-        const model = await Model.findByPk(+req.params?.id);
+    handler: async (req, res) => {
+        const model = await Model.findByPk(+req.params?.id, { user: req.user });
         assert(model, NotFound);
-        await model.destroy()
+        await model.destroy({ user: req.user })
         res.json(model)
     }
 });
