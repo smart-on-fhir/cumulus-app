@@ -1,6 +1,7 @@
 import { expect }                from "chai"
-import { Sequelize }             from "sequelize"
 import { getPermissionsForRole } from "../../../backend/acl"
+import setupDB                   from "../../../backend/db"
+import config                    from "../../../backend/config"
 import DataRequests              from "../../fixtures/DataRequests"
 import Tags                      from "../../fixtures/Tags"
 import {
@@ -17,7 +18,8 @@ describe("Subscriptions", () => {
         await resetTable("Tag", Tags)
         await resetTable("DataRequest", DataRequests)
 
-        const dbConnection: Sequelize = server.app.get("dbConnection")
+        const dbConnection = await setupDB(config);
+
         await dbConnection.query(`DROP table if exists "subscription_data_1"`)
         await dbConnection.query(
             `CREATE table "subscription_data_1" (

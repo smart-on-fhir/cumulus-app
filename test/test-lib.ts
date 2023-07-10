@@ -1,11 +1,12 @@
 import { Server as HTTPServer }  from "http"
 import { Express }               from "express-serve-static-core"
 import { expect }                from "chai"
-import { Sequelize }             from "sequelize"
 import main                      from "../backend/index"
 import Users                     from "./fixtures/Users"
 import { fixAutoIncrement }      from "../backend/lib"
 import { getPermissionsForRole } from "../backend/acl"
+import setupDB                   from "../backend/db"
+import config                    from "../backend/config"
 
 
 
@@ -103,7 +104,7 @@ export function getCookie(role: "guest" | "admin" | "manager" | "user" | string)
 
 
 export async function resetTable(modelName: string, data: Record<string, any>[]) {
-    const dbConnection: Sequelize = SERVER.app.get("dbConnection")
+    const dbConnection = await setupDB(config);
     const ModelConstructor = dbConnection.models[modelName]
     await ModelConstructor.sync({ force: true })
     await ModelConstructor.bulkCreate(data, { ignoreDuplicates: true })
