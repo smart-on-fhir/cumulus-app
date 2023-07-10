@@ -727,15 +727,15 @@ export default function Dashboard({
                                 generateCaption
                             ]}
                             // This key controls in which cases the chart should be re-created rather than updated!
-                            // key={ [
-                            //     chartType,
-                            //     viewColumn.name,
-                            //     viewGroupBy?.name || "no_stratifier",
-                            //     // finalChartOptions.annotations?.length || "",
-                            //     column2?.name || "no_secondary",
-                            //     column2type || "no_second_type",
-                            //     // Date.now()
-                            // ].join(":") }
+                            key={ [
+                                chartType,
+                                viewColumn.name,
+                                viewGroupBy?.name || "no_stratifier",
+                                // finalChartOptions.annotations?.length || "",
+                                column2?.name || "no_secondary",
+                                column2type || "no_second_type",
+                                // Date.now()
+                            ].join(":") }
                         /> }
                         <br/>
                         <CaptionEditor html={caption} onChange={caption => dispatch({ type: "UPDATE", payload: { caption }})}/>
