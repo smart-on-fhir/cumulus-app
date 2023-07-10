@@ -1,16 +1,17 @@
-import express                                   from "express"
+import express, { NextFunction, Response }       from "express"
 import { Router }                                from "express-serve-static-core"
 import { checkSchema, Schema, validationResult } from "express-validator"
 import { logger }                                from "../logger"
 import { HttpError, BadRequest }                 from "../errors"
 import { requirePermissionMiddleware }           from "../acl"
-import { AppRequestHandler }                     from "../types"
+import { AppRequest, AppRequestHandler }                     from "../types"
 
 
 export function route(router: Router, options: {
     path: string
     method: "get" | "post" | "put" | "delete"
-    handler: AppRequestHandler
+    // handler: AppRequestHandler
+    handler: (req: AppRequest, res: Response, next: NextFunction) => Promise<any>
     permission?: string[]
     request?: {
         schema?: Schema

@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express"
 import Crypto                                       from "crypto"
 import Bcrypt                                       from "bcryptjs"
-import { Op }                                       from "sequelize"
+import { Op, Sequelize }                            from "sequelize"
 import User                                         from "../db/models/User"
 import { wait }                                     from "../lib"
 import { logger }                                   from "../logger"
@@ -9,6 +9,7 @@ import { BadRequest, Forbidden, Unauthorized }      from "../errors"
 import { getPermissionsForRole }                    from "../acl"
 import { app }                                      from "../.."
 import { AppRequest, Role }                         from "../types"
+import SystemUser                                   from "../SystemUser"
 
 
 
@@ -23,24 +24,25 @@ export const router = express.Router({ mergeParams: true });
  * is found store it at `req.user` as an object with username, role and sid
  * properties. Otherwise `req.user` will be undefined.
  */
-export async function authenticate(req: app.UserRequest, res: Response, next: NextFunction) {
-    const dbConnection = req.app.get("dbConnection")
-    const { sid } = req.cookies;
-    if (sid) {
-        try {
-            const user = await User.findOne({ where: { sid }, __role__: "system" });
-            if (user) {
-                (req as AppRequest).user = user.toJSON()   
-                dbConnection.user = user; 
-            }
-        } catch (ex) {
-            dbConnection.user = { role: "guest" }; 
-            logger.error(ex, { tags: ["AUTH"] });
-        }
-    } else {
+export function authenticate(dbConnection: Sequelize) {
+    return async (req: app.UserRequest, res: Response, next: NextFunction) => {
+        const { sid } = req.cookies;
+        // @ts-ignore
         dbConnection.user = { role: "guest" }; 
+        if (sid) {
+            try {
+                // @ts-ignore
+                const user = await User.findOne({ where: { sid }, user: { role: "system" } });
+                if (user) {
+                    (req as AppRequest).user = user.toJSON()   
+                    dbConnection.user = user; 
+                }
+            } catch (ex) {
+                logger.error(ex, { tags: ["AUTH"] });
+            }
+        }
+        next();
     }
-    next();
 }
 
 /**
@@ -74,7 +76,7 @@ async function login(req: Request, res: Response) {
         const { username, password, remember } = req.body;
 
         // Search for user by username
-        const user = await User.findOne({ where: { email: { [Op.iLike]: username }}, __role__: "system" });
+        const user = await User.findOne({ where: { email: { [Op.iLike]: username }}, user: SystemUser });
 
         // No such username
         // Do NOT specify what is wrong in the error message!
@@ -93,7 +95,7 @@ async function login(req: Request, res: Response) {
         const sid = Crypto.randomBytes(32).toString("hex");
         
         // Update user's lastLogin and sid properties
-        await user.update({ sid, lastLogin: new Date() }, { __role__: "system" });
+        await user.update({ sid, lastLogin: new Date() }, { user: SystemUser });
 
         // Use session cookies by default
         let expires: Date | undefined = undefined
@@ -131,7 +133,7 @@ async function logout(req: AppRequest, res: Response) {
             await User.findOne({ where: { sid: user.sid }})
                 .then(model => {
                     if (model) {
-                        return model.update({ sid: null }, { __role__: "system" });
+                        return model.update({ sid: null }, { user: SystemUser });
                     }
                 });
         } catch (ex) {

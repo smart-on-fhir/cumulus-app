@@ -18,7 +18,7 @@ export function attachHooks(connection: Sequelize) {
 
     // Log updates -------------------------------------------------------------
     connection.addHook("afterUpdate", function(model: BaseModel, options) {
-        const role = options.__role__ || connection.user?.role || "guest"
+        const role = options.user?.role || "guest"
         logger.info(`${model} updated by ${connection.user?.email || role}`, { tags: ["ACTIVITY"] })
     })
 
@@ -29,13 +29,13 @@ export function attachHooks(connection: Sequelize) {
 
     // Log inserts -------------------------------------------------------------
     connection.addHook("afterCreate", function(model: BaseModel, options) {
-        const role = options.__role__ || connection.user?.role || "guest"
+        const role = options.user?.role || "guest"
         logger.info(`${model} created by ${connection.user?.email || role}`, { tags: ["ACTIVITY"] })
     })
 
     // Request permission to read one record -----------------------------------
     connection.addHook("afterFind", function(model: BaseModel | BaseModel[], options) {
-        const role = options.__role__ || connection.user?.role || "guest"
+        const role = options.user?.role || "guest"
         if (role !== "system") {
             if (Array.isArray(model)) {
                 model.forEach(m => {
@@ -59,8 +59,7 @@ export function attachHooks(connection: Sequelize) {
 
     // Log deletes -------------------------------------------------------------
     connection.addHook("afterDestroy", function(model: BaseModel, options) {
-        const role = options.__role__ || connection.user?.role || "guest"
-        logger.info(`${model} deleted by ${connection.user?.email || role}`, { tags: ["ACTIVITY"] })
+        logger.info(`${model} deleted by ${options.user?.email || options.user?.role || "guest"}`, { tags: ["ACTIVITY"] })
     })
 }
 

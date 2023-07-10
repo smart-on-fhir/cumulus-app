@@ -1,11 +1,10 @@
-import { Response, Router } from "express"
-import { Includeable }      from "sequelize/types"
-import Model                from "../db/models/Tag"
-import * as lib             from "../lib"
-import { NotFound }         from "../errors"
-import { assert }           from "../lib"
-import { route }            from "../lib/route"
-import { AppRequest }       from "../types"
+import { Router }      from "express"
+import { Includeable } from "sequelize/types"
+import Model           from "../db/models/Tag"
+import * as lib        from "../lib"
+import { NotFound }    from "../errors"
+import { assert }      from "../lib"
+import { route }       from "../lib/route"
 
 const router = Router({ mergeParams: true });
 
@@ -14,8 +13,8 @@ const router = Router({ mergeParams: true });
 route(router, {
     path: "/",
     method: "get",
-    async handler(req: AppRequest, res: Response) {
-        res.json(await Model.findAll(lib.getFindOptions(req)));
+    async handler(req, res) {
+        res.json(await Model.findAll({ ...lib.getFindOptions(req), user: req.user }));
     }
 })
 
@@ -60,7 +59,7 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res: Response) {
+    async handler(req, res) {
         
         const include: Includeable[] = [];
 
@@ -93,7 +92,7 @@ route(router, {
             })
         }
 
-        const model = await Model.findByPk(req.params.id, { include });
+        const model = await Model.findByPk(req.params.id, { include, user: req.user });
         assert(model, NotFound);
         res.json(model)
     }
@@ -135,10 +134,10 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res: Response) {
-        const model = await Model.findByPk(req.params.id);
+    async handler(req, res) {
+        const model = await Model.findByPk(req.params.id, { user: req.user });
         assert(model, NotFound);
-        res.json(await model.update(req.body))
+        res.json(await model.update(req.body, { user: req.user }))
     }
 });
 
@@ -172,8 +171,8 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res: Response) {
-        res.json(await Model.create({ ...req.body, creatorId: req.user?.id }))
+    async handler(req, res) {
+        res.json(await Model.create({ ...req.body, creatorId: req.user?.id }, { user: req.user }))
     }
 });
 
@@ -195,10 +194,10 @@ route(router, {
             }
         }
     },
-    async handler(req: AppRequest, res: Response) {
-        const model = await Model.findByPk(req.params.id);
+    async handler(req, res) {
+        const model = await Model.findByPk(req.params.id, { user: req.user });
         assert(model, NotFound);
-        await model.destroy()
+        await model.destroy({ user: req.user })
         res.json(model)
     }
 });

@@ -15,16 +15,19 @@ declare module 'sequelize' {
         user: CurrentUser
     }
     interface InstanceUpdateOptions {
-        __role__?: Role
+        user?: CurrentUser
     }
     interface InstanceDestroyOptions {
-        __role__?: Role
+        user?: CurrentUser
     }
     interface FindOptions {
-        __role__?: Role
+        user?: CurrentUser
     }
     interface CreateOptions {
-        __role__?: Role
+        user?: CurrentUser
+    }
+    interface DestroyOptions {
+        user?: CurrentUser
     }
 }
 
@@ -71,7 +74,7 @@ interface Config {
 }
 
 interface CurrentUser {
-    id   : number
+    id   : number | string
     email: string
     role : Role
     [key : string]: any
