@@ -496,11 +496,6 @@ export default class Chart extends React.Component<ChartProps>
     }
 
     componentDidMount() {
-        if (Highcharts.charts.length) {
-            Highcharts.charts.forEach((chart: any) => {
-                if (chart) chart.destroy()
-            })
-        }
         this.chart = Highcharts.chart("chart", this.props.options || {});
         Highcharts.charts = [this.chart]
     }
