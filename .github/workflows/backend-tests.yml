@@ -29,5 +29,5 @@ jobs:
 
       - run: npm ci --legacy-peer-deps
 
-      - run: npm run test:server
+      - run: npm run test
 
