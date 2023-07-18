@@ -383,16 +383,18 @@ export default function Dashboard({
     });
 
     // Convert filters to search parameters
+    const noRightOps = ["isNull", "isNotNull", "isTrue", "isFalse", "isNotTrue", "isNotFalse"];
     const filterParams: string[] = []
     let chain: string[] = [];
     filters.forEach(filter => {
+        const { left, operator, right, join } = filter
         // Skip incomplete filters
-        if (filter.left && filter.operator && filter.right.value !== undefined) {
-            if (filter.join === "and" && chain.length) {
+        if (left && operator && (right.value !== undefined || noRightOps.includes(operator))) {
+            if (join === "and" && chain.length) {
                 filterParams.push(chain.join(","))
                 chain = []
             }
-            chain.push([filter.left, filter.operator, filter.right.value].join(":"))
+            chain.push([left, operator, right.value].join(":"))
         }
     })
     if (chain.length) filterParams.push(chain.join(","))
