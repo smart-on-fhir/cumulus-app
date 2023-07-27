@@ -48,7 +48,7 @@ function DataElementEditor({
                 </select>
             </div>
             <div className="col col-0">
-                <button className="btn color-red" title="Remove this data element" onClick={() => onRemove()}>
+                <button className="btn color-red" title="Remove this data element" type="button" onClick={() => onRemove()}>
                     <i className="fas fa-trash-alt"/>    
                 </button>    
             </div>
