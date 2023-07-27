@@ -9,6 +9,7 @@ import {
     Sequelize
 } from "sequelize"
 import Tag from "./Tag";
+import Project from "./Project";
 
 
 export default class View extends BaseModel<InferAttributes<View>, InferCreationAttributes<View>>
@@ -22,7 +23,7 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
     declare createdAt       : CreationOptional<Date>;
     declare updatedAt       : CreationOptional<Date>;
 
-    declare projects?: NonAttribute<Tag[]>;
+    declare projects?: NonAttribute<Project[]>;
 
     declare setTags: HasManySetAssociationsMixin<Tag, number>;
 
