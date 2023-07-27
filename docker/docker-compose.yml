@@ -46,6 +46,7 @@ services:
       - AGGREGATOR_URL=$AGGREGATOR_URL
       - AGGREGATOR_API_KEY=$AGGREGATOR_API_KEY
       - AGGREGATOR_ENABLED=$AGGREGATOR_ENABLED
+      - LOG_SQL=$LOG_SQL
     volumes:
       - ../backend:/app/backend
       - ../build:/app/build
