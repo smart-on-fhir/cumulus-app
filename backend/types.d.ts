@@ -50,6 +50,8 @@ interface Config {
     // emails are sent to this address
     cumulusAdminEmail: string
 
+    userInviteExpireAfterHours: number
+
     docker: {
         containerName: string
     }

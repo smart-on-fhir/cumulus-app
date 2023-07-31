@@ -1,6 +1,7 @@
 import Bcrypt     from "bcryptjs"
 import moment     from "moment"
 import { logger } from "../../logger"
+import config     from "../../config"
 import BaseModel  from "./BaseModel"
 import {
     CreationOptional,
@@ -133,7 +134,7 @@ export default class User extends BaseModel<InferAttributes<User>, InferCreation
                     if (this.password) {
                         return this.lastLogin ? "Not logged in" : "Never logged in";
                     }
-                    if (moment().diff(moment(this.createdAt), "days") > 1) {
+                    if (moment().diff(moment(this.createdAt), "hours") > config.userInviteExpireAfterHours) {
                         return "Expired invitation";
                     }
                     return "Pending invitation";

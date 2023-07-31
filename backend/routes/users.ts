@@ -10,6 +10,7 @@ import User                from "../db/models/User"
 import { route }           from "../lib/route"
 import * as mail           from "../mail"
 import SystemUser          from "../SystemUser"
+import config              from "../config"
 import {
     BadRequest,
     Conflict,
@@ -86,11 +87,11 @@ route(router, {
         // No such user. Perhaps the invitation expired and the temp. user was deleted
         lib.assert(user, "Invalid or expired invitation", NotFound);
 
-        // @ts-ignore Account already activated
+        // Account already activated
         lib.assert(!user.password, "Account already activated", Conflict);
 
-        // @ts-ignore User found but created more than a day ago.
-        if (moment().diff(moment(user.createdAt), "days") > 1) {
+        // User found but created too long ago.
+        if (moment().diff(moment(user.createdAt), "hours") > config.userInviteExpireAfterHours) {
             throw new Gone("Expired invitation");
         }
 
@@ -363,8 +364,8 @@ route(router, {
         // @ts-ignore Account already activated
         lib.assert(!user.password, "Account already activated", Conflict);
 
-        // @ts-ignore User found but created more than a day ago.
-        if (moment().diff(moment(user.createdAt), "days") > 1) {
+        // @ts-ignore User found but created too long ago.
+        if (moment().diff(moment(user.createdAt), "hours") > config.userInviteExpireAfterHours) {
             throw new Gone("Expired invitation");
         }
 

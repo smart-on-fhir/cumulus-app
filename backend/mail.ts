@@ -1,5 +1,6 @@
 import formData     from "form-data"
 import Mailgun      from "mailgun.js"
+import moment from "moment"
 import { debuglog } from "util"
 import { app }      from ".."
 import config       from "./config"
@@ -116,7 +117,9 @@ export async function inviteUser({
 
     let html = [
         `<h2>You have been invited</h2>`,
-        `<p>Please use the following link within the next 24 hours to activate your Cumulus account:</p>`,
+        `<p>Please use the following link within the next ${
+            moment.duration(config.userInviteExpireAfterHours, "hours").humanize()
+        } to activate your Cumulus account:</p>`,
         `<p><a href="${href}" target="_blank">${href}</a></p>`
     ];
 
