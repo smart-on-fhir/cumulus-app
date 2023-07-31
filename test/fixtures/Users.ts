@@ -1,3 +1,5 @@
+import config from "../../backend/config"
+
 export default [
     {
         id      : 1,
@@ -59,7 +61,7 @@ export default [
         sid      : null,
         password : null,
         invitedBy: "admin@cumulus.test",
-        createdAt: new Date(Date.now() - 1000*60*60*48),
+        createdAt: new Date(Date.now() - 1000*60*60* (config.userInviteExpireAfterHours + 1)),
         activationCode: "test-activation-code-3"
     }
 ];
