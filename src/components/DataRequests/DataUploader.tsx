@@ -28,11 +28,28 @@ function detectDataTypeAt(i: number, name: string, rows: string[][]) {
     
     if (name === "cnt") return "integer";
 
-    if (name.match(/year/i )) return "date:YYYY";
-    if (name.match(/month/i)) return "date:YYYY-MM";
-    if (name.match(/week/i )) return "date:YYYY-MM-DD";
-    if (name.match(/day/i  )) return "date:YYYY-MM-DD";
-    if (name.match(/date/i )) return "date:YYYY-MM-DD";
+    const map = [
+        [ "range"  , "string"          ],
+        [ "age"    , "integer"         ],
+        [ "count"  , "integer"         ],
+        [ "int"    , "integer"         ],
+        [ "integer", "integer"         ],
+        [ "float"  , "float"           ],
+        [ "bool"   , "boolean"         ],
+        [ "boolean", "boolean"         ],
+        [ "year"   , "date:YYYY"       ],
+        [ "month"  , "date:YYYY-MM"    ],
+        [ "week"   , "date:YYYY-MM-DD" ],
+        [ "day"    , "date:YYYY-MM-DD" ],
+        [ "date"   , "date:YYYY-MM-DD" ]
+    ];
+
+    for (const [token, type] of map) {
+        const re = new RegExp("(\\b|_|[A-Z0-9]|^)" + token + "(\\b|_|[A-Z0-9]|$)")
+        if (name.match(re)) {
+            return type;
+        }
+    }
     
     let type = "";
 
