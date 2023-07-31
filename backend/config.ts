@@ -46,6 +46,10 @@ const config: Config = {
     // emails are sent to this address
     cumulusAdminEmail: CUMULUS_ADMIN_EMAIL,
 
+    // Note that moment humanized duration shows 24 * 7 as "168 hours" and not
+    // many people are used to that so we add one more hour to get "7 days"!
+    userInviteExpireAfterHours: 24 * 7 + 1,
+
     docker: {
         containerName: DB_DOCKER_CONTAINER
     },
