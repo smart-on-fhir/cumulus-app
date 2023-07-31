@@ -71,6 +71,21 @@ export default class Users extends Component<any, State>
         );
     }
 
+    reInvite(email: string, role: string) {
+        this.setState({ loading: true, error: null })
+    
+        request<{ message: string }>("/api/users/invite", {
+            method: "POST",
+            body: JSON.stringify({ email, role, force: true }),
+            headers: { "content-type": "application/json" }
+        })
+        .then(
+            () => this.fetch(),
+            error => this.setState({ error })
+        )
+        .finally(() => this.setState({ loading: false }));
+    }
+
     renderResults() {
         const { loading, error, records, selection } = this.state;
 
@@ -125,6 +140,7 @@ export default class Users extends Component<any, State>
                     user={ selection }
                     onChange={ patch => this.update(selection.id, patch)}
                     onDelete={() => this.delete(selection.id) }
+                    reInvite={() => this.reInvite(selection.email, selection.role)}
                 /> }
             </>
         )
@@ -157,11 +173,13 @@ export default class Users extends Component<any, State>
 function UserEditor({
     user,
     onChange,
-    onDelete
+    onDelete,
+    reInvite
 }: {
     user: app.ServerResponses.User,
     onChange: (patch: Partial<app.ServerResponses.User>) => void
     onDelete: () => void
+    reInvite: () => void
 }) {
     const auth = useAuth()
     const [ editing, setEditing ] = useState(false)
@@ -212,7 +230,7 @@ function UserEditor({
                 </div>
             </div>
             { user.id !== auth.user?.id && (
-            <div className="col col-4 center middle responsive">
+            <div className="col col-4 center top responsive">
                 <br />
                 {
                     editing ?
@@ -234,7 +252,6 @@ function UserEditor({
                     </button>
                 }
                 <br />
-                <br />
                 <button type="button" style={{ width: "14em" }} className="btn color-red" onClick={() => {
                     if (window.confirm("Are you sure you want to permanently delete this user account?")) {
                         onDelete()
@@ -242,6 +259,12 @@ function UserEditor({
                 }}>
                     Delete User
                 </button>
+                <br />
+                {
+                    user.status === "Expired invitation" || user.status === "Pending invitation" ?
+                    <button type="button" style={{ width: "14em" }} className="btn color-blue" onClick={reInvite}>Invite Again</button> :
+                    null
+                }
             </div> )}
         </div>
     )

@@ -29,6 +29,9 @@ declare module 'sequelize' {
     interface DestroyOptions {
         user?: CurrentUser
     }
+    interface UpdateOptions {
+        user?: CurrentUser
+    }
 }
 
 interface ModelDestroyOptions extends InstanceDestroyOptions {
