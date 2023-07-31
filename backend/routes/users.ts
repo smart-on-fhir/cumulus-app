@@ -281,18 +281,33 @@ route(router, {
         // @ts-ignore 
         const transaction = await User.sequelize.transaction();
 
-        const { email, role, message } = req.body;
+        const { email, role, message, force } = req.body;
+
+        const activationCode = Crypto.randomBytes(32).toString("hex")
 
         try {
-            var user = await User.create({
-                email,
-                role,
-                invitedBy: req.user.email,
-                activationCode: Crypto.randomBytes(32).toString("hex")
-            }, {
-                transaction,
-                user: req.user
-            });
+            if (force) {
+                await User.update({
+                    invitedBy: req.user.email,
+                    activationCode,
+                    createdAt: new Date()
+                }, {
+                    where: { email, role },
+                    limit: 1,
+                    transaction,
+                    user: req.user
+                })
+            } else {
+                await User.create({
+                    email,
+                    role,
+                    invitedBy: req.user.email,
+                    activationCode
+                }, {
+                    transaction,
+                    user: req.user
+                });
+            }
         } catch (e) {
             debug(e)
 
@@ -307,8 +322,8 @@ route(router, {
 
         try {
             await mail.inviteUser({
-                email  : user.email,
-                code   : user.activationCode!,
+                email,
+                code   : activationCode!,
                 baseUrl: lib.getRequestBaseURL(req),
                 message
             })
