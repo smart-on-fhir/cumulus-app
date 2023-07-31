@@ -43,10 +43,9 @@ function detectDataTypeAt(i: number, name: string, rows: string[][]) {
         [ "day"    , "date:YYYY-MM-DD" ],
         [ "date"   , "date:YYYY-MM-DD" ]
     ];
-
+    const tokens = name.toLowerCase().split("_").filter(Boolean)
     for (const [token, type] of map) {
-        const re = new RegExp("(\\b|_|[A-Z0-9]|^)" + token + "(\\b|_|[A-Z0-9]|$)")
-        if (name.match(re)) {
+        if (tokens.includes(token)) {
             return type;
         }
     }
