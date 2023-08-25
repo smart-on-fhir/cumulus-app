@@ -352,6 +352,8 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
                 throw new Error(`Filter operator "${operator}" is not implemented`);
             }
 
+            const sql = FilterConfig[operator](column)
+
             filterConditions.push({
                 column,
                 
@@ -360,10 +362,10 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
                 // to any previous filters
                 join: i ? "OR" : "AND",
 
-                sql: FilterConfig[operator](column)
+                sql
             });
 
-            if (right) {
+            if (right && sql.includes("?")) {
                 replacements.push(right)
             }
         });
