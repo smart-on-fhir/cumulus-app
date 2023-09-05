@@ -13,11 +13,9 @@ export default function Collapse({ header, children, collapsed }: {
 
     useEffect(() => {
         if (refBody.current) {
+            refBody.current.style.height = refBody.current.scrollHeight + "px";
             if (isCollapsed) {
                 refBody.current.style.height = "0"
-            }
-            else {
-                refBody.current.style.height = refBody.current.scrollHeight + "px";
             }
         }
     }, [isCollapsed, refBody])
@@ -25,8 +23,8 @@ export default function Collapse({ header, children, collapsed }: {
     
     const onTransitionEnd = () => {
         if (refBody.current) {
-            refBody.current.classList.remove("animating")
             refBody.current.style.height = isCollapsed ? "0" : "auto"
+            refBody.current.classList.remove("animating")
         }
     }
     
@@ -34,7 +32,6 @@ export default function Collapse({ header, children, collapsed }: {
         if (refBody.current) {
             refBody.current.classList.add("animating")
             refBody.current.style.height = refBody.current.scrollHeight + "px";
-            
         }
     }
     

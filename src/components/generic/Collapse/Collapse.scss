@@ -37,9 +37,11 @@
         transition: all .3s ease-in-out;
         min-height: 2px !important;
         height: auto;
+        visibility: visible;
 
         &.animating {
             overflow: hidden !important;
+            visibility: visible !important;
         }
     }
 
@@ -60,6 +62,7 @@
             opacity: 0;
             height: 0;
             overflow: hidden;
+            visibility: hidden;
         }
     }
 }
