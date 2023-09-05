@@ -45,7 +45,13 @@ export default function Collapse({ header, children, collapsed }: {
 
     return (
         <div className={"collapse" + (isCollapsed ? " collapsed" : "")}>
-            <div className="collapse-header" onClick={toggle}>
+            <div className="collapse-header" onClick={toggle} tabIndex={0}
+                onKeyDown={e => {
+                    if (e.key === " " || e.key === "Enter") {
+                        e.preventDefault();
+                        toggle()
+                    }
+                }}>
                 <i className={ "fa-solid fa-caret-" + (isCollapsed ? "right" : "down") }/> {header}
             </div>
             <div className="collapse-body" ref={refBody} onTransitionEnd={onTransitionEnd}>{children}</div>
