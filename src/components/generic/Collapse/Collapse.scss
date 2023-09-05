@@ -24,7 +24,8 @@
         text-indent: 0;
 
         .fa-solid {
-            width: 0.7em;
+            width: 0.9em;
+            text-align: center;
             color: fade-out(#000, 0.65);
         }
 
@@ -72,5 +73,12 @@
             overflow: hidden;
             visibility: hidden;
         }
+    }
+
+    .collapse-body .collapse-header {
+        color: $color-blue !important;
+        border-bottom: none;
+        box-shadow: none;
+        font-weight: 400;
     }
 }
