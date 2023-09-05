@@ -22,11 +22,11 @@ const DefaultChartOptions = {
         options3d: {
             enabled: false
         },
-        plotBorderColor: "#999",
+        plotBorderColor: "#999999",
         plotBorderWidth: 0
     },
     lang: {
-        noData: `<div style="text-align:center;padding:10px;color:#900;font-size:15px">No data to display!</div>
+        noData: `<div style="text-align:center;padding:10px;color:#900000;font-size:15px">No data to display!</div>
         <div style="padding:0 20px 10px;font-weight:400">If you have filters applied, try changing or removing them.</div>`,
     },
     noData: {
@@ -65,7 +65,7 @@ const DefaultChartOptions = {
         href: "https://smarthealthit.org/",
         style: {
             fontSize: "10px",
-            color: "#999",
+            color: "#999999",
             fontWeight: "bold"
         },
         position: {
@@ -107,8 +107,8 @@ const DefaultChartOptions = {
         // minPadding: 0,
         endOnTick: false,
         gridLineWidth: 1,
-        gridLineColor: "#DDD", // "rgba(0, 0, 0, 0.1)",
-        tickColor: "#DDD",
+        gridLineColor: "#DDDDDD", // "rgba(0, 0, 0, 0.1)",
+        tickColor: "#DDDDDD",
         // @ts-ignore
         tickLength: 10,
         tickWidth: 0,
@@ -125,7 +125,7 @@ const DefaultChartOptions = {
             }
         },
         lineWidth: 0,
-        lineColor: "#999",
+        lineColor: "#999999",
         // softMax: denominator ? 100 : undefined,            
         
         // Up to 10X Zoom
@@ -180,7 +180,7 @@ const DefaultChartOptions = {
             states: {
                 select: {
                     borderWidth: 1,
-                    color: "#999"
+                    color: "#999999"
                 }
             }
         },
@@ -197,7 +197,7 @@ const DefaultChartOptions = {
             states: {
                 select: {
                     borderWidth: 1,
-                    color: "#999"
+                    color: "#999999"
                 }
             },
         },
@@ -207,8 +207,8 @@ const DefaultChartOptions = {
             marker: {
                 enabled: false,
                 radius: 4,
-                lineColor: "#000",
-                fillColor: "#FFF",
+                lineColor: "#000000",
+                fillColor: "#FFFFFF",
                 lineWidth: 1,
                 states: {
                     hover: {
@@ -219,7 +219,7 @@ const DefaultChartOptions = {
                     select: {
                         enabled: true,
                         lineWidth: 2,
-                        fillColor: "#FFF",
+                        fillColor: "#FFFFFF",
                         radius: 5,
                         lineWidthPlus: 1
                     }
@@ -268,8 +268,8 @@ const DefaultChartOptions = {
             marker: {
                 enabled: false,
                 radius: 4,
-                lineColor: "#000",
-                fillColor: "#FFF",
+                lineColor: "#000000",
+                fillColor: "#FFFFFF",
                 lineWidth: 1,
                 states: {
                     hover: {
@@ -280,7 +280,7 @@ const DefaultChartOptions = {
                     select: {
                         enabled: true,
                         lineWidth: 2,
-                        fillColor: "#FFF",
+                        fillColor: "#FFFFFF",
                         radius: 5,
                         lineWidthPlus: 1
                     }
@@ -319,10 +319,10 @@ const DefaultChartOptions = {
         minPadding: 0,
         maxPadding: 0,
         lineWidth: 1,
-        lineColor: "#999",
-        gridLineColor: "#DDD",
+        lineColor: "#999999",
+        gridLineColor: "#DDDDDD",
         gridLineWidth: 0,
-        tickColor: "#DDD",
+        tickColor: "#DDDDDD",
         gridZIndex: 0,
         
         // maxPadding: 0,
