@@ -1,0 +1,143 @@
+@import "../../../styles/variables.scss";
+
+.property-grid {
+    $selection-bg: $color-blue;
+    $selection-bg-dark: mix($selection-bg, #000, 75%);
+    
+    grid: auto-flow / 1fr 1fr;
+    display: grid;
+    gap: 1px;
+    background: #0001;
+    border: 1px solid #0001;
+    margin: 0.25rem 0;
+    
+    ::selection {
+        background-color: $color-blue;
+        color: #FFF;
+    }
+
+    .property-grid {
+        display: contents;
+    }
+
+    .prop-label {
+        grid-column-start: 1;
+        grid-column-end  : 2;
+        display          : grid;
+        background       : $color-grey-light;
+        align-content    : center;
+        cursor: default;
+        
+        &.group-heading {
+            grid-column-end: 3;
+            border-bottom  : 1;
+            background     : linear-gradient(#DDD, #EEE);
+            background     : lighten($color: $color-blue, $amount: 36%);
+            padding        : 1px 4px;
+            box-shadow     : 0 1px 0 0 #DDD, 0 -1px 0 0 #DDD;
+            text-shadow    : 0 1px 0 #FFF;
+            display        : block;
+            color          : $selection-bg-dark;
+            cursor         : pointer;
+
+            b {
+                font-size: 90%;
+            }
+
+            .fa-solid {
+                width: 1em;
+                text-align: left;
+                color: fade-out(#000, 0.65);
+            }
+
+            &:hover .fa-solid {
+                color: fade-out(#000, 0.45);
+            }
+
+            &:focus {
+                outline: 1px solid $selection-bg-dark;
+                outline-offset: 0px;
+                position: relative;
+                z-index: 2;
+            }
+        }
+
+        small.color-muted {
+            display: none;
+        }
+
+        &:hover small.color-muted {
+            display: inline;
+        }
+
+        &.disabled {
+            color: #0006;
+        }
+    }
+    
+    .prop-editor {
+        display        : grid;
+        background     : $color-grey-light;
+        align-content  : stretch;
+        align-items    : flex-start;
+        justify-content: stretch;
+        justify-items  : flex-start;
+    }
+
+    input, select, textarea {
+        align-self: center;
+    }
+
+    input[type="checkbox"] {
+        margin: 4px;
+        &:focus {
+            outline: 1px solid $selection-bg-dark;
+            outline-offset: 4px;
+        }
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select:not([size]) {
+        border: 0;
+        border-radius: 0;
+        outline   : 0;
+        padding   : 1px;
+        background-color: transparent;
+
+        &:focus {
+            box-shadow: 0 0 0 1px $selection-bg-dark;
+            background-color: #FFF;
+            position: relative;
+            z-index: 3;
+        }
+    }
+
+    input[type="color"] {
+        border: 1px solid #FFF;
+        border-radius: 0;
+        outline: 0;
+        padding: 0;
+        box-shadow: 0 0 0 1px #0000;
+        margin: 1px;
+        min-height: max-content;
+        aspect-ratio: 1/1;
+        
+
+        &:focus {
+            box-shadow: 0 0 0 1px $selection-bg-dark;
+            border-color: #FFF;
+            position: relative;
+            z-index: 3;
+        }
+
+        &::-webkit-color-swatch {
+            box-shadow: 0 0 0 1px #0008 inset;
+        }
+
+        &.empty::-webkit-color-swatch {
+            background: linear-gradient(-45deg, transparent 45%, red 46%, red 54%, transparent 55%);
+            background-color: #FFF !important;
+        }
+    }
+}
