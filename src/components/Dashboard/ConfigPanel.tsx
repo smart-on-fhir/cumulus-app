@@ -777,32 +777,6 @@ export default function ConfigPanel({
                 </div>
                 <div className="mt-1 pb-2">
                     <Checkbox
-                        name="gridLineWidth"
-                        label="Render grid lines"
-                        // @ts-ignore
-                        checked={chartOptions.yAxis?.gridLineWidth !== 0}
-                        onChange={checked => onChange(merge(state, {
-                            chartOptions: {
-                                yAxis: {
-                                    gridLineWidth: checked ? 1 : 0
-                                }
-                            }
-                        }))}
-                    />
-                    <Checkbox
-                        name="lineWidth"
-                        label="Render axis line"
-                        // @ts-ignore
-                        checked={chartOptions.yAxis?.lineWidth !== 0}
-                        onChange={checked => onChange(merge(state, {
-                            chartOptions: {
-                                yAxis: {
-                                    lineWidth: checked ? 1 : 0
-                                }
-                            }
-                        }))}
-                    />
-                    <Checkbox
                         name="YTicks"
                         label="Render axis tick marks"
                         // @ts-ignore
@@ -829,6 +803,12 @@ export default function ConfigPanel({
                         }))}
                     />
                 </div>
+                <div className="pb-1">
+                    <AdvancedAxisEditor
+                        axis={ (state.chartOptions.yAxis || {}) as YAxisOptions }
+                        onChange={yAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { yAxis })})}
+                    />
+                </div>
             </Collapse> }
 
             { !isPie && <Collapse collapsed header={ isBar ? "Y Axis" : "X Axis" }>
@@ -851,32 +831,6 @@ export default function ConfigPanel({
                     />
                 </div>
                 <div className="mt-1 pb-2">
-                    <Checkbox
-                        name="XGridLineWidth"
-                        label="Render grid lines"
-                        // @ts-ignore
-                        checked={chartOptions.xAxis?.gridLineWidth === 1}
-                        onChange={checked => onChange(merge(state, {
-                            chartOptions: {
-                                xAxis: {
-                                    gridLineWidth: checked ? 1 : 0
-                                }
-                            }
-                        }))}
-                    />
-                    <Checkbox
-                        name="XLineWidth"
-                        label="Render axis line"
-                        // @ts-ignore
-                        checked={!!chartOptions.xAxis?.lineWidth}
-                        onChange={checked => onChange(merge(state, {
-                            chartOptions: {
-                                xAxis: {
-                                    lineWidth: checked ? 1 : 0
-                                }
-                            }
-                        }))}
-                    />
                     <Checkbox
                         name="XTicks"
                         label="Render axis tick marks"
@@ -902,6 +856,12 @@ export default function ConfigPanel({
                                 }
                             }
                         }))}
+                    />
+                </div>
+                <div className="pb-1">
+                    <AdvancedAxisEditor
+                        axis={ (state.chartOptions.xAxis || {}) as XAxisOptions }
+                        onChange={xAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { xAxis })})}
                     />
                 </div>
             </Collapse> }
@@ -934,6 +894,101 @@ export default function ConfigPanel({
             
             <br/>
         </div>
+    )
+}
+
+function AdvancedAxisEditor({
+    axis,
+    onChange
+}: {
+    axis: XAxisOptions | YAxisOptions,
+    onChange: (axis: Partial<XAxisOptions | YAxisOptions>) => void
+}) {
+    return (
+        <Collapse collapsed header="Advanced">
+            <PropertyGrid props={[
+                {
+                    name: "Alternate Grid Color",
+                    type: "color",
+                    value: axis.alternateGridColor,
+                    onChange: (alternateGridColor?: string) => onChange({ alternateGridColor: alternateGridColor ?? undefined })
+                },
+                {
+                    name: "Line Color",
+                    type: "color",
+                    value: axis.lineColor ?? "#333333",
+                    onChange: (lineColor?: string) => onChange({ lineColor: lineColor ?? "#333333" })
+                },
+                {
+                    name: "Line Width",
+                    type: "number",
+                    min: 0,
+                    value: axis.lineWidth ?? 1,
+                    onChange: (lineWidth?: number) => onChange({ lineWidth: lineWidth ?? 1 })
+                },
+                {
+                    name: "Grid Lines",
+                    type: "group",
+                    value: [
+                        {
+                            name: "Color",
+                            type: "color",
+                            value: axis.gridLineColor ?? "#e6e6e6",
+                            onChange: (gridLineColor?: string) => onChange({ gridLineColor: gridLineColor ?? "#e6e6e6" })
+                        },
+                        {
+                            name: "Width",
+                            type: "number",
+                            min: 0,
+                            step: 0.1,
+                            value: axis.gridLineWidth,
+                            onChange: (gridLineWidth?: number) => onChange({ gridLineWidth })
+                        },
+                        {
+                            name: "Dash Style",
+                            type: "options",
+                            options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+                            'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+                            'LongDashDot', 'LongDashDotDot'],
+                            value: axis.gridLineDashStyle ?? "Solid",
+                            onChange: (gridLineDashStyle: DashStyleValue) => onChange({ gridLineDashStyle: gridLineDashStyle ?? "Solid" })
+                        },
+                        {
+                            name: "Z Index",
+                            type: "number",
+                            value: axis.gridZIndex ?? 1,
+                            onChange: (gridZIndex?: number) => onChange({ gridZIndex: gridZIndex ?? 1 })
+                        }
+                    ]
+                },
+                {
+                    name: "Title",
+                    type: "group",
+                    value: [
+                        {
+                            name: "Align",
+                            type: "options",
+                            options: ["low", "middle", "high"],
+                            value: axis.title?.align ?? "middle",
+                            onChange: (align: AxisTitleAlignValue) => onChange({ title: { align }})
+                        },
+                        {
+                            name: "Color",
+                            type: "color",
+                            value: axis.title?.style?.color ?? "#666666",
+                            onChange: (color?: string) => onChange({ title: { style: { color: color ?? "#666666" }}})
+                        },
+                        {
+                            name: "Font Size",
+                            type: "length",
+                            units: ["px", "em", "rem"],
+                            value: axis.title?.style?.fontSize ?? "0.8em",
+                            onChange: (fontSize?: string) => onChange({ title: { style: { fontSize: fontSize ?? "0.8em" }}})
+                        }
+                    ]
+                }
+            ]}/>
+        </Collapse>
     )
 }
 
