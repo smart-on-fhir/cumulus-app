@@ -1,5 +1,4 @@
 
-import { merge }         from "highcharts"
 import { useState }      from "react"
 import Select            from "../generic/Select"
 import ColumnSelector    from "./ColumnSelector"
@@ -8,6 +7,18 @@ import Collapse          from "../generic/Collapse"
 import Checkbox          from "../generic/Checkbox"
 import AnnotationsUI     from "./AnnotationsUI"
 import TagSelector       from "../Tags/TagSelector"
+import PropertyGrid      from "../generic/PropertyGrid"
+import {
+    AlignValue,
+    AxisTitleAlignValue,
+    DashStyleValue,
+    merge,
+    Options,
+    OptionsLayoutValue,
+    VerticalAlignValue,
+    XAxisOptions,
+    YAxisOptions
+} from "highcharts"
 import {
     SupportedChartTypes,
     ChartIcons
@@ -127,14 +138,20 @@ export default function ConfigPanel({
 
     const { cols } = dataRequest.metadata || { cols: [] }
 
-    const { chartOptions } = state;
+    const { chartOptions, chartType } = state;
 
-    const isBar    = state.chartType.startsWith("bar")
-    const isColumn = state.chartType.startsWith("column")
-    const isPie    = state.chartType.startsWith("pie") || state.chartType.startsWith("donut")
-    const isStack  = state.chartType.endsWith("Stack")
-    const is3D     = state.chartType.includes("3d")
+    const isBar    = chartType.startsWith("bar")
+    const isColumn = chartType.startsWith("column")
+    const isPie    = chartType.startsWith("pie") || chartType.startsWith("donut")
+    const isStack  = chartType.endsWith("Stack")
     const isBarOrColumn = isBar || isColumn
+
+    const updateChartOptions = (patch: Partial<Options>) => {
+        onChange({
+            ...state,
+            chartOptions: merge(state.chartOptions, patch)
+        })
+    };
 
     return (
         <div style={{
@@ -148,6 +165,7 @@ export default function ConfigPanel({
                 <label>Tags</label>
                 <TagSelector selected={state.tags} onChange={tags => onChange({ ...state, tags })} />
             </div>
+
             <Collapse collapsed header="Chart">
                 <div className="mt-1">
                     <label>Chart Type</label>
@@ -337,6 +355,118 @@ export default function ConfigPanel({
                         />
                     </label>
                 </div> }
+                <div className="mt-1 pb-1">
+                    <Collapse collapsed header="Advanced">
+                        <PropertyGrid props={[
+                            {
+                                name: "Background Color",
+                                description: "The background color or gradient for the outer chart area.",
+                                type: "color",
+                                value: state.chartOptions.chart?.backgroundColor ?? "#FFFFFF",
+                                onChange: backgroundColor => onChange(merge(state, {
+                                    chartOptions: {
+                                        chart: {
+                                            backgroundColor
+                                        }
+                                    }
+                                }))
+                            },
+                            {
+                                name: "Border Color",
+                                description: "The color of the outer chart border.",
+                                type: "color",
+                                value: state.chartOptions.chart?.borderColor ?? "#334eff",
+                                onChange: borderColor => onChange(merge(state, {
+                                    chartOptions: {
+                                        chart: {
+                                            borderColor
+                                        }
+                                    }
+                                }))
+                            },
+                            {
+                                name: "Border Width",
+                                description: "The pixel width of the outer chart border.",
+                                type: "number",
+                                value: state.chartOptions.chart?.borderWidth ?? 0,
+                                min: 0,
+                                onChange: borderWidth => onChange(merge(state, {
+                                    chartOptions: {
+                                        chart: {
+                                            borderWidth
+                                        }
+                                    }
+                                }))
+                            },
+                            {
+                                name: "Border Radius",
+                                description: "The corner radius of the outer chart border.",
+                                type: "number",
+                                value: state.chartOptions.chart?.borderRadius ?? 0,
+                                min: 0,
+                                onChange: borderRadius => onChange(merge(state, {
+                                    chartOptions: {
+                                        chart: {
+                                            borderRadius
+                                        }
+                                    }
+                                }))
+                            },
+                            {
+                                name: "Spacing Top",
+                                description: "The space between the top edge of the chart and the content (plot area, axis title and labels, title, subtitle or legend in top position).",
+                                type: "number",
+                                value: state.chartOptions.chart?.spacingTop ?? 10,
+                                onChange: spacingTop => onChange(merge(state, {
+                                    chartOptions: {
+                                        chart: {
+                                            spacingTop
+                                        }
+                                    }
+                                }))
+                            },
+                            {
+                                name: "Spacing Right",
+                                description: "The space between the right edge of the chart and the content (plot area, axis title and labels, title, subtitle or legend in top position).",
+                                type: "number",
+                                value: state.chartOptions.chart?.spacingRight ?? 10,
+                                onChange: spacingRight => onChange(merge(state, {
+                                    chartOptions: {
+                                        chart: {
+                                            spacingRight
+                                        }
+                                    }
+                                }))
+                            },
+                            {
+                                name: "Spacing Bottom",
+                                description: "The space between the bottom edge of the chart and the content (plot area, axis title and labels, title, subtitle or legend in top position).",
+                                type: "number",
+                                value: state.chartOptions.chart?.spacingBottom ?? 15,
+                                onChange: spacingBottom => onChange(merge(state, {
+                                    chartOptions: {
+                                        chart: {
+                                            spacingBottom
+                                        }
+                                    }
+                                }))
+                            },
+                            {
+                                name: "Spacing Left",
+                                description: "The space between the left edge of the chart and the content (plot area, axis title and labels, title, subtitle or legend in top position).",
+                                type: "number",
+                                value: state.chartOptions.chart?.spacingLeft ?? 10,
+                                onChange: spacingLeft => onChange(merge(state, {
+                                    chartOptions: {
+                                        chart: {
+                                            spacingLeft
+                                        }
+                                    }
+                                }))
+                            }
+                        ]} />
+                    </Collapse>
+                </div>
                 <br/>
             </Collapse>
 
