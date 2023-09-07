@@ -120,8 +120,12 @@
         padding: 0;
         box-shadow: 0 0 0 1px #0000;
         margin: 1px;
-        min-height: max-content;
-        aspect-ratio: 1/1;
+        height: 20px;
+        width: 20px;
+        text-indent: 0;
+        box-sizing: border-box;
+        line-height: 1;
+        min-width: 20px;
         
 
         &:focus {
@@ -133,9 +137,20 @@
 
         &::-webkit-color-swatch {
             box-shadow: 0 0 0 1px #0008 inset;
+            background-color: transparent !important;
+        }
+        &::-moz-color-swatch {
+            box-shadow: 0 0 0 1px #0008 inset;
+            background-color: transparent !important;
         }
 
         &.empty::-webkit-color-swatch {
+            box-shadow: 0 0 0 1px #0008 inset;
+            background: linear-gradient(-45deg, transparent 45%, red 46%, red 54%, transparent 55%);
+            background-color: #FFF !important;
+        }
+        &.empty::-moz-color-swatch {
+            box-shadow: 0 0 0 1px #0008 inset;
             background: linear-gradient(-45deg, transparent 45%, red 46%, red 54%, transparent 55%);
             background-color: #FFF !important;
         }
