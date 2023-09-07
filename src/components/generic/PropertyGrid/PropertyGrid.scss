@@ -4,7 +4,7 @@
     $selection-bg: $color-blue;
     $selection-bg-dark: mix($selection-bg, #000, 75%);
     
-    grid: auto-flow / 1fr 1fr;
+    grid: auto-flow / auto auto;
     display: grid;
     gap: 1px;
     background: #0001;
@@ -26,6 +26,7 @@
         display          : grid;
         background       : $color-grey-light;
         align-content    : center;
+        padding          : 0 4px;
         cursor: default;
         
         &.group-heading {
@@ -63,11 +64,12 @@
         }
 
         small.color-muted {
-            display: none;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
         }
 
         &:hover small.color-muted {
-            display: inline;
+            opacity: 1;
         }
 
         &.disabled {
