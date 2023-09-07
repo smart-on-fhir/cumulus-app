@@ -331,47 +331,47 @@ export default function ConfigPanel({
                                     }
                                 }))
                             },
-                            {
-                                name: "Border Color",
-                                description: "The color of the outer chart border.",
-                                type: "color",
-                                value: state.chartOptions.chart?.borderColor ?? "#334eff",
-                                onChange: borderColor => onChange(merge(state, {
-                                    chartOptions: {
-                                        chart: {
-                                            borderColor
-                                        }
-                                    }
-                                }))
-                            },
-                            {
-                                name: "Border Width",
-                                description: "The pixel width of the outer chart border.",
-                                type: "number",
-                                value: state.chartOptions.chart?.borderWidth ?? 0,
-                                min: 0,
-                                onChange: borderWidth => onChange(merge(state, {
-                                    chartOptions: {
-                                        chart: {
-                                            borderWidth
-                                        }
-                                    }
-                                }))
-                            },
-                            {
-                                name: "Border Radius",
-                                description: "The corner radius of the outer chart border.",
-                                type: "number",
-                                value: state.chartOptions.chart?.borderRadius ?? 0,
-                                min: 0,
-                                onChange: borderRadius => onChange(merge(state, {
-                                    chartOptions: {
-                                        chart: {
-                                            borderRadius
-                                        }
-                                    }
-                                }))
-                            },
+                            // {
+                            //     name: "Border Color",
+                            //     description: "The color of the outer chart border.",
+                            //     type: "color",
+                            //     value: state.chartOptions.chart?.borderColor ?? "#334eff",
+                            //     onChange: borderColor => onChange(merge(state, {
+                            //         chartOptions: {
+                            //             chart: {
+                            //                 borderColor
+                            //             }
+                            //         }
+                            //     }))
+                            // },
+                            // {
+                            //     name: "Border Width",
+                            //     description: "The pixel width of the outer chart border.",
+                            //     type: "number",
+                            //     value: state.chartOptions.chart?.borderWidth ?? 0,
+                            //     min: 0,
+                            //     onChange: borderWidth => onChange(merge(state, {
+                            //         chartOptions: {
+                            //             chart: {
+                            //                 borderWidth
+                            //             }
+                            //         }
+                            //     }))
+                            // },
+                            // {
+                            //     name: "Border Radius",
+                            //     description: "The corner radius of the outer chart border.",
+                            //     type: "number",
+                            //     value: state.chartOptions.chart?.borderRadius ?? 0,
+                            //     min: 0,
+                            //     onChange: borderRadius => onChange(merge(state, {
+                            //         chartOptions: {
+                            //             chart: {
+                            //                 borderRadius
+                            //             }
+                            //         }
+                            //     }))
+                            // },
                             {
                                 name: "Spacing Top",
                                 description: "The space between the top edge of the chart and the content (plot area, axis title and labels, title, subtitle or legend in top position).",

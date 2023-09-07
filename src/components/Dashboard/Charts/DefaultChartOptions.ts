@@ -23,7 +23,11 @@ const DefaultChartOptions = {
             enabled: false
         },
         plotBorderColor: "#999999",
-        plotBorderWidth: 0
+        plotBorderWidth: 0,
+        borderWidth: 0,
+        borderColor: "#d1dae2",
+        borderRadius: 5,
+        backgroundColor: "#FFFFFF"
     },
     lang: {
         noData: `<div style="text-align:center;padding:10px;color:#900000;font-size:15px">No data to display!</div>
