@@ -41,6 +41,9 @@ const DefaultChartOptions = {
     exporting: {
         buttons: {
             contextButton: {
+                theme: {
+                    fill: "none"
+                },
                 menuItems: [
                     "viewFullscreen",
                     "printChart",
