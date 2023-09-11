@@ -1,4 +1,5 @@
 import { Command }  from "../Command"
+import { app }      from "../../types"
 
 
 export class OpenInAnalyticEnvironment extends Command

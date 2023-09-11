@@ -1,5 +1,6 @@
-import moment from "moment"
+import moment   from "moment"
 import Checkbox from "../../generic/Checkbox"
+import { app }  from "../../../types"
 
 
 export default function TransmissionEditor({

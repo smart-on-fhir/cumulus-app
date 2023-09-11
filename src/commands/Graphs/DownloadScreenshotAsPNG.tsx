@@ -1,5 +1,6 @@
 import { Command }            from "../Command"
 import { downloadScreenshot } from "../lib"
+import { app }                from "../../types"
 
 
 export class DownloadScreenshotAsPNG extends Command

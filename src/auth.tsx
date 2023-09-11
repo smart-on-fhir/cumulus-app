@@ -1,6 +1,7 @@
 import * as React     from "react"
 import { auth }       from "./backend" 
 import { AlertError } from "./components/generic/Alert"
+import { app }        from "./types"
 import {
   useNavigate,
   useLocation,

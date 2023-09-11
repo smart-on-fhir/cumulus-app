@@ -1,5 +1,6 @@
 import { createEditPage } from "../generic/EndpointEditWrapper"
 import Form               from "./Form"
+import { app }            from "../../types"
 import "./RequestGroups.scss"
 
 

@@ -1,4 +1,5 @@
 import HttpError from "./HttpError";
+import { app }   from "./types"
 
 
 export async function request<T=any>(path: string, options: RequestInit = {}): Promise<T> {

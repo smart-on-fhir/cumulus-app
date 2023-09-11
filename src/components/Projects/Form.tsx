@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react"
-import Loader from "../generic/Loader"
-import LinkWidget from "./LinkWidget"
+import Loader                  from "../generic/Loader"
+import LinkWidget              from "./LinkWidget"
+import { app }                 from "../../types"
 
 export default function Form({ data = {}, onSubmit, loading, error }: {
     data?: Record<string, any>
