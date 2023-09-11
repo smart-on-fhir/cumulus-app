@@ -2,6 +2,7 @@ import { classList }       from "../../../utils"
 import Checkbox            from "../../generic/Checkbox"
 import EndpointListWrapper from "../../generic/EndpointListWrapper"
 import Tag                 from "../Tag"
+import { app }             from "../../../types"
 import "../../generic/Select/Select.scss"
 import "./TagSelector.scss"
 

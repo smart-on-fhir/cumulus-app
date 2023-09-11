@@ -7,6 +7,7 @@ import Breadcrumbs                from "../generic/Breadcrumbs"
 import Loader                     from "../generic/Loader"
 import { AlertError }             from "../generic/Alert"
 import DataRequestForm            from "./form"
+import { app }                    from "../../types"
 
 import "./form.scss";
 

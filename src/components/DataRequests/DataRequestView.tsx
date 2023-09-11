@@ -14,6 +14,7 @@ import { AlertError }             from "../generic/Alert"
 import { classList, humanizeColumnName } from "../../utils"
 import Tag                        from "../Tags/Tag"
 import TransmissionView           from "./Transmissions/TransmissionView"
+import { app }                    from "../../types"
 
 // import GoogleMapReact from "google-map-react"
 

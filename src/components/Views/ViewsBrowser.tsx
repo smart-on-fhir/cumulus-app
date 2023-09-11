@@ -8,6 +8,7 @@ import ViewThumbnail   from "./ViewThumbnail"
 import { classList }   from "../../utils"
 import Collapse        from "../generic/Collapse"
 import { CustomSelection, WithSelection } from "../generic/WithSelection"
+import { app }         from "../../types"
 
 import "./ViewsBrowser.scss"
 

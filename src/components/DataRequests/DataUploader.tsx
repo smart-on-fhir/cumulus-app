@@ -7,6 +7,7 @@ import Alert, { AlertError }             from "../generic/Alert"
 import Loader                            from "../generic/Loader"
 import { request }                       from "../../backend"
 import { classList, defer, humanizeColumnName } from "../../utils"
+import { app }                           from "../../types"
 import "./DataUploader.scss"
 
 

@@ -3,6 +3,7 @@ import { useAuth }        from "../../auth"
 import DataRequestLink    from "../DataRequests/DataRequestLink"
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import ViewThumbnail      from "../Views/ViewThumbnail"
+import { app }            from "../../types"
 
 
 export default function View() {

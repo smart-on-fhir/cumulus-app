@@ -26,6 +26,7 @@ import { DeleteGraph }                           from "../../commands/Graphs/Del
 import { RequestLineLevelData }                  from "../../commands/Graphs/RequestLineLevelData"
 import { GenerateCaption }                       from "../../commands/Graphs/GenerateCaption"
 import { OpenInAnalyticEnvironment }             from "../../commands/Subscriptions/OpenInAnalyticEnvironment"
+import { app }                                   from "../../types"
 import {
     ReadOnlyPaths,
     SupportedChartTypes,

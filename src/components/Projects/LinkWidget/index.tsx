@@ -1,5 +1,6 @@
 import { classList } from "../../../utils"
 import Wrapper       from "../../generic/EndpointListWrapper"
+import { app }       from "../../../types"
 import "./LinkWidget.scss"
 
 

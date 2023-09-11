@@ -10,6 +10,7 @@ import { View }                      from "../../commands/Graphs/View";
 import { useCommand }                from "../../hooks";
 import { CustomSelection }           from "../generic/WithSelection";
 import { ellipsis, highlight }       from "../../utils";
+import { app }                       from "../../types"
 
 
 export default function ViewThumbnail({

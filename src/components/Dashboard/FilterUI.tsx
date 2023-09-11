@@ -2,6 +2,7 @@ import moment         from "moment"
 import { classList }  from "../../utils"
 import ColumnSelector from "./ColumnSelector"
 import { operators }  from "./config"
+import { app }        from "../../types"
 
 
 const emptyFilter: app.Filter = {

@@ -10,6 +10,9 @@ import DemographicsEditor from "./DemographicsEditor"
 import TransmissionEditor from "./Transmissions/TransmissionEditor"
 import EditorList         from "../generic/EditorList"
 import { useAuth }        from "../../auth"
+import { request }        from "../../backend"
+import LoadableSelect     from "../generic/Select/DatasetSelect"
+import { app }            from "../../types"
 
 import "./form.scss";
 
@@ -359,11 +362,31 @@ export default function DataRequestForm({
                                         <div className="color-muted small">The application pulls the data from the provided URL</div>
                                     </div>
                                 )
+                            },
+                            {
+                                value: "aggregator",
+                                icon: "fa-solid fa-network-wired color-blue",
+                                label: (
+                                    <div>
+                                        <div>Aggregator</div>
+                                        <div className="color-muted small">The application pulls the data from the Cumulus Aggregator</div>
+                                    </div>
+                                )
                             }
                         ]}
                         value={dataSourceType}
                         onChange={dataSourceType => onChange({ ...record, dataSourceType })}
                     />
+                    <LoadableSelect onChange={() => {}} load={async () => {
+                        // const res = await request("/api/aggregator/subscriptions")
+                        const res = await request("/api/aggregator/metadata/general_hospital/core")
+                        // console.log(res)
+                        const json = JSON.parse(res)
+                        return Object.keys(json).map((x: any, i: number) => ({
+                            label: x,
+                            value: i
+                        }))
+                    }}/>
                 </div>
 
                 {
