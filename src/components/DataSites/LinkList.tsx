@@ -3,6 +3,7 @@ import { Link }       from "react-router-dom";
 import { request }    from "../../backend";
 import { AlertError } from "../generic/Alert";
 import Loader         from "../generic/Loader";
+import { app }        from "../../types";
 
 interface State {
     records: app.DataSite[]

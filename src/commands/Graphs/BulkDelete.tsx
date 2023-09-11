@@ -1,5 +1,6 @@
 import { request } from "../../backend"
-import { Command }   from "../Command"
+import { Command } from "../Command"
+import { app }     from "../../types"
 
 
 export class BulkDelete extends Command

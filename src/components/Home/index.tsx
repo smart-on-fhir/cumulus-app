@@ -2,6 +2,7 @@ import { useState }               from "react"
 import { HelmetProvider, Helmet } from "react-helmet-async"
 import { Link }                   from "react-router-dom"
 import { useAuth }                from "../../auth"
+import { app }                    from "../../types"
 import EndpointListWrapper        from "../generic/EndpointListWrapper"
 import "./home.scss"
 

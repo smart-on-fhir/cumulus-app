@@ -1,7 +1,7 @@
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import Clip               from "../generic/Clip"
-import { useAuth }        from "../../auth";
-
+import { useAuth }        from "../../auth"
+import { app }            from "../../types"
 
 export default function View()
 {

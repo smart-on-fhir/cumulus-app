@@ -1,5 +1,6 @@
 import { NavigateFunction } from "react-router"
-import { Command }  from "../Command"
+import { Command }          from "../Command"
+import { app }              from "../../types"
 
 
 export class View extends Command

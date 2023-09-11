@@ -1,5 +1,6 @@
 import { createDeletePage } from "../generic/EndpointDeleteWrapper"
 import Clip                 from "../generic/Clip"
+import { app }              from "../../types"
 
 
 export default function Delete()

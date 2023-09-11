@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { app }  from "../../../types"
 import "./Tag.scss"
 
 export default function Tag({ tag, noLink }: { tag: Pick<app.Tag, "name" | "description" | "id">, noLink?: boolean })

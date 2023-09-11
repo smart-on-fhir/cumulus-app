@@ -1,4 +1,5 @@
 import CheckboxList from "../../generic/CheckboxList";
+import { app }      from "../../../types"
 
 const AVAILABLE_DEMOGRAPHICS = [
     {

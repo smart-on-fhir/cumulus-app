@@ -7,6 +7,7 @@ import MenuButton                 from "../generic/MenuButton"
 import EndpointListWrapper        from "../generic/EndpointListWrapper"
 import Grid                       from "../generic/Grid"
 import { useAuth }                from "../../auth"
+import { app }                    from "../../types"
 import "./Projects.scss"
 
 

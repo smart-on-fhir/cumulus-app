@@ -1,4 +1,5 @@
-import Select from "../generic/Select";
+import Select  from "../generic/Select"
+import { app } from "../../types"
 
 
 export default function ColumnSelector({
