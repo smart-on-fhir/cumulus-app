@@ -2,6 +2,7 @@ import { createDeletePage } from "../generic/EndpointDeleteWrapper"
 import Clip                 from "../generic/Clip"
 import DataRequestLink      from "../DataRequests/DataRequestLink"
 import Grid                 from "../generic/Grid"
+import { app }              from "../../types"
 
 
 export default function DeleteRequestGroup()

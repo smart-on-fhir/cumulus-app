@@ -4,6 +4,7 @@ import moment                   from "moment";
 import { defer }                from "../../../utils";
 import Loader                   from "../../generic/Loader";
 import { MenuItemConfig }       from "../../generic/Menu";
+import { app }                  from "../../../types"
 import {
     SupportedNativeChartTypes,
     SupportedChartTypes,

@@ -3,6 +3,7 @@ import Clip                 from "../generic/Clip"
 import DataRequestLink      from "../DataRequests/DataRequestLink"
 import Grid                 from "../generic/Grid"
 import ViewThumbnail        from "../Views/ViewThumbnail"
+import { app }              from "../../types"
 
 
 export default function Delete()

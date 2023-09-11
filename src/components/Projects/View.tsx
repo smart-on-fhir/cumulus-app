@@ -3,6 +3,7 @@ import DataRequestLink    from "../DataRequests/DataRequestLink"
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import Grid               from "../generic/Grid"
 import ViewThumbnail      from "../Views/ViewThumbnail"
+import { app }            from "../../types"
 
 
 export default function View() {

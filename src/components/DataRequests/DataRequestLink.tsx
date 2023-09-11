@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom"
+import { Link }      from "react-router-dom"
 import { stripTags } from "../../utils"
-import { Format } from "../Format"
+import { Format }    from "../Format"
+import { app }       from "../../types"
 
 function Icon(props: { type: "ok"|"pending"|"working" }) {
     return (

@@ -2,6 +2,7 @@ import { createDeletePage } from "../generic/EndpointDeleteWrapper"
 import Clip                 from "../generic/Clip"
 import DataRequestLink      from "../DataRequests/DataRequestLink"
 import ViewThumbnail        from "../Views/ViewThumbnail"
+import { app }              from "../../types"
 
 
 export default function Delete()

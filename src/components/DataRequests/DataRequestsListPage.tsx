@@ -9,9 +9,10 @@ import { useAuth }                from "../../auth"
 import Loader                     from "../generic/Loader"
 import { AlertError }             from "../generic/Alert"
 import Grid                       from "../generic/Grid"
+import Collapse                   from "../generic/Collapse"
+import { app }                    from "../../types"
 
 import "./DataRequestsListPage.scss";
-import Collapse from "../generic/Collapse"
 
 
 

@@ -8,6 +8,7 @@ import Checkbox          from "../generic/Checkbox"
 import AnnotationsUI     from "./AnnotationsUI"
 import TagSelector       from "../Tags/TagSelector"
 import PropertyGrid      from "../generic/PropertyGrid"
+import { app }           from "../../types"
 import {
     AlignValue,
     AxisTitleAlignValue,
