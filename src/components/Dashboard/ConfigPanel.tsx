@@ -769,7 +769,7 @@ export default function ConfigPanel({
                 <br />
             </Collapse>
 
-            { tabIndex === 0 && state.ranges && (
+            { state.ranges && (
                 <Collapse collapsed header="Confidence Intervals">
                     <div className="pt-1 pb-1">
                         <RangesEditor ranges={state.ranges} onChange={ranges => onChange({ ...state, ranges })}/>    
@@ -938,15 +938,11 @@ function RangesEditor({
         return <AreaRangesEditor ranges={ranges} onChange={onChange} />
     }
 
-    if (ranges.type === "errorbar") {
-        return <ErrorbarRangesEditor ranges={ranges} onChange={onChange} />
-    }
-    
     if (ranges.type === "column") {
         return <ColumnRangesEditor ranges={ranges} onChange={onChange} />
     }
 
-    return null
+    return <ErrorbarRangesEditor ranges={{ ...ranges, type: "errorbar" }} onChange={onChange} />
 }
 
 function ColumnRangesEditor({
@@ -1017,7 +1013,8 @@ function ColumnRangesEditor({
                 name: "Center",
                 type: "boolean",
                 value: !!ranges.centerInCategory,
-                onChange: centerInCategory => onChange({ centerInCategory })
+                onChange: centerInCategory => onChange({ centerInCategory }),
+                description: "In case of stratified data center multiple columns on the same axis and allow them to overlap each other."
             }
         ]} />
     )
@@ -1113,7 +1110,7 @@ function ErrorbarRangesEditor({
                 options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
                 'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
                 'LongDashDot', 'LongDashDotDot'],
-                value: ranges.stemDashStyle ?? "Dot",
+                value: ranges.stemDashStyle ?? "Dash",
                 onChange: stemDashStyle => onChange({ stemDashStyle })
             }
         ]} />
