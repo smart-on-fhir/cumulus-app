@@ -152,14 +152,7 @@ function getSeries({
     serverOptions   : Highcharts.Options
 }): SeriesOptions[]
 {
-    
     let series: SeriesOptions[] = []
-
-    let getDenominator = getDenominatorFactory(data)
-
-    function pointFromRow(row: [string, number]): Highcharts.XrangePointOptionsObject | number | number[] {
-        return getPoint({ row, xType, denominator: getDenominator(row, denominator) })
-    }
 
     function addSeries(options: any, secondary = false) {
         
@@ -186,7 +179,7 @@ function getSeries({
             id
         }
 
-        if (options.type.includes("area")) {
+        if (options.type === "areaspline") {
             cfg.fillColor = {
                 linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                 stops: [
@@ -241,11 +234,8 @@ function getSeries({
 
     function stratify(data: app.ServerResponses.StratifiedDataResponse, secondary = false) {
 
-        const _type = secondary ?
-            column2type!.replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes :
-            type;
+        const _type = secondary ? column2type!.replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes : type;
 
-        // start test
         let keys: any[] = [];
         data.data.forEach(group => {
             group.rows.forEach(row => {
@@ -264,10 +254,8 @@ function getSeries({
         else {
             keys.sort((a, b) => String(a).localeCompare(b + ""));
         }
-        // end test
         
         data.data.forEach(group => {
-            // start test
             addSeries({
                 type: _type,
                 name: group.stratifier,
