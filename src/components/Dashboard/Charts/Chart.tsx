@@ -307,6 +307,8 @@ function getSeries({
                     edgeWidth: is3d ? ranges.borderWidth : 0,
                     // @ts-ignore
                     centerInCategory: ranges.centerInCategory,
+                    // @ts-ignore
+                    pointWidth: ranges.pointWidth,
                     name: group.stratifier + " (range)",
                     data: keys.map(key => {
                         const row = group.rows.find(row => row[0] === key)
@@ -352,6 +354,8 @@ function getSeries({
                     edgeWidth: is3d ? ranges.borderWidth : 0,
                     // @ts-ignore
                     centerInCategory: ranges.centerInCategory,
+                    // @ts-ignore
+                    pointWidth: ranges.pointWidth,
                     data: data.data[0].rows.map(row => getPoint({
                         row,
                         xType,
