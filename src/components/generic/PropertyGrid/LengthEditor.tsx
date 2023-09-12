@@ -7,15 +7,17 @@ export interface EditableLengthProperty extends EditableProperty {
     min?: number
     max?: number
     step?: number
-    units?: string[]
+    units?: (string|{value: any, text: string})[]
 }
 
 export default function LengthEditor({ prop }: { prop: EditableLengthProperty }) {
-    const { value = "", min, max, step, units = [], onChange } = prop
+    const { value = "", min, max, step, units = [], onChange, disabled } = prop
     const v = parseFloat(value)
-    const u = value.match(/\d+(.*)$/)?.[1] || units[0] || ""
+    const u = String(value).match(/\d+(.*)$/)?.[1] ||
+        (units[0] ?
+            typeof units[0] === "string" ? units[0] : units[0].value : "") || ""
     return (
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", width: "100%" }}>
             <input
                 type="number"
                 value={ isNaN(v) ? "" : v }
@@ -25,9 +27,18 @@ export default function LengthEditor({ prop }: { prop: EditableLengthProperty })
                 min={ min }
                 max={ max }
                 step={ step }
+                disabled={ disabled }
             />
-            <select value={ u } onChange={ e => onChange(isNaN(v) ? undefined : v + e.target.value) }>
-                { (units || []).map((u, i) => <option key={ i } value={ u }>{ u }</option> ) }
+            <select
+                value={ u }
+                onChange={ e => onChange(isNaN(v) ? undefined : v + e.target.value) }
+                disabled={ disabled }>
+                { (units || []).map((unit, i) => {
+                    if (typeof unit === "string") {
+                        return <option key={ i } value={ unit }>{ unit }</option>
+                    }
+                    return <option key={ i } value={ unit.value }>{ unit.text }</option>
+                }) }
             </select>
         </div>
     )
