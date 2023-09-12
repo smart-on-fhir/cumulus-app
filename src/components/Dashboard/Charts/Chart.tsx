@@ -444,6 +444,9 @@ export function buildChartOptions({
                     rows.push(
                         `<tr><td style="text-align:right">${denominator ? "Computed Value:" : "Count:"}</td>`,
                         `<td style="width: 100%"><b>${
+                            denominator ?
+                                // @ts-ignore
+                                roundToPrecision(this.point.custom?.data?.cnt, 3).toLocaleString() + " (" + roundToPrecision(this.point.y!, 3) + "%)" :
                                 roundToPrecision(this.point.y!, 3).toLocaleString()
                         }</b></td></tr>`
                     )
