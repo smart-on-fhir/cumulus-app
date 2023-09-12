@@ -302,6 +302,7 @@ export declare module app {
         edgeColor?: string
         borderRadius?: number
         centerInCategory?: boolean
+        pointWidth?: number
     }
 
     type RangeOptions = AreaRangeOptions | ErrorRangeOptions | ColumnRangeOptions

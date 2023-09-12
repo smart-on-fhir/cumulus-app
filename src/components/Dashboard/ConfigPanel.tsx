@@ -1015,6 +1015,12 @@ function ColumnRangesEditor({
                 value: !!ranges.centerInCategory,
                 onChange: centerInCategory => onChange({ centerInCategory }),
                 description: "In case of stratified data center multiple columns on the same axis and allow them to overlap each other."
+            },
+            {
+                name : "Width",
+                type : "number",
+                value: ranges.pointWidth,
+                onChange: pointWidth => onChange({ pointWidth })
             }
         ]} />
     )
