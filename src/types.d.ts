@@ -1,5 +1,5 @@
 
-declare module app {
+export declare module app {
 
     /**
      * The current user of the app
