@@ -672,8 +672,22 @@ export default function ConfigPanel({
                                             Not available with no stratifier.
                                         </div>
                                     </div>,
+                                    value: "count",
+                                    icon: "fa-solid fa-percent color-brand-2",
+                                    disabled: !state.stratifyBy
+                                },
+                                {
+                                    label: <div>
+                                        <div>Stratified Sum</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the sum<br />
+                                            of values in every given data group.<br />
+                                            Not available with no stratifier.
+                                        </div>
+                                    </div>,
                                     value: "local",
-                                    icon: "fa-solid fa-percent color-brand-2"
+                                    icon: "fa-solid fa-percent color-brand-2",
+                                    disabled: !state.stratifyBy
                                 },
                                 {
                                     label: <div>

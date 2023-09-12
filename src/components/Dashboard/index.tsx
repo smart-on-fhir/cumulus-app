@@ -50,7 +50,7 @@ export interface ViewState
     filters         : app.Filter[]
     chartType       : string
     chartOptions    : Partial<Highcharts.Options>
-    denominator     : "" | "local" | "global"
+    denominator     : app.DenominatorType
     cleanState     ?: ViewState
     column2        ?: app.DataRequestDataColumn
     column2type     : keyof typeof SupportedChartTypes
@@ -110,10 +110,11 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
                     onSeriesToggle
                 })
             }
-        } catch {
+        } catch (ex) {
             // Errors might happen due to partially incompatible state properties.
             // For example if a stratifier is added to un-stratified data and the
             // stratified data is not yet available
+            console.error(ex)
         }
 
         return nextState
@@ -255,7 +256,10 @@ export default function Dashboard({
         data2: null,
 
         // True while chart data is loaded
-        loadingData: false,
+        loadingData: true,
+
+        // Error from the server
+        loadingDataError: null,
 
         // The final chart options that are rendered in the chart
         fullChartOptions: {},

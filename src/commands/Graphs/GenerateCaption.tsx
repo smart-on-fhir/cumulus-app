@@ -72,7 +72,15 @@ export class GenerateCaption extends Command
         const { viewColumn, denominator, column2, viewGroupBy } = this.state;
 
         let s  = `<div><b>X Axis:</b> ${viewColumn.label}${viewColumn.description && viewColumn.description.toLowerCase() !== viewColumn.label.toLowerCase() ? " - " + viewColumn.description : ""}</div>`
-            s += `<div><b>Y Axis:</b> ${denominator === "local" ? "% of total count for each group" : denominator === "global" ? "% of total count" : "Aggregate Count"}</div>`
+            s += `<div><b>Y Axis:</b> ${
+                denominator === "local" ?
+                    "% of the sum for each group" :
+                    denominator === "global" ?
+                        "% of global count" :
+                        denominator === "count" ?
+                            "% of total count for each group" :
+                            "Aggregate Count"
+            }</div>`
         
         this.chartOptions.series!.forEach((ser: any) => {
             

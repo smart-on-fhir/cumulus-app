@@ -69,28 +69,33 @@ export function getDateFormat({ dataType }: app.DataRequestDataColumn, forMoment
             "%Y-%m-%d"
 }
 
-function getDenominatorFactory(data: app.ServerResponses.DataResponse) {
-    
-    const cache: Record<string, number> = {};
+function pct(value: number, denominator?: number) {
+    return denominator ? value / denominator * 100 : value
+}
 
-    return function(row: [string, number], type: "local" | "global" | any) {
-        if (type === "global") {
-            return data.totalCount
-        }
-        if (type === "local") {
-            let x = row[0]
-            let out = cache[x];
-            if (out === undefined) {
-                // console.log("computing denominator")
-                out = cache[x] = (data as app.ServerResponses.StratifiedDataResponse).data.reduce(
-                    (prev, cur) => prev + (cur.rows.find(r => r[0] === x)||[0, 0])[1],
-                    0
-                );
-            }
-            return out
-        }
-        return 100
+function getDenominator(data: app.ServerResponses.DataResponse, type: app.DenominatorType, point: [string, number, ...any[]], cache: Record<string, number> = {}) {
+    if (type === "global") {
+        return data.totalCount
     }
+    if (type === "count" && point) {
+        return getTotalDenominator(data as app.ServerResponses.StratifiedDataResponse, point)
+    }
+    if (type === "local" && point) {
+        return getLocalDenominator(data as app.ServerResponses.StratifiedDataResponse, point, cache)
+    }
+    return undefined
+}
+
+function getTotalDenominator(data: app.ServerResponses.StratifiedDataResponse, point: [string, number, ...any[]]) {
+    return data.counts?.[point[0]]
+}
+
+function getLocalDenominator(data: app.ServerResponses.StratifiedDataResponse, point: [string, number, ...any[]], cache: Record<string, number> = {}) {
+    let x = point[0], out = cache[x]
+    if (!cache.hasOwnProperty(x)) {
+        out = cache[x] = data.data.reduce((prev, cur) => prev + (cur.rows.find(r => r[0] === point[0])||[0, 0])[1], 0);
+    }
+    return out
 }
 
 function getPoint({
@@ -100,13 +105,11 @@ function getPoint({
 }: {
     row: [string, number]
     xType: "category" | "linear" | "datetime"
-    denominator: number
+    denominator?: number
 }): Highcharts.XrangePointOptionsObject | number | number[] {
 
-    let value = denominator === 100 ? row[1] : row[1] / denominator * 100;
-
-    const point: Highcharts.XrangePointOptionsObject = {
-        y: value,
+    const point: any = {
+        y: pct(row[1], denominator),
 
         // The name of the point as shown in the legend, tooltip, dataLabels, etc.
         name: String(row[0]),
@@ -146,7 +149,7 @@ function getSeries({
     data2           : app.ServerResponses.StratifiedDataResponse | null
     column          : app.DataRequestDataColumn
     type            : SupportedNativeChartTypes 
-    denominator     : "" | "local" | "global"
+    denominator     : app.DenominatorType
     column2type    ?: keyof typeof SupportedChartTypes
     xType           : "category" | "linear" | "datetime"
     serverOptions   : Highcharts.Options
@@ -157,7 +160,7 @@ function getSeries({
     function addSeries(options: any, secondary = false) {
         
         // The ID of this series
-        const id = (secondary ? "secondary-" : "primary-") + options.name
+        const id = options?.id || (secondary ? "secondary-" : "primary-") + options.name
 
         const S = serverOptions.series?.find((s: any) => s.id === id)
 
@@ -236,6 +239,8 @@ function getSeries({
 
         const _type = secondary ? column2type!.replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes : type;
 
+        const denominatorCache = {}
+
         let keys: any[] = [];
         data.data.forEach(group => {
             group.rows.forEach(row => {
@@ -260,15 +265,14 @@ function getSeries({
                 type: _type,
                 name: group.stratifier,
                 data: keys.map(key => {
-                    const entry = group.rows.find(row => row[0] === key)
-                    return entry ?
-                        pointFromRow(entry) :
+                    const row = group.rows.find(row => row[0] === key)
+                    return row ?
+                        getPoint({ row, xType, denominator: getDenominator(data, denominator, row, denominatorCache) }) :
                         (type === "column" || type === "bar") && data.data.length > 1 ?
-                            pointFromRow([key, 0]) :
+                            getPoint({ row: [key, 0], xType, denominator: 100 }) :
                             null
                 }).filter(Boolean)
             }, secondary)
-            // end test
 
             // addSeries({
             //     type: _type,
@@ -280,10 +284,15 @@ function getSeries({
 
     if (data.rowCount) {
         if (!data.stratifier) {
+            const denominatorCache = {}
             addSeries({
                 type,
                 name: column.label || column.name,
-                data: data.data[0].rows.map(pointFromRow)
+                data: data.data[0].rows.map(row => getPoint({
+                    row,
+                    xType,
+                    denominator: getDenominator(data, denominator, row, denominatorCache)
+                }))
             });
         }
         else {
@@ -292,7 +301,6 @@ function getSeries({
     }
 
     if (data2 && data2.rowCount) {
-        getDenominator = getDenominatorFactory(data2)
         stratify(data2, true)
     }
 
@@ -316,7 +324,7 @@ export function buildChartOptions({
     column          : app.DataRequestDataColumn
     groupBy        ?: app.DataRequestDataColumn
     type            : SupportedNativeChartTypes
-    denominator    ?: "" | "local" | "global"
+    denominator    ?: app.DenominatorType
     column2type    ?: keyof typeof SupportedChartTypes
     onSeriesToggle  : (s: Record<string, boolean>) => void
 }): Highcharts.Options
@@ -423,7 +431,7 @@ export function buildChartOptions({
                 // Bullet ------------------------------------------------------
                 rows.push(`<tr><td colspan="2"><b style="color:${
                     // @ts-ignore
-                    this.point.series.color?.stops?.[0]?.[1] || this.point.color || DEFAULT_COLORS[this.point.series.index % DEFAULT_COLORS.length]
+                    this.point.color?.pattern?.color || this.point.series.color?.stops?.[0]?.[1] || this.point.color || DEFAULT_COLORS[this.point.series.index % DEFAULT_COLORS.length]
                 };-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
                 
                 // Header ------------------------------------------------------

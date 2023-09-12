@@ -17,6 +17,7 @@ import { logger }                                                 from "../logge
 import ImportJob                                                  from "../DataManager/ImportJob"
 import { requireAuth }                                            from "./Auth"
 import { getFindOptions, assert, rw, parseDelimitedString, uInt } from "../lib"
+import { version as pkgVersion }                                  from "../../package.json"
 
 
 const router = module.exports = express.Router({ mergeParams: true });
@@ -296,7 +297,8 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         column,
         stratifier,
         filtersParams.join("+"),
-        subscription.completed + ""
+        subscription.completed + "",
+        pkgVersion
     ].join("-")).digest("hex");
 
     res.setHeader('Cache-Control', `max-age=31536000, no-cache`)
@@ -438,6 +440,29 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
     if (stratifier) sql += `ORDER BY stratifier, x`
     else sql += `ORDER BY x`
 
+
+    function compileCountSQL(stratifier: string) {
+        let sql = `SELECT "${column}" as stratifier, sum(cnt::float) AS total FROM "${table}"`
+
+        let where: string[] = [ `"${stratifier}" IS NULL` ]
+
+        if (unusedColumns.length) {
+            where.push(...unusedColumns.map(c => `"${c.name}" IS NULL`))
+        }
+        
+        if (filterWhere) {
+            where.push(`(${ filterWhere })`)
+        }
+
+        sql += ` WHERE ${where.join(" AND ")}`
+        sql += ` GROUP BY "${column}"`
+        sql += ` ORDER BY "${column}"`
+        
+        return sql
+    }
+
+    // console.log(sql)
+    
     // Execute the query
     const result = await subscription.sequelize.query<any>(sql, {
         replacements,
@@ -448,6 +473,20 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
     // Do some post-processing
     let data: any[] = [];
     let group: any;
+    let counts: any;
+
+    if (stratifier) {
+        counts = {}
+        let countSql = compileCountSQL(stratifier)
+        // console.log(countSql)
+        const totals = await subscription.sequelize.query<any>(countSql, {
+            replacements,
+            logging: sql => logger.info(sql, { tags: ["SQL", "DATA"] }),
+            type: QueryTypes.SELECT
+        });
+
+        totals.forEach(row => counts[row.stratifier] = row.total)
+    }
 
     result.forEach(row => {
         if (!group || group.stratifier !== row.stratifier) {
@@ -466,6 +505,7 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         filters   : filtersParams,
         totalCount: subscription.metadata.total,
         rowCount  : result.length,
+        counts,
         data
     });
 }));

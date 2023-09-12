@@ -143,6 +143,10 @@
         &.disabled {
             color: #999;
             pointer-events: none;
+
+            * {
+                color: #999;
+            }
         }
     }
 
