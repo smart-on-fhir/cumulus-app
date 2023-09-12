@@ -8,7 +8,7 @@ export interface EditableOptionsProperty extends EditableProperty {
     disabled?: boolean
     title?: string
     style?: CSSProperties
-    options?: string[]
+    options?: (string | { value: string, label: string })[]
 }
 
 export default function OptionsEditor({ prop }: { prop: EditableOptionsProperty }) {
@@ -23,7 +23,12 @@ export default function OptionsEditor({ prop }: { prop: EditableOptionsProperty 
             title={ title }
             style={ style }
         >
-            { options.map((o, i) => <option key={i} value={o}>{o}</option>) }
+            { options.map((o, i) => {
+                if (typeof o === "string") {
+                    return <option key={i} value={o}>{o}</option>
+                }
+                return <option key={i} value={o.value}>{o.label}</option>
+            }) }
         </select>
     )
 }
