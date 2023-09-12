@@ -301,7 +301,7 @@ declare module app {
         Subscriptions?: DataRequest[]
     }
 
-    
+    type DenominatorType = "global" | "count" | "local" | ""
 
     namespace ServerResponses {
         
@@ -318,6 +318,7 @@ declare module app {
 
         interface StratifiedDataResponse extends UnStratifiedDataResponse {
             stratifier: string
+            counts: Record<string, number>
             data: ({
                 stratifier: string
                 rows: [string, number][]
