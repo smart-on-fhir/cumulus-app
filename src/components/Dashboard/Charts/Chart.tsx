@@ -502,7 +502,7 @@ export default class Chart extends React.Component<ChartProps>
     updateChart() {
         try {
             // update(options [, redraw] [, oneToOne] [, animation])
-            this.chart.update(this.props.options || {}, true, true, false)
+            this.chart.update(this.props.options, !this.props.loading, true, false)
         } catch (e) {
             console.debug(e)
         }
