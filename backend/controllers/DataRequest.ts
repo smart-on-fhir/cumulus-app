@@ -327,6 +327,8 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         throw new Error(`No such column "${stratifier}" (used as stratifier)`)
     }
 
+    const hasErrorBars = allColumns.find(x => x.name === "cnt_min") && allColumns.find(x => x.name === "cnt_max");
+
     // Replacement values for the SQL query
     const replacements: any[] = [];
 
@@ -388,6 +390,8 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         
         // The "cnt" is always used
         if (c.name === "cnt") return false
+        if (c.name === "cnt_min") return false
+        if (c.name === "cnt_max") return false
 
         // The selected column is used
         if (c.name === column) return false
@@ -424,6 +428,10 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
 
     // Select the count as "y"
     sql += `, sum(cnt::float) AS y `
+
+    if (hasErrorBars) {
+        sql += `, sum(cnt_min::float) AS y_min, sum(cnt_max::float) AS y_max `
+    }
 
     sql += `FROM "${table}" `
 
@@ -496,7 +504,10 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
             };
             data.push(group)
         }
-        group.rows.push([ row.x, row.y ])
+        group.rows.push(hasErrorBars ?
+            [ row.x, row.y, row.y_min, row.y_max ] :
+            [ row.x, row.y ]
+        )
     })
 
     res.json({

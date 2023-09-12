@@ -61,6 +61,7 @@ export interface ViewState
     fullChartOptions: Partial<Highcharts.Options>
     dataTabIndex    : number
     tags            : Pick<app.Tag, "id"|"name"|"description">[]
+    ranges          : app.RangeOptions
 }
 
 interface ViewAction
@@ -107,6 +108,7 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
                     groupBy         : nextState.viewGroupBy,
                     denominator     : nextState.denominator,
                     column2type     : nextState.column2type,
+                    ranges          : nextState.ranges,
                     onSeriesToggle
                 })
             }
@@ -179,6 +181,13 @@ function isTurbo(primaryData: app.ServerResponses.DataResponse, secondaryData?: 
     return out
 }
 
+function hasRanges(data: app.ServerResponses.DataResponse | null, data2: app.ServerResponses.StratifiedDataResponse | null) {
+    return (
+        (data?.data?.some(group => group.rows.some(row => row.length >= 4))) ||
+        (data2?.data?.some(group => group.rows.some(row => row.length >= 4)))
+    );
+}
+
 export default function Dashboard({
     view,
     dataRequest,
@@ -226,7 +235,8 @@ export default function Dashboard({
         chartType: viewSettings.viewType || "spline",
 
         // If column is not set pick the firs one other than "cnt"
-        viewColumn: cols.find(c => c.name === viewSettings.column || "") || cols.find(c => c.name !== "cnt")!,
+        viewColumn: cols.find(c => c.name === viewSettings.column || "") ||
+                    cols.find(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max")!,
 
         // The stratifier if any (groupBy is its legacy name)
         viewGroupBy: cols.find(c => c.name === viewSettings.groupBy),
@@ -271,7 +281,9 @@ export default function Dashboard({
             // @ts-ignore
             if (copy) delete tag.ViewsTags
             return tag
-        })
+        }),
+
+        ranges: viewSettings.ranges || {}
 
     } as ViewState, initViewState);
 
@@ -293,7 +305,8 @@ export default function Dashboard({
         fullChartOptions,
         loadingData,
         dataTabIndex,
-        tags
+        tags,
+        ranges
     } = state;
 
     function onSeriesToggle(map: Record<string, boolean>) {
@@ -348,7 +361,8 @@ export default function Dashboard({
                     denominator,
                     column2: column2?.name,
                     column2type,
-                    caption
+                    caption,
+                    ranges
                 }
             }).catch(e => alert(e.message));
         }
@@ -372,7 +386,8 @@ export default function Dashboard({
                     denominator,
                     column2: column2?.name,
                     column2type,
-                    caption
+                    caption,
+                    ranges
                 }
             }).then(
                 v => defer(() => navigate("/views/" + v.id)),
@@ -582,7 +597,8 @@ export default function Dashboard({
                                 denominator,
                                 column2: column2?.name || "",
                                 column2type,
-                                tags
+                                tags,
+                                ranges: hasRanges(data, data2) ? ranges : null
                             }}
                             onChange={state => {
                                 dispatch({ type: "UPDATE", payload: {
@@ -596,7 +612,8 @@ export default function Dashboard({
                                     denominator    : state.denominator,
                                     column2        : cols.find(c => c.name === state.column2),
                                     column2type    : state.column2type,
-                                    tags           : state.tags
+                                    tags           : state.tags,
+                                    ranges         : state.ranges
                                 }});
                             }}
                         />

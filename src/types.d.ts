@@ -1,3 +1,4 @@
+import { DashStyleValue } from "highcharts"
 
 export declare module app {
 
@@ -78,6 +79,7 @@ export declare module app {
         column2type?: string // Extra Column render as
         caption?: string // HTML chart caption
         seriesVisibility?: Record<string, boolean>
+        ranges?: RangeOptions
     }
 
     interface DataRequest {
@@ -260,6 +262,50 @@ export declare module app {
         point: AnnotationPoint
     }
 
+    interface AreaRangeOptions {
+        enabled?: boolean
+        type?: "areasplinerange"
+        allowPointSelect?: boolean
+        lineWidth?: number
+        dashStyle?: DashStyleValue
+        crisp?: boolean
+        opacity?: number
+        legendSymbol?: string
+        zIndex?: number
+        fillOpacity?: number
+    }
+
+    interface ErrorRangeOptions {
+        enabled?: boolean
+        type?: "errorbar"
+        allowPointSelect?: boolean
+        lineWidth?: number
+        crisp?: boolean
+        opacity?: number
+        legendSymbol?: string
+        zIndex?: number
+        whiskerLength?: string
+        whiskerWidth?: number
+        whiskerDashStyle?: DashStyleValue
+        stemDashStyle?: DashStyleValue
+    }
+
+    interface ColumnRangeOptions {
+        enabled?: boolean
+        type?: "column"
+        allowPointSelect?: boolean
+        opacity?: number
+        zIndex?: number
+        borderWidth?: number
+        edgeWidth?: number
+        borderColor?:  string
+        edgeColor?: string
+        borderRadius?: number
+        centerInCategory?: boolean
+    }
+
+    type RangeOptions = AreaRangeOptions | ErrorRangeOptions | ColumnRangeOptions
+
     interface AnnotationPoint {
 
         /**
@@ -305,6 +351,8 @@ export declare module app {
 
     namespace ServerResponses {
         
+        type DataResponseRow = [string, number] | [string, number, number, number]
+
         interface UnStratifiedDataResponse {
             column: string
             stratifier?: string
@@ -312,7 +360,7 @@ export declare module app {
             totalCount: number
             rowCount: number
             data: [{
-                rows: [string, number][]
+                rows: DataResponseRow[]
             }]
         }
 
@@ -321,7 +369,7 @@ export declare module app {
             counts: Record<string, number>
             data: ({
                 stratifier: string
-                rows: [string, number][]
+                rows: DataResponseRow[]
             })[]
         }
 

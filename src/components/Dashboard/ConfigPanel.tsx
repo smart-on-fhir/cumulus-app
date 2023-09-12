@@ -122,6 +122,7 @@ interface ChartConfigPanelState {
     annotations    : app.Annotation[]
     xCol           : app.DataRequestDataColumn
     tags           : Pick<app.Tag, "id"|"name"|"description">[]
+    ranges         : app.RangeOptions | null
 }
 
 export default function ConfigPanel({
@@ -641,7 +642,7 @@ export default function ConfigPanel({
                 <div className="pt-1">
                     <label>{ isPie ? "Slices" : "X Axis" }</label>
                     <ColumnSelector
-                        cols={ cols }
+                        cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max") }
                         value={ state.groupBy }
                         disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
                         onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
@@ -726,7 +727,13 @@ export default function ConfigPanel({
                                 placeholder="Select Column"
                                 addEmptyOption="start"
                                 value={ state.stratifyBy }
-                                disabled={[ "cnt", state.groupBy, state.column2 ].filter(Boolean)}
+                                disabled={[
+                                    "cnt",
+                                    "cnt_min",
+                                    "cnt_max",
+                                    state.groupBy,
+                                    state.column2
+                                ].filter(Boolean)}
                                 onChange={ (stratifyBy: string) => onChange({
                                     ...state,
                                     stratifyBy,
@@ -761,6 +768,14 @@ export default function ConfigPanel({
                 </> }
                 <br />
             </Collapse>
+
+            { tabIndex === 0 && state.ranges && (
+                <Collapse collapsed header="Confidence Intervals">
+                    <div className="pt-1 pb-1">
+                        <RangesEditor ranges={state.ranges} onChange={ranges => onChange({ ...state, ranges })}/>    
+                    </div>
+                </Collapse>
+            )}
 
             <Collapse collapsed header="Filters">
                 <div className="pt-1 pb-1">
@@ -912,320 +927,270 @@ export default function ConfigPanel({
     )
 }
 
-// function RangesEditor({
-//     ranges,
-//     onChange
-// }: {
-//     ranges: app.RangeOptions | null,
-//     onChange: (ranges: Partial<app.RangeOptions>) => void
-// }) {
-//     if (!ranges) {
-//         return null
-//     }
+function RangesEditor({
+    ranges,
+    onChange
+}: {
+    ranges: app.RangeOptions,
+    onChange: (ranges: Partial<app.RangeOptions>) => void
+}) {
+    if (ranges.type === "areasplinerange") {
+        return <AreaRangesEditor ranges={ranges} onChange={onChange} />
+    }
 
-//     if (ranges.type === "areasplinerange") {
-//         return <AreaRangesEditor ranges={ranges} onChange={onChange} />
-//     }
+    if (ranges.type === "errorbar") {
+        return <ErrorbarRangesEditor ranges={ranges} onChange={onChange} />
+    }
+    
+    if (ranges.type === "column") {
+        return <ColumnRangesEditor ranges={ranges} onChange={onChange} />
+    }
 
-//     return (
-//         <Collapse collapsed header="Error Ranges">
-//             <PropertyGrid props={[
-//                 {
-//                     name: "Enabled",
-//                     type: "boolean",
-//                     value: !!ranges.enabled,
-//                     onChange: (enabled: boolean) => onChange({ enabled })
-//                 },
-//                 {
-//                     name: "Type",
-//                     type: "options",
-//                     value: ranges.type,
-//                     options: ["areasplinerange", "errorbar", "column"],
-//                     onChange: (type) => onChange({ type })
-//                 },
-//                 {
-//                     name: "Line Width",
-//                     type: "number",
-//                     min: 0,
-//                     max: 50,
-//                     step: 0.1,
-//                     value: ranges.lineWidth ?? 1,
-//                     onChange: lineWidth => onChange({ lineWidth })
-//                 },
-//                 {
-//                     name: "Opacity",
-//                     type: "number",
-//                     min: 0,
-//                     max: 1,
-//                     step: 0.01,
-//                     value: ranges.opacity ?? 0.75,
-//                     onChange: opacity => onChange({ opacity })
-//                 },
-//                 {
-//                     name : "Z Index",
-//                     type : "number",
-//                     value: ranges.zIndex ?? -1,
-//                     onChange: zIndex => onChange({ zIndex })
-//                 },
-//                 {
-//                     name: "Fill Opacity",
-//                     type: "number",
-//                     min: 0,
-//                     max: 1,
-//                     step: 0.01,
-//                     disabled: ranges.type === "errorbar",
-//                     // @ts-ignore
-//                     value: ranges.fillOpacity ?? 0.5,
-//                     // @ts-ignore
-//                     onChange: fillOpacity => onChange({ fillOpacity })
-//                 },
-//                 {
-//                     name: "Dash Style",
-//                     type: "options",
-//                     disabled: ranges.type === "errorbar",
-//                     options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
-//                     'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
-//                     'LongDashDot', 'LongDashDotDot'],
-//                     // @ts-ignore
-//                     value: ranges.dashStyle ?? "Solid",
-//                     // @ts-ignore
-//                     onChange: dashStyle => onChange({ dashStyle })
-//                 },
-//                 {
-//                     name : "Whisker Length",
-//                     //type : "number",
-//                     type : "length",
-//                     description: "The length of the whiskers, the horizontal lines marking low and high values. It can be a numerical pixel value, or a percentage value of the box width. Set 0 to disable whiskers.",
-//                     disabled: ranges.type !== "errorbar",
-//                     min: 0,
-//                     max: 100,
-//                     units: ["%", "px"],
-//                     // @ts-ignore
-//                     value: ranges.whiskerLength ?? "80%",
-//                     // @ts-ignore
-//                     onChange: whiskerLength => onChange({ whiskerLength })
-//                 },
-//                 {
-//                     name : "Whisker Width",
-//                     type : "number",
-//                     description: "The line width of the whiskers, the horizontal lines marking low and high values.",
-//                     disabled: ranges.type !== "errorbar",
-//                     min: 0,
-//                     max: 20,
-//                     step: 0.1,
-//                     // @ts-ignore
-//                     value: ranges.whiskerWidth ?? 2,
-//                     // @ts-ignore
-//                     onChange: whiskerWidth => onChange({ whiskerWidth })
-//                 },
-//                 // legendSymbol?: string
-//                 {
-//                     name: "whisker Dash Style",
-//                     type: "options",
-//                     disabled: ranges.type !== "errorbar",
-//                     options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
-//                     'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
-//                     'LongDashDot', 'LongDashDotDot'],
-//                     // @ts-ignore
-//                     value: ranges.whiskerDashStyle ?? "Solid",
-//                     // @ts-ignore
-//                     onChange: whiskerDashStyle => onChange({ whiskerDashStyle })
-//                 },
-//                 {
-//                     name: "Stem Dash Style",
-//                     type: "options",
-//                     disabled: ranges.type !== "errorbar",
-//                     options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
-//                     'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
-//                     'LongDashDot', 'LongDashDotDot'],
-//                     // @ts-ignore
-//                     value: ranges.stemDashStyle ?? "Dot",
-//                     // @ts-ignore
-//                     onChange: stemDashStyle => onChange({ stemDashStyle })
-//                 }
-//                 // whiskerDashStyle?: DashStyleValue
-//                 // stemDashStyle?: DashStyleValue
-//             ]} />
-//         </Collapse>
-//     )
-// }
+    return null
+}
 
-// function ErrorbarRangesEditor({
-//     ranges,
-//     onChange
-// }: {
-//     ranges: app.ErrorRangeOptions,
-//     onChange: (ranges: Partial<app.ErrorRangeOptions>) => void
-// }) {
-//     return (
-//         <Collapse collapsed header="Error Ranges">
-//             <PropertyGrid props={[
-//                 {
-//                     name: "Enabled",
-//                     type: "boolean",
-//                     value: !!ranges.enabled,
-//                     onChange: (enabled: boolean) => onChange({ enabled })
-//                 },
-//                 {
-//                     name: "Type",
-//                     type: "options",
-//                     value: ranges.type,
-//                     options: ["areasplinerange", "errorbar", "column"],
-//                     onChange: (type) => onChange({ type })
-//                 },
-//                 {
-//                     name: "Line Width",
-//                     type: "number",
-//                     min: 0,
-//                     max: 50,
-//                     step: 0.1,
-//                     value: ranges.lineWidth ?? 1,
-//                     onChange: lineWidth => onChange({ lineWidth })
-//                 },
-//                 {
-//                     name: "Opacity",
-//                     type: "number",
-//                     min: 0,
-//                     max: 1,
-//                     step: 0.01,
-//                     value: ranges.opacity ?? 0.75,
-//                     onChange: opacity => onChange({ opacity })
-//                 },
-//                 {
-//                     name : "Z Index",
-//                     type : "number",
-//                     value: ranges.zIndex ?? -1,
-//                     onChange: zIndex => onChange({ zIndex })
-//                 },
-//                 {
-//                     name : "Whisker Length",
-//                     //type : "number",
-//                     type : "length",
-//                     description: "The length of the whiskers, the horizontal lines marking low and high values. It can be a numerical pixel value, or a percentage value of the box width. Set 0 to disable whiskers.",
-//                     disabled: ranges.type !== "errorbar",
-//                     min: 0,
-//                     max: 100,
-//                     units: ["%", "px"],
-//                     // @ts-ignore
-//                     value: ranges.whiskerLength ?? "80%",
-//                     // @ts-ignore
-//                     onChange: whiskerLength => onChange({ whiskerLength })
-//                 },
-//                 {
-//                     name : "Whisker Width",
-//                     type : "number",
-//                     description: "The line width of the whiskers, the horizontal lines marking low and high values.",
-//                     disabled: ranges.type !== "errorbar",
-//                     min: 0,
-//                     max: 20,
-//                     step: 0.1,
-//                     // @ts-ignore
-//                     value: ranges.whiskerWidth ?? 2,
-//                     // @ts-ignore
-//                     onChange: whiskerWidth => onChange({ whiskerWidth })
-//                 },
-//                 // legendSymbol?: string
-//                 {
-//                     name: "whisker Dash Style",
-//                     type: "options",
-//                     disabled: ranges.type !== "errorbar",
-//                     options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
-//                     'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
-//                     'LongDashDot', 'LongDashDotDot'],
-//                     // @ts-ignore
-//                     value: ranges.whiskerDashStyle ?? "Solid",
-//                     // @ts-ignore
-//                     onChange: whiskerDashStyle => onChange({ whiskerDashStyle })
-//                 },
-//                 {
-//                     name: "Stem Dash Style",
-//                     type: "options",
-//                     disabled: ranges.type !== "errorbar",
-//                     options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
-//                     'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
-//                     'LongDashDot', 'LongDashDotDot'],
-//                     // @ts-ignore
-//                     value: ranges.stemDashStyle ?? "Dot",
-//                     // @ts-ignore
-//                     onChange: stemDashStyle => onChange({ stemDashStyle })
-//                 }
-//                 // whiskerDashStyle?: DashStyleValue
-//                 // stemDashStyle?: DashStyleValue
-//             ]} />
-//         </Collapse>
-//     )
-// }
+function ColumnRangesEditor({
+    ranges,
+    onChange
+}: {
+    ranges: app.ColumnRangeOptions,
+    onChange: (ranges: Partial<app.ColumnRangeOptions>) => void
+}) {
+    return (
+        <PropertyGrid props={[
+            {
+                name: "Enabled",
+                type: "boolean",
+                value: !!ranges.enabled,
+                onChange: (enabled: boolean) => onChange({ enabled })
+            },
+            {
+                name: "Type",
+                type: "options",
+                value: ranges.type,
+                options: [
+                    { value: "areasplinerange", label: "Area" },
+                    { value: "errorbar", label: "Error Bars" },
+                    { value: "column", label: "Columns" }
+                ],
+                onChange: (type) => onChange({ type })
+            },
+            {
+                name: "Border Width",
+                type: "number",
+                min: 0,
+                max: 10,
+                step: 0.1,
+                value: ranges.borderWidth,
+                onChange: borderWidth => onChange({ borderWidth, edgeWidth: borderWidth })
+            },
+            {
+                name: "Border Color",
+                type: "color",
+                value: ranges.borderColor,
+                onChange: borderColor => onChange({ borderColor, edgeColor: borderColor })
+            },
+            {
+                name : "Border Radius",
+                type : "number",
+                min: 0,
+                max: 50,
+                value: ranges.borderRadius ?? 0,
+                onChange: borderRadius => onChange({ borderRadius })
+            },
+            {
+                name: "Opacity",
+                type: "number",
+                min: 0,
+                max: 1,
+                step: 0.01,
+                value: ranges.opacity ?? 0.75,
+                onChange: opacity => onChange({ opacity })
+            },
+            {
+                name : "Z Index",
+                type : "number",
+                value: ranges.zIndex ?? -1,
+                onChange: zIndex => onChange({ zIndex })
+            },
+            {
+                name: "Center",
+                type: "boolean",
+                value: !!ranges.centerInCategory,
+                onChange: centerInCategory => onChange({ centerInCategory })
+            }
+        ]} />
+    )
+}
 
-// function AreaRangesEditor({
-//     ranges,
-//     onChange
-// }: {
-//     ranges: app.AreaRangeOptions,
-//     onChange: (ranges: Partial<app.AreaRangeOptions>) => void
-// }) {
-//     return (
-//         <Collapse collapsed header="Error Ranges">
-//             <PropertyGrid props={[
-//                 {
-//                     name: "Enabled",
-//                     type: "boolean",
-//                     value: !!ranges.enabled,
-//                     onChange: (enabled: boolean) => onChange({ enabled })
-//                 },
-//                 {
-//                     name: "Type",
-//                     type: "options",
-//                     value: ranges.type,
-//                     options: ["areasplinerange", "errorbar", "column"],
-//                     onChange: (type) => onChange({ type })
-//                 },
-//                 {
-//                     name: "Line Width",
-//                     type: "number",
-//                     min: 0,
-//                     max: 50,
-//                     step: 0.1,
-//                     value: ranges.lineWidth ?? 1,
-//                     onChange: lineWidth => onChange({ lineWidth })
-//                 },
-//                 {
-//                     name: "Opacity",
-//                     type: "number",
-//                     min: 0,
-//                     max: 1,
-//                     step: 0.01,
-//                     value: ranges.opacity ?? 0.75,
-//                     onChange: opacity => onChange({ opacity })
-//                 },
-//                 {
-//                     name : "Z Index",
-//                     type : "number",
-//                     value: ranges.zIndex ?? -1,
-//                     onChange: zIndex => onChange({ zIndex })
-//                 },
-//                 {
-//                     name: "Fill Opacity",
-//                     type: "number",
-//                     min: 0,
-//                     max: 1,
-//                     step: 0.01,
-//                     value: ranges.fillOpacity ?? 0.5,
-//                     onChange: fillOpacity => onChange({ fillOpacity })
-//                 },
-//                 {
-//                     name: "Dash Style",
-//                     type: "options",
-//                     options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
-//                     'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
-//                     'LongDashDot', 'LongDashDotDot'],
-//                     value: ranges.dashStyle ?? "Solid",
-//                     onChange: dashStyle => onChange({ dashStyle })
-//                 }
-//             ]} />
-//         </Collapse>
-//     )
-// }
+function ErrorbarRangesEditor({
+    ranges,
+    onChange
+}: {
+    ranges: app.ErrorRangeOptions,
+    onChange: (ranges: Partial<app.ErrorRangeOptions>) => void
+}) {
+    return (
+        <PropertyGrid props={[
+            {
+                name: "Enabled",
+                type: "boolean",
+                value: !!ranges.enabled,
+                onChange: (enabled: boolean) => onChange({ enabled })
+            },
+            {
+                name: "Type",
+                type: "options",
+                value: ranges.type,
+                options: [
+                    { value: "areasplinerange", label: "Area" },
+                    { value: "errorbar", label: "Error Bars" },
+                    { value: "column", label: "Columns" }
+                ],
+                onChange: (type) => onChange({ type })
+            },
+            {
+                name: "Line Width",
+                type: "number",
+                min: 0,
+                max: 50,
+                step: 0.1,
+                value: ranges.lineWidth ?? 1,
+                onChange: lineWidth => onChange({ lineWidth })
+            },
+            {
+                name: "Opacity",
+                type: "number",
+                min: 0,
+                max: 1,
+                step: 0.01,
+                value: ranges.opacity ?? 0.75,
+                onChange: opacity => onChange({ opacity })
+            },
+            {
+                name : "Z Index",
+                type : "number",
+                value: ranges.zIndex ?? -1,
+                onChange: zIndex => onChange({ zIndex })
+            },
+            {
+                name : "Whisker Length",
+                type : "length",
+                description: "The length of the whiskers, the horizontal lines marking low and high values. " +
+                    "It can be a numerical pixel value, or a percentage value of the box width. Set 0 to disable whiskers.",
+                disabled: ranges.type !== "errorbar",
+                min: 0,
+                max: 100,
+                units: ["%", "px"],
+                value: ranges.whiskerLength ?? "80%",
+                onChange: whiskerLength => onChange({ whiskerLength })
+            },
+            {
+                name : "Whisker Width",
+                type : "number",
+                description: "The line width of the whiskers, the horizontal lines marking low and high values.",
+                disabled: ranges.type !== "errorbar",
+                min: 0,
+                max: 20,
+                step: 0.1,
+                value: ranges.whiskerWidth ?? 2,
+                onChange: whiskerWidth => onChange({ whiskerWidth })
+            },
+            {
+                name: "whisker Dash Style",
+                type: "options",
+                disabled: ranges.type !== "errorbar",
+                options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+                'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+                'LongDashDot', 'LongDashDotDot'],
+                value: ranges.whiskerDashStyle ?? "Solid",
+                onChange: whiskerDashStyle => onChange({ whiskerDashStyle })
+            },
+            {
+                name: "Stem Dash Style",
+                type: "options",
+                disabled: ranges.type !== "errorbar",
+                options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+                'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+                'LongDashDot', 'LongDashDotDot'],
+                value: ranges.stemDashStyle ?? "Dot",
+                onChange: stemDashStyle => onChange({ stemDashStyle })
+            }
+        ]} />
+    )
+}
 
+function AreaRangesEditor({
+    ranges,
+    onChange
+}: {
+    ranges: app.AreaRangeOptions,
+    onChange: (ranges: Partial<app.AreaRangeOptions>) => void
+}) {
+    return (
+        <PropertyGrid props={[
+            {
+                name: "Enabled",
+                type: "boolean",
+                value: !!ranges.enabled,
+                onChange: (enabled: boolean) => onChange({ enabled })
+            },
+            {
+                name: "Type",
+                type: "options",
+                value: ranges.type,
+                options: [
+                    { value: "areasplinerange", label: "Area" },
+                    { value: "errorbar", label: "Error Bars" },
+                    { value: "column", label: "Columns" }
+                ],
+                onChange: (type) => onChange({ type })
+            },
+            {
+                name: "Line Width",
+                type: "number",
+                min: 0,
+                max: 50,
+                step: 0.1,
+                value: ranges.lineWidth ?? 1,
+                onChange: lineWidth => onChange({ lineWidth })
+            },
+            {
+                name: "Opacity",
+                type: "number",
+                min: 0,
+                max: 1,
+                step: 0.01,
+                value: ranges.opacity ?? 0.75,
+                onChange: opacity => onChange({ opacity })
+            },
+            {
+                name : "Z Index",
+                type : "number",
+                value: ranges.zIndex ?? -1,
+                onChange: zIndex => onChange({ zIndex })
+            },
+            {
+                name: "Fill Opacity",
+                type: "number",
+                min: 0,
+                max: 1,
+                step: 0.01,
+                value: ranges.fillOpacity ?? 0.5,
+                onChange: fillOpacity => onChange({ fillOpacity })
+            },
+            {
+                name: "Dash Style",
+                type: "options",
+                options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+                'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+                'LongDashDot', 'LongDashDotDot'],
+                value: ranges.dashStyle ?? "Solid",
+                onChange: dashStyle => onChange({ dashStyle })
+            }
+        ]} />
+    )
+}
 
 function AdvancedAxisEditor({
     axis,
