@@ -292,8 +292,9 @@ function getSeries({
 
             if (ranges?.enabled) {
                 addSeries({
-                    type: ranges.type ?? "areasplinerange",
+                    type: ranges.type ?? "errorbar",
                     opacity: ranges.opacity ?? 0.75,
+                    zIndex: ranges.zIndex ?? -1,
                     // @ts-ignore
                     borderWidth: is3d ? 0 : ranges.borderWidth,
                     // @ts-ignore
@@ -335,9 +336,10 @@ function getSeries({
 
             if (ranges?.enabled) {
                 addSeries({
-                    type: ranges.type ?? "areasplinerange",
+                    type: ranges.type ?? "errorbar",
                     opacity: ranges.opacity ?? 0.75,
                     name: (column.label || column.name) + " (range)",
+                    zIndex: ranges.zIndex ?? -1,
                     // @ts-ignore
                     borderWidth: is3d ? 0 : ranges.borderWidth,
                     // @ts-ignore
@@ -485,7 +487,6 @@ export function buildChartOptions({
             areasplinerange: {
                 // @ts-ignore
                 lineWidth: ranges?.lineWidth ?? 1,
-                zIndex: ranges?.zIndex ?? -1,
                 dashStyle: (ranges as app.AreaRangeOptions)?.dashStyle,
                 fillOpacity: (ranges as app.AreaRangeOptions)?.fillOpacity ?? 0.5,
                 linkedTo: ':previous',
@@ -502,8 +503,7 @@ export function buildChartOptions({
             errorbar: {
                 // @ts-ignore
                 lineWidth: ranges?.lineWidth ?? 1,
-                zIndex: ranges?.zIndex ?? -1,
-                stemDashStyle: (ranges as app.ErrorRangeOptions)?.stemDashStyle ?? "Dot",
+                stemDashStyle: (ranges as app.ErrorRangeOptions)?.stemDashStyle ?? "Dash",
                 whiskerWidth: (ranges as app.ErrorRangeOptions)?.whiskerWidth ?? 2,
                 whiskerDashStyle: (ranges as app.ErrorRangeOptions)?.whiskerDashStyle ?? "Solid",
                 // @ts-ignore
