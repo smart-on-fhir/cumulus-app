@@ -10,8 +10,8 @@ import DemographicsEditor from "./DemographicsEditor"
 import TransmissionEditor from "./Transmissions/TransmissionEditor"
 import EditorList         from "../generic/EditorList"
 import { useAuth }        from "../../auth"
-import { request }        from "../../backend"
-import LoadableSelect     from "../generic/Select/DatasetSelect"
+// import { request }        from "../../backend"
+// import LoadableSelect     from "../generic/Select/DatasetSelect"
 import { app }            from "../../types"
 
 import "./form.scss";
@@ -377,7 +377,7 @@ export default function DataRequestForm({
                         value={dataSourceType}
                         onChange={dataSourceType => onChange({ ...record, dataSourceType })}
                     />
-                    <LoadableSelect onChange={() => {}} load={async () => {
+                    {/* <LoadableSelect onChange={() => {}} load={async () => {
                         // const res = await request("/api/aggregator/subscriptions")
                         const res = await request("/api/aggregator/metadata/general_hospital/core")
                         // console.log(res)
@@ -386,7 +386,7 @@ export default function DataRequestForm({
                             label: x,
                             value: i
                         }))
-                    }}/>
+                    }}/> */}
                 </div>
 
                 {
