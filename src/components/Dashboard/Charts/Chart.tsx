@@ -1,15 +1,15 @@
-import React                    from "react";
-import { Color, merge, Series } from "highcharts"
-import moment                   from "moment";
-import { defer }                from "../../../utils";
-import Loader                   from "../../generic/Loader";
-import { MenuItemConfig }       from "../../generic/Menu";
-import { app }                  from "../../../types"
+import React                       from "react"
+import { Color, merge, Series }    from "highcharts"
+import moment                      from "moment"
+import { defer, roundToPrecision } from "../../../utils"
+import Loader                      from "../../generic/Loader"
+import { MenuItemConfig }          from "../../generic/Menu"
+import { app }                     from "../../../types"
 import {
     SupportedNativeChartTypes,
     SupportedChartTypes,
     DEFAULT_COLORS
-} from "../config";
+} from "../config"
 
 
 declare var Highcharts: any
@@ -21,6 +21,7 @@ type SeriesOptions = (
     Highcharts.SeriesColumnOptions |
     Highcharts.SeriesBarOptions
 );
+
 
 /**
  * Function from https://github.com/danro/easing-js/blob/master/easing.js
@@ -431,30 +432,41 @@ export function buildChartOptions({
                     x = this.point.name
                 }
 
+                // Bullet ------------------------------------------------------
                 rows.push(`<tr><td colspan="2"><b style="color:${
                     // @ts-ignore
                     this.point.series.color?.stops?.[0]?.[1] || this.point.color || DEFAULT_COLORS[this.point.series.index % DEFAULT_COLORS.length]
                 };-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
                 
+                // Header ------------------------------------------------------
                 if (groupBy) {
                     rows.push(`<b>${this.point.series.name}</b><hr/></td></tr>`)
                 } else {
                     rows.push(`<b>${x}</b><hr/></td></tr>`)
                 }
 
+                // Group -------------------------------------------------------
                 if (groupBy) {
                     rows.push(`<tr><td style="text-align:right">${column.label || column.name}:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
                 }
 
-                rows.push(
-                    `<tr><td style="text-align:right">${denominator ? "Computed Value:" : "Count:"}</td>`,
-                    `<td style="width: 100%"><b>${denominator ? this.point.y?.toPrecision(3) + "%" : Number(this.point.y).toLocaleString()}</b></td></tr>`
-                )
+                // Value -------------------------------------------------------
+                // @ts-ignore
+                if (this.point.custom) {
+                    rows.push(
+                        `<tr><td style="text-align:right">${denominator ? "Computed Value:" : "Count:"}</td>`,
+                        `<td style="width: 100%"><b>${
+                                roundToPrecision(this.point.y!, 3).toLocaleString()
+                        }</b></td></tr>`
+                    )
+                }
 
+
+                // Denominator -------------------------------------------------
                 // @ts-ignore
                 if (denominator && this.point.custom?.denominator) {
                     // @ts-ignore
-                    rows.push(`<tr><td style="text-align:right">Denominator:</td><td><b>${this.point.custom.denominator}</b></td></tr>`)
+                    rows.push(`<tr style="opacity:0.6"><td style="text-align:right">Denominator:</td><td><b>${roundToPrecision(this.point.custom.denominator, 2).toLocaleString()}</b></td></tr>`)
                 }
                 
                 return `<table>${rows.join("")}</table>`
