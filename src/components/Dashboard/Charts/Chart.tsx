@@ -101,11 +101,13 @@ function getLocalDenominator(data: app.ServerResponses.StratifiedDataResponse, p
 function getPoint({
     row,
     xType,
-    denominator
+    denominator,
+    isErrorRange
 }: {
-    row: [string, number]
+    row: [string, number, number?, number?]
     xType: "category" | "linear" | "datetime"
     denominator?: number
+    isErrorRange?: boolean
 }): Highcharts.XrangePointOptionsObject | number | number[] {
 
     const point: any = {
@@ -116,11 +118,21 @@ function getPoint({
 
         custom: {
             data: {
-                cnt: row[1]
+                cnt    : row[1],
+                low    : row[2],
+                high   : row[3],
+                lowPct : pct(row[2] ?? 0, denominator),
+                highPct: pct(row[3] ?? 0, denominator)
             },
+            isErrorRange: !!isErrorRange,
             denominator
         }
     };
+
+    if (isErrorRange) {
+        point.low  = pct(row[2] ?? 0, denominator)
+        point.y = point.high = pct(row[3] ?? 0, denominator)
+    }
 
     // For datetime axes, the X value is the timestamp in milliseconds since 1970.
     if (xType === "datetime") {
@@ -143,7 +155,8 @@ function getSeries({
     denominator,
     column2type,
     serverOptions,
-    xType
+    xType,
+    ranges = {}
 }: {
     data            : app.ServerResponses.DataResponse
     data2           : app.ServerResponses.StratifiedDataResponse | null
@@ -153,8 +166,11 @@ function getSeries({
     column2type    ?: keyof typeof SupportedChartTypes
     xType           : "category" | "linear" | "datetime"
     serverOptions   : Highcharts.Options
+    ranges          : app.RangeOptions
 }): SeriesOptions[]
 {
+    const is3d = !!serverOptions.chart?.options3d?.enabled
+
     let series: SeriesOptions[] = []
 
     function addSeries(options: any, secondary = false) {
@@ -274,11 +290,33 @@ function getSeries({
                 }).filter(Boolean)
             }, secondary)
 
-            // addSeries({
-            //     type: _type,
-            //     name: group.stratifier,
-            //     data: group.rows.map(pointFromRow)
-            // }, secondary)
+            if (ranges?.enabled) {
+                addSeries({
+                    type: ranges.type ?? "areasplinerange",
+                    opacity: ranges.opacity ?? 0.75,
+                    // @ts-ignore
+                    borderWidth: is3d ? 0 : ranges.borderWidth,
+                    // @ts-ignore
+                    borderColor: is3d ? undefined : ranges.borderColor,
+                    // @ts-ignore
+                    borderRadius: ranges.borderRadius ?? 0,
+                    // @ts-ignore
+                    edgeColor: is3d ? ranges.borderColor : undefined,
+                    // @ts-ignore
+                    edgeWidth: is3d ? ranges.borderWidth : 0,
+                    // @ts-ignore
+                    centerInCategory: ranges.centerInCategory,
+                    name: group.stratifier + " (range)",
+                    data: keys.map(key => {
+                        const row = group.rows.find(row => row[0] === key)
+                        return row ?
+                            getPoint({ row, xType, denominator: getDenominator(data, denominator, row, denominatorCache), isErrorRange: true,  }) :
+                            (type === "column" || type === "bar") && data.data.length > 1 ?
+                                getPoint({ row: [key, 0], xType, denominator: 100, isErrorRange: true }) :
+                                null
+                    }).filter(Boolean)
+                });
+            }
         })
     }
 
@@ -294,6 +332,32 @@ function getSeries({
                     denominator: getDenominator(data, denominator, row, denominatorCache)
                 }))
             });
+
+            if (ranges?.enabled) {
+                addSeries({
+                    type: ranges.type ?? "areasplinerange",
+                    opacity: ranges.opacity ?? 0.75,
+                    name: (column.label || column.name) + " (range)",
+                    // @ts-ignore
+                    borderWidth: is3d ? 0 : ranges.borderWidth,
+                    // @ts-ignore
+                    borderColor: is3d ? undefined : ranges.borderColor,
+                    // @ts-ignore
+                    borderRadius: ranges.borderRadius ?? 0,
+                    // @ts-ignore
+                    edgeColor: is3d ? ranges.borderColor : undefined,
+                    // @ts-ignore
+                    edgeWidth: is3d ? ranges.borderWidth : 0,
+                    // @ts-ignore
+                    centerInCategory: ranges.centerInCategory,
+                    data: data.data[0].rows.map(row => getPoint({
+                        row,
+                        xType,
+                        denominator: getDenominator(data, denominator, row, denominatorCache),
+                        isErrorRange: true
+                    }))
+                });
+            }
         }
         else {
             stratify(data as app.ServerResponses.StratifiedDataResponse)
@@ -316,7 +380,8 @@ export function buildChartOptions({
     denominator = "",
     type,
     column2type,
-    onSeriesToggle
+    onSeriesToggle,
+    ranges = {}
 }: {
     data            : app.ServerResponses.DataResponse
     data2           : app.ServerResponses.StratifiedDataResponse | null
@@ -327,9 +392,12 @@ export function buildChartOptions({
     denominator    ?: app.DenominatorType
     column2type    ?: keyof typeof SupportedChartTypes
     onSeriesToggle  : (s: Record<string, boolean>) => void
+    ranges          : app.RangeOptions
 }): Highcharts.Options
 {
     const xType = getXType(column);
+
+    const is3d = !!options.chart?.options3d?.enabled
 
     const series = getSeries({
         data,
@@ -339,7 +407,8 @@ export function buildChartOptions({
         denominator,
         column2type,
         xType,
-        serverOptions: options
+        serverOptions: options,
+        ranges
     });
 
     const dynamicOptions: Highcharts.Options = {
@@ -348,7 +417,7 @@ export function buildChartOptions({
             options3d: {
                 depth: Math.min(series.length * 10, 100),
             },
-            plotBorderWidth: options.chart?.options3d?.enabled ? 0 : options.chart?.plotBorderWidth,
+            plotBorderWidth: is3d ? 0 : options.chart?.plotBorderWidth,
             animation: {
                 easing
             },
@@ -412,6 +481,34 @@ export function buildChartOptions({
                     offsetX: 0,
                     opacity: 0.2,
                 } : false
+            },
+            areasplinerange: {
+                // @ts-ignore
+                lineWidth: ranges?.lineWidth ?? 1,
+                zIndex: ranges?.zIndex ?? -1,
+                dashStyle: (ranges as app.AreaRangeOptions)?.dashStyle,
+                fillOpacity: (ranges as app.AreaRangeOptions)?.fillOpacity ?? 0.5,
+                linkedTo: ':previous',
+                marker: {
+                    enabled: false,
+                    radius: 6,
+                    states: {
+                        hover: {
+                            enabled: true
+                        }
+                    }
+                }
+            },
+            errorbar: {
+                // @ts-ignore
+                lineWidth: ranges?.lineWidth ?? 1,
+                zIndex: ranges?.zIndex ?? -1,
+                stemDashStyle: (ranges as app.ErrorRangeOptions)?.stemDashStyle ?? "Dot",
+                whiskerWidth: (ranges as app.ErrorRangeOptions)?.whiskerWidth ?? 2,
+                whiskerDashStyle: (ranges as app.ErrorRangeOptions)?.whiskerDashStyle ?? "Solid",
+                // @ts-ignore
+                whiskerLength: String(ranges?.whiskerLength || "").endsWith("px") ? parseFloat(ranges?.whiskerLength) : ranges?.whiskerLength ?? "80%",
+                linkedTo: ':previous'
             }
         },
         tooltip: {
@@ -448,7 +545,7 @@ export function buildChartOptions({
 
                 // Value -------------------------------------------------------
                 // @ts-ignore
-                if (this.point.custom) {
+                if (!this.point.custom?.isErrorRange) {
                     rows.push(
                         `<tr><td style="text-align:right">${denominator ? "Computed Value:" : "Count:"}</td>`,
                         `<td style="width: 100%"><b>${
@@ -460,6 +557,23 @@ export function buildChartOptions({
                     )
                 }
 
+                // Range -------------------------------------------------------
+                // @ts-ignore
+                const { data: { low, high, lowPct, highPct } = {}, denominator: d } = this.point.custom || {}
+
+                if (high !== undefined && low !== undefined) {
+                    if (denominator && d) {
+                        rows.push(
+                            `<tr style="opacity:0.6"><td style="text-align:right">Range:</td>` +
+                            `<td style="width: 100%"><b>${roundToPrecision(lowPct, 2) + "%"} - ${roundToPrecision(highPct, 2) + "%"}</b></td></tr>`
+                        )
+                    } else {
+                        rows.push(
+                            `<tr style="opacity:0.6"><td style="text-align:right">Range:</td>` +
+                            `<td style="width: 100%"><b>${roundToPrecision(low, 2).toLocaleString()} - ${roundToPrecision(high, 2).toLocaleString()}</b></td></tr>`
+                        )
+                    }
+                }
 
                 // Denominator -------------------------------------------------
                 // @ts-ignore
