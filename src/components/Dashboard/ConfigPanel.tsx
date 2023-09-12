@@ -912,6 +912,321 @@ export default function ConfigPanel({
     )
 }
 
+// function RangesEditor({
+//     ranges,
+//     onChange
+// }: {
+//     ranges: app.RangeOptions | null,
+//     onChange: (ranges: Partial<app.RangeOptions>) => void
+// }) {
+//     if (!ranges) {
+//         return null
+//     }
+
+//     if (ranges.type === "areasplinerange") {
+//         return <AreaRangesEditor ranges={ranges} onChange={onChange} />
+//     }
+
+//     return (
+//         <Collapse collapsed header="Error Ranges">
+//             <PropertyGrid props={[
+//                 {
+//                     name: "Enabled",
+//                     type: "boolean",
+//                     value: !!ranges.enabled,
+//                     onChange: (enabled: boolean) => onChange({ enabled })
+//                 },
+//                 {
+//                     name: "Type",
+//                     type: "options",
+//                     value: ranges.type,
+//                     options: ["areasplinerange", "errorbar", "column"],
+//                     onChange: (type) => onChange({ type })
+//                 },
+//                 {
+//                     name: "Line Width",
+//                     type: "number",
+//                     min: 0,
+//                     max: 50,
+//                     step: 0.1,
+//                     value: ranges.lineWidth ?? 1,
+//                     onChange: lineWidth => onChange({ lineWidth })
+//                 },
+//                 {
+//                     name: "Opacity",
+//                     type: "number",
+//                     min: 0,
+//                     max: 1,
+//                     step: 0.01,
+//                     value: ranges.opacity ?? 0.75,
+//                     onChange: opacity => onChange({ opacity })
+//                 },
+//                 {
+//                     name : "Z Index",
+//                     type : "number",
+//                     value: ranges.zIndex ?? -1,
+//                     onChange: zIndex => onChange({ zIndex })
+//                 },
+//                 {
+//                     name: "Fill Opacity",
+//                     type: "number",
+//                     min: 0,
+//                     max: 1,
+//                     step: 0.01,
+//                     disabled: ranges.type === "errorbar",
+//                     // @ts-ignore
+//                     value: ranges.fillOpacity ?? 0.5,
+//                     // @ts-ignore
+//                     onChange: fillOpacity => onChange({ fillOpacity })
+//                 },
+//                 {
+//                     name: "Dash Style",
+//                     type: "options",
+//                     disabled: ranges.type === "errorbar",
+//                     options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+//                     'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+//                     'LongDashDot', 'LongDashDotDot'],
+//                     // @ts-ignore
+//                     value: ranges.dashStyle ?? "Solid",
+//                     // @ts-ignore
+//                     onChange: dashStyle => onChange({ dashStyle })
+//                 },
+//                 {
+//                     name : "Whisker Length",
+//                     //type : "number",
+//                     type : "length",
+//                     description: "The length of the whiskers, the horizontal lines marking low and high values. It can be a numerical pixel value, or a percentage value of the box width. Set 0 to disable whiskers.",
+//                     disabled: ranges.type !== "errorbar",
+//                     min: 0,
+//                     max: 100,
+//                     units: ["%", "px"],
+//                     // @ts-ignore
+//                     value: ranges.whiskerLength ?? "80%",
+//                     // @ts-ignore
+//                     onChange: whiskerLength => onChange({ whiskerLength })
+//                 },
+//                 {
+//                     name : "Whisker Width",
+//                     type : "number",
+//                     description: "The line width of the whiskers, the horizontal lines marking low and high values.",
+//                     disabled: ranges.type !== "errorbar",
+//                     min: 0,
+//                     max: 20,
+//                     step: 0.1,
+//                     // @ts-ignore
+//                     value: ranges.whiskerWidth ?? 2,
+//                     // @ts-ignore
+//                     onChange: whiskerWidth => onChange({ whiskerWidth })
+//                 },
+//                 // legendSymbol?: string
+//                 {
+//                     name: "whisker Dash Style",
+//                     type: "options",
+//                     disabled: ranges.type !== "errorbar",
+//                     options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+//                     'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+//                     'LongDashDot', 'LongDashDotDot'],
+//                     // @ts-ignore
+//                     value: ranges.whiskerDashStyle ?? "Solid",
+//                     // @ts-ignore
+//                     onChange: whiskerDashStyle => onChange({ whiskerDashStyle })
+//                 },
+//                 {
+//                     name: "Stem Dash Style",
+//                     type: "options",
+//                     disabled: ranges.type !== "errorbar",
+//                     options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+//                     'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+//                     'LongDashDot', 'LongDashDotDot'],
+//                     // @ts-ignore
+//                     value: ranges.stemDashStyle ?? "Dot",
+//                     // @ts-ignore
+//                     onChange: stemDashStyle => onChange({ stemDashStyle })
+//                 }
+//                 // whiskerDashStyle?: DashStyleValue
+//                 // stemDashStyle?: DashStyleValue
+//             ]} />
+//         </Collapse>
+//     )
+// }
+
+// function ErrorbarRangesEditor({
+//     ranges,
+//     onChange
+// }: {
+//     ranges: app.ErrorRangeOptions,
+//     onChange: (ranges: Partial<app.ErrorRangeOptions>) => void
+// }) {
+//     return (
+//         <Collapse collapsed header="Error Ranges">
+//             <PropertyGrid props={[
+//                 {
+//                     name: "Enabled",
+//                     type: "boolean",
+//                     value: !!ranges.enabled,
+//                     onChange: (enabled: boolean) => onChange({ enabled })
+//                 },
+//                 {
+//                     name: "Type",
+//                     type: "options",
+//                     value: ranges.type,
+//                     options: ["areasplinerange", "errorbar", "column"],
+//                     onChange: (type) => onChange({ type })
+//                 },
+//                 {
+//                     name: "Line Width",
+//                     type: "number",
+//                     min: 0,
+//                     max: 50,
+//                     step: 0.1,
+//                     value: ranges.lineWidth ?? 1,
+//                     onChange: lineWidth => onChange({ lineWidth })
+//                 },
+//                 {
+//                     name: "Opacity",
+//                     type: "number",
+//                     min: 0,
+//                     max: 1,
+//                     step: 0.01,
+//                     value: ranges.opacity ?? 0.75,
+//                     onChange: opacity => onChange({ opacity })
+//                 },
+//                 {
+//                     name : "Z Index",
+//                     type : "number",
+//                     value: ranges.zIndex ?? -1,
+//                     onChange: zIndex => onChange({ zIndex })
+//                 },
+//                 {
+//                     name : "Whisker Length",
+//                     //type : "number",
+//                     type : "length",
+//                     description: "The length of the whiskers, the horizontal lines marking low and high values. It can be a numerical pixel value, or a percentage value of the box width. Set 0 to disable whiskers.",
+//                     disabled: ranges.type !== "errorbar",
+//                     min: 0,
+//                     max: 100,
+//                     units: ["%", "px"],
+//                     // @ts-ignore
+//                     value: ranges.whiskerLength ?? "80%",
+//                     // @ts-ignore
+//                     onChange: whiskerLength => onChange({ whiskerLength })
+//                 },
+//                 {
+//                     name : "Whisker Width",
+//                     type : "number",
+//                     description: "The line width of the whiskers, the horizontal lines marking low and high values.",
+//                     disabled: ranges.type !== "errorbar",
+//                     min: 0,
+//                     max: 20,
+//                     step: 0.1,
+//                     // @ts-ignore
+//                     value: ranges.whiskerWidth ?? 2,
+//                     // @ts-ignore
+//                     onChange: whiskerWidth => onChange({ whiskerWidth })
+//                 },
+//                 // legendSymbol?: string
+//                 {
+//                     name: "whisker Dash Style",
+//                     type: "options",
+//                     disabled: ranges.type !== "errorbar",
+//                     options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+//                     'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+//                     'LongDashDot', 'LongDashDotDot'],
+//                     // @ts-ignore
+//                     value: ranges.whiskerDashStyle ?? "Solid",
+//                     // @ts-ignore
+//                     onChange: whiskerDashStyle => onChange({ whiskerDashStyle })
+//                 },
+//                 {
+//                     name: "Stem Dash Style",
+//                     type: "options",
+//                     disabled: ranges.type !== "errorbar",
+//                     options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+//                     'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+//                     'LongDashDot', 'LongDashDotDot'],
+//                     // @ts-ignore
+//                     value: ranges.stemDashStyle ?? "Dot",
+//                     // @ts-ignore
+//                     onChange: stemDashStyle => onChange({ stemDashStyle })
+//                 }
+//                 // whiskerDashStyle?: DashStyleValue
+//                 // stemDashStyle?: DashStyleValue
+//             ]} />
+//         </Collapse>
+//     )
+// }
+
+// function AreaRangesEditor({
+//     ranges,
+//     onChange
+// }: {
+//     ranges: app.AreaRangeOptions,
+//     onChange: (ranges: Partial<app.AreaRangeOptions>) => void
+// }) {
+//     return (
+//         <Collapse collapsed header="Error Ranges">
+//             <PropertyGrid props={[
+//                 {
+//                     name: "Enabled",
+//                     type: "boolean",
+//                     value: !!ranges.enabled,
+//                     onChange: (enabled: boolean) => onChange({ enabled })
+//                 },
+//                 {
+//                     name: "Type",
+//                     type: "options",
+//                     value: ranges.type,
+//                     options: ["areasplinerange", "errorbar", "column"],
+//                     onChange: (type) => onChange({ type })
+//                 },
+//                 {
+//                     name: "Line Width",
+//                     type: "number",
+//                     min: 0,
+//                     max: 50,
+//                     step: 0.1,
+//                     value: ranges.lineWidth ?? 1,
+//                     onChange: lineWidth => onChange({ lineWidth })
+//                 },
+//                 {
+//                     name: "Opacity",
+//                     type: "number",
+//                     min: 0,
+//                     max: 1,
+//                     step: 0.01,
+//                     value: ranges.opacity ?? 0.75,
+//                     onChange: opacity => onChange({ opacity })
+//                 },
+//                 {
+//                     name : "Z Index",
+//                     type : "number",
+//                     value: ranges.zIndex ?? -1,
+//                     onChange: zIndex => onChange({ zIndex })
+//                 },
+//                 {
+//                     name: "Fill Opacity",
+//                     type: "number",
+//                     min: 0,
+//                     max: 1,
+//                     step: 0.01,
+//                     value: ranges.fillOpacity ?? 0.5,
+//                     onChange: fillOpacity => onChange({ fillOpacity })
+//                 },
+//                 {
+//                     name: "Dash Style",
+//                     type: "options",
+//                     options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+//                     'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+//                     'LongDashDot', 'LongDashDotDot'],
+//                     value: ranges.dashStyle ?? "Solid",
+//                     onChange: dashStyle => onChange({ dashStyle })
+//                 }
+//             ]} />
+//         </Collapse>
+//     )
+// }
+
+
 function AdvancedAxisEditor({
     axis,
     onChange
