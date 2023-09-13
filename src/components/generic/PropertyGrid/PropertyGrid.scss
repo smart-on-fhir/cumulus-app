@@ -87,6 +87,15 @@
         justify-content: stretch;
         justify-items  : flex-start;
         color          : #000;
+
+        > label {
+            padding: 0;
+            display: block;
+            width: 100%;
+            cursor: pointer;
+            font-weight: inherit;
+            color: #888;
+        }
     }
 
     input, select, textarea {

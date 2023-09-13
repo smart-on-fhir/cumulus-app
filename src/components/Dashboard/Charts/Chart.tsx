@@ -494,15 +494,15 @@ export function buildChartOptions({
                 dashStyle: (ranges as app.AreaRangeOptions)?.dashStyle,
                 fillOpacity: (ranges as app.AreaRangeOptions)?.fillOpacity ?? 0.5,
                 linkedTo: ':previous',
-                // marker: {
-                //     enabled: false,
+                marker: {
+                    enabled: false,
                 //     radius: 6,
                 //     states: {
                 //         hover: {
                 //             enabled: true
                 //         }
                 //     }
-                // },
+                },
                 states: {
                     hover: {
                         enabled: false
