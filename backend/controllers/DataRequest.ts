@@ -458,9 +458,9 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
             where.push(...unusedColumns.map(c => `"${c.name}" IS NULL`))
         }
         
-        if (filterWhere) {
-            where.push(`(${ filterWhere })`)
-        }
+        // if (filterWhere) {
+        //     where.push(`(${ filterWhere })`)
+        // }
 
         sql += ` WHERE ${where.join(" AND ")}`
         sql += ` GROUP BY "${column}"`
