@@ -9,7 +9,7 @@ export default function BooleanEditor({ prop }: { prop: EditableProperty }) {
                 disabled={ !!prop.disabled }
                 checked={ prop.value }
                 onChange={ () => prop.onChange(!prop.value) }
-            />&nbsp;{ prop.value + "" }
+            />{ prop.value + "" }
         </label>
     )
 }
