@@ -433,7 +433,7 @@ export default function ConfigPanel({
             </Collapse>
 
             <Collapse collapsed header="Plot">
-                <div className="pb-1 mt-1">
+                <div className="pb-1">
                     <PropertyGrid props={[
                         {
                             name: "Border Width",
@@ -771,7 +771,7 @@ export default function ConfigPanel({
 
             { state.ranges && (
                 <Collapse collapsed header="Confidence Intervals">
-                    <div className="pt-1 pb-1">
+                    <div className="pb-1">
                         <RangesEditor ranges={state.ranges} onChange={ranges => onChange({ ...state, ranges })}/>    
                     </div>
                 </Collapse>
@@ -805,7 +805,7 @@ export default function ConfigPanel({
                         }))}
                     />
                 </div>
-                <div className="mt-1 pb-2">
+                <div className="mt-1 pb-1">
                     <Checkbox
                         name="YTicks"
                         label="Render axis tick marks"
@@ -860,7 +860,7 @@ export default function ConfigPanel({
                         }))}
                     />
                 </div>
-                <div className="mt-1 pb-2">
+                <div className="mt-1 pb-1">
                     <Checkbox
                         name="XTicks"
                         label="Render axis tick marks"
