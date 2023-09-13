@@ -90,11 +90,16 @@
 
         > label {
             padding: 0;
-            display: block;
+            display: flex;
             width: 100%;
             cursor: pointer;
             font-weight: inherit;
             color: #888;
+            align-items: center;
+
+            input {
+                margin-right: 9px;
+            }
         }
     }
 
@@ -103,7 +108,7 @@
     }
 
     input[type="checkbox"] {
-        margin: 4px;
+        margin: 5px;
         &:focus {
             outline: 1px solid $selection-bg-dark;
             outline-offset: 4px;
