@@ -291,18 +291,16 @@ export declare module app {
     }
 
     interface ColumnRangeOptions {
-        enabled?: boolean
-        type?: "column"
+        enabled         ?: boolean
+        type            ?: "column"
         allowPointSelect?: boolean
-        opacity?: number
-        zIndex?: number
-        borderWidth?: number
-        edgeWidth?: number
-        borderColor?:  string
-        edgeColor?: string
-        borderRadius?: number
+        opacity         ?: number
+        zIndex          ?: number
+        borderWidth     ?: number
+        borderColor     ?:  string
+        borderRadius    ?: number
         centerInCategory?: boolean
-        pointWidth?: number
+        pointWidth      ?: number
     }
 
     type RangeOptions = AreaRangeOptions | ErrorRangeOptions | ColumnRangeOptions
