@@ -407,7 +407,7 @@ export function roundToPrecision(n: string | number, precision?: number) {
 
 export function escapeForFileName(input: string): string {
     return input.trim()
-        .replace(/[\/:*?"<>|\\\s\.\(\)]+/g, "_")
+        .replace(/[/:*?"<>|\\\s.()]+/g, "_")
         .replace(/\s+/g, "_")
         .replace(/_$/, "");
   }
