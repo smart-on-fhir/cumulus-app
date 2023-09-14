@@ -1,6 +1,7 @@
 import { Command }            from "../Command"
 import { downloadScreenshot } from "../lib"
 import { app }                from "../../types"
+import { escapeForFileName }  from "../../utils"
 
 
 export class DownloadScreenshotAsJPG extends Command
@@ -39,7 +40,10 @@ export class DownloadScreenshotAsJPG extends Command
 
     async execute() {
         this._working = true
-        await downloadScreenshot({ type: "image/jpeg", quality: 0.8, fileName: this._view.name })
-            .finally(() => this._working = false)
+        await downloadScreenshot({
+            type: "image/jpeg",
+            quality: 0.8,
+            fileName: escapeForFileName(this._view.name + "")
+        }).finally(() => this._working = false)
     }
 }
