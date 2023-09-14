@@ -551,8 +551,8 @@ export default function Dashboard({
 
     const deleteCommand    = useCommand(new DeleteGraph(view.id || 0, auth.user, navigate));
     const copyCommand      = useCommand(new CopyGraph(view.id || 0, auth.user, navigate));
-    const downloadPNG      = useCommand(new DownloadScreenshotAsPNG(view));
-    const downloadJPG      = useCommand(new DownloadScreenshotAsJPG(view));
+    const downloadPNG      = useCommand(new DownloadScreenshotAsPNG({ ...view, name: state.viewName }));
+    const downloadJPG      = useCommand(new DownloadScreenshotAsJPG({ ...view, name: state.viewName }));
     const toggleFullscreen = useCommand(new ToggleFullscreen());
     const printChart       = useCommand(new PrintChart());
     const requestLineData  = useCommand(new RequestLineLevelData(view.id || 0, auth.user, navigate))
