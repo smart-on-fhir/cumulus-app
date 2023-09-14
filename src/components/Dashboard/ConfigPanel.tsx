@@ -1138,6 +1138,59 @@ function AdvancedAxisEditor({
                     onChange: (lineWidth?: number) => onChange({ lineWidth: lineWidth ?? 1 })
                 },
                 {
+                    name: "Reversed",
+                    type: "boolean",
+                    value: !!axis.reversed,
+                    onChange: (reversed: boolean) => onChange({ reversed })
+                },
+                {
+                    name: "startOnTick",
+                    type: "boolean",
+                    value: !!axis.startOnTick,
+                    onChange: (startOnTick: boolean) => onChange({ startOnTick })
+                },
+                {
+                    name : "Min",
+                    type : "number",
+                    value: axis.min ?? undefined,
+                    disabled: axis.type === "category" || axis.type === "datetime",
+                    onChange: (min?: number) => onChange({ min: min ?? null })
+                },
+                // {
+                //     name : "softMin",
+                //     type : "number",
+                //     value: axis.softMin,
+                //     onChange: (softMin?: number) => onChange({ softMin })
+                // },
+                {
+                    name: "endOnTick",
+                    type: "boolean",
+                    value: !!axis.endOnTick,
+                    onChange: (endOnTick: boolean) => onChange({ endOnTick })
+                },
+                {
+                    name : "max",
+                    type : "number",
+                    value: axis.max ?? undefined,
+                    min: 0,
+                    disabled: axis.type === "category" || axis.type === "datetime",
+                    onChange: (max?: number) => onChange({ max: max ?? null })
+                },
+                // {
+                //     name : "softMax",
+                //     type : "number",
+                //     value: axis.softMax,
+                //     onChange: (softMax?: number) => onChange({ softMax })
+                // },
+                // {
+                //     name : "minPadding",
+                //     type : "number",
+                //     value: axis.minPadding ?? 0.05,
+                //     step: 0.01,
+                //     min: 0,
+                //     onChange: (minPadding?: number) => onChange({ minPadding })
+                // },
+                {
                     name: "Grid Lines",
                     type: "group",
                     value: [
