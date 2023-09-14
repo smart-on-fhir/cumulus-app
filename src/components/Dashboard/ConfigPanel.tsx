@@ -610,7 +610,7 @@ export default function ConfigPanel({
 
             <Collapse collapsed header="Data">
                 <div className="pt-1">
-                    <label>{ isPie ? "Slices" : "X Axis" }</label>
+                    <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
                     <ColumnSelector
                         cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max") }
                         value={ state.groupBy }
@@ -620,7 +620,7 @@ export default function ConfigPanel({
                     <p className="small color-muted"> {
                         isPie ?
                             "Select which data column provides the slices of the pie" :
-                            "Select which data column to plot over the X axis"
+                            `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
                     }</p>
                 </div>
                 { !isPie && <>
@@ -1104,7 +1104,7 @@ function AdvancedAxisEditor({
                 {
                     name: "Reversed",
                     type: "boolean",
-                    value: axis.reversed !== false,
+                    value: !!axis.reversed,
                     onChange: (reversed: boolean) => onChange({ reversed })
                 },
                 {
