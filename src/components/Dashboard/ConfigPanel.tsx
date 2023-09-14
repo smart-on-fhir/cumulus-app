@@ -1,5 +1,3 @@
-
-import { useState }      from "react"
 import Select            from "../generic/Select"
 import ColumnSelector    from "./ColumnSelector"
 import FilterUI          from "./FilterUI"
@@ -16,13 +14,21 @@ import {
     merge,
     Options,
     OptionsLayoutValue,
+    SeriesAreasplineOptions,
+    SeriesAreasplinerangeOptions,
+    SeriesColumnOptions,
+    SeriesErrorbarOptions,
+    SeriesOptionsType,
+    SeriesPieOptions,
+    SeriesSplineOptions,
     VerticalAlignValue,
     XAxisOptions,
     YAxisOptions
 } from "highcharts"
 import {
     SupportedChartTypes,
-    ChartIcons
+    ChartIcons,
+    DEFAULT_COLORS
 } from "./config"
 
 type SupportedChartType = keyof typeof SupportedChartTypes
@@ -85,25 +91,10 @@ function SecondaryDataEditor({
                         }
                     ]}
                 />
+                <p className="small color-muted">
+                    How should the secondary data be rendered
+                </p>
             </div> }
-
-            { !!state.column2 && !!state.column2type && <>
-                <div className="pt-1">
-                    <label>Colors</label>
-                    <br/>
-                    <ColorPresetEditor state={state} onChange={onChange} type="secondary" />
-                </div>
-                <div className="pt-1">
-                    <label>
-                        Opacity
-                        <SecondaryDataOpacityEditor state={state} onChange={onChange} />
-                    </label>
-                    <p className="small color-muted">
-                        Using semitransparent colors might slightly improve readability in case
-                        of overlapping lines or shapes
-                    </p>
-                </div>
-            </> }
         </>
     )
 }
@@ -139,8 +130,6 @@ export default function ConfigPanel({
     viewType: "overview" | "data"
     onChange: (state: ChartConfigPanelState) => void
 }) {
-    let [ tabIndex, setTabIndex ] = useState(0)
-
     const { cols } = dataRequest.metadata || { cols: [] }
 
     const { chartOptions, chartType } = state;
@@ -472,172 +461,150 @@ export default function ConfigPanel({
             </Collapse>
 
             <Collapse collapsed header="Legend">
-                <div className="pb-1 mt-1">
-                    <Checkbox
-                        name="legend"
-                        label="Show legend"
-                        checked={chartOptions.legend?.enabled !== false}
-                        onChange={enabled => onChange(merge(state, {
-                            chartOptions: {
-                                legend: { enabled }
-                            }
-                        }))}
-                    />
-                    { !isPie && <Checkbox
-                        name="editableLegend"
-                        label="Editable legend"
-                        disabled={!chartOptions.legend?.enabled}
-                        // @ts-ignore
-                        checked={!chartOptions.legend?._readonly}
-                        onChange={on => onChange(merge(state, {
-                            chartOptions: {
-                                legend: {
-                                    _readonly: !on
-                                }
-                            }
-                        }))}
-                    /> }
-                </div>
                 <div className="pb-1">
-                    <Collapse collapsed header="Advanced">
-                        <PropertyGrid props={[
-                            {
-                                name: "X Align",
-                                description: "The horizontal alignment of the legend box within the chart area. Valid values are left, center and right.\nIn the case that the legend is aligned in a corner position, the layout option will determine whether to place it above/below or on the side of the plot area.",
-                                type: "options",
-                                options: ["left", "center", "right"],
-                                value: chartOptions.legend?.align || "center",
-                                onChange: (align: AlignValue) => updateChartOptions({ legend: { align }})
-                            },
-                            {
-                                name: "Y Align",
-                                description: "The vertical alignment of the legend box. Can be one of top, middle or bottom. Vertical position can be further determined by the y option.\n\nIn the case that the legend is aligned in a corner position, the layout option will determine whether to place it above/below or on the side of the plot area.\n\nWhen the layout option is proximate, the verticalAlign option doesn't apply.",
-                                type: "options",
-                                options: ["top", "middle", "bottom"],
-                                value: chartOptions.legend?.verticalAlign || "bottom",
-                                onChange: (verticalAlign: VerticalAlignValue) => updateChartOptions({ legend: { verticalAlign }})
-                            },
-                            {
-                                name: "X Offset",
-                                type: "number",
-                                value: chartOptions.legend?.x ?? 0,
-                                description: "The x offset of the legend relative to its horizontal alignment align within chart.spacingLeft and chart.spacingRight. Negative x moves it to the left, positive x moves it to the right.",
-                                onChange: (x?: number) => updateChartOptions({ legend: { x: x ?? 0 }})
-                            },
-                            {
-                                name: "Y Offset",
-                                type: "number",
-                                value: chartOptions.legend?.y ?? 0,
-                                description: "The vertical offset of the legend relative to it's vertical alignment verticalAlign within chart.spacingTop and chart.spacingBottom. Negative y moves it up, positive y moves it down.",
-                                onChange: (y: number) => updateChartOptions({ legend: { y: y ?? 0 }})
-                            },
-                            {
-                                name: "Layout",
-                                description: "The layout of the legend items. Can be one of horizontal or vertical or proximate. When proximate, the legend items will be placed as close as possible to the graphs they're representing, except in inverted charts or when the legend position doesn't allow it.",
-                                type: "options",
-                                options: ["horizontal", "vertical"/*, "proximate"*/],
-                                value: chartOptions.legend?.layout || "horizontal",
-                                onChange: (layout: OptionsLayoutValue) => updateChartOptions({ legend: { layout }})
-                            },
-                            {
-                                name: "Align Columns",
-                                description: "If the layout is horizontal and the legend items span over two lines or more, whether to align the items into vertical columns. Setting this to false makes room for more items, but will look more messy.",
-                                type: "boolean",
-                                value: chartOptions.legend?.alignColumns ?? true,
-                                onChange: (alignColumns: boolean) => updateChartOptions({ legend: { alignColumns }})
-                            },
-                            {
-                                name: "Floating",
-                                description: "When the legend is floating, the plot area ignores it and is allowed to be placed below it.",
-                                type: "boolean",
-                                value: chartOptions.legend?.floating ?? false,
-                                onChange: (floating: boolean) => updateChartOptions({ legend: { floating }})
-                            },
-                            {
-                                name: "Width",
-                                type: "length",
-                                value: chartOptions.legend?.width,
-                                units: ["%", "px"],
-                                onChange: (width: string) => updateChartOptions({ legend: { width: width || undefined }})
-                            },
-                            {
-                                name: "Padding",
-                                type: "number",
-                                description: "The inner padding of the legend box.",
-                                value: chartOptions.legend?.padding ?? 8,
-                                onChange: (padding?: number) => updateChartOptions({ legend: { padding }})
-                            },
-                            {
-                                name: "Max Height",
-                                type: "number",
-                                value: chartOptions.legend?.maxHeight,
-                                description: "Maximum pixel height for the legend. When the maximum height is extended, navigation will show.",
-                                onChange: (maxHeight?: number) => updateChartOptions({ legend: { maxHeight }})
-                            },
-                            {
-                                name: "Background Color",
-                                type: "color",
-                                value: chartOptions.legend?.backgroundColor,
-                                description: "The background color of the legend.",
-                                onChange: (backgroundColor?: string) => updateChartOptions({ legend: { backgroundColor }})
-                            },
-                            {
-                                name: "Border Width",
-                                type: "number",
-                                value: chartOptions.legend?.borderWidth,
-                                onChange: (borderWidth: number) => updateChartOptions({ legend: { borderWidth }})
-                            },
-                            {
-                                name: "Border Color",
-                                type: "color",
-                                value: chartOptions.legend?.borderColor ?? "#999999",
-                                onChange: (borderColor?: string) => updateChartOptions({ legend: { borderColor: borderColor || "#999999" }})
-                            },
-                            {
-                                name: "Border Radius",
-                                type: "number",
-                                value: chartOptions.legend?.borderRadius ?? 0,
-                                onChange: (borderRadius?: number) => updateChartOptions({ legend: { borderRadius: borderRadius ?? 0 }})
-                            },
-                            {
-                                name: "Drop Shadow",
-                                type: "shadow",
-                                value: chartOptions.legend?.shadow ?? false,
-                                onChange: (shadow: any) => updateChartOptions({ legend: { shadow: shadow ?? false }})
-                            },
-                            {
-                                name: "Items",
-                                type: "group",
-                                value: [
-                                    {
-                                        name: "Distance",
-                                        type: "number",
-                                        value: chartOptions.legend?.itemDistance ?? 20,
-                                        onChange: (itemDistance: number) => updateChartOptions({ legend: { itemDistance }})
-                                    },
-                                    {
-                                        name: "Margin Top",
-                                        type: "number",
-                                        value: chartOptions.legend?.itemMarginTop ?? 2,
-                                        onChange: (itemMarginTop: number) => updateChartOptions({ legend: { itemMarginTop }})
-                                    },
-                                    {
-                                        name: "Margin Bottom",
-                                        type: "number",
-                                        value: chartOptions.legend?.itemMarginBottom ?? 2,
-                                        onChange: (itemMarginBottom: number) => updateChartOptions({ legend: { itemMarginBottom }})
-                                    },
-                                    {
-                                        name: "Format",
-                                        type: "string",
-                                        value: chartOptions.legend?.labelFormat ?? "{name}",
-                                        description: "A format string for each legend label. Available variables relates to properties on the series, or the point in case of pies.",
-                                        onChange: (labelFormat: string) => updateChartOptions({ legend: { labelFormat }})
-                                    },
-                                ],
-                            }
-                        ]} />
-                    </Collapse>
+                    <PropertyGrid props={[
+                        {
+                            name: "Enabled",
+                            type: "boolean",
+                            value: chartOptions.legend?.enabled !== false,
+                            onChange: (enabled: boolean) => updateChartOptions({ legend: { enabled }})
+                        },
+                        {
+                            name: "X Align",
+                            description: "The horizontal alignment of the legend box within the chart area. Valid values are left, center and right.\nIn the case that the legend is aligned in a corner position, the layout option will determine whether to place it above/below or on the side of the plot area.",
+                            type: "options",
+                            options: ["left", "center", "right"],
+                            value: chartOptions.legend?.align || "center",
+                            onChange: (align: AlignValue) => updateChartOptions({ legend: { align }})
+                        },
+                        {
+                            name: "Y Align",
+                            description: "The vertical alignment of the legend box. Can be one of top, middle or bottom. Vertical position can be further determined by the y option.\n\nIn the case that the legend is aligned in a corner position, the layout option will determine whether to place it above/below or on the side of the plot area.\n\nWhen the layout option is proximate, the verticalAlign option doesn't apply.",
+                            type: "options",
+                            options: ["top", "middle", "bottom"],
+                            value: chartOptions.legend?.verticalAlign || "bottom",
+                            onChange: (verticalAlign: VerticalAlignValue) => updateChartOptions({ legend: { verticalAlign }})
+                        },
+                        {
+                            name: "X Offset",
+                            type: "number",
+                            value: chartOptions.legend?.x ?? 0,
+                            description: "The x offset of the legend relative to its horizontal alignment align within chart.spacingLeft and chart.spacingRight. Negative x moves it to the left, positive x moves it to the right.",
+                            onChange: (x?: number) => updateChartOptions({ legend: { x: x ?? 0 }})
+                        },
+                        {
+                            name: "Y Offset",
+                            type: "number",
+                            value: chartOptions.legend?.y ?? 0,
+                            description: "The vertical offset of the legend relative to it's vertical alignment verticalAlign within chart.spacingTop and chart.spacingBottom. Negative y moves it up, positive y moves it down.",
+                            onChange: (y: number) => updateChartOptions({ legend: { y: y ?? 0 }})
+                        },
+                        {
+                            name: "Layout",
+                            description: "The layout of the legend items. Can be one of horizontal or vertical or proximate. When proximate, the legend items will be placed as close as possible to the graphs they're representing, except in inverted charts or when the legend position doesn't allow it.",
+                            type: "options",
+                            options: ["horizontal", "vertical"/*, "proximate"*/],
+                            value: chartOptions.legend?.layout || "horizontal",
+                            onChange: (layout: OptionsLayoutValue) => updateChartOptions({ legend: { layout }})
+                        },
+                        {
+                            name: "Align Columns",
+                            description: "If the layout is horizontal and the legend items span over two lines or more, whether to align the items into vertical columns. Setting this to false makes room for more items, but will look more messy.",
+                            type: "boolean",
+                            value: chartOptions.legend?.alignColumns ?? true,
+                            onChange: (alignColumns: boolean) => updateChartOptions({ legend: { alignColumns }})
+                        },
+                        {
+                            name: "Floating",
+                            description: "When the legend is floating, the plot area ignores it and is allowed to be placed below it.",
+                            type: "boolean",
+                            value: chartOptions.legend?.floating ?? false,
+                            onChange: (floating: boolean) => updateChartOptions({ legend: { floating }})
+                        },
+                        {
+                            name: "Width",
+                            type: "length",
+                            value: chartOptions.legend?.width,
+                            units: ["%", "px"],
+                            onChange: (width: string) => updateChartOptions({ legend: { width: width || undefined }})
+                        },
+                        {
+                            name: "Padding",
+                            type: "number",
+                            description: "The inner padding of the legend box.",
+                            value: chartOptions.legend?.padding ?? 8,
+                            onChange: (padding?: number) => updateChartOptions({ legend: { padding }})
+                        },
+                        {
+                            name: "Max Height",
+                            type: "number",
+                            value: chartOptions.legend?.maxHeight,
+                            description: "Maximum pixel height for the legend. When the maximum height is extended, navigation will show.",
+                            onChange: (maxHeight?: number) => updateChartOptions({ legend: { maxHeight }})
+                        },
+                        {
+                            name: "Background Color",
+                            type: "color",
+                            value: chartOptions.legend?.backgroundColor,
+                            description: "The background color of the legend.",
+                            onChange: (backgroundColor?: string) => updateChartOptions({ legend: { backgroundColor }})
+                        },
+                        {
+                            name: "Border Width",
+                            type: "number",
+                            value: chartOptions.legend?.borderWidth,
+                            onChange: (borderWidth: number) => updateChartOptions({ legend: { borderWidth }})
+                        },
+                        {
+                            name: "Border Color",
+                            type: "color",
+                            value: chartOptions.legend?.borderColor ?? "#999999",
+                            onChange: (borderColor?: string) => updateChartOptions({ legend: { borderColor: borderColor || "#999999" }})
+                        },
+                        {
+                            name: "Border Radius",
+                            type: "number",
+                            value: chartOptions.legend?.borderRadius ?? 0,
+                            onChange: (borderRadius?: number) => updateChartOptions({ legend: { borderRadius: borderRadius ?? 0 }})
+                        },
+                        {
+                            name: "Drop Shadow",
+                            type: "shadow",
+                            value: chartOptions.legend?.shadow ?? false,
+                            onChange: (shadow: any) => updateChartOptions({ legend: { shadow: shadow ?? false }})
+                        },
+                        {
+                            name: "Items",
+                            type: "group",
+                            value: [
+                                {
+                                    name: "Distance",
+                                    type: "number",
+                                    value: chartOptions.legend?.itemDistance ?? 20,
+                                    onChange: (itemDistance: number) => updateChartOptions({ legend: { itemDistance }})
+                                },
+                                {
+                                    name: "Margin Top",
+                                    type: "number",
+                                    value: chartOptions.legend?.itemMarginTop ?? 2,
+                                    onChange: (itemMarginTop: number) => updateChartOptions({ legend: { itemMarginTop }})
+                                },
+                                {
+                                    name: "Margin Bottom",
+                                    type: "number",
+                                    value: chartOptions.legend?.itemMarginBottom ?? 2,
+                                    onChange: (itemMarginBottom: number) => updateChartOptions({ legend: { itemMarginBottom }})
+                                },
+                                {
+                                    name: "Format",
+                                    type: "string",
+                                    value: chartOptions.legend?.labelFormat ?? "{name}",
+                                    description: "A format string for each legend label. Available variables relates to properties on the series, or the point in case of pies.",
+                                    onChange: (labelFormat: string) => updateChartOptions({ legend: { labelFormat }})
+                                },
+                            ],
+                        }
+                    ]} />
                 </div>
             </Collapse>
 
@@ -657,7 +624,32 @@ export default function ConfigPanel({
                     }</p>
                 </div>
                 { !isPie && <>
-                    <div className="pt-1 pb-1">
+                    <div className="pt-1">
+                        <label>Stratifier</label>
+                        <ColumnSelector
+                            cols={ cols }
+                            placeholder="Select Column"
+                            addEmptyOption="start"
+                            value={ state.stratifyBy }
+                            disabled={[
+                                "cnt",
+                                "cnt_min",
+                                "cnt_max",
+                                state.groupBy,
+                                state.column2
+                            ].filter(Boolean)}
+                            onChange={ (stratifyBy: string) => onChange({
+                                ...state,
+                                stratifyBy,
+                                denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
+                            }) }
+                        />
+                        <p className="small color-muted">
+                            Stratify the data into multiple series based on the chosen column. For example,
+                            this would produce multiple lines in a line chart.
+                        </p>
+                    </div>
+                    <div className="pt-1">
                         <label>Denominator</label>
                         <Select
                             options={[
@@ -713,77 +705,50 @@ export default function ConfigPanel({
                             value={ state.denominator }
                             onChange={ denominator => onChange({ ...state, denominator })}
                         />
-                    </div>
-                    <div className="tab-panel mt-1">
-                        <span
-                            onClick={() => setTabIndex(0)}
-                            className={"tab" + (tabIndex === 0 ? " active" : "")}
-                            style={{ background: tabIndex === 0 ? "#f8f8f7" : "transparent" }}
-                        >Primary Data</span>
-                        <span
-                            onClick={() => setTabIndex(1)}
-                            className={"tab" + (tabIndex === 1 ? " active" : "")}
-                            style={{ background: tabIndex === 1 ? "#f8f8f7" : "transparent" }}
-                        >Secondary Data</span>
-                    </div>
-
-                    { tabIndex === 0 && !isPie && <>
-                        <div className="pt-1">
-                            <label>Stratifier</label>
-                            <ColumnSelector
-                                cols={ cols }
-                                placeholder="Select Column"
-                                addEmptyOption="start"
-                                value={ state.stratifyBy }
-                                disabled={[
-                                    "cnt",
-                                    "cnt_min",
-                                    "cnt_max",
-                                    state.groupBy,
-                                    state.column2
-                                ].filter(Boolean)}
-                                onChange={ (stratifyBy: string) => onChange({
-                                    ...state,
-                                    stratifyBy,
-                                    denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
-                                }) }
-                            />
-                            <p className="small color-muted">
-                                Stratify the data into multiple series based on the chosen column. For example,
-                                this would produce multiple lines in a line chart.
-                            </p>
-                        </div>
-                    </> }
-
-                    { tabIndex === 1 && <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onChange} /> }
-                </> }
-
-                { tabIndex === 0 && <>
-                    <div className="pt-1">
-                        <b>Colors</b>
-                        <div>
-                            <ColorPresetEditor state={state} onChange={onChange} type={ isPie ? "only" : "primary" } />
-                        </div>
-                    </div>
-                    <div className="pt-1">
-                        <b>Opacity</b>
-                        <PrimaryDataOpacityEditor state={state} onChange={onChange} />
                         <p className="small color-muted">
-                            Using semitransparent colors might slightly improve readability in case
-                            of overlapping lines or shapes
+                            If set, renders the values as percentages of the given denominator
                         </p>
                     </div>
+                    { state.ranges && <div className="pt-1">
+                        <label>Confidence Intervals</label>
+                        <Select value={ state.ranges?.type || "" } options={[
+                            {
+                                value: "",
+                                icon : "fa-solid fa-plus-minus color-muted",
+                                label: "None"
+                            },
+                            {
+                                label: "Error Bars",
+                                value: "errorbar",
+                                icon : "fa-solid fa-plus-minus color-blue"
+                            },
+                            {
+                                label: "Area",
+                                value: "areasplinerange",
+                                icon : "fa-solid fa-plus-minus color-blue"
+                            },
+                            {
+                                label: "Bars / Columns",
+                                value: "column",
+                                icon : "fa-solid fa-plus-minus color-blue"
+                            },
+                        ]} onChange={type => onChange({ ...state, ranges: { type, enabled: !!type }})} />
+                        <p className="small color-muted">
+                            If information is available, add the error ranges to the chart
+                        </p>
+                    </div> }
+
+                    <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onChange} />
                 </> }
+
+                { isPie && <div className="pt-1">
+                    <SliceEditor state={state} onChange={onChange} />
+                </div> }
+
                 <br />
             </Collapse>
 
-            { state.ranges && (
-                <Collapse collapsed header="Confidence Intervals">
-                    <div className="pb-1">
-                        <RangesEditor ranges={state.ranges} onChange={ranges => onChange({ ...state, ranges })}/>    
-                    </div>
-                </Collapse>
-            )}
+            { !isPie && <SeriesEditor state={state} onChange={onChange} /> }
 
             <Collapse collapsed header="Filters">
                 <div className="pt-1 pb-1">
@@ -935,62 +900,9 @@ export default function ConfigPanel({
     )
 }
 
-function RangesEditor({
-    ranges,
-    onChange
-}: {
-    ranges: app.RangeOptions,
-    onChange: (ranges: any) => void
-}) {
-    const props = [
-        {
-            name: "Enabled",
-            type: "boolean",
-            value: !!ranges.enabled,
-            onChange: (enabled: boolean) => onChange({ enabled })
-        },
-        {
-            name: "Type",
-            type: "options",
-            value: ranges.type || "errorbar",
-            options: [
-                { value: "areasplinerange", label: "Area" },
-                { value: "errorbar", label: "Error Bars" },
-                { value: "column", label: "Columns" }
-            ],
-            onChange: (type: app.RangeOptions["type"]) => onChange({ type })
-        },
-        {
-            name: "Opacity",
-            type: "number",
-            min: 0,
-            max: 1,
-            step: 0.01,
-            value: ranges.opacity ?? 0.75,
-            onChange: (opacity: number) => onChange({ opacity })
-        },
-        {
-            name : "Z Index",
-            type : "number",
-            value: ranges.zIndex ?? -1,
-            onChange: (zIndex: number) => onChange({ zIndex })
-        },
-    ];
 
-    if (ranges.type === "column") {
-        props.push(...columnRangesEditor(ranges as app.ColumnRangeOptions, onChange) as any)
-    }
-    else if (ranges.type === "areasplinerange") {
-        props.push(...areaRangesEditor(ranges as app.AreaRangeOptions, onChange) as any)
-    }
-    else {
-        props.push(...errorbarRangesEditor({ ...ranges, type: "errorbar" } as app.ErrorRangeOptions, onChange) as any)
-    }
 
-    return <PropertyGrid props={props} />
-}
-
-function columnRangesEditor(ranges: app.ColumnRangeOptions, onChange: (ranges: Partial<app.ColumnRangeOptions>) => void) {
+function getColumnOptions(options: SeriesColumnOptions, onChange: (options: Partial<SeriesColumnOptions>) => void) {
     return [
         {
             name: "Border Width",
@@ -998,40 +910,47 @@ function columnRangesEditor(ranges: app.ColumnRangeOptions, onChange: (ranges: P
             min: 0,
             max: 10,
             step: 0.1,
-            value: ranges.borderWidth,
-            onChange: (borderWidth?: number) => onChange({ borderWidth })
+            value: options.borderWidth,
+            onChange: (borderWidth?: number) => onChange({ borderWidth, edgeWidth: borderWidth })
         },
         {
             name: "Border Color",
             type: "color",
-            value: ranges.borderColor,
-            onChange: (borderColor: string) => onChange({ borderColor })
+            value: options.borderColor,
+            onChange: (borderColor: string) => onChange({ borderColor, edgeColor: borderColor })
         },
         {
             name : "Border Radius",
             type : "number",
             min: 0,
             max: 50,
-            value: ranges.borderRadius ?? 0,
+            value: options.borderRadius ?? 0,
             onChange: (borderRadius: number) => onChange({ borderRadius })
         },
         {
             name: "Center",
             type: "boolean",
-            value: !!ranges.centerInCategory,
+            value: !!options.centerInCategory,
             onChange: (centerInCategory: boolean) => onChange({ centerInCategory }),
             description: "In case of stratified data center multiple columns on the same axis and allow them to overlap each other."
         },
         {
             name : "Width",
             type : "number",
-            value: ranges.pointWidth,
+            min  : 0,
+            value: options.pointWidth,
             onChange: (pointWidth: number) => onChange({ pointWidth })
+        },
+        {
+            name: "Shadow",
+            type: "shadow",
+            value: options.shadow || false,
+            onChange: (shadow: any) => onChange({ shadow })
         }
     ]
 }
 
-function errorbarRangesEditor(ranges: app.ErrorRangeOptions, onChange: (ranges: Partial<app.ErrorRangeOptions>) => void) {
+function getErrorbarOptions(options: SeriesErrorbarOptions, onChange: (options: Partial<SeriesErrorbarOptions>) => void) {
     return [
         {
             name: "Line Width",
@@ -1039,7 +958,7 @@ function errorbarRangesEditor(ranges: app.ErrorRangeOptions, onChange: (ranges: 
             min: 0,
             max: 50,
             step: 0.1,
-            value: ranges.lineWidth ?? 1,
+            value: options.lineWidth ?? 1,
             onChange: (lineWidth: number) => onChange({ lineWidth })
         },
         {
@@ -1049,9 +968,11 @@ function errorbarRangesEditor(ranges: app.ErrorRangeOptions, onChange: (ranges: 
                 "It can be a numerical pixel value, or a percentage value of the box width. Set 0 to disable whiskers.",
             min: 0,
             max: 100,
-            units: ["%", "px"],
-            value: ranges.whiskerLength ?? "80%",
-            onChange: (whiskerLength: string) => onChange({ whiskerLength })
+            units: ["px", "%"],
+            value: options.whiskerLength ?? "80%",
+            onChange: (whiskerLength: string) => {
+                onChange({ whiskerLength: whiskerLength.endsWith("px") ? parseFloat(whiskerLength) : whiskerLength ?? "80%" })
+            }
         },
         {
             name : "Whisker Width",
@@ -1060,7 +981,7 @@ function errorbarRangesEditor(ranges: app.ErrorRangeOptions, onChange: (ranges: 
             min: 0,
             max: 20,
             step: 0.1,
-            value: ranges.whiskerWidth ?? 2,
+            value: options.whiskerWidth ?? 2,
             onChange: (whiskerWidth: number) => onChange({ whiskerWidth })
         },
         {
@@ -1069,7 +990,7 @@ function errorbarRangesEditor(ranges: app.ErrorRangeOptions, onChange: (ranges: 
             options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
             'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
             'LongDashDot', 'LongDashDotDot'],
-            value: ranges.whiskerDashStyle ?? "Solid",
+            value: options.whiskerDashStyle ?? "Solid",
             onChange: (whiskerDashStyle: DashStyleValue) => onChange({ whiskerDashStyle })
         },
         {
@@ -1078,13 +999,13 @@ function errorbarRangesEditor(ranges: app.ErrorRangeOptions, onChange: (ranges: 
             options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
             'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
             'LongDashDot', 'LongDashDotDot'],
-            value: ranges.stemDashStyle ?? "Dash",
+            value: options.stemDashStyle ?? "Dash",
             onChange: (stemDashStyle: DashStyleValue) => onChange({ stemDashStyle })
         }
     ]
 }
 
-function areaRangesEditor(ranges: app.AreaRangeOptions, onChange: (ranges: Partial<app.AreaRangeOptions>) => void) {
+function getAreaOptions(options: SeriesAreasplineOptions | SeriesAreasplinerangeOptions, onChange: (options: Partial<SeriesAreasplineOptions | SeriesAreasplinerangeOptions>) => void) {
     return [
         {
             name: "Line Width",
@@ -1092,7 +1013,7 @@ function areaRangesEditor(ranges: app.AreaRangeOptions, onChange: (ranges: Parti
             min: 0,
             max: 50,
             step: 0.1,
-            value: ranges.lineWidth ?? 1,
+            value: options.lineWidth ?? 1,
             onChange: (lineWidth: number) => onChange({ lineWidth })
         },
         {
@@ -1101,7 +1022,7 @@ function areaRangesEditor(ranges: app.AreaRangeOptions, onChange: (ranges: Parti
             min: 0,
             max: 1,
             step: 0.01,
-            value: ranges.fillOpacity ?? 0.5,
+            value: options.fillOpacity ?? 1,
             onChange: (fillOpacity: number) => onChange({ fillOpacity })
         },
         {
@@ -1110,8 +1031,43 @@ function areaRangesEditor(ranges: app.AreaRangeOptions, onChange: (ranges: Parti
             options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
             'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
             'LongDashDot', 'LongDashDotDot'],
-            value: ranges.dashStyle ?? "Solid",
+            value: options.dashStyle ?? "Solid",
             onChange: (dashStyle: DashStyleValue) => onChange({ dashStyle })
+        },
+        {
+            name: "Shadow",
+            type: "shadow",
+            value: options.shadow || false,
+            onChange: (shadow: any) => onChange({ shadow })
+        }
+    ]
+}
+
+function getSplineOptions(options: SeriesSplineOptions, onChange: (options: Partial<SeriesSplineOptions>) => void) {
+    return [
+        {
+            name : "Line Width",
+            type : "number",
+            value: options.lineWidth ?? 1.5,
+            max  : 10,
+            min  : 0,
+            step : 0.1,
+            onChange: (lineWidth: number) => onChange({ lineWidth })
+        },
+        {
+            name: "Dash Style",
+            type: "options",
+            options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+            'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+            'LongDashDot', 'LongDashDotDot'],
+            value: options.dashStyle ?? "Solid",
+            onChange: (dashStyle: DashStyleValue) => onChange({ dashStyle })
+        },
+        {
+            name: "Shadow",
+            type: "shadow",
+            value: options.shadow || false,
+            onChange: (shadow: any) => onChange({ shadow })
         }
     ]
 }
@@ -1264,94 +1220,202 @@ function AdvancedAxisEditor({
     )
 }
 
-function ColorPresetEditor({
+function SeriesEditor({
     state,
     onChange,
-    type
 }: {
     state: ChartConfigPanelState,
-    type?: "primary" | "secondary" | "only",
     onChange: (state: ChartConfigPanelState) => void
 }) {
-    let colors = state.chartOptions.colors;
-    if (!colors) {
-        return null
-    }
-    return <>{ colors.map((c, i) => {
-        
-        if (type === "only") {
-            // @ts-ignore
-            if (i > state.chartOptions.series![0].data.length) {
-                return null    
+
+    const props = (state.chartOptions.series || []).map((s, i) => {
+
+        // Inherit defaults for the current chart type
+        s = merge(state.chartOptions.plotOptions?.[s.type] || {}, s) as SeriesOptionsType
+
+        // @ts-ignore
+        const color = s.color?.pattern?.color || s.color?.stops?.[0]?.[1] || s.color || DEFAULT_COLORS[i % DEFAULT_COLORS.length]
+
+        const props = [
+            {
+                name: "Visible",
+                type: "boolean",
+                value: s.visible !== false,
+                onChange: (visible: boolean) => {
+                    const next = merge(state)
+                    next.chartOptions.series![i].visible = visible;
+                    onChange(next)
+                }
+            },
+            {
+                name: "Name",
+                type: "string",
+                value: s.name,
+                onChange: (name: string) => {
+                    const next = merge(state)
+                    next.chartOptions.series![i].name = name;
+                    onChange(next)
+                }
+            },
+            // {
+            //     name: "Type",
+            //     type: "options",
+            //     options: [
+            //         'line', 'spline', 'area', 'areaspline', 'arearange',
+            //         'areasplinerange', 'bar', 'bubble', 'column',
+            //         'columnpyramid', 'pie', 'scatter'
+            //     ],
+            //     value: s.type,
+            //     onChange: (type: any) => {
+            //         const next = merge(state)
+            //         next.chartOptions.series![i].type = type;
+            //         onChange(next)
+            //     }
+            // },
+            {
+                name: "Color",
+                type: "color",
+                value: color,
+                onChange: (color: string) => {
+                    state.chartOptions.colors![i] = color
+                    onChange(state)
+                }
+            },
+            {
+                name: "Opacity",
+                type: "number",
+                value: s.opacity ?? 1,
+                max: 1,
+                step: 0.01,
+                onChange: (opacity: number) => {
+                    const next = merge(state)
+                    next.chartOptions.series![i].opacity = opacity;
+                    onChange(next)
+                }
+            },
+            {
+                name : "Z Index",
+                type : "number",
+                value: s.zIndex ?? 0,
+                onChange: (zIndex: number) => {
+                    const next = merge(state)
+                    next.chartOptions.series![i].zIndex = zIndex;
+                    onChange(next)
+                }
+            },
+            {
+                name : "Show in Legend",
+                type : "boolean",
+                value: s.showInLegend !== false,
+                onChange: (showInLegend: boolean) => {
+                    const next = merge(state)
+                    next.chartOptions.series![i].showInLegend = showInLegend;
+                    onChange(next)
+                }
             }
+        ]
+
+        if (s.type === "spline") {
+            props.push(...getSplineOptions(s as SeriesSplineOptions, options => {
+                const next = merge(state)
+                next.chartOptions.series![i] = merge(next.chartOptions.series![i], options);
+                onChange(next)
+            }) as any)
+        }
+        else if (s.type === "areasplinerange" || s.type === "areaspline") {
+            props.push(...getAreaOptions(s as SeriesAreasplinerangeOptions, options => {
+                const next = merge(state)
+                // @ts-ignore
+                next.chartOptions.series![i] = merge(next.chartOptions.series![i], options);
+                onChange(next)
+            }) as any)
+        }
+        else if (s.type === "column" || s.type === "bar") {
+            props.push(...getColumnOptions(s as SeriesColumnOptions, options => {
+                const next = merge(state)
+                // @ts-ignore
+                next.chartOptions.series![i] = merge(next.chartOptions.series![i], options);
+                onChange(next)
+            }) as any)
+        }
+        else if (s.type === "errorbar") {
+            props.push(...getErrorbarOptions(s as SeriesErrorbarOptions, options => {
+                const next = merge(state)
+                // @ts-ignore
+                next.chartOptions.series![i] = merge(next.chartOptions.series![i], options);
+                onChange(next)
+            }) as any)
         }
 
-        else if (type && !state.chartOptions.series?.[i]?.id?.startsWith(type + "-")) {
-            return null
+        return {
+            name: <>
+                <b style={{
+                    background: s.visible !== false ? color : "#DDD",
+                    width     : "0.9em",
+                    height    : "0.9em",
+                    display   : "inline-block",
+                    boxShadow : "0 0 1px #FFF, 0 1px 1px #FFF8 inset",
+                    border    : s.visible !== false ? "1px solid #000" : "1px solid #BBB",
+                    borderRadius: "20%",
+                }}/>
+                <span style={{ color: s.visible !== false ? "#369" : "#AAA" }}> { String(s.name ?? "") || "Series " + (i + 1)}</span>
+            </>,
+            type: "group",
+            value: props
         }
-        
-        return <input
-            type="color"
-            key={i}
-            value={String(c || "#DDDDDD")}
-            onChange={e => {
-                state.chartOptions.colors![i] = e.target.value
-                onChange(state)
-            }}
-        />
-    }) }</>
-}
+    })
 
-function PrimaryDataOpacityEditor({ state, onChange }: { state: ChartConfigPanelState, onChange: (state: ChartConfigPanelState) => void }) {
-    return <OpacityEditor
-        value={state.chartOptions.series?.find(s => s.id?.startsWith("primary-"))?.opacity ?? 1}
-        onChange={opacity => {
-            onChange({
-                ...state,
-                chartOptions: {
-                    // @ts-ignore
-                    series: state.chartOptions.series!.map(s => {
-                        if (s.id!.startsWith("primary-")) {
-                            return { ...s, opacity }
-                        }
-                        return s
-                    })
-                }
-            })
-        }}
-    />
-}
-
-function SecondaryDataOpacityEditor({ state, onChange }: { state: ChartConfigPanelState, onChange: (state: ChartConfigPanelState) => void }) {
-    return <OpacityEditor
-        value={state.chartOptions.series?.find(s => s.id?.startsWith("secondary-"))?.opacity ?? 1}
-        onChange={opacity => {
-            onChange({
-                ...state,
-                chartOptions: {
-                    // @ts-ignore
-                    series: state.chartOptions.series!.map(s => {
-                        if (s.id!.startsWith("secondary-")) {
-                            return { ...s, opacity }
-                        }
-                        return s
-                    })
-                }
-            })
-        }}
-    />
-}
-
-function OpacityEditor({ value, onChange }: { value: number, onChange: (value: number) => void}) {
     return (
-        <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.01}
-            value={value}
-            onChange={e => onChange(e.target.valueAsNumber)}
-            style={{ width: "100%", margin: 0 }}
-        />
+        <Collapse collapsed header="Series">
+            <PropertyGrid props={props as any} />
+            <br/>
+        </Collapse>
+    )
+}
+
+function SliceEditor({
+    state,
+    onChange
+}: {
+    state: ChartConfigPanelState,
+    onChange: (state: ChartConfigPanelState) => void
+}) {
+    const S = state.chartOptions.series?.[0] || {} as SeriesPieOptions
+
+    // @ts-ignore
+    const props = (S.data || []).map((point, i) => ({
+        name: String(point.name ?? "") || "Series " + (i + 1),
+        type: "color",
+        value: state.chartOptions.colors![i] || DEFAULT_COLORS[i % DEFAULT_COLORS.length],
+        onChange: (color: string) => {
+            state.chartOptions.colors![i] = color
+            onChange(state)
+        }
+    }));
+
+    return (
+        <div>
+            <div>
+                <span className="pull-right no-bold">{S.opacity??""}</span>
+                <label>Opacity</label>
+            </div>
+            <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={S.opacity}
+                onChange={e => {
+                    state.chartOptions.series![0].opacity = e.target.valueAsNumber
+                    onChange(state)
+                }}
+                style={{ width: "100%", margin: 0 }}
+            />
+            <br/>
+            <br/>
+            <Collapse header="Slice Colors">
+                <PropertyGrid props={props} />
+            </Collapse>
+        </div>
     )
 }

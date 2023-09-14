@@ -262,48 +262,10 @@ export declare module app {
         point: AnnotationPoint
     }
 
-    interface AreaRangeOptions {
+    type RangeOptions = {
+        type?: "errorbar" | "areasplinerange" | "column" | ""
         enabled?: boolean
-        type?: "areasplinerange"
-        allowPointSelect?: boolean
-        lineWidth?: number
-        dashStyle?: DashStyleValue
-        crisp?: boolean
-        opacity?: number
-        legendSymbol?: string
-        zIndex?: number
-        fillOpacity?: number
     }
-
-    interface ErrorRangeOptions {
-        enabled?: boolean
-        type?: "errorbar"
-        allowPointSelect?: boolean
-        lineWidth?: number
-        crisp?: boolean
-        opacity?: number
-        legendSymbol?: string
-        zIndex?: number
-        whiskerLength?: string
-        whiskerWidth?: number
-        whiskerDashStyle?: DashStyleValue
-        stemDashStyle?: DashStyleValue
-    }
-
-    interface ColumnRangeOptions {
-        enabled         ?: boolean
-        type            ?: "column"
-        allowPointSelect?: boolean
-        opacity         ?: number
-        zIndex          ?: number
-        borderWidth     ?: number
-        borderColor     ?:  string
-        borderRadius    ?: number
-        centerInCategory?: boolean
-        pointWidth      ?: number
-    }
-
-    type RangeOptions = AreaRangeOptions | ErrorRangeOptions | ColumnRangeOptions
 
     interface AnnotationPoint {
 
