@@ -4,7 +4,7 @@
     $selection-bg: $color-blue;
     $selection-bg-dark: mix($selection-bg, #000, 75%);
     
-    grid: auto-flow / auto auto;
+    grid: auto-flow / minmax(min-content, 50%) auto;
     display: grid;
     gap: 1px;
     background: #0001;
@@ -32,16 +32,24 @@
         font-weight      : 500;
         
         &.group-heading {
+            background     : $color-grey-light;
             grid-column-end: 3;
-            border-bottom  : 1;
-            background     : linear-gradient(#DDD, #EEE);
-            background     : lighten($color: $color-blue, $amount: 36%);
-            padding        : 1px 4px;
-            box-shadow     : 0 1px 0 0 #DDD, 0 -1px 0 0 #DDD;
-            text-shadow    : 0 1px 0 #FFF;
+            cursor         : pointer;
             display        : block;
             color          : $selection-bg-dark;
-            cursor         : pointer;
+            padding        : 1px 4px;
+            &.level-0 {
+                border-bottom  : 1;
+                // background     : linear-gradient(#DDD, #EEE);
+                // background     : lighten($color: $color-blue, $amount: 36%);
+                background     : #eee;
+                box-shadow     : 0 1px 0 0 #DDD, 0 -1px 0 0 #DDD;
+                text-shadow    : 0 1px 0 #FFF;
+            }
+
+            // &.level-1 {
+            //     background       : $color-grey-light;
+            // }
 
             b {
                 font-size: 90%;

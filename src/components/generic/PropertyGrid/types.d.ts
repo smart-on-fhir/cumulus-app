@@ -19,7 +19,7 @@ export interface EditableNumberProperty extends EditableProperty {
 }
 
 export interface EditableGroupProperty {
-    name: string
+    name: string | JSX.Element
     type: "group"
     value: EditableProperty[]
 }
