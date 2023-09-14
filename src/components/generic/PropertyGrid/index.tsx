@@ -51,32 +51,34 @@ export default function PropertyGrid({
 export function PropertyEditorGroup({
     props,
     name,
-    level = 0
+    level = 0,
+    open = false
 }: {
     props: EditableProperty[]
     name: string | JSX.Element,
-    level?: number 
+    level?: number
+    open?: boolean
 }) {
-    const [open, setOpen] = useState(false)
+    const [_open, setOpen] = useState(open)
 
     return (
         <div className="property-grid">
             <b
-                className={ "prop-label group-heading" + (open ? " open" : "") + " level-" + level }
-                onClick={() => setOpen(!open)}
+                className={ "prop-label group-heading" + (_open ? " open" : "") + " level-" + level }
+                onClick={() => setOpen(!_open)}
                 onKeyDown={e => {
                     if (e.key === " " || e.key === "Enter") {
                         e.preventDefault();
-                        setOpen(!open)
+                        setOpen(!_open)
                     }
                 }}
-                title={ "Click to " + (open ? "collapse" : "expand") }
+                title={ "Click to " + (_open ? "collapse" : "expand") }
                 tabIndex={0}
             >
-                <i className={ "fa-solid " + (open ? "fa-caret-down" : "fa-caret-right") } />
+                <i className={ "fa-solid " + (_open ? "fa-caret-down" : "fa-caret-right") } />
                 { name }
             </b>
-            { open ? <>
+            { _open ? <>
                 { props.map((prop, i) => {
                     if (prop.type === "shadow") {
                         return <ShadowEditor
@@ -89,7 +91,9 @@ export function PropertyEditorGroup({
                         />
                     }
                     return <Fragment key={i + "xx"}>
-                        <div className="prop-label" title={ prop.description } style={{ paddingLeft: "1.3em" }}>{ prop.name }</div>
+                        <div className="prop-label" title={ prop.description } style={{ paddingLeft: "1.3em" }}>
+                            <span className="nowrap">{ prop.name }</span>
+                        </div>
                         <div className="prop-editor"><PropertyEditor prop={prop as EditableProperty} /></div>
                     </Fragment>
                 }) }
@@ -102,7 +106,7 @@ function propertyGridRows(props: (EditableProperty | EditableGroupProperty)[], l
     return props.map((prop, i) => {
 
         if (prop.type === "group") {
-            return (<PropertyEditorGroup props={ prop.value } key={ i } name={ prop.name } />)
+            return (<PropertyEditorGroup props={ prop.value } key={ i } name={ prop.name } open={ !!prop.open } />)
         }
 
         prop = prop as EditableProperty
