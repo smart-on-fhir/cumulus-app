@@ -169,50 +169,39 @@ function getSeries({
     ranges          : app.RangeOptions
 }): SeriesOptions[]
 {
-    const is3d = !!serverOptions.chart?.options3d?.enabled
-
     let series: SeriesOptions[] = []
 
     function addSeries(options: any, secondary = false) {
         
-        // The ID of this series
-        const id = options?.id || (secondary ? "secondary-" : "primary-") + options.name
-
-        const S = serverOptions.series?.find((s: any) => s.id === id)
-
-        // Should the series be hidden?
-        const visible = S?.visible !== false
-
+        const S = serverOptions.series?.find((s: any) => s.id === options.id)
         const colors: string[] = serverOptions.colors!
 
         const color = colors[series.length % colors.length]
 
         const cfg: any = {
             index: series.length,
-            // colorIndex: series.length % colors.length,
-            opacity: S?.opacity,
             color,
-            visible,
-            // @ts-ignore
-            showInLegend: visible ? true : !serverOptions.legend?._readonly,
-            id
+            id: options.id
         }
 
-        if (options.type === "areaspline") {
+        if (type.includes("pie")) {
+            cfg.shadow = false
+        }
+
+        if (type.includes("area") && S?.visible !== false) {
             cfg.fillColor = {
                 linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                 stops: [
-                    [0, new Color(color).setOpacity(0.2 ).get('rgba') + ""],
-                    [1, new Color(color).setOpacity(0.05).get('rgba') + ""]
+                    // @ts-ignore
+                    [0, new Color(color).setOpacity((S?.fillOpacity ?? 1) * 1.0).get('rgba') + ""],
+                    // @ts-ignore
+                    [1, new Color(color).setOpacity((S?.fillOpacity ?? 1) * 0.2).get('rgba') + ""]
                 ]
             }
         }
 
         if (secondary) {
-            cfg.zIndex = -1
-            cfg.shadow = false
-
-            if (options.type.includes("column")) {
+            if (options.type?.includes("column") && S?.visible !== false) {
                 cfg.color = {
                     linearGradient: { x1: 1, y1: 0, x2: 0, y2: 1 },
                     stops: [
@@ -238,17 +227,10 @@ function getSeries({
             //     }
             // }
 
-            if (column2type!.includes("columnStack")) {
-                cfg.stacking = "normal"
-            }
-
-            if (options.type.includes("line")) {
-                cfg.dashStyle = "ShortDash"
-                cfg.lineWidth = 1.35
-            }
+            cfg.stacking = column2type!.includes("columnStack") ? "normal" : undefined
         }
 
-        series.push({ ...cfg, ...options });
+        series.push({ ...S, ...cfg, ...options });
     }
 
     function stratify(data: app.ServerResponses.StratifiedDataResponse, secondary = false) {
@@ -277,45 +259,35 @@ function getSeries({
         }
         
         data.data.forEach(group => {
+            const id  = (secondary ? "secondary-" : "primary-") + group.stratifier
+            const old = serverOptions.series?.find(s => s.id === id)
             addSeries({
                 type: _type,
-                name: group.stratifier,
+                id,
+                name: old?.name || group.stratifier,
                 data: keys.map(key => {
                     const row = group.rows.find(row => row[0] === key)
                     return row ?
                         getPoint({ row, xType, denominator: getDenominator(data, denominator, row, denominatorCache) }) :
-                        (type === "column" || type === "bar") && data.data.length > 1 ?
-                            getPoint({ row: [key, 0], xType, denominator: 100 }) :
+                        // (type === "column" || type === "bar") && data.data.length > 1 ?
+                        //     getPoint({ row: [key, 0], xType, denominator: 100 }) :
                             null
                 }).filter(Boolean)
             }, secondary)
 
             if (ranges?.enabled) {
+                const id  = (secondary ? "secondary-" : "primary-") + group.stratifier + " (range)"
+                const old = serverOptions.series?.find(s => s.id === id)
                 addSeries({
                     type: ranges.type ?? "errorbar",
-                    opacity: ranges.opacity ?? 0.75,
-                    zIndex: ranges.zIndex ?? -1,
-                    // @ts-ignore
-                    borderWidth: is3d ? 0 : ranges.borderWidth,
-                    // @ts-ignore
-                    borderColor: is3d ? undefined : ranges.borderColor,
-                    // @ts-ignore
-                    borderRadius: ranges.borderRadius ?? 0,
-                    // @ts-ignore
-                    edgeColor: is3d ? ranges.borderColor : undefined,
-                    // @ts-ignore
-                    edgeWidth: is3d ? ranges.borderWidth : 0,
-                    // @ts-ignore
-                    centerInCategory: ranges.centerInCategory,
-                    // @ts-ignore
-                    pointWidth: ranges.pointWidth,
-                    name: group.stratifier + " (range)",
+                    name: old?.name || group.stratifier + " (range)",
+                    id  : (secondary ? "secondary-" : "primary-") + group.stratifier + " (range)",
                     data: keys.map(key => {
                         const row = group.rows.find(row => row[0] === key)
                         return row ?
                             getPoint({ row, xType, denominator: getDenominator(data, denominator, row, denominatorCache), isErrorRange: true,  }) :
-                            (type === "column" || type === "bar") && data.data.length > 1 ?
-                                getPoint({ row: [key, 0], xType, denominator: 100, isErrorRange: true }) :
+                            // (type === "column" || type === "bar") && data.data.length > 1 ?
+                            //     getPoint({ row: [key, 0], xType, denominator: 100, isErrorRange: true }) :
                                 null
                     }).filter(Boolean)
                 });
@@ -326,9 +298,12 @@ function getSeries({
     if (data.rowCount) {
         if (!data.stratifier) {
             const denominatorCache = {}
+            const id  = "primary-" + (column.label || column.name)
+            const old = serverOptions.series?.find(s => s.id === id)
             addSeries({
                 type,
-                name: column.label || column.name,
+                id,
+                name: old?.name || column.label || column.name,
                 data: data.data[0].rows.map(row => getPoint({
                     row,
                     xType,
@@ -337,25 +312,12 @@ function getSeries({
             });
 
             if (ranges?.enabled) {
+                const id  = "primary-" + (column.label || column.name) + " (range)"
+                const old = serverOptions.series?.find(s => s.id === id)
                 addSeries({
                     type: ranges.type ?? "errorbar",
-                    opacity: ranges.opacity ?? 0.75,
-                    name: (column.label || column.name) + " (range)",
-                    zIndex: ranges.zIndex ?? -1,
-                    // @ts-ignore
-                    borderWidth: is3d ? 0 : ranges.borderWidth,
-                    // @ts-ignore
-                    borderColor: is3d ? undefined : ranges.borderColor,
-                    // @ts-ignore
-                    borderRadius: ranges.borderRadius ?? 0,
-                    // @ts-ignore
-                    edgeColor: is3d ? ranges.borderColor : undefined,
-                    // @ts-ignore
-                    edgeWidth: is3d ? ranges.borderWidth : 0,
-                    // @ts-ignore
-                    centerInCategory: ranges.centerInCategory,
-                    // @ts-ignore
-                    pointWidth: ranges.pointWidth,
+                    id,
+                    name: old?.name || (column.label || column.name) + " (range)",
                     data: data.data[0].rows.map(row => getPoint({
                         row,
                         xType,
@@ -430,7 +392,6 @@ export function buildChartOptions({
         },
         yAxis: {
             allowDecimals: denominator ? true : false,
-            // max: denominator === "local" ? 100 : undefined,
             labels: {
                 format: denominator ? "{text}%" : "{text}",
             }
@@ -443,19 +404,17 @@ export function buildChartOptions({
                 events: {
                     legendItemClick(e) {
                         e.preventDefault()
-                        // @ts-ignore
-                        if (options.legend?._readonly) {
-                            return false
-                        }
                         const visMap: Record<string, boolean> = {};
                         e.target.chart.series.forEach((s: Series) => visMap[s.userOptions.id!] = s === e.target ? !s.visible : s.visible)
                         onSeriesToggle(visMap)
                     }
                 },
                 dataSorting: {
-                    enabled: xType === "category",
+                    enabled: xType !== "datetime",
                     matchByName: false,
-                    sortKey: "index"
+                    // sortKey: "name,x"
+                    // sortKey: "name,x"
+                    sortKey: "name,x"
                 },
                 states: {
                     hover: {
@@ -477,31 +436,10 @@ export function buildChartOptions({
                 },
                 shadow: false
             },
-            spline: {
-                shadow: data2 ? { width: 2, opacity: 0.2, offsetY: 1 } : false
-            },
-            areaspline: {
-                shadow: data2 ? {
-                    width  : 2,
-                    offsetY: 1,
-                    offsetX: 0,
-                    opacity: 0.2,
-                } : false
-            },
             areasplinerange: {
-                // @ts-ignore
-                lineWidth: ranges?.lineWidth ?? 1,
-                dashStyle: (ranges as app.AreaRangeOptions)?.dashStyle,
-                fillOpacity: (ranges as app.AreaRangeOptions)?.fillOpacity ?? 0.5,
                 linkedTo: ':previous',
                 marker: {
                     enabled: false,
-                //     radius: 6,
-                //     states: {
-                //         hover: {
-                //             enabled: true
-                //         }
-                //     }
                 },
                 states: {
                     hover: {
@@ -510,13 +448,6 @@ export function buildChartOptions({
                 }
             },
             errorbar: {
-                // @ts-ignore
-                lineWidth: ranges?.lineWidth ?? 1,
-                stemDashStyle: (ranges as app.ErrorRangeOptions)?.stemDashStyle ?? "Dash",
-                whiskerWidth: (ranges as app.ErrorRangeOptions)?.whiskerWidth ?? 2,
-                whiskerDashStyle: (ranges as app.ErrorRangeOptions)?.whiskerDashStyle ?? "Solid",
-                // @ts-ignore
-                whiskerLength: String(ranges?.whiskerLength || "").endsWith("px") ? parseFloat(ranges?.whiskerLength) : ranges?.whiskerLength ?? "80%",
                 linkedTo: ':previous'
             }
         },
@@ -537,26 +468,34 @@ export function buildChartOptions({
                 // Bullet ------------------------------------------------------
                 rows.push(`<tr><td colspan="2"><b style="color:${
                     // @ts-ignore
-                    this.point.color?.pattern?.color || this.point.series.color?.stops?.[0]?.[1] || this.point.color || DEFAULT_COLORS[this.point.series.index % DEFAULT_COLORS.length]
+                    this.point.color?.pattern?.color || this.point.series?.color?.stops?.[0]?.[1] || this.point.color || DEFAULT_COLORS[this.point.series.index % DEFAULT_COLORS.length]
                 };-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
                 
                 // Header ------------------------------------------------------
                 if (groupBy) {
-                    rows.push(`<b>${this.point.series.name}</b><hr/></td></tr>`)
+                    // rows.push(`<tr><td style="text-align:right">X:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
+                    rows.push(`<b>${groupBy.label || groupBy.name}: ${this.point.series.name}</b><hr/></td></tr>`)
                 } else {
-                    rows.push(`<b>${x}</b><hr/></td></tr>`)
+                    rows.push(`<b>${this.point.series.name}: Count</b><hr/></td></tr>`)
                 }
+                //     rows.push(`<b>${x}</b><hr/></td></tr>`)
+                // } else {
+                //     rows.push(`<b>${x}</b><hr/></td></tr>`)
+                //     // rows.push(`<b>${this.point.series.name}</b><hr/></td></tr>`)
+                // }
+
+                // rows.push(`<tr><td>${this.point.series.name}</td><td>${groupBy}</td></tr>`)
 
                 // Group -------------------------------------------------------
-                if (groupBy) {
+                // if (groupBy) {
                     rows.push(`<tr><td style="text-align:right">${column.label || column.name}:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
-                }
+                // }
 
                 // Value -------------------------------------------------------
                 // @ts-ignore
                 if (!this.point.custom?.isErrorRange) {
                     rows.push(
-                        `<tr><td style="text-align:right">${denominator ? "Computed Value:" : "Count:"}</td>`,
+                        `<tr><td style="text-align:right">Count:</td>`,
                         `<td style="width: 100%"><b>${
                             denominator ?
                                 // @ts-ignore

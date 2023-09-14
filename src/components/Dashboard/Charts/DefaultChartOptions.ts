@@ -114,7 +114,7 @@ const DefaultChartOptions = {
         // minPadding: 0,
         endOnTick: false,
         gridLineWidth: 1,
-        gridLineColor: "#DDDDDD", // "rgba(0, 0, 0, 0.1)",
+        gridLineColor: "#DDDDDD",
         tickColor: "#DDDDDD",
         // @ts-ignore
         tickLength: 10,
@@ -163,7 +163,7 @@ const DefaultChartOptions = {
             slicedOffset    : 10,
             // center          : ["50%", "50%"],
             // size            : "75%",
-            
+            shadow: false,
             borderColor: "rgba(1, 1, 1, 0.5)",
             borderWidth: 0.5,
             edgeColor: "rgba(0, 0, 0, 0.25)",
@@ -174,16 +174,16 @@ const DefaultChartOptions = {
             }
         },
         column: {
-            edgeColor: "rgba(0, 0, 0, 0.25)",
-            edgeWidth: 0.5,
+            edgeColor         : "rgba(0, 0, 0, 0.5)",
+            borderColor       : "rgba(0, 0, 0, 0.5)",
+            borderWidth       : 0.5,
+            edgeWidth         : 0.5,
             getExtremesFromAll: true,
-            borderColor: "rgba(1, 1, 1, 0.5)",
-            borderWidth: 0.25,
-            borderRadius: 0.5,
-            pointPadding: 0.02,
-            groupPadding: 0.2,
-            crisp: false,
-            stacking: undefined,
+            borderRadius      : 0,
+            pointPadding      : 0.02,
+            groupPadding      : 0.2,
+            crisp             : false,
+            stacking          : undefined,
             states: {
                 select: {
                     borderWidth: 1,
@@ -192,15 +192,16 @@ const DefaultChartOptions = {
             }
         },
         bar: {
-            edgeColor: "rgba(0, 0, 0, 0.1)",
+            edgeColor         : "rgba(0, 0, 0, 0.5)",
+            borderColor       : "rgba(0, 0, 0, 0.5)",
+            borderWidth       : 0.5,
+            edgeWidth         : 0.5,
             getExtremesFromAll: true,
-            borderColor: "rgba(0, 0, 0, 0.5)",
-            borderWidth: 0.25,
-            borderRadius: 0.5,
-            pointPadding: 0.02,
-            groupPadding: 0.2,
-            stacking: undefined,
-            crisp: false,
+            borderRadius      : 0,
+            pointPadding      : 0.02,
+            groupPadding      : 0.2,
+            stacking          : undefined,
+            crisp             : false,
             states: {
                 select: {
                     borderWidth: 1,

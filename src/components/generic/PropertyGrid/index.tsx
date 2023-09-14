@@ -91,7 +91,7 @@ export function PropertyEditorGroup({
                         />
                     }
                     return <Fragment key={i + "xx"}>
-                        <div className="prop-label" title={ prop.description } style={{ paddingLeft: "1.3em" }}>
+                        <div className="prop-label" title={ prop.description || prop.name } style={{ paddingLeft: "1.3em" }}>
                             <span className="nowrap">{ prop.name }</span>
                         </div>
                         <div className="prop-editor"><PropertyEditor prop={prop as EditableProperty} /></div>
@@ -124,7 +124,7 @@ function propertyGridRows(props: (EditableProperty | EditableGroupProperty)[], l
 
         return (
             <Fragment key={ i }>
-                <div className={ "prop-label" + (prop.disabled ? " disabled" : "") } style={{ paddingLeft: level ? level + "em" : 4 }}>
+                <div className={ "prop-label" + (prop.disabled ? " disabled" : "") } style={{ paddingLeft: level ? level + "em" : 4 }} title={ prop.name }>
                     <span className="nowrap">
                         { prop.name }&nbsp;{ prop.description && <small className="color-muted" title={ prop.description }><i className="fa-solid fa-circle-info"></i></small> }
                     </span>
