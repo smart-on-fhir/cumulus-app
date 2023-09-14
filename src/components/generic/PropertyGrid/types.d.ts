@@ -22,4 +22,5 @@ export interface EditableGroupProperty {
     name: string | JSX.Element
     type: "group"
     value: EditableProperty[]
+    open?: boolean
 }
