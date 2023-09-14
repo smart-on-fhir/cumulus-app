@@ -457,10 +457,12 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         if (unusedColumns.length) {
             where.push(...unusedColumns.map(c => `"${c.name}" IS NULL`))
         }
+
+        // TODO: issue if stratifier is also in filters...
         
-        // if (filterWhere) {
-        //     where.push(`(${ filterWhere })`)
-        // }
+        if (filterWhere) {
+            where.push(`(${ filterWhere })`)
+        }
 
         sql += ` WHERE ${where.join(" AND ")}`
         sql += ` GROUP BY "${column}"`
