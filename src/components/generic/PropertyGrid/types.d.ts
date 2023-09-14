@@ -2,7 +2,7 @@ export interface EditableProperty {
     name: string
     value?: any
     description?: string
-    type: "boolean" | "number" | "length" | "color" | "options" | "shadow" | string
+    type: "boolean" | "number" | "length" | "color" | "options" | "shadow" | "date" | string
     onChange: (value?: any) => void
     group?: boolean
     disabled?: boolean
@@ -16,6 +16,14 @@ export interface EditableNumberProperty extends EditableProperty {
     min?: number
     max?: number
     step?: number
+}
+
+export interface EditableDateProperty extends EditableProperty {
+    value?: string | number
+    type: "date"
+    onChange: (value?: date) => void
+    min?: string | number
+    max?: string | number
 }
 
 export interface EditableGroupProperty {
