@@ -1085,7 +1085,7 @@ function AdvancedAxisEditor({
                 {
                     name: "Alternate Grid Color",
                     type: "color",
-                    value: axis.alternateGridColor,
+                    value: axis.alternateGridColor ?? "#0000",
                     onChange: (alternateGridColor?: string) => onChange({ alternateGridColor: alternateGridColor ?? undefined })
                 },
                 {
@@ -1104,21 +1104,27 @@ function AdvancedAxisEditor({
                 {
                     name: "Reversed",
                     type: "boolean",
-                    value: !!axis.reversed,
+                    value: axis.reversed !== false,
                     onChange: (reversed: boolean) => onChange({ reversed })
                 },
                 {
-                    name: "startOnTick",
+                    name: "Start on Tick",
                     type: "boolean",
-                    value: !!axis.startOnTick,
+                    value: axis.startOnTick !== false,
                     onChange: (startOnTick: boolean) => onChange({ startOnTick })
                 },
                 {
-                    name : "Min",
-                    type : "number",
-                    value: axis.min ?? undefined,
-                    disabled: axis.type === "category" || axis.type === "datetime",
-                    onChange: (min?: number) => onChange({ min: min ?? null })
+                    name    : "Min",
+                    type    : axis.type === "datetime" ? "date" : "number",
+                    value   : axis.type === "datetime" ? +new Date(axis.min ?? 0) : axis.min ?? undefined,
+                    disabled: axis.type === "category",
+                    onChange: (min?: number) => onChange({
+                        min: min ?
+                            axis.type === "datetime" ?
+                                +new Date(min) :
+                                min ?? null:
+                            null
+                    })
                 },
                 // {
                 //     name : "softMin",
@@ -1127,18 +1133,23 @@ function AdvancedAxisEditor({
                 //     onChange: (softMin?: number) => onChange({ softMin })
                 // },
                 {
-                    name: "endOnTick",
+                    name: "End on Tick",
                     type: "boolean",
                     value: !!axis.endOnTick,
                     onChange: (endOnTick: boolean) => onChange({ endOnTick })
                 },
                 {
-                    name : "max",
-                    type : "number",
-                    value: axis.max ?? undefined,
-                    min: 0,
-                    disabled: axis.type === "category" || axis.type === "datetime",
-                    onChange: (max?: number) => onChange({ max: max ?? null })
+                    name    : "Max",
+                    type    : axis.type === "datetime" ? "date" : "number",
+                    value   : axis.type === "datetime" ? +new Date(axis.max ?? 0) : axis.max ?? undefined,
+                    disabled: axis.type === "category",
+                    onChange: (max?: number) => onChange({
+                        max: max ?
+                            axis.type === "datetime" ?
+                                +new Date(max) :
+                                max ?? null:
+                            null
+                    })
                 },
                 // {
                 //     name : "softMax",
@@ -1404,7 +1415,7 @@ function SliceEditor({
                 min={0}
                 max={1}
                 step={0.01}
-                value={S.opacity}
+                value={S.opacity ?? 1}
                 onChange={e => {
                     state.chartOptions.series![0].opacity = e.target.valueAsNumber
                     onChange(state)

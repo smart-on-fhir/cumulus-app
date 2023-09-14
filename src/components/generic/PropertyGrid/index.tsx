@@ -7,11 +7,13 @@ import BooleanEditor from "./BooleanEditor"
 import OptionsEditor from "./OptionsEditor"
 import ShadowEditor  from "./ShadowEditor"
 import {
+    EditableDateProperty,
     EditableGroupProperty,
     EditableNumberProperty,
     EditableProperty
 } from "./types"
 import "./PropertyGrid.scss"
+import DateEditor from "./DateEditor"
 
 
 
@@ -27,6 +29,8 @@ function PropertyEditor({ prop, level = 0 }: { prop: EditableProperty, level?: n
             return <ColorEditor prop={ prop } />
         case "options":
             return <OptionsEditor prop={ prop } />
+        case "date":
+            return <DateEditor prop={ prop as EditableDateProperty } />
         case "shadow":
             return <ShadowEditor onChange={ prop.onChange } props={ prop.value} level={level + 1} />
         default:
