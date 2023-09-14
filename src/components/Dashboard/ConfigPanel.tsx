@@ -44,7 +44,7 @@ function SecondaryDataEditor({
     return (
         <>
             <div className="pt-1">
-                <label>Secondary Column</label>
+                <label>Secondary Data</label>
                 <ColumnSelector
                     addEmptyOption="start"
                     cols={ cols }
@@ -52,10 +52,13 @@ function SecondaryDataEditor({
                     disabled={[ "cnt", state.stratifyBy, state.groupBy ].filter(Boolean)}
                     onChange={ (column2: string) => onChange({ ...state, column2 }) }
                 />
+                <p className="small color-muted">
+                    Select another data column to render over the same X axis
+                </p>
             </div>
             
             { !!state.column2 && <div className="pt-1">
-                <label>Render As</label>
+                <label>Secondary Data Chart Type</label>
                 <Select
                     value={ state.column2type }
                     onChange={ column2type => onChange({ ...state, column2type })}
@@ -647,6 +650,11 @@ export default function ConfigPanel({
                         disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
                         onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
                     />
+                    <p className="small color-muted"> {
+                        isPie ?
+                            "Select which data column provides the slices of the pie" :
+                            "Select which data column to plot over the X axis"
+                    }</p>
                 </div>
                 { !isPie && <>
                     <div className="pt-1 pb-1">
