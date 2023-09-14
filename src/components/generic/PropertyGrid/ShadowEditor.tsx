@@ -15,12 +15,14 @@ export default function ShadowEditor({
     props,
     onChange,
     name = "Shadow",
-    description
+    description,
+    level = 0
 }: {
     props: ShadowProps | false,
     onChange: (props: ShadowProps | boolean) => void
     name?: string
     description?: string
+    level?: number
 }) {
     const p = props === false ? {} : props
 
@@ -28,13 +30,16 @@ export default function ShadowEditor({
 
     let title = [ description, "Click to " + (open ? "collapse" : "expand") ]
 
+    let pl = (level: number) => 3 + (level * 16)
+
     return (
         <>
             <b
-                className={ "prop-label group-heading" + (open ? " open" : "") }
+                className={ "prop-label group-heading" + (open ? " open" : "") + " level-" + level }
                 onClick={() => setOpen(!open)}
                 title={ title.filter(Boolean).join("\n") }
                 tabIndex={0}
+                style={{ paddingLeft: pl(level) }}
                 onKeyDown={e => {
                     if (e.key === " " || e.key === "Enter") {
                         e.preventDefault();
@@ -46,7 +51,7 @@ export default function ShadowEditor({
                 { name }
             </b>
             { open ? <>
-                <div className="prop-label" style={{ paddingLeft: "1.3em" }}>Enabled</div>
+                <div className="prop-label" style={{ paddingLeft: pl(level + 1) }}>Enabled</div>
                 <div className="prop-editor">
                     <BooleanEditor prop={{
                         name: "Enabled",
@@ -56,18 +61,18 @@ export default function ShadowEditor({
                         onChange: (on: boolean) => onChange(on ? {} : false),
                     }} />
                 </div>
-                <div className="prop-label" style={{ paddingLeft: "1.3em" }}>Color</div>
+                <div className="prop-label" style={{ paddingLeft: pl(level + 1) }}>Color</div>
                 <div className="prop-editor">
                     <ColorEditor prop={{
                         name : "Color",
                         type : "color",
-                        value: p.color,
+                        value: p.color ?? "#000000",
                         onChange(color: string) {
                             onChange({ ...(p || {}), color})
                         }
                     }} />
                 </div>
-                <div className="prop-label" style={{ paddingLeft: "1.3em" }}>OffsetX</div>
+                <div className="prop-label" style={{ paddingLeft: pl(level + 1) }}>OffsetX</div>
                 <div className="prop-editor">
                     <NumberEditor prop={{
                         name : "OffsetX",
@@ -78,7 +83,7 @@ export default function ShadowEditor({
                         }
                     }} />
                 </div>
-                <div className="prop-label" style={{ paddingLeft: "1.3em" }}>OffsetY</div>
+                <div className="prop-label" style={{ paddingLeft: pl(level + 1) }}>OffsetY</div>
                 <div className="prop-editor">
                     <NumberEditor prop={{
                         name : "OffsetY",
@@ -89,20 +94,20 @@ export default function ShadowEditor({
                         }
                     }} />
                 </div>
-                <div className="prop-label" style={{ paddingLeft: "1.3em" }}>Width</div>
+                <div className="prop-label" style={{ paddingLeft: pl(level + 1) }}>Width</div>
                 <div className="prop-editor">
                     <NumberEditor prop={{
                         name : "Width",
                         type : "number",
                         value: p.width ?? 3,
                         min  : 0,
-                        max  : 30,
+                        max  : 10,
                         onChange(width?: number) {
                             onChange({ ...(p || {}), width})
                         }
                     }} />
                 </div>
-                <div className="prop-label" style={{ paddingLeft: "1.3em" }}>Opacity</div>
+                <div className="prop-label" style={{ paddingLeft: pl(level + 1) }}>Opacity</div>
                 <div className="prop-editor">
                     <NumberEditor prop={{
                         name : "Opacity",
