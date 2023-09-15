@@ -1,12 +1,13 @@
-import Select            from "../generic/Select"
-import ColumnSelector    from "./ColumnSelector"
-import FilterUI          from "./FilterUI"
-import Collapse          from "../generic/Collapse"
-import Checkbox          from "../generic/Checkbox"
-import AnnotationsUI     from "./AnnotationsUI"
-import TagSelector       from "../Tags/TagSelector"
-import PropertyGrid      from "../generic/PropertyGrid"
-import { app }           from "../../types"
+import { useState }   from "react"
+import Select         from "../generic/Select"
+import ColumnSelector from "./ColumnSelector"
+import FilterUI       from "./FilterUI"
+import Collapse       from "../generic/Collapse"
+import Checkbox       from "../generic/Checkbox"
+import AnnotationsUI  from "./AnnotationsUI"
+import TagSelector    from "../Tags/TagSelector"
+import PropertyGrid   from "../generic/PropertyGrid"
+import { app }        from "../../types"
 import {
     AlignValue,
     AxisTitleAlignValue,
@@ -1239,6 +1240,10 @@ function SeriesEditor({
     onChange: (state: ChartConfigPanelState) => void
 }) {
 
+    const hasInvisible = !!state.chartOptions.series?.find(s => s.visible === false)
+
+    const [force, setForce] = useState(hasInvisible)
+
     const props = (state.chartOptions.series || []).map((s, i) => {
 
         // Inherit defaults for the current chart type
@@ -1379,7 +1384,32 @@ function SeriesEditor({
     return (
         <Collapse collapsed header="Series">
             <PropertyGrid props={props as any} />
-            <br/>
+            <div
+                className="link pt-1 pb-1 mb-1"
+                style={{ color: hasInvisible ? "#06D" : "#AAA" }}
+                tabIndex={0}
+                onClick={() => {
+                    if (hasInvisible) {
+                        const next = merge(state)
+                        next.chartOptions.series?.forEach(s => {
+                            if (s.visible === false) {
+                                s.showInLegend = !force
+                            }
+                        });
+                        onChange(next)
+                        setForce(!force)
+                    }
+                }}
+            >
+                <i className={
+                    "fa-solid " +
+                    (force ? "fa-eye" : "fa-eye-slash")
+                } style={{
+                    width: "1.8em",
+                    display: "inline-block",
+                    textAlign: "center"
+                }} />Toggle all hidden series in legend
+            </div>
         </Collapse>
     )
 }
