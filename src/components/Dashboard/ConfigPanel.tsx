@@ -1423,11 +1423,13 @@ function SliceEditor({
 }) {
     const S = state.chartOptions.series?.[0] || {} as SeriesPieOptions
 
+    const colors = state.chartOptions.colors || DEFAULT_COLORS
+
     // @ts-ignore
     const props = (S.data || []).map((point, i) => ({
         name: String(point.name ?? "") || "Series " + (i + 1),
         type: "color",
-        value: state.chartOptions.colors![i] || DEFAULT_COLORS[i % DEFAULT_COLORS.length],
+        value: colors[i % colors.length],
         onChange: (color: string) => {
             state.chartOptions.colors![i] = color
             onChange(state)

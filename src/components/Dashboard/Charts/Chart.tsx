@@ -172,7 +172,7 @@ function getSeries({
     let series: SeriesOptions[] = []
 
     function addSeries(options: any, secondary = false) {
-        
+
         const S = serverOptions.series?.find((s: any) => s.id === options.id)
         const colors: string[] = serverOptions.colors!
 
@@ -188,7 +188,7 @@ function getSeries({
             cfg.shadow = false
         }
 
-        if (type.includes("area") && S?.visible !== false) {
+        if (type.includes("area") && color && S?.visible !== false) {
             cfg.fillColor = {
                 linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                 stops: [
@@ -201,7 +201,7 @@ function getSeries({
         }
 
         if (secondary) {
-            if (options.type?.includes("column") && S?.visible !== false) {
+            if (options.type?.includes("column") && color && S?.visible !== false) {
                 cfg.color = {
                     linearGradient: { x1: 1, y1: 0, x2: 0, y2: 1 },
                     stops: [
