@@ -179,13 +179,9 @@ function getSeries({
         const color = colors[series.length % colors.length]
 
         const cfg: any = {
-            index: series.length,
+            // index: series.length,
             color,
             id: options.id
-        }
-
-        if (type.includes("pie")) {
-            cfg.shadow = false
         }
 
         if (type.includes("area") && color && S?.visible !== false) {
@@ -230,7 +226,11 @@ function getSeries({
             cfg.stacking = column2type!.includes("columnStack") ? "normal" : undefined
         }
 
-        series.push({ ...S, ...cfg, ...options });
+        series.push({
+            ...S,
+            ...cfg,
+            ...options
+        });
     }
 
     function stratify(data: app.ServerResponses.StratifiedDataResponse, secondary = false) {
@@ -433,8 +433,7 @@ export function buildChartOptions({
                                 ` - ${parseFloat((this.point.percentage || 0).toPrecision(2))} %</span>`
                         }
                     }
-                },
-                shadow: false
+                }
             },
             areasplinerange: {
                 linkedTo: ':previous',
