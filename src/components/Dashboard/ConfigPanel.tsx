@@ -564,8 +564,6 @@ export default function ConfigPanel({
                 <br />
             </Collapse>
 
-            { !isPie && <SeriesEditor state={state} onChange={onChange} /> }
-
             <Collapse collapsed header="Filters">
                 <div className="pt-1 pb-1">
                     <FilterUI
@@ -1064,6 +1062,114 @@ function getSplineOptions(options: SeriesSplineOptions, onChange: (options: Part
             onChange: (shadow: any) => onChange({ shadow })
         }
     ]
+}
+
+function getPieOptions(options: any, onChange: (options: any) => void, has3d = false) {
+    const props: any[] = [];
+
+    if (has3d) {
+        props.push(
+            {
+                name    : "Edge Width",
+                type    : "number",
+                min     : 0,
+                step    : 0.1,
+                value   : options.edgeWidth ?? 1,
+                onChange: (edgeWidth: number) => onChange({ edgeWidth })
+            },
+            {
+                name    : "Edge Color",
+                type    : "color",
+                value   : options.edgeColor ?? "#00000088",
+                onChange: (edgeColor: string) => onChange({ edgeColor }),
+            },
+            {
+                name    : "Depth",
+                type    : "number",
+                // min     : 0,
+                // step    : 0.1,
+                value   : options.depth ?? 50,
+                onChange: (depth: number) => onChange({ depth })
+            }
+        )
+    } else {
+        props.push(
+            {
+                name    : "Border Width",
+                type    : "number",
+                min     : 0,
+                step    : 0.1,
+                value   : options.borderWidth ?? 0.5,
+                onChange: (borderWidth: number) => onChange({ borderWidth })
+            },
+            {
+                name    : "Border Color",
+                type    : "color",
+                value   : options.borderColor ?? "#00000088",
+                onChange: (borderColor: string) => onChange({ borderColor })
+            }
+        )
+    }
+    
+    props.push(
+        {
+            name    : "Dash Style",
+            type    : "options",
+            options : DASH_STYLES,
+            value   : options.dashStyle ?? "Solid",
+            onChange: (dashStyle: DashStyleValue) => onChange({ dashStyle })
+        },
+        {
+            name    : "Opacity",
+            type    : "number",
+            min     : 0,
+            max     : 1,
+            step    : 0.01,
+            value   : options.opacity ?? 1,
+            onChange: (opacity: number) => onChange({ opacity })
+        },
+        {
+            name : "Inner Size",
+            type : "length",
+            units: ["%", "px"],
+            value: options.innerSize ?? "50%",
+            min  : 0,
+            max  : 100,
+            onChange: (innerSize: string) => onChange({ innerSize })
+        },
+        {
+            name: "Center X",
+            type: "length",
+            units: ["%", "px"],
+            value: options.center?.[0] ?? null,
+            onChange: (x?: string) => onChange({ center: [x || null, options.center?.[1] ?? null] })
+        },
+        {
+            name: "Center Y",
+            type: "length",
+            units: ["%", "px"],
+            value: options.center?.[1] ?? null,
+            onChange: (y?: string) => onChange({ center: [options.center?.[0] ?? null, y || null] })
+        },
+        {
+            name    : "startAngle",
+            type    : "number",
+            min     : -360,
+            max     : 360,
+            value   : options.startAngle ?? 0,
+            onChange: (startAngle: number) => onChange({ startAngle })
+        },
+        {
+            name    : "endAngle",
+            type    : "number",
+            min     : -360,
+            max     : 360,
+            value   : options.endAngle ?? 360,
+            onChange: (endAngle: number) => onChange({ endAngle })
+        }
+    )
+
+    return props;
 }
 
 function AdvancedAxisEditor({
@@ -1603,29 +1709,29 @@ function SliceEditor({
         }
     }));
 
+    const has3d = !!state.chartOptions.chart?.options3d?.enabled
+
+    const change = (patch: any) => {
+        const next = merge(state)
+        next.chartOptions.series?.forEach(s => Object.assign(s, patch));
+        onChange(next)
+    }
+
     return (
         <div>
-            <div>
-                <span className="pull-right no-bold">{S.opacity??""}</span>
-                <label>Opacity</label>
+            <div className="pt-1">
+                <Collapse collapsed header="Slice Colors">
+                    <div className="pb-1">
+                        <PropertyGrid props={props} />
+                    </div>
+                </Collapse>
+                <Collapse collapsed header="Advanced">
+                    <div className="pb-1">
+                        <PropertyGrid props={getPieOptions(S, change, has3d)} />
+                        {/* <AllSeriesEditor state={state} onChange={onChange} /> */}
+                    </div>
+                </Collapse>
             </div>
-            <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.01}
-                value={S.opacity ?? 1}
-                onChange={e => {
-                    state.chartOptions.series![0].opacity = e.target.valueAsNumber
-                    onChange(state)
-                }}
-                style={{ width: "100%", margin: 0 }}
-            />
-            <br/>
-            <br/>
-            <Collapse header="Slice Colors">
-                <PropertyGrid props={props} />
-            </Collapse>
         </div>
     )
 }
