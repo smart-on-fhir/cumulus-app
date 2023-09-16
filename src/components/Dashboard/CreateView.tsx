@@ -4,7 +4,6 @@ import Dashboard       from "."
 import { request }     from "../../backend"
 import { useBackend }  from "../../hooks"
 import { AlertError }  from "../generic/Alert"
-import Breadcrumbs     from "../generic/Breadcrumbs"
 import Loader          from "../generic/Loader"
 import { app }         from "../../types"
 
@@ -38,10 +37,6 @@ export default function CreateView()
     // Eventually render a Breadcrumbs and the dashboard
     return (
         <div className="container">
-            <Breadcrumbs links={[
-                { name: "Home" , href: "/" },
-                { name: "Create New Graph" }
-            ]}/>
             <Dashboard view={{}} dataRequest={result as app.DataRequest} />
         </div>
     )

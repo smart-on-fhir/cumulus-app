@@ -4,7 +4,6 @@ import Dashboard       from ".";
 import { request }     from "../../backend";
 import { useBackend }  from "../../hooks";
 import { AlertError }  from "../generic/Alert";
-import Breadcrumbs     from "../generic/Breadcrumbs";
 import Loader          from "../generic/Loader";
 
 export default function EditView({ copy }: { copy?: boolean })
@@ -37,11 +36,6 @@ export default function EditView({ copy }: { copy?: boolean })
 
     return (
         <div className="container">
-            <Breadcrumbs links={[
-                { name: "Home"  , href: "/" },
-                { name: "Graphs", href: "/views" },
-                { name: view.name }
-            ]}/>
             <Dashboard key={ copy ? "copy" : view.id } copy={copy} view={{
                 ...view,
                 name: copy ? view.name.replace(/(\s*\(copy\)\s*)?$/, " (copy)") : view.name,
