@@ -150,7 +150,6 @@ const DefaultChartOptions = {
             allowPointSelect: true,
             cursor          : 'pointer',
             showInLegend    : true,
-            shadow          : false,
             animation: {
                 duration: 0,//400,
                 defer: 0,
@@ -163,11 +162,6 @@ const DefaultChartOptions = {
             slicedOffset    : 10,
             // center          : ["50%", "50%"],
             // size            : "75%",
-            shadow: false,
-            borderColor: "rgba(1, 1, 1, 0.5)",
-            borderWidth: 0.5,
-            edgeColor: "rgba(0, 0, 0, 0.25)",
-            edgeWidth: 1,
             dataLabels: {
                 enabled: true,
 
@@ -245,31 +239,6 @@ const DefaultChartOptions = {
             getExtremesFromAll: true,
             dashStyle: "Solid",
         },
-    //     area: {
-    //         // fillOpacity: 0.2,
-    //         allowPointSelect: false,
-    //         cursor: "default",
-    //         marker: {
-    //             radius: 0,
-    //             enabled: true,
-    //             states: {
-    //                 hover: {
-    //                     radius: 4
-    //                 }
-    //             }
-    //         },
-    //         lineWidth: 1.5,
-    //         shadow: false,
-    //         states: {
-    //             hover: {
-    //                 lineWidth: 2,
-    //                 shadow: true, // show them even on datetime charts
-    //             }
-    //         },
-    //         connectNulls: false,
-    //         getExtremesFromAll: true,
-    //         dashStyle: "Solid",
-    //     },
         spline: {
             allowPointSelect: true,
             cursor: "default",
