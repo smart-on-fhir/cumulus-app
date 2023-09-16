@@ -100,6 +100,42 @@
     }
 }
 
+.dashboard {
+    margin-left : auto;
+    margin-right: auto;
+    flex        : 0 1 0;
+    width: 100%;
+    max-width: 1200px;
+    transition: all 0.2s;
+
+    &.sidebar-open {
+        max-width: 100%;
+    }
+}
+
+.dashboard-sidebar {
+    position      : sticky;
+    top           : 6rem;
+    width         : 0;
+    opacity       : 0;
+    pointer-events: none;
+    z-index       : -1;
+    transition    : all 0.2s ease-out;
+    margin-right  : 1rem;
+    height        : calc(100vh - 8rem);
+    overflow      : hidden;
+}
+
+.dashboard.sidebar-open .dashboard-sidebar {
+    width         : 340px;
+    opacity       : 1;
+    pointer-events: all;
+    z-index       : unset;
+    margin-right  : 1rem;
+    overflow-y    : auto;
+    overflow-X    : hidden;
+}
+
 @media (max-width: 960px) {
     .dashboard-sidebar {
         display: none;

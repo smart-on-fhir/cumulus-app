@@ -27,6 +27,7 @@ import { RequestLineLevelData }                  from "../../commands/Graphs/Req
 import { GenerateCaption }                       from "../../commands/Graphs/GenerateCaption"
 import { OpenInAnalyticEnvironment }             from "../../commands/Subscriptions/OpenInAnalyticEnvironment"
 import { app }                                   from "../../types"
+import Breadcrumbs                               from "../generic/Breadcrumbs"
 import {
     ReadOnlyPaths,
     SupportedChartTypes,
@@ -560,7 +561,7 @@ export default function Dashboard({
     const generateCaption  = useCommand(new GenerateCaption(fullChartOptions, state, c => dispatch({ type: "UPDATE", payload: { caption: c }})))
 
     return (
-        <div className={ saving || deleteCommand.working ? "grey-out" : undefined }>
+        <div className={ "dashboard " + (saving || deleteCommand.working ? "grey-out" : "") + (showOptions ? " sidebar-open" : "") }>
             <HelmetProvider>
                 <Helmet>
                     <title>{viewName}</title>
@@ -569,15 +570,7 @@ export default function Dashboard({
             </HelmetProvider>
             <div className="row">
                 <div className="col col-0">
-                    <div onTransitionEnd={onTransitionEnd} className="dashboard-sidebar" style={{
-                        position     : "relative",
-                        width        : showOptions ? 330 : 0,
-                        opacity      : showOptions ? 1 : 0,
-                        pointerEvents: showOptions ? "all" : "none",
-                        zIndex       : showOptions ? "unset" : -1,
-                        transition   : "all 0.2s ease-in-out",
-                        marginRight  : showOptions ? "1rem" : 0
-                    }}>
+                    <div onTransitionEnd={onTransitionEnd} className="dashboard-sidebar">
                         <ConfigPanel
                             dataRequest={dataRequest}
                             viewType={viewType}
@@ -621,6 +614,11 @@ export default function Dashboard({
                 </div>
                 <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start", minWidth: "32rem" }}>
                     <div style={{ position: "sticky", top: 2 }}>
+                        <Breadcrumbs links={[
+                            { name: "Home"  , href: "/" },
+                            { name: "Graphs", href: "/views" },
+                            { name: viewName }
+                        ]}/>
                         <h2 style={{ margin: "0 0 0.5ex", lineHeight: 1.2 }}>
                             <EditInPlace
                                 required
@@ -642,6 +640,32 @@ export default function Dashboard({
                             <div className="col col-0 mb-1">
                                 <div className="toolbar flex">
                                     <button
+                                        className={ "btn" + (showOptions ? " active" : "")}
+                                        onClick={() => dispatch({ type: "TOGGLE_OPTIONS" })}
+                                        title="Options">
+                                        <i className="fas fa-cog" />
+                                    </button>
+                                    <CommandButton { ...copyCommand } label={ "" } />
+                                    <CommandButton { ...deleteCommand } label={ "" } />
+                                    <button
+                                        className="btn"
+                                        onClick={ takeScreenshot }
+                                        title="Update Screenshot"
+                                        disabled={!view.id || !isAdmin || viewType !== "overview" }>
+                                        <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
+                                    </button>
+                                    <button
+                                        className="btn"
+                                        onClick={save}
+                                        title="Save Changes">
+                                        <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="col mb-1"></div>
+                            <div className="col col-0 mb-1">
+                                <div className="toolbar flex">
+                                    <button
                                         className={"btn" + (viewType === "overview" ? " active" : "")}
                                         onClick={() => dispatch({ type: "SET_VIEW_TYPE", payload: "overview" })}
                                         title="Report View"
@@ -654,32 +678,8 @@ export default function Dashboard({
                                         onClick={() => dispatch({ type: "SET_VIEW_TYPE", payload: "data"})}
                                         title="Data View"
                                         style={{ minWidth: "7em" }}
-                                        ><i className="fas fa-th" /> Data</button>
-                                </div>
-                            </div>
-                            <div className="col mb-1"></div>
-                            <div className="col col-0 mb-1">
-                                <div className="toolbar flex">
-                                    <button
-                                        className="btn"
-                                        onClick={save}
-                                        title="Save Changes">
-                                        <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
+                                        ><i className="fas fa-th" /> Data
                                     </button>
-                                    <CommandButton { ...copyCommand } label={ "" } />
-                                    <CommandButton { ...deleteCommand } label={ "" } />
-                                    <button
-                                        className="btn"
-                                        onClick={ takeScreenshot }
-                                        title="Update Screenshot"
-                                        disabled={!view.id || !isAdmin || viewType !== "overview" }>
-                                        <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
-                                    </button>
-                                    <button
-                                        className={ "btn" + (showOptions ? " active" : "")}
-                                        onClick={() => dispatch({ type: "TOGGLE_OPTIONS" })}
-                                        title="Options"
-                                        ><i className="fas fa-cog" /></button>
                                 </div>
                             </div>
                         </div>
