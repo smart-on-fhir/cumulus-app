@@ -34,7 +34,9 @@ import {
 
 type SupportedChartType = keyof typeof SupportedChartTypes
 
-
+const DASH_STYLES: DashStyleValue[] = ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+'LongDashDot', 'LongDashDotDot'];
 
 function SecondaryDataEditor({
     state,
@@ -425,6 +427,266 @@ export default function ConfigPanel({
                 <br/>
             </Collapse>
 
+            <Collapse collapsed header="Data">
+                <div className="pt-1">
+                    <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
+                    <ColumnSelector
+                        cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max") }
+                        value={ state.groupBy }
+                        disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
+                        onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
+                    />
+                    <p className="small color-muted"> {
+                        isPie ?
+                            "Select which data column provides the slices of the pie" :
+                            `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
+                    }</p>
+                </div>
+                { !isPie && <>
+                    <div className="pt-1">
+                        <label>Stratifier</label>
+                        <ColumnSelector
+                            cols={ cols }
+                            placeholder="Select Column"
+                            addEmptyOption="start"
+                            value={ state.stratifyBy }
+                            disabled={[
+                                "cnt",
+                                "cnt_min",
+                                "cnt_max",
+                                state.groupBy,
+                                state.column2
+                            ].filter(Boolean)}
+                            onChange={ (stratifyBy: string) => onChange({
+                                ...state,
+                                stratifyBy,
+                                denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
+                            }) }
+                        />
+                        <p className="small color-muted">
+                            Stratify the data into multiple series based on the chosen column. For example,
+                            this would produce multiple lines in a line chart.
+                        </p>
+                    </div>
+                    <div className="pt-1">
+                        <label>Denominator</label>
+                        <Select
+                            options={[
+                                {
+                                    label: <div>
+                                        <div>None</div>
+                                        <div className="small color-muted">
+                                            Render the aggregate counts as found in the<br/>
+                                            data source without further processing
+                                        </div>
+                                    </div>,
+                                    value: "",
+                                    icon: "fa-solid fa-percent grey-out"
+                                },
+                                {
+                                    label: <div>
+                                        <div>Stratified Count</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the total<br />
+                                            count of every given data group.<br />
+                                            Not available with no stratifier.
+                                        </div>
+                                    </div>,
+                                    value: "count",
+                                    icon: "fa-solid fa-percent color-brand-2",
+                                    disabled: !state.stratifyBy
+                                },
+                                {
+                                    label: <div>
+                                        <div>Stratified Sum</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the sum<br />
+                                            of values in every given data group.<br />
+                                            Not available with no stratifier.
+                                        </div>
+                                    </div>,
+                                    value: "local",
+                                    icon: "fa-solid fa-percent color-brand-2",
+                                    disabled: !state.stratifyBy
+                                },
+                                {
+                                    label: <div>
+                                        <div>Total Count</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the total<br />
+                                            count within the entire dataset
+                                        </div>
+                                    </div>,
+                                    value: "global",
+                                    icon: "fa-solid fa-percent color-blue"
+                                }
+                            ]}
+                            value={ state.denominator }
+                            onChange={ denominator => onChange({ ...state, denominator })}
+                        />
+                        <p className="small color-muted">
+                            If set, renders the values as percentages of the given denominator
+                        </p>
+                    </div>
+                    { state.ranges && <div className="pt-1">
+                        <label>Confidence Intervals</label>
+                        <Select value={ state.ranges?.type || "" } options={[
+                            {
+                                value: "",
+                                icon : "fa-solid fa-plus-minus color-muted",
+                                label: "None"
+                            },
+                            {
+                                label: "Error Bars",
+                                value: "errorbar",
+                                icon : "fa-solid fa-plus-minus color-blue"
+                            },
+                            {
+                                label: "Area",
+                                value: "areasplinerange",
+                                icon : "fa-solid fa-plus-minus color-blue"
+                            },
+                            {
+                                label: "Bars / Columns",
+                                value: "column",
+                                icon : "fa-solid fa-plus-minus color-blue"
+                            },
+                        ]} onChange={type => onChange({ ...state, ranges: { type, enabled: !!type }})} />
+                        <p className="small color-muted">
+                            If information is available, add the error ranges to the chart
+                        </p>
+                    </div> }
+
+                    <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onChange} />
+                </> }
+
+                { isPie && <SliceEditor state={state} onChange={onChange} /> }
+                <br />
+            </Collapse>
+
+            { !isPie && <SeriesEditor state={state} onChange={onChange} /> }
+
+            <Collapse collapsed header="Filters">
+                <div className="pt-1 pb-1">
+                    <FilterUI
+                        onChange={filters => onChange({ ...state, filters })}
+                        current={ state.filters }
+                        cols={ cols }
+                    />
+                </div>
+            </Collapse>
+
+            { !isPie && <SeriesEditor state={state} onChange={onChange} /> }
+
+            { !isPie && <Collapse collapsed header={ isBar ? "X Axis" : "Y Axis" }>
+                <div className="mt-1">
+                    <label>Axis Title</label>
+                    <input
+                        type="text"
+                        // @ts-ignore
+                        value={ chartOptions.yAxis?.title?.text || "" }
+                        onChange={ e => onChange(merge(state, {
+                            chartOptions: {
+                                yAxis: {
+                                    title: {
+                                        text: e.target.value
+                                    }
+                                }
+                            }
+                        }))}
+                    />
+                </div>
+                <div className="mt-1 pb-1">
+                    <Checkbox
+                        name="YTicks"
+                        label="Render axis tick marks"
+                        // @ts-ignore
+                        checked={chartOptions.yAxis?.tickWidth !== 0}
+                        onChange={checked => onChange(merge(state, {
+                            chartOptions: {
+                                yAxis: {
+                                    tickWidth: checked ? 1 : 0
+                                }
+                            }
+                        }))}
+                    />
+                    <Checkbox
+                        name="YLabels"
+                        label="Render labels"
+                        // @ts-ignore
+                        checked={chartOptions.yAxis?.labels?.enabled !== false}
+                        onChange={checked => onChange(merge(state, {
+                            chartOptions: {
+                                yAxis: {
+                                    labels: { enabled: checked }
+                                }
+                            }
+                        }))}
+                    />
+                </div>
+                <div className="pb-1">
+                    <AdvancedAxisEditor
+                        axis={ (state.chartOptions.yAxis || {}) as YAxisOptions }
+                        onChange={yAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { yAxis })})}
+                    />
+                </div>
+            </Collapse> }
+
+            { !isPie && <Collapse collapsed header={ isBar ? "Y Axis" : "X Axis" }>
+                <div className="mt-1">
+                    <label>Axis Title</label>
+                    <input
+                        type="text"
+                        placeholder={state.xCol.label || state.xCol.name || ""}
+                        // @ts-ignore
+                        value={ chartOptions.xAxis?.title?.text || "" }
+                        onChange={ e => onChange(merge(state, {
+                            chartOptions: {
+                                xAxis: {
+                                    title: {
+                                        text: e.target.value
+                                    }
+                                }
+                            }
+                        }))}
+                    />
+                </div>
+                <div className="mt-1 pb-1">
+                    <Checkbox
+                        name="XTicks"
+                        label="Render axis tick marks"
+                        // @ts-ignore
+                        checked={ !!chartOptions.xAxis?.tickWidth }
+                        onChange={checked => onChange(merge(state, {
+                            chartOptions: {
+                                xAxis: {
+                                    tickWidth: checked ? 1 : 0
+                                }
+                            }
+                        }))}
+                    />
+                    <Checkbox
+                        name="XLabels"
+                        label="Render labels"
+                        // @ts-ignore
+                        checked={chartOptions.xAxis?.labels?.enabled !== false}
+                        onChange={checked => onChange(merge(state, {
+                            chartOptions: {
+                                xAxis: {
+                                    labels: { enabled: checked }
+                                }
+                            }
+                        }))}
+                    />
+                </div>
+                <div className="pb-1">
+                    <AdvancedAxisEditor
+                        axis={ (state.chartOptions.xAxis || {}) as XAxisOptions }
+                        onChange={xAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { xAxis })})}
+                    />
+                </div>
+            </Collapse> }
+
             <Collapse collapsed header="Plot">
                 <div className="pb-1">
                     <PropertyGrid props={[
@@ -609,267 +871,6 @@ export default function ConfigPanel({
                 </div>
             </Collapse>
 
-            <Collapse collapsed header="Data">
-                <div className="pt-1">
-                    <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
-                    <ColumnSelector
-                        cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max") }
-                        value={ state.groupBy }
-                        disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
-                        onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
-                    />
-                    <p className="small color-muted"> {
-                        isPie ?
-                            "Select which data column provides the slices of the pie" :
-                            `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
-                    }</p>
-                </div>
-                { !isPie && <>
-                    <div className="pt-1">
-                        <label>Stratifier</label>
-                        <ColumnSelector
-                            cols={ cols }
-                            placeholder="Select Column"
-                            addEmptyOption="start"
-                            value={ state.stratifyBy }
-                            disabled={[
-                                "cnt",
-                                "cnt_min",
-                                "cnt_max",
-                                state.groupBy,
-                                state.column2
-                            ].filter(Boolean)}
-                            onChange={ (stratifyBy: string) => onChange({
-                                ...state,
-                                stratifyBy,
-                                denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
-                            }) }
-                        />
-                        <p className="small color-muted">
-                            Stratify the data into multiple series based on the chosen column. For example,
-                            this would produce multiple lines in a line chart.
-                        </p>
-                    </div>
-                    <div className="pt-1">
-                        <label>Denominator</label>
-                        <Select
-                            options={[
-                                {
-                                    label: <div>
-                                        <div>None</div>
-                                        <div className="small color-muted">
-                                            Render the aggregate counts as found in the<br/>
-                                            data source without further processing
-                                        </div>
-                                    </div>,
-                                    value: "",
-                                    icon: "fa-solid fa-percent grey-out"
-                                },
-                                {
-                                    label: <div>
-                                        <div>Stratified Count</div>
-                                        <div className="small color-muted">
-                                            Convert counts to percentage of the total<br />
-                                            count of every given data group.<br />
-                                            Not available with no stratifier.
-                                        </div>
-                                    </div>,
-                                    value: "count",
-                                    icon: "fa-solid fa-percent color-brand-2",
-                                    disabled: !state.stratifyBy
-                                },
-                                {
-                                    label: <div>
-                                        <div>Stratified Sum</div>
-                                        <div className="small color-muted">
-                                            Convert counts to percentage of the sum<br />
-                                            of values in every given data group.<br />
-                                            Not available with no stratifier.
-                                        </div>
-                                    </div>,
-                                    value: "local",
-                                    icon: "fa-solid fa-percent color-brand-2",
-                                    disabled: !state.stratifyBy
-                                },
-                                {
-                                    label: <div>
-                                        <div>Total Count</div>
-                                        <div className="small color-muted">
-                                            Convert counts to percentage of the total<br />
-                                            count within the entire dataset
-                                        </div>
-                                    </div>,
-                                    value: "global",
-                                    icon: "fa-solid fa-percent color-blue"
-                                }
-                            ]}
-                            value={ state.denominator }
-                            onChange={ denominator => onChange({ ...state, denominator })}
-                        />
-                        <p className="small color-muted">
-                            If set, renders the values as percentages of the given denominator
-                        </p>
-                    </div>
-                    { state.ranges && <div className="pt-1">
-                        <label>Confidence Intervals</label>
-                        <Select value={ state.ranges?.type || "" } options={[
-                            {
-                                value: "",
-                                icon : "fa-solid fa-plus-minus color-muted",
-                                label: "None"
-                            },
-                            {
-                                label: "Error Bars",
-                                value: "errorbar",
-                                icon : "fa-solid fa-plus-minus color-blue"
-                            },
-                            {
-                                label: "Area",
-                                value: "areasplinerange",
-                                icon : "fa-solid fa-plus-minus color-blue"
-                            },
-                            {
-                                label: "Bars / Columns",
-                                value: "column",
-                                icon : "fa-solid fa-plus-minus color-blue"
-                            },
-                        ]} onChange={type => onChange({ ...state, ranges: { type, enabled: !!type }})} />
-                        <p className="small color-muted">
-                            If information is available, add the error ranges to the chart
-                        </p>
-                    </div> }
-
-                    <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onChange} />
-                </> }
-
-                { isPie && <div className="pt-1">
-                    <SliceEditor state={state} onChange={onChange} />
-                </div> }
-
-                <br />
-            </Collapse>
-
-            { !isPie && <SeriesEditor state={state} onChange={onChange} /> }
-
-            <Collapse collapsed header="Filters">
-                <div className="pt-1 pb-1">
-                    <FilterUI
-                        onChange={filters => onChange({ ...state, filters })}
-                        current={ state.filters }
-                        cols={ cols }
-                    />
-                </div>
-            </Collapse>
-
-            { !isPie && <Collapse collapsed header={ isBar ? "X Axis" : "Y Axis" }>
-                <div className="mt-1">
-                    <label>Axis Title</label>
-                    <input
-                        type="text"
-                        // @ts-ignore
-                        value={ chartOptions.yAxis?.title?.text || "" }
-                        onChange={ e => onChange(merge(state, {
-                            chartOptions: {
-                                yAxis: {
-                                    title: {
-                                        text: e.target.value
-                                    }
-                                }
-                            }
-                        }))}
-                    />
-                </div>
-                <div className="mt-1 pb-1">
-                    <Checkbox
-                        name="YTicks"
-                        label="Render axis tick marks"
-                        // @ts-ignore
-                        checked={chartOptions.yAxis?.tickWidth !== 0}
-                        onChange={checked => onChange(merge(state, {
-                            chartOptions: {
-                                yAxis: {
-                                    tickWidth: checked ? 1 : 0
-                                }
-                            }
-                        }))}
-                    />
-                    <Checkbox
-                        name="YLabels"
-                        label="Render labels"
-                        // @ts-ignore
-                        checked={chartOptions.yAxis?.labels?.enabled !== false}
-                        onChange={checked => onChange(merge(state, {
-                            chartOptions: {
-                                yAxis: {
-                                    labels: { enabled: checked }
-                                }
-                            }
-                        }))}
-                    />
-                </div>
-                <div className="pb-1">
-                    <AdvancedAxisEditor
-                        axis={ (state.chartOptions.yAxis || {}) as YAxisOptions }
-                        onChange={yAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { yAxis })})}
-                    />
-                </div>
-            </Collapse> }
-
-            { !isPie && <Collapse collapsed header={ isBar ? "Y Axis" : "X Axis" }>
-                <div className="mt-1">
-                    <label>Axis Title</label>
-                    <input
-                        type="text"
-                        placeholder={state.xCol.label || state.xCol.name || ""}
-                        // @ts-ignore
-                        value={ chartOptions.xAxis?.title?.text || "" }
-                        onChange={ e => onChange(merge(state, {
-                            chartOptions: {
-                                xAxis: {
-                                    title: {
-                                        text: e.target.value
-                                    }
-                                }
-                            }
-                        }))}
-                    />
-                </div>
-                <div className="mt-1 pb-1">
-                    <Checkbox
-                        name="XTicks"
-                        label="Render axis tick marks"
-                        // @ts-ignore
-                        checked={ !!chartOptions.xAxis?.tickWidth }
-                        onChange={checked => onChange(merge(state, {
-                            chartOptions: {
-                                xAxis: {
-                                    tickWidth: checked ? 1 : 0
-                                }
-                            }
-                        }))}
-                    />
-                    <Checkbox
-                        name="XLabels"
-                        label="Render labels"
-                        // @ts-ignore
-                        checked={chartOptions.xAxis?.labels?.enabled !== false}
-                        onChange={checked => onChange(merge(state, {
-                            chartOptions: {
-                                xAxis: {
-                                    labels: { enabled: checked }
-                                }
-                            }
-                        }))}
-                    />
-                </div>
-                <div className="pb-1">
-                    <AdvancedAxisEditor
-                        axis={ (state.chartOptions.xAxis || {}) as XAxisOptions }
-                        onChange={xAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { xAxis })})}
-                    />
-                </div>
-            </Collapse> }
-
             { !isPie && <Collapse collapsed header="Annotations">
                 <AnnotationsUI
                     onChange={ annotations => onChange(
@@ -988,18 +989,14 @@ function getErrorbarOptions(options: SeriesErrorbarOptions, onChange: (options: 
         {
             name: "whisker Dash Style",
             type: "options",
-            options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
-            'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
-            'LongDashDot', 'LongDashDotDot'],
+            options: DASH_STYLES,
             value: options.whiskerDashStyle ?? "Solid",
             onChange: (whiskerDashStyle: DashStyleValue) => onChange({ whiskerDashStyle })
         },
         {
             name: "Stem Dash Style",
             type: "options",
-            options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
-            'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
-            'LongDashDot', 'LongDashDotDot'],
+            options: DASH_STYLES,
             value: options.stemDashStyle ?? "Dash",
             onChange: (stemDashStyle: DashStyleValue) => onChange({ stemDashStyle })
         }
@@ -1029,9 +1026,7 @@ function getAreaOptions(options: SeriesAreasplineOptions | SeriesAreasplinerange
         {
             name: "Dash Style",
             type: "options",
-            options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
-            'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
-            'LongDashDot', 'LongDashDotDot'],
+            options: DASH_STYLES,
             value: options.dashStyle ?? "Solid",
             onChange: (dashStyle: DashStyleValue) => onChange({ dashStyle })
         },
@@ -1058,9 +1053,7 @@ function getSplineOptions(options: SeriesSplineOptions, onChange: (options: Part
         {
             name: "Dash Style",
             type: "options",
-            options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
-            'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
-            'LongDashDot', 'LongDashDotDot'],
+            options: DASH_STYLES,
             value: options.dashStyle ?? "Solid",
             onChange: (dashStyle: DashStyleValue) => onChange({ dashStyle })
         },
@@ -1187,9 +1180,7 @@ function AdvancedAxisEditor({
                         {
                             name: "Dash Style",
                             type: "options",
-                            options: ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
-                            'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
-                            'LongDashDot', 'LongDashDotDot'],
+                            options: DASH_STYLES,
                             value: axis.gridLineDashStyle ?? "Solid",
                             onChange: (gridLineDashStyle: DashStyleValue) => onChange({ gridLineDashStyle: gridLineDashStyle ?? "Solid" })
                         },
@@ -1370,11 +1361,11 @@ function SeriesEditor({
                     width     : "0.9em",
                     height    : "0.9em",
                     display   : "inline-block",
-                    boxShadow : "0 0 1px #FFF, 0 1px 1px #FFF8 inset",
+                    boxShadow : s.visible !== false ? "0 0 1px #FFF, 0 1px 1px #FFF8 inset" : "0 0 1px #FFF, 0 1px 1px #CCC8 inset",
                     border    : s.visible !== false ? "1px solid #000" : "1px solid #BBB",
                     borderRadius: "20%",
                 }}/>
-                <span style={{ color: s.visible !== false ? "#369" : "#AAA" }}> { String(s.name ?? "") || "Series " + (i + 1)}</span>
+                <span style={{ color: s.visible !== false ? "#414e5c" : "#999" }}> { String(s.name ?? "") || "Series " + (i + 1)}</span>
             </>,
             type: "group",
             value: props
@@ -1385,8 +1376,8 @@ function SeriesEditor({
         <Collapse collapsed header="Series">
             <PropertyGrid props={props as any} />
             <div
-                className="link pt-1 pb-1 mb-1"
-                style={{ color: hasInvisible ? "#06D" : "#AAA" }}
+                className="link pt-1 pb-1"
+                style={{ color: hasInvisible ? "#06D" : "#AAA", userSelect: "none" }}
                 tabIndex={0}
                 onClick={() => {
                     if (hasInvisible) {
@@ -1410,8 +1401,184 @@ function SeriesEditor({
                     textAlign: "center"
                 }} />Toggle all hidden series in legend
             </div>
+            <Collapse collapsed header={
+                <span title="Changing these options will affect all series!">
+                    All Serries Override <i className="fa-solid fa-triangle-exclamation color-orange" />
+                </span>
+            }>
+                <AllSeriesEditor state={state} onChange={onChange} />
+            </Collapse>
+            <br/>
         </Collapse>
     )
+}
+
+function AllSeriesEditor({
+    state,
+    onChange,
+}: {
+    state: ChartConfigPanelState,
+    onChange: (state: ChartConfigPanelState) => void
+}) {
+    const change = (patch: any) => {
+        const next = merge(state)
+        next.chartOptions.series?.forEach(s => Object.assign(s, patch));
+        onChange(next)
+    }
+
+    const S: any = state.chartOptions.series?.[0] || {}
+
+    const currentTypes = (state.chartOptions.series || []).reduce((prev, cur) => {
+        if (!prev.includes(cur.type)) {
+            prev.push(cur.type)
+        }
+        return prev
+    }, [] as string[])
+
+    function hasSeries(...types: string[]) {
+        for (const type of types) {
+            if (currentTypes.includes(type)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    const hasColumn     = hasSeries("column")
+    const hasBar        = hasSeries("bar")
+    const hasPie        = hasSeries("pie")
+    const hasSpline     = hasSeries("spline")
+    const hasAreaSpline = hasSeries("areaspline")
+
+    const has3d = !!state.chartOptions.chart?.options3d?.enabled
+
+    const props: any[] = []
+
+    if (hasColumn || hasBar || hasPie) {
+        if (has3d) {
+            props.push(
+                {
+                    name: "Edge Width",
+                    type: "number",
+                    min: 0,
+                    step: 0.1,
+                    value: S.edgeWidth ?? 1,
+                    onChange: (edgeWidth: number) => change({ edgeWidth })
+                },
+                {
+                    name: "Edge Color",
+                    type: "color",
+                    value: S.edgeColor ?? "#00000088",
+                    onChange: (edgeColor: string) => change({ edgeColor }),
+                }
+            )
+        } else {
+            props.push(
+                {
+                    name: "Border Width",
+                    type: "number",
+                    min: 0,
+                    step: 0.1,
+                    value: S.borderWidth ?? 0.5,
+                    onChange: (borderWidth: number) => change({ borderWidth })
+                },
+                {
+                    name: "Border Color",
+                    type: "color",
+                    value: S.borderColor ?? "#00000088",
+                    onChange: (borderColor: string) => change({ borderColor })
+                }
+            )
+        }
+    }
+
+    if (hasColumn || hasBar) {
+        props.push(
+            {
+                name : "Border Radius",
+                type : "number",
+                min: 0,
+                max: 50,
+                value: S.borderRadius ?? 0,
+                onChange: (borderRadius: number) => change({ borderRadius })
+            },
+            {
+                name : "Point Padding",
+                type : "number",
+                min: 0,
+                max: 0.5,
+                step: 0.01,
+                value: S.pointPadding ?? 0.1,
+                onChange: (pointPadding: number) => change({ pointPadding })
+            }
+        )
+    }
+
+    if (state.stratifyBy && (hasColumn || hasBar)) {
+        props.push({
+            name : "Group Padding",
+            type : "number",
+            min: 0,
+            max: 0.5,
+            step: 0.01,
+            value: S.groupPadding ?? 0.2,
+            onChange: (groupPadding: number) => change({ groupPadding })
+        })
+    }
+
+    props.push({
+        name: "Dash Style",
+        type: "options",
+        options: DASH_STYLES,
+        value: S.dashStyle ?? "Solid",
+        onChange: (dashStyle: DashStyleValue) => change({ dashStyle })
+    })
+
+    if (hasSpline || hasAreaSpline) {
+        props.push({
+            name: "Line Width",
+            type: "number",
+            min: 0,
+            max: 50,
+            step: 0.1,
+            value: S.lineWidth ?? 1,
+            onChange: (lineWidth: number) => change({ lineWidth }),
+            disabled: !hasSeries("areaspline", "spline")
+        })
+    }
+
+    if (hasAreaSpline) {
+        props.push({
+            name: "Fill Opacity",
+            type: "number",
+            min: 0,
+            max: 1,
+            step: 0.01,
+            value: S.fillOpacity ?? 1,
+            onChange: (fillOpacity: number) => change({ fillOpacity }),
+        })
+    }
+
+    props.push({
+        name: "Opacity",
+        type: "number",
+        min: 0,
+        max: 1,
+        step: 0.01,
+        value: S.opacity ?? 1,
+        onChange: (opacity: number) => change({ opacity })
+    })
+
+    if (!has3d && (hasColumn || hasBar || hasSpline || hasAreaSpline)) {
+        props.push({
+            name: "Shadow",
+            type: "shadow",
+            value: S.shadow || false,
+            onChange: (shadow: any) => change({ shadow })
+        })
+    }
+
+    return <PropertyGrid props={ props } />
 }
 
 function SliceEditor({
