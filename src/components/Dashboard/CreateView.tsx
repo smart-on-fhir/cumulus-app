@@ -35,9 +35,5 @@ export default function CreateView()
     }
 
     // Eventually render a Breadcrumbs and the dashboard
-    return (
-        <div className="container">
-            <Dashboard view={{}} dataRequest={result as app.DataRequest} />
-        </div>
-    )
+    return <Dashboard view={{}} dataRequest={result as app.DataRequest} />
 }

@@ -34,13 +34,9 @@ export default function EditView({ copy }: { copy?: boolean })
         return <AlertError>{`Fetching graph with id "${id}" produced empty response`}</AlertError>
     }
 
-    return (
-        <div className="container">
-            <Dashboard key={ copy ? "copy" : view.id } copy={copy} view={{
-                ...view,
-                name: copy ? view.name.replace(/(\s*\(copy\)\s*)?$/, " (copy)") : view.name,
-                id: copy ? undefined : view.id
-            }} dataRequest={view.DataRequest} />
-        </div>
-    )
+    return <Dashboard key={ copy ? "copy" : view.id } copy={copy} view={{
+        ...view,
+        name: copy ? view.name.replace(/(\s*\(copy\)\s*)?$/, " (copy)") : view.name,
+        id: copy ? undefined : view.id
+    }} dataRequest={view.DataRequest} />
 }

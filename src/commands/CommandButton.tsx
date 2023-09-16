@@ -14,7 +14,7 @@ export default function CommandButton({
     working    ?: boolean,
     error      ?: Error | null,
     execute     : () => void,
-    label       : string | JSX.Element,
+    label       : string | JSX.Element | null,
     icon       ?: JSX.Element
     available  ?: boolean
     enabled    ?: boolean
@@ -34,8 +34,8 @@ export default function CommandButton({
             disabled={!enabled}
         >
             { working ? <i className="fas fa-circle-notch fa-spin" /> : icon }
-            { working || icon ? <>&nbsp;</> : null }
-            {label}
+            { working || (icon && label) ? <>&nbsp;</> : null }
+            { label }
         </button>
         : null
 }
