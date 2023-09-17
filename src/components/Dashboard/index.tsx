@@ -612,7 +612,7 @@ export default function Dashboard({
                         />
                     </div>
                 </div>
-                <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start", minWidth: "32rem" }}>
+                <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start", minWidth: "32rem", maxWidth: 1200 }}>
                     <div style={{ position: "sticky", top: 2 }}>
                         <Breadcrumbs links={[
                             { name: "Home"  , href: "/" },

@@ -153,9 +153,9 @@ export default function ConfigPanel({
     return (
         <div style={{
             color: "#666",
-            padding: "0 15px 0 3px",
+            padding: "0 0.5rem 0 0",
             width: 330,
-            marginRight: "1em"
+            marginRight: "0.5rem"
         }}>
 
             <div className="mb-1">
