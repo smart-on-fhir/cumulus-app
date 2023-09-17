@@ -111,6 +111,10 @@
     &.sidebar-open {
         max-width: 100%;
     }
+
+    > .row {
+        justify-content: center;
+    }
 }
 
 .dashboard-sidebar {
