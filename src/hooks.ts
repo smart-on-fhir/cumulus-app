@@ -32,10 +32,10 @@ export function useBackend<T=any>(fn: (signal?: AbortSignal) => Promise<T>, imme
                     dispatch({ loading: false, result })
                 }
             },
-            (error: Error) => {
+            async (error: Error) => {
                 // @ts-ignore
                 if (error.code === 401) {
-                    return logout()
+                    await logout()
                 }
 
                 if (!abortController.signal.aborted) {
@@ -43,7 +43,7 @@ export function useBackend<T=any>(fn: (signal?: AbortSignal) => Promise<T>, imme
                 }
             }
         );
-    }, [fn, abortController.signal]);
+    }, [fn, abortController.signal, logout]);
     
     useEffect(() => {
         if (immediate) { 
