@@ -310,6 +310,32 @@ export default function Dashboard({
         ranges
     } = state;
 
+    const stratifierName = viewGroupBy?.name
+    const secColumnName  = column2?.name || ""
+    const viewColumnName = viewColumn.name
+    const requestId      = dataRequest.id
+
+    const runtimeView: Partial<app.View> = {
+        id         : view.id,
+        name       : viewName,
+        description: viewDescription,
+        Tags       : tags,
+        settings: {
+            ...view.settings,
+            groupBy: stratifierName || "",
+            column : viewColumnName,
+            filters,
+            viewType: chartType,
+            // @ts-ignore
+            chartOptions: strip(fullChartOptions, ReadOnlyPaths),
+            denominator,
+            column2: secColumnName,
+            column2type,
+            caption,
+            ranges
+        }
+    }
+
     function onSeriesToggle(map: Record<string, boolean>) {
         const next = {
             chartOptions: {
@@ -346,51 +372,14 @@ export default function Dashboard({
         
         // Update
         if (view.id) {
-            await updateOne("views", view.id, {
-                ...view,
-                name: viewName,
-                description: viewDescription,
-                screenShot,
-                Tags: tags,
-                settings: {
-                    ...view.settings,
-                    groupBy: viewGroupBy?.name,
-                    column : viewColumn.name,
-                    filters,
-                    viewType: chartType,
-                    chartOptions: chartOptionsToSave,
-                    denominator,
-                    column2: column2?.name,
-                    column2type,
-                    caption,
-                    ranges
-                }
-            }).catch(e => alert(e.message));
+            const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
+            await updateOne("views", view.id, { ...runtimeView, screenShot }).catch(e => alert(e.message));
         }
 
         // Create
         else {
-            await createOne("views", {
-                ...view,
-                name: viewName,
-                description: viewDescription,
-                DataRequestId: dataRequest.id,
-                screenShot,
-                Tags: tags,
-                settings: {
-                    ...view.settings,
-                    groupBy: viewGroupBy?.name,
-                    column : viewColumn.name,
-                    filters,
-                    viewType: chartType,
-                    chartOptions: chartOptionsToSave,
-                    denominator,
-                    column2: column2?.name,
-                    column2type,
-                    caption,
-                    ranges
-                }
-            }).then(
+            const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
+            await createOne("views", { ...runtimeView, DataRequestId: dataRequest.id, screenShot, }).then(
                 v => defer(() => navigate("/views/" + v.id)),
                 e => alert(e.message)
             );
@@ -421,11 +410,7 @@ export default function Dashboard({
     if (chain.length) filterParams.push(chain.join(","))
 
     // Variables that control if new data needs to be fetched
-    const stratifierName = viewGroupBy?.name
-    const secColumnName  = column2?.name || ""
-    const viewColumnName = viewColumn.name
-    const requestId      = dataRequest.id
-    const filter         = filterParams.map(encodeURIComponent).join("&filter=")
+    const filter = filterParams.map(encodeURIComponent).join("&filter=")
 
     const loadData = useCallback(() => {
         dispatch({ type: "UPDATE", payload: {
@@ -551,9 +536,9 @@ export default function Dashboard({
     }
 
     const deleteCommand    = useCommand(new DeleteGraph(view.id || 0, auth.user, navigate));
-    const copyCommand      = useCommand(new CopyGraph(view.id || 0, auth.user, navigate));
-    const downloadPNG      = useCommand(new DownloadScreenshotAsPNG({ ...view, name: state.viewName }));
-    const downloadJPG      = useCommand(new DownloadScreenshotAsJPG({ ...view, name: state.viewName }));
+    const copyCommand      = useCommand(new CopyGraph(view.id || 0, auth.user, navigate, runtimeView));
+    const downloadPNG      = useCommand(new DownloadScreenshotAsPNG(runtimeView));
+    const downloadJPG      = useCommand(new DownloadScreenshotAsJPG(runtimeView));
     const toggleFullscreen = useCommand(new ToggleFullscreen());
     const printChart       = useCommand(new PrintChart());
     const requestLineData  = useCommand(new RequestLineLevelData(view.id || 0, auth.user, navigate))

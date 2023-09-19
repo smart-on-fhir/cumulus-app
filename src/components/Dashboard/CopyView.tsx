@@ -1,15 +1,17 @@
 import { useCallback } from "react";
-import { useParams }   from "react-router";
+import { useLocation, useParams }   from "react-router";
 import Dashboard       from ".";
 import { request }     from "../../backend";
 import { useBackend }  from "../../hooks";
 import { AlertError }  from "../generic/Alert";
 import Loader          from "../generic/Loader";
 
-export default function EditView({ copy }: { copy?: boolean })
+export default function CopyView()
 {
     // The subscription ID from the URL params
     const { id } = useParams()
+
+    const { state } = useLocation()
 
     // Fetch the subscription by ID
     const { loading, error, result: view } = useBackend(
@@ -34,5 +36,14 @@ export default function EditView({ copy }: { copy?: boolean })
         return <AlertError>{`Fetching graph with id "${id}" produced empty response`}</AlertError>
     }
 
-    return <Dashboard view={view} dataRequest={view.DataRequest} />
+    // @ts-ignore
+    if (state?.view) {
+        // @ts-ignore
+        Object.assign(view, state.view)
+    }
+
+    view.name = view.name.replace(/(\s*\(copy\)\s*)?$/, " (copy)")
+    delete view.id
+
+    return <Dashboard copy view={view} dataRequest={view.DataRequest} />
 }
