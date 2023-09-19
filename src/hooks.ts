@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react"
+import { useAuth } from "./auth";
 import { Command } from "./commands/Command";
 
 interface State<T = any> {
@@ -13,6 +14,8 @@ function reducer(state: State, payload: Partial<State>): State {
 
 export function useBackend<T=any>(fn: (signal?: AbortSignal) => Promise<T>, immediate = false)
 {
+    const { logout } = useAuth()
+
     const [state, dispatch] = useReducer(reducer, {
         loading: immediate,
         error: null,
@@ -30,6 +33,11 @@ export function useBackend<T=any>(fn: (signal?: AbortSignal) => Promise<T>, imme
                 }
             },
             (error: Error) => {
+                // @ts-ignore
+                if (error.code === 401) {
+                    return logout()
+                }
+
                 if (!abortController.signal.aborted) {
                     dispatch({ loading: false, error })
                 }
