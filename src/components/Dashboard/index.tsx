@@ -209,10 +209,10 @@ export default function Dashboard({
     
     copy?: boolean
 }) {
-
-    const navigate = useNavigate();
-    const auth     = useAuth();
-    const isAdmin  = auth.user?.role === "admin"
+    const navigate  = useNavigate();
+    const auth      = useAuth();
+    const canUpdate = auth.user?.permissions.includes("Views.update")
+    const canCreate = auth.user?.permissions.includes("Views.create")
 
     const { cols = [] } = dataRequest.metadata ?? {}
 
@@ -354,30 +354,20 @@ export default function Dashboard({
     // Save
     const { execute: save, loading: saving } = useBackend(async () => {
         
-        if (!isAdmin) {
-            return alert("You don't have permission to save graphs")
-        }
-
-        const screenShot = viewType === "overview" ?
-            await getScreenShot() :
-            undefined;
-
-        // const chartOptionsToSave = objectDiff(
-        //     strip(fullChartOptions, ReadOnlyPaths),
-        //     DefaultChartOptions
-        // );
-        const chartOptionsToSave = strip(fullChartOptions, ReadOnlyPaths);
-
-        // console.log(chartOptions, chartOptionsToSave)
-        
         // Update
         if (view.id) {
+            if (!canUpdate) {
+                return alert("You don't have permission to update graphs")
+            }
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
             await updateOne("views", view.id, { ...runtimeView, screenShot }).catch(e => alert(e.message));
         }
 
         // Create
         else {
+            if (!canCreate) {
+                return alert("You don't have permission to create graphs")
+            }
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
             await createOne("views", { ...runtimeView, DataRequestId: dataRequest.id, screenShot, }).then(
                 v => defer(() => navigate("/views/" + v.id)),
@@ -636,7 +626,7 @@ export default function Dashboard({
                                         className="btn"
                                         onClick={ takeScreenshot }
                                         title="Update Screenshot"
-                                        disabled={!view.id || !isAdmin || viewType !== "overview" }>
+                                        disabled={!view.id || !canUpdate || viewType !== "overview" }>
                                         <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
                                     </button>
                                     <button
