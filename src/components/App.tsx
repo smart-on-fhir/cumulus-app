@@ -3,10 +3,11 @@ import { AuthProvider, RequireAuth, LoginPage } from "../auth";
 import Header                                   from "./Header";
 import Home                                     from "./Home";
 import EditView                                 from "./Dashboard/EditView";
+import CopyView                                 from "./Dashboard/CopyView";
+import RequestDataForm                          from "./Dashboard/RequestDataForm";
 import Subscriptions                            from "./DataRequests";
 import RequestGroups                            from "./RequestGroups";
 import DataSiteListPage                         from "./DataSites";
-import RequestDataForm                          from "./Dashboard/RequestDataForm";
 import Navigation                               from "./Navigation";
 import Views                                    from "./Views";
 import Users                                    from "./Users";
@@ -38,7 +39,7 @@ export default function App()
                                     <Route path=":id">
                                         <Route index               element={ <RequireAuth><EditView /></RequireAuth> } />
                                         <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />
-                                        <Route path="copy"         element={ <RequireAuth><EditView copy /></RequireAuth> } />
+                                        <Route path="copy"         element={ <RequireAuth><CopyView /></RequireAuth> } />
                                     </Route>
                                 </Route>
 

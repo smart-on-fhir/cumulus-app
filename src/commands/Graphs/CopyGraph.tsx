@@ -8,12 +8,14 @@ export class CopyGraph extends Command
     private graphId?: number
     private user?: app.User | null
     private navigate?: NavigateFunction
+    private view?: Partial<app.View>
     
-    constructor(graphId: number, user?: app.User | null, navigate?: NavigateFunction) {
+    constructor(graphId: number, user?: app.User | null, navigate?: NavigateFunction, view?: Partial<app.View>) {
         super()
         this.graphId = graphId
         this.user = user
         this.navigate = navigate
+        this.view = view
     }
 
     label() {
@@ -39,7 +41,7 @@ export class CopyGraph extends Command
     execute() {
         setTimeout(() => {
             if (this.navigate) {
-                this.navigate(`/views/${this.graphId}/copy`)
+                this.navigate(`/views/${this.graphId}/copy`, { state: { view: this.view }, replace: false })
             } else {
                 const url = new URL(`/views/${this.graphId}/copy`, window.location.origin)
                 window.location.href = url.href
