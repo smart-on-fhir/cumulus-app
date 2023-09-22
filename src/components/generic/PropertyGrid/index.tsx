@@ -58,7 +58,7 @@ export function PropertyEditorGroup({
     level = 0,
     open = false
 }: {
-    props: EditableProperty[]
+    props: (EditableProperty | EditableGroupProperty)[]
     name: string | JSX.Element,
     level?: number
     open?: boolean
@@ -95,7 +95,7 @@ export function PropertyEditorGroup({
                         />
                     }
                     return <Fragment key={i + "xx"}>
-                        <div className="prop-label" title={ prop.description || prop.name } style={{ paddingLeft: "1.3em" }}>
+                        <div className="prop-label" style={{ paddingLeft: "1.3em" }}>
                             <span className="nowrap">{ prop.name }</span>
                         </div>
                         <div className="prop-editor"><PropertyEditor prop={prop as EditableProperty} /></div>

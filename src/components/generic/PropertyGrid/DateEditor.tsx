@@ -2,7 +2,7 @@ import { EditableDateProperty } from "./types"
 
 
 export default function DateEditor({ prop }: { prop: EditableDateProperty }) {
-    const { value, min, max, onChange, disabled } = prop
+    const { value, min, max, onChange, disabled, onContextMenu } = prop
     const d = new Date(value || 0)
     const s = `${
         d.getUTCFullYear()
@@ -19,6 +19,7 @@ export default function DateEditor({ prop }: { prop: EditableDateProperty }) {
             min={ min }
             max={ max }
             disabled={ !!disabled }
+            onContextMenu={onContextMenu}
         />
     )
 }
