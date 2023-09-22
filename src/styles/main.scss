@@ -51,7 +51,17 @@ p {
 
 code, pre {
   font-family: source-code-pro, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.9rem;
+  font-size: 92%;
+}
+
+code {
+  background: #C001;
+  color: #A00;
+  padding: 1px 2px;
+  border: 1px solid #9002;
+  margin: -1px;
+  border-radius: 3px;
+  vertical-align: baseline;
 }
 
 label {
@@ -118,6 +128,7 @@ b, .bold {
 
 // Paddings --------------------------------------------------------------------
 .p-0  { padding: 0;               }
+.p-05 { padding: $gap * 0.5;      }
 .p-1  { padding: $gap;            }
 .p-2  { padding: $gap * 2;        }
 .p-3  { padding: $gap * 3;        }
@@ -140,6 +151,7 @@ b, .bold {
 
 // Margins ---------------------------------------------------------------------
 .m-0  { margin: 0;                }
+.m-05 { margin: $gap * 0.5;       }
 .m-1  { margin: $gap;             }
 .m-2  { margin: $gap * 2;         }
 .m-3  { margin: $gap * 3;         }
