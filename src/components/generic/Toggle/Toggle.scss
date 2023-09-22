@@ -1,0 +1,39 @@
+@import "../../../styles/variables.scss";
+
+.toggle {
+    display       : inline-block;
+    vertical-align: text-bottom;
+    max-width     : 1.5em;
+    flex-grow     : 0;
+    border-radius : 1em;
+    background    : #FFF;
+    align-self    : baseline;
+    justify-self  : start;
+    margin        : 1.5px 0 -1.5px;
+    box-shadow    : 0 0 0 1px #8888;
+
+    &:after {
+        content      : "";
+        width        : 1em;
+        height       : 1em;
+        background   : #8888;
+        display      : block;
+        border-radius: 1em;
+        border       : 1.5px #FFF solid;
+        transition   : all 0.2s ease-in-out;
+        box-sizing   : border-box;
+    }
+
+    &.on {
+        box-shadow: 0 0 0 1px currentColor;
+        &:after {
+            background: currentColor;
+            transform: translateX(0.5em);
+        }
+    }
+
+    &:focus, &:focus-visible {
+        box-shadow: 0 0 0 1px $color-blue, 0 0 0 3px fade-out($color-blue, 0.6);
+        outline: none;
+    }
+}
