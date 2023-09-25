@@ -66,7 +66,13 @@ export default function DemographicsEditor({
                             newSelection.splice(index, 1)
                             onChange(newSelection)
                         } else {
-                            onChange([ ...demographics, item ])
+                            onChange([
+                                ...demographics,
+                                {
+                                    ...item,
+                                    description: String(item.description)
+                                }
+                            ])
                         }
                     }}
                 />

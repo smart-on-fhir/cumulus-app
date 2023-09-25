@@ -4,7 +4,7 @@ import Checkbox from "../Checkbox"
 interface CheckboxListDataItem {
     id?: number | string
     name: string
-    description?: string | null
+    description?: string | JSX.Element | null
     [key: string]: any
 }
 
