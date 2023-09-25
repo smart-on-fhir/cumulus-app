@@ -1,13 +1,14 @@
-import { useState }   from "react"
-import Select         from "../generic/Select"
-import ColumnSelector from "./ColumnSelector"
-import FilterUI       from "./FilterUI"
-import Collapse       from "../generic/Collapse"
-import Checkbox       from "../generic/Checkbox"
-import AnnotationsUI  from "./AnnotationsUI"
-import TagSelector    from "../Tags/TagSelector"
-import PropertyGrid   from "../generic/PropertyGrid"
-import { app }        from "../../types"
+import { MouseEvent, useState } from "react"
+import moment                   from "moment"
+import Select                   from "../generic/Select"
+import ColumnSelector           from "./ColumnSelector"
+import FilterUI                 from "./FilterUI"
+import Collapse                 from "../generic/Collapse"
+import Checkbox                 from "../generic/Checkbox"
+import AnnotationsUI            from "./AnnotationsUI"
+import TagSelector              from "../Tags/TagSelector"
+import PropertyGrid             from "../generic/PropertyGrid"
+import { app }                  from "../../types"
 import {
     AlignValue,
     AxisTitleAlignValue,
@@ -24,13 +25,17 @@ import {
     SeriesSplineOptions,
     VerticalAlignValue,
     XAxisOptions,
-    YAxisOptions
+    XAxisPlotLinesOptions,
+    YAxisOptions,
+    YAxisPlotLinesOptions
 } from "highcharts"
 import {
     SupportedChartTypes,
     ChartIcons,
-    DEFAULT_COLORS
+    DEFAULT_COLORS,
+    DATE_BOOKMARKS
 } from "./config"
+
 
 type SupportedChartType = keyof typeof SupportedChartTypes
 
@@ -681,6 +686,24 @@ export default function ConfigPanel({
                     <AdvancedAxisEditor
                         axis={ (state.chartOptions.xAxis || {}) as XAxisOptions }
                         onChange={xAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { xAxis })})}
+                    />
+                </div>
+            </Collapse> }
+
+            { !isPie && <Collapse collapsed header={ isBar ? "X Axis Plot Lines" : "Y Axis Plot Lines" }>
+                <div className="pt-1 pb-2">
+                    <PlotLinesEditor
+                        axis={ (state.chartOptions?.yAxis || {}) as YAxisOptions }
+                        onChange={plotLines => onChange({ ...state, chartOptions: merge(state.chartOptions, { yAxis: { plotLines } })})}
+                    />
+                </div>
+            </Collapse> }
+
+            { !isPie && <Collapse collapsed header={ isBar ? "Y Axis Plot Lines" : "X Axis Plot Lines" }>
+                <div className="pt-1 pb-2">
+                    <PlotLinesEditor
+                        axis={ (state.chartOptions?.xAxis  || {}) as XAxisOptions }
+                        onChange={plotLines => onChange({ ...state, chartOptions: merge(state.chartOptions, { xAxis: { plotLines } })})}
                     />
                 </div>
             </Collapse> }
@@ -1731,6 +1754,235 @@ function SliceEditor({
                         {/* <AllSeriesEditor state={state} onChange={onChange} /> */}
                     </div>
                 </Collapse>
+            </div>
+        </div>
+    )
+}
+
+function PlotLinesEditor({
+    axis,
+    onChange
+}: {
+    axis: XAxisOptions | YAxisOptions
+    onChange: (lines: XAxisPlotLinesOptions[] | YAxisPlotLinesOptions[]) => void
+}) {
+
+    const lines = axis.plotLines || []
+
+    return (
+        <div>
+            { lines.map((o, i) => {
+                return (
+                    <div key={i} className="repeatable">
+                        <header>
+                            <b>Plot Line { i + 1 }</b>
+                            <button className="btn color-red small btn-virtual" onClick={() => onChange(lines.filter((_, y) => y !== i))}>
+                                <i className="fas fa-trash-alt" />
+                            </button>
+                        </header>
+                        <PropertyGrid props={[
+                            {
+                                name: "Position",
+                                type: axis.type === "datetime" ? "date" : "number",
+                                description: "The position of the line in axis units.",
+                                value: o.value,
+                                // step:  axis.type === "category" ? 0.1 : 1,
+                                onChange: (value: any) => {
+                                    lines[i].value = axis.type === "datetime" ? +new Date(value) : value
+                                    onChange(lines)
+                                },
+                                onContextMenu: axis.type === "datetime" ? (e: MouseEvent) => {
+
+                                    // @ts-ignore
+                                    e.nativeEvent.menuItems = DATE_BOOKMARKS.map(item => ({
+                                        label: <>{ item.date }  -  <b>{ item.name }</b></>,
+                                        icon : <i className="fa-regular fa-calendar-check color-blue-dark" />,
+                                        active: moment(o.value).utc().isSame(moment(item.date).utc(), "day"),
+                                        execute: () => {
+                                            lines[i].value = +new Date(item.date)
+                                            onChange(lines)
+                                        }
+                                    }));
+        
+                                    // @ts-ignore
+                                    e.nativeEvent.menuItems.unshift({ label: "Well Known Dates" })
+                                } : undefined
+                            },
+                            {
+                                name: "Width",
+                                type: "number",
+                                value: o.width,
+                                step: 0.1,
+                                min: 0,
+                                onChange: (width: number) => {
+                                    lines[i].width =  width
+                                    onChange(lines)
+                                }
+                            },
+                            {
+                                name: "Color",
+                                type: "color",
+                                value: o.color,
+                                onChange: (color: string) => {
+                                    lines[i].color =  color
+                                    onChange(lines)
+                                }
+                            },
+                            {
+                                name: "Dash Style",
+                                type: "options",
+                                options: DASH_STYLES,
+                                value: o.dashStyle ?? "Solid",
+                                onChange: (dashStyle: DashStyleValue) => {
+                                    lines[i].dashStyle =  dashStyle
+                                    onChange(lines)
+                                }
+                            },
+                            {
+                                name : "Z Index",
+                                type : "number",
+                                value: o.zIndex,
+                                onChange: (zIndex: number) => {
+                                    lines[i].zIndex =  zIndex
+                                    onChange(lines)
+                                }
+                            },
+                            {
+                                name: "Label",
+                                type: "group",
+                                value: [
+                                    {
+                                        name: "Text",
+                                        type: "string",
+                                        value: o.label?.text,
+                                        onChange: (text: string) => {
+                                            lines[i] = merge(lines[i], { label: { text } })
+                                            console.log(lines)
+                                            onChange(lines)
+                                        }
+                                    },
+                                    {
+                                        name: "Align",
+                                        type: "options",
+                                        options: ["left", "center", "right"],
+                                        value: o.label?.align,
+                                        onChange: (align: AlignValue) => {
+                                            lines[i] = merge(lines[i], { label: { align } })
+                                            onChange(lines)
+                                        }
+                                    },
+                                    {
+                                        name: "Vertical Align",
+                                        type: "options",
+                                        options: ["top", "middle", "bottom"],
+                                        value: o.label?.verticalAlign,
+                                        onChange: (verticalAlign: VerticalAlignValue) => {
+                                            lines[i] = merge(lines[i], { label: { verticalAlign } })
+                                            onChange(lines)
+                                        }
+                                    },
+                                    {
+                                        name: "X Offset",
+                                        type: "number",
+                                        value: o.label?.x,
+                                        min: -500,
+                                        max: 500,
+                                        onChange: (x: number) => {
+                                            lines[i] = merge(lines[i], { label: { x } })
+                                            onChange(lines)
+                                        }
+                                    },
+                                    {
+                                        name: "Y Offset",
+                                        type: "number",
+                                        value: o.label?.y,
+                                        min: -500,
+                                        max: 500,
+                                        onChange: (y: number) => {
+                                            lines[i] = merge(lines[i], { label: { y } })
+                                            onChange(lines)
+                                        }
+                                    },
+                                    {
+                                        name: "Rotation",
+                                        type: "number",
+                                        value: o.label?.rotation,
+                                        min: -360,
+                                        max: 360,
+                                        onChange: (rotation: number) => {
+                                            lines[i] = merge(lines[i], { label: { rotation } })
+                                            onChange(lines)
+                                        }
+                                    }
+                                ],
+                            },
+                            {
+                                name: "Label Style",
+                                type: "group",
+                                value: [
+                                    {
+                                        name: "Font Size",
+                                        type: "length",
+                                        value: o.label?.style?.fontSize ?? "13px",
+                                        units: [ "px", "em", "rem" ],
+                                        onChange: (fontSize: string) => {
+                                            lines[i] = merge(lines[i], { label: { style: { fontSize } } })
+                                            onChange(lines)
+                                        }
+                                    },
+                                    {
+                                        name: "Font Weight",
+                                        type: "options",
+                                        options: [
+                                            { value: 100, label: "Thin (Hairline)" },
+                                            { value: 200, label: "Extra Light (Ultra Light)" },
+                                            { value: 300, label: "Light" },
+                                            { value: 400, label: "Normal (Regular)" },
+                                            { value: 500, label: "Medium" },
+                                            { value: 600, label: "Semi Bold (Semi Bold)" },
+                                            { value: 700, label: "Bold" },
+                                            { value: 800, label: "Extra Bold (Ultra Bold)" },
+                                            // { value: 900, label: "Black (Heavy)" },
+                                            // { value: 950, label: "Extra Black (Ultra Black)" },
+                                        ],
+                                        value: o.label?.style?.fontWeight,
+                                        onChange: (fontWeight: string) => {
+                                            lines[i] = merge(lines[i], { label: { style: { fontWeight } } })
+                                            onChange(lines)
+                                        }
+                                    },
+                                    {
+                                        name: "Text Color",
+                                        type: "color",
+                                        value: o.label?.style?.color,
+                                        onChange: (color: string) => {
+                                            lines[i] = merge(lines[i], { label: { style: { color } } })
+                                            onChange(lines)
+                                        }
+                                    }
+                                ]
+                            }
+                        ]} />
+                    </div>
+                );
+            })}
+            <div className="row middle">
+                <div className="col center">
+                    <button className="btn color-green small" onClick={() => {
+                        onChange([
+                            ...lines,
+                            {
+                                // value: 0,
+                                color: "#000000",
+                                width: 1,
+                                label: {
+                                    x: 4,
+                                    y: 4
+                                }
+                            }
+                        ])
+                    }}>Add Plot Line</button>
+                </div>
             </div>
         </div>
     )
