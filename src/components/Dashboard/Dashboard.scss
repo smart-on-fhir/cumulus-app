@@ -146,6 +146,28 @@
     overflow-X    : hidden;
 }
 
+.dashboard-sidebar .repeatable {
+    margin: 0 0 1em;
+    padding: 1px;
+    box-shadow: 0 0 0 1px #CCC inset;
+    border-radius: 5px 5px 0 0;
+    header {
+        padding: 2px 2px 2px 4px;
+        display: flex;
+        border-bottom: 1px solid #0002;
+        background: #EEE;
+        border-radius: 4px 4px 0 0;
+        box-shadow: 0 1px 0 #FFF inset;
+        b {
+            flex: 1;
+        }
+
+        button {
+            padding: 0;
+        }
+    }
+}
+
 @media (max-width: 960px) {
     .dashboard-sidebar {
         display: none;
