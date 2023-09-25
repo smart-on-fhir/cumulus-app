@@ -1,0 +1,37 @@
+.tabs {
+    display: flex;
+
+    .tabs-spacer {
+        box-shadow: 0 -1px 0 0 #CCC inset;
+        flex      : 1 1 0;
+    }
+
+    .tab-name {
+        padding      : 0.5em 1em;
+        cursor       : default;
+        border-radius: 5px 5px 0 0;
+        justify-self : stretch;
+        text-align   : center;
+        white-space  : nowrap;
+        overflow     : hidden;
+        text-overflow: ellipsis;
+        user-select  : none;
+        box-shadow   : 0 -1px 0 0 #CCC inset;
+        font-weight  : 500;
+        box-sizing   : border-box;
+
+        &:focus-visible {
+            outline       : 1px solid #06F6;
+            outline-offset: -0.4em;
+        }
+
+        &.active {
+            flex      : 0 0 fit-content;
+            box-shadow: 0 1px 0px 0 #BBB inset,
+                -1px 0 0 0 #CCC inset,
+                1px 0 0 0 #CCC inset,
+                0 13px 3px -10px #FFFC inset,
+                0 14px 0px -10px #F90 inset;
+        }
+    }
+}
