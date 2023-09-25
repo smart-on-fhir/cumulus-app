@@ -325,16 +325,16 @@ ul {
 }
 
 .string {
-  color: #373
+  color: #393
 }
 .integer {
   color: #A00
 }
-.float {
-  color: #D00
+.float, .number {
+  color: #A90
 }
 .boolean {
-  color: #009
+  color: #06A
 }
 .boolean-true {
   color: #00b300
@@ -343,7 +343,13 @@ ul {
   color: #C00
 }
 .date, .date\:YYYY-MM-DD, .date\:YYYY-MM, .date\:YYYY {
-  color: #609
+  color: #60A
+}
+.object {
+  color: #A0A
+}
+.array {
+  color: #0AA
 }
 .null {
   font-weight: bold;
