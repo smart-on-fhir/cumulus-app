@@ -13,7 +13,7 @@ import { app } from "./types"
 
 const deferMap = new WeakMap();
 
-export function defer(fn: () => void, delay = 0)
+export function defer(fn: () => void, delay?: number)
 {
     const f = () => {
         fn()
@@ -22,10 +22,10 @@ export function defer(fn: () => void, delay = 0)
 
     const ref = deferMap.get(fn);
     if (ref) {
-        if (delay) {
-            clearTimeout(ref)
-        } else {
+        if (delay === undefined) {
             cancelAnimationFrame(ref)
+        } else {
+            clearTimeout(ref)
         }
     }
 
@@ -217,35 +217,63 @@ export function generateColors(count: number, saturation = 75, lightness = 60, v
     return colors;
 }
 
-export function stripUndefined<T=Record<string, any> | any[]>(o: T): T {
+// export function stripValue<T=Record<string, any> | any[]>(o: T, needle: any): number {
+//     let strips = 0
+
+//     if (Array.isArray(o)) {
+//         for (let i = 0; i < o.length; i++) {
+//             let value = o[i];
+//             if (value === needle) {
+//                 o.splice(i, 1)
+//                 strips += 1
+//                 i -= 1
+//             }
+//             else if (value && typeof value === "object") {
+//                 strips += stripValue(o[i], needle)
+//             }
+//         }
+//     } else {
+//         for (let key in o) {
+//             let value = o[key];
+//             if (value === needle) {
+//                 delete o[key]
+//                 strips += 1
+//             }
+//             else if (value && typeof value === "object") {
+//                 strips += stripValue(o[key], needle)
+//             }
+//         }
+//     }
+
+//     return strips
+// }
+
     if (Array.isArray(o)) {
         for (let i = 0; i < o.length; i++) {
             let value = o[i];
-            if (value === undefined) {
+            if (value === needle) {
                 o.splice(i, 1)
+                strips += 1
                 i -= 1
-                continue;
             }
-
-            if (value && typeof value === "object") {
-                o[i] = stripUndefined(value)
+            else if (value && typeof value === "object") {
+                strips += stripValue(o[i], needle)
             }
         }
     } else {
         for (let key in o) {
             let value = o[key];
-            if (value === undefined) {
+            if (value === needle) {
                 delete o[key]
-                continue;
+                strips += 1
             }
-
-            if (value && typeof value === "object") {
-                o[key] = stripUndefined(value)
+            else if (value && typeof value === "object") {
+                strips += stripValue(o[key], needle)
             }
         }
     }
 
-    return o
+    return strips
 }
 
 export function isEmptyObject(x: Record<string, any>): boolean {

@@ -1,6 +1,6 @@
 import React                       from "react"
 import { Color, merge, Series }    from "highcharts"
-import moment                      from "moment"
+// import moment                      from "moment"
 import { defer, roundToPrecision } from "../../../utils"
 import Loader                      from "../../generic/Loader"
 import { MenuItemConfig }          from "../../generic/Menu"
@@ -136,7 +136,8 @@ function getPoint({
 
     // For datetime axes, the X value is the timestamp in milliseconds since 1970.
     if (xType === "datetime") {
-        point.x = moment(row[0]).utc().valueOf()
+        // point.x = moment(row[0]).utc().valueOf()
+        point.x = +new Date(row[0])// 2020-08-01
     }
 
     // For linear (numeric) axes, the X value is the numeric value or 0.
@@ -381,9 +382,10 @@ export function buildChartOptions({
 
     const dynamicOptions: Highcharts.Options = {
         chart: {
-            marginTop: type === "pie" || options.title?.text ? undefined : 40,
+            // @ts-ignore
+            // marginTop: type === "pie" || options.title?.text ? undefined : 40,
             options3d: {
-                depth: Math.min(series.length * 10, 100),
+                depth: options.chart?.options3d?.depth ?? Math.min(series.length * 10, 100),
             },
             plotBorderWidth: is3d ? 0 : options.chart?.plotBorderWidth,
             animation: {
@@ -457,7 +459,7 @@ export function buildChartOptions({
 
                 let x: any
                 if (xType === "datetime") {
-                    x = moment(this.point.x).format("YYYY-MM-DD")
+                    x = this.point.name//moment(this.point.x).format("YYYY-MM-DD")
                 } else if (xType === "linear") {
                     x = this.point.x
                 } else {
@@ -577,7 +579,7 @@ export default class Chart extends React.Component<ChartProps>
         // The UI can generate too frequent state updates in some cases (for
         // example via color pickers). Using defer here allows us to skip
         // some needless re-rendering 
-        defer(this.updateChart, 1);
+        defer(this.updateChart);
     }
 
     render() {

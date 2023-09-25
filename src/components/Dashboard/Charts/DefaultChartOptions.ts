@@ -25,8 +25,8 @@ const DefaultChartOptions = {
         plotBorderColor: "#999999",
         plotBorderWidth: 0,
         borderWidth: 0,
-        borderColor: "#d1dae2",
-        borderRadius: 5,
+        // borderColor: "#d1dae2",
+        // borderRadius: 5,
         backgroundColor: "#FFFFFF"
     },
     lang: {
