@@ -3,19 +3,19 @@
 .toggle {
     display       : inline-block;
     vertical-align: text-bottom;
-    max-width     : 1.5em;
-    flex-grow     : 0;
+    max-width     : 1.7em;
+    width         : 1.7em;
+    flex          : 0 0 1.7em;
     border-radius : 1em;
-    background    : #FFF;
-    align-self    : baseline;
-    justify-self  : start;
-    margin        : 1.5px 0 -1.5px;
+    background    : #FFF8;
+    align-self    : center;
+    margin        : 0 0 0;
     box-shadow    : 0 0 0 1px #8888;
 
     &:after {
         content      : "";
-        width        : 1em;
-        height       : 1em;
+        width        : 1.1em;
+        height       : 1.1em;
         background   : #8888;
         display      : block;
         border-radius: 1em;
@@ -26,9 +26,10 @@
 
     &.on {
         box-shadow: 0 0 0 1px currentColor;
+        background    : #FFF;
         &:after {
             background: currentColor;
-            transform: translateX(0.5em);
+            transform: translateX(0.6em);
         }
     }
 
