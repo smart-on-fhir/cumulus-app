@@ -30,10 +30,17 @@ label.checkbox-label {
         }
     }
 
-    > input[type="text"] {
+    > input[type="text"],
+    > input[type="number"],
+    > input[type="date"] {
        vertical-align: top; 
        line-height: inherit;
-       padding: 0 0.5em;
+       padding-top: 0;
+       padding-bottom: 0;
+       padding-left: 0.5em;
+       position: relative;
+       margin: -1px;
+       z-index: 2;
     }
 
     .checkbox-label-description {
