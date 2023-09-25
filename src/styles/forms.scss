@@ -216,7 +216,6 @@ input[type="color"] {
         height: 100%;
         border: 0;
         box-shadow: 0 0 0 1px #0008 inset;
-        background-color: transparent !important;
     }
     &::-moz-color-swatch {
         padding: 0;
@@ -224,7 +223,6 @@ input[type="color"] {
         margin: 0;
         border: 0;
         box-shadow: 0 0 0 1px #0008 inset;
-        background-color: transparent !important;
     }
 
     &.empty::-webkit-color-swatch {
@@ -257,6 +255,13 @@ input[type="color"] {
         border: 1px solid rgba(0, 0, 0, 0.5);
         opacity: 0.5;
         filter: grayscale(1);
+    }
+
+    .color-editor > &::-webkit-color-swatch {
+        background-color: transparent !important;
+    }
+    .color-editor > &::-moz-color-swatch {
+        background-color: transparent !important;
     }
 }
 
