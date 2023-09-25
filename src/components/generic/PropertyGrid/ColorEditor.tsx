@@ -19,7 +19,7 @@ export default function ColorEditor({ prop }: { prop: EditableProperty }) {
     let c = parse(prop.value)
 
     return (
-        <span style={{ display: "flex" }}>
+        <span className="color-editor" style={{ display: "flex" }}>
             <input
                 type="color"
                 value={ c }
