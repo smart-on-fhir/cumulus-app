@@ -248,33 +248,24 @@ export function generateColors(count: number, saturation = 75, lightness = 60, v
 //     return strips
 // }
 
-    if (Array.isArray(o)) {
-        for (let i = 0; i < o.length; i++) {
-            let value = o[i];
-            if (value === needle) {
-                o.splice(i, 1)
-                strips += 1
-                i -= 1
-            }
-            else if (value && typeof value === "object") {
-                strips += stripValue(o[i], needle)
-            }
-        }
-    } else {
-        for (let key in o) {
-            let value = o[key];
-            if (value === needle) {
-                delete o[key]
-                strips += 1
-            }
-            else if (value && typeof value === "object") {
-                strips += stripValue(o[key], needle)
-            }
-        }
-    }
+// export function deepMerge(target: Record<string, any>, source: Record<string, any>): Record<string, any> {
+//     forEach(source, (src, key) => {
+//         const dst         = target[key]
+//         const srcIsObject = src && typeof src === "object"
+//         const dstIsObject = dst && typeof dst === "object"
+//         const srcIsArray  = Array.isArray(src)
+//         const dstIsArray  = Array.isArray(dst)
 
-    return strips
-}
+//         if (srcIsArray) {
+//             target[key] = deepMerge([], src);
+//         } else if (srcIsObject) {
+//             target[key] = deepMerge(dstIsArray ? {} : dstIsObject ? dst : {}, src);
+//         } else {
+//             target[key] = src;
+//         }
+//     })
+//     return target;
+// }
 
 export function isEmptyObject(x: Record<string, any>): boolean {
     for (let _ in x) {
