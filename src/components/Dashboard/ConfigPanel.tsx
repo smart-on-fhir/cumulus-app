@@ -693,6 +693,7 @@ export default function ConfigPanel({
             { !isPie && <Collapse collapsed header={ isBar ? "X Axis Plot Lines" : "Y Axis Plot Lines" }>
                 <div className="pt-1 pb-2">
                     <PlotLinesEditor
+                        type={ isBar ? "x" : "y" }
                         axis={ (state.chartOptions?.yAxis || {}) as YAxisOptions }
                         onChange={plotLines => onChange({ ...state, chartOptions: merge(state.chartOptions, { yAxis: { plotLines } })})}
                     />
@@ -702,6 +703,7 @@ export default function ConfigPanel({
             { !isPie && <Collapse collapsed header={ isBar ? "Y Axis Plot Lines" : "X Axis Plot Lines" }>
                 <div className="pt-1 pb-2">
                     <PlotLinesEditor
+                        type={ isBar ? "y" : "x" }
                         axis={ (state.chartOptions?.xAxis  || {}) as XAxisOptions }
                         onChange={plotLines => onChange({ ...state, chartOptions: merge(state.chartOptions, { xAxis: { plotLines } })})}
                     />
@@ -1761,10 +1763,12 @@ function SliceEditor({
 
 function PlotLinesEditor({
     axis,
-    onChange
+    onChange,
+    type
 }: {
     axis: XAxisOptions | YAxisOptions
     onChange: (lines: XAxisPlotLinesOptions[] | YAxisPlotLinesOptions[]) => void
+    type: "x" | "y"
 }) {
 
     const lines = axis.plotLines || []
@@ -1871,7 +1875,7 @@ function PlotLinesEditor({
                                             onChange(lines)
                                         }
                                     },
-                                    {
+                                    type === "x" ? {
                                         name: "Vertical Align",
                                         type: "options",
                                         options: ["top", "middle", "bottom"],
@@ -1880,7 +1884,7 @@ function PlotLinesEditor({
                                             lines[i] = merge(lines[i], { label: { verticalAlign } })
                                             onChange(lines)
                                         }
-                                    },
+                                    } : false,
                                     {
                                         name: "X Offset",
                                         type: "number",
@@ -1914,7 +1918,7 @@ function PlotLinesEditor({
                                             onChange(lines)
                                         }
                                     }
-                                ],
+                                ].filter(Boolean) as any,
                             },
                             {
                                 name: "Label Style",
@@ -1923,7 +1927,7 @@ function PlotLinesEditor({
                                     {
                                         name: "Font Size",
                                         type: "length",
-                                        value: o.label?.style?.fontSize ?? "13px",
+                                        value: o.label?.style?.fontSize ?? "14px",
                                         units: [ "px", "em", "rem" ],
                                         onChange: (fontSize: string) => {
                                             lines[i] = merge(lines[i], { label: { style: { fontSize } } })
@@ -1934,18 +1938,16 @@ function PlotLinesEditor({
                                         name: "Font Weight",
                                         type: "options",
                                         options: [
-                                            { value: 100, label: "Thin (Hairline)" },
-                                            { value: 200, label: "Extra Light (Ultra Light)" },
+                                            { value: 100, label: "Thin" },
+                                            { value: 200, label: "Extra" },
                                             { value: 300, label: "Light" },
-                                            { value: 400, label: "Normal (Regular)" },
+                                            { value: 400, label: "Normal" },
                                             { value: 500, label: "Medium" },
-                                            { value: 600, label: "Semi Bold (Semi Bold)" },
+                                            { value: 600, label: "Semi Bold" },
                                             { value: 700, label: "Bold" },
-                                            { value: 800, label: "Extra Bold (Ultra Bold)" },
-                                            // { value: 900, label: "Black (Heavy)" },
-                                            // { value: 950, label: "Extra Black (Ultra Black)" },
+                                            { value: 800, label: "Extra Bold" }
                                         ],
-                                        value: o.label?.style?.fontWeight,
+                                        value: o.label?.style?.fontWeight ?? "400",
                                         onChange: (fontWeight: string) => {
                                             lines[i] = merge(lines[i], { label: { style: { fontWeight } } })
                                             onChange(lines)
@@ -1972,12 +1974,18 @@ function PlotLinesEditor({
                         onChange([
                             ...lines,
                             {
-                                // value: 0,
+                                // value: type === "y" ? 3500 : 1619222400000,
                                 color: "#000000",
                                 width: 1,
                                 label: {
-                                    x: 4,
-                                    y: 4
+                                    // text: "THIS IS A TEST",
+                                    x: type === "y" ? 0  : 5,
+                                    y: type === "x" ? 10 : -5,
+                                    rotation: 0,
+                                    style: {
+                                        fontSize  : "14px",
+                                        fontWeight: "400"
+                                    }
                                 }
                             }
                         ])
