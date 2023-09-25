@@ -514,7 +514,7 @@ export default function ConfigPanel({
                                         <div>Total Count</div>
                                         <div className="small color-muted">
                                             Convert counts to percentage of the total<br />
-                                            count within the entire dataset
+                                            count within the entire dataset.
                                         </div>
                                     </div>,
                                     value: "global",

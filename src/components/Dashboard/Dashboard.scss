@@ -28,6 +28,11 @@
         font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif !important;
         shape-rendering: geometricprecision;
     }
+
+    .highcharts-container {
+        left: 0 !important;
+        top: 0 !important;
+    }
 }
 
 .data-view {
