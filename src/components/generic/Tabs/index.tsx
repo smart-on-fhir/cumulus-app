@@ -30,7 +30,9 @@ export function Tabs({
                 )) }
                 <div className="tabs-spacer"/>
             </div>
-            { children[index]?.children }
+            <div className="tabs-content">
+                { children[index]?.children }
+            </div>
         </>
     )
 }
