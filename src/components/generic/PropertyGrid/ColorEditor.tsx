@@ -26,13 +26,14 @@ export default function ColorEditor({ prop }: { prop: EditableProperty }) {
                 onChange={ e => prop.onChange(e.target.value) }
                 className={ prop.value ? undefined : "empty" }
                 disabled={!!prop.disabled}
-                style={{ background: `linear-gradient(${c}, ${c}), repeating-linear-gradient(-45deg, #FFF, #CCC 2px, #FFF 3px, #FFF 4px)` }}
+                style={{ background: `linear-gradient(${c || "#FFF"}, ${c || "#FFF"}), repeating-linear-gradient(-45deg, #FFF, #CCC 2px, #FFF 3px, #FFF 4px)` }}
             />
             <input
                 type="text"
                 value={ prop.value || "" }
                 onChange={ e => prop.onChange(e.target.value) }
                 spellCheck={false}
+                disabled={!!prop.disabled}
             />
         </span>
     )
