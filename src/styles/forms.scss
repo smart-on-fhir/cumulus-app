@@ -199,7 +199,7 @@ input[type="color"] {
     border-radius  : 0;
     outline        : 0;
     padding        : 0;
-    margin         : 0px 1px 0 0;
+    margin         : 0px 2px;
     height         : 1.2em;
     width          : 1.2em;
     min-width      : 1.2em;
@@ -263,6 +263,10 @@ input[type="color"] {
     .color-editor > &::-moz-color-swatch {
         background-color: transparent !important;
     }
+}
+
+.color-editor {
+    column-gap: 2px;
 }
 
 ::-webkit-file-upload-button {
