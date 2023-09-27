@@ -52,6 +52,10 @@ export const TURBO_THRESHOLD = 1000
 
 export const DEFAULT_COLORS = generateColors(36)
 
+export const DEFAULT_FONT_SIZE = 16
+
+export const DEFAULT_FONT_FAMILY = "'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif"
+
 // These are computed at runtime and will not be saved on the server
 export const ReadOnlyPaths = [
     "exporting",

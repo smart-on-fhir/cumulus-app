@@ -1,6 +1,6 @@
 import { merge } from "highcharts";
 import { generateColors } from "../../../utils";
-import { SupportedChartTypes } from "../config";
+import { SupportedChartTypes, DEFAULT_FONT_SIZE, DEFAULT_FONT_FAMILY } from "../config";
 
 const DefaultChartOptions = {
     chart: {
@@ -27,7 +27,12 @@ const DefaultChartOptions = {
         borderWidth: 0,
         // borderColor: "#d1dae2",
         // borderRadius: 5,
-        backgroundColor: "#FFFFFF"
+        backgroundColor: "#FFFFFF",
+        style: {
+            fontSize: DEFAULT_FONT_SIZE + "px",
+            fontFamily: DEFAULT_FONT_FAMILY,
+            color: "#333333"
+        }
     },
     lang: {
         noData: `<div style="text-align:center;padding:10px;color:#900000;font-size:15px">No data to display!</div>
@@ -85,17 +90,13 @@ const DefaultChartOptions = {
     title: {
         text: "",//series.length ? getChartTitleText(column, groupBy) : "",
         style: {
-            fontWeight: "bold",
-            fontSize: "20px"
+            fontWeight: "bold"
         },
     },
     legend: {
         enabled: true,
         // margin: 0,
-        // padding: 0,
-        itemStyle: {
-            fontSize: "14px"
-        }
+        // padding: 0
     },
     colors: generateColors(16),
     yAxis: {
@@ -104,8 +105,7 @@ const DefaultChartOptions = {
             skew3d: true,
             margin: 15,
             style: {
-                fontWeight: "bold",
-                fontSize: "16px"
+                fontWeight: "bold"
             }
         },
         allowDecimals: true,
@@ -126,10 +126,7 @@ const DefaultChartOptions = {
         // ceiling: denominator ? 100 : undefined,
         labels: {
             enabled: true,
-            format: "{text}",
-            style: {
-                fontSize: "13px"
-            }
+            format: "{text}"
         },
         lineWidth: 0,
         lineColor: "#999999",
@@ -275,10 +272,7 @@ const DefaultChartOptions = {
         }
     },
     tooltip: {
-        useHTML: true,
-        style: {
-            fontSize: "14px"
-        }
+        useHTML: true
     },
     xAxis: {
         crosshair: true,
@@ -309,9 +303,6 @@ const DefaultChartOptions = {
             autoRotationLimit: 80,
             overflow: "justify",
             padding: 2,
-            style: {
-                fontSize: "13px"
-            }
             // staggerLines: 0,
 
             // style: {
@@ -332,8 +323,7 @@ const DefaultChartOptions = {
             skew3d: true,
             margin: 15,
             style: {
-                fontWeight: "bold",
-                fontSize: "16px"
+                fontWeight: "bold"
             }
         },
         dateTimeLabelFormats: {

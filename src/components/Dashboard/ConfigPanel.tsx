@@ -35,6 +35,7 @@ import {
     DEFAULT_COLORS,
     DATE_BOOKMARKS
 } from "./config"
+import ColorEditor from "../generic/PropertyGrid/ColorEditor"
 
 
 type SupportedChartType = keyof typeof SupportedChartTypes
@@ -125,6 +126,7 @@ interface ChartConfigPanelState {
     xCol           : app.DataRequestDataColumn
     tags           : Pick<app.Tag, "id"|"name"|"description">[]
     ranges         : app.RangeOptions | null
+    visualOverrides: app.VisualOverridesState
 }
 
 export default function ConfigPanel({
@@ -993,6 +995,14 @@ export default function ConfigPanel({
                 />
             </Collapse> }
             
+            <Collapse collapsed header="Advanced">
+                <br/>
+                <Collapse collapsed header="Visual Overrides">
+                    <div className="mt-1">
+                        <VisualOverridesEditor state={state.visualOverrides} onChange={visualOverrides => onChange({ ...state, visualOverrides })} />
+                    </div>
+                </Collapse>
+            </Collapse>
             <br/>
         </div>
     )
@@ -2066,5 +2076,86 @@ function PlotLinesEditor({
                 </div>
             </div>
         </div>
+    )
+}
+
+function VisualOverridesEditor({
+    state,
+    onChange
+}: {
+    state: app.VisualOverridesState
+    onChange: (state: app.VisualOverridesState) => void
+}) {
+    const { brightness, contrast, saturation, enabled, fontColor, fontColorEnabled } = state
+
+    return (
+        <>
+            <blockquote className="color-muted small" style={{
+                borderLeft: "3px solid orange",
+                padding: "0 0 0 0.5em",
+                margin: "0 0 1em"
+            }}>
+                <i className="fas fa-info-circle"/> Override the appearance of the chart before
+                exporting it as an image, taking a screenshot or printing it. These
+                settings are <b>NOT STORED</b>!
+            </blockquote>
+            <Checkbox name="" label="Enable Overrides" checked={ enabled } onChange={ enabled => onChange({ ...state, enabled })}/>
+            <br/>
+
+            <div aria-disabled={!enabled}>
+
+                <div className="row middle">
+                    <div className="col-0 color-blue-dark">Brightness&nbsp;</div>
+                    <div className="col left color-muted">{ brightness !== 100 && <i title="Reset" className="fa-solid fa-rotate-left small" onClick={() => onChange({ ...state, brightness: 100 })} /> }</div>
+                    <div className="col-0 color-muted small">{brightness}%</div>
+                </div>
+                <input type="range" min={0} max={200} value={brightness} step={1} disabled={!enabled} onChange={e => {
+                    onChange({ ...state, brightness: e.target.valueAsNumber })
+                }} />
+                
+
+                <div className="row middle mt-05">
+                    <div className="col-0 color-blue-dark">Contrast&nbsp;</div>
+                    <div className="col left color-muted">{ contrast !== 100 && <i title="Reset" className="fa-solid fa-rotate-left small" onClick={() => onChange({ ...state, contrast: 100 })} /> }</div>
+                    <div className="col-0 color-muted small">{contrast}%</div>
+                </div>
+                <input type="range" min={0} max={200} value={contrast} step={1} disabled={!enabled} onChange={e => {
+                    onChange({ ...state, contrast: e.target.valueAsNumber })
+                }} />
+
+                <div className="row middle mt-05">
+                    <div className="col-0 color-blue-dark">Saturation&nbsp;</div>
+                    <div className="col left color-muted">{ saturation !== 100 && <i title="Reset" className="fa-solid fa-rotate-left small" onClick={() => onChange({ ...state, saturation: 100 })} /> }</div>
+                    <div className="col-0 color-muted small">{saturation}%</div>
+                </div>
+                <input type="range" min={0} max={200} value={saturation} step={1} disabled={!enabled} onChange={e => {
+                    onChange({ ...state, saturation: e.target.valueAsNumber })
+                }} />
+                
+                <div className="mt-1 mb-2">
+                    <Checkbox name="" label="Use Global Text Color" disabled={!enabled} onChange={ fontColorEnabled => onChange({ ...state, fontColorEnabled })} checked={ !!fontColorEnabled } />
+                    <div className="row" style={{ height: "2em", margin: "2px 0px 0px 0px" }}>
+                        <div className="col-0 center top" style={{
+                            width: "1em",
+                            height: "1.36em",
+                            margin: "-3px 0 0 0.75em",
+                            borderColor: "#00000016",
+                            borderStyle: "solid",
+                            borderWidth: "0 0 2px 2px",
+                            borderRadius: "0 0 0 14px"
+                        }}/>
+                        <div className="col-0 pl-05">
+                            <ColorEditor prop={{
+                                name: "fontColor",
+                                type: "color",
+                                value: fontColor,
+                                disabled: !enabled || !fontColorEnabled,
+                                onChange: fontColor => onChange({ ...state, fontColor })
+                            }} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
     )
 }
