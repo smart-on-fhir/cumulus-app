@@ -52,15 +52,19 @@
     }
 
     .dialog-body {
-        padding : 0.5rem;
+        padding : 0.5rem 0.5rem 0;
         overflow: auto;
         flex    : 1;
+        background: #EEE;
+        display: flex;
+        flex-direction: column;
     }
 
     .dialog-footer {
-        padding        : 0.5rem;
-        border-top     : 1px solid #0003;
-        background     : $color-grey-light;
+        padding        : 0.5rem 0.5rem;
+        // border-top     : 1px solid #0003;
+        // background     : $color-grey-light;
+        background: #EEE;
         border-radius  : 0 0 5px 5px;
         flex           : 0;
         align-items    : center;
@@ -71,6 +75,14 @@
         flex-wrap      : wrap;
         flex-direction : row;
     }
+
+    .dialog-body:last-child {
+        padding-bottom: 0.5em;
+    }
+
+    // .dialog-body + .dialog-footer {
+    //     padding-top: 0;
+    // }
 }
 
 #modal .dialog-overlay {
