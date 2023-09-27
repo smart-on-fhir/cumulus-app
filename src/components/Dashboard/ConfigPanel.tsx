@@ -481,6 +481,23 @@ export default function ConfigPanel({
                                     }
                                 }))
                             },
+                            {
+                                name: "Root Font Size",
+                                type: "length",
+                                value: state.chartOptions.chart?.style?.fontSize ?? "16px",
+                                units: ["px", "pt"],
+                                description: "This allows implementers to control all the chart's font sizes by only setting the root level.",
+                                min: 8,
+                                max: 40,
+                                onChange: fontSize => onChange(merge(state, {
+                                    chartOptions: {
+                                        chart: {
+                                            style: {
+                                                fontSize
+                                            }
+                                        }
+                                    }
+                                }))
                             }
                         ]} />
                     </Collapse>
