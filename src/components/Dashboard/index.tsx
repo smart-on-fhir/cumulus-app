@@ -63,6 +63,7 @@ export interface ViewState
     dataTabIndex    : number
     tags            : Pick<app.Tag, "id"|"name"|"description">[]
     ranges          : app.RangeOptions
+    visualOverrides : app.VisualOverridesState
 }
 
 interface ViewAction
@@ -110,7 +111,7 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
                     denominator     : nextState.denominator,
                     column2type     : nextState.column2type,
                     ranges          : nextState.ranges,
-                    onSeriesToggle
+                    onSeriesToggle,
                 })
             }
         } catch (ex) {
@@ -284,7 +285,15 @@ export default function Dashboard({
             return tag
         }),
 
-        ranges: viewSettings.ranges || {}
+        ranges: viewSettings.ranges || {},
+
+        visualOverrides: {
+            enabled    : false,
+            brightness : 100, // 0 - 200%
+            contrast   : 100, // 0 - 200%
+            saturation : 100, // 0 - 200%
+            fontColor  : "#000000"
+        }
 
     } as ViewState, initViewState);
 
@@ -566,7 +575,8 @@ export default function Dashboard({
                                 column2: column2?.name || "",
                                 column2type,
                                 tags,
-                                ranges: hasRanges(data, data2) ? ranges : null
+                                ranges: hasRanges(data, data2) ? ranges : null,
+                                visualOverrides: state.visualOverrides
                             }}
                             onChange={state => {
                                 dispatch({ type: "UPDATE", payload: {
@@ -581,7 +591,8 @@ export default function Dashboard({
                                     column2        : cols.find(c => c.name === state.column2),
                                     column2type    : state.column2type,
                                     tags           : state.tags,
-                                    ranges         : state.ranges
+                                    ranges         : state.ranges,
+                                    visualOverrides: state.visualOverrides
                                 }});
                             }}
                         />
@@ -683,6 +694,7 @@ export default function Dashboard({
                         { viewColumn && viewType === "overview" && <BaseChart
                             loading={ loadingData }
                             options={ fullChartOptions }
+                            visualOverrides={ state.visualOverrides }
                             contextMenuItems={[
                                 {
                                     label: "Save Changes",

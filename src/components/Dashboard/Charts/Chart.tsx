@@ -8,7 +8,9 @@ import { app }                     from "../../../types"
 import {
     SupportedNativeChartTypes,
     SupportedChartTypes,
-    DEFAULT_COLORS
+    DEFAULT_COLORS,
+    DEFAULT_FONT_FAMILY,
+    DEFAULT_FONT_SIZE
 } from "../config"
 
 
@@ -29,6 +31,10 @@ type SeriesOptions = (
 function easing(pos: number) {
     if ((pos/=0.5) < 1) return 0.5*Math.pow(pos,2);
     return -0.5 * ((pos-=2)*pos - 2);
+}
+
+function emToPx(em: number) {
+    return Math.round(DEFAULT_FONT_SIZE * em) + "px"
 }
 
 export function getChartTitleText(column: app.DataRequestDataColumn, groupBy?: app.DataRequestDataColumn | null): string {
@@ -392,10 +398,23 @@ export function buildChartOptions({
                 easing
             },
         },
+        title: {
+            style: {
+                fontSize: "2em"
+            }
+        },
         yAxis: {
             allowDecimals: denominator ? true : false,
             labels: {
                 format: denominator ? "{text}%" : "{text}",
+                style: {
+                    fontSize: "0.85em"
+                }
+            },
+            title: {
+                style: {
+                    fontSize: "1em"
+                }
             }
         },
         plotOptions: {
@@ -426,12 +445,14 @@ export function buildChartOptions({
             },
             pie: {
                 dataLabels: {
+                    useHTML: true,
                     style: {
-                        fontSize: "14px"
+                        fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
+                        fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
                     },
                     formatter(): any {
                         if (this.point) {
-                            return `<b>${this.point.name}</b><span style="opacity:0.5;font-weight:400">` +
+                            return `<span style="font-weight:500">${this.point.name}</span><span style="opacity:0.5;font-weight:400">` +
                                 ` - ${parseFloat((this.point.percentage || 0).toPrecision(2))} %</span>`
                         }
                     }
@@ -454,6 +475,10 @@ export function buildChartOptions({
         },
         tooltip: {
             borderColor: "rgba(0, 0, 0, 0.4)",
+            style: {
+                fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
+                fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
+            },
             formatter(): any {
                 const rows = [];
 
@@ -536,7 +561,23 @@ export function buildChartOptions({
         },
         xAxis: {
             type: xType,
-            crosshair: type.includes("line")
+            crosshair: type.includes("line"),
+            labels: {
+                style: {
+                    fontSize: "0.85em"
+                }
+            },
+            title: {
+                style: {
+                    fontSize: "1em"
+                }
+            },
+        },
+        legend: {
+            itemStyle: {
+                fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
+                fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
+            }
         },
         series
     };
@@ -550,6 +591,7 @@ interface ChartProps {
     options : Highcharts.Options
     loading?: boolean
     contextMenuItems?: (MenuItemConfig | "-")[]
+    visualOverrides: app.VisualOverridesState
 }
 
 export default class Chart extends React.Component<ChartProps>
@@ -561,10 +603,38 @@ export default class Chart extends React.Component<ChartProps>
         this.updateChart = this.updateChart.bind(this);
     }
 
+    afterRender() {
+        const {
+            enabled,
+            brightness,
+            contrast,
+            saturation,
+            fontColor,
+            fontColorEnabled
+        } = this.props.visualOverrides
+        
+        if (enabled) {
+            this.chart.container.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+            const el = document.getElementById("chart-text-color")! as HTMLStyleElement
+            el.innerText = fontColor && fontColorEnabled ? 
+                `.main-chart .highcharts-container text { color: ${fontColor} !important; fill: ${fontColor} !important; }` +
+                `.main-chart .highcharts-container svg * { color: ${fontColor} !important; }` +
+                `.main-chart .highcharts-container .highcharts-data-labels .highcharts-data-label > span { color: ${fontColor} !important; }` +
+                `.main-chart .highcharts-container .highcharts-legend-item-hidden > text { filter: grayscale(1) opacity(0.5) !important; }` :
+                ""
+            el.sheet!.disabled = false
+        } else {
+            this.chart.container.style.filter = "none"
+            const el = document.getElementById("chart-text-color")! as HTMLStyleElement
+            el.sheet!.disabled = true
+        }
+    }
+
     updateChart() {
         try {
             // update(options [, redraw] [, oneToOne] [, animation])
             this.chart.update(this.props.options, !this.props.loading, true, false)
+            this.afterRender()
         } catch (e) {
             console.debug(e)
         }
@@ -573,6 +643,7 @@ export default class Chart extends React.Component<ChartProps>
     componentDidMount() {
         this.chart = Highcharts.chart("chart", this.props.options || {});
         Highcharts.charts = [this.chart]
+        this.afterRender()
     }
 
     componentDidUpdate() {

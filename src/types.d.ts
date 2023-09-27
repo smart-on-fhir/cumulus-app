@@ -82,6 +82,15 @@ export declare module app {
         ranges?: RangeOptions
     }
 
+    interface VisualOverridesState {
+        enabled    : boolean
+        brightness : number
+        contrast   : number
+        saturation : number
+        fontColor ?: string
+        fontColorEnabled ?: boolean
+    }
+
     interface DataRequest {
 
         /**
