@@ -556,6 +556,7 @@ $ie-bottom-track-color: darken($track-color, $contrast) !default;
   background: transparent;
   margin: math.div($thumb-height, 2) 0;
   width: $track-width;
+  height: $track-height;
 
   &::-moz-focus-outer {
     border: 0;
