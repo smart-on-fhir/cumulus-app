@@ -425,6 +425,62 @@ export default function ConfigPanel({
                                         }
                                     }
                                 }))
+                            },
+                            {
+                                name: "Font Family",
+                                type: "options",
+                                options: [
+                                    { label: "Generic", value: [
+                                        { value: "'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif", label: "Sans-serif Narrow (default)" },
+                                        { value: "Helvetica, Arial, sans-serif", label: "Sans-serif" },
+                                        { value: "'Times New Roman', Times, serif", label: "Serif" },
+                                        { value: "monospace", label: "Fixed Width" },
+                                        { value: "inherit", label: "Inherit (from the web page)" },
+                                    ]},
+                                    { label: "Sans-serif", value: [
+                                        { value: "Helvetica", label: "Helvetica" },
+                                        { value: "Arial", label: "Arial" },
+                                        { value: "Arial Narrow", label: "Arial Narrow" },
+                                        { value: "Arial Black", label: "Arial Black" },
+                                        { value: "Verdana", label: "Verdana" },
+                                        { value: "Tahoma", label: "Tahoma" },
+                                        { value: "Trebuchet MS", label: "Trebuchet MS" },
+                                        { value: "Impact", label: "Impact" },
+                                        { value: "Gill Sans", label: "Gill Sans" },
+
+                                    ] },
+                                    { label: "Serif", value: [
+                                        { value: "Times New Roman", label: "Times New Roman" },
+                                        { value: "Georgia", label: "Georgia" },
+                                        { value: "Palatino", label: "Palatino" },
+                                        { value: "Baskerville", label: "Baskerville" },
+                                    ]},
+                                    { label: "Monospace", value: [
+                                        { value: "Andale Mono", label: "Andalé Mono" },
+                                        { value: "Courier", label: "Courier" },
+                                        { value: "Lucida Grande", label: "Lucida Grande" },
+                                        { value: "Monaco", label: "Monaco" },
+                                    ]},
+                                    { label: "Cursive", value: [
+                                        { value: "Bradley Hand", label: "Bradley Hand" },
+                                        { value: "Brush Script MT", label: "Brush Script MT" },
+                                        { value: "Comic Sans MS", label: "Comic Sans MS" },
+                                    ]},
+                                    { label: "Fantasy", value: [
+                                        { value: "Luminari", label: "Luminari" },
+                                    ]}
+                                ],
+                                value: state.chartOptions.chart?.style?.fontFamily || "'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif",
+                                onChange: fontFamily => onChange(merge(state, {
+                                    chartOptions: {
+                                        chart: {
+                                            style: {
+                                                fontFamily
+                                            }
+                                        }
+                                    }
+                                }))
+                            },
                             }
                         ]} />
                     </Collapse>
