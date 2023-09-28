@@ -14,7 +14,10 @@ const DefaultChartOptions = {
             type: "x"
         },
         panKey: 'shift',
+        spacingTop   : 25,
+        spacingRight : 25,
         spacingBottom: 25,
+        spacingLeft  : 25,
         animation: {
             duration: 400,
             defer: 0,
@@ -50,6 +53,7 @@ const DefaultChartOptions = {
     exporting: {
         buttons: {
             contextButton: {
+                symbolStroke: "#0004",
                 theme: {
                     fill: "none"
                 },
@@ -104,6 +108,7 @@ const DefaultChartOptions = {
             text: "",
             skew3d: true,
             margin: 15,
+            // offset: 20,
             style: {
                 fontWeight: "bold"
             }
@@ -113,7 +118,7 @@ const DefaultChartOptions = {
         // maxPadding: 0,
         // minPadding: 0,
         endOnTick: false,
-        gridLineWidth: 1,
+        gridLineWidth: 0.5,
         gridLineColor: "#DDDDDD",
         tickColor: "#DDDDDD",
         // @ts-ignore
@@ -143,9 +148,11 @@ const DefaultChartOptions = {
     plotOptions: {
         series: {
             borderColor     : "rgba(0, 0, 0, 0.5)",
+            edgeColor       : "rgba(0, 0, 0, 0.5)",
             borderWidth     : 0.25,
+            edgeWidth       : 0.25,
             allowPointSelect: true,
-            cursor          : 'pointer',
+            cursor          : 'default',
             showInLegend    : true,
             animation: {
                 duration: 0,//400,
@@ -156,7 +163,7 @@ const DefaultChartOptions = {
             startAngle      : 0,
             innerSize       : 0,
             depth           : 50,
-            slicedOffset    : 10,
+            slicedOffset    : 15,
             // center          : ["50%", "50%"],
             // size            : "75%",
             dataLabels: {
@@ -165,10 +172,6 @@ const DefaultChartOptions = {
             }
         },
         column: {
-            edgeColor         : "rgba(0, 0, 0, 0.5)",
-            borderColor       : "rgba(0, 0, 0, 0.5)",
-            borderWidth       : 0.5,
-            edgeWidth         : 0.5,
             getExtremesFromAll: true,
             borderRadius      : 0,
             pointPadding      : 0.02,
@@ -183,10 +186,6 @@ const DefaultChartOptions = {
             }
         },
         bar: {
-            edgeColor         : "rgba(0, 0, 0, 0.5)",
-            borderColor       : "rgba(0, 0, 0, 0.5)",
-            borderWidth       : 0.5,
-            edgeWidth         : 0.5,
             getExtremesFromAll: true,
             borderRadius      : 0,
             pointPadding      : 0.02,
@@ -201,8 +200,8 @@ const DefaultChartOptions = {
             },
         },
         areaspline: {
-            allowPointSelect: true,
-            trackByArea: true,
+            trackByArea: false,
+            stickyTracking: true,
             marker: {
                 enabled: false,
                 radius: 4,
@@ -224,21 +223,19 @@ const DefaultChartOptions = {
                     }
                 }
             },
-            lineWidth: 1.5,
+            lineWidth: 2,
             states: {
                 hover: {
-                    lineWidth: 2,
+                    lineWidth: 3,
                     shadow: true, // show them even on datetime charts
                 }
             },
-            cursor: "default",
             connectNulls: false,
             getExtremesFromAll: true,
             dashStyle: "Solid",
+            fillOpacity: 0.5
         },
         spline: {
-            allowPointSelect: true,
-            cursor: "default",
             marker: {
                 enabled: false,
                 radius: 4,
@@ -260,10 +257,10 @@ const DefaultChartOptions = {
                     }
                 }
             },
-            lineWidth: 1.5,
+            lineWidth: 2,
             states: {
                 hover: {
-                    lineWidth: 2,
+                    lineWidth: 3,
                     shadow: true, // show them even on datetime charts
                 }
             },
@@ -281,7 +278,7 @@ const DefaultChartOptions = {
         // maxRange: xType === "category" ? undefined : 2,
 
         tickLength: 10,
-        tickWidth: 1,
+        tickWidth: 0,
         // minRange: 1,
         // maxRange: 2,
         offset: 0,
@@ -290,7 +287,7 @@ const DefaultChartOptions = {
         minPadding: 0,
         maxPadding: 0,
         lineWidth: 1,
-        lineColor: "#999999",
+        lineColor: "#99999999",
         gridLineColor: "#DDDDDD",
         gridLineWidth: 0,
         tickColor: "#DDDDDD",
@@ -362,7 +359,11 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                     pie: {
                         innerSize: 0
                     }
+                },
+                xAxis: {
+                    lineWidth: 0
                 }
+
             }) as Highcharts.Options;
         
         case "pie3d":
@@ -386,6 +387,9 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                     pie: {
                         innerSize: 0
                     }
+                },
+                xAxis: {
+                    lineWidth: 0
                 }
             }) as Highcharts.Options;
 
@@ -409,6 +413,9 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                         innerSize: "50%",
                         // slicedOffset: 10
                     }
+                },
+                xAxis: {
+                    lineWidth: 0
                 }
             }) as Highcharts.Options;
 
@@ -440,6 +447,9 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                     pie: {
                         innerSize: "50%"
                     }
+                },
+                xAxis: {
+                    lineWidth: 0
                 }
             }) as Highcharts.Options;
 
