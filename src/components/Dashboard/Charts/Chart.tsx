@@ -480,6 +480,8 @@ export function buildChartOptions({
         },
         tooltip: {
             borderColor: "rgba(0, 0, 0, 0.4)",
+            backgroundColor: "#FFFFFFEE",
+            outside: true,
             style: {
                 fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
                 fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
