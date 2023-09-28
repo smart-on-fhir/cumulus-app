@@ -586,7 +586,32 @@ export function buildChartOptions({
         series
     };
 
-    return merge(options, dynamicOptions) as Highcharts.Options
+    const result = merge(options, dynamicOptions) as Highcharts.Options
+
+    // Convert px to em in old chart annotations
+    result.annotations?.[0]?.labels?.forEach(l => {
+        l.style!.fontSize = options.chart?.style?.fontSize
+        l.style!.fontFamily = options.chart?.style?.fontFamily
+        l.useHTML = true
+    })
+
+    // @ts-ignore Convert px to em in old chart xAxis plotLines
+    const xAxisPlotLines = (result.xAxis?.plotLines || []) as XAxisPlotLinesOptions[];
+    xAxisPlotLines.forEach(l => {
+        if (l.label?.style?.fontSize) {
+            l.label.style.fontSize = lengthToEm(l.label.style.fontSize) + "em"
+        }
+    })
+
+    // @ts-ignore Convert px to em in old chart yAxis plotLines
+    const yAxisPlotLines = (result.yAxis?.plotLines || []) as YAxisPlotLinesOptions[];
+    yAxisPlotLines.forEach(l => {
+        if (l.label?.style?.fontSize) {
+            l.label.style.fontSize = lengthToEm(l.label.style.fontSize) + "em"
+        }
+    })
+
+    return result
 }
 
 
