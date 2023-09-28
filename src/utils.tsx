@@ -430,5 +430,25 @@ export function escapeForFileName(input: string): string {
         .replace(/\s+/g, " ")
         .replace(/_+/g, "_")
         .replace(/(_|\s|\.)$/, "");
-  }
-  
+}
+ 
+export function lengthToEm(length?: string, base = 16) {
+    length = String(length || "")
+    const num = parseFloat(length)
+    if (isNaN(num) || !isFinite(num)) {
+        return 1
+    }
+    if (length.endsWith("px")) {
+        return roundToPrecision(num / base, 2)
+    }
+    if (length.endsWith("rem")) {
+        return num // convert to em
+    }
+    if (length.endsWith("em")) {
+        return num
+    }
+    if (length.endsWith("%")) {
+        return roundToPrecision(num / 100, 2)
+    }
+    return 1
+}

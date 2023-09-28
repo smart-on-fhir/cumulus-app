@@ -747,6 +747,8 @@ export default function Dashboard({
                                     column2?.name || "no_secondary",
                                     column2type || "no_second_type",
                                     // Date.now()
+                                    fullChartOptions.chart?.style?.fontSize,
+                                    fullChartOptions.chart?.style?.fontFamily
                                 ].join(":")
                             }
                         /> }

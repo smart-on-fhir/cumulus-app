@@ -10,9 +10,9 @@ const emptyAnnotation: AnnotationsLabelsOptions = {
     overflow: "allow",
     //useHTML: true,
     style: {
-        textAlign: "center",
+        textAlign : "center",
         fontFamily: "inherit",
-
+        fontSize  : "1em"
     },
     point: {
         x: 1,
@@ -203,22 +203,8 @@ function Annotation({
                 </div>
             </div>
             <div className="row middle small" style={{ margin: "3px 0 0" }}>
-                <div className="col col-2 right"><b>Font:&nbsp;</b></div>
+                <div className="col col-2 right"><b>Padding:&nbsp;</b></div>
                 <div className="col col-3">
-                    <select value={ annotation.style?.fontSize } onChange={e => {
-                        onChange({ ...annotation, style: { ...annotation.style, fontSize: e.target.value } })
-                    }}>
-                        <option value="10px">10px</option>
-                        <option value="12px">12px</option>
-                        <option value="14px">14px</option>
-                        <option value="16px">16px</option>
-                        <option value="18px">18px</option>
-                        <option value="20px">20px</option>
-                        <option value="22px">22px</option>
-                    </select>
-                </div>
-                <div className="col col-2 right" style={{ maxWidth: "5em" }}><b>Padding:&nbsp;</b></div>
-                <div className="col">
                     <select value={ annotation.padding } onChange={e => {
                         onChange({ ...annotation, padding: +e.target.value })
                     }}>
@@ -233,18 +219,22 @@ function Annotation({
                         <option value="16">16px</option>
                     </select>
                 </div>
-                
-            </div>
-            <div className="row small middle" style={{ marginTop: 3 }}>
-                <div className="col col-2"></div>
-                <div className="col" style={{ lineHeight: 1.6 }}>
+                <div className="col col-3 right">
                     <Checkbox
                         label="Shadow"
                         checked={ !!annotation.shadow }
                         // disabled={ annotation.shape === "connector" }
                         name="shadow"
+                        // labelLeft
                         onChange={ shadow => onChange({ ...annotation, shadow })}
                     />
+                </div>
+                
+            </div>
+            <div className="row small middle" style={{ marginTop: 3 }}>
+                <div className="col col-2"></div>
+                <div className="col" style={{ lineHeight: 1.6 }}>
+                    
                 </div>
                 <div className="col right">
                     <button className="btn color-red small" onClick={onRemove}>

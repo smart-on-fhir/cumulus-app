@@ -1,7 +1,7 @@
 import React                       from "react"
 import { Color, merge, Series }    from "highcharts"
 // import moment                      from "moment"
-import { defer, roundToPrecision } from "../../../utils"
+import { defer, lengthToEm, roundToPrecision } from "../../../utils"
 import Loader                      from "../../generic/Loader"
 import { MenuItemConfig }          from "../../generic/Menu"
 import { app }                     from "../../../types"
@@ -400,7 +400,7 @@ export function buildChartOptions({
         },
         title: {
             style: {
-                fontSize: "2em"
+                fontSize: lengthToEm(options.title?.style?.fontSize ?? "2em") + "em"
             }
         },
         yAxis: {
@@ -408,12 +408,14 @@ export function buildChartOptions({
             labels: {
                 format: denominator ? "{text}%" : "{text}",
                 style: {
-                    fontSize: "0.85em"
+                    // @ts-ignore
+                    fontSize: lengthToEm(options.yAxis?.labels?.style?.fontSize ?? "0.85em") + "em"
                 }
             },
             title: {
                 style: {
-                    fontSize: "1em"
+                    // @ts-ignore
+                    fontSize: lengthToEm(options.yAxis?.title?.style?.fontSize) + "em"
                 }
             }
         },
@@ -564,12 +566,14 @@ export function buildChartOptions({
             crosshair: type.includes("line"),
             labels: {
                 style: {
-                    fontSize: "0.85em"
+                    // @ts-ignore
+                    fontSize: lengthToEm(options.xAxis?.labels?.style?.fontSize ?? "0.85em") + "em"
                 }
             },
             title: {
                 style: {
-                    fontSize: "1em"
+                    // @ts-ignore
+                    fontSize: lengthToEm(options.xAxis?.title?.style?.fontSize ?? "1em") + "em"
                 }
             },
         },

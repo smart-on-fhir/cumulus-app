@@ -36,6 +36,7 @@ import {
     DATE_BOOKMARKS
 } from "./config"
 import ColorEditor from "../generic/PropertyGrid/ColorEditor"
+import { lengthToEm } from "../../utils"
 
 
 type SupportedChartType = keyof typeof SupportedChartTypes
@@ -1425,10 +1426,12 @@ function AdvancedAxisEditor({
                         },
                         {
                             name: "Font Size",
-                            type: "length",
-                            units: ["px", "em", "rem"],
-                            value: axis.title?.style?.fontSize ?? "0.8em",
-                            onChange: (fontSize?: string) => onChange({ title: { style: { fontSize: fontSize ?? "0.8em" }}})
+                            type: "number",
+                            value: lengthToEm(axis.title?.style?.fontSize ?? "0.8"),
+                            step: 0.1,
+                            min: 0.5,
+                            max: 1.6,
+                            onChange: (fontSize: number) => onChange({ title: { style: { fontSize: fontSize + "em" }}})
                         }
                     ]
                 }
@@ -2009,11 +2012,13 @@ function PlotLinesEditor({
                                 value: [
                                     {
                                         name: "Font Size",
-                                        type: "length",
-                                        value: o.label?.style?.fontSize ?? "14px",
-                                        units: [ "px", "em", "rem" ],
-                                        onChange: (fontSize: string) => {
-                                            lines[i] = merge(lines[i], { label: { style: { fontSize } } })
+                                        type: "number",
+                                        value: lengthToEm(o.label?.style?.fontSize),
+                                        min: 0.5,
+                                        max: 3,
+                                        step: 0.01,
+                                        onChange: (fontSize: number) => {
+                                            lines[i] = merge(lines[i], { label: { style: { fontSize: fontSize + "em" } } })
                                             onChange(lines)
                                         }
                                     },
@@ -2066,7 +2071,7 @@ function PlotLinesEditor({
                                     y: type === "x" ? 10 : -5,
                                     rotation: 0,
                                     style: {
-                                        fontSize  : "14px",
+                                        fontSize  : "1em",
                                         fontWeight: "400"
                                     }
                                 }
