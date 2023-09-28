@@ -32,9 +32,9 @@ const DefaultChartOptions = {
         // borderRadius: 5,
         backgroundColor: "#FFFFFF",
         style: {
-            fontSize: DEFAULT_FONT_SIZE + "px",
+            fontSize  : DEFAULT_FONT_SIZE + "px",
             fontFamily: DEFAULT_FONT_FAMILY,
-            color: "#333333"
+            color     : "#333333"
         }
     },
     lang: {
