@@ -1,7 +1,7 @@
 export interface EditableProperty {
     name: string
     value?: any
-    description?: string
+    description?: string | ReactNode
     type: "boolean" | "number" | "length" | "color" | "options" | "shadow" | "date" | string
     onChange: (value?: any) => void
     group?: boolean
@@ -31,4 +31,5 @@ export interface EditableGroupProperty {
     type: "group"
     value: EditableProperty[]
     open?: boolean
+    description?: string
 }
