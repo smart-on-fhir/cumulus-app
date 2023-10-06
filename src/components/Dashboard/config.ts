@@ -1,4 +1,5 @@
 import { generateColors } from "../../utils"
+import { DashStyleValue } from "highcharts"
 
 export const SupportedChartTypes = {
     pie          : "Pie Chart",
@@ -55,6 +56,12 @@ export const DEFAULT_COLORS = generateColors(36)
 export const DEFAULT_FONT_SIZE = 16
 
 export const DEFAULT_FONT_FAMILY = "'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif"
+
+export const DASH_STYLES: DashStyleValue[] = [
+    'Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
+    'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
+    'LongDashDot', 'LongDashDotDot'
+];
 
 // These are computed at runtime and will not be saved on the server
 export const ReadOnlyPaths = [

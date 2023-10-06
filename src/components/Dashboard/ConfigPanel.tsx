@@ -33,17 +33,14 @@ import {
     SupportedChartTypes,
     ChartIcons,
     DEFAULT_COLORS,
-    DATE_BOOKMARKS
+    DATE_BOOKMARKS,
+    DASH_STYLES
 } from "./config"
 import ColorEditor from "../generic/PropertyGrid/ColorEditor"
 import { lengthToEm } from "../../utils"
 
 
 type SupportedChartType = keyof typeof SupportedChartTypes
-
-const DASH_STYLES: DashStyleValue[] = ['Solid', 'ShortDash', 'ShortDot', 'ShortDashDot',
-'ShortDashDotDot', 'Dot', 'Dash', 'LongDash', 'DashDot',
-'LongDashDot', 'LongDashDotDot'];
 
 function SecondaryDataEditor({
     state,
