@@ -27,6 +27,12 @@ export class DeleteGraph extends Command
             <i className="fas fa-trash-alt color-red" />
     }
 
+    description(ctx?: Record<string, any>) {
+        return ctx?.working ?
+            "Please wait while this graph is being deleted..." :
+            "Delete this Graph"
+    }
+
     available() {
         return !!this.graphId && !!this.user;
     }

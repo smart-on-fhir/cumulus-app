@@ -30,7 +30,7 @@ export default function CommandButton({
         <button
             className={ classList(classes) }
             onClick={execute}
-            title={description}
+            data-tooltip={description}
             disabled={!enabled}
         >
             { working ? <i className="fas fa-circle-notch fa-spin" /> : icon }

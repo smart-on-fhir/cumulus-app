@@ -18,6 +18,7 @@ import Projects                                 from "./Projects";
 import LogViewer                                from "./LogViewer";
 import Tags                                     from "./Tags";
 import { ContextMenu }                          from "./generic/Menu";
+import Tooltip                                  from "./generic/Tooltip";
 import "../styles/main.scss";
 
 export default function App()
@@ -25,6 +26,7 @@ export default function App()
     return (
         <AuthProvider>
             <ContextMenu />
+            <Tooltip />
             <BrowserRouter>
                 <Header/>
                 <div className="container container-fluid row p-1">
