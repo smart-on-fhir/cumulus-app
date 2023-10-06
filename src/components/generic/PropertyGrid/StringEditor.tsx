@@ -34,7 +34,7 @@ export default function StringEditor({ prop }: { prop: EditableStringProperty })
             title={ title }
             style={ style }
             spellCheck={ spellCheck }
-            placeholder={ placeholder }
+            placeholder={ placeholder ?? value + "" }
         />
     )
 }
