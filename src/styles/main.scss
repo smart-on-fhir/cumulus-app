@@ -51,13 +51,13 @@ p {
 
 code, pre {
   font-family: source-code-pro, Menlo, Monaco, Consolas, monospace;
-  font-size: 92%;
+  font-size: 90%;
 }
 
 code {
   background: #C001;
   color: #A00;
-  padding: 1px 2px;
+  padding: 1px 1px;
   border: 1px solid #9002;
   margin: -1px;
   border-radius: 3px;
@@ -204,6 +204,16 @@ hr {
   &.small {
     height: 1px;
   }
+
+  &.color-blue       { background: linear-gradient(90deg, transparent, $color-blue      , transparent); }
+  &.color-blue-dark  { background: linear-gradient(90deg, transparent, $color-blue-dark , transparent); }
+  &.color-orange     { background: linear-gradient(90deg, transparent, $color-orange    , transparent); }
+  &.color-red        { background: linear-gradient(90deg, transparent, $color-red       , transparent); }
+  &.color-grey-light { background: linear-gradient(90deg, transparent, $color-grey-light, transparent); }
+  &.color-grey       { background: linear-gradient(90deg, transparent, $color-grey      , transparent); }
+  &.color-grey-dark  { background: linear-gradient(90deg, transparent, $color-grey-dark , transparent); }
+  &.color-green      { background: linear-gradient(90deg, transparent, $color-green     , transparent); }
+  &.color-brand-2    { background: linear-gradient(90deg, transparent, $color-brand-2   , transparent); }
 }
 
 ul {
