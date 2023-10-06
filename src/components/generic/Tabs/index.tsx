@@ -1,15 +1,25 @@
-import { ReactChild, ReactNode, useState } from "react"
+import { ReactChild, ReactNode, useLayoutEffect, useState } from "react"
 import "./Tabs.scss"
 
 export function Tabs({
-    children
+    children,
+    selectedIndex = 0
 }: {
+    selectedIndex?: number
     children: {
         name: ReactChild
         children: ReactNode
     }[]
 }) {
-    const [index, setIndex] = useState(0)
+    const [index, setIndex] = useState(
+        Math.max(Math.min(selectedIndex, children.length - 1), 0)
+    )
+
+    useLayoutEffect(() => {
+        if (selectedIndex > -1) {
+            setIndex(Math.min(selectedIndex, children.length - 1))
+        }
+    }, [selectedIndex, children.length, setIndex])
 
     return (
         <>
