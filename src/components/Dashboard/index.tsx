@@ -628,7 +628,7 @@ export default function Dashboard({
                                     <button
                                         className={ "btn" + (showOptions ? " active" : "")}
                                         onClick={() => dispatch({ type: "TOGGLE_OPTIONS" })}
-                                        title="Options">
+                                        data-tooltip={showOptions ? "Hide Options" : "Show Options"}>
                                         <i className="fas fa-cog" />
                                     </button>
                                     <CommandButton { ...copyCommand } label={ "" } />
@@ -636,14 +636,14 @@ export default function Dashboard({
                                     <button
                                         className="btn"
                                         onClick={ takeScreenshot }
-                                        title="Update Screenshot"
+                                        data-tooltip="Update Screenshot"
                                         disabled={!view.id || !canUpdate || viewType !== "overview" }>
                                         <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
                                     </button>
                                     <button
                                         className="btn"
                                         onClick={save}
-                                        title="Save Changes">
+                                        data-tooltip="Save Changes">
                                         <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
                                     </button>
                                 </div>
@@ -654,7 +654,7 @@ export default function Dashboard({
                                     <button
                                         className={"btn" + (viewType === "overview" ? " active" : "")}
                                         onClick={() => dispatch({ type: "SET_VIEW_TYPE", payload: "overview" })}
-                                        title="Report View"
+                                        data-tooltip="Show the Chart"
                                         style={{ minWidth: "7em" }}
                                         >
                                         <i className="fas fa-chart-pie" /> Overview
@@ -662,7 +662,7 @@ export default function Dashboard({
                                     <button
                                         className={"btn" + (viewType === "data"     ? " active" : "")}
                                         onClick={() => dispatch({ type: "SET_VIEW_TYPE", payload: "data"})}
-                                        title="Data View"
+                                        data-tooltip="Show the Input Data"
                                         style={{ minWidth: "7em" }}
                                         ><i className="fas fa-th" /> Data
                                     </button>
