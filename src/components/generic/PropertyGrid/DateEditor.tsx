@@ -20,6 +20,7 @@ export default function DateEditor({ prop }: { prop: EditableDateProperty }) {
             max={ max }
             disabled={ !!disabled }
             onContextMenu={onContextMenu}
+            style={{ cursor: onContextMenu ? "context-menu" : "default" }}
         />
     )
 }
