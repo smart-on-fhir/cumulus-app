@@ -17,7 +17,7 @@ import DateEditor from "./DateEditor"
 
 
 
-function PropertyEditor({ prop, level = 0 }: { prop: EditableProperty, level?: number }): JSX.Element {
+function PropertyEditor({ prop, level = 1 }: { prop: EditableProperty, level?: number }): JSX.Element {
     switch (prop.type) {
         case "boolean":
             return <BooleanEditor prop={ prop } />
@@ -40,7 +40,7 @@ function PropertyEditor({ prop, level = 0 }: { prop: EditableProperty, level?: n
 
 export default function PropertyGrid({
     props,
-    level = 0
+    level = 1
 }: {
     props: (EditableProperty | EditableGroupProperty)[]
     level?: number
@@ -56,18 +56,21 @@ export function PropertyEditorGroup({
     props,
     name,
     level = 0,
-    open = false
+    open = level < 3,
+    description
 }: {
     props: (EditableProperty | EditableGroupProperty)[]
     name: string | JSX.Element,
     level?: number
     open?: boolean
+    description?: string
 }) {
     const [_open, setOpen] = useState(open)
 
     return (
         <div className="property-grid">
             <b
+                style={{ paddingLeft: (level - 2) + 0.3 + "em" }}
                 className={ "prop-label group-heading" + (_open ? " open" : "") + " level-" + level }
                 onClick={() => setOpen(!_open)}
                 onKeyDown={e => {
@@ -81,9 +84,13 @@ export function PropertyEditorGroup({
             >
                 <i className={ "fa-solid " + (_open ? "fa-caret-down" : "fa-caret-right") } />
                 { name }
+                { _open && !!description && <div className="property-description">{ description }</div> }
             </b>
             { _open ? <>
                 { props.map((prop, i) => {
+                    if (prop.type === "group") {
+                        return (<PropertyEditorGroup props={ prop.value } key={ i } name={ prop.name } open={ !!prop.open } level={level + 1} />)
+                    }
                     if (prop.type === "shadow") {
                         return <ShadowEditor
                             onChange={ prop.onChange }
@@ -92,13 +99,16 @@ export function PropertyEditorGroup({
                             name={ prop.name }
                             description={ prop.description }
                             level={level + 1}
+                            open={ !!prop.open }
                         />
                     }
                     return <Fragment key={i + "xx"}>
-                        <div className="prop-label" style={{ paddingLeft: "1.3em" }}>
-                            <span className="nowrap">{ prop.name }</span>
+                        <div className="prop-label" style={{ paddingLeft: (level) + 0.3 + "em" }}>
+                            <span className="nowrap">
+                                { prop.name }&nbsp;{ prop.description && <small className="color-muted" data-tooltip={ prop.description }><i className="fa-solid fa-circle-info"></i></small> }
+                            </span>
                         </div>
-                        <div className="prop-editor"><PropertyEditor prop={prop as EditableProperty} /></div>
+                        <div className="prop-editor"><PropertyEditor prop={prop as EditableProperty} level={ level + 1 } /></div>
                     </Fragment>
                 }) }
             </> : null }
@@ -109,8 +119,15 @@ export function PropertyEditorGroup({
 function propertyGridRows(props: (EditableProperty | EditableGroupProperty)[], level = 0): JSX.Element[] {
     return props.map((prop, i) => {
 
-        if (prop.type === "group") {
-            return (<PropertyEditorGroup props={ prop.value } key={ i } name={ prop.name } open={ !!prop.open } />)
+        if (Array.isArray(prop.value)) {
+            return <PropertyEditorGroup
+                props={ prop.value }
+                key={ i }
+                name={ prop.name }
+                open={ !!prop.open }
+                level={level + 1}
+                description={ prop.description }
+            />
         }
 
         prop = prop as EditableProperty
@@ -123,14 +140,15 @@ function propertyGridRows(props: (EditableProperty | EditableGroupProperty)[], l
                 name={ prop.name }
                 description={ prop.description }
                 level={ level }
+                open={ !!prop.open }
             />
         }
 
         return (
             <Fragment key={ i }>
-                <div className={ "prop-label" + (prop.disabled ? " disabled" : "") } style={{ paddingLeft: level ? level + "em" : 4 }} title={ prop.name }>
+                <div className={ "prop-label" + (prop.disabled ? " disabled" : "") } style={{ paddingLeft: level + 0.3 + "em" }}>
                     <span className="nowrap">
-                        { prop.name }&nbsp;{ prop.description && <small className="color-muted" title={ prop.description }><i className="fa-solid fa-circle-info"></i></small> }
+                    { prop.name }&nbsp;{ prop.description && <small className="color-muted" data-tooltip={ prop.description }><i className="fa-solid fa-circle-info"></i></small> }
                     </span>
                 </div>
                 <div className="prop-editor"><PropertyEditor prop={prop as EditableProperty} level={ level } /></div>
