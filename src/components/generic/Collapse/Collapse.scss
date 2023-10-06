@@ -44,7 +44,7 @@
         transform: none;
         transform-origin: 50% 0;
         transition: all .3s cubic-bezier(0.215, 0.610, 0.355, 1);
-        min-height: 2px !important;
+        min-height: 0 !important;
         height: auto;
         visibility: visible;
 
