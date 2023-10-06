@@ -16,48 +16,49 @@ export default function ShadowEditor({
     onChange,
     name = "Shadow",
     description,
-    level = 0
+    level = 0,
+    open
 }: {
     props: ShadowProps | false,
     onChange: (props: ShadowProps | boolean) => void
     name?: string
     description?: string
     level?: number
+    open?: boolean
 }) {
     const p = props === false ? {} : props
 
-    const [open, setOpen] = useState(false)
+    const [_open, setOpen] = useState(!!open)
 
-    let title = [ description, "Click to " + (open ? "collapse" : "expand") ]
+    let title = [ description, "Click to " + (_open ? "collapse" : "expand") ]
 
     let pl = (level: number) => 3 + (level * 16)
 
     return (
         <>
             <b
-                className={ "prop-label group-heading" + (open ? " open" : "") + " level-" + level }
-                onClick={() => setOpen(!open)}
+                className={ "prop-label group-heading" + (_open ? " open" : "") + " level-" + level }
+                onClick={() => setOpen(!_open)}
                 title={ title.filter(Boolean).join("\n") }
                 tabIndex={0}
-                style={{ paddingLeft: pl(level) }}
+                style={{ paddingLeft: pl(level - 1) }}
                 onKeyDown={e => {
                     if (e.key === " " || e.key === "Enter") {
                         e.preventDefault();
-                        setOpen(!open)
+                        setOpen(!_open)
                     }
                 }}
             >
-                <i className={ "fa-solid " + (open ? "fa-caret-down" : "fa-caret-right") } />
+                <i className={ "fa-solid " + (_open ? "fa-caret-down" : "fa-caret-right") } />
                 { name }
             </b>
-            { open ? <>
+            { _open ? <>
                 <div className="prop-label" style={{ paddingLeft: pl(level + 1) }}>Enabled</div>
                 <div className="prop-editor">
                     <BooleanEditor prop={{
                         name: "Enabled",
                         type: "boolean",
-                        // @ts-ignore
-                        value: props !== false,
+                        value: props !== undefined && props !== false,
                         onChange: (on: boolean) => onChange(on ? {} : false),
                     }} />
                 </div>
@@ -66,7 +67,7 @@ export default function ShadowEditor({
                     <ColorEditor prop={{
                         name : "Color",
                         type : "color",
-                        value: p.color ?? "#000000",
+                        value: p?.color ?? "#000000",
                         onChange(color: string) {
                             onChange({ ...(p || {}), color})
                         }
@@ -77,7 +78,7 @@ export default function ShadowEditor({
                     <NumberEditor prop={{
                         name : "OffsetX",
                         type : "number",
-                        value: p.offsetX ?? 1,
+                        value: p?.offsetX ?? 1,
                         onChange(offsetX?: number) {
                             onChange({ ...(p || {}), offsetX})
                         }
@@ -88,7 +89,7 @@ export default function ShadowEditor({
                     <NumberEditor prop={{
                         name : "OffsetY",
                         type : "number",
-                        value: p.offsetY ?? 1,
+                        value: p?.offsetY ?? 1,
                         onChange(offsetY?: number) {
                             onChange({ ...(p || {}), offsetY})
                         }
@@ -99,7 +100,7 @@ export default function ShadowEditor({
                     <NumberEditor prop={{
                         name : "Width",
                         type : "number",
-                        value: p.width ?? 3,
+                        value: p?.width ?? 3,
                         min  : 0,
                         max  : 10,
                         onChange(width?: number) {
@@ -112,7 +113,7 @@ export default function ShadowEditor({
                     <NumberEditor prop={{
                         name : "Opacity",
                         type : "number",
-                        value: p.opacity ?? 0.15,
+                        value: p?.opacity ?? 0.15,
                         min  : 0,
                         max  : 1,
                         step : 0.01,
