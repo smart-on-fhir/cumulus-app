@@ -2,7 +2,7 @@ import { EditableNumberProperty } from "./types"
 
 
 export default function NumberEditor({ prop }: { prop: EditableNumberProperty }) {
-    const { value, min, max, step, onChange, disabled } = prop
+    const { value, min, max, step, onChange, disabled, placeholder } = prop
     return (
         <input
             type="number"
@@ -12,6 +12,7 @@ export default function NumberEditor({ prop }: { prop: EditableNumberProperty })
             max={ max }
             step={ step }
             disabled={ !!disabled }
+            placeholder={ placeholder ?? value + "" }
         />
     )
 }
