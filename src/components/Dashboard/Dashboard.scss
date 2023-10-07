@@ -369,22 +369,11 @@
     .collapse-header {
         font-size: inherit;
         border-bottom: 1px solid #0001;
-        // border-top: 1px solid #FFFC;
-        padding: 3px 0;
+        padding: 3px 3px 3px 0;
         line-height: normal;
-        // margin: 0;
-        // display: block;
-        // overflow: hidden;
-        
-        display: flex;
-        flex-wrap: nowrap;
-        /* align-content: center; */
-        align-items: center;
-        justify-content: flex-start;
-        flex-direction: row;
-        > * {
-            padding: 0 4px;
-        }
+    }
+    .collapse.selected .collapse-header {
+        background: linear-gradient(170deg, #06C1, #06C3);
     }
 
     .collapse-body > .property-grid {

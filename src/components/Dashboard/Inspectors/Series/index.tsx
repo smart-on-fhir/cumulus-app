@@ -138,36 +138,22 @@ export function AllSeries({
         <div className="all-series">
             { options.series?.map((s: any, i) => {
                 const color = getColorForSeries(options, s.id)
-                return <Collapse key={i} collapsed header={
-                    <div style={{
-                        background: seriesId === s.id ? "linear-gradient(90deg, #06C1, #06C2)" : "none",
-                        boxShadow : seriesId === s.id ? "0 0 0 1px #06C2 inset" : "none",
-                        display   : "inline-flex",
-                        alignItems: "center",
-                        flex      : 1,
-                        margin    : "-2px 0 -2px 2px",
-                        padding   : "2px 0",
-                        borderRadius: 3
-                    }}>
+                return <Collapse key={i} collapsed className={seriesId === s.id ? "selected" : ""} header={
+                    <>
                          <b style={{
                              background: s.visible !== false ? color : "#DDD",
-                             width     : "1em",
-                             height    : "1em",
-                             flex      : "0 0 1em",
+                             width     : "15px",
+                             height    : "15px",
                              display   : "inline-block",
                              boxShadow : s.visible !== false ? "#666 0 0 0 1px inset, #FFF8 0 0 0px 2px inset" : "#CCC 0 0 0 1px inset",
                              borderRadius: "2px",
-                             margin      : "0 4px 0 3px"
+                             margin      : "0 5px 0 1px"
                          }}/>
-                         <div style={{ color: s.visible !== false ? "#414e5c" : "#999", overflow: "hidden", flex: "1 1 100%" }}> 
-                            <div style={{
-                                textOverflow: "ellipsis",
-                                overflow: "hidden",
-                                whiteSpace: "nowrap",
-                                maxWidth: "100%"
-                            }}>{ String(s.name ?? "") || "Series " + (i + 1)}</div>
-                         </div>
-                    </div>
+                        <span
+                            className={ "ellipsis" + (seriesId === s.id ? " selected" : "") }
+                            style={{ color: s.visible !== false ? "#414e5c" : "#999" }}
+                        >{ String(s.name ?? "") || "Series " + (i + 1)}</span>
+                    </>
                 }>
                     <PropertyGrid props={getOptions(options, onChange, s.id)} />
                 </Collapse>
