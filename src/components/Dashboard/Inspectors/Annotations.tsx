@@ -1,14 +1,13 @@
 import { AnnotationMockPointOptionsObject, AnnotationsLabelsOptions } from "highcharts"
 import moment             from "moment"
-import Checkbox           from "../generic/Checkbox"
-import { DATE_BOOKMARKS } from "./config"
-import { app }            from "../../types"
+import Checkbox           from "../../generic/Checkbox"
+import { Tabs }           from "../../generic/Tabs";
+import { DATE_BOOKMARKS } from "../config"
 
 
 const emptyAnnotation: AnnotationsLabelsOptions = {
     text: "",
     overflow: "allow",
-    //useHTML: true,
     style: {
         textAlign : "center",
         fontFamily: "inherit",
@@ -26,23 +25,27 @@ function Annotation({
     annotation,
     onChange,
     onRemove,
-    xCol,
-    down,
-    up
+    xType,
+    selected
 }: {
     annotation: AnnotationsLabelsOptions
     onChange: (f: AnnotationsLabelsOptions) => void
     onRemove: () => void
-    up     ?: () => void
-    down   ?: () => void
-    xCol    : app.DataRequestDataColumn
+    xType  ?: string
+    selected?: boolean
 })
 {
     const point = { ...(annotation.point || {}) as AnnotationMockPointOptionsObject }
     const { x, y, xAxis, yAxis } = point;
 
     return (
-        <div className="mb-1" style={{ background: "#EAEAEA", padding: 5, borderRadius: 7, border: "1px solid #D9D9D9" }}>
+        <div className="mb-1" style={{
+            background: "#DDD3 linear-gradient(#F7F7F7, #DDD3)",
+            padding: 5,
+            borderRadius: 7,
+            border: selected ? "1px solid #09F" : "1px solid #D9D9D9",
+            boxShadow: selected ? "0 0 0 3px #09F3" : "none"
+        }}>
             <div className="row small">
                 <div className="col">
                     <textarea
@@ -56,7 +59,7 @@ function Annotation({
             <div className="row middle small" style={{ margin: "6px 0 1px" }}>
                 <div className="col col-0 right" style={{ margin: "0 1px 0 2px" }}><b>X</b></div>
                 <div className="col" style={{ margin: "0 1px 0 2px" }}>
-                    { xCol.dataType.startsWith("date") ?
+                    { xType?.startsWith("date") ?
                         <input type="date" value={moment(x).utc().format("YYYY-MM-DD")} onChange={e => {
                             point.x = +(e.target.valueAsDate || 0)
                             onChange({ ...annotation, point })
@@ -246,64 +249,99 @@ function Annotation({
     )
 }
 
-
-export default function AnnotationsUI({
-    current = [],
+export default function Annotations({
+    annotations = [],
     onChange,
-    xCol
+    xType = "",
+    selectedIndex
 }: {
-    current: AnnotationsLabelsOptions[],
-    onChange: (current: AnnotationsLabelsOptions[]) => void
-    xCol: app.DataRequestDataColumn
+    annotations?: AnnotationsLabelsOptions[],
+    onChange: (annotations: AnnotationsLabelsOptions[]) => void
+    xType?: string
+    selectedIndex: number
+})
+{
+    const validSelectionIndex = selectedIndex > -1 && selectedIndex < annotations.length
+
+    const children = [];
+
+    
+
+    if (validSelectionIndex && selectedIndex > -1) {
+        const annotation = annotations[selectedIndex]
+        children.push({
+            name: <>
+                <i className="fa-solid fa-crosshairs"/> Selected Annotation
+            </>,
+            children: <Annotation
+                annotation={{ ...annotation }}
+                xType={ xType }
+                onRemove={() => {
+                    annotations.splice(selectedIndex, 1)
+                    onChange(annotations)
+                }}
+                onChange={f => {
+                    annotations[selectedIndex] = { ...f }
+                    onChange(annotations)
+                }}
+            />
+        })
+    }
+
+    children.push({
+        name: <><i className="fa-solid fa-layer-group" /> All Annotations</>,
+        children: <AllAnnotations
+            annotations={annotations}
+            onChange={onChange}
+            selectedIndex={selectedIndex}
+            xType={xType}
+        />
+    })
+
+    return <Tabs children={children} selectedIndex={0} />
+}
+
+export function AllAnnotations({
+    annotations = [],
+    onChange,
+    xType = "",
+    selectedIndex = -1
+}: {
+    annotations?: AnnotationsLabelsOptions[],
+    onChange: (annotations: AnnotationsLabelsOptions[]) => void
+    xType?: string
+    selectedIndex?: number
 })
 {
     function add() {
-        onChange([ ...current, emptyAnnotation ])
+        onChange([ ...annotations, emptyAnnotation ])
     }
 
     function remove(index: number) {
-        current.splice(index, 1)
-        onChange(current)
+        annotations.splice(index, 1)
+        onChange(annotations)
     }
 
-    function up(index: number) {
-        const items = [...current];
-        const cur = items[index];
-        items.splice(index, 1)
-        items.splice(index - 1, 0, cur)
-        onChange(items)
-    }
-
-    function down(index: number) {
-        const items = [...current];
-        const cur = items[index];
-        items.splice(index, 1)
-        items.splice(index + 1, 0, cur)
-        onChange(items)
-    }
-
-    return (
-        <div className="mt-1 mb-1">
-            { current.map((f, i) => (
-                <Annotation
-                    key={i}
-                    annotation={{...f}}
-                    xCol={xCol}
-                    onRemove={() => remove(i)}
-                    up={ i > 0 ? up.bind(null, i) : undefined }
-                    down={ i < current.length - 1 ? down.bind(null, i) : undefined }
-                    onChange={f => {
-                        current[i] = { ...f }
-                        onChange(current)
-                    }}
-                />
-            )) }
-            { current.length > 0 && <hr className="mt-1 mb-1"/> }
-            <div className="row middle">
-                <div className="col center">
-                    <button className="btn color-green small" onClick={add}>Add Annotation</button>
-                </div>
+    return <>
+        { annotations.map((f, i) => (
+            <Annotation
+                key={i}
+                annotation={{...f}}
+                xType={xType}
+                selected={selectedIndex === i}
+                onRemove={() => remove(i)}
+                onChange={f => {
+                    annotations[i] = { ...f }
+                    onChange(annotations)
+                }}
+            />
+        )) }
+        { annotations.length > 0 && <hr/> }
+        <div className="row middle mt-1">
+            <div className="col center">
+                <button className="btn color-green small" onClick={add}>Add Annotation</button>
             </div>
         </div>
-    )
+    </>
+
 }
