@@ -317,6 +317,19 @@ export declare module app {
         Subscriptions?: DataRequest[]
     }
 
+    interface Inspection {
+        enabled: boolean
+        match  : string[]
+        context: InspectionContext
+    }
+
+    interface InspectionContext {
+        selectedAnnotationIndex: number
+        selectedPlotLineId     : string
+        selectedPlotLineAxis   : "x" | "y" | ""
+        selectedSeriesId       : string
+    }
+
     type DenominatorType = "global" | "count" | "local" | ""
 
     namespace ServerResponses {
