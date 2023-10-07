@@ -606,11 +606,25 @@ export function buildChartOptions({
     const result = merge(options, dynamicOptions) as Highcharts.Options
 
     // Convert px to em in old chart annotations
-    result.annotations?.[0]?.labels?.forEach(l => {
-        l.style!.fontSize = options.chart?.style?.fontSize
+    result.annotations?.[0]?.labels?.forEach((l, i) => {
+        l.style!.fontSize   = options.chart?.style?.fontSize
         l.style!.fontFamily = options.chart?.style?.fontFamily
-        l.useHTML = true
+        l.useHTML           = false 
+        l.className         = `annotation-index-${i}`
     })
+    if (inspection.enabled && result.annotations?.[0]) {
+        result.annotations[0].events = {
+            // @ts-ignore
+            click: function(e: any) {
+                onInspectionChange(["annotation"], {
+                    selectedAnnotationIndex: +(
+                        e.target.parentElement?.classList?.value?.match(/\bannotation-index-(\d+)\b/)?.[1] ||
+                        -1
+                    )
+                })
+            }
+        }
+    }
 
     // @ts-ignore Convert px to em in old chart xAxis plotLines
     const xAxisPlotLines = (result.xAxis?.plotLines || []) as XAxisPlotLinesOptions[];
