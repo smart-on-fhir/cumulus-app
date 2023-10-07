@@ -9,7 +9,6 @@ import TagSelector              from "../Tags/TagSelector"
 import PropertyGrid             from "../generic/PropertyGrid"
 import { app }                  from "../../types"
 import {
-    AxisTitleAlignValue,
     DashStyleValue,
     merge,
     Options,
@@ -36,7 +35,6 @@ import Chart            from "./Inspectors/Chart"
 import { AllPlotLines } from "./Inspectors/AxisPlotLines"
 import Plot             from "./Inspectors/Plot"
 import { DEFS }         from "./Schema"
-import { lengthToEm }   from "../../utils"
 
 
 type SupportedChartType = keyof typeof SupportedChartTypes
