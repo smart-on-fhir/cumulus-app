@@ -31,6 +31,7 @@ import {
 } from "./config"
 import ColorEditor      from "../generic/PropertyGrid/ColorEditor"
 import Legend           from "./Inspectors/Legend"
+import AxisEditor       from "./Inspectors/Axis"
 import Chart            from "./Inspectors/Chart"
 import { AllPlotLines } from "./Inspectors/AxisPlotLines"
 import Plot             from "./Inspectors/Plot"
@@ -519,10 +520,9 @@ export default function ConfigPanel({
                     />
                 </div>
                 <div className="pb-1">
-                    <AdvancedAxisEditor
-                        axis={ (state.chartOptions.yAxis || {}) as YAxisOptions }
-                        onChange={yAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { yAxis })})}
-                    />
+                        <Collapse collapsed header="Advanced Axis Options">
+                            <AxisEditor axis={state.chartOptions.yAxis as YAxisOptions} onChange={yAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { yAxis })})} />
+                        </Collapse>
                 </div>
             </Collapse> }
 
@@ -574,10 +574,9 @@ export default function ConfigPanel({
                     />
                 </div>
                 <div className="pb-1">
-                    <AdvancedAxisEditor
-                        axis={ (state.chartOptions.xAxis || {}) as XAxisOptions }
-                        onChange={xAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { xAxis })})}
-                    />
+                        <Collapse collapsed header="Advanced Axis Options">
+                            <AxisEditor axis={state.chartOptions.xAxis as XAxisOptions} onChange={xAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { xAxis })})} />
+                        </Collapse>
                 </div>
             </Collapse> }
 
@@ -908,165 +907,6 @@ function getPieOptions(options: any, onChange: (options: any) => void, has3d = f
     )
 
     return props;
-}
-
-function AdvancedAxisEditor({
-    axis,
-    onChange
-}: {
-    axis: XAxisOptions | YAxisOptions,
-    onChange: (axis: Partial<XAxisOptions | YAxisOptions>) => void
-}) {
-    return (
-        <Collapse collapsed header="Advanced">
-            <PropertyGrid props={[
-                {
-                    name: "Alternate Grid Color",
-                    type: "color",
-                    value: axis.alternateGridColor ?? "#0000",
-                    onChange: (alternateGridColor?: string) => onChange({ alternateGridColor: alternateGridColor ?? undefined })
-                },
-                {
-                    name: "Line Color",
-                    type: "color",
-                    value: axis.lineColor ?? "#333333",
-                    onChange: (lineColor?: string) => onChange({ lineColor: lineColor ?? "#333333" })
-                },
-                {
-                    name: "Line Width",
-                    type: "number",
-                    min: 0,
-                    value: axis.lineWidth ?? 1,
-                    onChange: (lineWidth?: number) => onChange({ lineWidth: lineWidth ?? 1 })
-                },
-                {
-                    name: "Reversed",
-                    type: "boolean",
-                    value: !!axis.reversed,
-                    onChange: (reversed: boolean) => onChange({ reversed })
-                },
-                {
-                    name: "Start on Tick",
-                    type: "boolean",
-                    value: axis.startOnTick !== false,
-                    onChange: (startOnTick: boolean) => onChange({ startOnTick })
-                },
-                {
-                    name    : "Min",
-                    type    : axis.type === "datetime" ? "date" : "number",
-                    value   : axis.type === "datetime" ? +new Date(axis.min ?? 0) : axis.min ?? undefined,
-                    disabled: axis.type === "category",
-                    onChange: (min?: number) => onChange({
-                        min: min ?
-                            axis.type === "datetime" ?
-                                +new Date(min) :
-                                min ?? null:
-                            null
-                    })
-                },
-                // {
-                //     name : "softMin",
-                //     type : "number",
-                //     value: axis.softMin,
-                //     onChange: (softMin?: number) => onChange({ softMin })
-                // },
-                {
-                    name: "End on Tick",
-                    type: "boolean",
-                    value: !!axis.endOnTick,
-                    onChange: (endOnTick: boolean) => onChange({ endOnTick })
-                },
-                {
-                    name    : "Max",
-                    type    : axis.type === "datetime" ? "date" : "number",
-                    value   : axis.type === "datetime" ? +new Date(axis.max ?? 0) : axis.max ?? undefined,
-                    disabled: axis.type === "category",
-                    onChange: (max?: number) => onChange({
-                        max: max ?
-                            axis.type === "datetime" ?
-                                +new Date(max) :
-                                max ?? null:
-                            null
-                    })
-                },
-                // {
-                //     name : "softMax",
-                //     type : "number",
-                //     value: axis.softMax,
-                //     onChange: (softMax?: number) => onChange({ softMax })
-                // },
-                // {
-                //     name : "minPadding",
-                //     type : "number",
-                //     value: axis.minPadding ?? 0.05,
-                //     step: 0.01,
-                //     min: 0,
-                //     onChange: (minPadding?: number) => onChange({ minPadding })
-                // },
-                {
-                    name: "Grid Lines",
-                    type: "group",
-                    value: [
-                        {
-                            name: "Color",
-                            type: "color",
-                            value: axis.gridLineColor ?? "#e6e6e6",
-                            onChange: (gridLineColor?: string) => onChange({ gridLineColor: gridLineColor ?? "#e6e6e6" })
-                        },
-                        {
-                            name: "Width",
-                            type: "number",
-                            min: 0,
-                            step: 0.1,
-                            value: axis.gridLineWidth,
-                            onChange: (gridLineWidth?: number) => onChange({ gridLineWidth })
-                        },
-                        {
-                            name: "Dash Style",
-                            type: "options",
-                            options: DASH_STYLES,
-                            value: axis.gridLineDashStyle ?? "Solid",
-                            onChange: (gridLineDashStyle: DashStyleValue) => onChange({ gridLineDashStyle: gridLineDashStyle ?? "Solid" })
-                        },
-                        {
-                            name: "Z Index",
-                            type: "number",
-                            value: axis.gridZIndex ?? 1,
-                            onChange: (gridZIndex?: number) => onChange({ gridZIndex: gridZIndex ?? 1 })
-                        }
-                    ]
-                },
-                {
-                    name: "Title",
-                    type: "group",
-                    value: [
-                        {
-                            name: "Align",
-                            type: "options",
-                            options: ["low", "middle", "high"],
-                            value: axis.title?.align ?? "middle",
-                            onChange: (align: AxisTitleAlignValue) => onChange({ title: { align }})
-                        },
-                        {
-                            name: "Color",
-                            type: "color",
-                            value: axis.title?.style?.color ?? "#666666",
-                            onChange: (color?: string) => onChange({ title: { style: { color: color ?? "#666666" }}})
-                        },
-                        {
-                            name: "Font Size",
-                            type: "number",
-                            value: lengthToEm(axis.title?.style?.fontSize ?? "0.8"),
-                            step: 0.1,
-                            min: 0.5,
-                            max: 1.6,
-                            onChange: (fontSize: number) => onChange({ title: { style: { fontSize: fontSize + "em" }}})
-                        }
-                    ]
-                }
-            ]}/>
-        </Collapse>
-    )
 }
 
 function SeriesEditor({
