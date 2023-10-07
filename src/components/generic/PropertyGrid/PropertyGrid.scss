@@ -5,7 +5,9 @@
     $selection-bg-dark: mix($selection-bg, #000, 75%);
 
     // grid: auto-flow / minmax(min-content, 66%) 1fr;
-    grid: auto-flow / minmax(50%, max-content) auto;// minmax(min-content, 66%) 1fr;
+    // grid: auto-flow / minmax(50%, max-content) auto;// minmax(min-content, 66%) 1fr;
+    // grid: auto-flow / minmax(50%, max-content) 1fr;
+    grid: auto-flow / 3fr 2fr;
     display: grid;
     gap: 1px;
     background: #0001;
@@ -88,7 +90,7 @@
             transition: opacity 0.2s ease-in-out;
         }
 
-        :hover > & small.color-muted {
+        &:hover small.color-muted {
             opacity: 1;
         }
 
