@@ -2,10 +2,11 @@ import { ReactNode, useEffect, useRef, useState }  from "react"
 import "./Collapse.scss"
 
 
-export default function Collapse({ header, children, collapsed }: {
+export default function Collapse({ header, children, collapsed, className = "" }: {
     header: ReactNode,
-    children: ReactNode,
-    collapsed?: boolean
+    children: ReactNode ,
+    collapsed?: boolean,
+    className?: string
 }) {
     const [isCollapsed, setCollapsed] = useState(!!collapsed)
 
@@ -44,7 +45,7 @@ export default function Collapse({ header, children, collapsed }: {
     useEffect(() => onTransitionEnd(), []);
 
     return (
-        <div className={"collapse" + (isCollapsed ? " collapsed" : "")}>
+        <div className={"collapse " + className + (isCollapsed ? " collapsed" : "")}>
             <div className="collapse-header" onClick={toggle} tabIndex={0}
                 onKeyDown={e => {
                     if (e.key === " " || e.key === "Enter") {
