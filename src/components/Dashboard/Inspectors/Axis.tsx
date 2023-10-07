@@ -100,6 +100,16 @@ export function getOptions(axis: XAxisOptions | YAxisOptions, onChange: (a: Part
             onChange: (tickWidth?: number) => onChange({ tickWidth })
         },
         {
+            name: "Offset",
+            type: "number",
+            description: "The distance in pixels from the plot area to the axis line. " +
+                "A positive offset moves the axis with it's line, labels and ticks " +
+                "away from the plot area.\n\nDefaults to undefined.",
+            step: 1,
+            value: axis.offset,
+            onChange: (offset?: number) => onChange({ offset })
+        },
+        {
             name: "Title",
             type: "group",
             value: getTitleOptions(axis.title ?? {}, title => onChange({ title })),
