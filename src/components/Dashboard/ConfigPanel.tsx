@@ -37,6 +37,7 @@ import {
     DASH_STYLES
 } from "./config"
 import ColorEditor      from "../generic/PropertyGrid/ColorEditor"
+import Legend           from "./Inspectors/Legend"
 import { DEFS }         from "./Schema"
 import { lengthToEm }   from "../../utils"
 
@@ -820,153 +821,11 @@ export default function ConfigPanel({
                 </div>
             </Collapse>
 
-            <Collapse collapsed header="Legend">
-                <div className="pb-1">
-                    <PropertyGrid props={[
-                        {
-                            name: "Enabled",
-                            type: "boolean",
-                            value: chartOptions.legend?.enabled !== false,
-                            onChange: (enabled: boolean) => updateChartOptions({ legend: { enabled }})
-                        },
-                        {
-                            name: "X Align",
-                            description: "The horizontal alignment of the legend box within the chart area. Valid values are left, center and right.\nIn the case that the legend is aligned in a corner position, the layout option will determine whether to place it above/below or on the side of the plot area.",
-                            type: "options",
-                            options: ["left", "center", "right"],
-                            value: chartOptions.legend?.align || "center",
-                            onChange: (align: AlignValue) => updateChartOptions({ legend: { align }})
-                        },
-                        {
-                            name: "Y Align",
-                            description: "The vertical alignment of the legend box. Can be one of top, middle or bottom. Vertical position can be further determined by the y option.\n\nIn the case that the legend is aligned in a corner position, the layout option will determine whether to place it above/below or on the side of the plot area.\n\nWhen the layout option is proximate, the verticalAlign option doesn't apply.",
-                            type: "options",
-                            options: ["top", "middle", "bottom"],
-                            value: chartOptions.legend?.verticalAlign || "bottom",
-                            onChange: (verticalAlign: VerticalAlignValue) => updateChartOptions({ legend: { verticalAlign }})
-                        },
-                        {
-                            name: "X Offset",
-                            type: "number",
-                            value: chartOptions.legend?.x ?? 0,
-                            description: "The x offset of the legend relative to its horizontal alignment align within chart.spacingLeft and chart.spacingRight. Negative x moves it to the left, positive x moves it to the right.",
-                            onChange: (x?: number) => updateChartOptions({ legend: { x: x ?? 0 }})
-                        },
-                        {
-                            name: "Y Offset",
-                            type: "number",
-                            value: chartOptions.legend?.y ?? 0,
-                            description: "The vertical offset of the legend relative to it's vertical alignment verticalAlign within chart.spacingTop and chart.spacingBottom. Negative y moves it up, positive y moves it down.",
-                            onChange: (y: number) => updateChartOptions({ legend: { y: y ?? 0 }})
-                        },
-                        {
-                            name: "Layout",
-                            description: "The layout of the legend items. Can be one of horizontal or vertical or proximate. When proximate, the legend items will be placed as close as possible to the graphs they're representing, except in inverted charts or when the legend position doesn't allow it.",
-                            type: "options",
-                            options: ["horizontal", "vertical"/*, "proximate"*/],
-                            value: chartOptions.legend?.layout || "horizontal",
-                            onChange: (layout: OptionsLayoutValue) => updateChartOptions({ legend: { layout }})
-                        },
-                        {
-                            name: "Align Columns",
-                            description: "If the layout is horizontal and the legend items span over two lines or more, whether to align the items into vertical columns. Setting this to false makes room for more items, but will look more messy.",
-                            type: "boolean",
-                            value: chartOptions.legend?.alignColumns ?? true,
-                            onChange: (alignColumns: boolean) => updateChartOptions({ legend: { alignColumns }})
-                        },
-                        {
-                            name: "Floating",
-                            description: "When the legend is floating, the plot area ignores it and is allowed to be placed below it.",
-                            type: "boolean",
-                            value: chartOptions.legend?.floating ?? false,
-                            onChange: (floating: boolean) => updateChartOptions({ legend: { floating }})
-                        },
-                        {
-                            name: "Width",
-                            type: "length",
-                            value: chartOptions.legend?.width,
-                            units: ["%", "px"],
-                            onChange: (width: string) => updateChartOptions({ legend: { width: width || undefined }})
-                        },
-                        {
-                            name: "Padding",
-                            type: "number",
-                            description: "The inner padding of the legend box.",
-                            value: chartOptions.legend?.padding ?? 8,
-                            onChange: (padding?: number) => updateChartOptions({ legend: { padding }})
-                        },
-                        {
-                            name: "Max Height",
-                            type: "number",
-                            value: chartOptions.legend?.maxHeight,
-                            description: "Maximum pixel height for the legend. When the maximum height is extended, navigation will show.",
-                            onChange: (maxHeight?: number) => updateChartOptions({ legend: { maxHeight }})
-                        },
-                        {
-                            name: "Background Color",
-                            type: "color",
-                            value: chartOptions.legend?.backgroundColor,
-                            description: "The background color of the legend.",
-                            onChange: (backgroundColor?: string) => updateChartOptions({ legend: { backgroundColor }})
-                        },
-                        {
-                            name: "Border Width",
-                            type: "number",
-                            value: chartOptions.legend?.borderWidth,
-                            onChange: (borderWidth: number) => updateChartOptions({ legend: { borderWidth }})
-                        },
-                        {
-                            name: "Border Color",
-                            type: "color",
-                            value: chartOptions.legend?.borderColor ?? "#999999",
-                            onChange: (borderColor?: string) => updateChartOptions({ legend: { borderColor: borderColor || "#999999" }})
-                        },
-                        {
-                            name: "Border Radius",
-                            type: "number",
-                            value: chartOptions.legend?.borderRadius ?? 0,
-                            onChange: (borderRadius?: number) => updateChartOptions({ legend: { borderRadius: borderRadius ?? 0 }})
-                        },
-                        {
-                            name: "Drop Shadow",
-                            type: "shadow",
-                            value: chartOptions.legend?.shadow ?? false,
-                            onChange: (shadow: any) => updateChartOptions({ legend: { shadow: shadow ?? false }})
-                        },
-                        {
-                            name: "Items",
-                            type: "group",
-                            value: [
-                                {
-                                    name: "Distance",
-                                    type: "number",
-                                    value: chartOptions.legend?.itemDistance ?? 20,
-                                    onChange: (itemDistance: number) => updateChartOptions({ legend: { itemDistance }})
-                                },
-                                {
-                                    name: "Margin Top",
-                                    type: "number",
-                                    value: chartOptions.legend?.itemMarginTop ?? 2,
-                                    onChange: (itemMarginTop: number) => updateChartOptions({ legend: { itemMarginTop }})
-                                },
-                                {
-                                    name: "Margin Bottom",
-                                    type: "number",
-                                    value: chartOptions.legend?.itemMarginBottom ?? 2,
-                                    onChange: (itemMarginBottom: number) => updateChartOptions({ legend: { itemMarginBottom }})
-                                },
-                                {
-                                    name: "Format",
-                                    type: "string",
-                                    value: chartOptions.legend?.labelFormat ?? "{name}",
-                                    description: "A format string for each legend label. Available variables relates to properties on the series, or the point in case of pies.",
-                                    onChange: (labelFormat: string) => updateChartOptions({ legend: { labelFormat }})
-                                },
-                            ],
-                        }
-                    ]} />
-                </div>
-            </Collapse>
+                <Collapse collapsed header="Legend">
+                    <div className="pb-1">
+                        <Legend legend={chartOptions.legend} onChange={legend => updateChartOptions({ legend })} />
+                    </div>
+                </Collapse>
 
             { !isPie && <Collapse collapsed header="Annotations">
                 <AnnotationsUI
