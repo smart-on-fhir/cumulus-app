@@ -614,17 +614,39 @@ export function buildChartOptions({
 
     // @ts-ignore Convert px to em in old chart xAxis plotLines
     const xAxisPlotLines = (result.xAxis?.plotLines || []) as XAxisPlotLinesOptions[];
-    xAxisPlotLines.forEach(l => {
+    xAxisPlotLines.forEach((l, i) => {
         if (l.label?.style?.fontSize) {
             l.label.style.fontSize = lengthToEm(l.label.style.fontSize) + "em"
+        }
+        l.id = `x-axis-plot-line-${i}`
+        if (inspection.enabled) {
+            l.events = {
+                click: function() {
+                    onInspectionChange(["plotLine"], {
+                        selectedPlotLineId: this.id,
+                        selectedPlotLineAxis: "x"
+                    })
+                }
+            }
         }
     })
 
     // @ts-ignore Convert px to em in old chart yAxis plotLines
     const yAxisPlotLines = (result.yAxis?.plotLines || []) as YAxisPlotLinesOptions[];
-    yAxisPlotLines.forEach(l => {
+    yAxisPlotLines.forEach((l, i) => {
         if (l.label?.style?.fontSize) {
             l.label.style.fontSize = lengthToEm(l.label.style.fontSize) + "em"
+        }
+        l.id = `y-axis-plot-line-${i}`
+        if (inspection.enabled) {
+            l.events = {
+                click: function() {
+                    onInspectionChange(["plotLine"], {
+                        selectedPlotLineId: this.id,
+                        selectedPlotLineAxis: "y"
+                    })
+                }
+            }
         }
     })
 
