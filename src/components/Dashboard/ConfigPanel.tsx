@@ -1,5 +1,4 @@
-import { MouseEvent, useState } from "react"
-import moment                   from "moment"
+import { useState }             from "react"
 import Select                   from "../generic/Select"
 import ColumnSelector           from "./ColumnSelector"
 import FilterUI                 from "./FilterUI"
@@ -10,7 +9,6 @@ import TagSelector              from "../Tags/TagSelector"
 import PropertyGrid             from "../generic/PropertyGrid"
 import { app }                  from "../../types"
 import {
-    AlignValue,
     AxisTitleAlignValue,
     DashStyleValue,
     merge,
@@ -22,17 +20,13 @@ import {
     SeriesOptionsType,
     SeriesPieOptions,
     SeriesSplineOptions,
-    VerticalAlignValue,
     XAxisOptions,
-    XAxisPlotLinesOptions,
-    YAxisOptions,
-    YAxisPlotLinesOptions
+    YAxisOptions
 } from "highcharts"
 import {
     SupportedChartTypes,
     ChartIcons,
     DEFAULT_COLORS,
-    DATE_BOOKMARKS,
     DASH_STYLES
 } from "./config"
 import ColorEditor      from "../generic/PropertyGrid/ColorEditor"
