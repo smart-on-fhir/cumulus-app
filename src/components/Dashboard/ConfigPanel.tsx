@@ -12,13 +12,7 @@ import {
     DashStyleValue,
     merge,
     Options,
-    SeriesAreasplineOptions,
-    SeriesAreasplinerangeOptions,
-    SeriesColumnOptions,
-    SeriesErrorbarOptions,
-    SeriesOptionsType,
     SeriesPieOptions,
-    SeriesSplineOptions,
     XAxisOptions,
     YAxisOptions
 } from "highcharts"
@@ -35,6 +29,7 @@ import Chart            from "./Inspectors/Chart"
 import { AllPlotLines } from "./Inspectors/AxisPlotLines"
 import Plot             from "./Inspectors/Plot"
 import { DEFS }         from "./Schema"
+import { AllSeries }    from "./Inspectors/Series"
 
 
 type SupportedChartType = keyof typeof SupportedChartTypes
@@ -637,167 +632,7 @@ export default function ConfigPanel({
 
 
 
-function getColumnOptions(options: SeriesColumnOptions, onChange: (options: Partial<SeriesColumnOptions>) => void) {
-    return [
-        {
-            name: "Border Width",
-            type: "number",
-            min: 0,
-            max: 10,
-            step: 0.1,
-            value: options.borderWidth,
-            onChange: (borderWidth?: number) => onChange({ borderWidth, edgeWidth: borderWidth })
-        },
-        {
-            name: "Border Color",
-            type: "color",
-            value: options.borderColor,
-            onChange: (borderColor: string) => onChange({ borderColor, edgeColor: borderColor })
-        },
-        {
-            name : "Border Radius",
-            type : "number",
-            min: 0,
-            max: 50,
-            value: options.borderRadius ?? 0,
-            onChange: (borderRadius: number) => onChange({ borderRadius })
-        },
-        {
-            name: "Center",
-            type: "boolean",
-            value: !!options.centerInCategory,
-            onChange: (centerInCategory: boolean) => onChange({ centerInCategory }),
-            description: "In case of stratified data center multiple columns on the same axis and allow them to overlap each other."
-        },
-        {
-            name : "Width",
-            type : "number",
-            min  : 0,
-            value: options.pointWidth,
-            onChange: (pointWidth: number) => onChange({ pointWidth })
-        },
-        {
-            name: "Shadow",
-            type: "shadow",
-            value: options.shadow || false,
-            onChange: (shadow: any) => onChange({ shadow })
-        }
-    ]
-}
 
-function getErrorbarOptions(options: SeriesErrorbarOptions, onChange: (options: Partial<SeriesErrorbarOptions>) => void) {
-    return [
-        {
-            name: "Line Width",
-            type: "number",
-            min: 0,
-            max: 50,
-            step: 0.1,
-            value: options.lineWidth ?? 1,
-            onChange: (lineWidth: number) => onChange({ lineWidth })
-        },
-        {
-            name : "Whisker Length",
-            type : "length",
-            description: "The length of the whiskers, the horizontal lines marking low and high values. " +
-                "It can be a numerical pixel value, or a percentage value of the box width. Set 0 to disable whiskers.",
-            min: 0,
-            max: 100,
-            units: ["px", "%"],
-            value: options.whiskerLength ?? "80%",
-            onChange: (whiskerLength: string) => {
-                onChange({ whiskerLength: whiskerLength.endsWith("px") ? parseFloat(whiskerLength) : whiskerLength ?? "80%" })
-            }
-        },
-        {
-            name : "Whisker Width",
-            type : "number",
-            description: "The line width of the whiskers, the horizontal lines marking low and high values.",
-            min: 0,
-            max: 20,
-            step: 0.1,
-            value: options.whiskerWidth ?? 2,
-            onChange: (whiskerWidth: number) => onChange({ whiskerWidth })
-        },
-        {
-            name: "whisker Dash Style",
-            type: "options",
-            options: DASH_STYLES,
-            value: options.whiskerDashStyle ?? "Solid",
-            onChange: (whiskerDashStyle: DashStyleValue) => onChange({ whiskerDashStyle })
-        },
-        {
-            name: "Stem Dash Style",
-            type: "options",
-            options: DASH_STYLES,
-            value: options.stemDashStyle ?? "Dash",
-            onChange: (stemDashStyle: DashStyleValue) => onChange({ stemDashStyle })
-        }
-    ]
-}
-
-function getAreaOptions(options: SeriesAreasplineOptions | SeriesAreasplinerangeOptions, onChange: (options: Partial<SeriesAreasplineOptions | SeriesAreasplinerangeOptions>) => void) {
-    return [
-        {
-            name: "Line Width",
-            type: "number",
-            min: 0,
-            max: 50,
-            step: 0.1,
-            value: options.lineWidth ?? 1,
-            onChange: (lineWidth: number) => onChange({ lineWidth })
-        },
-        {
-            name: "Fill Opacity",
-            type: "number",
-            min: 0,
-            max: 1,
-            step: 0.01,
-            value: options.fillOpacity ?? 1,
-            onChange: (fillOpacity: number) => onChange({ fillOpacity })
-        },
-        {
-            name: "Dash Style",
-            type: "options",
-            options: DASH_STYLES,
-            value: options.dashStyle ?? "Solid",
-            onChange: (dashStyle: DashStyleValue) => onChange({ dashStyle })
-        },
-        {
-            name: "Shadow",
-            type: "shadow",
-            value: options.shadow || false,
-            onChange: (shadow: any) => onChange({ shadow })
-        }
-    ]
-}
-
-function getSplineOptions(options: SeriesSplineOptions, onChange: (options: Partial<SeriesSplineOptions>) => void) {
-    return [
-        {
-            name : "Line Width",
-            type : "number",
-            value: options.lineWidth ?? 1.5,
-            max  : 10,
-            min  : 0,
-            step : 0.1,
-            onChange: (lineWidth: number) => onChange({ lineWidth })
-        },
-        {
-            name: "Dash Style",
-            type: "options",
-            options: DASH_STYLES,
-            value: options.dashStyle ?? "Solid",
-            onChange: (dashStyle: DashStyleValue) => onChange({ dashStyle })
-        },
-        {
-            name: "Shadow",
-            type: "shadow",
-            value: options.shadow || false,
-            onChange: (shadow: any) => onChange({ shadow })
-        }
-    ]
-}
 
 function getPieOptions(options: any, onChange: (options: any) => void, has3d = false) {
     const props: any[] = [];
@@ -919,146 +754,13 @@ function SeriesEditor({
 
     const [force, setForce] = useState(hasInvisible)
 
-    const props = (state.chartOptions.series || []).map((s, i) => {
-
-        // Inherit defaults for the current chart type
-        s = merge(state.chartOptions.plotOptions?.[s.type] || {}, s) as SeriesOptionsType
-
-        // @ts-ignore
-        const color = s.color?.pattern?.color || s.color?.stops?.[0]?.[1] || s.color || DEFAULT_COLORS[i % DEFAULT_COLORS.length]
-
-        const props = [
-            {
-                name: "Visible",
-                type: "boolean",
-                value: s.visible !== false,
-                onChange: (visible: boolean) => {
-                    const next = merge(state)
-                    next.chartOptions.series![i].visible = visible;
-                    onChange(next)
-                }
-            },
-            {
-                name: "Name",
-                type: "string",
-                value: s.name,
-                onChange: (name: string) => {
-                    const next = merge(state)
-                    next.chartOptions.series![i].name = name;
-                    onChange(next)
-                }
-            },
-            // {
-            //     name: "Type",
-            //     type: "options",
-            //     options: [
-            //         'line', 'spline', 'area', 'areaspline', 'arearange',
-            //         'areasplinerange', 'bar', 'bubble', 'column',
-            //         'columnpyramid', 'pie', 'scatter'
-            //     ],
-            //     value: s.type,
-            //     onChange: (type: any) => {
-            //         const next = merge(state)
-            //         next.chartOptions.series![i].type = type;
-            //         onChange(next)
-            //     }
-            // },
-            {
-                name: "Color",
-                type: "color",
-                value: color,
-                onChange: (color: string) => {
-                    state.chartOptions.colors![i] = color
-                    onChange(state)
-                }
-            },
-            {
-                name: "Opacity",
-                type: "number",
-                value: s.opacity ?? 1,
-                max: 1,
-                step: 0.01,
-                onChange: (opacity: number) => {
-                    const next = merge(state)
-                    next.chartOptions.series![i].opacity = opacity;
-                    onChange(next)
-                }
-            },
-            {
-                name : "Z Index",
-                type : "number",
-                value: s.zIndex ?? 0,
-                onChange: (zIndex: number) => {
-                    const next = merge(state)
-                    next.chartOptions.series![i].zIndex = zIndex;
-                    onChange(next)
-                }
-            },
-            {
-                name : "Show in Legend",
-                type : "boolean",
-                value: s.showInLegend !== false,
-                onChange: (showInLegend: boolean) => {
-                    const next = merge(state)
-                    next.chartOptions.series![i].showInLegend = showInLegend;
-                    onChange(next)
-                }
-            }
-        ]
-
-        if (s.type === "spline") {
-            props.push(...getSplineOptions(s as SeriesSplineOptions, options => {
-                const next = merge(state)
-                next.chartOptions.series![i] = merge(next.chartOptions.series![i], options);
-                onChange(next)
-            }) as any)
-        }
-        else if (s.type === "areasplinerange" || s.type === "areaspline") {
-            props.push(...getAreaOptions(s as SeriesAreasplinerangeOptions, options => {
-                const next = merge(state)
-                // @ts-ignore
-                next.chartOptions.series![i] = merge(next.chartOptions.series![i], options);
-                onChange(next)
-            }) as any)
-        }
-        else if (s.type === "column" || s.type === "bar") {
-            props.push(...getColumnOptions(s as SeriesColumnOptions, options => {
-                const next = merge(state)
-                // @ts-ignore
-                next.chartOptions.series![i] = merge(next.chartOptions.series![i], options);
-                onChange(next)
-            }) as any)
-        }
-        else if (s.type === "errorbar") {
-            props.push(...getErrorbarOptions(s as SeriesErrorbarOptions, options => {
-                const next = merge(state)
-                // @ts-ignore
-                next.chartOptions.series![i] = merge(next.chartOptions.series![i], options);
-                onChange(next)
-            }) as any)
-        }
-
-        return {
-            name: <>
-                <b style={{
-                    background: s.visible !== false ? color : "#DDD",
-                    width     : "0.9em",
-                    height    : "0.9em",
-                    display   : "inline-block",
-                    boxShadow : s.visible !== false ? "0 0 1px #FFF, 0 1px 1px #FFF8 inset" : "0 0 1px #FFF, 0 1px 1px #CCC8 inset",
-                    border    : s.visible !== false ? "1px solid #000" : "1px solid #BBB",
-                    borderRadius: "20%",
-                }}/>
-                <span style={{ color: s.visible !== false ? "#414e5c" : "#999" }}> { String(s.name ?? "") || "Series " + (i + 1)}</span>
-            </>,
-            type: "group",
-            value: props
-        }
-    })
-
     return (
         <Collapse collapsed header="Series">
-            <PropertyGrid props={props as any} />
+            <AllSeries options={state.chartOptions} onChange={o => {
+                state.chartOptions = merge(state.chartOptions, o)
+                // next.chartOptions.series![i].visible = visible;
+                onChange(state)
+            }} />
             <div
                 className="link pt-1 pb-1"
                 style={{ color: hasInvisible ? "#06D" : "#AAA", userSelect: "none" }}

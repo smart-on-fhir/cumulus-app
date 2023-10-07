@@ -157,6 +157,7 @@
         background: #EEE;
         border-radius: 4px 4px 0 0;
         box-shadow: 0 1px 0 #FFF inset;
+        text-shadow: 0 1px 0 #FFF;
         b {
             flex: 1;
         }
@@ -164,6 +165,33 @@
         button {
             padding: 0;
         }
+    }
+}
+.dashboard-sidebar .all-series {
+    padding: 0 0;
+    .collapse-header {
+        font-size: inherit;
+        border-bottom: 1px solid #0001;
+        // border-top: 1px solid #FFFC;
+        padding: 3px 0;
+        line-height: normal;
+        // margin: 0;
+        // display: block;
+        // overflow: hidden;
+        
+        display: flex;
+        flex-wrap: nowrap;
+        /* align-content: center; */
+        align-items: center;
+        justify-content: flex-start;
+        flex-direction: row;
+        > * {
+            padding: 0 4px;
+        }
+    }
+
+    .collapse-body > .property-grid {
+        margin-left: 1.3em;
     }
 }
 
