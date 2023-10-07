@@ -38,6 +38,7 @@ import {
 import ColorEditor      from "../generic/PropertyGrid/ColorEditor"
 import Legend           from "./Inspectors/Legend"
 import Chart            from "./Inspectors/Chart"
+import Plot             from "./Inspectors/Plot"
 import { DEFS }         from "./Schema"
 import { lengthToEm }   from "../../utils"
 
@@ -607,37 +608,7 @@ export default function ConfigPanel({
 
             <Collapse collapsed header="Plot">
                 <div className="pb-1">
-                    <PropertyGrid props={[
-                        {
-                            name: "Border Width",
-                            description: "The pixel width of the plot area border",
-                            type: "number",
-                            step: 1,
-                            min: 0,
-                            max: 100,
-                            value: chartOptions.chart?.plotBorderWidth || 0,
-                            onChange: (n?: number) => updateChartOptions({ chart: { plotBorderWidth: n || 0 }})
-                        },
-                        {
-                            name: "Border Color",
-                            type: "color",
-                            value: chartOptions.chart?.plotBorderColor || "#334eff",
-                            onChange: (c: string) => updateChartOptions({ chart: { plotBorderColor: c || "#334eff" }})
-                        },
-                        {
-                            name: "Background Color",
-                            type: "color",
-                            value: chartOptions.chart?.plotBackgroundColor,
-                            onChange: (c?: string) => updateChartOptions({ chart: { plotBackgroundColor: c }})
-                        },
-                        {
-                            name: "Plot Shadow",
-                            type: "shadow",
-                            description: "Controls the drop shadow of the plot area",
-                            value: (chartOptions?.chart?.plotShadow || false) as any,
-                            onChange: (plotShadow: any) => updateChartOptions({ chart: { plotShadow }})
-                        }
-                    ]} />
+                        <Plot chart={chartOptions.chart} onChange={chart => updateChartOptions({ chart })} />
                 </div>
             </Collapse>
 
