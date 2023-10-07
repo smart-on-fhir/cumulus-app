@@ -1,7 +1,19 @@
 @import "../../styles/variables.scss";
 
-
-
+@mixin highlight($width: 1px, $offset: 0) {
+    outline: $width solid #39F;
+    outline-offset: $offset;
+    stroke: #39F3;
+    stroke-dasharray: none;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    transition: outline-color 0.3s linear 0s, stroke 0.3s linear 0s;
+    
+    &:active {
+        outline-color: #39F;
+        stroke: #39F8;
+    }
+}
 
 .highcharts-menu {
     
@@ -24,13 +36,185 @@
     overflow: hidden;
     position: relative;
 
-    * {
-        shape-rendering: geometricprecision;
-    }
-
     .highcharts-container {
         left: 0 !important;
-        top: 0 !important;
+        top : 0 !important;
+    }
+
+    &.inspecting {
+
+        $cursor: crosshair;
+        $outline: 2px solid #06C9;
+        
+        * {
+            cursor: $cursor !important;
+        }
+
+        // Pass events through if needed
+        .highcharts-plot-band, .highcharts-a11y-proxy-container-after, .highcharts-legend > * {
+            pointer-events: none;
+        }
+
+        // Chart ---------------------------------------------------------------
+        .highcharts-background {
+            outline-color: #06C0;
+            &:hover {
+                @include highlight(2px, -4px);
+            }
+        }
+
+        // Plot ----------------------------------------------------------------
+        .highcharts-plot-background {
+            pointer-events: fill; // Make it clickable even without a background
+            outline: 2px solid #06C0;
+            outline-offset: 2px;
+            &:hover {
+                @include highlight(2px, 2px);
+            }
+        }
+
+        // Axis Lines ----------------------------------------------------------
+        &:hover .highcharts-axis {
+            .highcharts-axis-line {
+                outline-color: #06C0;
+                stroke: #06C1;
+                pointer-events: all;
+
+                &[stroke-width="0"],
+                &[stroke-width="1"],
+                &[stroke-width="2"],
+                &[stroke-width="3"] {
+                    stroke-width: 4px !important;    
+                }
+            }
+            &:hover .highcharts-axis-line {
+                @include highlight(2px, 0);
+            }
+        }
+
+        // Axis Titles ---------------------------------------------------------
+        .highcharts-axis-title {
+            outline-color: #06C0;
+            &:hover {
+                @include highlight(2px, 2px);
+                border-radius: 0.1px;
+            }
+        }
+
+        // Axis Labels ---------------------------------------------------------
+        .highcharts-xaxis-labels, .highcharts-yaxis-labels {
+            > * {
+                outline-color: #06C0;
+            }
+            &:hover > * {
+                @include highlight(2px, 1px);
+                border-radius: 0.1px;
+            }
+        }
+
+        // Grid Lines ----------------------------------------------------------
+        &:hover .highcharts-grid {
+            path {
+                stroke-width: 3px;
+                stroke-dasharray: none;
+                stroke-linejoin: round;
+                stroke: #06C1;
+                outline-color: #06C0;
+            }
+            &:hover path {
+                @include highlight(2px, 0);
+            }
+        }
+
+        // Legend --------------------------------------------------------------
+        .highcharts-legend {
+            // pointer-events: all;
+            // pointer-events: bounding-box;
+            .highcharts-legend-box {
+                outline-color: #06C0;
+                // pointer-events: none;
+                pointer-events: bounding-box;
+            }
+            &:hover .highcharts-legend-box {
+                @include highlight(2px, 0);
+                border-radius: 1px;
+            }
+        }
+
+        // Title ---------------------------------------------------------------
+        .highcharts-title {
+            outline-color: #06C0;
+            &:hover {
+                @include highlight(2px, 3px);
+                border-radius: 0.1px;
+            }
+        }
+
+        // Caption -------------------------------------------------------------
+        .highcharts-caption {
+            outline-color: #06C0;
+            &:hover {
+                @include highlight(2px, 1px);
+                border-radius: 0.1px;
+            }
+        }
+
+        // Subtitle ------------------------------------------------------------
+        .highcharts-subtitle {
+            outline-color: #06C0;
+            &:hover {
+                @include highlight(2px, 1px);
+                border-radius: 0.1px;
+            }
+        }
+
+        // Annotations ---------------------------------------------------------
+        // .highcharts-annotation .highcharts-annotation-label > span {
+        //     outline-color: #06C0;
+        // }
+        // .highcharts-annotation:hover .highcharts-annotation-label > span {
+        //     @include highlight(2px, 1px);
+        //     border-radius: 0.1px;
+        // }
+        .highcharts-annotation-label {
+            pointer-events: bounding-box;
+            outline-color: #06C0;
+            // * {
+            //     pointer-events: none;
+            // }
+            &:hover {
+                @include highlight(2px, 1px);
+                border-radius: 0.5px;
+            }
+        }
+
+        // Plot Lines ----------------------------------------------------------
+        &:hover .highcharts-plot-line {
+            stroke-width: 4px;
+            stroke-dasharray: none;
+            stroke: #06C3;
+            pointer-events: all;
+            outline-color: #06C0;
+
+            &:hover {
+                @include highlight(2px, 0px);
+            }
+        }
+        &:hover .highcharts-plot-line-label {
+            outline-color: #06C0;
+            &:hover {
+                @include highlight(2px, 0px);
+                border-radius: 1px;
+            }
+        }
+        // &:has(.highcharts-plot-line:hover), &:has(.highcharts-plot-line-label:hover) {
+        //     .highcharts-plot-line-label {
+        //         @include highlight(2px, 1px);
+        //     }
+        //     // .highcharts-plot-line {
+        //     //     @include highlight(1px, 1px);
+        //     // }
+        // }
     }
 }
 
@@ -165,6 +349,19 @@
         button {
             padding: 0;
         }
+    }
+}
+.dynamic-inspector {
+    padding-bottom: 1rem;
+
+    .tabs .tab-name.active {
+        background: linear-gradient(#fff, #fff0);
+    }
+    .tabs-content {
+        padding   : 0.5rem 0;
+        box-shadow: none;
+        height    : auto;
+        background: transparent;
     }
 }
 .dashboard-sidebar .all-series {

@@ -1,4 +1,4 @@
-import React                       from "react"
+import React, { MouseEvent }       from "react"
 import { Color, merge, Series }    from "highcharts"
 // import moment                      from "moment"
 import { defer, lengthToEm, roundToPrecision } from "../../../utils"
@@ -10,7 +10,8 @@ import {
     SupportedChartTypes,
     DEFAULT_COLORS,
     DEFAULT_FONT_FAMILY,
-    DEFAULT_FONT_SIZE
+    DEFAULT_FONT_SIZE,
+    INSPECTORS
 } from "../config"
 
 
@@ -359,18 +360,22 @@ export function buildChartOptions({
     type,
     column2type,
     onSeriesToggle,
-    ranges = {}
+    ranges = {},
+    onInspectionChange,
+    inspection
 }: {
-    data            : app.ServerResponses.DataResponse
-    data2           : app.ServerResponses.StratifiedDataResponse | null
-    options        ?: Highcharts.Options
-    column          : app.DataRequestDataColumn
-    groupBy        ?: app.DataRequestDataColumn
-    type            : SupportedNativeChartTypes
-    denominator    ?: app.DenominatorType
-    column2type    ?: keyof typeof SupportedChartTypes
-    onSeriesToggle  : (s: Record<string, boolean>) => void
-    ranges          : app.RangeOptions
+    data              : app.ServerResponses.DataResponse
+    data2             : app.ServerResponses.StratifiedDataResponse | null
+    options          ?: Highcharts.Options
+    column            : app.DataRequestDataColumn
+    groupBy          ?: app.DataRequestDataColumn
+    type              : SupportedNativeChartTypes
+    denominator      ?: app.DenominatorType
+    column2type      ?: keyof typeof SupportedChartTypes
+    onSeriesToggle    : (s: Record<string, boolean>) => void
+    ranges            : app.RangeOptions
+    inspection        : app.Inspection
+    onInspectionChange: (inspection: string[], context: Partial<app.InspectionContext>) => void
 }): Highcharts.Options
 {
     const xType = getXType(column);
@@ -428,11 +433,16 @@ export function buildChartOptions({
                     easing
                 },
                 events: {
+                    click: inspection.enabled ? function(e) {
+                        onInspectionChange(["series"], { selectedSeriesId: e.point.series.options.id })
+                    } : undefined,
                     legendItemClick(e) {
                         e.preventDefault()
-                        const visMap: Record<string, boolean> = {};
-                        e.target.chart.series.forEach((s: Series) => visMap[s.userOptions.id!] = s === e.target ? !s.visible : s.visible)
-                        onSeriesToggle(visMap)
+                        if (!inspection.enabled) {
+                            const visMap: Record<string, boolean> = {};
+                            e.target.chart.series.forEach((s: Series) => visMap[s.userOptions.id!] = s === e.target ? !s.visible : s.visible)
+                            onSeriesToggle(visMap)
+                        }
                     }
                 },
                 dataSorting: {
@@ -481,7 +491,9 @@ export function buildChartOptions({
         tooltip: {
             borderColor: "rgba(0, 0, 0, 0.4)",
             backgroundColor: "#FFFFFFEE",
-            outside: true,
+            outside: false,
+            hideDelay: 100,
+            enabled: !inspection.enabled,
             style: {
                 fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
                 fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
@@ -568,7 +580,7 @@ export function buildChartOptions({
         },
         xAxis: {
             type: xType,
-            crosshair: type.includes("line"),
+            crosshair: !inspection.enabled && type.includes("line"),
             labels: {
                 style: {
                     // @ts-ignore
@@ -626,6 +638,7 @@ interface ChartProps {
     loading?: boolean
     contextMenuItems?: (MenuItemConfig | "-")[]
     visualOverrides: app.VisualOverridesState
+    onInspectionChange?: (result: string[], ctx: Partial<app.InspectionContext>) => void
 }
 
 export default class Chart extends React.Component<ChartProps>
@@ -680,6 +693,18 @@ export default class Chart extends React.Component<ChartProps>
         this.afterRender()
     }
 
+    onMouseDown(e: MouseEvent) {
+        if (this.props.onInspectionChange) {
+            let element = e.target as SVGElement | HTMLElement | null
+            if (element) {
+                let tag = Object.entries(INSPECTORS).find(([, selector]) => element!.matches(selector))?.[0]
+                if (tag) {
+                    this.props.onInspectionChange([tag], {})
+                }
+            }
+        }
+    }
+
     componentDidUpdate() {
         // The UI can generate too frequent state updates in some cases (for
         // example via color pickers). Using defer here allows us to skip
@@ -688,9 +713,9 @@ export default class Chart extends React.Component<ChartProps>
     }
 
     render() {
-        const { loading } = this.props
-        return <div style={{ position: "relative" }} className={ loading ? "loading" : undefined }>
-            <div id="chart" className="main-chart" onContextMenu={e => {
+        const { loading, onInspectionChange } = this.props
+        return <div style={{ position: "relative" }} className={ loading ? "loading" : undefined } onMouseDown={ e => this.onMouseDown(e) }>
+            <div id="chart" className={ "main-chart" + (onInspectionChange ? " inspecting" : "") } onContextMenu={e => {
 
                 // @ts-ignore
                 let menuItems = [...(e.nativeEvent?.menuItems || [])];

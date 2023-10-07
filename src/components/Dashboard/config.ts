@@ -63,6 +63,27 @@ export const DASH_STYLES: DashStyleValue[] = [
     'LongDashDot', 'LongDashDotDot'
 ];
 
+export const INSPECTORS = {
+    xAxisTitle    : ".highcharts-xaxis .highcharts-axis-title",
+    yAxisTitle    : ".highcharts-yaxis .highcharts-axis-title",
+    xAxis         : ".highcharts-xaxis, .highcharts-xaxis *",
+    yAxis         : ".highcharts-yaxis, .highcharts-yaxis *",
+    xAxisLabels   : ".highcharts-xaxis-labels *",
+    yAxisLabels   : ".highcharts-yaxis-labels *",
+    xAxisGridLines: ".highcharts-xaxis-grid path",
+    yAxisGridLines: ".highcharts-yaxis-grid path",
+    legend        : ".highcharts-legend *",
+    caption       : ".highcharts-caption",
+    subtitle      : ".highcharts-subtitle",
+    title         : ".highcharts-title",
+    chart         : ".highcharts-background",
+    plot          : ".highcharts-plot-background",
+    plotLineLabel : ".highcharts-plot-line-label, .highcharts-plot-line-label *",
+    // plotLine      : ".highcharts-plot-line",
+    // annotation    : ".chart-annotation *",
+    // annotation    : ".highcharts-label-box.highcharts-annotation-label-box",
+};
+
 // These are computed at runtime and will not be saved on the server
 export const ReadOnlyPaths = [
     "exporting",
