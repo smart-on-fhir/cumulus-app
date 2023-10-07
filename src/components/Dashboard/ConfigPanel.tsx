@@ -23,6 +23,7 @@ import {
     DASH_STYLES
 } from "./config"
 import ColorEditor      from "../generic/PropertyGrid/ColorEditor"
+import DynamicInspector from "./Inspectors"
 import Legend           from "./Inspectors/Legend"
 import AxisEditor       from "./Inspectors/Axis"
 import Chart            from "./Inspectors/Chart"
@@ -117,6 +118,7 @@ interface ChartConfigPanelState {
     tags           : Pick<app.Tag, "id"|"name"|"description">[]
     ranges         : app.RangeOptions | null
     visualOverrides: app.VisualOverridesState
+    inspection     : app.Inspection
 }
 
 export default function ConfigPanel({
@@ -160,96 +162,138 @@ export default function ConfigPanel({
                 <TagSelector selected={state.tags} onChange={tags => onChange({ ...state, tags })} />
             </div>
 
-            <Collapse collapsed header="Chart">
-                <div className="mt-1">
-                    <label>Chart Type</label>
-                    <Select
-                        value={ state.chartType }
-                        onChange={ chartType => onChange({ ...state, chartType })}
-                        options={Object.keys(SupportedChartTypes).map((type, i) => ({
-                            value: type,
-                            label: SupportedChartTypes[type as SupportedChartType],
-                            icon: ChartIcons[type as keyof typeof ChartIcons],
-                            disabled: (type.includes("Stack") && !state.stratifyBy) || (
-                                (type.includes("pie") || type.includes("donut")) && !!state.stratifyBy
-                            )
-                        }))}
+            {state.inspection.match?.length ?
+                <>
+                    {/* <pre style={{ whiteSpace: "pre-wrap" }}>{ JSON.stringify(state.inspection, null, 4) }</pre> */}
+                    <DynamicInspector
+                        chartOptions={state.chartOptions}
+                        onChange={updateChartOptions}
+                        inspection={state.inspection}
+                        xCol={ state.xCol }
+                        chartType={chartType}
                     />
-                </div>
-                <div className="mt-1">
-                    <label>Chart Title</label>
-                    <input
-                        type="text"
-                        value={ chartOptions.title?.text || "" }
-                        onChange={ e => onChange(merge(state, {
-                            chartOptions: {
-                                title: {
-                                    text: e.target.value
-                                }
-                            }
-                        }))}
-                    />
-                    <br/>
-                </div>
-                { isBarOrColumn && state.stratifyBy && 
+                    <br />
+                </> :
+                <>
+
+                
+
+                <Collapse collapsed header="Chart">
                     <div className="mt-1">
-                        <label>
-                            Group Padding
-                            <input
-                                type="range"
-                                min={0}
-                                max={0.5}
-                                step={0.01}
-                                value={
-                                    isColumn ? 
-                                        chartOptions.plotOptions?.column?.groupPadding === undefined ?
-                                            0.2 :
-                                            chartOptions.plotOptions.column.groupPadding :
-                                        chartOptions.plotOptions?.bar?.groupPadding === undefined ?
-                                            0.2 :
-                                            chartOptions.plotOptions.bar.groupPadding
+                        <label>Chart Type</label>
+                        <Select
+                            value={ state.chartType }
+                            onChange={ chartType => onChange({ ...state, chartType })}
+                            options={Object.keys(SupportedChartTypes).map((type, i) => ({
+                                value: type,
+                                label: SupportedChartTypes[type as SupportedChartType],
+                                icon: ChartIcons[type as keyof typeof ChartIcons],
+                                disabled: (type.includes("Stack") && !state.stratifyBy) || (
+                                    (type.includes("pie") || type.includes("donut")) && !!state.stratifyBy
+                                )
+                            }))}
+                        />
+                    </div>
+                    <div className="mt-1">
+                        <label>Chart Title</label>
+                        <input
+                            type="text"
+                            value={ chartOptions.title?.text || "" }
+                            onChange={ e => onChange(merge(state, {
+                                chartOptions: {
+                                    title: {
+                                        text: e.target.value
+                                    }
                                 }
-                                onChange={e => onChange(
-                                    merge(state, {
-                                        chartOptions: {
-                                            plotOptions: {
-                                                [isColumn ? "column" : "bar"]: {
-                                                    groupPadding: e.target.valueAsNumber
+                            }))}
+                        />
+                        <br/>
+                    </div>
+                    { isBarOrColumn && state.stratifyBy && 
+                        <div className="mt-1">
+                            <label>
+                                Group Padding
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={0.5}
+                                    step={0.01}
+                                    value={
+                                        isColumn ? 
+                                            chartOptions.plotOptions?.column?.groupPadding === undefined ?
+                                                0.2 :
+                                                chartOptions.plotOptions.column.groupPadding :
+                                            chartOptions.plotOptions?.bar?.groupPadding === undefined ?
+                                                0.2 :
+                                                chartOptions.plotOptions.bar.groupPadding
+                                    }
+                                    onChange={e => onChange(
+                                        merge(state, {
+                                            chartOptions: {
+                                                plotOptions: {
+                                                    [isColumn ? "column" : "bar"]: {
+                                                        groupPadding: e.target.valueAsNumber
+                                                    }
                                                 }
                                             }
-                                        }
-                                    })
-                                )}
-                                style={{ width: "100%", margin: 0 }}
-                            />
-                        </label>
-                        <p className="small color-muted">Padding between each value groups</p>
-                    </div>
-                }
-                { isBarOrColumn && !isStack &&
-                    <div className="mt-1">
+                                        })
+                                    )}
+                                    style={{ width: "100%", margin: 0 }}
+                                />
+                            </label>
+                            <p className="small color-muted">Padding between each value groups</p>
+                        </div>
+                    }
+                    { isBarOrColumn && !isStack &&
+                        <div className="mt-1">
+                            <label>
+                                Point Padding
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={0.5}
+                                    step={0.01}
+                                    value={
+                                        isColumn ? 
+                                            chartOptions.plotOptions?.column?.pointPadding === undefined ?
+                                                0.02 :
+                                                chartOptions.plotOptions.column.pointPadding :
+                                            chartOptions.plotOptions?.bar?.pointPadding === undefined ?
+                                                0.02 :
+                                                chartOptions.plotOptions.bar.pointPadding
+                                    }
+                                    onChange={e => onChange(     
+                                        merge(state, {
+                                            chartOptions: {
+                                                plotOptions: {
+                                                    [isColumn ? "column" : "bar"]: {
+                                                        pointPadding: e.target.valueAsNumber
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    )}
+                                    style={{ width: "100%", margin: 0 }}
+                                />
+                            </label>
+                            <p className="small color-muted">Padding between each column or bar</p>
+                        </div>
+                    }
+                    { isPie && <div className="mt-1">
                         <label>
-                            Point Padding
+                            Start Angle
                             <input
                                 type="range"
                                 min={0}
-                                max={0.5}
-                                step={0.01}
-                                value={
-                                    isColumn ? 
-                                        chartOptions.plotOptions?.column?.pointPadding === undefined ?
-                                            0.02 :
-                                            chartOptions.plotOptions.column.pointPadding :
-                                        chartOptions.plotOptions?.bar?.pointPadding === undefined ?
-                                            0.02 :
-                                            chartOptions.plotOptions.bar.pointPadding
-                                }
+                                max={360}
+                                step={1}
+                                value={ chartOptions.plotOptions?.pie?.startAngle || 0 }
                                 onChange={e => onChange(     
                                     merge(state, {
                                         chartOptions: {
                                             plotOptions: {
-                                                [isColumn ? "column" : "bar"]: {
-                                                    pointPadding: e.target.valueAsNumber
+                                                pie: {
+                                                    startAngle: e.target.valueAsNumber
                                                 }
                                             }
                                         }
@@ -258,330 +302,304 @@ export default function ConfigPanel({
                                 style={{ width: "100%", margin: 0 }}
                             />
                         </label>
-                        <p className="small color-muted">Padding between each column or bar</p>
-                    </div>
-                }
-                { isPie && <div className="mt-1">
-                    <label>
-                        Start Angle
-                        <input
-                            type="range"
-                            min={0}
-                            max={360}
-                            step={1}
-                            value={ chartOptions.plotOptions?.pie?.startAngle || 0 }
-                            onChange={e => onChange(     
-                                merge(state, {
-                                    chartOptions: {
-                                        plotOptions: {
-                                            pie: {
-                                                startAngle: e.target.valueAsNumber
-                                            }
-                                        }
-                                    }
-                                })
-                            )}
-                            style={{ width: "100%", margin: 0 }}
-                        />
-                    </label>
-                </div> }
-                { isPie && <div className="mt-1">
-                    <label>
-                        Selected Slice Offset
-                        <input
-                            type="range"
-                            min={0}
-                            max={30}
-                            step={1}
-                            value={ chartOptions.plotOptions?.pie?.slicedOffset === undefined ? 30 : chartOptions.plotOptions.pie.slicedOffset }
-                            onChange={e => onChange(
-                                merge(state, {
-                                    chartOptions: {
-                                        plotOptions: {
-                                            pie: {
-                                                slicedOffset: e.target.valueAsNumber
-                                            }
-                                        }
-                                    }
-                                })
-                            )}
-                            style={{ width: "100%", margin: 0 }}
-                        />
-                    </label>
-                </div> }
-                <div className="mt-1 pb-1">
-                    <Collapse collapsed header="Advanced">
-                            <Chart chart={state.chartOptions.chart} onChange={chart => onChange(merge(state, { chartOptions: { chart }}))} />
-                    </Collapse>
-                </div>
-                <br/>
-            </Collapse>
-
-            <Collapse collapsed header="Data">
-                <div className="pt-1">
-                    <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
-                    <ColumnSelector
-                        cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max") }
-                        value={ state.groupBy }
-                        disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
-                        onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
-                    />
-                    <p className="small color-muted"> {
-                        isPie ?
-                            "Select which data column provides the slices of the pie" :
-                            `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
-                    }</p>
-                </div>
-                { !isPie && <>
-                    <div className="pt-1">
-                        <label>Stratifier</label>
-                        <ColumnSelector
-                            cols={ cols }
-                            placeholder="Select Column"
-                            addEmptyOption="start"
-                            value={ state.stratifyBy }
-                            disabled={[
-                                "cnt",
-                                "cnt_min",
-                                "cnt_max",
-                                state.groupBy,
-                                state.column2
-                            ].filter(Boolean)}
-                            onChange={ (stratifyBy: string) => onChange({
-                                ...state,
-                                stratifyBy,
-                                denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
-                            }) }
-                        />
-                        <p className="small color-muted">
-                            Stratify the data into multiple series based on the chosen column. For example,
-                            this would produce multiple lines in a line chart.
-                        </p>
-                    </div>
-                    <div className="pt-1">
-                        <label>Denominator</label>
-                        <Select
-                            options={[
-                                {
-                                    label: <div>
-                                        <div>None</div>
-                                        <div className="small color-muted">
-                                            Render the aggregate counts as found in the<br/>
-                                            data source without further processing
-                                        </div>
-                                    </div>,
-                                    value: "",
-                                    icon: "fa-solid fa-percent grey-out"
-                                },
-                                {
-                                    label: <div>
-                                        <div>Stratified Count</div>
-                                        <div className="small color-muted">
-                                            Convert counts to percentage of the total<br />
-                                            count of every given data group.<br />
-                                            Not available with no stratifier.
-                                        </div>
-                                    </div>,
-                                    value: "count",
-                                    icon: "fa-solid fa-percent color-brand-2",
-                                    disabled: !state.stratifyBy
-                                },
-                                {
-                                    label: <div>
-                                        <div>Stratified Sum</div>
-                                        <div className="small color-muted">
-                                            Convert counts to percentage of the sum<br />
-                                            of values in every given data group.<br />
-                                            Not available with no stratifier.
-                                        </div>
-                                    </div>,
-                                    value: "local",
-                                    icon: "fa-solid fa-percent color-brand-2",
-                                    disabled: !state.stratifyBy
-                                },
-                                {
-                                    label: <div>
-                                        <div>Total Count</div>
-                                        <div className="small color-muted">
-                                            Convert counts to percentage of the total<br />
-                                            count within the entire dataset.
-                                        </div>
-                                    </div>,
-                                    value: "global",
-                                    icon: "fa-solid fa-percent color-blue"
-                                }
-                            ]}
-                            value={ state.denominator }
-                            onChange={ denominator => onChange({ ...state, denominator })}
-                        />
-                        <p className="small color-muted">
-                            If set, renders the values as percentages of the given denominator
-                        </p>
-                    </div>
-                    { state.ranges && <div className="pt-1">
-                        <label>Confidence Intervals</label>
-                        <Select value={ state.ranges?.type || "" } options={[
-                            {
-                                value: "",
-                                icon : "fa-solid fa-plus-minus color-muted",
-                                label: "None"
-                            },
-                            {
-                                label: "Error Bars",
-                                value: "errorbar",
-                                icon : "fa-solid fa-plus-minus color-blue"
-                            },
-                            {
-                                label: "Area",
-                                value: "areasplinerange",
-                                icon : "fa-solid fa-plus-minus color-blue"
-                            },
-                            {
-                                label: "Bars / Columns",
-                                value: "column",
-                                icon : "fa-solid fa-plus-minus color-blue"
-                            },
-                        ]} onChange={type => onChange({ ...state, ranges: { type, enabled: !!type }})} />
-                        <p className="small color-muted">
-                            If information is available, add the error ranges to the chart
-                        </p>
                     </div> }
+                    { isPie && <div className="mt-1">
+                        <label>
+                            Selected Slice Offset
+                            <input
+                                type="range"
+                                min={0}
+                                max={30}
+                                step={1}
+                                value={ chartOptions.plotOptions?.pie?.slicedOffset === undefined ? 30 : chartOptions.plotOptions.pie.slicedOffset }
+                                onChange={e => onChange(
+                                    merge(state, {
+                                        chartOptions: {
+                                            plotOptions: {
+                                                pie: {
+                                                    slicedOffset: e.target.valueAsNumber
+                                                }
+                                            }
+                                        }
+                                    })
+                                )}
+                                style={{ width: "100%", margin: 0 }}
+                            />
+                        </label>
+                    </div> }
+                    <div className="mt-1 pb-1">
+                        <Collapse collapsed header="Advanced">
+                            <Chart chart={state.chartOptions.chart} onChange={chart => onChange(merge(state, { chartOptions: { chart }}))} />
+                        </Collapse>
+                    </div>
+                    <br/>
+                </Collapse>
 
-                    <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onChange} />
-                </> }
+                <Collapse collapsed header="Data">
+                    <div className="pt-1">
+                        <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
+                        <ColumnSelector
+                            cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max") }
+                            value={ state.groupBy }
+                            disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
+                            onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
+                        />
+                        <p className="small color-muted"> {
+                            isPie ?
+                                "Select which data column provides the slices of the pie" :
+                                `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
+                        }</p>
+                    </div>
+                    { !isPie && <>
+                        <div className="pt-1">
+                            <label>Stratifier</label>
+                            <ColumnSelector
+                                cols={ cols }
+                                placeholder="Select Column"
+                                addEmptyOption="start"
+                                value={ state.stratifyBy }
+                                disabled={[
+                                    "cnt",
+                                    "cnt_min",
+                                    "cnt_max",
+                                    state.groupBy,
+                                    state.column2
+                                ].filter(Boolean)}
+                                onChange={ (stratifyBy: string) => onChange({
+                                    ...state,
+                                    stratifyBy,
+                                    denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
+                                }) }
+                            />
+                            <p className="small color-muted">
+                                Stratify the data into multiple series based on the chosen column. For example,
+                                this would produce multiple lines in a line chart.
+                            </p>
+                        </div>
+                        <div className="pt-1">
+                            <label>Denominator</label>
+                            <Select
+                                options={[
+                                    {
+                                        label: <div>
+                                            <div>None</div>
+                                            <div className="small color-muted">
+                                                Render the aggregate counts as found in the<br/>
+                                                data source without further processing
+                                            </div>
+                                        </div>,
+                                        value: "",
+                                        icon: "fa-solid fa-percent grey-out"
+                                    },
+                                    {
+                                        label: <div>
+                                            <div>Stratified Count</div>
+                                            <div className="small color-muted">
+                                                Convert counts to percentage of the total<br />
+                                                count of every given data group.<br />
+                                                Not available with no stratifier.
+                                            </div>
+                                        </div>,
+                                        value: "count",
+                                        icon: "fa-solid fa-percent color-brand-2",
+                                        disabled: !state.stratifyBy
+                                    },
+                                    {
+                                        label: <div>
+                                            <div>Stratified Sum</div>
+                                            <div className="small color-muted">
+                                                Convert counts to percentage of the sum<br />
+                                                of values in every given data group.<br />
+                                                Not available with no stratifier.
+                                            </div>
+                                        </div>,
+                                        value: "local",
+                                        icon: "fa-solid fa-percent color-brand-2",
+                                        disabled: !state.stratifyBy
+                                    },
+                                    {
+                                        label: <div>
+                                            <div>Total Count</div>
+                                            <div className="small color-muted">
+                                                Convert counts to percentage of the total<br />
+                                                count within the entire dataset.
+                                            </div>
+                                        </div>,
+                                        value: "global",
+                                        icon: "fa-solid fa-percent color-blue"
+                                    }
+                                ]}
+                                value={ state.denominator }
+                                onChange={ denominator => onChange({ ...state, denominator })}
+                            />
+                            <p className="small color-muted">
+                                If set, renders the values as percentages of the given denominator
+                            </p>
+                        </div>
+                        { state.ranges && <div className="pt-1">
+                            <label>Confidence Intervals</label>
+                            <Select value={ state.ranges?.type || "" } options={[
+                                {
+                                    value: "",
+                                    icon : "fa-solid fa-plus-minus color-muted",
+                                    label: "None"
+                                },
+                                {
+                                    label: "Error Bars",
+                                    value: "errorbar",
+                                    icon : "fa-solid fa-plus-minus color-blue"
+                                },
+                                {
+                                    label: "Area",
+                                    value: "areasplinerange",
+                                    icon : "fa-solid fa-plus-minus color-blue"
+                                },
+                                {
+                                    label: "Bars / Columns",
+                                    value: "column",
+                                    icon : "fa-solid fa-plus-minus color-blue"
+                                },
+                            ]} onChange={type => onChange({ ...state, ranges: { type, enabled: !!type }})} />
+                            <p className="small color-muted">
+                                If information is available, add the error ranges to the chart
+                            </p>
+                        </div> }
 
-                { isPie && <SliceEditor state={state} onChange={onChange} /> }
-                <br />
-            </Collapse>
+                        <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onChange} />
+                    </> }
 
-            <Collapse collapsed header="Filters">
-                <div className="pt-1 pb-1">
-                    <FilterUI
-                        onChange={filters => onChange({ ...state, filters })}
-                        current={ state.filters }
-                        cols={ cols }
-                    />
-                </div>
-            </Collapse>
+                    { isPie && <SliceEditor state={state} onChange={onChange} /> }
+                    <br />
+                </Collapse>
 
-            { !isPie && <SeriesEditor state={state} onChange={onChange} /> }
+                <Collapse collapsed header="Filters">
+                    <div className="pt-1 pb-1">
+                        <FilterUI
+                            onChange={filters => onChange({ ...state, filters })}
+                            current={ state.filters }
+                            cols={ cols }
+                        />
+                    </div>
+                </Collapse>
 
-            { !isPie && <Collapse collapsed header={ isBar ? "X Axis" : "Y Axis" }>
-                <div className="mt-1">
-                    <label>Axis Title</label>
-                    <input
-                        type="text"
-                        // @ts-ignore
-                        value={ chartOptions.yAxis?.title?.text || "" }
-                        onChange={ e => onChange(merge(state, {
-                            chartOptions: {
-                                yAxis: {
-                                    title: {
-                                        text: e.target.value
+                { !isPie && <SeriesEditor state={state} onChange={onChange} /> }
+
+                { !isPie && <Collapse collapsed header={ isBar ? "X Axis" : "Y Axis" }>
+                    <div className="mt-1">
+                        <label>Axis Title</label>
+                        <input
+                            type="text"
+                            // @ts-ignore
+                            value={ chartOptions.yAxis?.title?.text || "" }
+                            onChange={ e => onChange(merge(state, {
+                                chartOptions: {
+                                    yAxis: {
+                                        title: {
+                                            text: e.target.value
+                                        }
                                     }
                                 }
-                            }
-                        }))}
-                    />
-                </div>
-                <div className="mt-1 pb-1">
-                    <Checkbox
-                        name="YTicks"
-                        label="Render axis tick marks"
-                        // @ts-ignore
-                        checked={chartOptions.yAxis?.tickWidth !== 0}
-                        onChange={checked => onChange(merge(state, {
-                            chartOptions: {
-                                yAxis: {
-                                    tickWidth: checked ? 1 : 0
+                            }))}
+                        />
+                    </div>
+                    <div className="mt-1 pb-1">
+                        <Checkbox
+                            name="YTicks"
+                            label="Render axis tick marks"
+                            // @ts-ignore
+                            checked={chartOptions.yAxis?.tickWidth !== 0}
+                            onChange={checked => onChange(merge(state, {
+                                chartOptions: {
+                                    yAxis: {
+                                        tickWidth: checked ? 1 : 0
+                                    }
                                 }
-                            }
-                        }))}
-                    />
-                    <Checkbox
-                        name="YLabels"
-                        label="Render labels"
-                        // @ts-ignore
-                        checked={chartOptions.yAxis?.labels?.enabled !== false}
-                        onChange={checked => onChange(merge(state, {
-                            chartOptions: {
-                                yAxis: {
-                                    labels: { enabled: checked }
+                            }))}
+                        />
+                        <Checkbox
+                            name="YLabels"
+                            label="Render labels"
+                            // @ts-ignore
+                            checked={chartOptions.yAxis?.labels?.enabled !== false}
+                            onChange={checked => onChange(merge(state, {
+                                chartOptions: {
+                                    yAxis: {
+                                        labels: { enabled: checked }
+                                    }
                                 }
-                            }
-                        }))}
-                    />
-                </div>
-                <div className="pb-1">
+                            }))}
+                        />
+                    </div>
+                    <div className="pb-1">
                         <Collapse collapsed header="Advanced Axis Options">
                             <AxisEditor axis={state.chartOptions.yAxis as YAxisOptions} onChange={yAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { yAxis })})} />
                         </Collapse>
-                </div>
-            </Collapse> }
+                    </div>
+                </Collapse> }
 
-            { !isPie && <Collapse collapsed header={ isBar ? "Y Axis" : "X Axis" }>
-                <div className="mt-1">
-                    <label>Axis Title</label>
-                    <input
-                        type="text"
-                        placeholder={state.xCol.label || state.xCol.name || ""}
-                        // @ts-ignore
-                        value={ chartOptions.xAxis?.title?.text || "" }
-                        onChange={ e => onChange(merge(state, {
-                            chartOptions: {
-                                xAxis: {
-                                    title: {
-                                        text: e.target.value
+                { !isPie && <Collapse collapsed header={ isBar ? "Y Axis" : "X Axis" }>
+                    <div className="mt-1">
+                        <label>Axis Title</label>
+                        <input
+                            type="text"
+                            placeholder={state.xCol.label || state.xCol.name || ""}
+                            // @ts-ignore
+                            value={ chartOptions.xAxis?.title?.text || "" }
+                            onChange={ e => onChange(merge(state, {
+                                chartOptions: {
+                                    xAxis: {
+                                        title: {
+                                            text: e.target.value
+                                        }
                                     }
                                 }
-                            }
-                        }))}
-                    />
-                </div>
-                <div className="mt-1 pb-1">
-                    <Checkbox
-                        name="XTicks"
-                        label="Render axis tick marks"
-                        // @ts-ignore
-                        checked={ !!chartOptions.xAxis?.tickWidth }
-                        onChange={checked => onChange(merge(state, {
-                            chartOptions: {
-                                xAxis: {
-                                    tickWidth: checked ? 1 : 0
+                            }))}
+                        />
+                    </div>
+                    <div className="mt-1 pb-1">
+                        <Checkbox
+                            name="XTicks"
+                            label="Render axis tick marks"
+                            // @ts-ignore
+                            checked={ !!chartOptions.xAxis?.tickWidth }
+                            onChange={checked => onChange(merge(state, {
+                                chartOptions: {
+                                    xAxis: {
+                                        tickWidth: checked ? 1 : 0
+                                    }
                                 }
-                            }
-                        }))}
-                    />
-                    <Checkbox
-                        name="XLabels"
-                        label="Render labels"
-                        // @ts-ignore
-                        checked={chartOptions.xAxis?.labels?.enabled !== false}
-                        onChange={checked => onChange(merge(state, {
-                            chartOptions: {
-                                xAxis: {
-                                    labels: { enabled: checked }
+                            }))}
+                        />
+                        <Checkbox
+                            name="XLabels"
+                            label="Render labels"
+                            // @ts-ignore
+                            checked={chartOptions.xAxis?.labels?.enabled !== false}
+                            onChange={checked => onChange(merge(state, {
+                                chartOptions: {
+                                    xAxis: {
+                                        labels: { enabled: checked }
+                                    }
                                 }
-                            }
-                        }))}
-                    />
-                </div>
-                <div className="pb-1">
+                            }))}
+                        />
+                    </div>
+                    <div className="pb-1">
                         <Collapse collapsed header="Advanced Axis Options">
                             <AxisEditor axis={state.chartOptions.xAxis as XAxisOptions} onChange={xAxis => onChange({ ...state, chartOptions: merge(state.chartOptions, { xAxis })})} />
                         </Collapse>
-                </div>
-            </Collapse> }
+                    </div>
+                </Collapse> }
 
                 { !isPie && <Collapse collapsed header="Plot Lines">
                     <AllPlotLines chartOptions={state.chartOptions} onChange={chartOptions => onChange({ ...state, chartOptions })} />
-            </Collapse> }
+                </Collapse> }
 
-            <Collapse collapsed header="Plot">
-                <div className="pb-1">
+                <Collapse collapsed header="Plot">
+                    <div className="pb-1">
                         <Plot chart={chartOptions.chart} onChange={chart => updateChartOptions({ chart })} />
-                </div>
-            </Collapse>
+                    </div>
+                </Collapse>
 
                 <Collapse collapsed header="Legend">
                     <div className="pb-1">
@@ -589,43 +607,44 @@ export default function ConfigPanel({
                     </div>
                 </Collapse>
 
-            { !isPie && <Collapse collapsed header="Annotations">
+                { !isPie && <Collapse collapsed header="Annotations">
                     <div className="pt-1 pb-2">
                         <AllAnnotations
-                    onChange={ annotations => onChange(
-                        {
-                            ...state,
-                            chartOptions: {
-                                
-                                annotations: [{
-                                    visible: true,
-                                    draggable: '',
-                                    crop: false,
-                                    labelOptions: {
-                                        overflow: "justify",
-                                        allowOverlap: true,
-                                        className: "chart-annotation"
-                                    },
-                                    labels: annotations
-                                }]
-                            }
-                        }
-                    )}
+                            onChange={ annotations => onChange(
+                                {
+                                    ...state,
+                                    chartOptions: {
+                                        
+                                        annotations: [{
+                                            visible: true,
+                                            draggable: '',
+                                            crop: false,
+                                            labelOptions: {
+                                                overflow: "justify",
+                                                allowOverlap: true,
+                                                className: "chart-annotation"
+                                            },
+                                            labels: annotations
+                                        }]
+                                    }
+                                }
+                            )}
                             annotations={ chartOptions.annotations?.[0]?.labels || [] }
                             xType={ state.xCol.dataType }
-                />
+                        />
                     </div>
-            </Collapse> }
-            
-            <Collapse collapsed header="Advanced">
-                <br/>
-                <Collapse collapsed header="Visual Overrides">
-                    <div className="mt-1">
-                        <VisualOverridesEditor state={state.visualOverrides} onChange={visualOverrides => onChange({ ...state, visualOverrides })} />
-                    </div>
+                </Collapse> }
+                
+                <Collapse collapsed header="Advanced">
+                    <br/>
+                    <Collapse collapsed header="Visual Overrides">
+                        <div className="mt-1">
+                            <VisualOverridesEditor state={state.visualOverrides} onChange={visualOverrides => onChange({ ...state, visualOverrides })} />
+                        </div>
+                    </Collapse>
                 </Collapse>
-            </Collapse>
-            <br/>
+                <br/>
+            </>}
         </div>
     )
 }

@@ -76,7 +76,7 @@ function Editor({
         case "xAxis":
             return (
                 <div>
-                    <h4 className="color-brand-2">{ dir("x") } Axis</h4>
+                    <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> { dir("x") } Axis</h5>
                     <hr/>
                     <AxisEditor axis={xAxis} onChange={ a => onChange({ xAxis: a as XAxisOptions }) } />
                 </div>
@@ -84,77 +84,77 @@ function Editor({
 
         case "yAxis":
             return <>
-                <h4 className="color-brand-2">{ dir("y") } Axis</h4>
+                <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> { dir("y") } Axis</h5>
                 <hr/>
                 <AxisEditor axis={yAxis} onChange={ a => onChange({ yAxis: a as YAxisOptions }) } />
             </>
         
         case "xAxisTitle": 
             return <>
-                <h4 className="color-brand-2">{ dir("x") } Axis Title</h4>
+                <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> { dir("x") } Axis Title</h5>
                 <hr/>
                 <AxisTitleEditor title={xAxis.title} onChange={ title => onChange({ xAxis: { title }}) } />
             </>
 
         case "yAxisTitle": 
             return <>
-                <h4 className="color-brand-2">{ dir("y") } Axis Title</h4>
+                <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> { dir("y") } Axis Title</h5>
                 <hr/>
                 <AxisTitleEditor title={yAxis.title} onChange={ title => onChange({ yAxis: { title }}) } />
             </>
 
         case "xAxisGridLines":
             return <>
-                <h4 className="color-brand-2">{ dir("x") } Axis GridLines</h4>
+                <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> { dir("x") } Axis GridLines</h5>
                 <hr/>
                 <AxisGridLinesEditor axis={xAxis} onChange={ a => onChange({ xAxis: a as XAxisOptions }) } />
             </>
         
         case "yAxisGridLines":
             return <>
-                <h4 className="color-brand-2">{ dir("y") } Axis GridLines</h4>
+                <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> { dir("y") } Axis GridLines</h5>
                 <hr />
                 <AxisGridLinesEditor axis={yAxis} onChange={ a => onChange({ yAxis: a as YAxisOptions }) } />
             </>
 
         case "xAxisLabels":
             return <>
-                <h4 className="color-brand-2">{ dir("x") } Axis Labels</h4>
+                <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> { dir("x") } Axis Labels</h5>
                 <hr/>
                 <AxisLabelsEditor axis={xAxis} onChange={ a => onChange({ xAxis: a as XAxisOptions }) } />
             </>
         
         case "yAxisLabels":
             return <>
-                <h4 className="color-brand-2">{ dir("y") } Axis Labels</h4>
+                <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> { dir("y") } Axis Labels</h5>
                 <hr/>
                 <AxisLabelsEditor axis={yAxis} onChange={ a => onChange({ yAxis: a as YAxisOptions }) } />
             </>
         
         case "legend":
             return <>
-                <h4 className="color-brand-2">Legend</h4>
+                <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> Legend</h5>
                 <hr/>
                 <Legend legend={chartOptions.legend} onChange={ l => onChange({ legend: l as LegendOptions }) } />
             </>
 
         case "plot":
             return <>
-                <h4 className="color-brand-2">Plot Area</h4>
+                <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> Plot Area</h5>
                 <hr/>
                 <Plot chart={chartOptions.chart} onChange={ c => onChange({ chart: c as ChartOptions }) } />
             </>
 
         case "title":
             return <>
-                <h4 className="color-brand-2">Chart Title</h4>
+                <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> Chart Title</h5>
                 <hr/>
                 <Title title={chartOptions.title} onChange={ t => onChange({ title: t as TitleOptions }) } />
             </>
 
         case "chart":
             return <>
-                <h4 className="color-brand-2">Chart</h4>
+                <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> Chart</h5>
                 <hr />
                 <Chart chart={chartOptions.chart} onChange={ c => onChange({ chart: c as ChartOptions }) } />
             </>

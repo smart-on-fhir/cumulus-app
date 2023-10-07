@@ -64,6 +64,7 @@ export interface ViewState
     tags            : Pick<app.Tag, "id"|"name"|"description">[]
     ranges          : app.RangeOptions
     visualOverrides : app.VisualOverridesState
+    inspection      : app.Inspection
 }
 
 interface ViewAction
@@ -77,13 +78,20 @@ function initViewState(initialState: ViewState): ViewState
     return { ...initialState, cleanState: { ...initialState } }
 }
 
-function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string, boolean>) => void })
+function getViewReducer({
+    onSeriesToggle,
+    onInspectionChange
+}: {
+    onSeriesToggle: (s: Record<string, boolean>) => void
+    onInspectionChange: (inspection: string[], context: any) => void
+}) 
 {
     const chartable = [
         "chartType",
         "chartOptions",
         "denominator",
         "data",
+        "inspection"
     ];
 
     function computeChartOptions(nextState: ViewState) {
@@ -111,7 +119,9 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
                     denominator     : nextState.denominator,
                     column2type     : nextState.column2type,
                     ranges          : nextState.ranges,
+                    inspection      : nextState.inspection,
                     onSeriesToggle,
+                    onInspectionChange,
                 })
             }
         } catch (ex) {
@@ -153,6 +163,10 @@ function getViewReducer({ onSeriesToggle }: { onSeriesToggle: (s: Record<string,
             if (nextState.chartType.startsWith("pie") || nextState.chartType.startsWith("donut")) {
                 nextState.viewGroupBy = undefined
                 nextState.denominator = ""
+            }
+
+            if (nextState.inspection.enabled && nextState.inspection.match.length) {
+                nextState.showOptions = true
             }
 
             // @ts-ignore
@@ -219,7 +233,7 @@ export default function Dashboard({
 
     const viewSettings = view.settings || {} as Partial<app.ViewSettings>
 
-    const [ state, dispatch ] = useReducer(getViewReducer({ onSeriesToggle }), {
+    const [ state, dispatch ] = useReducer(getViewReducer({ onSeriesToggle, onInspectionChange }), {
         
         // Chart or grid view? start with chart
         viewType: "overview",
@@ -293,6 +307,17 @@ export default function Dashboard({
             contrast   : 100, // 0 - 200%
             saturation : 100, // 0 - 200%
             fontColor  : "#000000"
+        },
+        
+        inspection: {
+            enabled: false,
+            match: [],
+            context: {
+                selectedAnnotationIndex: -1,
+                selectedPlotLineId     : "",
+                selectedPlotLineAxis   : "",
+                selectedSeriesId       : ""
+            }
         }
 
     } as ViewState, initViewState);
@@ -354,6 +379,26 @@ export default function Dashboard({
             }
         }
         dispatch({ type: "UPDATE", payload: next})
+    }
+
+    function onInspectionChange(match: string[], context: any) {
+        dispatch({
+            type: "UPDATE",
+            payload: {
+                inspection: {
+                    ...state.inspection,
+                    match,
+                    context: {
+                        selectedAnnotationIndex: -1,
+                        selectedPlotLineId     : "",
+                        selectedPlotLineAxis   : "",
+                        selectedSeriesId       : "",
+                        ...context
+                    }
+                }
+            }
+        })
+        
     }
 
     const onTransitionEnd = () => {
@@ -576,7 +621,8 @@ export default function Dashboard({
                                 column2type,
                                 tags,
                                 ranges: hasRanges(data, data2) ? ranges : null,
-                                visualOverrides: state.visualOverrides
+                                visualOverrides: state.visualOverrides,
+                                inspection: state.inspection
                             }}
                             onChange={state => {
                                 dispatch({ type: "UPDATE", payload: {
@@ -592,7 +638,8 @@ export default function Dashboard({
                                     column2type    : state.column2type,
                                     tags           : state.tags,
                                     ranges         : state.ranges,
-                                    visualOverrides: state.visualOverrides
+                                    visualOverrides: state.visualOverrides,
+                                    // inspection     : state.inspection
                                 }});
                             }}
                         />
@@ -630,6 +677,22 @@ export default function Dashboard({
                                         onClick={() => dispatch({ type: "TOGGLE_OPTIONS" })}
                                         data-tooltip={showOptions ? "Hide Options" : "Show Options"}>
                                         <i className="fas fa-cog" />
+                                    </button>
+                                    <button
+                                        className={ "btn" + (state.inspection.enabled ? " active" : "") }
+                                        data-tooltip="Inspect elements by click"
+                                        onClick={() => dispatch({
+                                            type: "UPDATE",
+                                            payload: {
+                                                inspection: {
+                                                    enabled: !state.inspection.enabled,
+                                                    match  : [],
+                                                    context: {}
+                                                }
+                                            } 
+                                        })}>
+                                        {/* <i className="fa-solid fa-arrow-pointer"/> */}
+                                        <i className="fa-solid fa-crosshairs"/>
                                     </button>
                                     <CommandButton { ...copyCommand } label={ "" } />
                                     <CommandButton { ...deleteCommand } label={ "" } />
@@ -695,6 +758,7 @@ export default function Dashboard({
                             loading={ loadingData }
                             options={ fullChartOptions }
                             visualOverrides={ state.visualOverrides }
+                            onInspectionChange={ state.inspection.enabled ? onInspectionChange : undefined }
                             contextMenuItems={[
                                 {
                                     label: "Save Changes",
