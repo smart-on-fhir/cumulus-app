@@ -5,7 +5,7 @@ import ColumnSelector           from "./ColumnSelector"
 import FilterUI                 from "./FilterUI"
 import Collapse                 from "../generic/Collapse"
 import Checkbox                 from "../generic/Checkbox"
-import AnnotationsUI            from "./AnnotationsUI"
+import { AllAnnotations }       from "./Inspectors/Annotations"
 import TagSelector              from "../Tags/TagSelector"
 import PropertyGrid             from "../generic/PropertyGrid"
 import { app }                  from "../../types"
@@ -827,7 +827,8 @@ export default function ConfigPanel({
                 </Collapse>
 
             { !isPie && <Collapse collapsed header="Annotations">
-                <AnnotationsUI
+                    <div className="pt-1 pb-2">
+                        <AllAnnotations
                     onChange={ annotations => onChange(
                         {
                             ...state,
@@ -847,9 +848,10 @@ export default function ConfigPanel({
                             }
                         }
                     )}
-                    current={ chartOptions.annotations?.[0]?.labels || [] }
-                    xCol={ state.xCol }
+                            annotations={ chartOptions.annotations?.[0]?.labels || [] }
+                            xType={ state.xCol.dataType }
                 />
+                    </div>
             </Collapse> }
             
             <Collapse collapsed header="Advanced">
