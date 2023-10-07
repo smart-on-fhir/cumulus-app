@@ -15,7 +15,6 @@ import {
     DashStyleValue,
     merge,
     Options,
-    OptionsLayoutValue,
     SeriesAreasplineOptions,
     SeriesAreasplinerangeOptions,
     SeriesColumnOptions,
