@@ -147,7 +147,7 @@ function propertyGridRows(props: (EditableProperty | EditableGroupProperty)[], l
         return (
             <Fragment key={ i }>
                 <div className={ "prop-label" + (prop.disabled ? " disabled" : "") } style={{ paddingLeft: level + 0.3 + "em" }}>
-                    <span className="nowrap">
+                    <span className="nowrap" title={ prop.name.length > 20 ? prop.name : undefined }>
                     { prop.name }&nbsp;{ prop.description && <small className="color-muted" data-tooltip={ prop.description }><i className="fa-solid fa-circle-info"></i></small> }
                     </span>
                 </div>
