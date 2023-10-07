@@ -108,7 +108,6 @@ const DefaultChartOptions = {
             text: "",
             skew3d: true,
             margin: 15,
-            // offset: 20,
             style: {
                 fontWeight: "bold"
             }
@@ -281,7 +280,6 @@ const DefaultChartOptions = {
         tickWidth: 0,
         // minRange: 1,
         // maxRange: 2,
-        offset: 0,
         startOnTick: false,
         endOnTick: false,
         minPadding: 0,
@@ -466,9 +464,6 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                         stacking: undefined,
                         crisp: false
                     }
-                },
-                xAxis: {
-                    offset: 0
                 }
             }) as Highcharts.Options;
 
@@ -495,9 +490,6 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                     title: {
                         text: ""
                     }
-                },
-                xAxis: {
-                    offset: 5
                 }
             }) as Highcharts.Options;
         
@@ -524,9 +516,6 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                             stacking: "normal",
                             crisp: false
                         }
-                    },
-                    xAxis: {
-                        offset: 0
                     }
                 }
             ) as Highcharts.Options;
@@ -554,9 +543,6 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                     title: {
                         text: ""
                     }
-                },
-                xAxis: {
-                    offset: 5
                 }
             }) as Highcharts.Options;
 
@@ -572,9 +558,6 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                     bar: {
                         stacking: undefined
                     }
-                },
-                xAxis: {
-                    offset: 0
                 }
             }) as Highcharts.Options;
 
@@ -589,9 +572,6 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                         viewDistance: 100,
                         axisLabelPosition: null
                     }
-                },
-                xAxis: {
-                    offset: 5
                 },
                 yAxis: {
                     title: {
@@ -629,9 +609,6 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                     title: {
                         text: "Count"
                     }
-                },
-                xAxis: {
-                    offset: 0
                 }
             }) as Highcharts.Options;
 
@@ -658,9 +635,6 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                     title: {
                         text: ""
                     }
-                },
-                xAxis: {
-                    offset: 5
                 }
             }) as Highcharts.Options;
             
@@ -671,9 +645,6 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                     options3d: {
                         enabled: false
                     }
-                },
-                xAxis: {
-                    offset: 0
                 }
             }) as Highcharts.Options;
 
@@ -684,9 +655,6 @@ export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, c
                     options3d: {
                         enabled: false
                     }
-                },
-                xAxis: {
-                    offset: 0
                 }
             }) as Highcharts.Options;
     }
