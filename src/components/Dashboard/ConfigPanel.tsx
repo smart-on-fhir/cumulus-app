@@ -36,8 +36,9 @@ import {
     DATE_BOOKMARKS,
     DASH_STYLES
 } from "./config"
-import ColorEditor from "../generic/PropertyGrid/ColorEditor"
-import { lengthToEm } from "../../utils"
+import ColorEditor      from "../generic/PropertyGrid/ColorEditor"
+import { DEFS }         from "./Schema"
+import { lengthToEm }   from "../../utils"
 
 
 type SupportedChartType = keyof typeof SupportedChartTypes
@@ -1763,11 +1764,8 @@ function AllSeriesEditor({
 
     if (hasAreaSpline) {
         props.push({
+            ...DEFS.opacity,
             name: "Fill Opacity",
-            type: "number",
-            min: 0,
-            max: 1,
-            step: 0.01,
             value: S.fillOpacity ?? 1,
             onChange: (fillOpacity: number) => change({ fillOpacity }),
         })
