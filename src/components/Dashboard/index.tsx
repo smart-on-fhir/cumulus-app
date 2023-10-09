@@ -58,7 +58,6 @@ export interface ViewState
     data            : app.ServerResponses.DataResponse | null
     data2           : app.ServerResponses.StratifiedDataResponse | null
     loadingData     : boolean
-    fullChartOptions: Partial<Highcharts.Options>
     dataTabIndex    : number
     tags            : Pick<app.Tag, "id"|"name"|"description">[]
     ranges          : app.RangeOptions
@@ -282,9 +281,6 @@ export default function Dashboard({
         // Error from the server
         loadingDataError: null,
 
-        // The final chart options that are rendered in the chart
-        fullChartOptions: {},
-
         // Which is the active tab in the data view
         dataTabIndex: 0,
 
@@ -332,7 +328,6 @@ export default function Dashboard({
         caption,
         data,
         data2,
-        fullChartOptions,
         loadingData,
         dataTabIndex,
         tags,
@@ -356,7 +351,7 @@ export default function Dashboard({
             filters,
             viewType: chartType,
             // @ts-ignore
-            chartOptions: strip(fullChartOptions, ReadOnlyPaths),
+            chartOptions: strip(state.chartOptions, ReadOnlyPaths),
             denominator,
             column2: secColumnName,
             column2type,
@@ -368,7 +363,7 @@ export default function Dashboard({
     function onSeriesToggle(map: Record<string, boolean>) {
         const next = {
             chartOptions: {
-                series: (fullChartOptions.series || []).map(s => {
+                series: (state.chartOptions.series || []).map(s => {
                     return { ...s, visible: map[s.id + ""] !== false }
                 })
             }
@@ -553,7 +548,7 @@ export default function Dashboard({
                 type: "UPDATE",
                 payload: {
                     chartOptions: {
-                        ...fullChartOptions,
+                        ...state.chartOptions,
                         annotations: [{
                             visible: true,
                             draggable: '',
@@ -564,7 +559,7 @@ export default function Dashboard({
                                 className: "chart-annotation"
                             },
                             labels: [
-                                ...(fullChartOptions.annotations?.[0]?.labels || []),
+                                ...(state.chartOptions.annotations?.[0]?.labels || []),
                                 ...labels
                             ]
                         }]
@@ -582,7 +577,7 @@ export default function Dashboard({
     const printChart       = useCommand(new PrintChart());
     const requestLineData  = useCommand(new RequestLineLevelData(view.id || 0, auth.user, navigate))
     const openInAE         = useCommand(new OpenInAnalyticEnvironment(view.DataRequestId || 0, auth.user))
-    const generateCaption  = useCommand(new GenerateCaption(fullChartOptions, state, c => dispatch({ type: "UPDATE", payload: { caption: c }})))
+    const generateCaption  = useCommand(new GenerateCaption(state.chartOptions, state, c => dispatch({ type: "UPDATE", payload: { caption: c }})))
 
     return (
         <div className={ "dashboard " + (saving || deleteCommand.working ? "grey-out" : "") + (showOptions ? " sidebar-open" : "") }>
@@ -609,7 +604,7 @@ export default function Dashboard({
                                 chartType,
                                 viewName,
                                 viewDescription,
-                                chartOptions: fullChartOptions,
+                                chartOptions: state.chartOptions,
                                 // chartOptions: finalChartOptions,
                                 denominator,
                                 column2: column2?.name || "",
@@ -751,7 +746,7 @@ export default function Dashboard({
                         ) }
                         { viewColumn && viewType === "overview" && <BaseChart
                             loading={ loadingData }
-                            options={ fullChartOptions }
+                            options={ state.chartOptions }
                             visualOverrides={ state.visualOverrides }
                             onInspectionChange={ state.inspection.enabled ? onInspectionChange : undefined }
                             contextMenuItems={[
@@ -805,9 +800,8 @@ export default function Dashboard({
                                     // finalChartOptions.annotations?.length || "",
                                     column2?.name || "no_secondary",
                                     column2type || "no_second_type",
-                                    // Date.now()
-                                    fullChartOptions.chart?.style?.fontSize,
-                                    fullChartOptions.chart?.style?.fontFamily
+                                    state.chartOptions.chart?.style?.fontSize,
+                                    state.chartOptions.chart?.style?.fontFamily,
                                 ].join(":")
                             }
                         /> }
