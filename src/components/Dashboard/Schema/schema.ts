@@ -127,7 +127,7 @@ const schema: Schema = {
                 max: 180,
                 defaultValue: 0
             },
-            "beta": {
+            beta: {
                 name: "Beta",
                 type: "number",
                 description: "One of the two rotation angles for the chart.",
@@ -139,7 +139,8 @@ const schema: Schema = {
                 name: "depth",
                 type: "number",
                 description: "The total depth of the chart.",
-                defaultValue: 100
+                min: 50,
+                defaultValue: 200
             },
             enabled: {
                 name: "Enabled",
@@ -157,7 +158,8 @@ const schema: Schema = {
                 name: "View Distance",
                 type: "number",
                 description: "Defines the distance the viewer is standing in front of the chart, this setting is important to calculate the perspective effect in column and scatter charts. It is not used for 3D pie charts.",
-                min: 1,
+                min: 5,
+                max: 100,
                 defaultValue: 25
             },
             axisLabelPosition: {
@@ -175,6 +177,20 @@ const schema: Schema = {
                         "label": "auto"
                     }
                 ]
+            },
+            frame: {
+                visible: {
+                    name: "Show Frame",
+                    type: "options",
+                    options: [
+                        { value: true , label: "true"  },
+                        { value: false, label: "false" },
+                        { value: "default", label: "default" },
+                        { value: "auto", label: "auto" }
+                    ],
+                    defaultValue: "default",
+                    description: "Whether to display the frame. Possible values are true, false, \"auto\" to display only the frames behind the data, and \"default\" to display faces behind the data based on the axis layout, ignoring the point of view."
+                }
             }
         },
         polar: {

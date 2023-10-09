@@ -17,11 +17,14 @@ type GridItem = string | {
 
 function getPropEditor(root: Record<string, any>, onChange: (x: Partial<typeof root>) => void, item: GridItem): EditableProperty | EditableGroupProperty {
 
-    if (item && typeof item === "object" && item.type === "group") {
-        return {
-            ...item,
-            value: Object.values(item.value).map((x: any) => getPropEditor(root, onChange, x))
-        } as EditableGroupProperty
+    if (item && typeof item === "object") {
+        if (item.type === "group") {
+            return {
+                ...item,
+                value: Object.values(item.value).map((x: any) => getPropEditor(root, onChange, x))
+            } as EditableGroupProperty
+        }
+        return { ...item } as EditableProperty
     }
     
     const path = String(item).split(".")
