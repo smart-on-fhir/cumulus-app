@@ -18,6 +18,12 @@ export function getOptions(axis: XAxisOptions | YAxisOptions, onChange: (a: Part
             onChange: (format: string) => onChange({ labels: { format }})
         },
         {
+            name: "zIndex",
+            type: "number",
+            value: axis.labels?.zIndex ?? 7,
+            onChange: (zIndex = 7) => onChange({ labels: { zIndex }})
+        },
+        {
             name : "Style",
             type : "group",
             open : true,
