@@ -185,7 +185,7 @@ function getSeries({
         // @ts-ignore
         const prev = serverOptions.plotOptions?.[options.type || "series"] ?? {}
 
-        const colors: string[] = serverOptions.colors!
+        const colors: string[] = serverOptions.colors as string[]
 
         const color = colors[series.length % colors.length]
 
@@ -197,7 +197,7 @@ function getSeries({
 
         if (type.includes("area") && color && S?.visible !== false) {
             // @ts-ignore
-            const fillOpacity = S?.fillOpacity ?? prev.fillOpacity ?? 1
+            const fillOpacity = S?.fillOpacity ?? prev.fillOpacity ?? 0.75
             cfg.fillColor = {
                 linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                 stops: [

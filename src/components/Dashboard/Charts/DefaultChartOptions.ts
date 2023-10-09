@@ -1,10 +1,8 @@
-import { merge } from "highcharts";
-import { generateColors } from "../../../utils";
-import { SupportedChartTypes, DEFAULT_FONT_SIZE, DEFAULT_FONT_FAMILY } from "../config";
+import { merge, Options } from "highcharts"
 
-const DefaultChartOptions = {
+const DefaultChartOptions: Options = {
     chart: {
-        type: "areaspline",
+        type: "spline",
         height: null,
         width: null,
         panning: {
@@ -92,7 +90,7 @@ const DefaultChartOptions = {
         text: "SMART®"
     },
     title: {
-        text: "",//series.length ? getChartTitleText(column, groupBy) : "",
+        text: "",
         style: {
             fontWeight: "bold"
         },
@@ -147,6 +145,7 @@ const DefaultChartOptions = {
     plotOptions: {
         series: {
             borderColor     : "rgba(0, 0, 0, 0.5)",
+            // @ts-ignore
             edgeColor       : "rgba(0, 0, 0, 0.5)",
             borderWidth     : 0.25,
             edgeWidth       : 0.25,
@@ -268,7 +267,10 @@ const DefaultChartOptions = {
         }
     },
     tooltip: {
-        useHTML: true
+        useHTML: true,
+        style: {
+            zIndex: 1000000
+        }
     },
     xAxis: {
         crosshair: true,

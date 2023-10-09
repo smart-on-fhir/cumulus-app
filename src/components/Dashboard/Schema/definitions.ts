@@ -78,7 +78,7 @@ export const DEFS = {
                 { value: "'Times New Roman', Times, serif", label: "Serif" },
                 { value: "monospace", label: "Fixed Width" },
                 { value: "inherit", label: "Inherit" },
-                { value: undefined, label: "Unset" },
+                // { value: undefined, label: "Unset" },
             ]},
             { label: "Sans-serif", value: [
                 { value: "Helvetica", label: "Helvetica" },
