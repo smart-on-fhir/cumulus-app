@@ -14,7 +14,7 @@ import { getOptions as getErrorBarOptions  } from "./ErrorBar"
 
 
 export function getOptions(options : Options, onChange: (o: Partial<Options>) => void, seriesId: string) {
-    
+
     const series         = getSeriesById(options, seriesId) as SeriesOptionsType
     const seriesIndex    = getIndexOfSeriesId(options, seriesId)
     const onSeriesChange = getSeriesUpdater<SeriesOptionsType>(options, onChange, seriesId)
@@ -34,6 +34,13 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
             type: "string",
             value: series.name,
             onChange: (name: string) => onSeriesChange({ name })
+        },
+        {
+            name: "Index",
+            description: "The index of the series in the chart, affecting the internal index in the chart.series array, the visible Z index as well as the order in the legend.",
+            type: "number",
+            value: series.index,
+            onChange: (index?: number) => onSeriesChange({ index })
         },
         {
             ...DEFS.seriesType,
