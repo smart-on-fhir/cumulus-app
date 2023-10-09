@@ -52,7 +52,6 @@ export interface ViewState
     chartType       : string
     chartOptions    : Partial<Highcharts.Options>
     denominator     : app.DenominatorType
-    cleanState     ?: ViewState
     column2        ?: app.DataRequestDataColumn
     column2type     : keyof typeof SupportedChartTypes
     caption         : string
@@ -73,10 +72,6 @@ interface ViewAction
     payload?: any
 }
 
-function initViewState(initialState: ViewState): ViewState
-{
-    return { ...initialState, cleanState: { ...initialState } }
-}
 
 function getViewReducer({
     onSeriesToggle,
@@ -320,7 +315,7 @@ export default function Dashboard({
             }
         }
 
-    } as ViewState, initViewState);
+    } as ViewState);
 
     const {
         viewType,
