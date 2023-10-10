@@ -105,6 +105,8 @@ export const ReadOnlyPaths = [
     "plotOptions.pie.dataLabels.formatter",
     "tooltip.formatter",
     "xAxis.type",
+    "lang",
+    "noData"
 ];
 
 export const DATE_BOOKMARKS = [

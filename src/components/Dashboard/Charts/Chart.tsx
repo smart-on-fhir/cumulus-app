@@ -601,6 +601,22 @@ export function buildChartOptions({
                 fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
             }
         },
+        lang: {
+            noData: `
+                <text x="180" y="30" text-anchor="middle" fill="#C30F" stroke="#FFF6" stroke-width="0.5" style="font-size:20px; font-weight:900">No data to display!</text>
+                <text x="180" y="50" text-anchor="middle" fill="#888C" stroke="#FFF6" stroke-width="0.5" style="font-size:15px; font-weight:500">If you have filters applied, try changing or removing them.</text>`,
+        },
+        noData: {
+            attr: {
+                fill  : "#CCC3",
+                r     : 5,
+                stroke: "#8883",
+                width : 360,
+                height: 60,
+                "stroke-width": 2
+            },
+            useHTML: false
+        },
         series
     };
 
