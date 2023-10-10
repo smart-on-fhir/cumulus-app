@@ -80,59 +80,37 @@ function getViewReducer({
     onInspectionChange: (inspection: string[], context: any) => void
 }) 
 {
-    const chartable = [
-        "chartType",
-        "chartOptions",
-        "denominator",
-        "data",
-        "inspection"
-    ];
 
-    function computeChartOptions(nextState: ViewState) {
-        try {
-            if (nextState.data) {
-                if (nextState.chartType.startsWith("pie") || nextState.chartType.startsWith("donut")) {
-                    nextState.viewGroupBy = undefined
-                    nextState.data2 = null
-                }
-
-                const options = getDefaultChartOptions(
-                    nextState.chartType as keyof typeof SupportedChartTypes,
-                    nextState.chartOptions
-                );
-
-                // Now build the final options by adding dynamic properties
-                // like series data and function options
-                nextState.chartOptions = buildChartOptions({
-                    options,
-                    type            : options.chart!.type as SupportedNativeChartTypes,
-                    data            : nextState.data,
-                    data2           : nextState.data2,
-                    column          : nextState.viewColumn,
-                    groupBy         : nextState.viewGroupBy,
-                    denominator     : nextState.denominator,
-                    column2type     : nextState.column2type,
-                    ranges          : nextState.ranges,
-                    inspection      : nextState.inspection,
-                    onSeriesToggle,
-                    onInspectionChange,
-                })
-            }
-        } catch (ex) {
-            // Errors might happen due to partially incompatible state properties.
-            // For example if a stratifier is added to un-stratified data and the
-            // stratified data is not yet available
-            console.error(ex)
-        }
-
-        return nextState
-    }
 
     return function viewReducer(state: ViewState, action: ViewAction): ViewState
     {
+        if (action.type === "SET_DATA") {
+            const data = action.payload
+
+            return {
+                ...state,
+                chartOptions: buildChartOptions({
+                    options         : state.chartOptions,
+                    type            : state.chartOptions.chart!.type as SupportedNativeChartTypes,
+                    data,
+                    data2           : state.data2,
+                    column          : state.viewColumn,
+                    groupBy         : state.viewGroupBy,
+                    denominator     : state.denominator,
+                    column2type     : state.column2type,
+                    ranges          : state.ranges,
+                    inspection      : state.inspection,
+                    onSeriesToggle,
+                    onInspectionChange,
+                })
+            };
+        }
+
         if (action.type === "SET_CHART_OPTIONS") {
             if (state.data) {
                 const chartOptions = action.payload
+
+                // const chartOptions = stripValue(action.payload, "__DELETED__")
 
                 const options = getDefaultChartOptions(
                     state.chartType as any,
