@@ -399,10 +399,10 @@ export function buildChartOptions({
         chart: {
             // @ts-ignore
             // marginTop: type === "pie" || options.title?.text ? undefined : 40,
-            options3d: {
-                depth: options.chart?.options3d?.depth ?? Math.min(series.length * 10, 100),
-            },
-            plotBorderWidth: is3d ? 0 : options.chart?.plotBorderWidth,
+            // options3d: {
+            //     depth: options.chart?.options3d?.depth ?? Math.min(series.length * 10, 100),
+            // },
+            // plotBorderWidth: is3d ? 0 : options.chart?.plotBorderWidth,
             animation: {
                 easing
             },
