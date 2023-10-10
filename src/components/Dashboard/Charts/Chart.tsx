@@ -195,7 +195,7 @@ function getSeries({
             id: options.id
         }
 
-        if (type.includes("area") && color && S?.visible !== false) {
+        if ((options.type?.type === "area" || options.type?.type === "areaspline") && color && S?.visible !== false) {
             // @ts-ignore
             const fillOpacity = S?.fillOpacity ?? prev.fillOpacity ?? 0.75
             cfg.fillColor = {
@@ -213,7 +213,7 @@ function getSeries({
                     linearGradient: { x1: 1, y1: 0, x2: 0, y2: 1 },
                     stops: [
                         [0, new Color(color).setOpacity(1.0).get('rgba') + ""],
-                        [1, new Color(color).setOpacity(0.5).get('rgba') + ""]
+                        [1, new Color(color).setOpacity(0.6).get('rgba') + ""]
                     ]
                 }
             }
@@ -291,7 +291,7 @@ function getSeries({
                 const old = serverOptions.series?.find(s => s.id === id)
                 addSeries({
                     type: ranges.type ?? "errorbar",
-                    name: (old?.name ?? group.stratifier) + " (range)",
+                    name: old?.name ?? group.stratifier + " (range)",
                     id  : (secondary ? "secondary-" : "primary-") + group.stratifier + " (range)",
                     data: keys.map(key => {
                         const row = group.rows.find(row => row[0] === key)

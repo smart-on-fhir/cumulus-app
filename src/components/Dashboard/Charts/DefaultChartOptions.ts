@@ -1,4 +1,4 @@
-import { merge, Options } from "highcharts"
+import { merge, Options, PointMarkerOptionsObject } from "highcharts"
 import { generateColors } from "../../../utils"
 import Pie                from "./Pie"
 import Pie3d              from "./Pie3d"
@@ -22,6 +22,24 @@ import {
     DEFAULT_FONT_FAMILY
 } from "../config"
 
+
+const marker: PointMarkerOptionsObject = {
+    enabled  : false,
+    radius   : 4,
+    lineWidth: 0.5,
+    states: {
+        hover: {
+            lineWidth: 2,
+            radius   : 5,
+        },
+        select: {
+            lineWidth: 2,
+            radius: 5,
+            lineColor: "#000000",
+            fillColor: "#FFFFFF",
+        }
+    }
+}
 
 const DefaultChartOptions: Options = {
     chart: {
@@ -210,23 +228,7 @@ const DefaultChartOptions: Options = {
         area: {
             trackByArea: true,
             stickyTracking: true,
-            marker: {
-                enabled  : false,
-                radius   : 5,
-                lineWidth: 2,
-                fillColor: "#FFFFFF",
-                states: {
-                    hover: {
-                        lineWidth: 1,
-                        lineColor: "#000000",
-                        radius   : 5,
-                    },
-                    select: {
-                        lineWidth: 2,
-                        radius: 6
-                    }
-                }
-            },
+            marker,
             lineWidth: 2,
             connectNulls: false,
             getExtremesFromAll: true,
@@ -238,22 +240,7 @@ const DefaultChartOptions: Options = {
             // tooltips and other mouse or touch events. Defaults to false.
             trackByArea: true,
             stickyTracking: true,
-            marker: {
-                enabled  : false,
-                radius   : 5,
-                lineWidth: 2,
-                fillColor: "#FFFFFF",
-                states: {
-                    hover: {
-                        lineWidth: 2,
-                        radius   : 5,
-                    },
-                    select: {
-                        lineWidth: 2,
-                        radius: 6
-                    }
-                }
-            },
+            marker,
             lineWidth: 2,
             states: {
                 normal: {
@@ -272,45 +259,13 @@ const DefaultChartOptions: Options = {
             fillOpacity: 0.5
         },
         spline: {
-            marker: {
-                enabled: false,
-                radius: 5,
-                lineWidth: 2,
-                lineColor: "contrast",
-                states: {
-                    hover: {
-                        lineWidth: 2,
-                        radius   : 5,
-                    },
-                    select: {
-                        lineWidth: 2,
-                        lineColor: "#000000",
-                        fillColor: "#FFFFFF",
-                        radius: 6
-                    }
-                }
-            },
+            marker,
             lineWidth: 2,
             connectNulls: true,
             dashStyle: "Solid",
         },
         line: {
-            marker: {
-                enabled: false,
-                radius: 5,
-                lineWidth: 2,
-                states: {
-                    hover: {
-                        lineWidth: 2
-                    },
-                    select: {
-                        lineWidth: 2,
-                        lineColor: "#000000",
-                        fillColor: "#FFFFFF",
-                        radius: 6
-                    }
-                }
-            },
+            marker,
             lineWidth: 2,
             connectNulls: true,
             dashStyle: "Solid",

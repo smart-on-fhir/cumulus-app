@@ -83,12 +83,14 @@
                 &[stroke-width="0"],
                 &[stroke-width="1"],
                 &[stroke-width="2"],
-                &[stroke-width="3"] {
-                    stroke-width: 4px !important;    
+                &[stroke-width="3"],
+                &[stroke-width="4"] {
+                    stroke-width: 5px !important;
                 }
             }
             &:hover .highcharts-axis-line {
-                @include highlight(2px, 0);
+                stroke: #06C9;
+                // @include highlight(2px, 0);
             }
         }
 
@@ -119,10 +121,11 @@
                 stroke-dasharray: none;
                 stroke-linejoin: round;
                 stroke: #06C1;
-                outline-color: #06C0;
+                // outline-color: #06C0;
             }
             &:hover path {
-                @include highlight(2px, 0);
+                stroke: #06C9;
+                // @include highlight(2px, 0);
             }
         }
 
