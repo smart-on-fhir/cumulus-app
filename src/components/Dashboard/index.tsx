@@ -912,8 +912,8 @@ export default function Dashboard({
                                     // finalChartOptions.annotations?.length || "",
                                     column2?.name || "no_secondary",
                                     column2type || "no_second_type",
-                                    state.chartOptions.chart?.style?.fontSize,
-                                    state.chartOptions.chart?.style?.fontFamily,
+                                    state.chartOptions.chart?.options3d?.enabled ?? false,
+                                    (chartType.includes("pie") || chartType.includes("donut")) ? state.chartOptions.chart?.options3d?.alpha : 0,
                                 ].join(":")
                             }
                         /> }

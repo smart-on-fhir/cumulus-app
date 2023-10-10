@@ -266,7 +266,7 @@ function getSeries({
             keys.sort((a, b) => +new Date(a) - +new Date(b));
         }
         else {
-            keys.sort((a, b) => String(a).localeCompare(b + ""));
+            // keys.sort((a, b) => String(a).localeCompare(b + ""));
         }
         
         data.data.forEach(group => {
@@ -474,7 +474,7 @@ export function buildChartOptions({
                 },
                 states: {
                     hover: {
-                        enabled: false
+                        enabled: !inspection.enabled // No hover on ranges normally
                     }
                 }
             },
