@@ -131,11 +131,33 @@ function getViewReducer({
     return function viewReducer(state: ViewState, action: ViewAction): ViewState
     {
         if (action.type === "SET_CHART_OPTIONS") {
-            const nextState = {
-                ...state,
-                chartOptions: Highcharts.merge(state.chartOptions, action.payload)
-            };
-            return computeChartOptions(nextState);
+            if (state.data) {
+                const chartOptions = action.payload
+
+                const options = getDefaultChartOptions(
+                    state.chartType as any,
+                    Highcharts.merge(state.chartOptions, chartOptions)
+                )
+
+                return {
+                    ...state,
+                    chartOptions: buildChartOptions({
+                        options,
+                        type            : options.chart!.type as SupportedNativeChartTypes,
+                        data            : state.data,
+                        data2           : state.data2,
+                        column          : state.viewColumn,
+                        groupBy         : state.viewGroupBy,
+                        denominator     : state.denominator,
+                        column2type     : state.column2type,
+                        ranges          : state.ranges,
+                        inspection      : state.inspection,
+                        onSeriesToggle,
+                        onInspectionChange,
+                    })
+                };
+            }
+        }
         }
 
         if (action.type === "SET_VIEW_TYPE") {
@@ -594,6 +616,7 @@ export default function Dashboard({
                             dataRequest={dataRequest}
                             viewType={viewType}
                             view={view}
+                            onChartOptionsChange={ (payload: Highcharts.Options) => dispatch({ type: "SET_CHART_OPTIONS", payload }) }
                             state={{
                                 groupBy   : viewColumn.name,
                                 stratifyBy: viewGroupBy?.name || "",
@@ -622,10 +645,7 @@ export default function Dashboard({
                                     viewColumn     : cols.find(c => c.name === state.groupBy),
                                     viewGroupBy    : cols.find(c => c.name === state.stratifyBy),
                                     filters        : [...state.filters],
-                                    chartOptions   : state.chartOptions,
                                     denominator    : state.denominator,
-                                    column2        : cols.find(c => c.name === state.column2),
-                                    column2type    : state.column2type,
                                     tags           : state.tags,
                                     ranges         : state.ranges,
                                     visualOverrides: state.visualOverrides,
