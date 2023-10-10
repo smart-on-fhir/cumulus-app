@@ -42,11 +42,11 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
             value: series.index,
             onChange: (index?: number) => onSeriesChange({ index })
         },
-        {
-            ...DEFS.seriesType,
-            value: seriesType,
-            onChange: (type: any) => onSeriesChange({ type })
-        },
+        // {
+        //     ...DEFS.seriesType,
+        //     value: seriesType,
+        //     onChange: (type: any) => onSeriesChange({ type })
+        // },
         {
             ...DEFS.opacity,
             value: series.opacity ?? 1,

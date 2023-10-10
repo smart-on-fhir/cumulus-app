@@ -387,6 +387,8 @@ export default function Dashboard({
 
     } as ViewState);
 
+    // console.log(state)
+
     const {
         viewType,
         showOptions,
