@@ -42,7 +42,7 @@ function SecondaryDataEditor({
 }: {
     state: ChartConfigPanelState
     dataRequest: app.DataRequest
-    onChange: (state: ChartConfigPanelState) => void
+    onChange: (payload: { column?: string, type?: string }) => void
 }) {
     
     const { cols } = dataRequest.metadata || { cols: [] }
@@ -56,7 +56,7 @@ function SecondaryDataEditor({
                     cols={ cols }
                     value={ state.column2 || null }
                     disabled={[ "cnt", state.stratifyBy, state.groupBy ].filter(Boolean)}
-                    onChange={ (column2: string) => onChange({ ...state, column2 }) }
+                    onChange={ (column: string) => onChange({ column }) }
                 />
                 <p className="small color-muted">
                     Select another data column to render over the same X axis
@@ -67,7 +67,7 @@ function SecondaryDataEditor({
                 <label>Secondary Data Chart Type</label>
                 <Select
                     value={ state.column2type }
-                    onChange={ column2type => onChange({ ...state, column2type })}
+                    onChange={ type => onChange({ type })}
                     options={[
                         {
                             value: "spline",
@@ -124,14 +124,21 @@ interface ChartConfigPanelState {
 export default function ConfigPanel({
     dataRequest,
     state,
+    onChange,
+    onChartTypeChange,
     onChartOptionsChange,
+    onRangeOptionsChange,
+    onSecondaryDataOptionsChange
 } : {
     dataRequest: app.DataRequest
     view?: Partial<app.View>
     state: ChartConfigPanelState
     viewType: "overview" | "data"
     onChange: (state: ChartConfigPanelState) => void
+    onChartTypeChange: (type: string) => void
     onChartOptionsChange: (options: Options) => void
+    onRangeOptionsChange: (ranges: app.RangeOptions) => void
+    onSecondaryDataOptionsChange: (payload: { column?: string, type?: string }) => void
 }) {
     const { cols } = dataRequest.metadata || { cols: [] }
 
@@ -435,13 +442,13 @@ export default function ConfigPanel({
                                     value: "column",
                                     icon : "fa-solid fa-plus-minus color-blue"
                                 },
-                            ]} onChange={type => onChange({ ...state, ranges: { type, enabled: !!type }})} />
+                            ]} onChange={type => onRangeOptionsChange({ type, enabled: !!type })} />
                             <p className="small color-muted">
                                 If information is available, add the error ranges to the chart
                             </p>
                         </div> }
 
-                        <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onChange} />
+                        <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onSecondaryDataOptionsChange} />
                     </> }
 
                     { isPie && <SliceEditor state={state} onChange={onChange} /> }
@@ -982,7 +989,6 @@ function SliceEditor({
                 <Collapse collapsed header="Advanced">
                     <div className="pb-1">
                         <PropertyGrid props={getPieOptions(S, change, has3d)} />
-                        {/* <AllSeriesEditor state={state} onChange={onChange} /> */}
                     </div>
                 </Collapse>
             </div>
