@@ -1,5 +1,21 @@
 import { merge, Options } from "highcharts"
 import { generateColors } from "../../../utils"
+import Pie                from "./Pie"
+import Pie3d              from "./Pie3d"
+import Donut              from "./Donut"
+import Donut3d            from "./Donut3d"
+import Column             from "./Column"
+import Column3d           from "./Column3d"
+import ColumnStack        from "./ColumnStack"
+import ColumnStack3d      from "./ColumnStack3d"
+import Bar                from "./Bar"
+import Bar3d              from "./Bar3d"
+import BarStack           from "./BarStack"
+import BarStack3d         from "./BarStack3d"
+import Spline             from "./Spline"
+import AreaSpline         from "./AreaSpline"
+import Line               from "./Line"
+import Area               from "./Area"
 import {
     SupportedChartTypes,
     DEFAULT_FONT_SIZE,
@@ -347,325 +363,32 @@ const DefaultChartOptions: Options = {
 
 export default DefaultChartOptions
 
-export function getDefaultChartOptions(type: keyof typeof SupportedChartTypes, customOptions: Partial<Highcharts.Options> = {}): Highcharts.Options {
-    switch (type) {
-        case "pie":
-            return merge(DefaultChartOptions as unknown, {
-                plotOptions: {
-                    pie: {
-                        slicedOffset: 30,
-                    }
-                }
-            }, customOptions, {
-                chart: {
-                    type: "pie",
-                    options3d: {
-                        enabled: false
-                    }
-                },
-                plotOptions: {
-                    pie: {
-                        innerSize: 0
-                    }
-                },
-                xAxis: {
-                    lineWidth: 0
-                }
+const chartTypes: Record<string, Options> = {
+    "pie"          : Pie,
+    "pie3d"        : Pie3d,
+    "donut"        : Donut,
+    "donut3d"      : Donut3d,
+    "line"         : Line,
+    "spline"       : Spline,
+    "area"         : Area,
+    "areaspline"   : AreaSpline,
+    "column"       : Column,
+    "column3d"     : Column3d,
+    "columnStack"  : ColumnStack,
+    "columnStack3d": ColumnStack3d,
+    "bar"          : Bar,
+    "bar3d"        : Bar3d,
+    "barStack"     : BarStack,
+    "barStack3d"   : BarStack3d,
+}
 
-            }) as Highcharts.Options;
-        
-        case "pie3d":
-            return merge(DefaultChartOptions as unknown, {
-                plotOptions: {
-                    pie: {
-                        slicedOffset: 30,
-                    }
-                }
-            }, customOptions, {
-                chart: {
-                    type: "pie",
-                    options3d: {
-                        enabled: true,
-                        alpha: 45,
-                        beta: 0,
-                        depth: 350
-                    }
-                },
-                plotOptions: {
-                    pie: {
-                        innerSize: 0
-                    }
-                },
-                xAxis: {
-                    lineWidth: 0
-                }
-            }) as Highcharts.Options;
-
-        case "donut":
-            return merge(DefaultChartOptions as unknown, {
-                plotOptions: {
-                    pie: {
-                        // innerSize: "50%",
-                        slicedOffset: 10
-                    }
-                }
-            }, customOptions, {
-                chart: {
-                    type: "pie",
-                    options3d: {
-                        enabled: false
-                    }
-                },
-                plotOptions: {
-                    pie: {
-                        innerSize: "50%",
-                        // slicedOffset: 10
-                    }
-                },
-                xAxis: {
-                    lineWidth: 0
-                }
-            }) as Highcharts.Options;
-
-        case "donut3d":
-            return merge(DefaultChartOptions as unknown, {
-                chart: {
-                    type: "pie",
-                    options3d: {
-                        enabled: true,
-                        alpha: 45,
-                        beta: 0,
-                        depth: 350
-                    }
-                },
-                plotOptions: {
-                    pie: {
-                        innerSize: "50%",
-                        slicedOffset: 30
-                    }
-                }
-            }, customOptions, {
-                chart: {
-                    type: "pie",
-                    options3d: {
-                        enabled: true
-                    }
-                },
-                plotOptions: {
-                    pie: {
-                        innerSize: "50%"
-                    }
-                },
-                xAxis: {
-                    lineWidth: 0
-                }
-            }) as Highcharts.Options;
-
-        case "column":
-            return merge(DefaultChartOptions as unknown, customOptions, {
-                chart: {
-                    type: "column",
-                    options3d: {
-                        enabled: false
-                    }
-                },
-                plotOptions: {
-                    column: {
-                        stacking: undefined,
-                        crisp: false
-                    }
-                }
-            }) as Highcharts.Options;
-
-        case "column3d":
-            return merge(DefaultChartOptions as unknown, customOptions, {
-                chart: {
-                    type: "column",
-                    options3d: {
-                        enabled: true,
-                        alpha: 10,
-                        beta: 15,
-                        depth: 80,
-                        fitToPlot: true,
-                        viewDistance: 60,
-                        axisLabelPosition: null
-                    }
-                },
-                plotOptions: {
-                    column: {
-                        stacking: undefined
-                    }
-                },
-                yAxis: {
-                    title: {
-                        text: ""
-                    }
-                }
-            }) as Highcharts.Options;
-        
-        case "columnStack":
-            return merge(
-                DefaultChartOptions as unknown,
-                {
-                    yAxis: {
-                        title: {
-                            text: "Count"
-                        }
-                    }
-                },
-                customOptions,
-                {
-                    chart: {
-                        type: "column",
-                        options3d: {
-                            enabled: false
-                        }
-                    },
-                    plotOptions: {
-                        column: {
-                            stacking: "normal",
-                            crisp: false
-                        }
-                    }
-                }
-            ) as Highcharts.Options;
-
-        case "columnStack3d":
-            return merge(DefaultChartOptions as unknown, customOptions, {
-                chart: {
-                    type: "column",
-                    options3d: {
-                        enabled: true,
-                        alpha: 10,
-                        beta: 15,
-                        depth: 80,
-                        fitToPlot: true,
-                        viewDistance: 60,
-                        axisLabelPosition: null
-                    }
-                },
-                plotOptions: {
-                    column: {
-                        stacking: "normal"
-                    }
-                },
-                yAxis: {
-                    title: {
-                        text: ""
-                    }
-                }
-            }) as Highcharts.Options;
-
-        case "bar":
-            return merge(DefaultChartOptions as unknown, customOptions, {
-                chart: {
-                    type: "bar",
-                    options3d: {
-                        enabled: false
-                    }
-                },
-                plotOptions: {
-                    bar: {
-                        stacking: undefined
-                    }
-                }
-            }) as Highcharts.Options;
-
-        case "bar3d":
-            return merge(DefaultChartOptions as unknown, {
-                chart: {
-                    options3d: {
-                        alpha: 10,
-                        beta: 15,
-                        depth: 80,
-                        fitToPlot: true,
-                        viewDistance: 100,
-                        axisLabelPosition: null
-                    }
-                },
-                yAxis: {
-                    title: {
-                        text: ""
-                    }
-                }
-            }, customOptions, {
-                chart: {
-                    type: "bar",
-                    options3d: {
-                        enabled: true
-                    }
-                },
-                plotOptions: {
-                    bar: {
-                        stacking: undefined
-                    }
-                }
-            }) as Highcharts.Options;
-
-        case "barStack":
-            return merge(DefaultChartOptions as unknown, customOptions, {
-                chart: {
-                    type: "bar",
-                    options3d: {
-                        enabled: false
-                    }
-                },
-                plotOptions: {
-                    bar: {
-                        stacking: "normal"
-                    }
-                },
-                yAxis: {
-                    title: {
-                        text: "Count"
-                    }
-                }
-            }) as Highcharts.Options;
-
-        case "barStack3d":
-            return merge(DefaultChartOptions as unknown, customOptions, {
-                chart: {
-                    // type: "bar",
-                    options3d: {
-                        enabled: true,
-                        alpha: 10,
-                        beta: 15,
-                        depth: 80,
-                        fitToPlot: true,
-                        viewDistance: 100,
-                        axisLabelPosition: null
-                    }
-                },
-                plotOptions: {
-                    bar: {
-                        stacking: "normal"
-                    }
-                },
-                yAxis: {
-                    title: {
-                        text: ""
-                    }
-                }
-            }) as Highcharts.Options;
-            
-        case "spline":
-            return merge(DefaultChartOptions as unknown, customOptions, {
-                chart: {
-                    type: "spline",
-                    options3d: {
-                        enabled: false
-                    }
-                }
-            }) as Highcharts.Options;
-
-        case "areaspline":
-            return merge(DefaultChartOptions as unknown, customOptions, {
-                chart: {
-                    type: "areaspline",
-                    options3d: {
-                        enabled: false
-                    }
-                }
-            }) as Highcharts.Options;
-    }
+export function getDefaultChartOptions(
+    type: keyof typeof SupportedChartTypes,
+    userOptions: Options = {},
+    applyTypeOverrides = false
+): Options {
+    const typeOptions = chartTypes[type] || chartTypes.spline
+    return applyTypeOverrides ?
+        merge(DefaultChartOptions, userOptions, typeOptions) :
+        merge(DefaultChartOptions, typeOptions, userOptions)
 }
