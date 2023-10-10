@@ -446,13 +446,6 @@ export function buildChartOptions({
                         }
                     }
                 },
-                dataSorting: {
-                    enabled: xType !== "datetime",
-                    matchByName: false,
-                    // sortKey: "name,x"
-                    // sortKey: "name,x"
-                    sortKey: "name,x"
-                },
                 states: {
                     hover: {
                         opacity: 1
