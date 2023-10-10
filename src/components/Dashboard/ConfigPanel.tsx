@@ -56,7 +56,7 @@ function SecondaryDataEditor({
                     cols={ cols }
                     value={ state.column2 || null }
                     disabled={[ "cnt", state.stratifyBy, state.groupBy ].filter(Boolean)}
-                    onChange={ (column: string) => onChange({ column }) }
+                    onChange={ (column: string) => onChange({ column, type: state.column2type }) }
                 />
                 <p className="small color-muted">
                     Select another data column to render over the same X axis
@@ -66,8 +66,8 @@ function SecondaryDataEditor({
             { !!state.column2 && <div className="pt-1">
                 <label>Secondary Data Chart Type</label>
                 <Select
-                    value={ state.column2type }
-                    onChange={ type => onChange({ type })}
+                    value={ state.column2type ?? "spline" }
+                    onChange={ type => onChange({ type, column: state.column2 })}
                     options={[
                         {
                             value: "line",
@@ -122,7 +122,7 @@ interface ChartConfigPanelState {
     chartOptions   : Partial<Highcharts.Options>
     denominator    : string
     column2        : string
-    column2type    : string
+    column2type   ?: string
     annotations    : app.Annotation[]
     xCol           : app.DataRequestDataColumn
     tags           : Pick<app.Tag, "id"|"name"|"description">[]

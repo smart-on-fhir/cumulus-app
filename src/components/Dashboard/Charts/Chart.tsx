@@ -234,7 +234,7 @@ function getSeries({
             //     }
             // }
 
-            cfg.stacking = column2type!.includes("columnStack") ? "normal" : undefined
+            cfg.stacking = column2type?.includes("columnStack") ? "normal" : undefined
         }
 
         series.push({
@@ -246,7 +246,7 @@ function getSeries({
 
     function stratify(data: app.ServerResponses.StratifiedDataResponse, secondary = false) {
 
-        const _type = secondary ? column2type!.replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes : type;
+        const _type = secondary ? (column2type || "spline").replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes : type;
 
         const denominatorCache = {}
 
