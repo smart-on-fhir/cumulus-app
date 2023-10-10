@@ -53,7 +53,7 @@ export interface ViewState
     chartOptions    : Partial<Highcharts.Options>
     denominator     : app.DenominatorType
     column2        ?: app.DataRequestDataColumn
-    column2type     : keyof typeof SupportedChartTypes
+    column2type    ?: keyof typeof SupportedChartTypes
     caption         : string
     data            : app.ServerResponses.DataResponse | null
     data2           : app.ServerResponses.StratifiedDataResponse | null
@@ -84,26 +84,28 @@ function getViewReducer({
 
     return function viewReducer(state: ViewState, action: ViewAction): ViewState
     {
-        if (action.type === "SET_DATA") {
-            const data = action.payload
-
-            return {
-                ...state,
-                chartOptions: buildChartOptions({
-                    options         : state.chartOptions,
-                    type            : state.chartOptions.chart!.type as SupportedNativeChartTypes,
-                    data,
-                    data2           : state.data2,
-                    column          : state.viewColumn,
-                    groupBy         : state.viewGroupBy,
-                    denominator     : state.denominator,
-                    column2type     : state.column2type,
-                    ranges          : state.ranges,
-                    inspection      : state.inspection,
+        function updateChartOptions(currentState: ViewState) {
+            if (currentState.data) {
+                currentState.chartOptions = buildChartOptions({
+                    options         : currentState.chartOptions,
+                    type            : currentState.chartOptions.chart!.type as SupportedNativeChartTypes,
+                    data            : currentState.data,
+                    data2           : currentState.data2,
+                    column          : currentState.viewColumn,
+                    groupBy         : currentState.viewGroupBy,
+                    denominator     : currentState.denominator,
+                    column2type     : currentState.column2type,
+                    ranges          : currentState.ranges,
+                    inspection      : currentState.inspection,
                     onSeriesToggle,
                     onInspectionChange,
                 })
-            };
+            }
+            return currentState
+        }
+
+        if (action.type === "SET_DATA") {
+            return updateChartOptions({ ...state, data: action.payload })
         }
 
         if (action.type === "SET_CHART_OPTIONS") {
@@ -138,55 +140,19 @@ function getViewReducer({
         }
 
         if (action.type === "SET_RANGE_OPTIONS") {
+            const out = { ...state, ranges: action.payload }
             if (state.data) {
-                const ranges: app.RangeOptions  = action.payload 
-
-                return {
-                    ...state,
-                    ranges,
-                    chartOptions: buildChartOptions({
-                        options         : state.chartOptions,
-                        type            : state.chartOptions.chart!.type as SupportedNativeChartTypes,
-                        data            : state.data,
-                        data2           : state.data2,
-                        column          : state.viewColumn,
-                        groupBy         : state.viewGroupBy,
-                        denominator     : state.denominator,
-                        column2type     : state.column2type,
-                        ranges,
-                        inspection      : state.inspection,
-                        onSeriesToggle,
-                        onInspectionChange,
-                    })
-                };
+                updateChartOptions(out)
             }
+            return out
         }
 
         if (action.type === "SET_SECONDARY_DATA_OPTIONS") {
-            console.log(action)
+            const out = { ...state, column2: action.payload.column, column2type: action.payload.type }
             if (state.data) {
-                const { column = state.column2, type = state.column2type }  = action.payload 
-
-                return {
-                    ...state,
-                    column2: column,
-                    column2type: type,
-                    chartOptions: buildChartOptions({
-                        options         : state.chartOptions,
-                        type            : state.chartOptions.chart!.type as SupportedNativeChartTypes,
-                        data            : state.data,
-                        data2           : state.data2,
-                        column          : state.viewColumn,
-                        groupBy         : state.viewGroupBy,
-                        denominator     : state.denominator,
-                        column2type     : type,
-                        ranges          : state.ranges,
-                        inspection      : state.inspection,
-                        onSeriesToggle,
-                        onInspectionChange,
-                    })
-                };
+                updateChartOptions(out)
             }
+            return out
         }
 
         if (action.type === "SET_CHART_TYPE") {
@@ -372,7 +338,7 @@ export default function Dashboard({
         column2: cols.find(c => c.name === viewSettings.column2 || ""),
 
         // secondary data type
-        column2type: viewSettings.column2type || "",
+        column2type: viewSettings.column2type,
 
         // View caption if any
         caption: viewSettings.caption || "",
@@ -914,6 +880,8 @@ export default function Dashboard({
                                     column2type || "no_second_type",
                                     state.chartOptions.chart?.options3d?.enabled ?? false,
                                     (chartType.includes("pie") || chartType.includes("donut")) ? state.chartOptions.chart?.options3d?.alpha : 0,
+                                    state.ranges.enabled,
+                                    state.ranges.type
                                 ].join(":")
                             }
                         /> }
