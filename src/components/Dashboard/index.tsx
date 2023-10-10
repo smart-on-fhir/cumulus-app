@@ -103,7 +103,7 @@ function getViewReducer({
 
                 // Now build the final options by adding dynamic properties
                 // like series data and function options
-                nextState.fullChartOptions = buildChartOptions({
+                nextState.chartOptions = buildChartOptions({
                     options,
                     type            : options.chart!.type as SupportedNativeChartTypes,
                     data            : nextState.data,
