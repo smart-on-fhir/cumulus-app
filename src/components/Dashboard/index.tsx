@@ -158,6 +158,90 @@ function getViewReducer({
                 };
             }
         }
+
+        if (action.type === "SET_RANGE_OPTIONS") {
+            if (state.data) {
+                const ranges: app.RangeOptions  = action.payload 
+
+                return {
+                    ...state,
+                    ranges,
+                    chartOptions: buildChartOptions({
+                        options         : state.chartOptions,
+                        type            : state.chartOptions.chart!.type as SupportedNativeChartTypes,
+                        data            : state.data,
+                        data2           : state.data2,
+                        column          : state.viewColumn,
+                        groupBy         : state.viewGroupBy,
+                        denominator     : state.denominator,
+                        column2type     : state.column2type,
+                        ranges,
+                        inspection      : state.inspection,
+                        onSeriesToggle,
+                        onInspectionChange,
+                    })
+                };
+            }
+        }
+
+        if (action.type === "SET_SECONDARY_DATA_OPTIONS") {
+            console.log(action)
+            if (state.data) {
+                const { column = state.column2, type = state.column2type }  = action.payload 
+
+                return {
+                    ...state,
+                    column2: column,
+                    column2type: type,
+                    chartOptions: buildChartOptions({
+                        options         : state.chartOptions,
+                        type            : state.chartOptions.chart!.type as SupportedNativeChartTypes,
+                        data            : state.data,
+                        data2           : state.data2,
+                        column          : state.viewColumn,
+                        groupBy         : state.viewGroupBy,
+                        denominator     : state.denominator,
+                        column2type     : type,
+                        ranges          : state.ranges,
+                        inspection      : state.inspection,
+                        onSeriesToggle,
+                        onInspectionChange,
+                    })
+                };
+            }
+        }
+
+        if (action.type === "SET_CHART_TYPE") {
+
+            const chartType = action.payload
+
+            const nextState = { ...state, chartType };
+
+            if (chartType.startsWith("pie") || chartType.startsWith("donut")) {
+                nextState.viewGroupBy = undefined
+                nextState.data2 = null
+            }
+
+            if (nextState.data) {
+                const options = getDefaultChartOptions(chartType, nextState.chartOptions, true)
+
+                nextState.chartOptions = buildChartOptions({
+                    options,
+                    type            : options.chart!.type as SupportedNativeChartTypes,
+                    data            : nextState.data,
+                    data2           : nextState.data2,
+                    column          : nextState.viewColumn,
+                    groupBy         : nextState.viewGroupBy,
+                    denominator     : nextState.denominator,
+                    column2type     : nextState.column2type,
+                    ranges          : nextState.ranges,
+                    inspection      : nextState.inspection,
+                    onSeriesToggle,
+                    onInspectionChange,
+                })
+            }
+
+            return nextState;
         }
 
         if (action.type === "SET_VIEW_TYPE") {
@@ -176,18 +260,42 @@ function getViewReducer({
 
         if (action.type === "UPDATE") {
             const nextState = Highcharts.merge(state, action.payload);
-            if (nextState.chartType.startsWith("pie") || nextState.chartType.startsWith("donut")) {
-                nextState.viewGroupBy = undefined
-                nextState.denominator = ""
-            }
-
+            
             if (nextState.inspection.enabled && nextState.inspection.match.length) {
                 nextState.showOptions = true
             }
 
+            const chartable = [
+                // "chartOptions",
+                "denominator",
+                "data",
+                "data2",
+                // "column"
+                "inspection"
+            ];
+
             // @ts-ignore
-            if (Object.keys(action.payload).some(key => chartable.includes(key) && action.payload[key] !== state[key])) {
-                computeChartOptions(nextState);
+            if (nextState.data && Object.keys(action.payload).some(key => chartable.includes(key) && action.payload[key] !== state[key])) {
+                // computeChartOptions(state, nextState);
+                const options = getDefaultChartOptions(
+                    nextState.chartType as keyof typeof SupportedChartTypes,
+                    nextState.chartOptions
+                );
+
+                nextState.chartOptions = buildChartOptions({
+                    options         : options,
+                    type            : options.chart!.type as SupportedNativeChartTypes,
+                    data            : nextState.data!,
+                    data2           : nextState.data2,
+                    column          : nextState.viewColumn,
+                    groupBy         : nextState.viewGroupBy,
+                    denominator     : nextState.denominator,
+                    column2type     : nextState.column2type,
+                    ranges          : nextState.ranges,
+                    inspection      : nextState.inspection,
+                    onSeriesToggle,
+                    onInspectionChange,
+                })
             }
 
             return nextState;
@@ -616,7 +724,16 @@ export default function Dashboard({
                             dataRequest={dataRequest}
                             viewType={viewType}
                             view={view}
+                            onChartTypeChange={ (type: string) => dispatch({ type: "SET_CHART_TYPE", payload: type }) }
                             onChartOptionsChange={ (payload: Highcharts.Options) => dispatch({ type: "SET_CHART_OPTIONS", payload }) }
+                            onRangeOptionsChange={ (payload: app.RangeOptions) => dispatch({ type: "SET_RANGE_OPTIONS", payload }) }
+                            onSecondaryDataOptionsChange={ (payload: { column?: string, type?: string }) => dispatch({
+                                type: "SET_SECONDARY_DATA_OPTIONS",
+                                payload: {
+                                    column: payload.column ? cols.find(c => c.name === payload.column) : undefined,
+                                    type: payload.type
+                                }
+                            }) }
                             state={{
                                 groupBy   : viewColumn.name,
                                 stratifyBy: viewGroupBy?.name || "",
@@ -641,15 +758,12 @@ export default function Dashboard({
                                 dispatch({ type: "UPDATE", payload: {
                                     viewName       : state.viewName,
                                     viewDescription: state.viewDescription,
-                                    chartType      : state.chartType,
                                     viewColumn     : cols.find(c => c.name === state.groupBy),
                                     viewGroupBy    : cols.find(c => c.name === state.stratifyBy),
                                     filters        : [...state.filters],
                                     denominator    : state.denominator,
                                     tags           : state.tags,
-                                    ranges         : state.ranges,
-                                    visualOverrides: state.visualOverrides,
-                                    // inspection     : state.inspection
+                                    visualOverrides: state.visualOverrides
                                 }});
                             }}
                         />
