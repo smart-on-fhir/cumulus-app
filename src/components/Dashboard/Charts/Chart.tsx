@@ -329,7 +329,7 @@ function getSeries({
                 addSeries({
                     type: ranges.type ?? "errorbar",
                     id,
-                    name: (old?.name ?? name) + " (range)",
+                    name: old?.name ?? name + " (range)",
                     data: data.data[0].rows.map(row => getPoint({
                         row,
                         xType,
