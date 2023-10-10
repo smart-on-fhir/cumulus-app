@@ -11,12 +11,12 @@ export function getOptions(axis: XAxisOptions | YAxisOptions, onChange: (a: Part
             value   : axis.labels?.enabled !== false,
             onChange: (enabled: boolean) => onChange({ labels: { enabled }})
         },
-        {
-            name    : "Format",
-            type    : "text",
-            value   : axis.labels?.format ?? "{text}",
-            onChange: (format: string) => onChange({ labels: { format }})
-        },
+        // {
+        //     name    : "Format",
+        //     type    : "text",
+        //     value   : axis.labels?.format ?? "{text}",
+        //     onChange: (format: string) => onChange({ labels: { format }})
+        // },
         {
             name: "zIndex",
             type: "number",
