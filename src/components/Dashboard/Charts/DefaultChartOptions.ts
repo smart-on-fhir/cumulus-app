@@ -1,4 +1,10 @@
 import { merge, Options } from "highcharts"
+import { generateColors } from "../../../utils"
+import {
+    DEFAULT_FONT_SIZE,
+    DEFAULT_FONT_FAMILY
+} from "../config"
+
 
 const DefaultChartOptions: Options = {
     chart: {
