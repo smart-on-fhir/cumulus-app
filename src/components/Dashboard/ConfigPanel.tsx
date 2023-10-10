@@ -70,13 +70,23 @@ function SecondaryDataEditor({
                     onChange={ type => onChange({ type })}
                     options={[
                         {
-                            value: "spline",
+                            value: "line",
                             label: "Line",
+                            icon: ChartIcons.line
+                        },
+                        {
+                            value: "spline",
+                            label: "Soft Line",
                             icon: ChartIcons.spline
                         },
                         {
-                            value: "areaspline",
+                            value: "area",
                             label: "Area",
+                            icon: ChartIcons.area
+                        },
+                        {
+                            value: "areaspline",
+                            label: "Soft Area",
                             icon: ChartIcons.areaspline
                         },
                         {

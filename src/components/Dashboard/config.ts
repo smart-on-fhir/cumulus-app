@@ -7,8 +7,10 @@ export const SupportedChartTypes = {
     donut        : "Donut Chart",
     donut3d      : "Donut Chart 3D",
     
-    spline       : "Line Chart",
-    areaspline   : "Area Chart",
+    line         : "Line Chart",
+    spline       : "Soft Line Chart",
+    area         : "Area Chart",
+    areaspline   : "Soft Area Chart",
 
     column       : "Column Chart",
     column3d     : "Column Chart 3D",
@@ -27,8 +29,10 @@ export const ChartIcons = {
     donut        : "/icons/donut_chart.png",
     donut3d      : "/icons/donut_chart.png",
     
+    line         : "/icons/line_chart.png",
     spline       : "/icons/line_chart.png",
-    areaspline   : "/icons/area_chart.png", //"fas fa-chart-area",
+    area         : "/icons/area_chart.png",
+    areaspline   : "/icons/area_chart.png",
 
     column       : "/icons/column_chart.png",
     column3d     : "/icons/column_chart.png",
@@ -41,7 +45,7 @@ export const ChartIcons = {
     barStack3d   : "/icons/bar_chart.png",
 }
 
-export type SupportedNativeChartTypes = "pie" | "spline" | "areaspline" | "column" | "bar"
+export type SupportedNativeChartTypes = "pie" | "line" | "spline" | "area" | "areaspline" | "column" | "bar"
 
 /**
  * Charts that can only have one dimension plus count. They DO NOT support

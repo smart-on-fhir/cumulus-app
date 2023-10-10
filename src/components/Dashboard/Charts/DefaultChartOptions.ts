@@ -207,14 +207,41 @@ const DefaultChartOptions: Options = {
                 }
             },
         },
-        areaspline: {
-            trackByArea: false,
+        area: {
+            trackByArea: true,
             stickyTracking: true,
             marker: {
                 enabled  : false,
                 radius   : 5,
                 lineWidth: 2,
-                // lineColor: undefined,
+                fillColor: "#FFFFFF",
+                states: {
+                    hover: {
+                        lineWidth: 1,
+                        lineColor: "#000000",
+                        radius   : 5,
+                    },
+                    select: {
+                        lineWidth: 2,
+                        radius: 6
+                    }
+                }
+            },
+            lineWidth: 2,
+            connectNulls: false,
+            getExtremesFromAll: true,
+            dashStyle: "Solid",
+            fillOpacity: 0.5
+        },
+        areaspline: {
+            // Whether the whole area or just the line should respond to mouseover
+            // tooltips and other mouse or touch events. Defaults to false.
+            trackByArea: true,
+            stickyTracking: true,
+            marker: {
+                enabled  : false,
+                radius   : 5,
+                lineWidth: 2,
                 fillColor: "#FFFFFF",
                 states: {
                     hover: {
@@ -223,7 +250,6 @@ const DefaultChartOptions: Options = {
                     },
                     select: {
                         lineWidth: 2,
-                        // fillColor: "#FFFFFF",
                         radius: 6
                     }
                 }
