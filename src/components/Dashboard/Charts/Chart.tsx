@@ -595,7 +595,7 @@ export function buildChartOptions({
             },
         },
         legend: {
-            useHTML: false,
+            useHTML: true,
             itemStyle: {
                 fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
                 fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
