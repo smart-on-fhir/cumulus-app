@@ -35,19 +35,6 @@ const DefaultChartOptions: Options = {
             color     : "#333333"
         }
     },
-    lang: {
-        noData: `<div style="text-align:center;padding:10px;color:#900000;font-size:15px">No data to display!</div>
-        <div style="padding:0 20px 10px;font-weight:400">If you have filters applied, try changing or removing them.</div>`,
-    },
-    noData: {
-        attr: {
-            fill: "#F6F6F6",
-            r: 5,
-            stroke: "#E6E6E6",
-            "stroke-width": "1px"
-        },
-        useHTML: true
-    },
     exporting: {
         buttons: {
             contextButton: {
