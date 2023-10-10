@@ -1,6 +1,7 @@
 import { merge, Options } from "highcharts"
 import { generateColors } from "../../../utils"
 import {
+    SupportedChartTypes,
     DEFAULT_FONT_SIZE,
     DEFAULT_FONT_FAMILY
 } from "../config"
