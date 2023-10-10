@@ -18,10 +18,27 @@ export type OptGroup = { value: Option[], label: string, disabled?: boolean }
 export default function OptionsEditor({ prop }: { prop: EditableOptionsProperty }) {
     const { value, required, onChange, disabled, title, style, options = [] } = prop
 
+    function flatten(input: (Option | OptGroup)[]): any[] {
+        return input.reduce((prev, cur) => {
+            if (typeof cur === "string") {
+                prev.push(cur)
+            }
+            else if (Array.isArray(cur.value)) {
+                prev.push(...flatten(cur.value))
+            }
+            else {
+                prev.push(cur.value)
+            }
+            return prev
+        }, [] as any[])
+    }
+
+    const flat = flatten(options)
+
     return (
         <select
-            value={ value }
-            onChange={ e => onChange(e.target.value) }
+            value={ value + "" }
+            onChange={ e => onChange(flat[e.target.selectedIndex]) }
             required={ required }
             disabled={ disabled }
             title={ title }
@@ -42,7 +59,7 @@ function Options({ options }: { options: (Option | OptGroup)[] }) {
                 <Options options={o.value} />
             </optgroup>
         }
-        return <option key={i} value={o.value} disabled={o.disabled}>{o.label}</option>
+        return <option key={i} value={o.value + ""} disabled={o.disabled}>{o.label}</option>
     }) }
     </>
 }
