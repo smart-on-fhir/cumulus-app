@@ -275,7 +275,7 @@ function getSeries({
             addSeries({
                 type: _type,
                 id,
-                name: old?.name || group.stratifier,
+                name: String(old?.name ?? group.stratifier),
                 data: keys.map(key => {
                     const row = group.rows.find(row => row[0] === key)
                     return row ?
@@ -291,7 +291,7 @@ function getSeries({
                 const old = serverOptions.series?.find(s => s.id === id)
                 addSeries({
                     type: ranges.type ?? "errorbar",
-                    name: old?.name || group.stratifier + " (range)",
+                    name: (old?.name ?? group.stratifier) + " (range)",
                     id  : (secondary ? "secondary-" : "primary-") + group.stratifier + " (range)",
                     data: keys.map(key => {
                         const row = group.rows.find(row => row[0] === key)
@@ -309,12 +309,13 @@ function getSeries({
     if (data.rowCount) {
         if (!data.stratifier) {
             const denominatorCache = {}
-            const id  = "primary-" + (column.label || column.name)
+            const name = String(column.label || column.name)
+            const id  = "primary-" + name
             const old = serverOptions.series?.find(s => s.id === id)
             addSeries({
                 type,
                 id,
-                name: old?.name || column.label || column.name,
+                name: old?.name ?? name,
                 data: data.data[0].rows.map(row => getPoint({
                     row,
                     xType,
@@ -323,12 +324,12 @@ function getSeries({
             });
 
             if (ranges?.enabled) {
-                const id  = "primary-" + (column.label || column.name) + " (range)"
+                const id  = "primary-" + name + " (range)"
                 const old = serverOptions.series?.find(s => s.id === id)
                 addSeries({
                     type: ranges.type ?? "errorbar",
                     id,
-                    name: old?.name || (column.label || column.name) + " (range)",
+                    name: (old?.name ?? name) + " (range)",
                     data: data.data[0].rows.map(row => getPoint({
                         row,
                         xType,
