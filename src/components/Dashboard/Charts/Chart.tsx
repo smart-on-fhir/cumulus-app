@@ -471,10 +471,15 @@ export function buildChartOptions({
                 linkedTo: ':previous',
                 marker: {
                     enabled: false,
+                    states: {
+                        hover: {
+                            enabled: false
+                        }
+                    }
                 },
                 states: {
                     hover: {
-                        enabled: !inspection.enabled // No hover on ranges normally
+                        enabled: !!inspection.enabled // No hover on ranges normally
                     }
                 }
             },
