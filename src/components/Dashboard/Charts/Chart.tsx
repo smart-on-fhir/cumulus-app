@@ -381,7 +381,7 @@ export function buildChartOptions({
 {
     const xType = getXType(column);
 
-    const is3d = !!options.chart?.options3d?.enabled
+    // const is3d = !!options.chart?.options3d?.enabled
 
     const series = getSeries({
         data,
