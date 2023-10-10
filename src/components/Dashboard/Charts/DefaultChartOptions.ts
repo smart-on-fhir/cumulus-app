@@ -194,30 +194,32 @@ const DefaultChartOptions: Options = {
             trackByArea: false,
             stickyTracking: true,
             marker: {
-                enabled: false,
-                radius: 4,
-                lineColor: "#000000",
+                enabled  : false,
+                radius   : 5,
+                lineWidth: 2,
+                // lineColor: undefined,
                 fillColor: "#FFFFFF",
-                lineWidth: 1,
                 states: {
                     hover: {
-                        lineWidth: 1,
-                        lineWidthPlus: 0,
-                        radius: 4,
+                        lineWidth: 2,
+                        radius   : 5,
                     },
                     select: {
-                        enabled: true,
                         lineWidth: 2,
-                        fillColor: "#FFFFFF",
-                        radius: 5,
-                        lineWidthPlus: 1
+                        // fillColor: "#FFFFFF",
+                        radius: 6
                     }
                 }
             },
             lineWidth: 2,
             states: {
+                normal: {
+                    // @ts-ignore
+                    lineWidth: 2,
+                },
                 hover: {
                     lineWidth: 3,
+                    lineWidthPlus: 3,
                     shadow: true, // show them even on datetime charts
                 }
             },
@@ -229,32 +231,44 @@ const DefaultChartOptions: Options = {
         spline: {
             marker: {
                 enabled: false,
-                radius: 4,
-                lineColor: "#000000",
-                fillColor: "#FFFFFF",
-                lineWidth: 1,
+                radius: 5,
+                lineWidth: 2,
+                lineColor: "contrast",
                 states: {
                     hover: {
-                        lineWidth: 1,
-                        lineWidthPlus: 0,
-                        radius: 4,
+                        lineWidth: 2,
+                        radius   : 5,
                     },
                     select: {
-                        enabled: true,
                         lineWidth: 2,
+                        lineColor: "#000000",
                         fillColor: "#FFFFFF",
-                        radius: 5,
-                        lineWidthPlus: 1
+                        radius: 6
                     }
                 }
             },
             lineWidth: 2,
-            states: {
-                hover: {
-                    lineWidth: 3,
-                    shadow: true, // show them even on datetime charts
+            connectNulls: true,
+            dashStyle: "Solid",
+        },
+        line: {
+            marker: {
+                enabled: false,
+                radius: 5,
+                lineWidth: 2,
+                states: {
+                    hover: {
+                        lineWidth: 2
+                    },
+                    select: {
+                        lineWidth: 2,
+                        lineColor: "#000000",
+                        fillColor: "#FFFFFF",
+                        radius: 6
+                    }
                 }
             },
+            lineWidth: 2,
             connectNulls: true,
             dashStyle: "Solid",
         }
