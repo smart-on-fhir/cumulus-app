@@ -1,13 +1,22 @@
-import { useState }             from "react"
-import Select                   from "../generic/Select"
-import ColumnSelector           from "./ColumnSelector"
-import FilterUI                 from "./FilterUI"
-import Collapse                 from "../generic/Collapse"
-import Checkbox                 from "../generic/Checkbox"
-import { AllAnnotations }       from "./Inspectors/Annotations"
-import TagSelector              from "../Tags/TagSelector"
-import PropertyGrid             from "../generic/PropertyGrid"
-import { app }                  from "../../types"
+import { useState }       from "react"
+import Select             from "../generic/Select"
+import ColumnSelector     from "./ColumnSelector"
+import FilterUI           from "./FilterUI"
+import Collapse           from "../generic/Collapse"
+import Checkbox           from "../generic/Checkbox"
+import { AllAnnotations } from "./Inspectors/Annotations"
+import TagSelector        from "../Tags/TagSelector"
+import PropertyGrid       from "../generic/PropertyGrid"
+import { app }            from "../../types"
+import TreeEditor         from "../generic/TreeEditor"
+import ColorEditor        from "../generic/PropertyGrid/ColorEditor"
+import DynamicInspector   from "./Inspectors"
+import Legend             from "./Inspectors/Legend"
+import AxisEditor         from "./Inspectors/Axis"
+import Chart              from "./Inspectors/Chart"
+import { AllPlotLines }   from "./Inspectors/AxisPlotLines"
+import { DEFS }           from "./Schema"
+import { AllSeries }      from "./Inspectors/Series"
 import {
     DashStyleValue,
     merge,
@@ -22,15 +31,6 @@ import {
     DEFAULT_COLORS,
     DASH_STYLES
 } from "./config"
-import ColorEditor      from "../generic/PropertyGrid/ColorEditor"
-import DynamicInspector from "./Inspectors"
-import Legend           from "./Inspectors/Legend"
-import AxisEditor       from "./Inspectors/Axis"
-import Chart            from "./Inspectors/Chart"
-import { AllPlotLines } from "./Inspectors/AxisPlotLines"
-import Plot             from "./Inspectors/Plot"
-import { DEFS }         from "./Schema"
-import { AllSeries }    from "./Inspectors/Series"
 
 
 type SupportedChartType = keyof typeof SupportedChartTypes
@@ -575,12 +575,6 @@ export default function ConfigPanel({
                 { !isPie && <Collapse collapsed header="Plot Lines">
                     <AllPlotLines chartOptions={state.chartOptions} onChange={onChartOptionsChange} />
                 </Collapse> }
-
-                <Collapse collapsed header="Plot">
-                    <div className="pb-1">
-                        <Plot chart={chartOptions.chart} onChange={chart => onChartOptionsChange({ chart })} />
-                    </div>
-                </Collapse>
 
                 <Collapse collapsed header="Legend">
                     <div className="pb-1">
