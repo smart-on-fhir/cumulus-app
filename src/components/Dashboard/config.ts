@@ -93,7 +93,7 @@ export const ReadOnlyPaths = [
     "exporting",
     // "plotOptions",
     "tooltip",
-    "chart.marginTop",
+    // "chart.marginTop",
     "chart.type",
     "chart.animation.easing",
     // "series",
