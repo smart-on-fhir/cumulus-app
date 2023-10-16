@@ -66,8 +66,9 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
             type: "color",
             value: color,
             onChange: (color: string) => {
-                options.colors![seriesIndex % options.colors!.length] = color
-                onChange(options)
+                const colors = [...options.colors!]
+                colors[seriesIndex % colors.length] = color
+                onChange({ colors })
             }
         })
     }
