@@ -209,10 +209,21 @@ export function hslToHex(h: number, s: number, l: number) {
     return `#${f(0)}${f(8)}${f(4)}`;
 }
 
-export function generateColors(count: number, saturation = 75, lightness = 60, variety = 1, startColor = 0) {
+/**
+ * @param count How many colors to generate?
+ * @param saturation 0 to 100; defaults to 75.
+ * @param lightness 0 to 100; defaults to 60.
+ * @param variety 0 to 2; defaults to 1
+ * @param startColor Start hue angle. Defaults to 0.
+ */
+export function generateColors(count: number, saturation = 75, lightness = 50, variety = 1, startColor = 0): string[] {
     const colors: string[] = [];
     for (let i = 0; i < count; i++) {
-        colors.push(hslToHex((startColor + (137.5 * i * variety)) % 360 , saturation, lightness));
+        colors.push(hslToHex(
+            (startColor + (137.5 * i * variety)) % 360,
+            saturation,
+            lightness
+        ));
     }
     return colors;
 }

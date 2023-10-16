@@ -195,7 +195,7 @@ function getSeries({
             id: options.id
         }
 
-        if ((options.type?.type === "area" || options.type?.type === "areaspline") && color && S?.visible !== false) {
+        if ((options.type === "area" || options.type === "areaspline") && color && S?.visible !== false) {
             // @ts-ignore
             const fillOpacity = S?.fillOpacity ?? prev.fillOpacity ?? 0.75
             cfg.fillColor = {

@@ -475,7 +475,7 @@ export default function ConfigPanel({
                     </div>
                 </Collapse>
 
-                { !isPie && <SeriesEditor state={state} onChange={onChange} /> }
+                { !isPie && <SeriesEditor state={state} onChange={onChartOptionsChange} /> }
 
                 { !isPie && <Collapse collapsed header={ isBar ? "X Axis" : "Y Axis" }>
                     <div className="mt-1">
@@ -741,7 +741,7 @@ function SeriesEditor({
     onChange,
 }: {
     state: ChartConfigPanelState,
-    onChange: (state: ChartConfigPanelState) => void
+    onChange: (options: Options) => void
 }) {
 
     const hasInvisible = !!state.chartOptions.series?.find(s => s.visible === false)
@@ -750,24 +750,20 @@ function SeriesEditor({
 
     return (
         <Collapse collapsed header="Series">
-            <AllSeries options={state.chartOptions} onChange={o => {
-                state.chartOptions = merge(state.chartOptions, o)
-                // next.chartOptions.series![i].visible = visible;
-                onChange(state)
-            }} />
+            <AllSeries options={state.chartOptions} onChange={onChange} />
             <div
                 className="link pt-1 pb-1"
                 style={{ color: hasInvisible ? "#06D" : "#AAA", userSelect: "none" }}
                 tabIndex={0}
                 onClick={() => {
                     if (hasInvisible) {
-                        const next = merge(state)
-                        next.chartOptions.series?.forEach(s => {
+                        const series = [...state.chartOptions.series!]
+                        series.forEach(s => {
                             if (s.visible === false) {
                                 s.showInLegend = !force
                             }
                         });
-                        onChange(next)
+                        onChange({ series })
                         setForce(!force)
                     }
                 }}
@@ -798,12 +794,12 @@ function AllSeriesEditor({
     onChange,
 }: {
     state: ChartConfigPanelState,
-    onChange: (state: ChartConfigPanelState) => void
+    onChange: (options: Options) => void
 }) {
     const change = (patch: any) => {
         const next = merge(state)
         next.chartOptions.series?.forEach(s => Object.assign(s, patch));
-        onChange(next)
+        onChange(next.chartOptions)
     }
 
     const S: any = state.chartOptions.series?.[0] || {}
