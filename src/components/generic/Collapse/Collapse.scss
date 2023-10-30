@@ -31,9 +31,10 @@
         display    : grid;
         grid       : auto-flow / auto auto 1fr;
         align-items: center;
+        gap: 4px;
 
         > .fa-solid {
-            width: 18px;
+            width: 16px;
             font-size: 16px;
             text-align: center;
             color: fade-out(#000, 0.65);

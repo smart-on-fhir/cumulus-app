@@ -155,7 +155,7 @@ export function AllSeries({
                              display   : "inline-block",
                              boxShadow : s.visible !== false ? "#666 0 0 0 1px inset, #FFF8 0 0 0px 2px inset" : "#CCC 0 0 0 1px inset",
                              borderRadius: "2px",
-                             margin      : "0 5px 0 1px"
+                             margin      : "0 2px 0 0"
                          }}/>
                         <span
                             className={ "ellipsis" + (seriesId === s.id ? " selected" : "") }
