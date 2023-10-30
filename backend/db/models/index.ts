@@ -88,6 +88,8 @@ export function init(connection: Sequelize) {
     });
     DataRequest.hasMany(View, {
         foreignKey: "DataRequestId",
+        constraints: true,
+        hooks: true,
         onDelete: "CASCADE"
     });
 
