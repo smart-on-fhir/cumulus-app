@@ -1,86 +1,13 @@
-import readline                                    from "readline/promises"
 import clc                                         from "cli-color"
 import dotenv                                      from "dotenv"
 import dotenvExpand                                from "dotenv-expand"
 import { existsSync, readFileSync, writeFileSync } from "fs"
-
-const rl = readline.createInterface({
-    input : process.stdin,
-    output: process.stdout
-});
+import { ask }                                     from "./lib"
 
 
 const STATE: Record<string, string | number | boolean> = {}
 
 
-function list(items: (string | number | boolean)[], conditional = "or") {
-    if (items.length === 1) {
-        return clc.bold.cyan(JSON.stringify(items[0]))
-    }
-    items = [ ...items ]
-    const last = items.pop()
-    return items.map(s => clc.bold.cyan(JSON.stringify(s))).join(", ") +
-        " " + conditional + " " + clc.bold.cyan(JSON.stringify(last))
-}
-
-async function ask(question: string, {
-    answers,
-    defaultValue,
-    required,
-    currentValue
-}: {
-    answers?: string[]
-    defaultValue?: any
-    required?: boolean
-    currentValue?: string | number | boolean
-} = {}) {
-    let msg = ["\n📄 " + clc.italic.green(question.trim())];
-
-    if (answers) {
-        msg.push(`Supported values: ${list(answers)}.`)
-    }
-
-    if (defaultValue !== undefined) {
-        msg.push(`Default value: ${clc.bold.magenta(JSON.stringify(defaultValue))}.`)
-    } else {
-        msg.push(`This variable has no default value.`)
-    }
-    if (currentValue !== undefined) {
-        msg.push(`Your current value is ${clc.bold.magenta(JSON.stringify(currentValue))}.`)
-    }
-    if (defaultValue !== undefined) {
-        msg.push(`Hit Enter to accept the default value.`)
-    }
-    let answer = (await rl.question(
-        clc.italic.green(
-            msg.join(question.includes("\n") ? "\n" : " ")
-        ) + "\n" + clc.bold("Answer: ")
-    )).trim()
-
-    if (!answer) answer = defaultValue
-
-    while (!answer && required) {
-        process.stdout.write("\x1B[1A\x1B[0G\x1B[0J")
-        answer = await rl.question(clc.italic.green(
-            `⛔️ This value is required! Please try again:\n`
-        ));
-    }
-
-    if (answers) {
-        while (!answers.includes(answer)) {
-            process.stdout.write("\x1B[1A\x1B[0G\x1B[0J")
-            answer = await rl.question(clc.italic.green(
-                `⛔️ Only the following values are supported: ${list(answers)}. ` +
-                'Please try again:\n'
-            ));
-        }
-    }
-
-    process.stdout.write("\x1B[1A\x1B[0G\x1B[0J")
-    console.log(clc.bold.yellow(answer))
-
-    return answer
-}
 
 function generateEnvFile() {
     const vars: Record<string, string | number | boolean> = {
@@ -133,7 +60,7 @@ function generateEnvFile() {
 }
 
 
-async function main()
+export default async function main()
 {
     // Main settings -----------------------------------------------------------
 
@@ -388,5 +315,3 @@ async function main()
 
     process.exit(0)
 }
-
-main()

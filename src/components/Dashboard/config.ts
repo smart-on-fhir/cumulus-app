@@ -1,5 +1,6 @@
-import { generateColors } from "../../utils"
 import { DashStyleValue } from "highcharts"
+import { generateColors } from "../../utils"
+export { ReadOnlyPaths }  from "../../config"
 
 export const SupportedChartTypes = {
     pie          : "Pie Chart",
@@ -88,30 +89,6 @@ export const INSPECTORS = {
     // annotation    : ".highcharts-label-box.highcharts-annotation-label-box",
 };
 
-// These are computed at runtime and will not be saved on the server
-export const ReadOnlyPaths = [
-    "exporting",
-    // "plotOptions",
-    "tooltip",
-    // "chart.marginTop",
-    "chart.type",
-    "chart.animation.easing",
-    // "series",
-    "series.[].data",
-    "series.[].color",
-    "chart.options3d.depth",
-    // "chart.plotBorderWidth",
-    // "colors",
-    "yAxis.allowDecimals",
-    "yAxis.labels.format",
-    "plotOptions.series.animation.easing",
-    "plotOptions.series.events.legendItemClick",
-    "plotOptions.pie.dataLabels.formatter",
-    "tooltip.formatter",
-    "xAxis.type",
-    "lang",
-    "noData"
-];
 
 export const DATE_BOOKMARKS = [
     { date: "2020-03-01", name: "Start of COVID Pre-Delta era" },

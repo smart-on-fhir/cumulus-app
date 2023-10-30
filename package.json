@@ -1,6 +1,6 @@
 {
   "name": "cumulus-app",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.1",
@@ -45,7 +45,6 @@
     "winston-daily-rotate-file": "^4.7.1"
   },
   "scripts": {
-    "configure": "ts-node --skipProject --transpile-only configure.ts",
     "build": "react-scripts build",
     "start": "npm run start:manual",
     "start:docker": "if-env NODE_ENV=production && npm run start:prod:docker || npm run start:dev:docker",
@@ -94,6 +93,7 @@
     "@types/sequelize": "^4.28.14",
     "@types/slug": "^5.0.3",
     "chai": "^4.3.7",
+    "commander": "^11.1.0",
     "mocha": "^10.1.0",
     "nodemon": "^2.0.20",
     "nyc": "^15.1.0",
