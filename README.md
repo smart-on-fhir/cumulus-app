@@ -25,7 +25,7 @@ To simplify the configuration process we have created a script that will ask you
 any required information and generate the configuration files for you. All you need
 to do is:
 ```
-npm run configure
+./bin/cumulus.ts configure
 ```
 The configuration script will generate a local config file for you named `.env.production.local`
 or `.env.development.local`. You can run it twice to generate both files, although 
