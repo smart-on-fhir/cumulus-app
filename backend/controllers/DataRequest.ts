@@ -97,6 +97,7 @@ const filtersWithoutParams = [
 
 // Views -----------------------------------------------------------------------
 router.get("/:id/views", rw(async (req: AppRequest, res: Response) => {
+    requestPermission(req.user?.role || "guest", "Views.read")
     const options = getFindOptions(req);
     options.where = { DataRequestId: +req.params.id };
     const views = await ViewModel.findAll({ ...options, user: req.user });
