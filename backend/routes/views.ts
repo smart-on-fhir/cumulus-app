@@ -58,6 +58,9 @@ route(router, {
                     }
                 }
             },
+            attributes: {
+                in: ["query"],
+                optional: true,
             }
         }
     },
@@ -84,6 +87,10 @@ route(router, {
 
         if (req.query.offset) {
             options.offset = +req.query.offset
+        }
+
+        if (req.query.attributes) {
+            options.attributes = String(req.query.attributes).split(",")
         }
 
         res.json(await Model.findAll(options))
