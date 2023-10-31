@@ -46,6 +46,18 @@ route(router, {
                         min: 1
                     }
                 }
+            },
+            offset: {
+                in: ["query"],
+                optional: true,
+                toInt: true,
+                isInt: {
+                    errorMessage: "'offset' must be an integer",
+                    options: {
+                        min: 0
+                    }
+                }
+            },
             }
         }
     },
@@ -68,6 +80,10 @@ route(router, {
 
         if (req.query.limit) {
             options.limit = +req.query.limit
+        }
+
+        if (req.query.offset) {
+            options.offset = +req.query.offset
         }
 
         res.json(await Model.findAll(options))
