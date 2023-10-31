@@ -13,7 +13,7 @@ export function getSeriesById(options: Options, seriesId: string) {
 export function getSeriesPlotOptionsById(options: Options, seriesId: string) {
     const series = getSeriesById(options, seriesId);
     const seriesType = series.type ?? options.chart?.type ?? "spline"
-    return options.plotOptions![seriesType] || {}
+    return options.plotOptions?.[seriesType] || {}
 }
 
 export function getSeriesUpdater<T extends SeriesOptions>(options: Options, onChange: (o: Partial<Options>) => void, seriesId: string) {
@@ -28,8 +28,7 @@ export function getSeriesPlotOptionsUpdater<T extends SeriesOptions>(options: Op
     return (patch: Partial<T>) => {
         const series = getSeriesById(options, seriesId);
         const seriesType = series.type ?? options.chart?.type ?? "spline"
-        options.plotOptions![seriesType] = merge(options.plotOptions![seriesType], patch) as T
-        onChange(options)
+        onChange(merge(options, { plotOptions: { [seriesType]: patch }}))
     }
 }
 
