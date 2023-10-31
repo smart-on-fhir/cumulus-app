@@ -30,6 +30,8 @@ export default function ViewsBrowser({
 
     const query = new URLSearchParams()
 
+    query.set("attributes", "id,name,description,updatedAt,screenShot")
+
     switch (sort) {
         case "mod-asc":
             query.set("order", "updatedAt:asc");
