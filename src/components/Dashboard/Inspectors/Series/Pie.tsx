@@ -86,6 +86,15 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
             onChange: (dashStyle: DashStyleValue) => onSeriesChange({ dashStyle })
         },
         {
+            name : "Size",
+            type : "length",
+            units: ["%", "px"],
+            value: series.size ?? seriesTypeOptions.size ?? undefined,
+            min  : 0,
+            max  : 100,
+            onChange: (size: string) => onSeriesChange({ size })
+        },
+        {
             name : "Inner Size",
             type : "length",
             units: ["%", "px"],

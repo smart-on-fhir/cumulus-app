@@ -686,10 +686,19 @@ function getPieOptions(options: any, onChange: (options: any) => void, has3d = f
             onChange: (opacity: number) => onChange({ opacity })
         },
         {
+            name : "Size",
+            type : "length",
+            units: ["%", "px"],
+            value: options.size ?? undefined,
+            min  : 0,
+            max  : 100,
+            onChange: (size: string) => onChange({ size })
+        },
+        {
             name : "Inner Size",
             type : "length",
             units: ["%", "px"],
-            value: options.innerSize ?? "50%",
+            value: options.innerSize ?? "0%",
             min  : 0,
             max  : 100,
             onChange: (innerSize: string) => onChange({ innerSize })
