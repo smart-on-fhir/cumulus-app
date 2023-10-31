@@ -16,7 +16,8 @@ const options: Options = {
     plotOptions: {
         pie: {
             innerSize: 0,
-            slicedOffset: 30
+            slicedOffset: 30,
+            center: ["50%", "50%"]
         }
     },
     xAxis: {
