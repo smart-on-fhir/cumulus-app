@@ -1,9 +1,10 @@
-import { Sequelize }               from "sequelize"
-import { Umzug, SequelizeStorage } from "umzug"
-import { Config }                  from "../types"
-import { getDockerContainer }      from "./Docker"
-import { logger }                  from "../logger"
-import { attachHooks, init as initModels }      from "./models"
+import { Sequelize }                       from "sequelize"
+import { Umzug, SequelizeStorage }         from "umzug"
+import { Config }                          from "../types"
+import { getDockerContainer }              from "./Docker"
+import { logger }                          from "../logger"
+import { attachHooks, init as initModels } from "./models"
+import { seedTable }                       from "./seeds/lib"
 
 
 let connection: Sequelize;
@@ -116,7 +117,7 @@ async function applySeeds(options: Config, dbConnection: Sequelize)
         if (count > 0) {
             logger.verbose("- Seeding the database SKIPPED because the users table is not empty");
         } else {
-            const seed = require(seedPath);
+            const { seed } = require(seedPath);
             try {
                 await seed(dbConnection);
             } catch (error) {
