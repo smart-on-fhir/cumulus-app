@@ -82,6 +82,7 @@ interface CurrentUser {
     id   : number
     email: string
     role : Role
+    permissions: Record<string, boolean>
     [key : string]: any
 }
 

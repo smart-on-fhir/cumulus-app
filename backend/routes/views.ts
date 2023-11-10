@@ -452,7 +452,7 @@ route(router, {
     method: "post",
     path  : "/:id/request-linelevel-data",
     async handler(req, res) {
-        requestPermission(req.user?.role || "guest", "DataRequests.requestLineLevelData")
+        requestPermission({ user: req.user, resource: "Subscription", action: "requestLineLevelData" })
         requestLineLevelData(req.body).then(
             () => res.end(),
             (e: any) => {
