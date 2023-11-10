@@ -40,5 +40,6 @@
 .tabs-content {
     background: linear-gradient(#FFF, #FFF8);
     box-shadow: 0 -1px 0 0 #CCC inset, -1px 0 0 0 #CCC inset, 1px 0 0 0 #CCC inset;
-    height: 100%;
+    // height: 100%;
+    height: -webkit-fill-available;
 }
