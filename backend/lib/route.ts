@@ -3,8 +3,7 @@ import { Router }                                from "express-serve-static-core
 import { checkSchema, Schema, validationResult } from "express-validator"
 import { logger }                                from "../logger"
 import { HttpError, BadRequest }                 from "../errors"
-import { requirePermissionMiddleware }           from "../acl"
-import { AppRequest, AppRequestHandler }                     from "../types"
+import { AppRequest, AppRequestHandler }         from "../types"
 
 
 export function route(router: Router, options: {
@@ -27,18 +26,7 @@ export function route(router: Router, options: {
         express.urlencoded({ extended: true, limit: "5MB" }),
         express.text({ limit: "5MB" })
     )
-
-    // Authentication ------------------------------------------------------
-    if (options.permission) {
-        if (Array.isArray(options.permission)) {
-            options.permission.forEach(permission => {
-                middlewares.push(requirePermissionMiddleware(permission))
-            })
-        } else {
-            middlewares.push(requirePermissionMiddleware(options.permission))
-        }
-    }
-
+    
     // Request validation --------------------------------------------------
     if (options.request?.schema) {
         middlewares.push(
