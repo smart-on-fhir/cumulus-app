@@ -14,7 +14,7 @@ export default [
     { user_id: null, role: "user"   , user_group_id: null, resource: "Subscription Groups", action: "update", resource_id: null, permission: 0, comment: "Can update subscription groups" },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Subscription Groups", action: "delete", resource_id: null, permission: 0, comment: "Can delete subscription groups" },
     
-    // s
+    // Graphs
     { user_id: null, role: "admin"  , user_group_id: null, resource: "Graphs", action: "read"  , resource_id: null, permission: 1, comment: "Can read graphs"   },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "Graphs", action: "create", resource_id: null, permission: 1, comment: "Can create graphs" },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "Graphs", action: "update", resource_id: null, permission: 1, comment: "Can update graphs" },
@@ -41,14 +41,14 @@ export default [
     { user_id: null, role: "manager", user_group_id: null, resource: "Subscriptions", action: "update"               , resource_id: null, permission: 1, comment: "Can update subscriptions"                       },
     { user_id: null, role: "manager", user_group_id: null, resource: "Subscriptions", action: "delete"               , resource_id: null, permission: 1, comment: "Can delete subscriptions"                       },
     { user_id: null, role: "manager", user_group_id: null, resource: "Subscriptions", action: "export"               , resource_id: null, permission: 1, comment: "Can export subscriptions data"                  },
-    { user_id: null, role: "manager", user_group_id: null, resource: "Subscriptions", action: "refresh"              , resource_id: null, permission: 1, comment: "Can refresh subscriptions data"                 },
+    { user_id: null, role: "manager", user_group_id: null, resource: "Subscriptions", action: "refresh"              , resource_id: null, permission: 0, comment: "Can refresh subscriptions data"                 },
     { user_id: null, role: "manager", user_group_id: null, resource: "Subscriptions", action: "requestLineLevelData" , resource_id: null, permission: 1, comment: "Can request line-level data from subscriptions" },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Subscriptions", action: "read"                 , resource_id: null, permission: 1, comment: "Can read subscriptions"                         },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Subscriptions", action: "create"               , resource_id: null, permission: 0, comment: "Can create subscriptions"                       },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Subscriptions", action: "update"               , resource_id: null, permission: 0, comment: "Can update subscriptions"                       },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Subscriptions", action: "delete"               , resource_id: null, permission: 0, comment: "Can delete subscriptions"                       },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Subscriptions", action: "export"               , resource_id: null, permission: 1, comment: "Can export subscriptions data"                  },
-    { user_id: null, role: "user"   , user_group_id: null, resource: "Subscriptions", action: "refresh"              , resource_id: null, permission: 1, comment: "Can refresh subscriptions data"                 },
+    { user_id: null, role: "user"   , user_group_id: null, resource: "Subscriptions", action: "refresh"              , resource_id: null, permission: 0, comment: "Can refresh subscriptions data"                 },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Subscriptions", action: "requestLineLevelData" , resource_id: null, permission: 1, comment: "Can request line-level data from subscriptions" },
     
     // DataSites
