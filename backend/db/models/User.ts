@@ -10,6 +10,10 @@ import {
     InferCreationAttributes,
     Sequelize
 } from "sequelize"
+import Permission from "./Permission"
+import { Op } from "sequelize"
+import { CurrentUser } from "../../types"
+import { buildPermissionId } from "../../lib"
 
 
 function validatePassword(pass: string|null) {
@@ -48,12 +52,38 @@ export default class User extends BaseModel<InferAttributes<User>, InferCreation
     declare createdAt     : CreationOptional<Date>;
     declare updatedAt     : CreationOptional<Date>;
 
+    private _permissions: Record<string, boolean> | Promise<Record<string, boolean>> = null!;
+
     toString() {
         return `User "${this.email}"`
     }
 
     isOwnedBy(user: User) {
         return user && user.id && user.id === this.id
+    }
+
+    public async getPermissions() {
+        if (!this._permissions) {
+            this._permissions = Permission.findAll({
+                where: {
+                    [Op.or]: [
+                        { role   : this.role, user_id: null }, // ("role" = ? AND "user_id" IS NULL)
+                        { user_id: this.id  , role   : null }, // ("user_id" = ? AND "role" IS NULL)
+                        // TODO: Figure out user groups
+                    ]
+                },
+                user: { role: "system" } as CurrentUser
+            }).then(rows => {
+                const out: Record<string, boolean> = {}
+                rows.forEach(row => {
+                    out[buildPermissionId(row)] = row.permission
+                })
+                return out;
+            })
+
+            return await this._permissions
+        }
+        return this._permissions
     }
 
     static initialize(sequelize: Sequelize) {
