@@ -15,7 +15,6 @@ import ViewModel                                                  from "../db/mo
 import ColumnsMetadata                                            from "../cumulus_library_columns.json"
 import { logger }                                                 from "../logger"
 import ImportJob                                                  from "../DataManager/ImportJob"
-import { requireAuth }                                            from "./Auth"
 import { getFindOptions, assert, rw, parseDelimitedString, uInt } from "../lib"
 import { version as pkgVersion }                                  from "../../package.json"
 
@@ -177,7 +176,7 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
 }));
 
 // Refresh Data endpoint ------------------------------------------------------
-router.get("/:id/refresh", requireAuth("admin"), rw(async (req: AppRequest, res: Response) => {
+router.get("/:id/refresh", rw(async (req: AppRequest, res: Response) => {
     const model = await Model.findByPk(req.params.id, { ...getFindOptions(req), user: req.user })
     assert(model, "Model not found", NotFound)
     const data = await fetchData(model)

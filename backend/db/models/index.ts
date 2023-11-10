@@ -17,21 +17,9 @@ export function attachHooks(connection: Sequelize) {
         model.requestPermissionToUpdate(options)
     })
 
-    // Log updates -------------------------------------------------------------
-    connection.addHook("afterUpdate", function(model: BaseModel, options) {
-        const role = options.user?.role || "guest"
-        logger.info(`${model} updated by ${connection.user?.email || role}`, { tags: ["ACTIVITY"] })
-    })
-
     // Request permission to create --------------------------------------------
     connection.addHook("beforeCreate", function(model: BaseModel, options) {
         model.requestPermissionToCreate(options)
-    })
-
-    // Log inserts -------------------------------------------------------------
-    connection.addHook("afterCreate", function(model: BaseModel, options) {
-        const role = options.user?.role || "guest"
-        logger.info(`${model} created by ${connection.user?.email || role}`, { tags: ["ACTIVITY"] })
     })
 
     // Request permission to read one record -----------------------------------
@@ -57,6 +45,16 @@ export function attachHooks(connection: Sequelize) {
     connection.addHook('beforeDestroy', function(model: BaseModel, options) {
         model.requestPermissionToDelete(options)
     });
+
+    // Log inserts -------------------------------------------------------------
+    connection.addHook("afterCreate", function(model: BaseModel, options) {
+        logger.info(`${model} created by ${connection.user?.email || options.user?.role || "guest"}`, { tags: ["ACTIVITY"] })
+    })
+
+    // Log updates -------------------------------------------------------------
+    connection.addHook("afterUpdate", function(model: BaseModel, options) {
+        logger.info(`${model} updated by ${connection.user?.email || options.user?.role || "guest"}`, { tags: ["ACTIVITY"] })
+    })
 
     // Log deletes -------------------------------------------------------------
     connection.addHook("afterDestroy", function(model: BaseModel, options) {
