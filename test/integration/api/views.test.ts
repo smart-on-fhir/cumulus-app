@@ -11,16 +11,16 @@ describe("Graphs", () => {
     })
 
     describe("list", () => {
-        testEndpoint("Views.read", "GET", "/api/views?order=name:asc")
+        testEndpoint("Graphs.read", "GET", "/api/views?order=name:asc")
     })
 
     describe("view", () => {
-        testEndpoint("Views.read", "GET", "/api/views/1?tags=true")
+        testEndpoint("Graphs.read", "GET", "/api/views/1?tags=true")
     })
 
     describe("create", () => {
         testEndpoint(
-            "Views.create",
+            "Graphs.create",
             "POST",
             "/api/views",
             {
@@ -35,7 +35,7 @@ describe("Graphs", () => {
 
     describe("update", () => {
         testEndpoint(
-            "Views.update",
+            "Graphs.update",
             "PUT",
             "/api/views/1",
             {
@@ -49,6 +49,6 @@ describe("Graphs", () => {
     })
 
     describe("delete", () => {
-        testEndpoint("Views.delete", "DELETE", "/api/views/1")
+        testEndpoint("Graphs.delete", "DELETE", "/api/views/1")
     })
 });

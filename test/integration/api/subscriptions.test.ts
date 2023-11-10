@@ -1,5 +1,4 @@
 import { expect }                from "chai"
-import { getPermissionsForRole } from "../../../backend/acl"
 import setupDB                   from "../../../backend/db"
 import config                    from "../../../backend/config"
 import DataRequests              from "../../fixtures/DataRequests"
@@ -7,6 +6,7 @@ import Tags                      from "../../fixtures/Tags"
 import {
     getCookie,
     resetTable,
+    getPermissionsForRole,
     server,
     testEndpoint
 } from "../../test-lib"
@@ -34,16 +34,16 @@ describe("Subscriptions", () => {
     })
 
     describe("list", () => {
-        testEndpoint("DataRequests.read", "GET", "/api/requests")
+        testEndpoint("Subscriptions.read", "GET", "/api/requests")
     })
 
     describe("view", () => {
-        testEndpoint("DataRequests.read", "GET", "/api/requests/1?group=true&tags=true&graphs=true")
+        testEndpoint("Subscriptions.read", "GET", "/api/requests/1?group=true&tags=true&graphs=true")
     })
 
     describe("create", () => {
         testEndpoint(
-            "DataRequests.create",
+            "Subscriptions.create",
             "POST",
             "/api/requests",
             {
@@ -56,7 +56,7 @@ describe("Subscriptions", () => {
 
     describe("update", () => {
         testEndpoint(
-            "DataRequests.update",
+            "Subscriptions.update",
             "PUT",
             "/api/requests/1",
             {
@@ -68,12 +68,12 @@ describe("Subscriptions", () => {
     })
 
     describe("delete", () => {
-        testEndpoint("DataRequests.delete", "DELETE", "/api/requests/1")
+        testEndpoint("Subscriptions.delete", "DELETE", "/api/requests/1")
     })
 
     describe("by-group", () => {
         ["guest", "user", "manager", "admin"].forEach(role => {
-            const permissions = getPermissionsForRole(role as any);
+            const permissions = getPermissionsForRole(role);
     
             const options: RequestInit = { method: "GET" }
             const headers: Record<string, any> = {};
@@ -83,7 +83,7 @@ describe("Subscriptions", () => {
             }
             options.headers = headers
     
-            if (permissions.includes("DataRequests.read")) {
+            if (permissions.includes("Subscriptions.read")) {
                 it (`${role} can read subscriptions by group`, async () => {
                     const res = await fetch(`${server.baseUrl}/api/requests/by-group?requestLimit=2`, options);
                     expect(res.status).to.equal(200)
@@ -99,7 +99,7 @@ describe("Subscriptions", () => {
 
     describe("get subscription graphs", () => {
         ["guest", "user", "manager", "admin"].forEach(role => {
-            const permissions = getPermissionsForRole(role as any);
+            const permissions = getPermissionsForRole(role);
     
             const options: RequestInit = { method: "GET" }
             const headers: Record<string, any> = {};
@@ -109,7 +109,7 @@ describe("Subscriptions", () => {
             }
             options.headers = headers
     
-            if (permissions.includes("DataRequests.read") && permissions.includes("Views.read")) {
+            if (permissions.includes("Subscriptions.read") && permissions.includes("Graphs.read")) {
                 it (`${role} can read subscription graphs`, async () => {
                     const res = await fetch(`${server.baseUrl}/api/requests/1/views`, options);
                     expect(res.status).to.equal(200)
@@ -125,7 +125,7 @@ describe("Subscriptions", () => {
 
     describe("export subscription data", () => {
         ["guest", "user", "manager", "admin"].forEach(role => {
-            const permissions = getPermissionsForRole(role as any);
+            const permissions = getPermissionsForRole(role);
     
             const options: RequestInit = { method: "GET" }
             const headers: Record<string, any> = {};
@@ -135,7 +135,7 @@ describe("Subscriptions", () => {
             }
             options.headers = headers
     
-            if (permissions.includes("DataRequests.export")) {
+            if (permissions.includes("Subscriptions.export")) {
                 it (`${role} can export subscription data`, async () => {
                     const res = await fetch(`${server.baseUrl}/api/requests/1/data?inline=true`, options);
                     expect(res.status).to.equal(200)
@@ -151,7 +151,7 @@ describe("Subscriptions", () => {
 
     describe.skip("refresh subscription data", () => {
         ["guest", "user", "manager", "admin"].forEach(role => {
-            const permissions = getPermissionsForRole(role as any);
+            const permissions = getPermissionsForRole(role);
     
             const options: RequestInit = { method: "GET" }
             const headers: Record<string, any> = {};
@@ -161,9 +161,9 @@ describe("Subscriptions", () => {
             }
             options.headers = headers
     
-            if (permissions.includes("DataRequests.refresh")) {
+            if (permissions.includes("Subscriptions.refresh")) {
                 it (`${role} can refresh subscription data`, async () => {
-                    const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, options);
+                    const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, options)
                     expect(res.status).to.equal(200)
                 })
             } else {

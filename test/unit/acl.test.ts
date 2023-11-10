@@ -1,46 +1,35 @@
-import { expect }                           from "chai"
-// import { ACL, roles }                       from "../../backend/acl"
-// import { hasPermission, requestPermission } from "../../backend/controllers/Auth"
+import { expect } from "chai"
+import User       from "../../backend/db/models/User";
 
 
-// type Action = keyof typeof ACL
-// type Role   = keyof typeof roles
+describe("Permissions", () => {
+    it ("User.getPermissions", async () => {
+        const user = await User.findByPk(5, { user: { role: "system" }})
+        const permissions = await user.getPermissions()
 
+        // Explicit permissions --------------------------------------------
 
-describe("ACL", () => {
+        // Graph#1 has been shared with User#3
+        expect(permissions["Graphs#1.read"]).to.equal(true)
+        expect(permissions["Graphs#1.update"]).to.equal(true)
+        expect(permissions["Graphs#1.delete"]).to.equal(true)
 
-    // const actions = Object.keys(ACL);
+        // User#3 can read any Graph
+        expect(permissions["Graphs.read"]).to.equal(true)
 
-    // it ("hasPermission rejects unknown action", () => {
-    //     expect(hasPermission("x" as Action, Object.keys(roles)[0] as Role)).to.equal(false)
-    // })
+        // Dynamic permissions ---------------------------------------------
+        // TODO: Users can edit themselves
 
-    // it ("hasPermission rejects unknown role", () => {
-    //     expect(hasPermission(actions[0] as Action, "bad-role" as Role)).to.equal(false)
-    // })
-
-    // actions.forEach(action => {
-    //     for (const role in roles) {
-    //         const allowed = !!ACL[action as Action][roles[role as Role]];
-    //         it (`${allowed ? "Allows" : "Does NOT allow"} "${role}" to perform "${action}" action`, () => {
-    //             expect(hasPermission(action as Action, role as Role)).to.equal(allowed)
-
-    //             const check = () => {
-    //                 requestPermission(
-    //                     action as Action,
-    //                     // @ts-ignore
-    //                     role === "guest" ? {} : { user: { role } },
-    //                     role === "owner"
-    //                 );
-    //             };
-
-    //             if (allowed) {
-    //                 expect(check).not.to.throw
-    //             }
-    //             else {
-    //                 expect(check).to.throw(/Permission denied/)
-    //             }
-    //         })
-    //     }
-    // })
+        // Role permissions ------------------------------------------------
+        expect(permissions["SubscriptionGroups.read"]).to.equal(true)
+        expect(permissions["Subscriptions.read"]).to.equal(true)
+        expect(permissions["Subscriptions.refresh"]).to.equal(true)
+        expect(permissions["Subscriptions.requestLineLevelData"]).to.equal(true)
+        expect(permissions["DataSites.read"]).to.equal(true)
+        expect(permissions["StudyAreas.read"]).to.equal(true)
+        expect(permissions["Tags.read"]).to.equal(true)
+        expect(permissions["SubscriptionTags.read"]).to.equal(true)
+        expect(permissions["GraphTags.read"]).to.equal(true)
+        expect(permissions["StudyAreaSubscriptions.read"]).to.equal(true)
+    })
 })

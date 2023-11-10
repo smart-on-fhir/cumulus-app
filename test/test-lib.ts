@@ -1,13 +1,12 @@
-import { Server as HTTPServer }  from "http"
-import { Express }               from "express-serve-static-core"
-import { expect }                from "chai"
-import main                      from "../backend/index"
-import Users                     from "./fixtures/Users"
-import { fixAutoIncrement }      from "../backend/lib"
-import { getPermissionsForRole } from "../backend/acl"
-import setupDB                   from "../backend/db"
-import config                    from "../backend/config"
-
+import { Server as HTTPServer }                from "http"
+import { Express }                             from "express-serve-static-core"
+import { expect }                              from "chai"
+import main                                    from "../backend/index"
+import Users                                   from "./fixtures/Users"
+import Permissions                             from "./fixtures/Permissions"
+import { buildPermissionId, fixAutoIncrement } from "../backend/lib"
+import setupDB                                 from "../backend/db"
+import config                                  from "../backend/config"
 
 
 export const admin = Users.find(u => u.role === "admin")!
@@ -22,6 +21,27 @@ export const activatedUser = Users.find(u => u.name === "Recently activated user
 
 export const expiredUser = Users.find(u => u.name === "Expired user")!
 
+export function getPermissionsForUser({ role, id }: any) {
+    return Permissions.filter(x => {
+        return x.permission && (
+            (x.user_id === id && x.role === null) ||
+            (x.user_id === null && x.role === role)
+        )
+    }).map(buildPermissionId)
+}
+
+export function getPermissionsForRole(role: string) {
+    switch (role) {
+        case "admin":
+            return getPermissionsForUser(admin)
+        case "manager":
+            return getPermissionsForUser(manager)
+        case "user":
+            return getPermissionsForUser(user)
+        default:
+            return getPermissionsForUser({ id: -1, role: "guest" })
+    }
+}
 
 class Server {
 
@@ -113,7 +133,7 @@ export async function resetTable(modelName: string, data: Record<string, any>[])
 
 export function testEndpoint(permission: string, method: "GET" | "PUT" | "POST" | "DELETE", uri: string, payload?: any) {
     ["guest", "user", "manager", "admin"].forEach(role => {
-        const permissions = getPermissionsForRole(role as any);
+        const permissions = getPermissionsForRole(role);
 
         const options: RequestInit = { method }
         const headers: Record<string, any> = {};
