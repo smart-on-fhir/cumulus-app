@@ -27,6 +27,10 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
 
     declare setTags: HasManySetAssociationsMixin<Tag, number>;
 
+    getPublicName() {
+        return "Graphs"
+    }
+
     static initialize(sequelize: Sequelize) {
         View.init({
             id: {

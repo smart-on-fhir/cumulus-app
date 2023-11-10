@@ -34,6 +34,10 @@ export default class Project extends BaseModel<InferAttributes<Project>, InferCr
         return user && user.id && user.id === this.creatorId;
     }
 
+    getPublicName() {
+        return "StudyAreas"
+    }
+
     static initialize(sequelize: Sequelize) {
         Project.init({
             id: {
