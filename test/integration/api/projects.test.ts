@@ -1,5 +1,4 @@
 import { expect }                from "chai"
-import { getPermissionsForRole } from "../../../backend/acl";
 import Projects                  from "../../fixtures/Projects"
 import Subscriptions             from "../../fixtures/DataRequests"
 import {
@@ -7,7 +6,8 @@ import {
     resetTable,
     admin,
     testEndpoint,
-    getCookie
+    getCookie,
+    getPermissionsForRole
 } from "../../test-lib"
 
 
@@ -17,7 +17,7 @@ describe("Projects", () => {
     
     describe("list (GET /api/projects)", () => {
 
-        testEndpoint("Projects.read", "GET", "/api/projects")
+        testEndpoint("StudyAreas.read", "GET", "/api/projects")
         
         // it ("handles bad parameter errors", async () => {
         //     const res = await fetch(`${server.baseUrl}/api/projects?order=x`, { headers: { Cookie: "sid=" + admin.sid }})
@@ -27,7 +27,7 @@ describe("Projects", () => {
 
     describe("view (GET /api/projects/:id)", () => {
         
-        testEndpoint("Projects.read", "GET", "/api/projects/1")
+        testEndpoint("StudyAreas.read", "GET", "/api/projects/1")
 
         it ("handles bad parameter errors", async () => {
             const res1 = await fetch(`${server.baseUrl}/api/projects/100`, { headers: { Cookie: "sid=" + admin.sid }})
@@ -40,7 +40,7 @@ describe("Projects", () => {
 
     describe("create (POST /api/projects)", () => {
 
-        testEndpoint("Projects.create", "POST", "/api/projects", { name: "Project name", description: "Project description" });
+        testEndpoint("StudyAreas.create", "POST", "/api/projects", { name: "Project name", description: "Project description" });
         // testEndpoint("Projects.create", "POST", "/api/projects", { name: "Project name", description: "Project description", Subscriptions });
 
         ["guest", "user", "manager", "admin"].forEach(role => {
@@ -87,7 +87,7 @@ describe("Projects", () => {
     
     describe("update (PUT /api/projects/:id)", () => {
 
-        testEndpoint("Projects.update", "PUT", "/api/projects/1", { name: "Project name 2", description: "Project description 2" });
+        testEndpoint("StudyAreas.update", "PUT", "/api/projects/1", { name: "Project name 2", description: "Project description 2" });
 
         ["guest", "user", "manager", "admin"].forEach(role => {
             const permissions = getPermissionsForRole(role as any);
@@ -134,7 +134,7 @@ describe("Projects", () => {
     
     describe("delete (DELETE /api/projects/:id)", () => {
         
-        testEndpoint("Projects.delete", "DELETE", "/api/projects/1")
+        testEndpoint("StudyAreas.delete", "DELETE", "/api/projects/1")
 
         it ("handles bad parameter errors", async () => {
             const res1 = await fetch(`${server.baseUrl}/api/projects/10`, { method: "DELETE", headers: { Cookie: "sid=" + admin.sid }})
