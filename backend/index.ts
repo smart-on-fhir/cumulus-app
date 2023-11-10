@@ -90,7 +90,7 @@ function setUpErrorHandlers(app: Application)
     // Global error 404 handler
     app.use((req, res) => {
         logger.error(`${req.method} ${decodeURIComponent(req.originalUrl)} -> 404 Not Found`)
-        res.sendStatus(404).end("Not Found");
+        res.status(404).end("Not Found");
     });
 
     // Global error 500 handler
