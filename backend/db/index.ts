@@ -4,6 +4,7 @@ import { Config }                          from "../types"
 import { getDockerContainer }              from "./Docker"
 import { logger }                          from "../logger"
 import { attachHooks, init as initModels } from "./models"
+import { join }                            from "path"
 import { seedTable }                       from "./seeds/lib"
 
 
@@ -116,6 +117,21 @@ async function applySeeds(options: Config, dbConnection: Sequelize)
         const count = await dbConnection.models.User.count()
         if (count > 0) {
             logger.verbose("- Seeding the database SKIPPED because the users table is not empty");
+
+            // However, even if the DB is not empty the Permissions table might be
+            const permissionCount =  await dbConnection.models.Permission.count()
+            if (permissionCount === 0) {
+                logger.verbose("- Seeding default permissions...");
+                const path = join(seedPath, "permissions.ts")
+                try {
+                    const data = require(path).default;
+                    await seedTable(dbConnection, "Permission", data)
+                } catch (error) {
+                    logger.error("Applying seeds failed %o", error)
+                    process.exit(1)
+                }
+                logger.verbose(`✔ Applied seeds from ${path.replace(__dirname, "")}`);
+            }
         } else {
             const { seed } = require(seedPath);
             try {
