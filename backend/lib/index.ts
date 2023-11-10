@@ -502,3 +502,26 @@ export function validateRequest(...validations: ValidationChain[]) {
         res.status(400).json({ errors: errors.array() });
     };
 }
+
+export function buildPermissionId({
+    resource,
+    resource_id,
+    attribute,
+    action
+}: {
+    resource     : string
+    action       : string
+    resource_id ?: number | null
+    attribute   ?: string | null
+    [key: string]: any
+}) {
+    let key = resource
+    if (resource_id) {
+        key += "#" + resource_id
+    }
+    if (attribute) {
+        key += "." + attribute
+    }
+    key += "." + action
+    return key
+}
