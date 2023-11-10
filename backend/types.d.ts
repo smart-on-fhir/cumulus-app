@@ -79,7 +79,7 @@ interface Config {
 }
 
 interface CurrentUser {
-    id   : number | string
+    id   : number
     email: string
     role : Role
     [key : string]: any
