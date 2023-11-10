@@ -5,10 +5,11 @@ import DataSites            from "./fixtures/DataSites"
 import Projects             from "./fixtures/Projects"
 import RequestGroups        from "./fixtures/RequestGroups"
 import DataRequests         from "./fixtures/DataRequests"
-import Views                from "./fixtures/Views"        
+import Views                from "./fixtures/Views"
+import Permissions          from "./fixtures/Permissions"
 
 
-module.exports = async function(connection: Sequelize) {
+export async function seed(connection: Sequelize) {
 
     const { models } = connection
 
@@ -29,5 +30,8 @@ module.exports = async function(connection: Sequelize) {
     
     await models.View.bulkCreate(Views);
     await fixAutoIncrement(connection, models.View.tableName, "id");
+
+    await models.Permission.bulkCreate(Permissions);
+    await fixAutoIncrement(connection, models.Permission.tableName, "id");
 
 }
