@@ -20,6 +20,7 @@ export async function seed(connection: Sequelize) {
     await seedTable(connection, "DataRequest" , data_requests )
     await seedTable(connection, "View"        , views         )
     await seedTable(connection, "Tag"         , tags          )
+    await seedTable(connection, "Permission"  , permissions   )
     
     await connection.models.DataRequestsTags.bulkCreate(dataRequestsTags, { ignoreDuplicates: true })
     await connection.models.ViewsTags.bulkCreate(viewsTags, { ignoreDuplicates: true })

@@ -8,6 +8,7 @@ import RequestGroup  from "./RequestGroup"
 import Tag           from "./Tag"
 import User          from "./User"
 import View          from "./View"
+import Permission    from "./Permission"
 
 export function attachHooks(connection: Sequelize) {
 
@@ -71,6 +72,7 @@ export function init(connection: Sequelize) {
     Project.initialize(connection);
     RequestGroup.initialize(connection);
     View.initialize(connection);
+    Permission.initialize(connection);
 
     // The possible choices for onDelete and onUpdate are:
     // RESTRICT, CASCADE, NO ACTION, SET DEFAULT and SET NULL.
