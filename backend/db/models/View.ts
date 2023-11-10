@@ -20,6 +20,7 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
     declare description     : CreationOptional<string | null>;
     declare screenShot      : CreationOptional<string | null>;
     declare settings        : CreationOptional<Record<string, any> | null>;
+    declare creatorId       : CreationOptional<number | null>;
     declare createdAt       : CreationOptional<Date>;
     declare updatedAt       : CreationOptional<Date>;
 
@@ -68,6 +69,8 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
             },
 
             DataRequestId: DataTypes.INTEGER,
+
+            creatorId: DataTypes.INTEGER,
             
             createdAt: DataTypes.DATE,
             updatedAt: DataTypes.DATE

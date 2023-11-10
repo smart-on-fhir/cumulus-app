@@ -11,7 +11,8 @@ import { requestPermission }    from "../acl"
 import {
     NotFound,
     InternalServerError,
-    HttpError
+    HttpError,
+    Unauthorized
 } from "../errors"
 
 
@@ -321,7 +322,8 @@ route(router, {
         }
     },
     async handler(req, res) {
-        const model = await Model.create(req.body, { user: req.user })
+        assert(req.user?.id, "Guest cannot create graphs", Unauthorized)
+        const model = await Model.create({ ...req.body, creatorId: req.user.id }, { user: req.user })
         if (Array.isArray(req.body.Tags)) {
             await model.setTags(req.body.Tags.map(t => t.id), { user: req.user })
             await model.reload({ include: [{ association: "Tags" }], user: req.user })
