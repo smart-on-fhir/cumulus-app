@@ -1,7 +1,7 @@
 import Checkbox from "../Checkbox"
 
 
-interface CheckboxListDataItem {
+export interface CheckboxListDataItem {
     id?: number | string
     name: string
     description?: string | JSX.Element | null
@@ -26,6 +26,7 @@ export default function CheckboxList({
                     name={ item.name }
                     label={ String(item.label || item.name) }
                     description={ item.description || undefined }
+                    disabled={ item.disabled }
                     className="mb-1"
                     key={i}
                 />
