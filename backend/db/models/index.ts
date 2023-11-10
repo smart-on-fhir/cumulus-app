@@ -48,12 +48,12 @@ export function attachHooks(connection: Sequelize) {
 
     // Log inserts -------------------------------------------------------------
     connection.addHook("afterCreate", function(model: BaseModel, options) {
-        logger.info(`${model} created by ${connection.user?.email || options.user?.role || "guest"}`, { tags: ["ACTIVITY"] })
+        logger.info(`${model} created by ${options.user?.email || options.user?.role || "guest"}`, { tags: ["ACTIVITY"] })
     })
 
     // Log updates -------------------------------------------------------------
     connection.addHook("afterUpdate", function(model: BaseModel, options) {
-        logger.info(`${model} updated by ${connection.user?.email || options.user?.role || "guest"}`, { tags: ["ACTIVITY"] })
+        logger.info(`${model} updated by ${options.user?.email || options.user?.role || "guest"}`, { tags: ["ACTIVITY"] })
     })
 
     // Log deletes -------------------------------------------------------------

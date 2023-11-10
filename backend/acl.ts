@@ -1,145 +1,86 @@
-import { NextFunction } from "express";
-import { AppRequest, AppRequestHandler, Role } from "./types";
 import { Forbidden, Unauthorized } from "./errors";
+import { buildPermissionId } from "./lib";
 
 
-type Action = "create" | "read" | "update" | "delete" | "*" | string 
-
-interface Permissions {
-    [action: Action]: boolean | Permissions
-}
-
-interface Acl {
-    [subject: string]: Partial<Record<Role, boolean | Permissions>>
-}
-
-export const ACL: Acl = {
-    RequestGroups: {
-        admin  : { read: true, create: true, update: true, delete: true },
-        manager: { read: true, create: true, update: true, delete: true },
-        user   : { read: true }
-    },
-    Views: {
-        admin  : { read: true, create: true, update: true, delete: true },
-        manager: { read: true, create: true, update: true, delete: true },
-        user   : { read: true, create: true, update: true, delete: true },
-        owner  : { read: true, create: true, update: true, delete: true },
-    },
-    DataRequests: {
-        admin  : { read: true, create: true, update: true, delete: true, export: true, requestLineLevelData: true, refresh: true },
-        manager: { read: true, create: true, update: true, delete: true, export: true, requestLineLevelData: true, refresh: true },
-        user   : { read: true, requestLineLevelData: true, refresh: true }
-    },
-    DataSites: {
-        admin  : { read: true, create: true, update: true, delete: true },
-        manager: { read: true, create: true, update: true },
-        user   : { read: true }
-    },
-    Projects: {
-        admin  : { read: true, create: true, update: true, delete: true },
-        manager: { read: true, create: true, update: true, delete: true },
-        user   : { read: true }
-    },
-    Users: {
-        admin  : { read: true, create: true, update: true, delete: true, invite: true },
-        owner  : { read: true, update: true }
-    },
-    Tags: {
-        admin  : { read: true, create: true, update: true, delete: true },
-        manager: { read: true, create: true, update: true, delete: true },
-        user   : { read: true }
-    },
-    DataRequestsTags: {
-        admin  : { read: true, create: true, update: true, delete: true },
-        manager: { read: true },
-        user   : { read: true }
-    },
-    ViewsTags: {
-        admin  : { read: true, create: true, update: true, delete: true },
-        manager: { read: true, create: true, update: true, delete: true },
-        user   : { read: true }
-    },
-    ProjectsSubscriptions: {
-        admin  : { read: true, create: true, update: true, delete: true },
-        manager: { read: true, create: true, update: true, delete: true },
-        user   : { read: true }
-    },
-    Logs: {
-        admin: { read: true }
-    }
-}
-
-Object.freeze(ACL)
-
-export function getPermissionsForRole(role: "admin"|"manager"|"user"|"guest"): string[] {
-    const permissions: string[] = [];
-    for (const s in ACL) {
-        if (role in ACL[s]) {
-            const x = ACL[s][role]
-            if (x === false) {
-                continue;
-            }
-            else if (x === true) {
-                permissions.push(s);
-            }
-            else {
-                for (const a in x) {
-                    if (x[a]) {
-                        permissions.push(s + "." + a);
-                    }
-                }
-            }
-        }
-    }
-    return permissions;
-}
-
-/**
- * @param role
- * @param path `"subject.action[.path...]"`
- */
-export function requestPermission(role: Role, path: string, isOwner?: boolean)
+export function requestPermission({ user = {}, resource, attribute, action }: {
+    user     ?: { role?: string; id?: number; permissions?: Record<string, boolean>; [key: string]: any; }
+    resource  : any // (string | BaseModel) but can't import BaseModel due to circular dependency
+    action    : string
+    attribute?: string
+})
 {
-    let allowed = hasPermission(role, path)
-    let msg: string;
+    const { role = "guest", id = -1, permissions = {} } = user
+
+    if (role === "system" || role === "owner") return true
+
+    const isOwner      = typeof resource === "string" ? false    : resource.isOwnedBy(user)
+
+    if (isOwner) return true
+
+    const resourceName = typeof resource === "string" ? resource : resource.getPublicName()
+    const resource_id  = typeof resource === "string" ? null     : resource.get("id") as number
+    const tried: string[] = [];
+
+    const msgPrefix = role === "guest" ? "Guest" : `User ${id > 0 ? `#${id} ` : ""}having role of "${role}"`;
     
-    if (!allowed) {
-        msg = `User with role "${role}" has no ${path} permission`;
-        if (role !== "owner" && isOwner) {
-            allowed = hasPermission("owner", path)
-            if (!allowed) {
-                msg = `User with role "${role}|owner" has no ${path} permission`;
-            }
-        }
-    }
-
-    if (!allowed) {
-
+    function throwError(msg?: string) {
+        msg = msg || msgPrefix + ` was rejected the following permission: "${perm}"`;
         const data = {
             message: `Permission denied`,
             tags   : ["AUTH"],
-            reason : `Permission denied for "${role}" to perform "${path}" action!`,
+            reason : msg,
             owner  : isOwner
         };
-
         throw role === "guest" ? new Unauthorized(msg!, data) : new Forbidden(msg!, data);
     }
-}
 
-/**
- * @param role
- * @param path `"subject.action[.path...]"`
- */
-export function hasPermission(role: Role, path: string) {
-    const [ subject, ...rest ] = path.split(".");
-    return [ role, ...rest  ].reduce((prev: any, cur) => {
-        return prev && prev !== true ? prev[cur] : prev
-    }, ACL[subject as keyof typeof ACL]) === true
-}
-
-export function requirePermissionMiddleware(permission: string, isOwner?: (req: AppRequest) => boolean): AppRequestHandler {
-    return (req: AppRequest, res: any, next: NextFunction) => {
-        requestPermission(req.user?.role || "guest", permission, isOwner && isOwner(req)) 
-        next()
+    // Resource#id.attribute.action --------------------------------------------
+    if (resource_id && attribute) {
+        const perm = buildPermissionId({ resource: resourceName, action, attribute, resource_id })
+        if (permissions[perm] === false) {
+            throwError()
+        }
+        else if (permissions[perm] === true) {
+            return true
+        }
+        tried.push(perm)
     }
+
+    // Resource#id.action ------------------------------------------------------
+    if (resource_id) {
+        const perm = buildPermissionId({ resource: resourceName, action, resource_id })
+        if (permissions[perm] === false) {
+            throwError()
+        }
+        else if (permissions[perm] === true) {
+            return true
+        }
+        tried.push(perm)
+    }
+
+    // Resource.attribute.action -----------------------------------------------
+    if (attribute) {
+        const perm = buildPermissionId({ resource: resourceName, action, attribute })
+        if (permissions[perm] === false) {
+            throwError()
+        }
+        else if (permissions[perm] === true) {
+            return true
+        }
+        tried.push(perm)
+    }
+
+    // Resource.action ---------------------------------------------------------
+    const perm = buildPermissionId({ resource: resourceName, action });
+    if (permissions[perm] === false) {
+        throwError()
+    }
+    else if (permissions[perm] === true) {
+        return true
+    }
+    tried.push(perm)
+
+
+    // No permissions found ----------------------------------------------------
+    throwError(`${msgPrefix} needs at least one of the following permissions: "${tried.join('", "')}".`);
 }

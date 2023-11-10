@@ -52,7 +52,7 @@ route(router, {
         }
     },
     async handler(req: AppRequest, res: Response, next: NextFunction) {
-        requestPermission(req.user?.role || "guest", "Logs.read")
+        requestPermission({ user: req.user, resource: "Logs", action: "read" })
     
         const levels = String(req.query.levels || "").trim().split(/\s*,\s*/).filter(Boolean);
 

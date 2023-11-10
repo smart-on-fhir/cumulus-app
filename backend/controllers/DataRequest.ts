@@ -96,7 +96,7 @@ const filtersWithoutParams = [
 
 // Views -----------------------------------------------------------------------
 router.get("/:id/views", rw(async (req: AppRequest, res: Response) => {
-    requestPermission(req.user?.role || "guest", "Views.read")
+    requestPermission({ user: req.user as any, resource: "Graphs", action: "read" })
     const options = getFindOptions(req);
     options.where = { DataRequestId: +req.params.id };
     const views = await ViewModel.findAll({ ...options, user: req.user });
@@ -105,7 +105,7 @@ router.get("/:id/views", rw(async (req: AppRequest, res: Response) => {
 
 // Export Data endpoint --------------------------------------------------------
 router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
-    requestPermission(req.user?.role || "guest", "DataRequests.export")
+    requestPermission({ user: req.user, resource: "Subscriptions", action: "export" })
     const model = await Model.findByPk(req.params.id, { ...getFindOptions(req), user: req.user })
     assert(model, "Model not found", NotFound)
     assert(model.metadata, "Subscription data not found", NotFound)

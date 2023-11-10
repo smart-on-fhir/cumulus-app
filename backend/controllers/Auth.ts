@@ -6,7 +6,6 @@ import User                                         from "../db/models/User"
 import { wait }                                     from "../lib"
 import { logger }                                   from "../logger"
 import { BadRequest, Forbidden, Unauthorized }      from "../errors"
-import { getPermissionsForRole }                    from "../acl"
 import { app }                                      from "../.."
 import { AppRequest, Role }                         from "../types"
 import SystemUser                                   from "../SystemUser"
@@ -34,8 +33,9 @@ export function authenticate(dbConnection: Sequelize) {
                 // @ts-ignore
                 const user = await User.findOne({ where: { sid }, user: { role: "system" } });
                 if (user) {
-                    (req as AppRequest).user = user.toJSON()   
-                    dbConnection.user = user; 
+                    const currentUser = user.toJSON() as any;
+                    currentUser.permissions = await user.getPermissions();
+                    (req as AppRequest).user = currentUser
                 }
             } catch (ex) {
                 logger.error(ex, { tags: ["AUTH"] });
@@ -91,6 +91,9 @@ async function login(req: Request, res: Response) {
             throw new BadRequest("Invalid email or password", { reason: "Invalid password" });
         }
 
+        // Collect what this user will be allowed to do
+        const permissions = await user.getPermissions()
+
         // Generate SID and update the user in DB
         const sid = Crypto.randomBytes(32).toString("hex");
         
@@ -114,7 +117,7 @@ async function login(req: Request, res: Response) {
             email: user.get("email"),
             role : user.get("role"),
             remember,
-            permissions: getPermissionsForRole(user.get("role"))
+            permissions: Object.keys(permissions).filter(k => !!permissions[k])
         });
 
     } catch (ex) {

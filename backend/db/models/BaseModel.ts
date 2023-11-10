@@ -27,16 +27,25 @@ export default abstract class BaseModel<
         const role = options?.user?.role || "guest"
         if (role !== "system") {
             const attributes = this.get();
-            Object.keys(attributes).forEach(attr => {
-                requestPermission(role, `${(this.constructor as typeof BaseModel).tableName}.read.${attr}`, this.isOwnedBy(options?.user))
-            })
+            for (const attr of Object.keys(attributes)) {
+                requestPermission({
+                    user: options?.user as any,
+                    resource: this,
+                    action: "read",
+                    attribute: attr
+                })
+            }
         }
     }
 
     requestPermissionToCreate(options?: CreateOptions) {
         const role = options?.user?.role || "guest"
         if (role !== "system") {
-            requestPermission(role, `${(this.constructor as typeof BaseModel).tableName}.create`)
+            requestPermission({
+                user: options?.user as any,
+                resource: this.getPublicName(),
+                action: "create"
+            })
         }
     }
 
@@ -45,11 +54,20 @@ export default abstract class BaseModel<
         if (role !== "system") {
             const changed = this.changed()
             if (changed) {
-                changed.forEach((column) => {
-                    requestPermission(role, `${(this.constructor as typeof BaseModel).tableName}.update.${column}`, this.isOwnedBy(options?.user))
-                })
+                for (const attribute of changed) {
+                    requestPermission({
+                        user: options?.user as any,
+                        resource: this,
+                        action: "update",
+                        attribute
+                    })
+                }
             } else {
-                requestPermission(role, `${(this.constructor as typeof BaseModel).tableName}.update`, this.isOwnedBy(options?.user))
+                requestPermission({
+                    user: options?.user as any,
+                    resource: this,
+                    action: "update"
+                })
             }
         }
     }
@@ -57,7 +75,11 @@ export default abstract class BaseModel<
     requestPermissionToDelete(options?: InstanceDestroyOptions) {
         const role = options?.user?.role || "guest"
         if (role !== "system") {
-            requestPermission(role, `${(this.constructor as typeof BaseModel).tableName}.delete`, this.isOwnedBy(options?.user))
+            requestPermission({
+                user: options?.user as any,
+                resource: this,
+                action: "delete"
+            })
         }
     }
 
