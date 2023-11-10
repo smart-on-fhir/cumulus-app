@@ -16,6 +16,10 @@ export default class RequestGroup extends BaseModel<InferAttributes<RequestGroup
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 
+    getPublicName() {
+        return "SubscriptionGroups"
+    }
+
     static initialize(sequelize: Sequelize) {
         RequestGroup.init({
             id: {
