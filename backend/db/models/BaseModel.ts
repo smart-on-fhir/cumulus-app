@@ -15,6 +15,10 @@ export default abstract class BaseModel<
         throw new Error(`Model ${this.name} did not implement the initialize method`)
     }
 
+    public getPublicName() {
+        return (this.constructor as typeof BaseModel).tableName
+    }
+
     public isOwnedBy(user: any): boolean {
         return false
     }

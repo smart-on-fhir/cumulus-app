@@ -33,6 +33,10 @@ export default class DataRequest extends BaseModel<InferAttributes<DataRequest>,
 
     declare setTags: HasManySetAssociationsMixin<Tag, number>;
 
+    getPublicName() {
+        return "Subscriptions"
+    }
+
     static initialize(sequelize: Sequelize) {
         DataRequest.init({
             id: {
