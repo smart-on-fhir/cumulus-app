@@ -255,7 +255,7 @@ route(router, {
 
             await model.update(req.body, { transaction, user: req.user })
             if (Array.isArray(req.body.Tags)) {
-                await model.setTags(req.body.Tags.map((t: any) => t.id), { user: req.user })
+                await model.setTags(req.body.Tags.map((t: any) => t.id), { transaction, user: req.user })
             }
             await transaction.commit()
             res.json(model)
