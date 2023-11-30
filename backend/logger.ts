@@ -115,7 +115,7 @@ export const logger = createLogger({
             )
         })
     ],
-    // exitOnError: false,
+    exitOnError: false,
     silent: false,
     defaultMeta: {}
 })
