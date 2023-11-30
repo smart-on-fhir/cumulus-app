@@ -10,6 +10,7 @@ import {
 } from "sequelize"
 import { app } from "../../..";
 import Tag from "./Tag";
+import logger from "../../logger";
 
 
 
@@ -159,7 +160,9 @@ export default class DataRequest extends BaseModel<InferAttributes<DataRequest>,
 
                 async afterCreate(model) {
                     // Note that we don't wait for this to complete
-                    sendDataRequest(model.toJSON() as any).catch(console.error);
+                    sendDataRequest(model.toJSON() as any).catch(error => {
+                        logger.error("Failed sending data request: " + error, error)
+                    });
 
                 }
             }

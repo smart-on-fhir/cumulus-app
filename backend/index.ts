@@ -97,6 +97,8 @@ function setUpErrorHandlers(app: Application)
     // Global error 500 handler
     app.use((error, req, res, next) => {
         
+        // console.error(error)
+
         // HTTP Errors
         if (error.http) {
             error.data = { ...error.data, user: req.user?.email || "guest" }
@@ -111,7 +113,7 @@ function setUpErrorHandlers(app: Application)
         }
 
         // Sequelize Validation Errors
-        else if (error.name === "SequelizeValidationError") {
+        else if (error.name === "SequelizeValidationError" || error.name === "SequelizeUniqueConstraintError") {
             const msg = error.errors.map(e => `${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => ${e.type || "Error"} while validating ${e.path || "data"}: ${e.message}`).join("\n")
             logger.error("Sequelize Validation Error " + JSON.stringify(error, null, 4))
             res.status(400).send(msg);
@@ -121,7 +123,7 @@ function setUpErrorHandlers(app: Application)
         else {
             const msg = `${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => ${error.message.replace(/^\s*\w*Error:\s+/, "")}`
             logger.error(msg, error)
-            res.status(500).send(msg);
+            res.status(500).send("Internal Server Error");
         }
 
         res.end()

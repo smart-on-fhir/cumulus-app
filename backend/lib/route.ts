@@ -63,13 +63,7 @@ export function route(router: Router, options: {
     // Handler -------------------------------------------------------------
     middlewares.push((req, res, next) => {
         Promise.resolve(options.handler(req, res, next)).catch(error => {
-            if (error instanceof HttpError) {
-                return next(error)
-            }
-            logger.error(error, { tags: ["DATA"] })
-            const finalError = new BadRequest()
-            finalError.cause = error.stack
-            next(finalError)
+            return next(error)
         })
     })
 
