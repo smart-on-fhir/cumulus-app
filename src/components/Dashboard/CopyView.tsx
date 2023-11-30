@@ -1,10 +1,13 @@
-import { useCallback } from "react";
-import { useLocation, useParams }   from "react-router";
-import Dashboard       from ".";
-import { request }     from "../../backend";
-import { useBackend }  from "../../hooks";
-import { AlertError }  from "../generic/Alert";
-import Loader          from "../generic/Loader";
+import { useCallback }            from "react"
+import { useLocation, useParams } from "react-router"
+import Dashboard                  from "."
+import { useAuth }                from "../../auth"
+import { request }                from "../../backend"
+import { useBackend }             from "../../hooks"
+import { app }                    from "../../types"
+import { AlertError }             from "../generic/Alert"
+import Loader                     from "../generic/Loader"
+
 
 export default function CopyView()
 {
@@ -13,8 +16,10 @@ export default function CopyView()
 
     const { state } = useLocation()
 
+    const { user } = useAuth()
+
     // Fetch the subscription by ID
-    const { loading, error, result: view } = useBackend(
+    const { loading, error, result: view } = useBackend<app.View>(
         useCallback(() => {
             return request("/api/views/" + id + "?tags=true&subscription=true&group=true&projects=true");
         }, [id]),
@@ -42,8 +47,11 @@ export default function CopyView()
         Object.assign(view, state.view)
     }
 
-    view.name = view.name.replace(/(\s*\(copy\)\s*)?$/, " (copy)")
+    view.name = view.name!.replace(/(\s*\(copy\)\s*)?$/, " (copy)")
+    // @ts-ignore
     delete view.id
+    view.creatorId = user!.id // change ownership
 
+    // @ts-ignore
     return <Dashboard copy view={view} dataRequest={view.DataRequest} />
 }
