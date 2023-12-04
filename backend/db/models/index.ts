@@ -104,10 +104,12 @@ export function init(connection: Sequelize) {
     DataRequest.belongsToMany(Tag, { through: "DataRequestsTags", timestamps: false });
 
 
+
     // SubscriptionGroups ------------------------------------------------------
 
     // SubscriptionGroup have many Subscriptions as requests
     RequestGroup.hasMany(DataRequest, { as: "requests", foreignKey: "groupId", onDelete: "SET DEFAULT" });
+
 
 
     // StudyAreas --------------------------------------------------------------
@@ -115,6 +117,7 @@ export function init(connection: Sequelize) {
     // StudyArea has many Subscriptions
     Project.belongsToMany(DataRequest, { through: "ProjectsSubscriptions", as: "Subscriptions", timestamps: false });
     
+
 
     // Users -------------------------------------------------------------------
     
@@ -125,6 +128,7 @@ export function init(connection: Sequelize) {
     User.belongsToMany(UserGroup, { through: "UserGroupUsers", timestamps: false, as: "groups" });
 
     
+
     // Tags --------------------------------------------------------------------
 
     // Tag has many Graphs as graphs
@@ -137,10 +141,9 @@ export function init(connection: Sequelize) {
     Tag.belongsToMany(DataRequest, { through: "DataRequestsTags", timestamps: false, as: "subscriptions" });
 
 
+
     // UserGroups --------------------------------------------------------------
     
     // UserGroup has many Users as users
     UserGroup.belongsToMany(User, { through: "UserGroupUsers", timestamps: false, as: "users" });
-
-
 }
