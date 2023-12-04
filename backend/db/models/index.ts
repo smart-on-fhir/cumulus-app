@@ -9,6 +9,8 @@ import Tag           from "./Tag"
 import User          from "./User"
 import View          from "./View"
 import Permission    from "./Permission"
+import UserGroup     from "./UserGroup"
+
 
 export function attachHooks(connection: Sequelize) {
 
@@ -71,6 +73,7 @@ export function init(connection: Sequelize) {
     RequestGroup.initialize(connection);
     View.initialize(connection);
     Permission.initialize(connection);
+    UserGroup.initialize(connection);
 
     // The possible choices for onDelete and onUpdate are:
     // RESTRICT, CASCADE, NO ACTION, SET DEFAULT and SET NULL.
@@ -134,16 +137,10 @@ export function init(connection: Sequelize) {
     Tag.belongsToMany(DataRequest, { through: "DataRequestsTags", timestamps: false, as: "subscriptions" });
 
 
-    // -------------------------------------------------------------------------
-    //                           subscriptions :: tags
-    // -------------------------------------------------------------------------
-    DataRequest.belongsToMany(Tag, {
-        through: "DataRequestsTags",
-        timestamps: false
-    });
-    Tag.belongsToMany(DataRequest, {
-        through: "DataRequestsTags",
-        timestamps: false,
-        as: "subscriptions"
-    });
+    // UserGroups --------------------------------------------------------------
+    
+    // UserGroup has many Users as users
+    UserGroup.belongsToMany(User, { through: "UserGroupUsers", timestamps: false, as: "users" });
+
+
 }

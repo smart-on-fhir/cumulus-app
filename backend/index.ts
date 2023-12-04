@@ -75,6 +75,7 @@ function setupAPI(app: Application)
     app.use("/api/data-sites"    , require("./routes/sites"            ).default);
     app.use("/api/aggregator"    , require("./routes/aggregator"       ).default);
     app.use("/api/permissions"   , require("./routes/permissions"      ).default);
+    app.use("/api/user-groups"   , require("./routes/userGroups"       ).default);
     logger.verbose("✔ REST API set up");
 }
 
