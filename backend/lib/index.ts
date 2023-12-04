@@ -60,17 +60,25 @@ export function getFindOptions(req)
 
     // where -------------------------------------------------------------------
     if (req.query.where) {
-        const parts = String(req.query.where).split(":")
-        if (parts.length === 2) {
-            options.where = { [parts[0]]: parts[1] };
-        }
-        else if (parts.length === 3 && parts[1] in Op) {
-            options.where = {
-                [parts[0]]: {
-                    [Op[parts[1]]]: parts[2]
+        String(req.query.where).split(",").forEach(x => {
+            const parts = x.split(":")
+            const parse = (x: string) => {
+                try {
+                    return JSON.parse(x)
+                } catch {
+                    return x
                 }
-            };
-        }
+            }
+            if (parts.length === 2) {
+                (options.where as any)![parts[0]] = parse(parts[1]);
+            }
+            else if (parts.length === 3 && parts[1] in Op) {
+                (options.where as any)![parts[0]] = {
+                    // @ts-ignore
+                    [Op[parts[1]]]: parse(parts[2])
+                };
+            }
+        })
     }
 
     // pick & omit -------------------------------------------------------------

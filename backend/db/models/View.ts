@@ -36,6 +36,10 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
         return "Graphs"
     }
 
+    isOwnedBy(user: CurrentUser) {
+        return !!user && !!user.id && user.id === this.creatorId
+    }
+
     static initialize(sequelize: Sequelize) {
         View.init({
             id: {
