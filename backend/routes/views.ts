@@ -8,6 +8,7 @@ import { assert }               from "../lib"
 import { logger }               from "../logger"
 import { requestLineLevelData } from "../mail"
 import { requestPermission }    from "../acl"
+import SystemUser               from "../SystemUser"
 import {
     NotFound,
     InternalServerError,
@@ -72,7 +73,7 @@ route(router, {
                 { association: "Tags", attributes: ["id", "name", "description"] },
                 { association: "DataRequest", attributes: ["id", "name"] }
             ],
-            user: req.user
+            user: SystemUser
         };
 
         if (req.query.order) {
@@ -94,7 +95,7 @@ route(router, {
             options.attributes = String(req.query.attributes).split(",")
         }
 
-        res.json(await Model.findAll(options))
+        res.json(await Model.scope({ method: ['visible', req.user] }).findAll(options))
     }
 })
 
