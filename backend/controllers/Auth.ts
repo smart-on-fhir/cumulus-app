@@ -27,11 +27,11 @@ export function authenticate(dbConnection: Sequelize) {
     return async (req: app.UserRequest, res: Response, next: NextFunction) => {
         const { sid } = req.cookies;
         // @ts-ignore
-        dbConnection.user = { role: "guest" }; 
+        (req as AppRequest).user = { role: "guest", id: -1, permissions: {} }; 
         if (sid) {
             try {
                 // @ts-ignore
-                const user = await User.findOne({ where: { sid }, user: { role: "system" } });
+                const user = await User.findOne({ where: { sid }, user: SystemUser });
                 if (user) {
                     const currentUser = user.toJSON() as any;
                     currentUser.permissions = await user.getPermissions();
@@ -40,6 +40,9 @@ export function authenticate(dbConnection: Sequelize) {
             } catch (ex) {
                 logger.error(ex, { tags: ["AUTH"] });
             }
+        }
+        else {
+            // get permissions for guest?
         }
         next();
     }
@@ -133,7 +136,7 @@ async function logout(req: AppRequest, res: Response) {
     const { user } = req;
     if (user && user.sid) {
         try {
-            await User.findOne({ where: { sid: user.sid }})
+            await User.findOne({ where: { sid: user.sid }, user: SystemUser })
                 .then(model => {
                     if (model) {
                         return model.update({ sid: null }, { user: SystemUser });
