@@ -1,4 +1,8 @@
-import BaseModel     from "./BaseModel"
+import BaseModel       from "./BaseModel"
+import Tag             from "./Tag"
+import Project         from "./Project"
+import { CurrentUser } from "../../types"
+import SystemUser      from "../../SystemUser"
 import {
     CreationOptional,
     DataTypes,
@@ -6,10 +10,10 @@ import {
     InferAttributes,
     InferCreationAttributes,
     NonAttribute,
-    Sequelize
+    Sequelize,
+    Op
 } from "sequelize"
-import Tag from "./Tag";
-import Project from "./Project";
+
 
 
 export default class View extends BaseModel<InferAttributes<View>, InferCreationAttributes<View>>
@@ -76,7 +80,40 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
             updatedAt: DataTypes.DATE
         }, {
             sequelize,
-            modelName: "View"
+            modelName: "View",
+            scopes: {
+                visible: function(user: CurrentUser) {
+                    
+                    // If the current user has permission to read any graph,
+                    // then allow any graph
+                    if (user.permissions["Graphs.read"]) {
+                        return {}
+                    }
+
+                    // Otherwise pretend this is a system query so that the lack
+                    // of "Graph.read" isn't stopping us, but then restrict to
+                    // only seeing the graphs which have been explicitly shared
+                    // with or created by the current user
+                    return {
+                        user: SystemUser,
+                        where: {
+                            [Op.or]: [
+                                { creatorId: user.id },
+                                { id: {
+                                    [Op.in]: sequelize.literal(`(
+                                        SELECT "resource_id"
+                                          FROM "Permissions"
+                                         WHERE "user_id" = ${+user.id}
+                                           AND "resource" = 'Graphs'
+                                           AND "action" = 'read'
+                                           AND "permission" IS TRUE
+                                    ) `)
+                                }}
+                            ]
+                        }
+                    }
+                }
+            }
         });
     }
 }
