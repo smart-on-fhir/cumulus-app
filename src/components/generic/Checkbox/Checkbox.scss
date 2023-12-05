@@ -56,7 +56,8 @@ label.checkbox-label {
 
     &:hover {
         background: lighten($color: $color-blue, $amount: 36%);
-        box-shadow: 0 0 0 1px lighten($color: $color-blue, $amount: 30%) inset;
+        background: fade-out($color-blue, 0.74);
+        box-shadow: 0 0 0 1px fade-out($color-blue, 0.7) inset;
     }
 
     &.label-left {
