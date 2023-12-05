@@ -58,8 +58,37 @@ export function attachHooks(connection: Sequelize) {
         logger.info(`${model} updated by ${options.user?.email || options.user?.role || "guest"}`, { tags: ["ACTIVITY"] })
     })
 
-    // Log deletes -------------------------------------------------------------
-    connection.addHook("afterDestroy", function(model: BaseModel, options) {
+    // After delete ------------------------------------------------------------
+    connection.addHook("afterDestroy", async function(model: BaseModel, options) {
+
+        // Delete all permissions given for this type + id
+        if (!(model instanceof Permission)) {
+            await Permission.destroy({
+                where: {
+                    resource: model.getPublicName(),
+                    resource_id: model.get("id")!
+                }
+            })
+        }
+        
+        // Delete all permissions given to this user
+        if (model instanceof User) {
+            await Permission.destroy({
+                where: {
+                    user_id: model.get("id")!
+                }
+            })    
+        }
+
+        // Delete all permissions given to this group
+        else if (model instanceof UserGroup) {
+            await Permission.destroy({
+                where: {
+                    user_group_id: model.get("id")!
+                }
+            })    
+        }
+
         logger.info(`${model} deleted by ${options.user?.email || options.user?.role || "guest"}`, { tags: ["ACTIVITY"] })
     })
 }
