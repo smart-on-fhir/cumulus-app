@@ -234,7 +234,7 @@ function UserEditor({
                 { !user.lastLogin && <div className="row gap mb-05">
                     <b className="col col-4 right color-blue-dark">Activation Link: </b>
                     <div className="col" style={{ wordBreak: "break-all" }}>
-                        <a href={activationLink} target="_blank" className="link">{activationLink}</a>
+                        <a href={activationLink} target="_blank" className="link" rel="noreferrer">{activationLink}</a>
                     </div>
                 </div> }
             </div>
