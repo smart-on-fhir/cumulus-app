@@ -29,7 +29,7 @@ export class BulkDelete extends Command
     }
 
     enabled() {
-        return this.graphIds.length > 0 && !!this.user?.permissions?.includes("Views.delete");
+        return this.graphIds.length > 0 && !!this.user?.permissions?.includes("Graphs.delete");
     }
     
     async execute() {

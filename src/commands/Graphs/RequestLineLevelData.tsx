@@ -1,6 +1,7 @@
-import { NavigateFunction } from "react-router"
-import { Command }          from "../Command"
-import { app }              from "../../types"
+import { NavigateFunction }  from "react-router"
+import { Command }           from "../Command"
+import { app }               from "../../types"
+import { requestPermission } from "../../utils"
 
 
 export class RequestLineLevelData extends Command
@@ -34,9 +35,17 @@ export class RequestLineLevelData extends Command
 
     enabled() {
         return (
-            !!this.graphId &&
-            !!this.user?.permissions?.includes("Views.read") &&
-            !!this.user?.permissions?.includes("DataRequests.requestLineLevelData")
+            requestPermission({
+                user       : this.user!,
+                resource   : "Graphs",
+                resource_id: this.graphId,
+                action     : "read"
+            })
+            && requestPermission({
+                user       : this.user!,
+                resource   : "Subscriptions",
+                action     : "requestLineLevelData"
+            })
         );
     }
     

@@ -33,7 +33,9 @@ export class View extends Command
     }
 
     enabled() {
-        return !!this.graphId && !!this.user?.permissions?.includes("Views.read");
+        // If we have been able to see the thumbnail, than we should also be
+        // able to view the graph
+        return this.available();
     }
     
     execute() {
