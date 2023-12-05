@@ -55,15 +55,17 @@ export default function Navigation()
     }
 
     const canReadSites         = user.permissions.includes("DataSites.read")
-    const canReadSubscriptions = user.permissions.includes("DataRequests.read")
-    const canCreateGroups      = user.permissions.includes("RequestGroups.create")
-    const canUpdateGroups      = user.permissions.includes("RequestGroups.update")
+    const canReadSubscriptions = user.permissions.includes("Subscriptions.read")
+    const canListGroups        = user.permissions.includes("SubscriptionGroups.search") && user.permissions.includes("SubscriptionGroups.read")
     const canReadTags          = user.permissions.includes("Tags.read")
-    const canReadGraphs        = user.permissions.includes("Views.read")
-    const canReadProjects      = user.permissions.includes("Projects.read")
-    const canCreateProjects    = user.permissions.includes("Projects.create")
+    const canReadGraphs        = user.permissions.includes("Graphs.search")
+    const canReadProjects      = user.permissions.includes("StudyAreas.read")
+    const canCreateProjects    = user.permissions.includes("StudyAreas.create")
     const canReadUsers         = user.permissions.includes("Users.read")
     const canReadLogs          = user.permissions.includes("Logs.read")
+    const canManagePermissions = user.permissions.includes("Permissions.read")
+    const canReadUserGroups    = user.permissions.includes("UserGroups.read")
+    const canAdminister        = canReadUsers || canReadLogs || canReadUserGroups || canManagePermissions;
 
     return (
         <div className="navigation">
@@ -79,12 +81,14 @@ export default function Navigation()
                 { canReadGraphs && <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" /> Graphs</NavLink> }
                 { canReadSites && <NavLink to="/sites"><i className="icon fa-solid fa-location-dot" /> Healthcare Sites</NavLink> }
                 { canReadSubscriptions && <NavLink to="/requests"><i className="icon fa-solid fa-database" /> Subscriptions</NavLink> }
-                { (canCreateGroups || canUpdateGroups) && <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Subscription Groups</NavLink> }
+                { canListGroups && <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Subscription Groups</NavLink> }
                 { canReadTags && <NavLink to="/tags"><i className="icon fa-solid fa-tag" /> Tags</NavLink> }
                 
-                { (canReadUsers || canReadLogs || canReadUsers) && (
+                { canAdminister && (
                     <NavGroup icon="fa-solid fa-screwdriver-wrench" label="Administration">
                         { canReadUsers && <NavLink to="/users" end><i className="icon fa-solid fa-users" /> Users</NavLink> }
+                        { canReadUserGroups && <NavLink to="/user-groups" end><i className="icon fa-solid fa-user-friends" /> User Groups</NavLink> }
+                        { canManagePermissions && <NavLink to="/permissions" end><i className="icon fa-solid fa-shield" /> Permissions</NavLink> }
                         { canReadLogs && <NavLink to="/logs"><i className="icon fa-solid fa-clipboard-list" /> View Logs</NavLink> }
                     </NavGroup>
                 )}
