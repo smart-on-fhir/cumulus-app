@@ -16,8 +16,8 @@ export default function List()
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const canUpdate = user?.permissions.includes("Projects.update")
-    const canDelete = user?.permissions.includes("Projects.delete")
+    const canUpdate = user?.permissions.includes("StudyAreas.update")
+    const canDelete = user?.permissions.includes("StudyAreas.delete")
 
     return (
         <>

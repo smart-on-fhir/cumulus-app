@@ -11,12 +11,12 @@ export default function Endpoint() {
     return (
         <Routes>
             <Route path="/">
-                <Route index element={ <IfAllowed permissions="Projects.read" element={ <List /> } /> } />
-                <Route path="new" element={ <IfAllowed permissions="Projects.create" element={ <Create /> } /> } />
+                <Route index element={ <IfAllowed permissions="StudyAreas.read" element={ <List /> } /> } />
+                <Route path="new" element={ <IfAllowed permissions="StudyAreas.create" element={ <Create /> } /> } />
                 <Route path=":id">
-                    <Route index element={ <IfAllowed permissions="Projects.read" element={ <View /> } /> } />
-                    <Route path="edit" element={ <IfAllowed permissions="Projects.update" element={ <Edit /> } /> } />
-                    <Route path="delete" element={ <IfAllowed permissions="Projects.delete" element={ <Delete /> } /> } />
+                    <Route index element={ <IfAllowed permissions="StudyAreas.read" element={ <View /> } /> } />
+                    <Route path="edit" element={ <IfAllowed permissions="StudyAreas.update" element={ <Edit /> } /> } />
+                    <Route path="delete" element={ <IfAllowed permissions="StudyAreas.delete" element={ <Delete /> } /> } />
                 </Route>
             </Route>
         </Routes>
