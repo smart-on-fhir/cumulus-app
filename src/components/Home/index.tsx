@@ -27,7 +27,7 @@ export default function Home() {
 
 function Projects() {
     const { user } = useAuth();
-    const canCreate = user?.permissions.includes("Projects.create")
+    const canCreate = user?.permissions.includes("StudyAreas.create")
     return (
         <EndpointListWrapper endpoint="/api/projects?order=updatedAt:desc">
             { (data: app.Project[]) => {
@@ -115,7 +115,7 @@ function Graphs() {
 
 function Subscriptions() {
     const { user } = useAuth();
-    const canCreate = user?.permissions.includes("DataRequests.create")
+    const canCreate = user?.permissions.includes("Subscriptions.create")
     return <EndpointListWrapper endpoint="/api/requests?order=updatedAt:desc&limit=5">
         { (data: app.DataSite[]) => {
             return (
