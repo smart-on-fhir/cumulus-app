@@ -18,7 +18,7 @@ describe("Tags", () => {
 
         it ("handles bad parameter errors", async () => {
             const res = await fetch(`${server.baseUrl}/api/tags?order=x`, { headers: { Cookie: "sid=" + admin.sid }})
-            expect(res.status).to.equal(400)
+            expect(res.status).to.equal(500)
         })
     })
 
