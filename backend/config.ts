@@ -1,7 +1,9 @@
 import Path           from "path"
+import { debuglog }   from "util"
 import { bool, uInt } from "./lib"
-import { logger }     from "./logger"
-import { Config } from "./types";
+import { Config }     from "./types"
+
+const debugSql = debuglog("sql")
 
 const {
     HOST                   = "0.0.0.0",
@@ -21,7 +23,6 @@ const {
     APP_EMAIL_FROM         = "admin@cumulus.org",
     CUMULUS_ADMIN_EMAIL    = "",
     REGIONAL_CLUSTER_EMAIL = "",
-    LOG_SQL                = "false",
     AGGREGATOR_URL         = "",
     AGGREGATOR_API_KEY     = "",
     AGGREGATOR_ENABLED     = "false",
@@ -65,9 +66,7 @@ const config: Config = {
             dialect : "postgres",
             schema  : "public",
             database: DB_DATABASE,
-            logging : bool(LOG_SQL) ?
-                (msg) => logger.log("info", msg, { tags: ["SQL"] }) :
-                false,
+            logging : sql => debugSql(sql),
             username: DB_USER,
             password: DB_PASS,
             port    : +DB_PORT,
