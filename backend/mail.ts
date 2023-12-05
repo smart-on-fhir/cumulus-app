@@ -147,3 +147,79 @@ export async function inviteUser({
         html   : html.join("\n")
     })
 }
+
+// -----------------------------------------------------------------------------
+
+/**
+ * When someone shares a graph with user(s) and includes the optional message,
+ * this function will be called to send that message to all recipients
+ */
+export async function notifyForGraphsAccess({
+    emails,
+    graphId,
+    actions,
+    baseUrl,
+    message
+}: {
+    /**
+     * Users to notify
+     */
+    emails: string[]
+
+    /**
+     * One or more IDs of Graphs that have been shared
+     */
+    graphId: number[]
+
+    /**
+     * One or more actions that have been allowed
+     */
+    actions: string[]
+
+    baseUrl: string
+
+    message?: string
+})
+{
+    const actionsMap = {
+        read  : "view the graph in our chart editor",
+        update: "make changes to the graph",
+        delete: "delete the graph",
+        share : "share the graph with others",
+        search: "view this graph within lists and search results",
+    }
+
+    function generateActionsList(actions: (keyof typeof actionsMap)[]) {
+        const list = actions.map(a => actionsMap[a] || a);
+        const last = list.pop()
+        return list.join(", ") + " and " + last
+    }
+
+    return Promise.allSettled(emails.map(email => {
+        let html = [`<h2>The following content has been shared with you:</h2>`];
+
+        graphId.forEach(id => {
+            const href = new URL("/views/" + id, baseUrl)
+            html.push(`<div><a href="${href}" target="_blank">${href}</a></div>`)
+        })
+
+        html.push(`<p>You are allowed to ${generateActionsList(actions as any)}.</p>`)
+
+        if (message) {
+            html.push(
+                `<p>The user who shared this with you sent you the following ` +
+                `message:<br/><br/> ${message.replace(/<.*?>/g, "")}.</p>`
+            )
+        }
+
+        html.push(`<br /><br />Regards,<br/>The Cumulus team`)
+
+        return client.messages.create(config.mailGun.domain, {
+            from   : config.appEmail,
+            to     : email,
+            subject: "New content has been shared with you",
+            html   : html.join("\n")
+        })
+    }))
+}
+
