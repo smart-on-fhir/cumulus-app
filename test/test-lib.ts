@@ -131,7 +131,13 @@ export async function resetTable(modelName: string, data: Record<string, any>[])
     await fixAutoIncrement(dbConnection, ModelConstructor.tableName, "id")
 }
 
-export function testEndpoint(permission: string, method: "GET" | "PUT" | "POST" | "DELETE", uri: string, payload?: any) {
+export function testEndpoint(
+    permission: string,
+    method    : "GET" | "PUT" | "POST" | "DELETE",
+    uri       : string,
+    payload  ?: any,
+    shareable = false
+) {
     ["guest", "user", "manager", "admin"].forEach(role => {
         const permissions = getPermissionsForRole(role);
 
@@ -163,7 +169,7 @@ export function testEndpoint(permission: string, method: "GET" | "PUT" | "POST" 
         } else {
             it (`${role} cannot ${method} ${uri}`, async () => {
                 const res = await fetch(`${server.baseUrl}${uri}`, options)
-                expect(res.status).to.equal(role === "guest" ? 401 : 403)
+                expect(res.status).to.equal(shareable ? 200 : role === "guest" ? 401 : 403)
             })
         }
     })
