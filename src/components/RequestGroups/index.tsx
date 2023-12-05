@@ -11,12 +11,12 @@ export default function Endpoint() {
     return (
         <Routes>
             <Route path="/">
-                <Route index element={ <IfAllowed element={ <RequestGroupList /> } permissions="RequestGroups.read" /> } />
-                <Route path="new" element={ <IfAllowed element={ <RequestGroupCreate /> } permissions="RequestGroups.create" /> } />
+                <Route index element={ <IfAllowed element={ <RequestGroupList /> } permissions="SubscriptionGroups.read" /> } />
+                <Route path="new" element={ <IfAllowed element={ <RequestGroupCreate /> } permissions="SubscriptionGroups.create" /> } />
                 <Route path=":id">
-                    <Route index element={ <IfAllowed element={ <RequestGroupView /> } permissions="RequestGroups.read" /> } />
-                    <Route path="edit" element={ <IfAllowed element={ <RequestGroupEdit /> } permissions="RequestGroups.update" /> } />
-                    <Route path="delete" element={ <IfAllowed element={ <DeleteRequestGroup /> } permissions="RequestGroups.delete" /> } />
+                    <Route index element={ <IfAllowed element={ <RequestGroupView /> } permissions="SubscriptionGroups.read" /> } />
+                    <Route path="edit" element={ <IfAllowed element={ <RequestGroupEdit /> } permissions="SubscriptionGroups.update" /> } />
+                    <Route path="delete" element={ <IfAllowed element={ <DeleteRequestGroup /> } permissions="SubscriptionGroups.delete" /> } />
                 </Route>
             </Route>
         </Routes>
