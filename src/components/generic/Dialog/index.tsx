@@ -1,43 +1,41 @@
-import { MouseEvent, useLayoutEffect } from "react"
-import { createPortal }                from "react-dom"
+import { CSSProperties, MouseEvent, useLayoutEffect } from "react"
+import { render }                from "react-dom"
 import "./Dialog.scss"
 
+export function centerDialog() {
+    const win = document.getElementById("modal")?.firstElementChild as HTMLDivElement
+    if (win) {
+        win.style.transform = `translate(${
+            window.innerWidth / 2 - win.offsetWidth / 2
+        }px, ${
+            window.innerHeight / 2 - win.offsetHeight / 2
+        }px)`
+    }
+}
 
 export default function Dialog({
     modal,
-    open,
     body,
     header,
     footer,
     className = "",
-    onClose
+    style
 } : {
-    modal    ?: boolean
-    open     ?: boolean
-    body      : JSX.Element | string
-    header   ?: JSX.Element | string
-    footer   ?: JSX.Element | string
-    className?: string
-    onClose   : (...args: any[]) => void
+    modal      ?: boolean
+    header     ?: JSX.Element | string
+    className  ?: string
+    body        : (props: { close: () => void }) => JSX.Element | string
+    footer     ?: (props: { close: () => void }) => JSX.Element | string
+    style      ?: CSSProperties
 })
 {
     const container = document.getElementById("modal")!
 
-    useLayoutEffect(() => {
-        const win = container.firstElementChild as HTMLDivElement
-        
-        if (win) {
-            win.style.transform = `translate(${
-                window.innerWidth / 2 - win.offsetWidth / 2
-            }px, ${
-                window.innerHeight / 2 - win.offsetHeight / 2
-            }px)`
-        }
-    }, [open])
-
-    if (!open) {
-        return createPortal(null, container)
+    function close() {
+        render(<>{}</>, container)
     }
+
+    useLayoutEffect(centerDialog, [])
 
     function dragStart(e: MouseEvent) {
 
@@ -70,24 +68,23 @@ export default function Dialog({
         }, { once: true })
     }
 
-    return createPortal(
+    return (
         <>
-            <div className={ className + " dialog" }>
+            <div className={ className + " dialog" } style={style}>
                 { !!header && <div className="dialog-header" onMouseDown={dragStart}>
                     <div>{ header }</div>
-                    <i className="fa-solid fa-circle-xmark close-dialog" title="Close" onMouseDown={() => onClose()} />
+                    <i className="fa-solid fa-circle-xmark close-dialog" title="Close" onMouseDown={() => close()} />
                 </div> }
-                <div className="dialog-body">{ body }</div>
-                { !!footer && <div className="dialog-footer">{ footer }</div> }
+                <div className="dialog-body">{ body({ close }) }</div>
+                { !!footer && <div className="dialog-footer">{ footer({ close }) }</div> }
             </div>
             <div className={ "dialog-overlay" + (modal ? " modal" : "") } onMouseDown={e => {
                 e.preventDefault()
                 e.stopPropagation()
                 if (!modal) {
-                    onClose()
+                    close()
                 }
             }} onContextMenu={e => e.preventDefault()} />
-        </>,
-        container
+        </>
     )
 }
