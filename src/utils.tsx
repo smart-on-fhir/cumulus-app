@@ -463,3 +463,88 @@ export function lengthToEm(length?: string, base = 16) {
     }
     return 1
 }
+
+export function buildPermissionLabel({ user_group_id, role, user_id, permission, action, resource_id, resource, attribute }: app.Permission) {
+    let label = "";
+
+    if (user_group_id) {
+        label += `Members of user group #${ user_group_id } are`
+    } else if (role) {
+        label += `Users with role "${ role }" are`
+    } else if (user_id) {
+        label += `User#${ user_id } is`
+    }
+
+    label += `${permission ? "" : " not"} allowed to ${action}`
+    label += attribute ? `the "${attribute}" attribute of` : ""
+    label += resource_id ? ` ${resource}#${ resource_id }` : ` all ${resource}`
+    return label;
+}
+
+export function buildPermissionId({
+    resource,
+    resource_id,
+    attribute,
+    action
+}: {
+    resource     : string
+    action       : string
+    resource_id ?: number | null
+    attribute   ?: string | null
+    [key: string]: any
+}) {
+    let key = resource
+    if (resource_id) {
+        key += "#" + resource_id
+    }
+    if (attribute) {
+        key += "." + attribute
+    }
+    key += "." + action
+    return key
+}
+
+export function requestPermission({ user, resource, resource_id, action }: {
+    user        : app.CurrentUser
+    resource    : string
+    action      : string
+    resource_id?: number
+}, onReject?: ((message: string) => void))
+{
+    const { role = "guest", id = -1, permissions } = user
+
+    if (role === "system" || role === "owner") {
+        return true
+    }
+
+    const tried: string[] = [];
+    
+    // Resource#id.action ------------------------------------------------------
+    if (resource_id) {
+        const perm = buildPermissionId({ resource, action, resource_id })
+        if (permissions.includes(perm)) {
+            return true
+        }
+        tried.push(perm)
+    }
+    
+    // Resource.action ---------------------------------------------------------
+    const perm = buildPermissionId({ resource, action });
+    if (permissions.includes(perm)) {
+        return true
+    }
+    tried.push(perm)
+    
+    
+    // No permissions found ----------------------------------------------------
+    if (onReject) {
+        let msg = role === "guest" ?
+            "Guest" :
+            `User${id > 0 ? `#${id}` : ""}(role="${role}")`;
+        msg += `${msg} needs at least one of the following permissions: "${tried.join('", "')}".`
+        console.info(msg)
+        onReject(msg);
+    }
+
+    return false
+}
