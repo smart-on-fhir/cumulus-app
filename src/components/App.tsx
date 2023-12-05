@@ -20,6 +20,7 @@ import Tags                                     from "./Tags";
 import { ContextMenu }                          from "./generic/Menu";
 import Tooltip                                  from "./generic/Tooltip";
 import PermissionsManager                       from "./Permissions";
+import UserGroups                               from "./UserGroups";
 import "../styles/main.scss";
 
 export default function App()
@@ -58,6 +59,7 @@ export default function App()
                                 <Route path="users/invite"  element={ <RequireAuth><Invite /></RequireAuth> } />
                                 <Route path="users"         element={ <RequireAuth><Users /></RequireAuth> } />
                                 <Route path="permissions"   element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
+                                <Route path="user-groups/*" element={ <RequireAuth><UserGroups /></RequireAuth> } />
                                 
                                 <Route path="*" element="Page Not Found" />
                             </Route>
