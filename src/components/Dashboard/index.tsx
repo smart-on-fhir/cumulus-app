@@ -15,6 +15,7 @@ import { defer, Json, strip }                    from "../../utils"
 import { getDefaultChartOptions }                from "./Charts/DefaultChartOptions"
 import Tag                                       from "../Tags/Tag"
 import Grid                                      from "../generic/Grid"
+import Breadcrumbs                               from "../generic/Breadcrumbs"
 import { getScreenShot }                         from "../../commands/lib"
 import CommandButton                             from "../../commands/CommandButton"
 import { DownloadScreenshotAsPNG }               from "../../commands/Graphs/DownloadScreenshotAsPNG"
@@ -27,7 +28,6 @@ import { RequestLineLevelData }                  from "../../commands/Graphs/Req
 import { GenerateCaption }                       from "../../commands/Graphs/GenerateCaption"
 import { OpenInAnalyticEnvironment }             from "../../commands/Subscriptions/OpenInAnalyticEnvironment"
 import { app }                                   from "../../types"
-import Breadcrumbs                               from "../generic/Breadcrumbs"
 import {
     ReadOnlyPaths,
     SupportedChartTypes,
@@ -72,7 +72,7 @@ interface ViewAction
 }
 
 
-function getViewReducer({
+export function getViewReducer({
     onSeriesToggle,
     onInspectionChange
 }: {
@@ -294,8 +294,8 @@ export default function Dashboard({
 }) {
     const navigate  = useNavigate();
     const auth      = useAuth();
-    const canUpdate = auth.user?.permissions.includes("Views.update")
-    const canCreate = auth.user?.permissions.includes("Views.create")
+    const canUpdate = auth.user?.permissions.includes("Graphs.update")
+    const canCreate = auth.user?.permissions.includes("Graphs.create")
 
     const { cols = [] } = dataRequest.metadata ?? {}
 
