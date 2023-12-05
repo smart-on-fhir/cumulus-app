@@ -169,10 +169,6 @@ export function testEndpoint(permission: string, method: "GET" | "PUT" | "POST" 
     })
 }
 
-before(async function() {
-    this.timeout(30000)
-    return await SERVER.start()
-})
-
-after(async () => await SERVER.stop())
+before(async () => await SERVER.start())
+after (async () => await SERVER.stop ())
 
