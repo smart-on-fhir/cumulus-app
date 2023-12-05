@@ -533,3 +533,20 @@ export function buildPermissionId({
     key += "." + action
     return key
 }
+
+export function explode(input: Record<string, any>[], keys?: string[]): any {
+    keys = keys || Object.keys(input[0])
+    const key: any = keys.pop()
+    let out: any[] = []
+    for (const rec of input) {
+        if (Array.isArray(rec[key])) {
+            out.push(...rec[key].map((v: any) => ({ ...rec, [key]: v })))
+        } else {
+            out.push(rec)
+        }
+    }
+    if (keys.length) {
+        return explode(out, keys)
+    }
+    return out
+}
