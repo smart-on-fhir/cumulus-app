@@ -186,6 +186,8 @@ function UserEditor({
     const [ editing, setEditing ] = useState(false)
     const [ role, setRole ] = useState(user.role)
 
+    const activationLink = new URL("/activate?code=" + user.activationCode, window.location.origin).href
+
     return (
         <div className="row wrap">
             <div className="col col-6 responsive">
@@ -229,6 +231,12 @@ function UserEditor({
                         <span className="color-muted">never</span> }
                     </div>
                 </div>
+                { !user.lastLogin && <div className="row gap mb-05">
+                    <b className="col col-4 right color-blue-dark">Activation Link: </b>
+                    <div className="col" style={{ wordBreak: "break-all" }}>
+                        <a href={activationLink} target="_blank" className="link">{activationLink}</a>
+                    </div>
+                </div> }
             </div>
             { user.id !== auth.user?.id && (
             <div className="col col-4 center top responsive">
