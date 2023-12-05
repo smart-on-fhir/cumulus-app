@@ -117,7 +117,8 @@ describe("Subscriptions", () => {
             } else {
                 it (`${role} cannot read subscription graphs`, async () => {
                     const res = await fetch(`${server.baseUrl}/api/requests/1/views`, options)
-                    expect(res.status).to.equal(role === "guest" ? 401 : 403)
+                    expect(res.status).to.equal(200)
+                    expect(await res.json()).to.deep.equal([])
                 })
             }
         })
