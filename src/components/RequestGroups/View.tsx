@@ -11,9 +11,9 @@ export default function RequestGroupView()
 {
     const { user } = useAuth();
 
-    const canUpdate    = user?.permissions.includes("RequestGroups.update")
-    const canDelete    = user?.permissions.includes("RequestGroups.delete")
-    const canCreateSub = user?.permissions.includes("DataRequests.create")
+    const canUpdate    = user?.permissions.includes("SubscriptionGroups.update")
+    const canDelete    = user?.permissions.includes("SubscriptionGroups.delete")
+    const canCreateSub = user?.permissions.includes("Subscriptions.create")
 
     return createViewPage<app.RequestGroup>({
         basePath: "/groups",

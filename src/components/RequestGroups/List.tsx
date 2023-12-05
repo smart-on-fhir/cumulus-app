@@ -10,7 +10,7 @@ export default function RequestGroupList()
 {
     const { user } = useAuth();
 
-    const canCreate = user?.permissions.includes("RequestGroups.create")
+    const canCreate = user?.permissions.includes("SubscriptionGroups.create")
 
     return createListPage<app.RequestGroup[]>({
         nameSingular: "Subscription Group",
@@ -36,8 +36,8 @@ export default function RequestGroupList()
                                     <th style={{ width: "2em" }}>ID</th>
                                     <th style={{ width: "60%" }}>Name</th>
                                     <th>Description</th>
-                                    <IfAllowed showError={false} permissions="RequestGroups.update" element={ <th style={{ width: "2.5em" }} /> } />
-                                    <IfAllowed showError={false} permissions="RequestGroups.delete" element={ <th style={{ width: "2.5em" }} /> } />
+                                    <IfAllowed showError={false} permissions="SubscriptionGroups.update" element={ <th style={{ width: "2.5em" }} /> } />
+                                    <IfAllowed showError={false} permissions="SubscriptionGroups.delete" element={ <th style={{ width: "2.5em" }} /> } />
                                 </tr>
                             </thead>
                             <tbody>
@@ -46,12 +46,12 @@ export default function RequestGroupList()
                                         <td>{row.id}</td>
                                         <td><Link title={row.name} to={"./" + row.id} className="link">{row.name}</Link></td>
                                         <td>{row.description || ""}</td>
-                                        <IfAllowed showError={false} permissions="RequestGroups.update" element={ <td className="right nowrap">
+                                        <IfAllowed showError={false} permissions="SubscriptionGroups.update" element={ <td className="right nowrap">
                                             <Link title="Edit" className="btn small color-brand-2 btn-virtual" to={ row.id + "/edit" }>
                                                 <i className="fa-solid fa-pen-to-square" />
                                             </Link>
                                         </td> } />
-                                        <IfAllowed showError={false} permissions="RequestGroups.delete" element={ <td className="right nowrap">
+                                        <IfAllowed showError={false} permissions="SubscriptionGroups.delete" element={ <td className="right nowrap">
                                             <Link title="Delete" className="btn small color-red btn-virtual" to={ row.id + "/delete" }>
                                                 <i className="fa-solid fa-trash-can" />
                                             </Link>
