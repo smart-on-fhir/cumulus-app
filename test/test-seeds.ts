@@ -7,6 +7,7 @@ import RequestGroups        from "./fixtures/RequestGroups"
 import DataRequests         from "./fixtures/DataRequests"
 import Views                from "./fixtures/Views"
 import Permissions          from "./fixtures/Permissions"
+import UserGroups           from "./fixtures/UserGroups"
 
 
 export async function seed(connection: Sequelize) {
@@ -33,5 +34,8 @@ export async function seed(connection: Sequelize) {
 
     await models.Permission.bulkCreate(Permissions);
     await fixAutoIncrement(connection, models.Permission.tableName, "id");
+
+    await models.UserGroup.bulkCreate(UserGroups);
+    await fixAutoIncrement(connection, models.UserGroup.tableName, "id");
 
 }
