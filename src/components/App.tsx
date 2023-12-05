@@ -19,6 +19,7 @@ import LogViewer                                from "./LogViewer";
 import Tags                                     from "./Tags";
 import { ContextMenu }                          from "./generic/Menu";
 import Tooltip                                  from "./generic/Tooltip";
+import PermissionsManager                       from "./Permissions";
 import "../styles/main.scss";
 
 export default function App()
@@ -45,17 +46,18 @@ export default function App()
                                     </Route>
                                 </Route>
 
-                                <Route path="requests/*"   element={ <RequireAuth><Subscriptions /></RequireAuth> } />
-                                <Route path="sites/*"      element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
-                                <Route path="groups/*"     element={ <RequireAuth><RequestGroups /></RequireAuth> } />
-                                <Route path="projects/*"   element={ <RequireAuth><Projects /></RequireAuth> } />
-                                <Route path="tags/*"       element={ <RequireAuth><Tags /></RequireAuth> } />
-                                <Route path="logs"         element={ <RequireAuth><LogViewer /></RequireAuth>} />
-                                <Route path="login"        element={ <LoginPage /> } />
-                                <Route path="activate"     element={ <Activate/> } />
-                                <Route path="user"         element={ <RequireAuth><Account /></RequireAuth> } />
-                                <Route path="users/invite" element={ <RequireAuth><Invite /></RequireAuth> } />
-                                <Route path="users"        element={ <RequireAuth><Users /></RequireAuth> } />
+                                <Route path="requests/*"    element={ <RequireAuth><Subscriptions /></RequireAuth> } />
+                                <Route path="sites/*"       element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
+                                <Route path="groups/*"      element={ <RequireAuth><RequestGroups /></RequireAuth> } />
+                                <Route path="projects/*"    element={ <RequireAuth><Projects /></RequireAuth> } />
+                                <Route path="tags/*"        element={ <RequireAuth><Tags /></RequireAuth> } />
+                                <Route path="logs"          element={ <RequireAuth><LogViewer /></RequireAuth>} />
+                                <Route path="login"         element={ <LoginPage /> } />
+                                <Route path="activate"      element={ <Activate /> } />
+                                <Route path="user"          element={ <RequireAuth><Account /></RequireAuth> } />
+                                <Route path="users/invite"  element={ <RequireAuth><Invite /></RequireAuth> } />
+                                <Route path="users"         element={ <RequireAuth><Users /></RequireAuth> } />
+                                <Route path="permissions"   element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
                                 
                                 <Route path="*" element="Page Not Found" />
                             </Route>
