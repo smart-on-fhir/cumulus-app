@@ -7,9 +7,12 @@ import { AlertError }  from "../generic/Alert"
 import ViewThumbnail   from "./ViewThumbnail"
 import { classList }   from "../../utils"
 import Collapse        from "../generic/Collapse"
-import { CustomSelection, WithSelection } from "../generic/WithSelection"
 import { app }         from "../../types"
-
+import { useAuth }     from "../../auth"
+import {
+    CustomSelection,
+    WithSelection
+} from "../generic/WithSelection"
 import "./ViewsBrowser.scss"
 
 
@@ -27,6 +30,10 @@ export default function ViewsBrowser({
     sort?: "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | "",
     groupBy?: "tag" | "subscription" | ""
 }) {
+
+    let { user } = useAuth();
+
+    const canCreateGraphs = user!.permissions.includes("Graphs.create")
 
     const query = new URLSearchParams()
 
@@ -106,7 +113,8 @@ export default function ViewsBrowser({
                 ["view-browser view-browser-" + layout] : true,
                 "nested": !!requestId
             })}>
-                { requestId && <Link to={`/requests/${requestId}/create-view`} className="view-thumbnail view-thumbnail-add-btn">
+                { requestId && !canCreateGraphs && result?.length === 0 && <div className="color-red small">You cannot see any of the graphs and you are not allowed to create new graphs!</div> }
+                { requestId && canCreateGraphs && <Link to={`/requests/${requestId}/create-view`} className="view-thumbnail view-thumbnail-add-btn">
                         <div className="view-thumbnail-image">
                             <div className="plus-icon-wrapper">
                                 <i className="fas fa-plus"/>
