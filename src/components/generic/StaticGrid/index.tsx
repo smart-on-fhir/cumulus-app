@@ -14,7 +14,7 @@ interface Column {
 export default function StaticGrid({
     columns,
     rows,
-    selectBy,
+    selectBy = null,
     selection = [],
     onSelectionChange,
     rowTitle,
@@ -24,7 +24,7 @@ export default function StaticGrid({
 }: {
     columns           : Column[]
     rows              : Record<string, any>[]
-    selectBy          : string | null
+    selectBy         ?: string | null
     selection        ?: any[]
     onSelectionChange?: (selection: any[]) => void
     rowTitle         ?: (row: any) => string,
