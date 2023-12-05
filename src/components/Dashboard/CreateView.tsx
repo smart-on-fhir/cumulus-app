@@ -6,12 +6,15 @@ import { useBackend }  from "../../hooks"
 import { AlertError }  from "../generic/Alert"
 import Loader          from "../generic/Loader"
 import { app }         from "../../types"
+import { useAuth }     from "../../auth"
 
 
 export default function CreateView()
 {
     // The subscription ID from the URL params
     const { id } = useParams();
+
+    const { user } = useAuth()
 
     // Fetch the subscription by ID
     const { loading, error, result } = useBackend(
@@ -35,5 +38,5 @@ export default function CreateView()
     }
 
     // Eventually render a Breadcrumbs and the dashboard
-    return <Dashboard view={{}} dataRequest={result as app.DataRequest} />
+    return <Dashboard view={{ creatorId: user!.id }} dataRequest={result as app.DataRequest} />
 }

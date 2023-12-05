@@ -21,6 +21,15 @@ export declare module app {
         permissions: string[]
     }
 
+    interface UserGroup {
+        id          : number
+        name        : string
+        description : string
+        updatedAt   : string
+        createdAt   : string
+        users      ?: Pick<User, "id" | "name" | "email" | "role">[]
+    }
+
     interface Tag {
         id            : number
         name          : string
@@ -31,6 +40,21 @@ export declare module app {
         creator      ?: Pick<User, "id" | "email">
         graphs       ?: Pick<View, "id" | "name" | "description" | "DataRequestId">[]
         subscriptions?: Pick<DataRequest, "id" | "name" | "description" | "completed" | "refresh">[]
+    }
+
+    interface Permission {
+        id           : number
+        user_id      : number | null
+        role         : "admin" | "manager" | "user" | "guest" | null
+        resource     : string
+        attribute    : string | null
+        resource_id  : number | null
+        user_group_id: number | null
+        action       : string
+        permission   : boolean
+        comment      : string
+        createdAt    : string
+        updatedAt    : string
     }
 
     type CurrentUser = Omit<User, "password" | "sid">
@@ -62,6 +86,7 @@ export declare module app {
         DataRequestId: number | null
         screenShot?: string
         settings?: ViewSettings
+        creatorId?: number | null
         Tags?: Pick<Tag, "id" | "name" | "description">[]
         DataRequest?: Pick<DataRequest, "id" | "name">
         createdAt?: Date
