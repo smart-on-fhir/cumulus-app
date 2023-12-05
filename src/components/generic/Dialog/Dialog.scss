@@ -52,7 +52,7 @@
     }
 
     .dialog-body {
-        padding : 0.5rem 0.5rem 0;
+        padding : 0.5rem;
         overflow: auto;
         flex    : 1;
         background: #EEE;
@@ -62,9 +62,10 @@
 
     .dialog-footer {
         padding        : 0.5rem 0.5rem;
-        // border-top     : 1px solid #0003;
-        // background     : $color-grey-light;
-        background: #EEE;
+        border-top     : 1px solid #0003;
+        background     : #EEE;
+        background     : linear-gradient(#0002, #0001 100%);
+        box-shadow     : 0 10px 5px -10px #0002 inset;
         border-radius  : 0 0 5px 5px;
         flex           : 0;
         align-items    : center;
@@ -74,25 +75,26 @@
         align-content  : center;
         flex-wrap      : wrap;
         flex-direction : row;
+
+        button {
+            border-color: #0003;
+        }
     }
 
     .dialog-body:last-child {
         padding-bottom: 0.5em;
     }
-
-    // .dialog-body + .dialog-footer {
-    //     padding-top: 0;
-    // }
 }
 
 #modal .dialog-overlay {
-    z-index       : 40000;
-    position      : fixed;
-    top           : 0;
-    right         : 0;
-    bottom        : 0;
-    left          : 0;
-    background    : #8883;
+    z-index        : 40000;
+    position       : fixed;
+    top            : 0;
+    right          : 0;
+    bottom         : 0;
+    left           : 0;
+    background     : #8888;
+    backdrop-filter: grayscale(1) contrast(0.75);
 
     &:not(.modal) {
         pointer-events: none;
