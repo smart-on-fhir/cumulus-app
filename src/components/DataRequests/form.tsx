@@ -205,8 +205,8 @@ export default function DataRequestForm({
 {
     const { user } = useAuth();
 
-    const canUpdate = user?.permissions.includes("DataRequests.update")
-    const canDelete = user?.permissions.includes("DataRequests.delete")
+    const canUpdate = user?.permissions.includes("Subscriptions.update")
+    const canDelete = user?.permissions.includes("Subscriptions.delete")
 
     function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
