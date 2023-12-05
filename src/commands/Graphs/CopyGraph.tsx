@@ -1,6 +1,7 @@
 import { NavigateFunction } from "react-router"
 import { Command }          from "../Command"
 import { app }              from "../../types"
+import { requestPermission } from "../../utils"
 
 
 export class CopyGraph extends Command
@@ -31,11 +32,32 @@ export class CopyGraph extends Command
     }
 
     available() {
-        return !!this.graphId && !!this.user;
+        return (
+            // Not available for guests
+            !!this.user
+
+            // Not available for charts that are not saved yet
+            && !!this.graphId
+
+            // Not available for those who can't create charts
+            && requestPermission({
+                user     : this.user,
+                resource : "Graphs",
+                action   : "create"
+            })
+
+            // Not available for those who can't read this chart
+            && requestPermission({
+                user       : this.user,
+                resource   : "Graphs",
+                resource_id: this.graphId,
+                action     : "read"
+            })
+        );
     }
 
     enabled() {
-        return !!this.graphId && !!this.user?.permissions?.includes("Views.create");
+        return true
     }
     
     execute() {

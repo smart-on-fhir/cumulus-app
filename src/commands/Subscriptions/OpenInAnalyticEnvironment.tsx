@@ -1,5 +1,6 @@
-import { Command }  from "../Command"
-import { app }      from "../../types"
+import { Command }           from "../Command"
+import { app }               from "../../types"
+import { requestPermission } from "../../utils"
 
 
 export class OpenInAnalyticEnvironment extends Command
@@ -36,8 +37,13 @@ export class OpenInAnalyticEnvironment extends Command
     enabled() {
         return (
             !!this.subscriptionId &&
-            !!this.user?.permissions?.includes("DataRequests.export") &&
-            !!process.env.REACT_APP_NOTEBOOK_URL
+            !!process.env.REACT_APP_NOTEBOOK_URL &&
+            requestPermission({
+                user       : this.user!,
+                resource   : "Subscriptions",
+                resource_id: this.subscriptionId,
+                action     : "export"
+            })
         );
     }
     

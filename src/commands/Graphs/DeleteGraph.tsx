@@ -1,7 +1,8 @@
-import { NavigateFunction } from "react-router"
-import { deleteOne }        from "../../backend"
-import { Command }          from "../Command"
-import { app }              from "../../types"
+import { NavigateFunction }  from "react-router"
+import { deleteOne }         from "../../backend"
+import { Command }           from "../Command"
+import { app }               from "../../types"
+import { requestPermission } from "../../utils"
 
 
 export class DeleteGraph extends Command
@@ -38,7 +39,12 @@ export class DeleteGraph extends Command
     }
 
     enabled() {
-        return !!this.graphId && !!this.user?.permissions?.includes("Views.delete");
+        return !!this.graphId && requestPermission({
+            user       : this.user!,
+            resource   : "Graphs",
+            resource_id: this.graphId,
+            action     : "delete"
+        });
     }
     
     async execute() {

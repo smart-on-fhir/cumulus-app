@@ -31,11 +31,11 @@ export class DownloadScreenshotAsJPG extends Command
     }
 
     enabled() {
-        return !this._working && !!this._view.settings;
+        return !this._working && !!this._view.settings && !!this._view.name;
     }
 
     active() {
-        return !!this._working && !!this._view.settings;
+        return !!this._working;
     }
 
     async execute() {
