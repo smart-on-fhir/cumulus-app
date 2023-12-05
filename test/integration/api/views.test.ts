@@ -11,7 +11,7 @@ describe("Graphs", () => {
     })
 
     describe("list", () => {
-        testEndpoint("Graphs.read", "GET", "/api/views?order=name:asc")
+        testEndpoint("Graphs.read", "GET", "/api/views?order=name:asc", null, true)
     })
 
     describe("view", () => {

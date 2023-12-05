@@ -179,4 +179,10 @@ export default [
     { id: 148, user_id: 5, role: null, resource: "Graphs", action: "update", user_group_id: null, resource_id: 1, permission: 1, comment: "" },
     { id: 149, user_id: 5, role: null, resource: "Graphs", action: "delete", user_group_id: null, resource_id: 1, permission: 1, comment: "" },
 
+    // Permissions
+    { id: 150, user_id: null, role: "admin", resource: "UserGroups", action: "read"  , user_group_id: null, resource_id : null, permission: 1, comment: "Admins can read user groups"   },
+    { id: 151, user_id: null, role: "admin", resource: "UserGroups", action: "create", user_group_id: null, resource_id : null, permission: 1, comment: "Admins can create user groups" },
+    { id: 152, user_id: null, role: "admin", resource: "UserGroups", action: "update", user_group_id: null, resource_id : null, permission: 1, comment: "Admins can update user groups" },
+    { id: 153, user_id: null, role: "admin", resource: "UserGroups", action: "delete", user_group_id: null, resource_id : null, permission: 1, comment: "Admins can delete user groups" },
+
 ]
