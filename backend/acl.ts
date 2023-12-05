@@ -1,5 +1,9 @@
-import { Forbidden, Unauthorized } from "./errors";
-import { buildPermissionId } from "./lib";
+import { debuglog }                from "util"
+import { Forbidden, Unauthorized } from "./errors"
+import { buildPermissionId }       from "./lib"
+
+
+const debugAuth = debuglog("auth")
 
 
 export function requestPermission({ user = {}, resource, attribute, action }: {
@@ -11,20 +15,29 @@ export function requestPermission({ user = {}, resource, attribute, action }: {
 {
     const { role = "guest", id = -1, permissions = {} } = user
 
-    if (role === "system" || role === "owner") return true
-
-    const isOwner      = typeof resource === "string" ? false    : resource.isOwnedBy(user)
-
-    if (isOwner) return true
+    if (role === "system" || role === "owner") {
+        debugAuth(`The ${role} is allowed to "${action}"`)
+        return true
+    }
 
     const resourceName = typeof resource === "string" ? resource : resource.getPublicName()
     const resource_id  = typeof resource === "string" ? null     : resource.get("id") as number
+    const isOwner = typeof resource === "string" ? false : resource.isOwnedBy(user)
+
+    if (isOwner) {
+        debugAuth(
+            `User${id > 0 ? `#${id}` : ""}(role="${role}") is allowed to "${
+            action}" ${resourceName}#${resource_id}${attribute ? "." + attribute
+            : ""} as owner`
+        )
+        return true
+    }
+
     const tried: string[] = [];
 
-    const msgPrefix = role === "guest" ? "Guest" : `User ${id > 0 ? `#${id} ` : ""}having role of "${role}"`;
+    const msgPrefix = role === "guest" ? "Guest" : `User${id > 0 ? `#${id}` : ""}(role="${role}")`;
     
-    function throwError(msg?: string) {
-        msg = msg || msgPrefix + ` was rejected the following permission: "${perm}"`;
+    function throwError(msg: string) {
         const data = {
             message: `Permission denied`,
             tags   : ["AUTH"],
@@ -34,50 +47,45 @@ export function requestPermission({ user = {}, resource, attribute, action }: {
         throw role === "guest" ? new Unauthorized(msg!, data) : new Forbidden(msg!, data);
     }
 
+    function testPermission(perm: string) {
+        const record = permissions[perm]
+        debugAuth(
+            msgPrefix + ` requested "${perm}" => ${record === true ?
+                "GRANTED" :
+                record === false ? "REJECTED" : "no record."}`
+        )
+        if (record === false) {
+            throwError(msgPrefix + ` was rejected the following permission: "${perm}"`)
+        }
+        else if (record === true) {
+            return true
+        }
+    }
+
     // Resource#id.attribute.action --------------------------------------------
     if (resource_id && attribute) {
         const perm = buildPermissionId({ resource: resourceName, action, attribute, resource_id })
-        if (permissions[perm] === false) {
-            throwError()
-        }
-        else if (permissions[perm] === true) {
-            return true
-        }
+        if (testPermission(perm) === true) return true
         tried.push(perm)
     }
 
     // Resource#id.action ------------------------------------------------------
     if (resource_id) {
         const perm = buildPermissionId({ resource: resourceName, action, resource_id })
-        if (permissions[perm] === false) {
-            throwError()
-        }
-        else if (permissions[perm] === true) {
-            return true
-        }
+        if (testPermission(perm) === true) return true
         tried.push(perm)
     }
 
     // Resource.attribute.action -----------------------------------------------
     if (attribute) {
         const perm = buildPermissionId({ resource: resourceName, action, attribute })
-        if (permissions[perm] === false) {
-            throwError()
-        }
-        else if (permissions[perm] === true) {
-            return true
-        }
+        if (testPermission(perm) === true) return true
         tried.push(perm)
     }
 
     // Resource.action ---------------------------------------------------------
     const perm = buildPermissionId({ resource: resourceName, action });
-    if (permissions[perm] === false) {
-        throwError()
-    }
-    else if (permissions[perm] === true) {
-        return true
-    }
+    if (testPermission(perm) === true) return true
     tried.push(perm)
 
 
