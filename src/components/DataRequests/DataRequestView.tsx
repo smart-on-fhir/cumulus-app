@@ -1,4 +1,4 @@
-import { useCallback, useState }            from "react"
+import { useCallback, useState }  from "react"
 import { useParams }              from "react-router"
 import { Link }                   from "react-router-dom"
 import { HelmetProvider, Helmet } from "react-helmet-async"
@@ -7,7 +7,6 @@ import { request }                from "../../backend"
 import { useBackend }             from "../../hooks"
 import Breadcrumbs                from "../generic/Breadcrumbs"
 import { Format }                 from "../Format"
-// import map                        from "../Home/map.png"
 import ViewsBrowser               from "../Views/ViewsBrowser"
 import Loader                     from "../generic/Loader"
 import { AlertError }             from "../generic/Alert"
@@ -16,41 +15,6 @@ import Tag                        from "../Tags/Tag"
 import TransmissionView           from "./Transmissions/TransmissionView"
 import { app }                    from "../../types"
 
-// import GoogleMapReact from "google-map-react"
-
-// interface SimpleMapProps {
-//     center: {
-//         lat: number
-//         lng: number
-//     },
-//     zoom: number
-// }
-// class SimpleMap extends Component<SimpleMapProps> {
-  
-//     render() {
-//       return (
-//         // Important! Always set the container height explicitly
-//         <div style={{ height: '300px', width: '100%' }}>
-//           <GoogleMapReact
-//             bootstrapURLKeys={{ key: "AIzaSyAoE75RGPdm1LApIAkCTXtBx6rjsOVaqNA" }}
-//             defaultCenter={this.props.center}
-//             defaultZoom={this.props.zoom}
-//           >
-//             <i className="fas fa-map-marker"
-//                 style={{
-//                     color: "#C00",
-//                     fontSize: "30px",
-//                     textShadow: "1px 1px 2px #000"
-//                 }}
-//                 // @ts-ignore
-//               lat={42.33732992698751}
-//               lng={-71.10595995789029}
-//             />
-//           </GoogleMapReact>
-//         </div>
-//       );
-//     }
-// }
 
 export default function DataRequestView(): JSX.Element
 {
