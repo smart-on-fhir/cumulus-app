@@ -90,7 +90,8 @@ export function createEditPage<T = unknown>({
     namePlural,
     endpoint,
     nameField = "name",
-    renderForm
+    renderForm,
+    query
 }: {
     nameSingular     : string
     namePlural       : string
@@ -100,6 +101,7 @@ export function createEditPage<T = unknown>({
     /** @deprecated */
     primaryKeyField ?: string
     nameField       ?: string
+    query           ?: string
     renderForm       : (props: {
         loading : boolean
         data    : T
@@ -114,7 +116,7 @@ export function createEditPage<T = unknown>({
                     <title>Edit { nameSingular }</title>
                 </Helmet>
             </HelmetProvider>
-            <EndpointEditWrapper endpoint={ endpoint }>
+            <EndpointEditWrapper endpoint={ endpoint } query={ query }>
                 {({ data, error, loading, onSubmit }) => (
                     <>
                         <Breadcrumbs links={[
