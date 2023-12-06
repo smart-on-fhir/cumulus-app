@@ -50,13 +50,8 @@ export class ManagePermissions extends Command
     }
     
     execute() {
-
         render(
-            <PermissionsDialog 
-                resource="Graphs"
-                resource_id={ this.graph.id! }
-                user={ this.user }
-            />,
+            <PermissionsDialog resource="Graphs" resource_id={ this.graph.id! } />,
             document.getElementById("modal")!
         )
     }

@@ -1,9 +1,8 @@
-import { useEffect, useState }  from "react"
+import { useCallback, useEffect, useState }  from "react"
 import { request }              from "../../../../backend"
 import { AlertError }           from "../../../../components/generic/Alert"
 import Dialog, { centerDialog } from "../../../../components/generic/Dialog"
 import StaticGrid               from "../../../../components/generic/StaticGrid"
-import { app }                  from "../../../../types"
 import { buildPermissionLabel } from "../../../../utils"
 
 
@@ -16,20 +15,14 @@ interface Permission {
 }
 
 
-export default function PermissionsDialog({
-    user = null,
-    resource,
-    resource_id
-}: {
-    user?: app.User | null
-    resource: string
-    resource_id: number
-})
+export default function PermissionsDialog({ resource, resource_id }: { resource: string; resource_id: number })
 {
     const [selection, setSelection ] = useState<number[]>([])
     const [loading  , setLoading   ] = useState<boolean>(false)
     const [error    , setError     ] = useState<Error|null>(null)
     const [data     , setData      ] = useState<Permission[]>([])
+
+    const hasPermissions = !!data.length
 
     const deleteSelected = () => {
         setLoading(true)
@@ -42,12 +35,12 @@ export default function PermissionsDialog({
         ).finally(() => setLoading(false))
     }
 
-    const fetchPermissions = () => {
+    const fetchPermissions = useCallback(() => {
         setLoading(true)
         return request<Permission[]>(`/api/permissions/list?resource=${resource}&resource_id=${resource_id}`)
             .then(setData, setError)
             .finally(() => setLoading(false))
-    }
+    }, [resource, resource_id])
 
     const getHeader = () => {
         return <><i className="fas fa-share-alt-square" /> Manage Permissions</>
@@ -122,8 +115,8 @@ export default function PermissionsDialog({
         </>
     }
 
-    useEffect(() => { fetchPermissions() }, []);
-    useEffect(() => { centerDialog() }, [!!data.length])
+    useEffect(() => { fetchPermissions() }, [ fetchPermissions ]);
+    useEffect(() => { centerDialog() }, [ hasPermissions ])
 
     return <Dialog
         modal
