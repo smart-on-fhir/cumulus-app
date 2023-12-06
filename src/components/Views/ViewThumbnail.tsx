@@ -1,16 +1,19 @@
-import { useRef }                    from "react";
-import { Link, useNavigate }         from "react-router-dom";
-import { useAuth }                   from "../../auth";
-import { BulkDelete }                from "../../commands/Graphs/BulkDelete";
-import { CopyGraph }                 from "../../commands/Graphs/CopyGraph";
-import { DeleteGraph }               from "../../commands/Graphs/DeleteGraph";
-import { OpenInAnalyticEnvironment } from "../../commands/Subscriptions/OpenInAnalyticEnvironment";
-import { RequestLineLevelData }      from "../../commands/Graphs/RequestLineLevelData";
-import { View }                      from "../../commands/Graphs/View";
-import { useCommand }                from "../../hooks";
-import { CustomSelection }           from "../generic/WithSelection";
-import { ellipsis, highlight }       from "../../utils";
+import { useRef }                    from "react"
+import { Link, useNavigate }         from "react-router-dom"
+import { CustomSelection }           from "../generic/WithSelection"
 import { app }                       from "../../types"
+import { useAuth }                   from "../../auth"
+import { useCommand }                from "../../hooks"
+import { ellipsis, highlight }       from "../../utils"
+import { BulkDelete }                from "../../commands/Graphs/BulkDelete"
+import { CopyGraph }                 from "../../commands/Graphs/CopyGraph"
+import { DeleteGraph }               from "../../commands/Graphs/DeleteGraph"
+import { OpenInAnalyticEnvironment } from "../../commands/Subscriptions/OpenInAnalyticEnvironment"
+import { RequestLineLevelData }      from "../../commands/Graphs/RequestLineLevelData"
+import { View }                      from "../../commands/Graphs/View"
+import { ShareGraph }                from "../../commands/Graphs/Share/ShareGraph"
+import { BulkShareGraph }            from "../../commands/Graphs/Share/BulkShareGraph"
+import { ManagePermissions }         from "../../commands/Graphs/Share/ManagePermissions"
 
 
 export default function ViewThumbnail({
@@ -31,12 +34,15 @@ export default function ViewThumbnail({
     const navigate          = useNavigate()
     const link              = useRef<HTMLAnchorElement>(null)
     
-    const deleteCommand     = useCommand(new DeleteGraph(view.id || 0, auth.user, navigate));
-    const copyCommand       = useCommand(new CopyGraph(view.id || 0, auth.user, navigate));
-    const bulkDeleteCommand = useCommand(new BulkDelete(selection?.items || [], auth.user))
-    const viewCommand       = useCommand(new View(view.id, auth.user, navigate))
-    const requestLineData   = useCommand(new RequestLineLevelData(view.id, auth.user, navigate))
-    const openInAE          = useCommand(new OpenInAnalyticEnvironment(view.DataRequestId || 0, auth.user))
+    const deleteCommand      = useCommand(new DeleteGraph(view.id || 0, auth.user, navigate));
+    const copyCommand        = useCommand(new CopyGraph(view.id || 0, auth.user, navigate));
+    const bulkDeleteCommand  = useCommand(new BulkDelete(selection?.items || [], auth.user))
+    const viewCommand        = useCommand(new View(view.id, auth.user, navigate))
+    const requestLineData    = useCommand(new RequestLineLevelData(view.id, auth.user, navigate))
+    const openInAE           = useCommand(new OpenInAnalyticEnvironment(view.DataRequestId || 0, auth.user))
+    const shareCommand       = useCommand(new ShareGraph(view.id || 0, auth.user));
+    const bulkShareGraph     = useCommand(new BulkShareGraph(selection?.items || [], auth.user))
+    const permissionsCommand = useCommand(new ManagePermissions(view, auth.user));
 
     return (
         <Link
@@ -59,7 +65,9 @@ export default function ViewThumbnail({
                     requestLineData,
                     openInAE,
                     deleteCommand,
-                    copyCommand
+                    copyCommand,
+                    shareCommand,
+                    permissionsCommand
                 ];
 
                 if (selection && selection.size() > 1 && selection.includes(view.id)) {
@@ -68,6 +76,9 @@ export default function ViewThumbnail({
 
                     if (bulkDeleteCommand.available) {
                         bulkItems.push(bulkDeleteCommand)
+                    }
+                    if (bulkShareGraph.available) {
+                        bulkItems.push(bulkShareGraph)
                     }
 
                     if (bulkItems.length) {

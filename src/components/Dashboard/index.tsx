@@ -26,6 +26,8 @@ import { PrintChart }                            from "../../commands/Graphs/Pri
 import { DeleteGraph }                           from "../../commands/Graphs/DeleteGraph"
 import { RequestLineLevelData }                  from "../../commands/Graphs/RequestLineLevelData"
 import { GenerateCaption }                       from "../../commands/Graphs/GenerateCaption"
+import { ShareGraph }                            from "../../commands/Graphs/Share/ShareGraph"
+import { ManagePermissions }                     from "../../commands/Graphs/Share/ManagePermissions"
 import { OpenInAnalyticEnvironment }             from "../../commands/Subscriptions/OpenInAnalyticEnvironment"
 import { app }                                   from "../../types"
 import {
@@ -645,15 +647,17 @@ export default function Dashboard({
         }
     }
 
-    const deleteCommand    = useCommand(new DeleteGraph(view.id || 0, auth.user, navigate));
-    const copyCommand      = useCommand(new CopyGraph(view.id || 0, auth.user, navigate, runtimeView));
-    const downloadPNG      = useCommand(new DownloadScreenshotAsPNG(runtimeView));
-    const downloadJPG      = useCommand(new DownloadScreenshotAsJPG(runtimeView));
-    const toggleFullscreen = useCommand(new ToggleFullscreen());
-    const printChart       = useCommand(new PrintChart());
-    const requestLineData  = useCommand(new RequestLineLevelData(view.id || 0, auth.user, navigate))
-    const openInAE         = useCommand(new OpenInAnalyticEnvironment(view.DataRequestId || 0, auth.user))
-    const generateCaption  = useCommand(new GenerateCaption(state.chartOptions, state, c => dispatch({ type: "UPDATE", payload: { caption: c }})))
+    const deleteCommand        = useCommand(new DeleteGraph(view.id || 0, auth.user, navigate));
+    const copyCommand          = useCommand(new CopyGraph(view.id || 0, auth.user, navigate, runtimeView));
+    const shareCommand         = useCommand(new ShareGraph(view.id || 0, auth.user));
+    const managePermissionsCmd = useCommand(new ManagePermissions(view, auth.user));
+    const downloadPNG          = useCommand(new DownloadScreenshotAsPNG(runtimeView));
+    const downloadJPG          = useCommand(new DownloadScreenshotAsJPG(runtimeView));
+    const toggleFullscreen     = useCommand(new ToggleFullscreen());
+    const printChart           = useCommand(new PrintChart());
+    const requestLineData      = useCommand(new RequestLineLevelData(view.id || 0, auth.user, navigate))
+    const openInAE             = useCommand(new OpenInAnalyticEnvironment(view.DataRequestId || 0, auth.user))
+    const generateCaption      = useCommand(new GenerateCaption(state.chartOptions, state, c => dispatch({ type: "UPDATE", payload: { caption: c }})))
 
     return (
         <div className={ "dashboard " + (saving || deleteCommand.working ? "grey-out" : "") + (showOptions ? " sidebar-open" : "") }>
@@ -765,6 +769,7 @@ export default function Dashboard({
                                         <i className="fa-solid fa-crosshairs"/>
                                     </button>
                                     <CommandButton { ...copyCommand } label={ "" } />
+                                    <CommandButton { ...shareCommand } label={ "" } />
                                     <CommandButton { ...deleteCommand } label={ "" } />
                                     <button
                                         className="btn"
@@ -837,6 +842,8 @@ export default function Dashboard({
                                 },
                                 deleteCommand,
                                 copyCommand,
+                                shareCommand,
+                                managePermissionsCmd,
                                 {
                                     label: "Update Graph Thumbnail",
                                     execute: takeScreenshot,
