@@ -82,17 +82,16 @@
 
             &.opened {
                 padding   : 18px 6px 2px 4px;
-                background: #FFF linear-gradient(fade-out($color-blue, 0.95), fade-out($color-blue, 0.9));
             }
 
             .icon {
-                width: 1em;
+                width: 1.2em;
                 text-align: center;
                 color: #0004;
             }
 
             &:hover {
-                background: #FFF linear-gradient(fade-out($color-blue, 0.9), fade-out($color-blue, 0.8));
+                background: #e4f1ff;
             }
         }
     }
