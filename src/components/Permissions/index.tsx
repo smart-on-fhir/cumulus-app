@@ -195,29 +195,34 @@ function UserPermissionsUI() {
                                 {
                                     name : "user_id",
                                     label: "User ID",
-                                    type : "number"
+                                    type : "number",
+                                    searchable: true
                                 },
                                 {
                                     name : "resource",
                                     label: "Resource Type",
-                                    type : "string"
+                                    type : "string",
+                                    searchable: true
                                 },
                                 {
                                     name  : "resource_id",
                                     label : "Resource ID",
                                     type  : "number",
+                                    searchable: true,
                                     render: (r) => r.resource_id ?? <span className="color-brand-2">ALL</span>
                                 },
                                 {
                                     name  : "attribute",
                                     label : "Attribute",
                                     type  : "string",
+                                    searchable: true,
                                     render: (r) => r.attribute || <span className="color-brand-2">ALL</span>
                                 },
                                 {
                                     name: "action",
                                     label: "Action",
-                                    type: "string"
+                                    type: "string",
+                                    searchable: true
                                 },
                                 {
                                     name  : "permission",
@@ -226,11 +231,14 @@ function UserPermissionsUI() {
                                     render: (r) => r.permission ? <span className="color-green">Yes</span> : <span className="color-red">No</span>
                                 }
                             ]}
-                            rows={data}
-                            selectBy="id"
-                            selection={selection}
-                            onSelectionChange={setSelection}
-                            rowTitle={buildPermissionLabel}
+                            rows={ data }
+                            idProperty="id"
+                            groupBy="action"
+                            groupLabel={ value => <>Permission to <b>{value}</b></> }
+                            selection={ selection }
+                            onSelectionChange={ setSelection }
+                            selectionType="multiple"
+                            rowTitle={ buildPermissionLabel }
                         />
                         <div className="pt-1">
                             <button

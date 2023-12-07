@@ -1,101 +1,292 @@
-import { CSSProperties, useState } from "react"
+import { CSSProperties, Fragment, useState } from "react"
+import { JSONObject, JSONValue }             from "../../../types"
+import { highlight }                         from "../../../utils"
 import "./StaticGrid.scss"
 
 
 interface Column {
-    name   : string
-    type   : "number" | "string" | "boolean"
-    label ?: string
+    /**
+     * The property name (as should be found in data rows)
+     */
+    name: string
+
+    /**
+     * Data type - affects sorting and rendering
+     */
+    type: "number" | "string" | "boolean"
+
+    /**
+     * The header label
+     */
+    label?: string
+
+    searchable?: boolean
+
     style ?: CSSProperties
+
     render?: (row: any, c: Column) => JSX.Element
+}
+
+interface StaticGridProps<T = JSONObject> {
+    
+    /**
+     * Column definitions for the Grid
+     */
+    columns: Column[]
+
+    /**
+     * Data rows
+     */
+    rows: T[]
+
+    /**
+     * The name of the unique identifier property used to identify selected
+     * rows and as react key for table rows. Defaults to "id".
+     */
+    idProperty?: string
+
+    /**
+     * Is set and not null, this is the name of the property to
+     * use for tracking the selection. Typically, this will be
+     * the name of an unique column acting as an ID.
+     */
+    selectBy?: string | null
+
+    /**
+     * Is set and not null, this is the name of the property to
+     * group by.
+     */
+    groupBy?: string | null
+
+    groupLabel?: (value: JSONValue) => JSX.Element | string
+    
+    /**
+     * List of selected IDs
+     */
+    selection?: any[]
+    
+    onSelectionChange?: (selection: T[]) => void
+
+    selectionType?: "single" | "multiple" | "none",
+    
+    rowTitle?: (row: T) => string,
+    
+    maxHeight        ?: number | string
+    minHeight        ?: number | string
+    height           ?: number | string
 }
 
 
 export default function StaticGrid({
     columns,
     rows,
-    selectBy = null,
+    idProperty = "id",
+    groupBy = null,
+    groupLabel,
     selection = [],
+    selectionType = "none",
     onSelectionChange,
     rowTitle,
     maxHeight,
     minHeight,
     height
-}: {
-    columns           : Column[]
-    rows              : Record<string, any>[]
-    selectBy         ?: string | null
-    selection        ?: any[]
-    onSelectionChange?: (selection: any[]) => void
-    rowTitle         ?: (row: any) => string,
-    maxHeight        ?: number | string
-    minHeight        ?: number | string
-    height           ?: number | string
-}) {
+}: StaticGridProps) {
 
+    const searchableCols = columns.filter(c => c.searchable === true)
+
+    const [search    , setSearch    ] = useState("")
     const [sortColumn, setSortColumn] = useState("")
     const [sortDir   , setSortDir   ] = useState<"asc"|"desc">("asc")
-    const [recs      , setRecs      ] = useState<Record<string, any>[]>(rows)
+    const [groupMap  , setGroupMap  ] = useState<Record<string, boolean>>({})
 
     function onHeaderClick(colName: string) {
-        const col = columns.find(c => c.name === colName)!
         setSortColumn(colName)
         setSortDir(sortDir === "desc" ? "asc" : "desc")
-        setRecs([...rows].sort((a: any, b: any) => {
-            if (col.type === "number") {
-                return (b[colName] - a[colName]) * (sortDir === "asc" ? -1 : 1)
-            }
-            return String(b[colName] || "").localeCompare(String(a[colName] || "")) * (sortDir === "asc" ? 1 : -1)
-        }))
+    }
+
+    const prepareData = () => {
+
+        let _rows = [...rows];
+
+        if (search) {
+            _rows = _rows.filter(row => {
+                return searchableCols.some(c => String(row[c.name]).includes(search))
+            })
+        }
+
+        if (sortColumn) {
+            const col = columns.find(c => c.name === sortColumn)!
+            _rows = _rows.sort((a: any, b: any) => {
+                if (col.type === "number") {
+                    return (b[sortColumn] - a[sortColumn]) * (sortDir === "asc" ? -1 : 1)
+                }
+                return String(b[sortColumn] || "").localeCompare(String(a[sortColumn] || "")) * (sortDir === "asc" ? 1 : -1)
+            })
+        }
+
+        return _rows
+    }
+
+    const renderHeader = () => {
+        return (
+            <thead>
+                <tr>
+                    { selectionType !== "none" && <th style={{ width: "2em" }}></th> }
+                    { columns.filter(c => c.name !== groupBy).map((c, i) => (
+                        <th
+                            key={i}
+                            style={c.style}
+                            onMouseDown={() => onHeaderClick(c.name)}
+                            className={sortColumn === c.name ? "sorted" : ""}
+                        >
+                            { c.label ?? c.name } {
+                            sortColumn === c.name ?
+                                sortDir === "asc" ?
+                                    <i className="fas icon fa-angle-up"/> :
+                                    <i className="fas icon fa-angle-down"/> :
+                                ""
+                            }
+                        </th>
+                    )) }
+                </tr>
+            </thead>
+        )
+    }
+
+    const renderBody = () => {
+        const recs = prepareData()
+
+        const colLength = columns.length + (selectionType !== "none" && onSelectionChange ? 1: 0)
+
+        if (!recs.length) {
+            return (
+                <tbody>
+                    <tr>
+                        <td className="no-data" colSpan={colLength}>
+                            No data! {
+                                search && <> Try to <b className="link" onClick={() => setSearch("")}>clear search</b>.</>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            )
+        }
+
+        if (groupBy) {
+            const groups: Record<string, any[]> = {};
+
+            recs.forEach(row => {
+                let label = row[groupBy];
+                let group = groups[label];
+                if (!group) {
+                    group = groups[label] = [];
+                }
+                group.push(row)
+            });
+
+            
+
+            return (
+                <tbody>
+                    { Object.keys(groups).map((label, i) => {
+                        return (
+                            <Fragment key={i}>
+                                <tr>
+                                    <td
+                                        colSpan={colLength}
+                                        className={ "group-header" + (groupMap[label] === false ? " closed": " opened") }
+                                        onClick={() => setGroupMap({ ...groupMap, [label]: groupMap[label] === false ? true : false })}
+                                    >
+                                        {
+                                            groupMap[label] === false ?
+                                                <i className="fas icon fa-angle-right"/> :
+                                                <i className="fas icon fa-angle-down"/>
+                                        } { groupLabel ? groupLabel(label) : `${groupBy} = ${label}` }
+                                    </td>
+                                </tr>
+                                {
+                                    groupMap[label] !== false ?
+                                        groups[label].map(u => renderRow(u)) :
+                                        null
+                                }
+                            </Fragment>
+                        )
+                    })}
+                </tbody>
+            )
+        }
+
+        return (
+            <tbody>
+                { recs.map(u => renderRow(u)) }
+            </tbody>
+        )
+    }
+
+    const renderRow = (rec: any) => {
+        const selected = !!(selectionType !== "none" && selection.includes(rec[idProperty]))
+        return <tr
+            key={ rec[idProperty] }
+            className={ selected ? "selected" : undefined }
+            data-tooltip={ rowTitle ? rowTitle(rec) : undefined } >
+            { selectionType !== "none" && onSelectionChange && <td>
+                <input
+                    type={ selectionType === "single" ? "radio" : "checkbox" }
+                    checked={selected}
+                    onChange={e => {
+                        const cur = rec[idProperty]
+                        if (selectionType === "single") {
+                            onSelectionChange(e.target.checked ? [cur] : [])
+                        } else {
+                            if (e.target.checked) {
+                                onSelectionChange([...selection, cur])
+                            } else {
+                                onSelectionChange([...selection].filter(x => x !== cur))
+                            }
+                        }
+                    }}
+                />
+            </td> }
+            { columns.filter(c => c.name !== groupBy).map((c, i) => {
+                let value: any = c.render ? c.render(rec, c) : rec[c.name] + "";
+                if (search && c.searchable && (typeof value === "string" || typeof value === "number")) {
+                    value = <div dangerouslySetInnerHTML={{ __html: highlight(value + "", search) }} />
+                }
+                return <td key={i}>{ value }</td>
+            }) }
+        </tr>
+    }
+
+    const renderSearch = () => {
+        
+        if (!searchableCols.length) {
+            return null
+        }
+
+        const title = "Search " + searchableCols.map(c => c.label || c.name).join(", ")
+
+        return (
+            <div className="mb-1 center">
+                <input
+                    type="search"
+                    placeholder="Search"
+                    title={ title }
+                    value={ search }
+                    onChange={ e => setSearch(e.target.value) }
+                />
+            </div>
+        )
     }
 
     return (
-        <div className="static-grid-wrapper" style={{ maxHeight, minHeight, height }}>
-            <table className="static-grid-table">
-                <thead>
-                    <tr>
-                        { selectBy && <th style={{ width: "2em" }}></th> }
-                        { columns.map((c, i) => (
-                            <th
-                                key={i}
-                                style={c.style}
-                                onMouseDown={() => onHeaderClick(c.name)}
-                                className={sortColumn === c.name ? "sorted" : ""}
-                            >
-                                { c.label ?? c.name } {
-                                sortColumn === c.name ?
-                                    sortDir === "asc" ?
-                                        <i className="fas icon fa-angle-up"/> :
-                                        <i className="fas icon fa-angle-down"/> :
-                                    ""
-                                }
-                            </th>
-                        )) }
-                    </tr>
-                </thead>
-                <tbody>
-                    { recs.map(u => {
-                        const selected = !!(selectBy && selection.includes(u[selectBy]))
-                        return <tr
-                            key={u.id}
-                            className={ selected ? "selected" : undefined }
-                            data-tooltip={ rowTitle ? rowTitle(u) : undefined } >
-                            { selectBy && onSelectionChange && <td>
-                                <input type="checkbox" checked={selected} onChange={e => {
-                                    if (e.target.checked) {
-                                        onSelectionChange([...selection, u[selectBy]])
-                                    } else {
-                                        onSelectionChange([...selection].filter(x => x !== u[selectBy]))
-                                    }
-                                }} />
-                            </td> }
-                            { columns.map((c, i) => (
-                                <td key={i}>{ c.render ? c.render(u, c) : u[c.name] + "" }</td>
-                            )) }
-                        </tr>
-                    }) }
-                </tbody>
-            </table>
-        </div>
+        <>
+            { renderSearch() }
+            <div className="static-grid-wrapper" style={{ maxHeight, minHeight, height }}>
+                <table className="static-grid-table">
+                    { renderHeader() }
+                    { renderBody() }
+                </table>
+            </div>
+        </>
     )
 }
