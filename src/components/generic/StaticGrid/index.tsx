@@ -221,7 +221,8 @@ export default function StaticGrid({
         return <tr
             key={ rec[idProperty] }
             className={ selected ? "selected" : undefined }
-            data-tooltip={ rowTitle ? rowTitle(rec) : undefined } >
+            data-tooltip={ rowTitle ? rowTitle(rec) : undefined }
+            data-tooltip-position="center bottom">
             { selectionType !== "none" && onSelectionChange && <td>
                 <input
                     type={ selectionType === "single" ? "radio" : "checkbox" }
@@ -263,9 +264,11 @@ export default function StaticGrid({
                 <input
                     type="search"
                     placeholder="Search"
-                    title={ title }
+                    // title={ title }
                     value={ search }
                     onChange={ e => setSearch(e.target.value) }
+                    data-tooltip={ title }
+                    data-tooltip-position="center bottom"
                 />
             </div>
         )
