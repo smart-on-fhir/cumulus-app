@@ -52,7 +52,7 @@ export function UserGrid({
                 { name: "role" , type: "string" }
             ]}
             rows={users}
-            selectBy={ onSelectionChange ? "id" : null }
+            selectionType={ onSelectionChange ? "multiple" : "none" }
             selection={ selection.map(u => u.id) }
             onSelectionChange={ onSelectionChange ? (sel: number[]) => {
                 onSelectionChange(users.filter(u => sel.includes(u.id)))
