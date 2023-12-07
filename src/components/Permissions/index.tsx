@@ -232,7 +232,6 @@ function UserPermissionsUI() {
                                 }
                             ]}
                             rows={ data }
-                            idProperty="id"
                             groupBy="action"
                             groupLabel={ value => <>Permission to <b>{value}</b></> }
                             selection={ selection }
@@ -332,7 +331,7 @@ function GroupPermissionsUI() {
                                 }
                             ]}
                             rows={data}
-                            selectBy="id"
+                            selectionType="multiple"
                             selection={selection}
                             onSelectionChange={setSelection}
                             rowTitle={buildPermissionLabel}

@@ -47,13 +47,6 @@ interface StaticGridProps<T = JSONObject> {
 
     /**
      * Is set and not null, this is the name of the property to
-     * use for tracking the selection. Typically, this will be
-     * the name of an unique column acting as an ID.
-     */
-    selectBy?: string | null
-
-    /**
-     * Is set and not null, this is the name of the property to
      * group by.
      */
     groupBy?: string | null
@@ -131,7 +124,7 @@ export default function StaticGrid({
         return (
             <thead>
                 <tr>
-                    { selectionType !== "none" && <th style={{ width: "2em" }}></th> }
+                    { selectionType !== "none" && <th style={{ width: "1em" }}></th> }
                     { columns.filter(c => c.name !== groupBy).map((c, i) => (
                         <th
                             key={i}

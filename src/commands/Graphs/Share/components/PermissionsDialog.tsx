@@ -102,7 +102,7 @@ export default function PermissionsDialog({ resource, resource_id }: { resource:
                                 }
                             ]}
                             rows={data}
-                            selectBy="id"
+                            selectionType="multiple"
                             selection={selection}
                             onSelectionChange={setSelection}
                             rowTitle={buildPermissionLabel}
