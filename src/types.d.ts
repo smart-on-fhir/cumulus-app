@@ -1,5 +1,11 @@
 import { DashStyleValue } from "highcharts"
 
+export type JSONScalar = string | number | boolean | null;
+export type JSONArray  = JSONValue[];
+// export type JSONObject = { [ key: string ]: JSONValue };
+export type JSONObject = Record<string, JSONValue>;
+export type JSONValue  = JSONScalar | JSONArray | JSONObject;
+
 export declare module app {
 
     /**

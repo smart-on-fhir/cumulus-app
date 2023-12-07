@@ -1,16 +1,16 @@
+@import "../../../styles/variables.scss";
+
+
 .static-grid-wrapper {
     overflow  : auto;
-    border    : 1px solid #0002;
+    border    : 1px solid #0003;
     position  : relative;
     min-height: 3em;
 
     .static-grid-table {
         cursor: default;
         border-spacing: 0;
-        
         background: #0001;
-        // table-layout: fixed;
-        
 
         tr {
             background: #FFF;
@@ -30,6 +30,10 @@
             white-space   : nowrap;
             text-overflow : ellipsis;
             overflow      : hidden;
+            input {
+                margin: 0 auto;
+                line-height: inherit;
+            }
         }
 
         th {
@@ -44,13 +48,11 @@
 
             &.sorted {
                 box-shadow: 0 -2px 0 0 #F906 inset;
-                // border-bottom: 2px solid #F909;
                 background: linear-gradient(#FFF, #FFF);
             }
         }
 
         tr.selected td {
-            // background: #3699;
             background: highlight;
             color: highlightText;
         }
@@ -58,6 +60,40 @@
         thead th {
             position: sticky;
             top: 0;
+        }
+
+        td.no-data {
+            text-align: center;
+            padding: 0.5em 1em;
+            color: #900;
+        }
+
+        .group-header {
+            background: #FFF;
+            border-bottom: 2px solid $color-blue;
+            color: $color-blue;
+            cursor: pointer;
+            padding       : 2px 6px 2px 4px;
+            transition: all 0.2s;
+
+            &.closed {
+                border-bottom: 1px dashed #0002;
+            }
+
+            &.opened {
+                padding   : 18px 6px 2px 4px;
+                background: #FFF linear-gradient(fade-out($color-blue, 0.95), fade-out($color-blue, 0.9));
+            }
+
+            .icon {
+                width: 1em;
+                text-align: center;
+                color: #0004;
+            }
+
+            &:hover {
+                background: #FFF linear-gradient(fade-out($color-blue, 0.9), fade-out($color-blue, 0.8));
+            }
         }
     }
 }
