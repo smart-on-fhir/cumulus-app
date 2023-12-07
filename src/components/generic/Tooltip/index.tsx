@@ -33,14 +33,74 @@ export default class Tooltip extends Component<any> {
 
             // @ts-ignore
             this.tooltip.current.firstChild!.innerText = el.getAttribute("data-tooltip") ?? ""
-                
-            const elRect = el.getBoundingClientRect()
-            const ttRect = this.tooltip.current.getBoundingClientRect()
-            const x = Math.max(elRect.left + elRect.width / 2 - ttRect.width / 2, 2)
-            const y = Math.max(elRect.top - ttRect.height, 10)
-            this.tooltip.current.style.transform = `translate(${x}px, ${y}px)`
+
+            this.positionTooltip(el)
             this.tooltip.current.style.opacity = "1"
         }, 300)
+    }
+
+    positionTooltip(el: Element) {
+        const pos    = el.getAttribute("data-tooltip-position") ?? "50% 0"
+        const elRect = el.getBoundingClientRect()
+        const ttRect = this.tooltip.current!.getBoundingClientRect()
+
+        let xValue = 50, yValue = 0, xUnit = "%", yUnit = "px";
+        
+        let [horizontal = "50%", vertical = "0"] = pos.trim().split(/\s+/);
+
+        if (horizontal === "left"  ) {
+            xValue = 0
+            xUnit  = "px"
+        } else if (horizontal === "center") {
+            xValue = 50
+            xUnit  = "%"
+        } else if (horizontal === "right" ) {
+            xValue = 100
+            xUnit  = "%"
+        } else {
+            xUnit  = horizontal.endsWith("%") ? "%" : "px"
+            xValue = parseFloat(horizontal)
+        }
+
+        if (vertical === "top") {
+            yValue = 0
+            yUnit  = "px"
+        } else if (vertical === "middle") {
+            yValue = 50
+            yUnit  = "%"
+        } else if (vertical === "bottom") {
+            yValue = 100
+            yUnit  = "%"
+        } else {
+            yUnit  = vertical.endsWith("%") ? "%" : "px"
+            yValue = parseInt(vertical)
+        }
+
+        const x = xUnit === "%" ?
+            Math.max(elRect.left + elRect.width / 100 * xValue - ttRect.width / 2, 2) :
+            Math.max(elRect.left - ttRect.width / 2 + xValue, 2);
+
+        let y = yUnit === "%" ?
+            Math.max(elRect.top + elRect.height / 100 * yValue, 10) :
+            Math.max(elRect.top + yValue, 10);
+
+        if (y > elRect.top + elRect.height / 2) {
+            this.tooltip.current!.classList.add("top-pointer")
+        }
+        else {
+            this.tooltip.current!.classList.remove("top-pointer")
+            y -= ttRect.height
+        }
+        
+        this.tooltip.current!.classList[
+            x < elRect.left - ttRect.width / 2 ||
+            x > elRect.left + elRect.width - ttRect.width / 2 //||
+            // y < elRect.top - ttRect.height ||
+            // y > elRect.top + elRect.height - ttRect.height
+            ? "add" : "remove"
+        ]("no-pointer")
+        
+        this.tooltip.current!.style.transform = `translate(${x}px, ${y}px)`
     }
     
     hideTooltip() {
