@@ -647,9 +647,9 @@ export default function Dashboard({
         }
     }
 
-    const deleteCommand        = useCommand(new DeleteGraph(view.id || 0, auth.user, navigate));
+    const deleteCommand        = useCommand(new DeleteGraph({ graphId: view.id || 0, user: auth.user, navigate, ownerId: view.creatorId }));
     const copyCommand          = useCommand(new CopyGraph(view.id || 0, auth.user, navigate, runtimeView));
-    const shareCommand         = useCommand(new ShareGraph(view.id || 0, auth.user));
+    const shareCommand         = useCommand(new ShareGraph(view, auth.user));
     const managePermissionsCmd = useCommand(new ManagePermissions(view, auth.user));
     const downloadPNG          = useCommand(new DownloadScreenshotAsPNG(runtimeView));
     const downloadJPG          = useCommand(new DownloadScreenshotAsJPG(runtimeView));
