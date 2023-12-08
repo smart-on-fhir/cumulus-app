@@ -31,7 +31,7 @@ export default [
     { user_id: null, role: "manager", user_group_id: null, resource: "Graphs", action: "search", resource_id: null, permission: 1, comment: "Can search and list graphs" },
     { user_id: null, role: "manager", user_group_id: null, resource: "Graphs", action: "share" , resource_id: null, permission: 1, comment: "Can share graphs"  },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Graphs", action: "read"  , resource_id: null, permission: 0, comment: "Can read graphs"   },
-    { user_id: null, role: "user"   , user_group_id: null, resource: "Graphs", action: "create", resource_id: null, permission: 0, comment: "Can create graphs" },
+    { user_id: null, role: "user"   , user_group_id: null, resource: "Graphs", action: "create", resource_id: null, permission: 1, comment: "Can create graphs" },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Graphs", action: "update", resource_id: null, permission: 0, comment: "Can update graphs" },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Graphs", action: "delete", resource_id: null, permission: 0, comment: "Can delete graphs" },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Graphs", action: "search", resource_id: null, permission: 1, comment: "Can search and list graphs" },
