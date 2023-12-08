@@ -11,7 +11,7 @@ import ConfigPanel                               from "./ConfigPanel"
 import {buildChartOptions, default as BaseChart} from "./Charts/Chart"
 import CaptionEditor                             from "./CaptionEditor"
 import EditInPlace                               from "../generic/EditInPlace"
-import { defer, Json, strip }                    from "../../utils"
+import { defer, Json, requestPermission, strip } from "../../utils"
 import { getDefaultChartOptions }                from "./Charts/DefaultChartOptions"
 import Tag                                       from "../Tags/Tag"
 import Grid                                      from "../generic/Grid"
@@ -296,8 +296,9 @@ export default function Dashboard({
 }) {
     const navigate  = useNavigate();
     const auth      = useAuth();
-    const canUpdate = auth.user?.permissions.includes("Graphs.update")
-    const canCreate = auth.user?.permissions.includes("Graphs.create")
+    const isOwner   = auth.user && view.creatorId === auth.user.id;
+    const canUpdate = isOwner || requestPermission({ user: auth.user!, resource: "Graphs", resource_id: view.id, action: "update" })
+    const canCreate = requestPermission({ user: auth.user!, resource: "Graphs", action: "create" })
 
     const { cols = [] } = dataRequest.metadata ?? {}
 
