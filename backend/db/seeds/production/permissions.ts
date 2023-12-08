@@ -176,4 +176,12 @@ export default [
     { user_id: null, role: "admin"  , user_group_id: null, resource: "UserGroups", action: "create", resource_id: null, permission: 1, comment: "Can create UserGroups" },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "UserGroups", action: "update", resource_id: null, permission: 1, comment: "Can update UserGroups" },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "UserGroups", action: "delete", resource_id: null, permission: 1, comment: "Can delete UserGroups" },
+    { user_id: null, role: "manager", user_group_id: null, resource: "UserGroups", action: "read"  , resource_id: null, permission: 1, comment: "Can read UserGroups"   },
+    { user_id: null, role: "manager", user_group_id: null, resource: "UserGroups", action: "create", resource_id: null, permission: 0, comment: "Can create UserGroups" },
+    { user_id: null, role: "manager", user_group_id: null, resource: "UserGroups", action: "update", resource_id: null, permission: 0, comment: "Can update UserGroups" },
+    { user_id: null, role: "manager", user_group_id: null, resource: "UserGroups", action: "delete", resource_id: null, permission: 0, comment: "Can delete UserGroups" },
+    { user_id: null, role: "user"   , user_group_id: null, resource: "UserGroups", action: "read"  , resource_id: null, permission: 1, comment: "Can read UserGroups"   },
+    { user_id: null, role: "user"   , user_group_id: null, resource: "UserGroups", action: "create", resource_id: null, permission: 0, comment: "Can create UserGroups" },
+    { user_id: null, role: "user"   , user_group_id: null, resource: "UserGroups", action: "update", resource_id: null, permission: 0, comment: "Can update UserGroups" },
+    { user_id: null, role: "user"   , user_group_id: null, resource: "UserGroups", action: "delete", resource_id: null, permission: 0, comment: "Can delete UserGroups" },
 ]
