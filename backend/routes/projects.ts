@@ -3,6 +3,7 @@ import Model                      from "../db/models/Project"
 import { route }                  from "../lib/route"
 import { NotFound, Unauthorized } from "../errors"
 import { assert }                 from "../lib"
+import View                       from "../db/models/View"
 
 
 const router = express.Router({ mergeParams: true });
@@ -57,7 +58,10 @@ route(router, {
                     // },
                     include: [
                         {
-                            association: "Views"
+                            model: View.scope({ method: ['visible', req.user] }),
+                            attributes: [
+                                "id","creatorId","name","description","updatedAt","screenShot"
+                            ]
                         }
                     ]
                 }
