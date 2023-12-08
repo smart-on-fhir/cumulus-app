@@ -8,13 +8,20 @@ import { requestPermission } from "../../utils"
 export class DeleteGraph extends Command
 {
     private graphId?: number
+    private ownerId?: number | null
     private user?: app.User | null
     private navigate?: NavigateFunction
     
-    constructor(graphId: number, user?: app.User | null, navigate?: NavigateFunction) {
+    constructor({ graphId, ownerId, user, navigate }: {
+        graphId  : number,
+        ownerId ?: number | null,
+        user    ?: app.User | null,
+        navigate?: NavigateFunction
+    }) {
         super()
-        this.graphId = graphId
-        this.user = user
+        this.graphId  = graphId
+        this.ownerId  = ownerId
+        this.user     = user
         this.navigate = navigate
     }
 
@@ -39,7 +46,8 @@ export class DeleteGraph extends Command
     }
 
     enabled() {
-        return !!this.graphId && requestPermission({
+        const isOwner = this.user && this.user.id === this.ownerId
+        return isOwner || !!this.graphId && requestPermission({
             user       : this.user!,
             resource   : "Graphs",
             resource_id: this.graphId,

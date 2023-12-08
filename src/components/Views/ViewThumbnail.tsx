@@ -28,32 +28,32 @@ export default function ViewThumbnail({
     selected       ?: boolean
     selectable     ?: boolean
     onSelect       ?: (id: number) => void
-    selection      ?: CustomSelection<number>
+    selection      ?: CustomSelection<app.View>
 }) {
     const auth              = useAuth()
     const navigate          = useNavigate()
     const link              = useRef<HTMLAnchorElement>(null)
     
-    const deleteCommand      = useCommand(new DeleteGraph(view.id || 0, auth.user, navigate));
+    const deleteCommand      = useCommand(new DeleteGraph({ graphId: view.id || 0, user: auth.user, navigate, ownerId: view.creatorId }));
     const copyCommand        = useCommand(new CopyGraph(view.id || 0, auth.user, navigate));
-    const bulkDeleteCommand  = useCommand(new BulkDelete(selection?.items || [], auth.user))
+    const bulkDeleteCommand  = useCommand(new BulkDelete({ graphs: selection?.items || [], user: auth.user }))
     const viewCommand        = useCommand(new View(view.id, auth.user, navigate))
     const requestLineData    = useCommand(new RequestLineLevelData(view.id, auth.user, navigate))
     const openInAE           = useCommand(new OpenInAnalyticEnvironment(view.DataRequestId || 0, auth.user))
-    const shareCommand       = useCommand(new ShareGraph(view.id || 0, auth.user));
-    const bulkShareGraph     = useCommand(new BulkShareGraph(selection?.items || [], auth.user))
+    const shareCommand       = useCommand(new ShareGraph(view, auth.user));
+    const bulkShareGraph     = useCommand(new BulkShareGraph({ graphs: selection?.items || [], user: auth.user }))
     const permissionsCommand = useCommand(new ManagePermissions(view, auth.user));
 
     return (
         <Link
             ref={link}
             to={ "/views/" + view.id }
-            className={"view-thumbnail" + (selection?.includes(view.id) ? " selected" : "")}
+            className={"view-thumbnail" + (selection?.includes(view) ? " selected" : "")}
             title={ showDescription ? undefined : view.description || undefined }
             onClick={e => {
                 if (selection && e.metaKey) {
                     e.preventDefault()
-                    selection.toggle(view.id)
+                    selection.toggle(view)
                 }
             }}
             onContextMenu={function (e) {
@@ -70,7 +70,7 @@ export default function ViewThumbnail({
                     permissionsCommand
                 ];
 
-                if (selection && selection.size() > 1 && selection.includes(view.id)) {
+                if (selection && selection.size() > 1 && selection.includes(view)) {
 
                     const bulkItems: any[] = [];
 

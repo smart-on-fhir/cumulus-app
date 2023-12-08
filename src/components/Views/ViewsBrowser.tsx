@@ -1,18 +1,15 @@
-import { useCallback } from "react"
-import { Link }        from "react-router-dom"
-import { useBackend }  from "../../hooks"
-import { request }     from "../../backend"
-import Loader          from "../generic/Loader"
-import { AlertError }  from "../generic/Alert"
-import ViewThumbnail   from "./ViewThumbnail"
-import { classList }   from "../../utils"
-import Collapse        from "../generic/Collapse"
-import { app }         from "../../types"
-import { useAuth }     from "../../auth"
-import {
-    CustomSelection,
-    WithSelection
-} from "../generic/WithSelection"
+import { useCallback }                    from "react"
+import { Link }                           from "react-router-dom"
+import ViewThumbnail                      from "./ViewThumbnail"
+import { AlertError }                     from "../generic/Alert"
+import Collapse                           from "../generic/Collapse"
+import Loader                             from "../generic/Loader"
+import { CustomSelection, WithSelection } from "../generic/WithSelection"
+import { useBackend }                     from "../../hooks"
+import { request }                        from "../../backend"
+import { classList }                      from "../../utils"
+import { app }                            from "../../types"
+import { useAuth }                        from "../../auth"
 import "./ViewsBrowser.scss"
 
 
@@ -37,7 +34,7 @@ export default function ViewsBrowser({
 
     const query = new URLSearchParams()
 
-    query.set("attributes", "id,name,description,updatedAt,screenShot")
+    query.set("attributes", "id,creatorId,name,description,updatedAt,screenShot")
 
     switch (sort) {
         case "mod-asc":
@@ -101,7 +98,7 @@ export default function ViewsBrowser({
         }
     }
 
-    function renderItems(selection: CustomSelection<number>) {
+    function renderItems(selection: CustomSelection<app.View>) {
         if (groupBy === "subscription") {
             return renderBySubscription(selection)
         }
@@ -113,7 +110,7 @@ export default function ViewsBrowser({
                 ["view-browser view-browser-" + layout] : true,
                 "nested": !!requestId
             })}>
-                { requestId && !canCreateGraphs && result?.length === 0 && <div className="color-red small">You cannot see any of the graphs and you are not allowed to create new graphs!</div> }
+                { requestId && !canCreateGraphs && result?.length === 0 && <div className="color-red small">You cannot see any of the graphs, and you are not allowed to create new graphs!</div> }
                 { requestId && canCreateGraphs && <Link to={`/requests/${requestId}/create-view`} className="view-thumbnail view-thumbnail-add-btn">
                         <div className="view-thumbnail-image">
                             <div className="plus-icon-wrapper">
@@ -143,7 +140,7 @@ export default function ViewsBrowser({
         )
     }
 
-    function renderBySubscription(selection: CustomSelection<number>) {
+    function renderBySubscription(selection: CustomSelection<app.View>) {
         const groups: Record<string, any[]> = {};
         (result || []).forEach(item => {
             let label = item.DataRequest!.name;
@@ -157,7 +154,7 @@ export default function ViewsBrowser({
         return renderGroups(groups, "database", selection)
     }
 
-    function renderByTag(selection: CustomSelection<number>) {
+    function renderByTag(selection: CustomSelection<app.View>) {
         const groups: Record<string, any[]> = {};
         
         const unTagged: any[] = [];
@@ -184,7 +181,7 @@ export default function ViewsBrowser({
         return renderGroups(groups, "sell", selection)
     }
 
-    function renderGroups(groups: Record<string, any[]>, icon: string, selection: CustomSelection<number>) {
+    function renderGroups(groups: Record<string, any[]>, icon: string, selection: CustomSelection<app.View>) {
         return <>
             {
                 Object.keys(groups).map((k, i) => (
@@ -214,7 +211,9 @@ export default function ViewsBrowser({
         </>
     }
 
-    return <WithSelection<number>>{(selection) => {
-        return <div>{ renderItems(selection) }</div>
-    }}</WithSelection>
+    return (
+        <WithSelection<app.View> equals={(a, b) => !!a.id && a.id === b.id}>
+            { selection => <div>{ renderItems(selection) }</div> }
+        </WithSelection>
+    )
 }

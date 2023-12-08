@@ -1,17 +1,18 @@
-import { render }  from "react-dom"
-import { app }     from "../../../types"
-import { Command } from "../../Command"
-import ShareDialog from "./components/ShareDialog"
+import { render }            from "react-dom"
+import ShareDialog           from "./components/ShareDialog"
+import { Command }           from "../../Command"
+import { app }               from "../../../types"
+import { requestPermission } from "../../../utils"
 
 
 export class BulkShareGraph extends Command
 {
-    private graphId: number[]
+    private graphs: app.View[]
     private user: app.User | null
     
-    constructor(graphId: number[], user: app.User | null) {
+    constructor({ graphs, user }: { graphs: app.View[], user: app.User | null }) {
         super()
-        this.graphId = graphId
+        this.graphs = graphs
         this.user = user
     }
 
@@ -28,18 +29,28 @@ export class BulkShareGraph extends Command
     }
 
     available() {
-        return !!this.graphId.length && !!this.user;
+        return !!this.graphs.length && !!this.user;
     }
 
     enabled() {
-        return !!this.graphId.length && !!this.user?.permissions?.includes("Graphs.create");
+        return this.graphs.length > 0 && this.graphs.every(g => {
+            if (this.user!.id === g.creatorId) {
+                return true
+            }
+            return requestPermission({
+                user: this.user!,
+                resource: "Graphs",
+                action: "share",
+                resource_id: g.id
+            })
+        });
     }
     
     execute() {
         render(
             <ShareDialog 
                 resource="Graphs"
-                resource_id={ this.graphId }
+                resource_id={ this.graphs.map(g => g.id) }
                 user={ this.user }
             />,
             document.getElementById("modal")!

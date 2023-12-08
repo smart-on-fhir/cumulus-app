@@ -1,16 +1,17 @@
-import { request } from "../../backend"
-import { Command } from "../Command"
-import { app }     from "../../types"
+import { request }           from "../../backend"
+import { Command }           from "../Command"
+import { app }               from "../../types"
+import { requestPermission } from "../../utils"
 
 
 export class BulkDelete extends Command
 {
-    private graphIds: number[]
+    private graphs: Partial<app.View>[]
     private user?: app.User | null
     
-    constructor(graphIds: number[], user?: app.User | null) {
+    constructor({ graphs, user }: { graphs: Partial<app.View>[], user?: app.User | null }) {
         super()
-        this.graphIds = graphIds
+        this.graphs = graphs
         this.user = user
     }
 
@@ -25,16 +26,26 @@ export class BulkDelete extends Command
     }
 
     available() {
-        return this.graphIds.length > 0 && !!this.user;
+        return this.graphs.length > 0 && !!this.user;
     }
 
     enabled() {
-        return this.graphIds.length > 0 && !!this.user?.permissions?.includes("Graphs.delete");
+        return this.graphs.length > 0 && this.graphs.every(g => {
+            if (this.user!.id === g.creatorId) {
+                return true
+            }
+            return requestPermission({
+                user: this.user!,
+                resource: "Graphs",
+                action: "delete",
+                resource_id: g.id
+            })
+        });
     }
     
     async execute() {
         if (window.confirm("Yre you sure you want to delete these graphs?")) {
-            return request(`/api/views?id=${this.graphIds.join(",")}`, { method: "DELETE" }).then(() => {
+            return request(`/api/views?id=${this.graphs.map(g => g.id).join(",")}`, { method: "DELETE" }).then(() => {
                 window.location.reload()
             })
         }
