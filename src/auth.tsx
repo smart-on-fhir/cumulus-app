@@ -10,11 +10,12 @@ import {
 
 
 interface AuthContextType {
-    user: app.User | null;
-    login: (username: string, password: string, remember?: boolean) => Promise<void>;
-    logout: () => Promise<void>;
-    update: (props: Partial<app.User>) => void;
-    error: Error | null;
+    user   : app.User | null;
+    login  : (username: string, password: string, remember?: boolean) => Promise<void>;
+    logout : () => Promise<void>;
+    update : (props: Partial<app.User>) => void;
+    sync   : () => Promise<void>;
+    error  : Error | null;
     loading: boolean;
 }
 
@@ -72,9 +73,20 @@ export function AuthProvider({ children }: { children: React.ReactNode })
         }
         window.location.href = "/login"
     }
+
+    const sync = React.useCallback(() => {
+        return auth.sync().then(user => {
+            const json = JSON.stringify(user)
+            if (JSON.stringify(storedUser) !== json) {
+                localStorage.setItem("user", json);
+                setUser(user);
+            }
+        })
+    }, [storedUser])
+
   
     return (
-        <AuthContext.Provider value={{ user, login, logout, error, loading, update }}>
+        <AuthContext.Provider value={{ user, login, logout, error, loading, update, sync }}>
             {children}
         </AuthContext.Provider>
     );
