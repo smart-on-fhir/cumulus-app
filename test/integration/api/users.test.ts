@@ -32,6 +32,35 @@ describe("Users", () => {
         })
     })
 
+    describe("view (GET /api/users/me)", () => {
+        
+        it ("admin can view himself", async () => {
+            const res = await fetch(`${server.baseUrl}/api/users/me`, { headers: { Cookie: "sid=" + admin.sid } })
+            expect(res.status).to.equal(200)
+            expect(await res.json()).to.haveOwnProperty("id").that.equals(admin.id)
+        })
+
+        it ("manager can view himself", async () => {
+            const res = await fetch(`${server.baseUrl}/api/users/me`, { headers: { Cookie: "sid=" + manager.sid } })
+            expect(res.status).to.equal(200)
+            expect(await res.json()).to.haveOwnProperty("id").that.equals(manager.id)
+        })
+
+        it ("user can view himself", async () => {
+            const res = await fetch(`${server.baseUrl}/api/users/me`, { headers: { Cookie: "sid=" + user.sid } })
+            expect(res.status).to.equal(200)
+            expect(await res.json()).to.haveOwnProperty("id").that.equals(user.id)
+        })
+
+        it ("guest cannot view himself", async () => {
+            const res = await fetch(`${server.baseUrl}/api/users/me`)
+            const json = await res.json()
+            expect(json).to.haveOwnProperty("id").that.equals(-1)
+            expect(json).to.haveOwnProperty("role").that.equals("guest")
+            expect(json).to.haveOwnProperty("permissions").that.deep.equals([])
+        })
+    })
+
     describe("view (GET /api/users/:id)", () => {
         
         testEndpoint("Users.read", "GET", "/api/users/" + admin.id)

@@ -99,6 +99,19 @@ route(router, {
     }
 })
 
+// Get info for the current user -----------------------------------------------
+route(router, {
+    path: "/me",
+    method: "get",
+    async handler(req, res) {
+        const user = req.user!
+        res.json(secure({
+            ...user,
+            permissions: Object.keys(user.permissions).filter(k => !!user.permissions[k])
+        }))
+    }
+});
+
 // Get one user by ID ----------------------------------------------------------
 route(router, {
     path: "/:id",
