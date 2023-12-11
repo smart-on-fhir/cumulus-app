@@ -21,9 +21,11 @@ interface AuthContextType {
 
 let AuthContext = React.createContext<AuthContextType>(null!);
 
+let timer: NodeJS.Timeout, delay = 1000;
+
 export function AuthProvider({ children }: { children: React.ReactNode })
 {
-    const storedUser = JSON.parse(localStorage.getItem("user") || "null") as app.User | null;
+    let storedUser = JSON.parse(localStorage.getItem("user") || "null") as app.User | null;
 
     // transition for users logged in before permissions were implemented
     if (storedUser && !storedUser.permissions) {
@@ -80,10 +82,28 @@ export function AuthProvider({ children }: { children: React.ReactNode })
             if (JSON.stringify(storedUser) !== json) {
                 localStorage.setItem("user", json);
                 setUser(user);
+                delay = 1000
             }
         })
     }, [storedUser])
 
+    React.useEffect(() => {
+        const _sync = () => {
+            if (timer) {
+                clearTimeout(timer)
+            }
+            sync().finally(() => {
+                delay = Math.min(delay * 1.1, 60000)
+                timer = setTimeout(_sync, delay)
+            })
+        }
+        timer = setTimeout(_sync, delay)
+        return () => {
+            if (timer) {
+                clearTimeout(timer)
+            }
+        }
+    }, [sync])
   
     return (
         <AuthContext.Provider value={{ user, login, logout, error, loading, update, sync }}>
