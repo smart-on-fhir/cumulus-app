@@ -1,18 +1,18 @@
 import express, { NextFunction, Request, Response } from "express"
 import Crypto                                       from "crypto"
 import Bcrypt                                       from "bcryptjs"
-import { Op, Sequelize }                            from "sequelize"
+import { Op }                                       from "sequelize"
 import User                                         from "../db/models/User"
 import { wait }                                     from "../lib"
 import { logger }                                   from "../logger"
-import { BadRequest, Forbidden, Unauthorized }      from "../errors"
+import { BadRequest }                               from "../errors"
 import { app }                                      from "../.."
-import { AppRequest, Role }                         from "../types"
+import { AppRequest }                               from "../types"
 import SystemUser                                   from "../SystemUser"
 
 
 
-const AUTH_DELAY = process.env.NODE_ENV === "production" ? 1000 : 1000;
+const AUTH_DELAY = process.env.NODE_ENV === "test" ? 0 : 1000;
 
 export const router = express.Router({ mergeParams: true });
 
@@ -23,7 +23,7 @@ export const router = express.Router({ mergeParams: true });
  * is found store it at `req.user` as an object with username, role and sid
  * properties. Otherwise `req.user` will be undefined.
  */
-export function authenticate(dbConnection: Sequelize) {
+export function authenticate() {
     return async (req: app.UserRequest, res: Response, next: NextFunction) => {
         const { sid } = req.cookies;
         // @ts-ignore
@@ -38,33 +38,12 @@ export function authenticate(dbConnection: Sequelize) {
                     (req as AppRequest).user = currentUser
                 }
             } catch (ex) {
-                logger.error(ex, { tags: ["AUTH"] });
+                logger.error(ex as any, { tags: ["AUTH"] });
             }
         }
         else {
             // get permissions for guest?
         }
-        next();
-    }
-}
-
-/**
- * Require Authentication middleware -------------------------------------------
- * Checks `req.user?.role`.
- * - if the user does not exist throws HttpError.Unauthorized
- * - if the user does not have one of the required roles throws HttpError.Forbidden
- */
-export function requireAuth(...roles: Role[]): (req: app.UserRequest, res: Response, next: NextFunction) => void {
-    return function(req, res, next) {
-        
-        if (!req.user) {
-            return next(new Unauthorized("Authorization required"));
-        }
-
-        if (roles.length && !roles.includes(req.user.role)) {
-            return next(new Forbidden("Permission denied"));
-        }
-
         next();
     }
 }
@@ -124,7 +103,7 @@ async function login(req: Request, res: Response) {
         });
 
     } catch (ex) {
-        logger.error(ex, { tags: ["AUTH"] })
+        logger.error(ex as any, { tags: ["AUTH"] })
         res.status(401).end("Login failed");
     }
 }
@@ -143,7 +122,7 @@ async function logout(req: AppRequest, res: Response) {
                     }
                 });
         } catch (ex) {
-            logger.error(ex, { tags: ["AUTH"] });
+            logger.error(ex as any, { tags: ["AUTH"] });
         }
     }
     res.clearCookie("sid").json({ message: "Logged out" }).end();

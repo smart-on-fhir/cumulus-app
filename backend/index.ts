@@ -56,9 +56,9 @@ function createServer(config: Config)
     return { app, server };
 }
 
-function setupAuth(app: Application, dbConnection: Sequelize)
+function setupAuth(app: Application)
 {
-    app.use(cookieParser(), Auth.authenticate(dbConnection));
+    app.use(cookieParser(), Auth.authenticate());
     app.use("/api/auth", Auth.router);
     logger.verbose("✔ Authentication set up");
 }
@@ -155,8 +155,8 @@ function startServer(server: HTTP.Server, config: Config)
 async function main(config: Config = settings)
 {
     const { app, server } = createServer(config);
-    const dbConnection = await setupDB(config);
-    setupAuth(app, dbConnection);
+    await setupDB(config);
+    setupAuth(app);
     setupAPI(app);
     setupStaticContent(app);
     setUpErrorHandlers(app);

@@ -423,7 +423,7 @@ route(router, {
         const match = (/^data:(.+?);base64,(.+)$/).exec(data || "");
 
         if (!match) {
-            return res.sendStatus(400).end(`Invalid base64 image data`);
+            return res.status(400).end(`Invalid base64 image data`);
         }
 
         const file = Buffer.from(match[2], "base64");
