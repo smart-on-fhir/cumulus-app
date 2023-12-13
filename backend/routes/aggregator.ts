@@ -3,7 +3,6 @@ import express, { Request, Response } from "express"
 import https, { RequestOptions } from "https"
 import { rw } from "../lib"
 import config from "../config"
-import { requireAuth } from "../controllers/Auth"
 
 
 const router = express.Router({ mergeParams: true })
@@ -30,7 +29,9 @@ const AGGREGATOR_PATHS = [
     "/study-periods",
 ];
 
-router.get(AGGREGATOR_PATHS, requireAuth(), rw(async (req: Request, res: Response) => {
+router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
+
+    // TODO: Request appropriate permissions
 
     const { enabled, apiKey, baseUrl } = config.aggregator
 

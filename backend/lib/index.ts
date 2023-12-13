@@ -126,18 +126,22 @@ export function getFindOptions(req)
 
     // limit ------------------------------------------------------------------
     if (req.query.limit) {
-        options.limit = uInt(req.query.limit)
-
         String(req.query.limit).split(",").forEach(x => {
             const tokens = x.trim().split(":")
             if (tokens.length === 1) {
-                options.limit = uInt(tokens[0])
+                const limit = uInt(tokens[0])
+                if (limit > 0) {
+                    options.limit = limit
+                }
             }
             else if (tokens.length === 2) {
-                const model = (options.include as IncludeOptions[]).find(o => o.association === tokens[0])
-                if (model) {
-                    model.separate = true
-                    model.limit = uInt(tokens[1])
+                const limit = uInt(tokens[1])
+                if (limit > 0) {
+                    const model = (options.include as IncludeOptions[]).find(o => o.association === tokens[0])
+                    if (model) {
+                        model.separate = true
+                        model.limit = limit
+                    }
                 }
             }
         });
@@ -431,10 +435,10 @@ export function valueToDataType(x: string) {
     if (!x) {
         return ""
     }
-    if ((/^-?[0-9]+$/).test(x)) {
+    if ((/^(-|\+)?[0-9]+$/).test(x)) {
         return "integer"
     }
-    if ((/^-?[0-9]*\.[0-9]+$/).test(x)) {
+    if ((/^(-|\+)?[0-9]*\.[0-9]+$/).test(x)) {
         return "float"
     }
     if ((/^\d{4}-01-01/).test(x)) {
