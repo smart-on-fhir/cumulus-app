@@ -15,7 +15,7 @@ describe("Graphs", () => {
         testEndpoint("Graphs.read", "GET", "/api/views?order=name:asc", null, true)
     })
 
-    describe.only("view", () => {
+    describe("view", () => {
         testEndpoint("Graphs.read", "GET", "/api/views/1?tags=true&group=true&projects=true&subscription=true")
         
         it("get the screenshot", async () => {
