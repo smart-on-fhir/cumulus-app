@@ -1,7 +1,7 @@
 import moment        from "moment"
 import { Op }        from "sequelize"
 import DataRequest   from "./db/models/DataRequest"
-import { fetchData } from "./controllers/DataRequest"
+import { fetchData } from "./routes/DataRequest"
 import { logger }    from "./logger"
 
 

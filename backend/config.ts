@@ -25,8 +25,7 @@ const {
     REGIONAL_CLUSTER_EMAIL = "",
     AGGREGATOR_URL         = "",
     AGGREGATOR_API_KEY     = "",
-    AGGREGATOR_ENABLED     = "false",
-
+    AGGREGATOR_ENABLED     = "false"
 } = process.env;
 
 
