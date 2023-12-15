@@ -198,10 +198,15 @@ export async function notifyForGraphsAccess({
     return Promise.allSettled(emails.map(email => {
         let html = [`<h2>The following content has been shared with you:</h2>`];
 
-        graphId.forEach(id => {
-            const href = new URL("/views/" + id, baseUrl)
+        if (graphId.length) {
+            graphId.forEach(id => {
+                const href = new URL("/views/" + id, baseUrl)
+                html.push(`<div><a href="${href}" target="_blank">${href}</a></div>`)
+            })
+        } else {
+            const href = new URL("/views/", baseUrl)
             html.push(`<div><a href="${href}" target="_blank">${href}</a></div>`)
-        })
+        }
 
         html.push(`<p>You are allowed to ${generateActionsList(actions as any)}.</p>`)
 
