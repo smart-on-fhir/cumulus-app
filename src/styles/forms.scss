@@ -81,7 +81,10 @@
         pointer-events: none;
 
         &, & * {
-            color         : #BBB;
+            color         : #8888;
+            background    : #8881;
+            border-color  : #8883;
+            text-shadow   : 0 1px 0 #FFF8;
             filter        : grayscale(1);
         }
     }
