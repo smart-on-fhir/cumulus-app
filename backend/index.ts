@@ -5,12 +5,15 @@ import Path                     from "path"
 import express, { Application } from "express"
 import cors                     from "cors"
 import cookieParser             from "cookie-parser"
-import { Sequelize }            from "sequelize";
-import * as Auth                from "./controllers/Auth"
+import * as Auth                from "./routes/Auth"
 import setupDB                  from "./db"
 import settings                 from "./config"
 import { logger }               from "./logger"
-import { AppRequest, Config }   from "./types"
+import {
+    AppRequest,
+    Config,
+    AppErrorRequestHandler
+} from "./types"
 
 
 function createServer(config: Config)
@@ -65,17 +68,17 @@ function setupAuth(app: Application)
 
 function setupAPI(app: Application)
 {
-    app.use("/api/request-groups", require("./routes/groups"           ).default);
-    app.use("/api/requests"      , require("./controllers/DataRequest" ));
-    app.use("/api/views"         , require("./routes/views"            ).default);
-    app.use("/api/users"         , require("./routes/users"            ).default);
-    app.use("/api/projects"      , require("./routes/projects"         ).default);
-    app.use("/api/logs"          , require("./routes/logs"             ).default);
-    app.use("/api/tags"          , require("./routes/tags"             ).default);
-    app.use("/api/data-sites"    , require("./routes/sites"            ).default);
-    app.use("/api/aggregator"    , require("./routes/aggregator"       ).default);
-    app.use("/api/permissions"   , require("./routes/permissions"      ).default);
-    app.use("/api/user-groups"   , require("./routes/userGroups"       ).default);
+    app.use("/api/request-groups", require("./routes/groups"      ).default);
+    app.use("/api/requests"      , require("./routes/DataRequest" ));
+    app.use("/api/views"         , require("./routes/views"       ).default);
+    app.use("/api/users"         , require("./routes/users"       ).default);
+    app.use("/api/projects"      , require("./routes/projects"    ).default);
+    app.use("/api/logs"          , require("./routes/logs"        ).default);
+    app.use("/api/tags"          , require("./routes/tags"        ).default);
+    app.use("/api/data-sites"    , require("./routes/sites"       ).default);
+    app.use("/api/aggregator"    , require("./routes/aggregator"  ).default);
+    app.use("/api/permissions"   , require("./routes/permissions" ).default);
+    app.use("/api/user-groups"   , require("./routes/userGroups"  ).default);
     logger.verbose("✔ REST API set up");
 }
 
@@ -96,7 +99,7 @@ function setUpErrorHandlers(app: Application)
     });
 
     // Global error 500 handler
-    app.use((error, req, res, next) => {
+    app.use(((error, req, res, next) => {
         
         // console.error(error)
 
@@ -128,7 +131,7 @@ function setUpErrorHandlers(app: Application)
         }
 
         res.end()
-    });
+    }) as AppErrorRequestHandler);
 
     logger.verbose("✔ Error handlers activated");
 }

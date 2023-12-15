@@ -109,3 +109,16 @@ interface AppRequestHandler<
         next: NextFunction,
     ): void;
 }
+
+export type AppErrorRequestHandler<
+    P = ParamsDictionary,
+    ResBody = any,
+    ReqBody = any,
+    ReqQuery = ParsedQs,
+    Locals extends Record<string, any> = Record<string, any>
+> = (
+    err: any,
+    req: AppRequest<P, ResBody, ReqBody, ReqQuery, Locals>,
+    res: Response<ResBody, Locals>,
+    next: NextFunction,
+) => void;

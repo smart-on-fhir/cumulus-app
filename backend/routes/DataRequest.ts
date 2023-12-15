@@ -13,7 +13,7 @@ import GroupModel                                                 from "../db/mo
 import { requestPermission }                                      from "../acl"
 import ViewModel                                                  from "../db/models/View"
 import ColumnsMetadata                                            from "../cumulus_library_columns.json"
-import { logger }                                                 from "../logger"
+import { logger, logSql }                                                 from "../logger"
 import ImportJob                                                  from "../DataManager/ImportJob"
 import { getFindOptions, assert, rw, parseDelimitedString, uInt } from "../lib"
 import { version as pkgVersion }                                  from "../../package.json"
@@ -475,7 +475,7 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
     // Execute the query
     const result = await subscription.sequelize.query<any>(sql, {
         replacements,
-        logging: sql => logger.info(sql, { tags: ["SQL", "DATA"] }),
+        logging: logSql,
         type: QueryTypes.SELECT
     });
 
@@ -490,7 +490,7 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         // console.log(countSql)
         const totals = await subscription.sequelize.query<any>(countSql, {
             replacements,
-            logging: sql => logger.info(sql, { tags: ["SQL", "DATA"] }),
+            logging: logSql,
             type: QueryTypes.SELECT
         });
 
