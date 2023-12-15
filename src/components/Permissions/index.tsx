@@ -1,7 +1,10 @@
 import { useState }               from "react"
 import { Helmet, HelmetProvider } from "react-helmet-async"
+import { useAuth }                from "../../auth"
 import { request, updateOne }     from "../../backend"
-import { useBackend }             from "../../hooks"
+import CommandButton              from "../../commands/CommandButton"
+import { CreatePermission }       from "../../commands/Graphs/Share/CreatePermission"
+import { useBackend, useCommand } from "../../hooks"
 import { app }                    from "../../types"
 import { buildPermissionLabel }   from "../../utils"
 import Alert, { AlertError }      from "../generic/Alert"
@@ -35,6 +38,10 @@ const roleBgColors = {
 
 
 export default function PermissionsManager() {
+    const { user } = useAuth()
+    const [ key, setKey ] = useState(0)
+    const createPermissionCommand = useCommand(new CreatePermission(user, () => setKey(key + 1)));
+
     return (
         <>
             <HelmetProvider>
@@ -43,16 +50,23 @@ export default function PermissionsManager() {
                 </Helmet>
             </HelmetProvider>
             <div className="permissions-page container">
-                <h4>
-                    <i className="icon fa-solid fa-shield color-blue-dark" /> Manage Permissions
-                </h4>
+                <div className="pt-1 row gap">
+                    <div className="col">
+                        <h4>
+                            <i className="icon fa-solid fa-shield color-blue-dark" /> Manage Permissions
+                        </h4>
+                    </div>
+                    <div className="col col-0">
+                        <CommandButton { ...createPermissionCommand } />
+                    </div>
+                </div>
                 <hr />
                 <br />
                 <Tabs children={[
                     {
                         name: "Role-based Permissions",
                         children: (
-                            <EndpointListWrapper endpoint="/api/permissions?order=resource:asc&where=role:not:null&where=resource_id:eq:null&where=user_group_id:eq:null">
+                            <EndpointListWrapper key={key + "-role-based"} endpoint="/api/permissions?order=resource:asc&where=role:not:null&where=resource_id:eq:null&where=user_group_id:eq:null">
                             { (data: app.Permission[]) => {
                                 let lastObject = "", buffer: app.Permission[] = [], children: JSX.Element[] = [];
                                 data.forEach((row: app.Permission, i) => {
@@ -89,11 +103,11 @@ export default function PermissionsManager() {
                     },
                     {
                         name: "User-based permissions",
-                        children: <UserPermissionsUI />
+                        children: <UserPermissionsUI key={key + "-user-based"} />
                     },
                     {
                         name: "Group-based permissions",
-                        children: <GroupPermissionsUI />
+                        children: <GroupPermissionsUI key={key + "-group-based"} />
                     }
                 ]} />
             </div>

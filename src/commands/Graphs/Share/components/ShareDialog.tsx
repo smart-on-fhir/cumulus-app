@@ -7,6 +7,7 @@ import Loader                  from "../../../../components/generic/Loader"
 import { app }                 from "../../../../types"
 import ActionsList             from "./ActionsList"
 import EmailSelector           from "./EmailSelector"
+import ResourceIdSelector      from "./ResourceIdSelector"
 import RoleList                from "./RoleList"
 import UserGroupList           from "./UserGroupList"
 
@@ -15,17 +16,21 @@ export default function ShareDialog({
     user = null,
     resource,
     resource_id,
-    dialogTitle = "Crete or Update Permissions"
+    dialogTitle = "Crete or Update Permissions",
+    onComplete
 }: {
     user?: app.User | null
     resource: string
     resource_id?: number[]
     dialogTitle?: string
+    onComplete?: () => void
 })
 {
     const canReadUsers      = !!user?.permissions.includes("Users.read");
     const canReadUserGroups = !!user?.permissions.includes("UserGroups.read");
 
+    const [resourceType          , setResourceType          ] = useState<string>(resource);
+    const [resourceIds           , setResourceIds           ] = useState<number[] | undefined>(resource_id);
     const [loadingUserEmails     , setLoadingUserEmails     ] = useState<boolean>(false);
     const [loadingUserGroups     , setLoadingUserGroups     ] = useState<boolean>(false);
     const [loadingActions        , setLoadingActions        ] = useState<boolean>(false);
@@ -53,6 +58,8 @@ export default function ShareDialog({
         guest  : false
     })
 
+    const isLoading = loadingUserEmails || loadingUserGroups || loadingActions
+
 
     const submit = (close: () => void) => {
         const error = getValidationError()
@@ -65,8 +72,8 @@ export default function ShareDialog({
         // ---------------------------------------------------------------------
         setSubmitting(true)
         const payload: any = {
-            resource,
-            resource_id,
+            resource: resourceType,
+            resource_id: resourceIds?.length ? resourceIds : undefined,
             action: Object.keys(selectedActions).filter(k => selectedActions[k].selected)
         }
         if (shareWith === "users") {
@@ -134,7 +141,7 @@ export default function ShareDialog({
     }
 
     const getBody = (close: () => void) => {
-        if (loadingUserEmails || loadingUserGroups || loadingActions) {
+        if (loadingUserEmails || loadingUserGroups) {
             return <Loader msg="Loading..." />
         }
     
@@ -154,17 +161,51 @@ export default function ShareDialog({
             <form onSubmit={e => { e.preventDefault(); submit(close); } } className="m-1">
                 { validationError && <AlertError>{ validationError }</AlertError> }
                 { error && <AlertError>The server rejected this attempt with the following message: { error }</AlertError> }
-                <div aria-disabled={submitting}>
+                <div aria-disabled={ submitting || isLoading }>
+                    { (!resource || !resource_id) && <>
+                        <div className="mb-1">
+                            <label className="color-blue">Share What</label>
+                            <hr className="mb-05" />
+                            { !resource && <>
+                                <p>
+                                    <b style={{ fontWeight: 500 }}>Resource Type</b>
+                                    <span className="color-muted pull-right">Select the type of resources you want to manage access to</span>
+                                </p>
+                                <select className="mb-1" value={resourceType} onChange={e => {
+                                    setResourceIds([])
+                                    setResourceType(e.target.value)
+                                }}>
+                                    <option value="" disabled>Please Select</option>
+                                    <option value="SubscriptionGroups">SubscriptionGroups</option>
+                                    <option value="Graphs">Graphs</option>
+                                    <option value="Subscriptions">Subscriptions</option>
+                                    <option value="DataSites">DataSites</option>
+                                    <option value="StudyAreas">StudyAreas</option>
+                                    <option value="Tags">Tags</option>
+                                    <option value="UserGroups">UserGroups</option>
+                                </select>
+                            </> }
+                            { (resourceType && !resource_id) && <>
+                                <p>
+                                    <b style={{ fontWeight: 500 }}>Resources</b>
+                                    <span className="color-muted pull-right">Select resources to manage or leave this empty to manage them all</span>
+                                </p>
+                                <ResourceIdSelector resourceType={resourceType} selection={resourceIds || []} onSelectionChange={setResourceIds}/>
+                            </> }
+                        </div>
+                    </> }
                     <div>
+                        <label className="color-blue">Share with Who</label>
+                        <hr />
                         <Grid gap="2rem" cols="auto auto auto">
                             <label style={{ fontWeight: 400 }}>
-                                <input name="share-with" type="radio" checked={ shareWith === "users"  } onChange={ () => setShareWith("users" )} /> Share With Users
+                                <input name="share-with" type="radio" checked={ shareWith === "users"  } onChange={ () => setShareWith("users" )} /> Users
                             </label>
                             <label style={{ fontWeight: 400 }}>
-                                <input name="share-with" type="radio" checked={ shareWith === "groups" } onChange={ () => setShareWith("groups")} /> Share With User Groups
+                                <input name="share-with" type="radio" checked={ shareWith === "groups" } onChange={ () => setShareWith("groups")} /> User Groups
                             </label>
                             <label style={{ fontWeight: 400 }}>
-                                <input name="share-with" type="radio" checked={ shareWith === "roles"  } onChange={ () => setShareWith("roles" )} /> Share With User Roles
+                                <input name="share-with" type="radio" checked={ shareWith === "roles"  } onChange={ () => setShareWith("roles" )} /> User Roles
                             </label>
                         </Grid>
                     </div>
@@ -185,9 +226,9 @@ export default function ShareDialog({
                         shareWith === "users" && <>
                             <EmailSelector emails={userEmails} selection={selectedEmails} onChange={setSelectedEmails} />
                             <div className="mt-1">
-                                <label className="color-blue">Message to recipients</label>
+                                <label className="color-blue">Message to Recipients</label>
                                 <textarea
-                                    rows={4}
+                                    rows={3}
                                     placeholder="Optional message to send to recipients"
                                     value={message}
                                     onChange={e => setMessage(e.target.value)}
@@ -204,28 +245,34 @@ export default function ShareDialog({
                             </Grid>
                         </>
                     }
-                    <br />
-                    <label className="color-blue">Allowed actions</label>
-                    <hr />
-                    <Grid cols="1fr 1fr" gap="0 1rem">
-                        <ActionsList actions={selectedActions} onChange={setSelectedActions} user={user!} resource={resource} />
-                    </Grid>
+                    { resourceType && <>
+                        <br />
+                        <label className="color-blue">Allowed Actions</label>
+                        <hr />
+                        <Grid cols="1fr 1fr 1fr" gap="0 1rem">
+                            <ActionsList actions={selectedActions} onChange={setSelectedActions} user={user!} resource={resourceType} />
+                        </Grid>
+                    </> }
                 </div>
             </form>
         )
     }
 
     useEffect(() => {
-        
-        setLoadingActions(true)
-        request<string[]>("/api/permissions/actions?resource=Graphs")
-            .then(actions => {
-                const selectedActions: Record<string, { selected: boolean }> = {}
-                actions.forEach(action => selectedActions[action] = { selected: action === "read"})
-                setSelectedActions(selectedActions)
-            }, setLoadingActionsError)
-            .finally(() => setLoadingActions(false))
+        if (resourceType) {
+            setLoadingActions(true)
+            request<string[]>(`/api/permissions/actions?resource=${resourceType}`)
+                .then(actions => {
+                    const selectedActions: Record<string, { selected: boolean }> = {}
+                    actions.forEach(action => selectedActions[action] = { selected: action === "read"})
+                    setSelectedActions(selectedActions)
+                }, setLoadingActionsError)
+                .finally(() => setLoadingActions(false))
+        }
+    }, [resourceType])
 
+    useEffect(() => {
+        
         if (canReadUsers) {
             setLoadingUserEmails(true)
             request<{ email: string }[]>("/api/users?attributes=email").then(
@@ -233,7 +280,9 @@ export default function ShareDialog({
                 error => setLoadingUserEmailsError(error)
             ).finally(() => setLoadingUserEmails(false))
         }
-        
+    }, [ canReadUsers ]);
+    
+    useEffect(() => {
         if (canReadUserGroups) {
             setLoadingUserGroups(true)
             request<app.UserGroup[]>("/api/user-groups?attributes=id,name,description").then(
@@ -242,8 +291,7 @@ export default function ShareDialog({
             ).finally(() => setLoadingUserGroups(false))
         }
 
-
-    }, [ canReadUsers, canReadUserGroups ]);
+    }, [ canReadUserGroups ]);
 
     return <Dialog
         modal
@@ -251,5 +299,6 @@ export default function ShareDialog({
         body={ ({ close }) => getBody(close) }
         footer={ ({ close }) => getFooter(close) }
         style={{ width: 650 }}
+        onComplete={ onComplete }
     />
 }
