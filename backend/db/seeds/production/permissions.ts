@@ -168,8 +168,10 @@ export default [
     { user_id: null, role: "admin"  , user_group_id: null, resource: "Logs", action: "read", resource_id: null, permission: 1, comment: "Can read logs" },
 
     // Permissions
-    { user_id: null, role: "admin"  , resource: "Permissions", action: "read"  , user_group_id: null, resource_id : null, permission: 1,                          comment: "Can read permissions" },
-    { user_id: null, role: "admin"  , resource: "Permissions", action: "update", user_group_id: null, resource_id : null, permission: 1, attribute: "permission", comment: "Can flip permissions" },
+    { user_id: null, role: "admin"  , resource: "Permissions", action: "read"  , user_group_id: null, resource_id : null, permission: 1, comment: "Can read permissions"   },
+    { user_id: null, role: "admin"  , resource: "Permissions", action: "update", user_group_id: null, resource_id : null, permission: 1, comment: "Can update permissions" },
+    { user_id: null, role: "admin"  , resource: "Permissions", action: "create", user_group_id: null, resource_id : null, permission: 1, comment: "Can create permissions" },
+    { user_id: null, role: "admin"  , resource: "Permissions", action: "delete", user_group_id: null, resource_id : null, permission: 1, comment: "Can delete permissions" },
 
     // UserGroups
     { user_id: null, role: "admin"  , user_group_id: null, resource: "UserGroups", action: "read"  , resource_id: null, permission: 1, comment: "Can read UserGroups"   },

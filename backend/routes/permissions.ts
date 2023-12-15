@@ -4,6 +4,11 @@ import Permission                from "../db/models/Permission"
 import Graph                     from "../db/models/View"
 import User                      from "../db/models/User"
 import UserGroup                 from "../db/models/UserGroup"
+import DataRequest               from "../db/models/DataRequest"
+import RequestGroup              from "../db/models/RequestGroup"
+import DataSite                  from "../db/models/DataSite"
+import Project                   from "../db/models/Project"
+import Tag                       from "../db/models/Tag"
 import * as lib                  from "../lib"
 import { assert }                from "../lib"
 import { route }                 from "../lib/route"
@@ -22,9 +27,33 @@ type Role   = "manager" | "user" | "guest"
 
 // Currently only Graphs can be shared but that might change in the future
 const SHAREABLE_MODELS: Record<string, { Model: any, actions: Action[] }> = {
-    "Graphs" : {
+    Graphs : {
         Model: Graph as any,
         actions: ["search", "read", "update", "delete", "share"]
+    },
+    Subscriptions: {
+        Model: DataRequest as any,
+        actions: ["read", "update", "delete", "share"]
+    },
+    SubscriptionGroups: {
+        Model: RequestGroup as any,
+        actions: ["read", "update", "delete", "share"]
+    },
+    DataSites: {
+        Model: DataSite as any,
+        actions: ["read", "update", "delete", "share"]
+    },
+    StudyAreas: {
+        Model: Project as any,
+        actions: ["read", "update", "delete", "share"]
+    },
+    Tags: {
+        Model: Tag as any,
+        actions: ["read", "update", "delete", "share"]
+    },
+    UserGroups: {
+        Model: UserGroup as any,
+        actions: ["read", "update", "delete", "share"]
     }
 };
 
