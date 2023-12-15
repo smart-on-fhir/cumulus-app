@@ -114,7 +114,7 @@ export async function validate(body: Record<string, any>): Promise<InputParams>
     // resource_id
     // -------------------------------------------------------------------------
     if (resource_id) {
-        resource_id = makeArray(resource_id)
+        resource_id = makeArray(resource_id ?? [])
 
         for (const id of resource_id) {
             if (typeof id !== "number" || id < 1 || isNaN(id) || !isFinite(id)) {
@@ -149,7 +149,7 @@ export async function validate(body: Record<string, any>): Promise<InputParams>
     // role
     // -------------------------------------------------------------------------
     if (role) {
-        role = makeArray(role)
+        role = makeArray(role ?? [])
         const invalid = role.filter((r: Role) => !SHAREABLE_ROLES.includes(r))
         if (invalid.length) {
             throw new BadRequest(`Invalid role(s) ${invalid.join(", ")}`)
@@ -159,7 +159,7 @@ export async function validate(body: Record<string, any>): Promise<InputParams>
     // user_group_id
     // -------------------------------------------------------------------------
     if (user_group_id) {
-        user_group_id = makeArray(user_group_id)
+        user_group_id = makeArray(user_group_id ?? [])
 
         const count = await UserGroup.count({
             where: {
@@ -178,7 +178,7 @@ export async function validate(body: Record<string, any>): Promise<InputParams>
     // email
     // -------------------------------------------------------------------------
     if (email) {
-        email = makeArray(email)
+        email = makeArray(email ?? [])
 
         user_id = await emailsToUserIDs(email)
 
@@ -193,7 +193,7 @@ export async function validate(body: Record<string, any>): Promise<InputParams>
         throw new BadRequest("Please specify what action(s) should be allowed or disallowed")
     }
 
-    action = makeArray(action)
+    action = makeArray(action ?? [])
 
     for (const a of action) {
         if (!SHAREABLE_MODELS[resource].actions.includes(a)) {
@@ -398,11 +398,12 @@ route(router, {
             }
             await transaction.commit()
             
-            if (email) {
+            // FIXME: Make the email generic enough to handle sharing of anything and not only charts
+            if (email && resource === "Graphs") {
                 notifyForGraphsAccess({
-                    actions: makeArray(action),
-                    emails : makeArray(email),
-                    graphId: makeArray(resource_id),
+                    actions: makeArray(action ?? []),
+                    emails : makeArray(email ?? []),
+                    graphId: makeArray(resource_id ?? []),
                     baseUrl: lib.getRequestBaseURL(req),
                     message
                 })

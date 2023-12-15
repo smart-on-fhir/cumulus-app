@@ -1,8 +1,8 @@
-import { Router }      from "express"
-import { Includeable } from "sequelize/types"
-import Model           from "../db/models/UserGroup"
-import { assert }      from "../lib"
-import { route }       from "../lib/route"
+import { Router }                 from "express"
+import { Includeable }            from "sequelize/types"
+import Model                      from "../db/models/UserGroup"
+import { assert, getFindOptions } from "../lib"
+import { route }                  from "../lib/route"
 import {
     HttpError,
     InternalServerError,
@@ -29,6 +29,7 @@ route(router, {
     },
     async handler(req, res) {
         const rows = await Model.findAll({
+            ...getFindOptions(req),
             include: req.query.users ? [{
                 association: "users",
                 attributes: ["id", "name", "email", "role"]

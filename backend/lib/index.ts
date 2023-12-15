@@ -81,8 +81,12 @@ export function getFindOptions(req)
         })
     }
 
-    // pick & omit -------------------------------------------------------------
-    if (req.query.pick || req.query.omit) {
+
+    // attributes | pick & omit ------------------------------------------------
+    if (req.query.attributes) {
+        options.attributes = String(req.query.attributes).split(",")
+    }
+    else if (req.query.pick || req.query.omit) {
         
         const attributes: FindAttributeOptions = {
             include: []
@@ -91,6 +95,7 @@ export function getFindOptions(req)
         if (req.query.pick) {
             attributes.include = String(req.query.pick).split(",")
         }
+
         if (req.query.omit) {
             attributes.exclude = String(req.query.omit).split(",")
         }

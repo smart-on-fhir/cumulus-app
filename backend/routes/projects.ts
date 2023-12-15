@@ -2,7 +2,7 @@ import express                    from "express"
 import Model                      from "../db/models/Project"
 import { route }                  from "../lib/route"
 import { NotFound, Unauthorized } from "../errors"
-import { assert }                 from "../lib"
+import { assert, getFindOptions } from "../lib"
 import View                       from "../db/models/View"
 
 
@@ -14,6 +14,7 @@ route(router, {
     method: "get",
     handler: async (req, res) => {
         res.json(await Model.findAll({
+            ...getFindOptions(req),
             include: [
                 {
                     association: "Subscriptions",
