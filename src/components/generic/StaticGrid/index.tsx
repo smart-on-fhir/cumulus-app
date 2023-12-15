@@ -124,7 +124,21 @@ export default function StaticGrid({
         return (
             <thead>
                 <tr>
-                    { selectionType !== "none" && <th style={{ width: "1em" }}></th> }
+                    { selectionType !== "none" && <th style={{ width: "1em" }}>
+                        { onSelectionChange && selectionType === "multiple" &&
+                            <input
+                                type="checkbox"
+                                checked={ selection.length === rows.length }
+                                onChange={e => {
+                                    if (e.target.checked) {
+                                        onSelectionChange(rows.map(r => r[idProperty]))
+                                    } else {
+                                        onSelectionChange([])
+                                    }
+                                }}
+                            />
+                        }
+                    </th> }
                     { columns.filter(c => c.name !== groupBy).map((c, i) => (
                         <th
                             key={i}
@@ -264,7 +278,6 @@ export default function StaticGrid({
                 <input
                     type="search"
                     placeholder="Search"
-                    // title={ title }
                     value={ search }
                     onChange={ e => setSearch(e.target.value) }
                     data-tooltip={ title }
