@@ -10,7 +10,7 @@ function Icon({ arg }: { arg: string }) {
     return <i className={ arg + " select-component-option-icon" }/>
 }
 
-interface SelectProps {
+export interface SelectProps {
     tabIndex?: number
     options?: SelectOption[]
     placeholder?: string
@@ -20,7 +20,7 @@ interface SelectProps {
     title?: string
 }
 
-interface SelectOption {
+export interface SelectOption {
     value: any
     label: string | JSX.Element
     icon?: string
