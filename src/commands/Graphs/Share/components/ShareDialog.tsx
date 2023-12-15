@@ -14,11 +14,13 @@ import UserGroupList           from "./UserGroupList"
 export default function ShareDialog({
     user = null,
     resource,
-    resource_id
+    resource_id,
+    dialogTitle = "Crete or Update Permissions"
 }: {
     user?: app.User | null
     resource: string
     resource_id?: number[]
+    dialogTitle?: string
 })
 {
     const canReadUsers      = !!user?.permissions.includes("Users.read");
@@ -121,7 +123,7 @@ export default function ShareDialog({
     }
 
     const getHeader = () => {
-        return <><i className="fas fa-share-alt-square" /> Share Graphs</>
+        return <><i className="fas fa-share-alt-square" /> {dialogTitle}</>
     }
 
     const getFooter = (close: () => void) => {
@@ -248,8 +250,6 @@ export default function ShareDialog({
         header={ getHeader() }
         body={ ({ close }) => getBody(close) }
         footer={ ({ close }) => getFooter(close) }
-        style={{
-            width: 650
-        }}
+        style={{ width: 650 }}
     />
 }
