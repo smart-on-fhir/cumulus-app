@@ -19,7 +19,8 @@ export default function Dialog({
     header,
     footer,
     className = "",
-    style
+    style,
+    onComplete
 } : {
     modal      ?: boolean
     header     ?: JSX.Element | string
@@ -27,12 +28,14 @@ export default function Dialog({
     body        : (props: { close: () => void }) => JSX.Element | string
     footer     ?: (props: { close: () => void }) => JSX.Element | string
     style      ?: CSSProperties
+    onComplete ?: () => void
 })
 {
     const container = document.getElementById("modal")!
 
     function close() {
         render(<>{}</>, container)
+        onComplete && onComplete()
     }
 
     useLayoutEffect(centerDialog, [])
