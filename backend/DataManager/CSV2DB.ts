@@ -1,6 +1,6 @@
 import { Transform } from"stream"
 import { DATA_TYPES, evaluate } from "./dataTypes"
-import { logger } from "../logger"
+import { logSql } from "../logger"
 import { PoolClient } from "pg";
 
 
@@ -70,7 +70,7 @@ export default class CSV2DB extends Transform
         try {
             return await this.client.query(sql, params)
         } catch (e) {
-            logger.info(sql, { params, tags: ["SQL", "DATA"] })
+            logSql(sql, { params })
             throw e
         }
     }

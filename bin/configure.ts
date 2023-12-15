@@ -21,7 +21,6 @@ function generateEnvFile() {
         DB_SSL                : String(STATE.DB_SSL),
         DB_SEED               : String(STATE.DB_SEED),
         DB_SYNC               : String(STATE.DB_SYNC),
-        LOG_SQL               : String(STATE.LOG_SQL),
         DATABASE_URL          : String(STATE.DATABASE_URL),
         MAILGUN_API_KEY       : String(STATE.MAILGUN_API_KEY),
         MAILGUN_DOMAIN        : String(STATE.MAILGUN_DOMAIN),
@@ -193,15 +192,6 @@ export default async function main()
             }
         )
     }
-
-    STATE.LOG_SQL = await ask(
-        "Would you like to log SQL queries?",
-        {
-            answers: [ "true", "false" ],
-            defaultValue: "false",
-            currentValue: STATE.LOG_SQL
-        }
-    )
 
     STATE.DATABASE_URL = `postgres://${STATE.DB_USER}:${STATE.DB_PASS}@${STATE.DB_HOST || "localhost"}:${STATE.DB_PORT}/${STATE.DB_DATABASE}`
 

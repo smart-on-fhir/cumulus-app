@@ -1,9 +1,8 @@
 import Path           from "path"
-import { debuglog }   from "util"
 import { bool, uInt } from "./lib"
+import { logSql }     from "./logger"
 import { Config }     from "./types"
 
-const debugSql = debuglog("sql")
 
 const {
     HOST                   = "0.0.0.0",
@@ -65,7 +64,7 @@ const config: Config = {
             dialect : "postgres",
             schema  : "public",
             database: DB_DATABASE,
-            logging : sql => debugSql(sql),
+            logging : logSql,
             username: DB_USER,
             password: DB_PASS,
             port    : +DB_PORT,

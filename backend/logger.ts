@@ -1,6 +1,9 @@
 import { transports, format, createLogger } from "winston"
 import DailyRotateFile from "winston-daily-rotate-file"
-import { resolve } from "path"
+import { resolve }     from "path"
+import { debuglog }    from "util"
+
+export const logSql = debuglog("app-sql")
 
 
 const { combine, splat, cli, printf, timestamp, ms, json } = format;
@@ -20,7 +23,7 @@ export const combinedLogger = createLogger({
             json         : true,
             silent: process.env.NODE_ENV === "test",
             format: combine(
-                format(info => info.tags?.includes("SQL") ? false : info)(),
+                format(info => info)(),
                 format.errors({ stack: true }),
                 splat(),
                 timestamp(),
@@ -39,7 +42,7 @@ export const logger = createLogger({
             level : process.env.LOG_LEVEL || "warn",
             silent: process.env.NODE_ENV === "test",
             format: combine(
-                format(info => info.tags?.includes("SQL") || info.tags?.includes("WEB") ? false : info)(),
+                format(info => info.tags?.includes("WEB") ? false : info)(),
                 splat(),
                 format.errors({ stack: true }),
                 printf(info => {
@@ -93,25 +96,6 @@ export const logger = createLogger({
                 timestamp(),
                 ms(),
                 format.printf(m => `${m.timestamp} ${m.ms} ${m.level}: ${m.message}`)
-            )
-        }),
-
-        // SQL LOG -------------------------------------------------------------
-        new DailyRotateFile({
-            filename     : resolve(__dirname, '../logs/sql_%DATE%'),
-            datePattern  : 'YYYY-MM',
-            zippedArchive: true,
-            maxSize      : '10MB',
-            maxFiles     : 5,
-            extension    : ".log",
-            level        : "silly",
-            format: combine(
-                format(info => info.tags?.includes("SQL") ? info : false)(),
-                timestamp(),
-                ms(),
-                // simple()
-                // format.printf(({ message, ...rest }) => `${message} ${JSON.stringify(rest)}`)
-                format.printf(m => `${m.timestamp} ${m.ms}`.padEnd(34) + m.message)
             )
         })
     ],
