@@ -78,11 +78,15 @@ export function AuthProvider({ children }: { children: React.ReactNode })
 
     const sync = React.useCallback(() => {
         return auth.sync().then(user => {
-            const json = JSON.stringify(user)
-            if (JSON.stringify(storedUser) !== json) {
-                localStorage.setItem("user", json);
-                setUser(user);
-                delay = 1000
+            if (user.id && user.id > 0) {
+                const json = JSON.stringify(user)
+                if (JSON.stringify(storedUser) !== json) {
+                    localStorage.setItem("user", json);
+                    setUser(user);
+                    delay = 1000
+                }
+            } else {
+                delay = 300000
             }
         })
     }, [storedUser])
@@ -93,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode })
                 clearTimeout(timer)
             }
             sync().finally(() => {
-                delay = Math.min(delay * 1.1, 60000)
+                delay = Math.min(delay * 1.1, 300000)
                 timer = setTimeout(_sync, delay)
             })
         }
