@@ -389,7 +389,7 @@ describe("Permissions", () => {
                     role         : ["user", "manager", "guest", null],
                     user_group_id: [null, 1],
                     email        : [null, "user@cumulus.test"],
-                    action       : ["read", "update", "delete", "search", "share"],
+                    action       : ["read", "update", "delete", "share"],
                     permission   : true
                 }
             ]);
@@ -459,7 +459,7 @@ describe("Permissions", () => {
                     role         : ["user", "manager", "guest", null],
                     user_group_id: [null, 1],
                     email        : [null, "user@cumulus.test"],
-                    action       : ["read", "update", "delete", "search", "share"],
+                    action       : ["read", "update", "delete", "share"],
                     permission   : false
                 }
             ]);
@@ -478,51 +478,39 @@ describe("Permissions", () => {
             beforeEach(async () => {
                 await resetTable("Permission", Permissions)
                 await Permission.bulkCreate([
-                    { resource: "Graphs", role: "admin"  , action: "search", permission: true },
-                    { resource: "Graphs", role: "admin"  , action: "share" , permission: true },
-                    { resource: "Graphs", role: "manager", action: "search", permission: true },
-                    { resource: "Graphs", role: "manager", action: "share" , permission: true },
-
-
-                    { resource: "Graphs", role: "user" , action: "read"  , permission: true },
-                    { resource: "Graphs", role: "user" , action: "update", permission: true },
-                    { resource: "Graphs", role: "user" , action: "delete", permission: true },
-                    { resource: "Graphs", role: "user" , action: "search", permission: true },
-                    { resource: "Graphs", role: "user" , action: "share" , permission: true },
-                    { resource: "Graphs", role: "guest", action: "read"  , permission: true },
-                    { resource: "Graphs", role: "guest", action: "update", permission: true },
-                    { resource: "Graphs", role: "guest", action: "delete", permission: true },
-                    { resource: "Graphs", role: "guest", action: "search", permission: true },
-                    { resource: "Graphs", role: "guest", action: "share" , permission: true },
-                    { resource: "Graphs", user_id: 3, action: "read"  , permission: true },
-                    { resource: "Graphs", user_id: 3, action: "update", permission: true },
-                    { resource: "Graphs", user_id: 3, action: "delete", permission: true },
-                    { resource: "Graphs", user_id: 3, action: "search", permission: true },
-                    { resource: "Graphs", user_id: 3, action: "share" , permission: true },
+                    { resource: "Graphs", role: "admin"   , action: "share" , permission: true },
+                    { resource: "Graphs", role: "manager" , action: "share" , permission: true },
+                    { resource: "Graphs", role: "user"    , action: "read"  , permission: true },
+                    { resource: "Graphs", role: "user"    , action: "update", permission: true },
+                    { resource: "Graphs", role: "user"    , action: "delete", permission: true },
+                    { resource: "Graphs", role: "user"    , action: "share" , permission: true },
+                    { resource: "Graphs", role: "guest"   , action: "read"  , permission: true },
+                    { resource: "Graphs", role: "guest"   , action: "update", permission: true },
+                    { resource: "Graphs", role: "guest"   , action: "delete", permission: true },
+                    { resource: "Graphs", role: "guest"   , action: "share" , permission: true },
+                    { resource: "Graphs", user_id: 3      , action: "read"  , permission: true },
+                    { resource: "Graphs", user_id: 3      , action: "update", permission: true },
+                    { resource: "Graphs", user_id: 3      , action: "delete", permission: true },
+                    { resource: "Graphs", user_id: 3      , action: "share" , permission: true },
                     { resource: "Graphs", user_group_id: 1, action: "read"  , permission: true },
                     { resource: "Graphs", user_group_id: 1, action: "update", permission: true },
                     { resource: "Graphs", user_group_id: 1, action: "delete", permission: true },
-                    { resource: "Graphs", user_group_id: 1, action: "search", permission: true },
                     { resource: "Graphs", user_group_id: 1, action: "share" , permission: true },
-                    { resource: "Graphs", role: "user" , action: "read"  , permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "user" , action: "update", permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "user" , action: "delete", permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "user" , action: "search", permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "user" , action: "share" , permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "guest", action: "read"  , permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "guest", action: "update", permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "guest", action: "delete", permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "guest", action: "search", permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "guest", action: "share" , permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_id: 3, action: "read"  , permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_id: 3, action: "update", permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_id: 3, action: "delete", permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_id: 3, action: "search", permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_id: 3, action: "share" , permission: true, resource_id: 1 },
+                    { resource: "Graphs", role: "user"    , action: "read"  , permission: true, resource_id: 1 },
+                    { resource: "Graphs", role: "user"    , action: "update", permission: true, resource_id: 1 },
+                    { resource: "Graphs", role: "user"    , action: "delete", permission: true, resource_id: 1 },
+                    { resource: "Graphs", role: "user"    , action: "share" , permission: true, resource_id: 1 },
+                    { resource: "Graphs", role: "guest"   , action: "read"  , permission: true, resource_id: 1 },
+                    { resource: "Graphs", role: "guest"   , action: "update", permission: true, resource_id: 1 },
+                    { resource: "Graphs", role: "guest"   , action: "delete", permission: true, resource_id: 1 },
+                    { resource: "Graphs", role: "guest"   , action: "share" , permission: true, resource_id: 1 },
+                    { resource: "Graphs", user_id: 3      , action: "read"  , permission: true, resource_id: 1 },
+                    { resource: "Graphs", user_id: 3      , action: "update", permission: true, resource_id: 1 },
+                    { resource: "Graphs", user_id: 3      , action: "delete", permission: true, resource_id: 1 },
+                    { resource: "Graphs", user_id: 3      , action: "share" , permission: true, resource_id: 1 },
                     { resource: "Graphs", user_group_id: 1, action: "read"  , permission: true, resource_id: 1 },
                     { resource: "Graphs", user_group_id: 1, action: "update", permission: true, resource_id: 1 },
                     { resource: "Graphs", user_group_id: 1, action: "delete", permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_group_id: 1, action: "search", permission: true, resource_id: 1 },
                     { resource: "Graphs", user_group_id: 1, action: "share" , permission: true, resource_id: 1 },
                 ])
             })
@@ -605,7 +593,7 @@ describe("Permissions", () => {
         it ("works as expected", async () => {
             const res = await fetch(`${server.baseUrl}/api/permissions/actions?resource=Graphs`, { headers: { Cookie: "sid=" + admin.sid }})
             expect(res.status).to.equal(200)
-            expect(await res.json()).to.deep.equal(["search", "read", "update", "delete", "share"])
+            expect(await res.json()).to.deep.equal(["read", "update", "delete", "share"])
         })
     })
 
@@ -631,7 +619,7 @@ describe("Permissions", () => {
                 { resource: "Graphs", user_id: 3, action: "read"  , permission: true, resource_id: 1 },
                 { resource: "Graphs", user_id: 3, action: "update", permission: true, resource_id: 1 },
                 { resource: "Graphs", user_id: 3, action: "delete", permission: true, resource_id: 1 },
-                { resource: "Graphs", user_id: 3, action: "search", permission: true, resource_id: 1 },
+                // { resource: "Graphs", user_id: 3, action: "search", permission: true, resource_id: 1 },
                 { resource: "Graphs", user_id: 3, action: "share" , permission: true, resource_id: 1 },
             ])
 
@@ -646,7 +634,7 @@ describe("Permissions", () => {
                 { resource: "Graphs", user_id: 3, action: "read"  , permission: true, resource_id: 1 },
                 { resource: "Graphs", user_id: 3, action: "update", permission: true, resource_id: 1 },
                 { resource: "Graphs", user_id: 3, action: "delete", permission: true, resource_id: 1 },
-                { resource: "Graphs", user_id: 3, action: "search", permission: true, resource_id: 1 },
+                // { resource: "Graphs", user_id: 3, action: "search", permission: true, resource_id: 1 },
                 { resource: "Graphs", user_id: 3, action: "share" , permission: true, resource_id: 1 },
             ])
 
@@ -661,7 +649,7 @@ describe("Permissions", () => {
                 { resource: "Subscriptions", user_id: 3, action: "read"  , permission: true, resource_id: 1 },
                 { resource: "Subscriptions", user_id: 3, action: "update", permission: true, resource_id: 1 },
                 { resource: "Subscriptions", user_id: 3, action: "delete", permission: true, resource_id: 1 },
-                { resource: "Subscriptions", user_id: 3, action: "search", permission: true, resource_id: 1 },
+                // { resource: "Subscriptions", user_id: 3, action: "search", permission: true, resource_id: 1 },
                 { resource: "Subscriptions", user_id: 3, action: "share" , permission: true, resource_id: 1 },
             ])
 
@@ -676,7 +664,7 @@ describe("Permissions", () => {
                 { resource: "DataSites", user_id: 3, action: "read"  , permission: true, resource_id: 1 },
                 { resource: "DataSites", user_id: 3, action: "update", permission: true, resource_id: 1 },
                 { resource: "DataSites", user_id: 3, action: "delete", permission: true, resource_id: 1 },
-                { resource: "DataSites", user_id: 3, action: "search", permission: true, resource_id: 1 },
+                // { resource: "DataSites", user_id: 3, action: "search", permission: true, resource_id: 1 },
                 { resource: "DataSites", user_id: 3, action: "share" , permission: true, resource_id: 1 },
             ])
 
@@ -714,7 +702,7 @@ describe("Permissions", () => {
                 { resource: "SubscriptionGroups", user_id: 3, action: "read"  , permission: true, resource_id: 1 },
                 { resource: "SubscriptionGroups", user_id: 3, action: "update", permission: true, resource_id: 1 },
                 { resource: "SubscriptionGroups", user_id: 3, action: "delete", permission: true, resource_id: 1 },
-                { resource: "SubscriptionGroups", user_id: 3, action: "search", permission: true, resource_id: 1 },
+                // { resource: "SubscriptionGroups", user_id: 3, action: "search", permission: true, resource_id: 1 },
                 { resource: "SubscriptionGroups", user_id: 3, action: "share" , permission: true, resource_id: 1 },
             ])
 
@@ -729,7 +717,7 @@ describe("Permissions", () => {
                 { resource: "Tags", user_id: 3, action: "read"  , permission: true, resource_id: 1 },
                 { resource: "Tags", user_id: 3, action: "update", permission: true, resource_id: 1 },
                 { resource: "Tags", user_id: 3, action: "delete", permission: true, resource_id: 1 },
-                { resource: "Tags", user_id: 3, action: "search", permission: true, resource_id: 1 },
+                // { resource: "Tags", user_id: 3, action: "search", permission: true, resource_id: 1 },
                 { resource: "Tags", user_id: 3, action: "share" , permission: true, resource_id: 1 },
             ])
 
@@ -744,7 +732,7 @@ describe("Permissions", () => {
                 { resource: "StudyAreas", user_id: 3, action: "read"  , permission: true, resource_id: 1 },
                 { resource: "StudyAreas", user_id: 3, action: "update", permission: true, resource_id: 1 },
                 { resource: "StudyAreas", user_id: 3, action: "delete", permission: true, resource_id: 1 },
-                { resource: "StudyAreas", user_id: 3, action: "search", permission: true, resource_id: 1 },
+                // { resource: "StudyAreas", user_id: 3, action: "search", permission: true, resource_id: 1 },
                 { resource: "StudyAreas", user_id: 3, action: "share" , permission: true, resource_id: 1 },
             ])
 
