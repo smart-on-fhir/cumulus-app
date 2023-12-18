@@ -29,7 +29,7 @@ type Role   = "manager" | "user" | "guest"
 const SHAREABLE_MODELS: Record<string, { Model: any, actions: Action[] }> = {
     Graphs : {
         Model: Graph as any,
-        actions: ["search", "read", "update", "delete", "share"]
+        actions: ["read", "update", "delete", "share"]
     },
     Subscriptions: {
         Model: DataRequest as any,
