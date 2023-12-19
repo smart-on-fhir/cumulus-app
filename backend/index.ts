@@ -47,7 +47,6 @@ function setupAPI(app: Application)
     app.use("/api/views"         , require("./routes/views"       ).default);
     app.use("/api/users"         , require("./routes/users"       ).default);
     app.use("/api/projects"      , require("./routes/projects"    ).default);
-    app.use("/api/logs"          , require("./routes/logs"        ).default);
     app.use("/api/tags"          , require("./routes/tags"        ).default);
     app.use("/api/data-sites"    , require("./routes/sites"       ).default);
     app.use("/api/aggregator"    , require("./routes/aggregator"  ).default);
