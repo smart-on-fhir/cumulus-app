@@ -1,5 +1,8 @@
-import { sendDataRequest } from "../../mail"
+import { sendDataRequest } from "../../services/mail"
+import { app }             from "../../.."
+import * as logger         from "../../services/logger"
 import BaseModel           from "./BaseModel"
+import Tag                 from "./Tag"
 import {
     CreationOptional,
     DataTypes,
@@ -8,10 +11,6 @@ import {
     InferCreationAttributes,
     Sequelize
 } from "sequelize"
-import { app } from "../../..";
-import Tag from "./Tag";
-import logger from "../../logger";
-
 
 
 export default class DataRequest extends BaseModel<InferAttributes<DataRequest>, InferCreationAttributes<DataRequest>>

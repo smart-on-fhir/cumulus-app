@@ -1,10 +1,10 @@
+import { join }                            from "path"
 import { Sequelize }                       from "sequelize"
 import { Umzug, SequelizeStorage }         from "umzug"
 import { Config }                          from "../types"
 import { getDockerContainer }              from "./Docker"
-import { logger }                          from "../logger"
+import * as logger                         from "../services/logger"
 import { attachHooks, init as initModels } from "./models"
-import { join }                            from "path"
 import { seedTable }                       from "./seeds/lib"
 
 
@@ -17,12 +17,12 @@ async function waitForDatabaseServer(options: Config)
             await getDockerContainer(options)
         } catch (ex) {
             if (ex.failed && !ex.isCanceled && !ex.killed) {
-                logger.error(ex, { tags: ["DOCKER"] })
+                logger.error(ex)
                 process.exit(ex.exitCode)
             }
             throw ex
         }
-        logger.verbose(`✔ Initialized Docker container "${options.docker.containerName}"`, { tags: ["DATA"] })
+        logger.verbose(`✔ Initialized Docker container "${options.docker.containerName}"`)
     }
 }
 
@@ -34,7 +34,7 @@ async function connectToDatabase(options: Config)
         logger.verbose("✔ Connected to the database");
         return connection
     } catch (ex) {
-        logger.error("✘ Failed to connected to the database", { ...ex, tags: ["DATA"] });
+        logger.error("✘ Failed to connected to the database", { ...ex });
         throw ex;
     }
 }
@@ -44,7 +44,7 @@ async function syncModels(options: Config)
     // This creates the table, dropping it first if it already existed
     if (options.db.sync == "force") {
         await connection.sync({ force: true })
-        logger.verbose(`✔ Dropped and re-created tables`, { tags: ["DATA"] })
+        logger.verbose(`✔ Dropped and re-created tables`)
     }
     
     // This creates the table if it doesn't exist (and does nothing if it already
@@ -52,7 +52,7 @@ async function syncModels(options: Config)
     else {
     // if (options.db.sync == "normal") {
         await connection.sync()
-        logger.verbose(`✔ Created tables which did not exist (if any)`, { tags: ["DATA"] })
+        logger.verbose(`✔ Created tables which did not exist (if any)`)
     }
 
     
@@ -62,7 +62,7 @@ async function syncModels(options: Config)
     // necessary changes in the table to make it match the model.
     // if (options.db.sync == "alter") {
     //     await connection.sync({ alter: true })
-    //     logger.verbose(`✔ Updated tables to match model structures`, { tags: ["DATA"] })
+    //     logger.verbose(`✔ Updated tables to match model structures`)
     // }
 }
 
@@ -93,9 +93,9 @@ async function applyMigrations(options: Config, dbConnection: Sequelize)
         },
         storage: new SequelizeStorage({ sequelize: dbConnection }),
         logger: {
-            debug: msg => logger.debug(msg.event + " " + msg.name, { ...msg, tags: ["DATA"] }),
-            info : msg => logger.info (msg.event + " " + msg.name, { ...msg, tags: ["DATA"] }),
-            warn : msg => logger.warn (msg.event + " " + msg.name, { ...msg, tags: ["DATA"] }),
+            debug: msg => logger.debug(msg.event + " " + msg.name, { ...msg }),
+            info : msg => logger.info (msg.event + " " + msg.name, { ...msg }),
+            warn : msg => logger.warn (msg.event + " " + msg.name, { ...msg }),
             error: logger.error
         }
     });
@@ -173,7 +173,7 @@ export default async function setupDB(options: Config): Promise<Sequelize>
 
     attachHooks(connection)
 
-    require("../Scheduler");
+    require("../services/Scheduler");
     
     return connection;
 }

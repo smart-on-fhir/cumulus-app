@@ -13,7 +13,7 @@ import * as lib                  from "../lib"
 import { assert }                from "../lib"
 import { route }                 from "../lib/route"
 import SystemUser                from "../SystemUser"
-import { notifyForGraphsAccess } from "../mail"
+import { notifyForGraphsAccess } from "../services/mail"
 import {
     BadRequest,
     Forbidden,
@@ -309,7 +309,6 @@ route(router, {
             const msg = "Only admins and resource owners can do this"
             const data = {
                 message: `Permission denied`,
-                tags   : ["AUTH"],
                 reason : msg,
                 owner  : false
             };

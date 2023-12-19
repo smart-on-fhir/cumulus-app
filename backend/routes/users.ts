@@ -8,7 +8,7 @@ import moment              from "moment"
 import * as lib            from "../lib"
 import User                from "../db/models/User"
 import { route }           from "../lib/route"
-import * as mail           from "../mail"
+import * as mail           from "../services/mail"
 import SystemUser          from "../SystemUser"
 import config              from "../config"
 import {

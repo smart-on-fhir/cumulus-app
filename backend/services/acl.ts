@@ -1,6 +1,6 @@
 import { debuglog }                from "util"
-import { Forbidden, Unauthorized } from "./errors"
-import { buildPermissionId }       from "./lib"
+import { Forbidden, Unauthorized } from "../errors"
+import { buildPermissionId }       from "../lib"
 
 
 const debugAuth = debuglog("auth")
@@ -40,7 +40,6 @@ export function requestPermission({ user = {}, resource, attribute, action }: {
     function throwError(msg: string) {
         const data = {
             message: `Permission denied`,
-            tags   : ["AUTH"],
             reason : msg,
             owner  : isOwner
         };

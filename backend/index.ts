@@ -8,12 +8,8 @@ import cookieParser             from "cookie-parser"
 import * as Auth                from "./routes/Auth"
 import setupDB                  from "./db"
 import settings                 from "./config"
-import { logger }               from "./logger"
-import {
-    AppRequest,
-    Config,
-    AppErrorRequestHandler
-} from "./types"
+import * as logger              from "./services/logger"
+import { Config, AppErrorRequestHandler } from "./types"
 
 
 function createServer(config: Config)
@@ -27,30 +23,8 @@ function createServer(config: Config)
 
     logger.verbose("✔ Created a server");
 
-    app.use((req, res, next) => {
-        res.on("finish", () => {
-            const meta: Record<string, any> = {
-                tags     : ["WEB"],
-                userAgent: req.headers["user-agent"],
-                ip       : req.socket ? req.ip : undefined,
-                user     : (req as AppRequest).user?.email || "guest"
-            }
-            
-            if (req.method === "POST" || req.method === "PUT") {
-                meta.requestBody = req.body
-            }
-            
-            logger.log(
-                "http", // res.statusCode >= 400 ? "error" : "http",
-                `${res.statusCode} ${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)}`,
-                meta
-            )
-        })
-        next()
-    });
-
     if (config.throttle) {
-        app.use((rec, res, next) => setTimeout(next, 1000));
+        app.use((rec, res, next) => setTimeout(next, config.throttle));
         logger.verbose("All responses delayed by %sms", config.throttle);
     }
 
