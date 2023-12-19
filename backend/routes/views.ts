@@ -5,9 +5,9 @@ import crypto                   from "crypto"
 import Model                    from "../db/models/View"
 import { route }                from "../lib/route"
 import { assert }               from "../lib"
-import { logger }               from "../logger"
-import { requestLineLevelData } from "../mail"
-import { requestPermission }    from "../acl"
+import * as logger              from "../services/logger"
+import { requestLineLevelData } from "../services/mail"
+import { requestPermission }    from "../services/acl"
 import SystemUser               from "../SystemUser"
 import {
     NotFound,
@@ -263,12 +263,11 @@ route(router, {
         } catch (ex) {
             await transaction.rollback()
             if (ex instanceof HttpError) {
-                ex.data = { tags: ["DATA"] }
                 ex.cause = ex.stack
                 throw ex
             }
             const { message, stack } = ex as Error
-            const error = new InternalServerError("Updating graph failed. " + message, { tags: ["DATA"] })
+            const error = new InternalServerError("Updating graph failed. " + message)
             error.cause = stack
             throw error
         }
@@ -457,7 +456,7 @@ route(router, {
         requestLineLevelData(req.body).then(
             () => res.end(),
             (e: any) => {
-                logger.error(e, { tags: ["DATA"] })
+                logger.error(e)
                 res.status(400).json(e)
             }
         )

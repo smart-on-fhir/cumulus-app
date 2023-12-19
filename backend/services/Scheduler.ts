@@ -1,8 +1,8 @@
 import moment        from "moment"
 import { Op }        from "sequelize"
-import DataRequest   from "./db/models/DataRequest"
-import { fetchData } from "./routes/DataRequest"
-import { logger }    from "./logger"
+import DataRequest   from "../db/models/DataRequest"
+import { fetchData } from "../routes/DataRequest"
+import * as logger   from "../services/logger"
 
 
 async function run() {
@@ -54,7 +54,7 @@ async function synchronize()
 
         // Check if it is time to refresh this model's data
         if (refreshAt.isSameOrBefore(moment(), "minute")) {
-            logger.info(`Refreshing data for ${row}...`, { tags: ["DATA"] })
+            logger.info(`Refreshing data for ${row}...`)
             try {
                 const data = await fetchData(row)
                 await row.set({ data, completed: new Date() }).save();

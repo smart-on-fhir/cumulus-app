@@ -1,7 +1,7 @@
-import Path           from "path"
-import { bool, uInt } from "./lib"
-import { logSql }     from "./logger"
-import { Config }     from "./types"
+import Path              from "path"
+import { bool, uInt }    from "./lib"
+import { sql as logSql } from "./services/logger"
+import { Config }        from "./types"
 
 
 const {

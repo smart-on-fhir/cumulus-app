@@ -1,6 +1,6 @@
 import { CreateOptions, FindOptions, InstanceDestroyOptions, InstanceUpdateOptions } from "sequelize"
 import { Sequelize, Model }  from "sequelize"
-import { requestPermission } from "../../acl"
+import { requestPermission } from "../../services/acl"
 
 
 export default abstract class BaseModel<

@@ -3,7 +3,7 @@ import { runSimple } from "run-container"
 import { Sequelize } from "sequelize"
 import { Config }    from "../types"
 import { wait }      from"../lib"
-import { logger }    from "../logger"
+import * as logger   from "../services/logger"
 
 const RETRY_DELAY   = 1000  // 1s
 const RETRY_TIMEOUT = 10000 // 10s

@@ -1,8 +1,7 @@
 import express, { NextFunction, Response }       from "express"
 import { Router }                                from "express-serve-static-core"
 import { checkSchema, Schema, validationResult } from "express-validator"
-import { logger }                                from "../logger"
-import { HttpError, BadRequest }                 from "../errors"
+import * as logger                               from "../services/logger"
 import { AppRequest, AppRequestHandler }         from "../types"
 
 

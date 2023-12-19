@@ -4,7 +4,7 @@ import Bcrypt                                       from "bcryptjs"
 import { Op }                                       from "sequelize"
 import User                                         from "../db/models/User"
 import { wait }                                     from "../lib"
-import { logger }                                   from "../logger"
+import * as logger                                  from "../services/logger"
 import { BadRequest }                               from "../errors"
 import { app }                                      from "../.."
 import { AppRequest }                               from "../types"
@@ -38,7 +38,7 @@ export function authenticate() {
                     (req as AppRequest).user = currentUser
                 }
             } catch (ex) {
-                logger.error(ex as any, { tags: ["AUTH"] });
+                logger.error(ex);
             }
         }
         else {
@@ -103,7 +103,7 @@ async function login(req: Request, res: Response) {
         });
 
     } catch (ex) {
-        logger.error(ex as any, { tags: ["AUTH"] })
+        logger.error(ex)
         res.status(401).end("Login failed");
     }
 }
@@ -122,7 +122,7 @@ async function logout(req: AppRequest, res: Response) {
                     }
                 });
         } catch (ex) {
-            logger.error(ex as any, { tags: ["AUTH"] });
+            logger.error(ex);
         }
     }
     res.clearCookie("sid").json({ message: "Logged out" }).end();

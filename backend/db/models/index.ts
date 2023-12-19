@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize"
-import { logger }    from "../../logger"
+import * as logger   from "../../services/logger"
 import BaseModel     from "./BaseModel"
 import DataRequest   from "./DataRequest"
 import DataSite      from "./DataSite"
@@ -50,12 +50,12 @@ export function attachHooks(connection: Sequelize) {
 
     // Log inserts -------------------------------------------------------------
     connection.addHook("afterCreate", function(model: BaseModel, options) {
-        logger.info(`${model} created by ${options.user?.email || options.user?.role || "guest"}`, { tags: ["ACTIVITY"] })
+        logger.info(`${model} created by ${options.user?.email || options.user?.role || "guest"}`)
     })
 
     // Log updates -------------------------------------------------------------
     connection.addHook("afterUpdate", function(model: BaseModel, options) {
-        logger.info(`${model} updated by ${options.user?.email || options.user?.role || "guest"}`, { tags: ["ACTIVITY"] })
+        logger.info(`${model} updated by ${options.user?.email || options.user?.role || "guest"}`)
     })
 
     // After delete ------------------------------------------------------------
@@ -89,7 +89,7 @@ export function attachHooks(connection: Sequelize) {
             })    
         }
 
-        logger.info(`${model} deleted by ${options.user?.email || options.user?.role || "guest"}`, { tags: ["ACTIVITY"] })
+        logger.info(`${model} deleted by ${options.user?.email || options.user?.role || "guest"}`)
     })
 }
 
@@ -175,4 +175,11 @@ export function init(connection: Sequelize) {
     
     // UserGroup has many Users as users
     UserGroup.belongsToMany(User, { through: "UserGroupUsers", timestamps: false, as: "users" });
+
+
+
+    // Permissions -------------------------------------------------------------
+    
+    // Permission belongs to User (sometimes)
+    Permission.belongsTo(User, { foreignKey: "user_id" });
 }

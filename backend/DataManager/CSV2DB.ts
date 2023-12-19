@@ -1,6 +1,6 @@
 import { Transform } from"stream"
 import { DATA_TYPES, evaluate } from "./dataTypes"
-import { logSql } from "../logger"
+import { sql as logSql } from "../services/logger"
 import { PoolClient } from "pg";
 
 

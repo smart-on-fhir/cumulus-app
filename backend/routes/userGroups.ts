@@ -149,12 +149,11 @@ route(router, {
         } catch (ex) {
             await transaction.rollback()
             if (ex instanceof HttpError) {
-                ex.data = { tags: ["DATA"] }
                 ex.cause = ex.stack
                 throw ex
             }
             const { message, stack } = ex as Error
-            const error = new InternalServerError(`Updating ${Model.name} failed. ${message}`, { tags: ["DATA"] })
+            const error = new InternalServerError(`Updating ${Model.name} failed. ${message}`)
             error.cause = stack
             throw error
         }

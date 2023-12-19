@@ -1,8 +1,8 @@
-import Bcrypt     from "bcryptjs"
-import moment     from "moment"
-import { logger } from "../../logger"
-import config     from "../../config"
-import BaseModel  from "./BaseModel"
+import Bcrypt      from "bcryptjs"
+import moment      from "moment"
+import * as logger from "../../services/logger"
+import config      from "../../config"
+import BaseModel   from "./BaseModel"
 import {
     CreationOptional,
     DataTypes,
@@ -193,7 +193,7 @@ export default class User extends BaseModel<InferAttributes<User>, InferCreation
             hooks: {
                 async afterUpdate(model) {
                     if (model.changed("sid")) {
-                        logger.info(`${model} ${model.sid ? "logged in" : "logged out"}`, { tags: ["AUTH", "ACTIVITY"] })
+                        logger.info(`${model} ${model.sid ? "logged in" : "logged out"}`)
                     }
                 }
             }
