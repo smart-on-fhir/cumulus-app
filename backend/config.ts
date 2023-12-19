@@ -1,19 +1,21 @@
-import Path              from "path"
-import { bool, uInt }    from "./lib"
-import { sql as logSql } from "./services/logger"
-import { Config }        from "./types"
+import Path                       from "path"
+import { bool, parseDbUrl, uInt } from "./lib"
+import { sql as logSql }          from "./services/logger"
+import { Config }                 from "./types"
 
+
+const dbSettings = parseDbUrl(process.env.DATABASE_URL || "")
 
 const {
     HOST                   = "0.0.0.0",
     PORT                   = "4000",
     DB_SEED                = "db/seeds",
     DB_SYNC                = "none", // normal|force|alter|none
-    DB_HOST                = "localhost",
-    DB_PORT                = 5432,
-    DB_USER                = "",
-    DB_PASS                = "",
-    DB_DATABASE            = "cumulus",
+    DB_HOST                = dbSettings.host || "localhost",
+    DB_PORT                = dbSettings.port || "5432",
+    DB_USER                = dbSettings.username || "",
+    DB_PASS                = dbSettings.password || "",
+    DB_DATABASE            = dbSettings.database || "cumulus",
     THROTTLE               = 0,
     DB_SSL                 = "true",
     DB_DOCKER_CONTAINER    = "",

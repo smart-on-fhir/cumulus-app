@@ -559,3 +559,21 @@ export function explode(input: Record<string, any>[], keys?: string[]): any {
     }
     return out
 }
+
+export function parseDbUrl(url: string) {
+    // postgres://user:pass@host:port/database?query
+    const match = url.match(/^(.*?):\/\/(.*?):(.*?)@(.*?):(.*?)\/(.*?)(\?.*)?$/) || [];
+    const out = {
+        dialect : match[1],
+        username: match[2],
+        password: match[3],
+        host    : match[4],
+        port    : match[5],
+        database: match[6],
+        query   : {}
+    };
+    new URLSearchParams(match[7] || "").forEach((value, key) => {
+        out.query[key] = value
+    });
+    return out
+}
