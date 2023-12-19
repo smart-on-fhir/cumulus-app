@@ -25,6 +25,8 @@ interface Column {
     style ?: CSSProperties
 
     render?: (row: any, c: Column) => JSX.Element
+
+    value?: (row: any, c: Column) => any
 }
 
 interface StaticGridProps<T = JSONObject> {
@@ -103,7 +105,10 @@ export default function StaticGrid({
 
         if (search) {
             _rows = _rows.filter(row => {
-                return searchableCols.some(c => String(row[c.name]).includes(search))
+                return searchableCols.some(c => {
+                    const val = c.value ? c.value(row, c) : row[c.name];
+                    return String(val).includes(search)
+                })
             })
         }
 
@@ -256,7 +261,11 @@ export default function StaticGrid({
                 />
             </td> }
             { columns.filter(c => c.name !== groupBy).map((c, i) => {
-                let value: any = c.render ? c.render(rec, c) : rec[c.name] + "";
+                let value: any = c.render ?
+                    c.render(rec, c) :
+                    c.value ?
+                        c.value(rec, c) + "" : 
+                        rec[c.name] + "";
                 if (search && c.searchable && (typeof value === "string" || typeof value === "number")) {
                     value = <div dangerouslySetInnerHTML={{ __html: highlight(value + "", search) }} />
                 }

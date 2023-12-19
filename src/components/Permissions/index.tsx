@@ -192,7 +192,7 @@ function UserPermissionsUI() {
             revoke access permissions.
         </div>
         <div className="p-1">
-            <EndpointListWrapper endpoint="/api/permissions?order=resource:asc&where=user_id:not:null" key={key}>
+            <EndpointListWrapper endpoint="/api/permissions?order=resource:asc&where=user_id:not:null&include=User:email" key={key}>
                 { (data: app.Permission[]) => {
                     if (!data.length) {
                         return <Alert color="orange" icon="fas fa-exclamation-circle"><b>No records found</b></Alert>
@@ -208,9 +208,11 @@ function UserPermissionsUI() {
                                 },
                                 {
                                     name : "user_id",
-                                    label: "User ID",
+                                    label: "User",
                                     type : "number",
-                                    searchable: true
+                                    searchable: true,
+                                    render: (r) => r.User.email,
+                                    value : (r) => r.User.email,
                                 },
                                 {
                                     name : "resource",
