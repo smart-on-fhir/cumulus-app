@@ -155,9 +155,6 @@ export default [
     { user_id: null, role: "user"   , user_group_id: null, resource: "StudyAreaSubscriptions", action: "update", resource_id: null, permission: 0, comment: "Can update which subscriptions are included in study area" },
     { user_id: null, role: "user"   , user_group_id: null, resource: "StudyAreaSubscriptions", action: "delete", resource_id: null, permission: 0, comment: "Can exclude subscriptions from study area"                 },
 
-    // Logs
-    { user_id: null, role: "admin"  , user_group_id: null, resource: "Logs", action: "read", resource_id: null, permission: 1, comment: "Can read logs" },
-
     // Permissions
     { user_id: null, role: "admin"  , resource: "Permissions", action: "read"  , user_group_id: null, resource_id : null, permission: 1, comment: "Can read permissions"   },
     { user_id: null, role: "admin"  , resource: "Permissions", action: "update", user_group_id: null, resource_id : null, permission: 1, comment: "Can update permissions" },
