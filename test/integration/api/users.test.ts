@@ -247,7 +247,7 @@ describe("Users", () => {
 
         it ("rejects if mail cannot be sent", async () => {
             
-            const resolved = require.resolve("../../../backend/mail");
+            const resolved = require.resolve("../../../backend/services/mail");
             
             const cachedModule: any = require.cache[resolved]
             
@@ -273,7 +273,7 @@ describe("Users", () => {
 
         it ("works as expected", async () => {
 
-            const resolved = require.resolve("../../../backend/mail");
+            const resolved = require.resolve("../../../backend/services/mail");
             
             const cachedModule: any = require.cache[resolved]
             
