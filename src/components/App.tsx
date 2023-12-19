@@ -15,7 +15,6 @@ import Invite                                   from "./Users/Invite";
 import Account                                  from "./Users/Account";
 import Activate                                 from "./Users/Activate";
 import Projects                                 from "./Projects";
-import LogViewer                                from "./LogViewer";
 import Tags                                     from "./Tags";
 import { ContextMenu }                          from "./generic/Menu";
 import Tooltip                                  from "./generic/Tooltip";
@@ -52,7 +51,6 @@ export default function App()
                                 <Route path="groups/*"      element={ <RequireAuth><RequestGroups /></RequireAuth> } />
                                 <Route path="projects/*"    element={ <RequireAuth><Projects /></RequireAuth> } />
                                 <Route path="tags/*"        element={ <RequireAuth><Tags /></RequireAuth> } />
-                                <Route path="logs"          element={ <RequireAuth><LogViewer /></RequireAuth>} />
                                 <Route path="login"         element={ <LoginPage /> } />
                                 <Route path="activate"      element={ <Activate /> } />
                                 <Route path="user"          element={ <RequireAuth><Account /></RequireAuth> } />
