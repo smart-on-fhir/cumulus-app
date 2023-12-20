@@ -51,7 +51,7 @@ export class ShareGraph extends Command
         render(
             <ShareDialog 
                 resource="Graphs"
-                resource_id={ [this.graph.id!] }
+                selectedResources={ [this.graph] }
                 user={ this.user }
             />,
             document.getElementById("modal")!

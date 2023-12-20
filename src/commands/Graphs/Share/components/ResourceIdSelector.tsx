@@ -21,7 +21,7 @@ export default function ResourceIdSelector({
     onSelectionChange,
 }: {
     resourceType?: string
-    selection    : number[]
+    selection    : any[]
     onSelectionChange: (selection: number[]) => void
 })
 {

@@ -167,16 +167,17 @@ function PermissionCheckbox({ permission } : { permission: app.Permission }) {
 
 function UserPermissionsUI() {
 
-    const [selection, setSelection] = useState<number[]>([])
+    const [selection, setSelection] = useState<app.Permission[]>([])
     const [deleting, setDeleting  ] = useState<boolean>(false)
     const [error   , setError     ] = useState<Error|null>(null)
     const [key     , setKey       ] = useState<number>(0)
 
     function deleteSelected() {
         setDeleting(true)
-            request("/api/permissions?id=" + selection.join(","), { method: "DELETE" }).then(
+            request("/api/permissions?id=" + selection.map(p => p.id).join(","), { method: "DELETE" }).then(
                 () => {
                     setError(null)
+                    setSelection([])
                     setKey(key + 1)
                 },
                 setError
@@ -272,7 +273,7 @@ function UserPermissionsUI() {
 
 function GroupPermissionsUI() {
 
-    const [selection, setSelection] = useState<number[]>([])
+    const [selection, setSelection] = useState<app.Permission[]>([])
     const [deleting, setDeleting  ] = useState<boolean>(false)
     const [error   , setError     ] = useState<Error|null>(null)
     const [key     , setKey       ] = useState<number>(0)
@@ -280,7 +281,7 @@ function GroupPermissionsUI() {
 
     function deleteSelected() {
         setDeleting(true)
-            request("/api/permissions?id=" + selection.join(","), { method: "DELETE" }).then(
+            request("/api/permissions?id=" + selection.map(p => p.id).join(","), { method: "DELETE" }).then(
                 () => {
                     setError(null)
                     setKey(key + 1)

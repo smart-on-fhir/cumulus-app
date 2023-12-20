@@ -15,13 +15,13 @@ import UserGroupList           from "./UserGroupList"
 export default function ShareDialog({
     user = null,
     resource,
-    resource_id,
+    selectedResources,
     dialogTitle = "Crete or Update Permissions",
     onComplete
 }: {
     user?: app.User | null
     resource: string
-    resource_id?: number[]
+    selectedResources?: any[]
     dialogTitle?: string
     onComplete?: () => void
 })
@@ -30,7 +30,7 @@ export default function ShareDialog({
     const canReadUserGroups = !!user?.permissions.includes("UserGroups.read");
 
     const [resourceType          , setResourceType          ] = useState<string>(resource);
-    const [resourceIds           , setResourceIds           ] = useState<number[] | undefined>(resource_id);
+    const [resources             , setResources             ] = useState<any[] | undefined>(selectedResources);
     const [loadingUserEmails     , setLoadingUserEmails     ] = useState<boolean>(false);
     const [loadingUserGroups     , setLoadingUserGroups     ] = useState<boolean>(false);
     const [loadingActions        , setLoadingActions        ] = useState<boolean>(false);
@@ -73,7 +73,7 @@ export default function ShareDialog({
         setSubmitting(true)
         const payload: any = {
             resource: resourceType,
-            resource_id: resourceIds?.length ? resourceIds : undefined,
+            resource_id: resources?.length ? resources.map(r => r.id) : undefined,
             action: Object.keys(selectedActions).filter(k => selectedActions[k].selected)
         }
         if (shareWith === "users") {
@@ -162,7 +162,7 @@ export default function ShareDialog({
                 { validationError && <AlertError>{ validationError }</AlertError> }
                 { error && <AlertError>The server rejected this attempt with the following message: { error }</AlertError> }
                 <div aria-disabled={ submitting || isLoading }>
-                    { (!resource || !resource_id) && <>
+                    { (!resource || !selectedResources) && <>
                         <div className="mb-1">
                             <label className="color-blue">Share What</label>
                             <hr className="mb-05" />
@@ -172,7 +172,7 @@ export default function ShareDialog({
                                     <span className="color-muted pull-right">Select the type of resources you want to manage access to</span>
                                 </p>
                                 <select className="mb-1" value={resourceType} onChange={e => {
-                                    setResourceIds([])
+                                    setResources([])
                                     setResourceType(e.target.value)
                                 }}>
                                     <option value="" disabled>Please Select</option>
@@ -185,12 +185,12 @@ export default function ShareDialog({
                                     <option value="UserGroups">UserGroups</option>
                                 </select>
                             </> }
-                            { (resourceType && !resource_id) && <>
+                            { (resourceType && !selectedResources) && <>
                                 <p>
                                     <b style={{ fontWeight: 500 }}>Resources</b>
                                     <span className="color-muted pull-right">Select resources to manage or leave this empty to manage them all</span>
                                 </p>
-                                <ResourceIdSelector resourceType={resourceType} selection={resourceIds || []} onSelectionChange={setResourceIds}/>
+                                <ResourceIdSelector resourceType={resourceType} selection={resources || []} onSelectionChange={setResources}/>
                             </> }
                         </div>
                     </> }

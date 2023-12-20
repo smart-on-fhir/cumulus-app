@@ -50,7 +50,7 @@ export class BulkShareGraph extends Command
         render(
             <ShareDialog 
                 resource="Graphs"
-                resource_id={ this.graphs.map(g => g.id) }
+                selectedResources={ [...this.graphs] }
                 user={ this.user }
             />,
             document.getElementById("modal")!
