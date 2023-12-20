@@ -58,7 +58,9 @@ interface StaticGridProps<T = JSONObject> {
     /**
      * List of selected IDs
      */
-    selection?: any[]
+    selection?: T[]
+
+    equals?: (a: T, b: T) => boolean
     
     onSelectionChange?: (selection: T[]) => void
 
@@ -84,7 +86,8 @@ export default function StaticGrid({
     rowTitle,
     maxHeight,
     minHeight,
-    height
+    height,
+    equals = (a, b) => a === b
 }: StaticGridProps) {
 
     const searchableCols = columns.filter(c => c.searchable === true)
@@ -136,7 +139,7 @@ export default function StaticGrid({
                                 checked={ selection.length === rows.length }
                                 onChange={e => {
                                     if (e.target.checked) {
-                                        onSelectionChange(rows.map(r => r[idProperty]))
+                                        onSelectionChange([...rows])
                                     } else {
                                         onSelectionChange([])
                                     }
@@ -236,7 +239,7 @@ export default function StaticGrid({
     }
 
     const renderRow = (rec: any) => {
-        const selected = !!(selectionType !== "none" && selection.includes(rec[idProperty]))
+        const selected = !!(selectionType !== "none" && !!selection.find(x => equals(x, rec)))
         return <tr
             key={ rec[idProperty] }
             className={ selected ? "selected" : undefined }
@@ -247,14 +250,13 @@ export default function StaticGrid({
                     type={ selectionType === "single" ? "radio" : "checkbox" }
                     checked={selected}
                     onChange={e => {
-                        const cur = rec[idProperty]
                         if (selectionType === "single") {
-                            onSelectionChange(e.target.checked ? [cur] : [])
+                            onSelectionChange(e.target.checked ? [rec] : [])
                         } else {
                             if (e.target.checked) {
-                                onSelectionChange([...selection, cur])
+                                onSelectionChange([...selection, rec])
                             } else {
-                                onSelectionChange([...selection].filter(x => x !== cur))
+                                onSelectionChange([...selection].filter(x => !equals(x, rec)))
                             }
                         }
                     }}

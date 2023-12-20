@@ -53,10 +53,9 @@ export function UserGrid({
             ]}
             rows={users}
             selectionType={ onSelectionChange ? "multiple" : "none" }
-            selection={ selection.map(u => u.id) }
-            onSelectionChange={ onSelectionChange ? (sel: number[]) => {
-                onSelectionChange(users.filter(u => sel.includes(u.id)))
-            } : undefined }
+            selection={ selection }
+            onSelectionChange={ onSelectionChange }
+            equals={(a, b) => +a.id === +b.id}
         />
     )
 }

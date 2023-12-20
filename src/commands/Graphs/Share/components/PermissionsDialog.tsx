@@ -17,7 +17,7 @@ interface Permission {
 
 export default function PermissionsDialog({ resource, resource_id }: { resource: string; resource_id: number })
 {
-    const [selection, setSelection ] = useState<number[]>([])
+    const [selection, setSelection ] = useState<Permission[]>([])
     const [loading  , setLoading   ] = useState<boolean>(false)
     const [error    , setError     ] = useState<Error|null>(null)
     const [data     , setData      ] = useState<Permission[]>([])
@@ -26,7 +26,7 @@ export default function PermissionsDialog({ resource, resource_id }: { resource:
 
     const deleteSelected = () => {
         setLoading(true)
-        return request("/api/permissions?id=" + selection.join(","), { method: "DELETE" }).then(
+        return request("/api/permissions?id=" + selection.map(p => p.id).join(","), { method: "DELETE" }).then(
             () => {
                 setError(null)
                 return fetchPermissions()
