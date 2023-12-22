@@ -1,15 +1,17 @@
-import { Sequelize } from "sequelize"
-import * as logger   from "../../services/logger"
-import BaseModel     from "./BaseModel"
-import DataRequest   from "./DataRequest"
-import DataSite      from "./DataSite"
-import Project       from "./Project"
-import RequestGroup  from "./RequestGroup"
-import Tag           from "./Tag"
-import User          from "./User"
-import View          from "./View"
-import Permission    from "./Permission"
-import UserGroup     from "./UserGroup"
+import { Sequelize, Op } from "sequelize"
+import * as logger       from "../../services/logger"
+import BaseModel         from "./BaseModel"
+import DataRequest       from "./DataRequest"
+import DataSite          from "./DataSite"
+import Project           from "./Project"
+import RequestGroup      from "./RequestGroup"
+import Tag               from "./Tag"
+import User              from "./User"
+import View              from "./View"
+import Permission        from "./Permission"
+import UserGroup         from "./UserGroup"
+import SystemUser        from "../../SystemUser"
+import { emit }          from "../../services/SSE"
 
 
 export function attachHooks(connection: Sequelize) {
@@ -51,11 +53,17 @@ export function attachHooks(connection: Sequelize) {
     // Log inserts -------------------------------------------------------------
     connection.addHook("afterCreate", function(model: BaseModel, options) {
         logger.info(`${model} created by ${options.user?.email || options.user?.role || "guest"}`)
+        if (model instanceof Permission) {
+            updateUsers()
+        }
     })
 
     // Log updates -------------------------------------------------------------
     connection.addHook("afterUpdate", function(model: BaseModel, options) {
         logger.info(`${model} updated by ${options.user?.email || options.user?.role || "guest"}`)
+        if (model instanceof Permission || model instanceof UserGroup) {
+            updateUsers()
+        }
     })
 
     // After delete ------------------------------------------------------------
@@ -69,6 +77,8 @@ export function attachHooks(connection: Sequelize) {
                     resource_id: model.get("id")!
                 }
             })
+        } else {
+            updateUsers()
         }
         
         // Delete all permissions given to this user
@@ -90,6 +100,47 @@ export function attachHooks(connection: Sequelize) {
         }
 
         logger.info(`${model} deleted by ${options.user?.email || options.user?.role || "guest"}`)
+    })
+
+    connection.addHook("afterBulkDestroy", options => {
+        // @ts-ignore
+        const { model, user, where } = options
+        logger.info('Multiple %s records (%o) deleted by %s', model.name, where, user?.email || user?.role || "guest")
+        if (model === Permission) {
+            updateUsers()
+        }
+    })
+
+
+    // When to update user permissions -----------------------------------------
+    async function updateUsers() {
+        const onlineUsers = await User.findAll({
+            where: {
+                sid: { [Op.not]: null },
+                role: { [Op.not]: "admin" }
+            },
+            user: SystemUser
+        });
+        for (const user of onlineUsers) {
+            await updateUser(user);
+        }
+    }
+
+    async function updateUser(user: User) {
+        const permissions = await user.getPermissions(true);
+        const json = {
+            ...user.toJSON(),
+            permissions: Object.keys(permissions).filter(k => !!permissions[k])
+        }
+        // @ts-ignore
+        delete json.password
+        // @ts-ignore
+        delete json.sid
+        emit({ type: "userSync", data: json }, user.id)
+    }
+    
+    User.addHook("afterUpdate", (model, options) => {
+        updateUser(model as User)
     })
 }
 
