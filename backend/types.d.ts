@@ -35,6 +35,9 @@ declare module 'sequelize' {
     interface UpsertOptions {
         user?: CurrentUser
     }
+    interface SaveOptions {
+        user?: CurrentUser
+    }
 }
 
 interface ModelDestroyOptions extends InstanceDestroyOptions {
