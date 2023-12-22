@@ -96,7 +96,7 @@ async function applyMigrations(options: Config, dbConnection: Sequelize)
             debug: msg => logger.debug(msg.event + " " + msg.name, { ...msg }),
             info : msg => logger.info (msg.event + " " + msg.name, { ...msg }),
             warn : msg => logger.warn (msg.event + " " + msg.name, { ...msg }),
-            error: logger.error
+            error: msg => logger.error(msg.event + " " + msg.name, { ...msg })
         }
     });
 

@@ -50,15 +50,14 @@ export default function Navigation()
     let { loading, user, logout } = useAuth();
     let navigate = useNavigate();
 
-    if (!user || !user.permissions) {
+    if (!user || !Array.isArray(user.permissions)) {
         return null
     }
 
     const canReadSites         = user.permissions.includes("DataSites.read")
     const canReadSubscriptions = user.permissions.includes("Subscriptions.read")
-    const canListGroups        = user.permissions.includes("SubscriptionGroups.search") && user.permissions.includes("SubscriptionGroups.read")
+    const canListGroups        = user.permissions.includes("SubscriptionGroups.read")
     const canReadTags          = user.permissions.includes("Tags.read")
-    const canReadGraphs        = user.permissions.includes("Graphs.search")
     const canReadProjects      = user.permissions.includes("StudyAreas.read")
     const canCreateProjects    = user.permissions.includes("StudyAreas.create")
     const canReadUsers         = user.permissions.includes("Users.read")
@@ -77,7 +76,7 @@ export default function Navigation()
                     </NavGroup>
                 )}
 
-                { canReadGraphs && <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" /> Graphs</NavLink> }
+                <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" /> Graphs</NavLink>
                 { canReadSites && <NavLink to="/sites"><i className="icon fa-solid fa-location-dot" /> Healthcare Sites</NavLink> }
                 { canReadSubscriptions && <NavLink to="/requests"><i className="icon fa-solid fa-database" /> Subscriptions</NavLink> }
                 { canListGroups && <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Subscription Groups</NavLink> }

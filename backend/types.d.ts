@@ -31,6 +31,9 @@ declare module 'sequelize' {
     }
     interface UpdateOptions {
         user?: CurrentUser
+    }    
+    interface UpsertOptions {
+        user?: CurrentUser
     }
 }
 

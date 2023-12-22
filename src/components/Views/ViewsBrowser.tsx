@@ -30,7 +30,7 @@ export default function ViewsBrowser({
 
     let { user } = useAuth();
 
-    const canCreateGraphs = user!.permissions.includes("Graphs.create")
+    const canCreateGraphs = user?.permissions.includes("Graphs.create")
 
     const query = new URLSearchParams()
 

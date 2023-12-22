@@ -38,7 +38,7 @@ export default abstract class BaseModel<
         }
     }
 
-    requestPermissionToCreate(options?: CreateOptions) {
+    public requestPermissionToCreate(options?: CreateOptions) {
         const role = options?.user?.role || "guest"
         if (role !== "system") {
             requestPermission({
@@ -49,7 +49,7 @@ export default abstract class BaseModel<
         }
     }
 
-    requestPermissionToUpdate(options?: InstanceUpdateOptions) {
+    public requestPermissionToUpdate(options?: InstanceUpdateOptions) {
         const role = options?.user?.role || "guest"
         if (role !== "system") {
             const changed = this.changed()
@@ -72,7 +72,7 @@ export default abstract class BaseModel<
         }
     }
 
-    requestPermissionToDelete(options?: InstanceDestroyOptions) {
+    public requestPermissionToDelete(options?: InstanceDestroyOptions) {
         const role = options?.user?.role || "guest"
         if (role !== "system") {
             requestPermission({
@@ -83,7 +83,7 @@ export default abstract class BaseModel<
         }
     }
 
-    toString() {
+    public toString() {
         let str = `${this.constructor.name} #${this.get("id")}`
         let name = this.get("name")
         if (name) {
