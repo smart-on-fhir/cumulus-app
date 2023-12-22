@@ -38,38 +38,31 @@ export default class Permission extends BaseModel<InferAttributes<Permission>, I
             },
             user_id: {
                 type: DataTypes.INTEGER,
-                allowNull: true,
-                unique: 'compositeIndex'
+                allowNull: true
             },
             role: {
                 type: DataTypes.STRING,
-                allowNull: true,
-                unique: 'compositeIndex'
+                allowNull: true
             },
             user_group_id: {
                 type: DataTypes.INTEGER,
-                allowNull: true,
-                unique: 'compositeIndex'
+                allowNull: true
             },
             resource: {
                 type: DataTypes.STRING,
-                allowNull: false,
-                unique: 'compositeIndex'
+                allowNull: false
             },
             resource_id: {
                 type: DataTypes.INTEGER,
-                allowNull: true,
-                unique: 'compositeIndex'
+                allowNull: true
             },
             attribute: {
                 type: DataTypes.STRING,
-                allowNull: true,
-                unique: 'compositeIndex'
+                allowNull: true
             },
             action: {
                 type: DataTypes.STRING,
-                allowNull: false,
-                unique: 'compositeIndex'
+                allowNull: false
             },
             permission: {
                 type: DataTypes.BOOLEAN,
