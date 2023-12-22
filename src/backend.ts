@@ -74,12 +74,5 @@ export const auth = {
             method : "GET",
             credentials: "include"
         });
-    },
-    async sync(): Promise<app.User> {
-        return request(`/api/users/me`, {
-            mode   : "cors",
-            method : "GET",
-            credentials: "include"
-        });
     }
 };

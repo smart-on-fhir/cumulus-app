@@ -1,7 +1,8 @@
-import * as React     from "react"
-import { auth }       from "./backend" 
-import { AlertError } from "./components/generic/Alert"
-import { app }        from "./types"
+import * as React         from "react"
+import { auth }           from "./backend" 
+import { app }            from "./types"
+import { useServerEvent } from "./hooks"
+import { AlertError }     from "./components/generic/Alert"
 import {
   useNavigate,
   useLocation,
@@ -14,14 +15,11 @@ interface AuthContextType {
     login  : (username: string, password: string, remember?: boolean) => Promise<void>;
     logout : () => Promise<void>;
     update : (props: Partial<app.User>) => void;
-    sync   : () => Promise<void>;
     error  : Error | null;
     loading: boolean;
 }
 
 let AuthContext = React.createContext<AuthContextType>(null!);
-
-let timer: NodeJS.Timeout, delay = 1000;
 
 export function AuthProvider({ children }: { children: React.ReactNode })
 {
@@ -43,6 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode })
     const [user , setUser ] = React.useState<app.User|null>(storedUser);
     const [error, setError] = React.useState<Error|null>(null);
     const [loading, setLoading] = React.useState(false);
+    const subscribe = useServerEvent()
 
     async function update(props: Partial<app.User>) {
         const updatedUser = { ...user, ...props } as app.User;
@@ -76,41 +75,11 @@ export function AuthProvider({ children }: { children: React.ReactNode })
         window.location.href = "/login"
     }
 
-    const sync = React.useCallback(() => {
-        return auth.sync().then(user => {
-            if (user.id && user.id > 0) {
-                const json = JSON.stringify(user)
-                if (JSON.stringify(storedUser) !== json) {
-                    localStorage.setItem("user", json);
-                    setUser(user);
-                    delay = 1000
-                }
-            } else {
-                delay = 300000
-            }
-        })
-    }, [storedUser])
+    React.useEffect(() => subscribe("userSync", update), [])
 
-    React.useEffect(() => {
-        const _sync = () => {
-            if (timer) {
-                clearTimeout(timer)
-            }
-            sync().finally(() => {
-                delay = Math.min(delay * 1.1, 300000)
-                timer = setTimeout(_sync, delay)
-            })
-        }
-        timer = setTimeout(_sync, delay)
-        return () => {
-            if (timer) {
-                clearTimeout(timer)
-            }
-        }
-    }, [sync])
   
     return (
-        <AuthContext.Provider value={{ user, login, logout, error, loading, update, sync }}>
+        <AuthContext.Provider value={{ user, login, logout, error, loading, update }}>
             {children}
         </AuthContext.Provider>
     );
