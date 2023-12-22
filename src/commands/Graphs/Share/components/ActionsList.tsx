@@ -1,28 +1,37 @@
 import Checkbox from "../../../../components/generic/Checkbox"
-import { app }  from "../../../../types"
 
+
+// The following actions are disabled if "read" is not checked
+const READ_DEPENDENT = [
+    "update",
+    "delete",
+    "share"
+]
 
 export default function ActionsList({
     actions,
-    onChange,
-    resource,
-    user
+    onChange
 }: {
     actions : Record<string, { selected: boolean }>
     onChange: (actions: Record<string, { selected: boolean }>) => void
-    resource: string
-    user    : app.User
 })
 {
+    function isSelected(action: keyof typeof actions) {
+        return actions[action].selected
+    }
+    
     return <>
-        { Object.keys(actions).map(key => {
-            const o = actions[key];
+        { Object.keys(actions).map(action => {
+            const o = actions[action];
+            
+            const disabled = (action !== "read" && READ_DEPENDENT.includes(action) && !isSelected("read"));
+            
             return <Checkbox
-                key={key}
+                key={action}
                 checked={ o.selected }
-                name={ key }
-                onChange={() => onChange({ ...actions, [key] : { selected: !o.selected }})}
-                disabled={ !user.permissions.includes(resource + "." + key) }
+                name={ action }
+                onChange={() => onChange({ ...actions, [action] : { selected: !o.selected }})}
+                disabled={disabled}
             />
         })}
     </>
