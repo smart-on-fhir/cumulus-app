@@ -66,13 +66,12 @@ export function AuthProvider({ children }: { children: React.ReactNode })
 
     async function logout() {
         if (user) {
-            setUser(null)
             setLoading(true)
+            setUser(null)
             await auth.logout()
             localStorage.removeItem("user")
             setLoading(false)
         }
-        window.location.href = "/login"
     }
 
     React.useEffect(() => subscribe("userSync", update), [])

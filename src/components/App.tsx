@@ -38,7 +38,7 @@ export default function App()
                                 <Route index element={ <RequireAuth><Home /></RequireAuth> } />
 
                                 <Route path="views">
-                                    <Route index element={ <Views /> } />
+                                    <Route index element={ <RequireAuth><Views /></RequireAuth> } />
                                     <Route path=":id">
                                         <Route index               element={ <RequireAuth><EditView /></RequireAuth> } />
                                         <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />

@@ -71,7 +71,6 @@ const emitter = {
     },
     on(eventType: string, callback: eventHandler) {
         (eventHandlers[eventType] = eventHandlers[eventType] || []).push(callback);
-        console.log(eventHandlers[eventType].length)
         return () => {
             eventHandlers[eventType] = eventHandlers[eventType].filter(cb => cb !== callback);
         }
