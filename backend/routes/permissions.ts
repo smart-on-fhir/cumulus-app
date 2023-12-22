@@ -302,8 +302,13 @@ route(router, {
         }
 
         const { Model } = SHAREABLE_MODELS[resourceType]
+        const model = await Model.findByPk(+req.query.resource_id!, { user: SystemUser })
 
-        const isOwner = new Model({ id: +req.query.resource_id! }).isOwnedBy(req.user)
+        if (!model) {
+            throw new Forbidden("Model not found");
+        }
+
+        const isOwner = model.isOwnedBy(req.user)
 
         if (req.user?.role !== "admin" && !isOwner) {
             const msg = "Only admins and resource owners can do this"
@@ -317,12 +322,20 @@ route(router, {
         
         const list = await Permission.sequelize!.query(
             `SELECT p.id, p.permission, p.action,
-            CASE WHEN p.user_id IS NOT NULL THEN 'User' ELSE 'UserGroup' END as "actorType",
-            CASE WHEN p.user_id IS NOT NULL THEN u.email ELSE g.name END as "actor"
+            CASE
+                WHEN p.user_id IS NOT NULL THEN 'User'
+                WHEN p.role    IS NOT NULL THEN 'Role'
+                ELSE                            'UserGroup'
+            END as "actorType",
+            CASE
+                WHEN p.user_id IS NOT NULL THEN u.email
+                WHEN p.role    IS NOT NULL THEN p.role
+                ELSE                            g.name
+            END as "actor"
             FROM "Permissions" AS "p"
             LEFT JOIN "Users" u ON u.id = p.user_id
             LEFT JOIN "UserGroups" g ON g.id = p.user_group_id
-            WHERE p.resource = ? AND p.resource_id=? AND (p.user_id IS NOT NULL OR p.user_group_id IS NOT NULL)`,
+            WHERE p.resource = ? AND p.resource_id=? AND (p.user_id IS NOT NULL OR p.user_group_id IS NOT NULL OR p.role IS NOT NULL)`,
             {
                 replacements: [resourceType, +req.query.resource_id!],
                 type: QueryTypes.SELECT
@@ -422,7 +435,7 @@ route(router, {
 
             const rows = lib.explode([params])
             for (const row of rows) {
-                await Permission.upsert(row, { transaction })
+                await Permission.upsert(row, { transaction, user: req.user })
             }
             await transaction.commit()
             

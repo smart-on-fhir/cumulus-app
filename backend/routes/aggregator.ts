@@ -1,8 +1,8 @@
 
 import express, { Request, Response } from "express"
-import https, { RequestOptions } from "https"
-import { rw } from "../lib"
-import config from "../config"
+import https, { RequestOptions }      from "https"
+import { rw }                         from "../lib"
+import config                         from "../config"
 
 
 const router = express.Router({ mergeParams: true })

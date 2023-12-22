@@ -87,7 +87,9 @@ export default function PermissionsDialog({ resource, resource_id }: { resource:
                                     render: r => <>
                                         { r.actorType === "User" ?
                                             <i className="fas fa-user color-blue center" style={{width: "1.3em"}} /> :
-                                            <i className="far fa-folder-open color-blue center" style={{width: "1.3em"}}/>
+                                            r.actorType === "Role" ?
+                                                <i className="fas fa-theater-masks color-blue center" style={{width: "1.3em"}} /> :
+                                                <i className="far fa-folder-open color-blue center" style={{width: "1.3em"}} />
                                         }
                                         <span> { r.actor }</span>
                                     </>
