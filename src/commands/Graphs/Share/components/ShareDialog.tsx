@@ -204,9 +204,9 @@ export default function ShareDialog({
                             <label style={{ fontWeight: 400 }}>
                                 <input name="share-with" type="radio" checked={ shareWith === "groups" } onChange={ () => setShareWith("groups")} /> User Groups
                             </label>
-                            <label style={{ fontWeight: 400 }}>
+                            { resource && <label style={{ fontWeight: 400 }}>
                                 <input name="share-with" type="radio" checked={ shareWith === "roles"  } onChange={ () => setShareWith("roles" )} /> User Roles
-                            </label>
+                            </label> }
                         </Grid>
                     </div>
                     <br/>
@@ -261,7 +261,7 @@ export default function ShareDialog({
     useEffect(() => {
         if (resourceType) {
             setLoadingActions(true)
-            request<string[]>(`/api/permissions/actions?resource=${resourceType}`)
+            request<string[]>(`/api/permissions/actions?resource=${resourceType}&resource_id=${resources?.map(r => r.id)}`)
                 .then(actions => {
                     const selectedActions: Record<string, { selected: boolean }> = {}
                     actions.forEach(action => selectedActions[action] = { selected: action === "read"})

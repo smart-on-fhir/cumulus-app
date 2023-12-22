@@ -14,6 +14,8 @@ import { assert }                from "../lib"
 import { route }                 from "../lib/route"
 import SystemUser                from "../SystemUser"
 import { notifyForGraphsAccess } from "../services/mail"
+import { requestPermission }     from "../services/acl"
+import { CurrentUser }           from "../types"
 import {
     BadRequest,
     Forbidden,
@@ -260,20 +262,63 @@ route(router, {
             throw new BadRequest(`Invalid or missing "resource" parameter`)
         }
         
-        let { actions } = SHAREABLE_MODELS[resourceType];
+        let { actions, Model } = SHAREABLE_MODELS[resourceType];
 
-        let isOwner = false
-
-        let resource_id = +(req.query.resource_id || 0)
-        if (!isNaN(resource_id) && isFinite(resource_id)) {
-            isOwner = new SHAREABLE_MODELS[resourceType].Model({ id: resource_id }).isOwnedBy(req.user);
+        // Admins get the full list of actions
+        if (req.user?.role === "admin") {
+            return res.json(actions)
         }
 
-        if (!isOwner && req.user?.role !== "admin") {
-            actions = actions.filter(a => !!req.user?.permissions[resourceType + "." + a])
+        let resourceIds = String(req.query.resource_id || "").trim().split(/\s*,\s*/).map(x => {
+            const n = parseInt(x, 10)
+            if (isNaN(n) || !isFinite(n) || n < 1) {
+                return 0
+            }
+            return n
+        }).filter(Boolean)
+
+        // When opened in single resource mode
+        if (resourceIds.length === 1) {
+            const model = await Model.findByPk(resourceIds[0], { user: req.user })
+
+            // Invalid resource_id
+            if (!model) {
+                return res.json([])
+            }
+
+            // Owners get the full list of actions
+            if (model.isOwnedBy(req.user)) {
+                return res.json(actions)
+            }
+
+            return res.json(actions.filter(a => {
+                try {
+                    requestPermission({
+                        user    : req.user,
+                        resource: model,
+                        action  : a
+                    })
+                    return true
+                } catch (e) {
+                    return false
+                }
+            }))
         }
-        
-        res.json(actions)
+
+        // Otherwise exclude actions that the current user cannot perform on the
+        // entire resource type
+        res.json(actions.filter(a => {
+            try {
+                requestPermission({
+                    user    : req.user,
+                    resource: resourceType,
+                    action  : a
+                })
+                return true
+            } catch (e) {
+                return false
+            }
+        }))
     }
 })
 
