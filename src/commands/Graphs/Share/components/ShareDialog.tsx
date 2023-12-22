@@ -269,7 +269,7 @@ export default function ShareDialog({
                 }, setLoadingActionsError)
                 .finally(() => setLoadingActions(false))
         }
-    }, [resourceType])
+    }, [resourceType, resources])
 
     useEffect(() => {
         
