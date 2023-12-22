@@ -233,4 +233,5 @@ export function init(connection: Sequelize) {
     
     // Permission belongs to User (sometimes)
     Permission.belongsTo(User, { foreignKey: "user_id" });
+    Permission.belongsTo(UserGroup, { foreignKey: "user_group_id" });
 }
