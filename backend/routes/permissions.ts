@@ -252,6 +252,50 @@ export async function validate(body: Record<string, any>): Promise<InputParams>
     }
 }
 
+async function canShare(user: CurrentUser, permission: {
+    resource      : keyof typeof SHAREABLE_MODELS
+    action        : string
+    resource_id  ?: number | null
+    user_id      ?: number | null
+    role         ?: number | null
+    user_group_id?: number | null
+}) {
+    if (user.role === "guest") {
+        return false
+    }
+
+    if (user.role === "admin" || user.role === "system") {
+        return true
+    }
+
+    if (permission.resource_id) {
+        const Model = SHAREABLE_MODELS[permission.resource].Model
+        const model = await Model.findByPk(permission.resource_id, { user })
+        
+        if (!model) {
+            return false
+        }
+
+        if (model.isOwnedBy(user)) {
+            return true
+        }
+
+        try {
+            requestPermission({ resource: model, user, action: permission.action })
+            return true
+        } catch (e) {
+            return false
+        }
+    }
+
+    try {
+        requestPermission({ resource: permission.resource, user, action: permission.action })
+        return true
+    } catch (e) {
+        return false
+    }
+}
+
 // Get actions -----------------------------------------------------------------
 route(router, {
     path: "/actions",
@@ -480,7 +524,30 @@ route(router, {
 
             const rows = lib.explode([params])
             for (const row of rows) {
-                await Permission.upsert(row, { transaction, user: req.user })
+                
+                const allowed = await canShare(req.user!, row)
+                if (!allowed) {
+                    throw new Forbidden("You are not allowed to perform this action")
+                }
+
+
+                const where = {
+                    user_id      : row.user_id       ?? null,
+                    role         : row.role          ?? null,
+                    user_group_id: row.user_group_id ?? null,
+                    resource     : row.resource      ?? null,
+                    resource_id  : row.resource_id   ?? null,
+                    // attribute    : row.attribute     ?? null,
+                    action       : row.action        ?? null,
+                }
+
+                const count = await Permission.count({ where, transaction })
+                if (count) {
+                    await Permission.update({ permission: row.permission }, { where, transaction, user: SystemUser })
+                } else {
+                    const model = new Permission(row)
+                    await model.save({ transaction, user: SystemUser })
+                }
             }
             await transaction.commit()
             
