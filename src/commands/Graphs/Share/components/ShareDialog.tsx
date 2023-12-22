@@ -16,7 +16,7 @@ export default function ShareDialog({
     user = null,
     resource,
     selectedResources,
-    dialogTitle = "Crete or Update Permissions",
+    dialogTitle = "Create or Update Permissions",
     onComplete
 }: {
     user?: app.User | null
@@ -197,7 +197,7 @@ export default function ShareDialog({
                     <div>
                         <label className="color-blue">Share with Who</label>
                         <hr />
-                        <Grid gap="2rem" cols="auto auto auto">
+                        <Grid cols="1fr 1fr 1fr" gap="2rem 1rem">
                             <label style={{ fontWeight: 400 }}>
                                 <input name="share-with" type="radio" checked={ shareWith === "users"  } onChange={ () => setShareWith("users" )} /> Users
                             </label>
@@ -214,7 +214,7 @@ export default function ShareDialog({
                         shareWith === "groups" && <>
                             <label className="color-blue">Selected User Groups</label>
                             <hr />
-                            <Grid cols="1fr 1fr">
+                            <Grid cols="1fr 1fr 1fr" gap="0 1rem">
                                 <UserGroupList
                                     groups={ userGroups.map(g => ({ ...g, selected: selectedGroups.includes(g.id) }))}
                                     onChange={ groups => setSelectedGroups(groups.filter(g => g.selected).map(g => g.id)) }
@@ -240,8 +240,8 @@ export default function ShareDialog({
                         shareWith === "roles" && <>
                             <label className="color-blue">Selected Roles</label>
                             <hr />
-                            <Grid cols="1fr 1fr">
-                                <RoleList roles={selectedRoles} onChange={setSelectedRoles}/>
+                            <Grid cols="1fr 1fr 1fr" gap="0 1rem">
+                                <RoleList roles={selectedRoles} onChange={setSelectedRoles} />
                             </Grid>
                         </>
                     }
