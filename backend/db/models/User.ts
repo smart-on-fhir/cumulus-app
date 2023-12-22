@@ -1,8 +1,10 @@
-import Bcrypt      from "bcryptjs"
-import moment      from "moment"
-import * as logger from "../../services/logger"
-import config      from "../../config"
-import BaseModel   from "./BaseModel"
+import Bcrypt                from "bcryptjs"
+import moment                from "moment"
+import { QueryTypes }        from "sequelize"
+import BaseModel             from "./BaseModel"
+import * as logger           from "../../services/logger"
+import config                from "../../config"
+import { buildPermissionId } from "../../lib"
 import {
     CreationOptional,
     DataTypes,
@@ -10,10 +12,6 @@ import {
     InferCreationAttributes,
     Sequelize
 } from "sequelize"
-import Permission from "./Permission"
-import { Op } from "sequelize"
-import { CurrentUser } from "../../types"
-import { buildPermissionId } from "../../lib"
 
 
 function validatePassword(pass: string|null) {
@@ -62,20 +60,30 @@ export default class User extends BaseModel<InferAttributes<User>, InferCreation
         return user && user.id && user.id === this.id
     }
 
-    public async getPermissions() {
-        if (!this._permissions) {
-            this._permissions = Permission.findAll({
-                where: {
-                    [Op.or]: [
-                        { role   : this.role, user_id: null }, // ("role" = ? AND "user_id" IS NULL)
-                        { user_id: this.id  , role   : null }, // ("user_id" = ? AND "role" IS NULL)
-                        // TODO: Figure out user groups
-                    ]
-                },
-                user: { role: "system" } as CurrentUser
-            }).then(rows => {
+    public async getPermissions(force = false) {
+        if (force || !this._permissions) {
+            this._permissions = await this.sequelize.query(
+                `SELECT "id", "user_id", "role", "user_group_id", "resource",
+                    "resource_id", "attribute", "action", "permission", case
+                        when "role"          IS NOT NULL then 1
+                        when "user_group_id" IS NOT NULL then 2
+                        when "user_id"       IS NOT NULL then 3
+                    END as "actor"
+                    FROM "public"."Permissions" AS "Permission"
+                    WHERE 
+                        "role" = ? OR
+                        "user_id" = ? OR
+                        "user_group_id" IN (SELECT "UserGroupId" FROM "UserGroupUsers" WHERE "UserId" = ?)
+                    order by actor`,
+                {
+                    type: QueryTypes.SELECT,
+                    replacements: [this.role, +this.id, +this.id]
+                }
+            )
+            .then(rows => {
                 const out: Record<string, boolean> = {}
                 rows.forEach(row => {
+                    // @ts-ignore
                     out[buildPermissionId(row)] = row.permission
                 })
                 return out;
