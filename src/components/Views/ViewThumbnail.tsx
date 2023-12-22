@@ -12,7 +12,7 @@ import { OpenInAnalyticEnvironment } from "../../commands/Subscriptions/OpenInAn
 import { RequestLineLevelData }      from "../../commands/Graphs/RequestLineLevelData"
 import { View }                      from "../../commands/Graphs/View"
 import { ShareGraph }                from "../../commands/Graphs/Share/ShareGraph"
-import { BulkShareGraph }            from "../../commands/Graphs/Share/BulkShareGraph"
+// import { BulkShareGraph }            from "../../commands/Graphs/Share/BulkShareGraph"
 import { ManagePermissions }         from "../../commands/Graphs/Share/ManagePermissions"
 
 
@@ -41,7 +41,7 @@ export default function ViewThumbnail({
     const requestLineData    = useCommand(new RequestLineLevelData(view.id, auth.user, navigate))
     const openInAE           = useCommand(new OpenInAnalyticEnvironment(view.DataRequestId || 0, auth.user))
     const shareCommand       = useCommand(new ShareGraph(view, auth.user));
-    const bulkShareGraph     = useCommand(new BulkShareGraph({ graphs: selection?.items || [], user: auth.user }))
+    // const bulkShareGraph     = useCommand(new BulkShareGraph({ graphs: selection?.items || [], user: auth.user }))
     const permissionsCommand = useCommand(new ManagePermissions(view, auth.user));
 
     return (
@@ -77,9 +77,9 @@ export default function ViewThumbnail({
                     if (bulkDeleteCommand.available) {
                         bulkItems.push(bulkDeleteCommand)
                     }
-                    if (bulkShareGraph.available) {
-                        bulkItems.push(bulkShareGraph)
-                    }
+                    // if (bulkShareGraph.available) {
+                    //     bulkItems.push(bulkShareGraph)
+                    // }
 
                     if (bulkItems.length) {
                         items.unshift({
