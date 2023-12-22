@@ -250,7 +250,7 @@ export default function ShareDialog({
                         <label className="color-blue">Allowed Actions</label>
                         <hr />
                         <Grid cols="1fr 1fr 1fr" gap="0 1rem">
-                            <ActionsList actions={selectedActions} onChange={setSelectedActions} user={user!} resource={resourceType} />
+                            <ActionsList actions={selectedActions} onChange={setSelectedActions} />
                         </Grid>
                     </> }
                 </div>
