@@ -52,6 +52,7 @@ function setupAPI(app: Application)
     app.use("/api/aggregator"    , require("./routes/aggregator"  ).default);
     app.use("/api/permissions"   , require("./routes/permissions" ).default);
     app.use("/api/user-groups"   , require("./routes/userGroups"  ).default);
+    app.use("/api/sse"           , require("./services/SSE"       ).longPollingHandler);
     logger.verbose("✔ REST API set up");
 }
 
