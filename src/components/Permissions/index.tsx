@@ -299,7 +299,7 @@ function GroupPermissionsUI() {
             which will effectively revoke access permissions.
         </div>
         <div className="p-1">
-            <EndpointListWrapper endpoint="/api/permissions?order=resource:asc&where=user_group_id:not:null" key={key}>
+            <EndpointListWrapper endpoint="/api/permissions?order=resource:asc&where=user_group_id:not:null&include=UserGroup:name" key={key}>
                 { (data: app.Permission[]) => {
                     if (!data.length) {
                         return <Alert color="orange" icon="fas fa-exclamation-circle"><b>No records found</b></Alert>
@@ -314,31 +314,38 @@ function GroupPermissionsUI() {
                                     type : "number"
                                 },
                                 {
-                                    name : "user_group_id",
-                                    label: "User Group ID",
-                                    type : "number"
+                                    name      : "user_group_id",
+                                    label     : "User Group",
+                                    type      : "number",
+                                    searchable: true,
+                                    render    : (r) => r.UserGroup.name,
+                                    value     : (r) => r.UserGroup.name,
                                 },
                                 {
                                     name : "resource",
                                     label: "Resource Type",
-                                    type : "string"
+                                    type : "string",
+                                    searchable: true
                                 },
                                 {
                                     name  : "resource_id",
                                     label : "Resource ID",
                                     type  : "number",
+                                    searchable: true,
                                     render: (r) => r.resource_id ?? <span className="color-brand-2">ALL</span>
                                 },
                                 {
                                     name  : "attribute",
                                     label : "Attribute",
                                     type  : "string",
+                                    searchable: true,
                                     render: (r) => r.attribute || <span className="color-brand-2">ALL</span>
                                 },
                                 {
                                     name: "action",
                                     label: "Action",
-                                    type: "string"
+                                    type: "string",
+                                    searchable: true
                                 },
                                 {
                                     name  : "permission",
