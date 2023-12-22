@@ -88,8 +88,9 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
             scopes: {
                 visible: function(user: CurrentUser) {
                     
-                    // If the current user has permission to read any graph,
-                    // then allow any graph
+                    // If the current user has permission to read any graph, or
+                    // if the current user belongs to user-group which is
+                    // allowed to read any graph, then allow any graph
                     if (user.permissions["Graphs.read"]) {
                         return {}
                     }
@@ -102,12 +103,27 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
                         user: SystemUser,
                         where: {
                             [Op.or]: [
+                                // Graphs created by me
                                 { creatorId: user.id },
+
+                                // Graphs shared with me
                                 { id: {
                                     [Op.in]: sequelize.literal(`(
                                         SELECT "resource_id"
                                           FROM "Permissions"
                                          WHERE "user_id" = ${+user.id}
+                                           AND "resource" = 'Graphs'
+                                           AND "action" = 'read'
+                                           AND "permission" IS TRUE
+                                    ) `)
+                                }},
+
+                                // Graphs shared with groups I'm a member of
+                                { id: {
+                                    [Op.in]: this.sequelize.literal(`(
+                                        SELECT "resource_id"
+                                          FROM "Permissions"
+                                         WHERE "user_group_id" IN (SELECT "UserGroupId" FROM "UserGroupUsers" WHERE "UserId" = ${+user.id})
                                            AND "resource" = 'Graphs'
                                            AND "action" = 'read'
                                            AND "permission" IS TRUE
