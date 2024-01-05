@@ -61,6 +61,8 @@ interface Config {
 
     userInviteExpireAfterHours: number
 
+    userResetExpireAfterHours: number
+
     docker: {
         containerName: string
     }

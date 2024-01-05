@@ -401,7 +401,7 @@ route(router, {
         lib.assert(newPassword1 === newPassword2, "Passwords do not match", BadRequest);
 
         try {
-            await user.update({ name, password: newPassword1 }, { user: { ...req.user!, role: "owner" }})
+            await user.update({ name, password: newPassword1, activationCode: null }, { user: { ...req.user!, role: "owner" }})
             res.json({ name: user.name })
         } catch (cause) {
             throw new BadRequest("Error activating account", { cause })
@@ -434,5 +434,105 @@ route(router, {
         res.json(secure(model))
     }
 });
+
+// Reset Password --------------------------------------------------------------
+
+// User submits the password reset form providing code and passwords 
+route(router, {
+    path: "/update-password",
+    method: "post",
+    request: {
+        schema: {
+            code: {
+                in: "body",
+                exists: true,
+                errorMessage: "Missing code parameter"
+            },
+            password: {
+                in: "body",
+                exists: true,
+                errorMessage: "Missing password parameter"
+            }
+        }
+    },
+    async handler(req, res) {
+
+        await lib.wait(1000) // for security reasons
+
+        const { code, password } = req.body
+
+        // Find the user
+        const user = await User.findOne({
+            where: { activationCode: code },
+            user: SystemUser
+        })
+
+        // No such user
+        lib.assert(user, "Invalid password reset code", BadRequest);
+
+        // User found but link created too long ago.
+        if (moment().diff(moment(user.activateUntil), "hours") > 0) {
+            throw new Gone("Expired password reset link");
+        }
+
+        try {
+            await user.update({
+                password,
+                activationCode: null,
+                activateUntil : null
+            }, { user: SystemUser })
+            res.end("Password updated")
+        } catch (e) {
+            const error = new BadRequest("Error updating account")
+            error.cause = e.stack
+            throw error
+        }
+    }
+})
+
+// User submits the password reset form providing the email 
+route(router, {
+    path: "/reset",
+    method: "post",
+    request: {
+        schema: {
+            email: {
+                in          : "body",
+                errorMessage: "Missing email parameter",
+                exists      : true
+            },
+        },
+    },
+    async handler(req, res) {
+
+        await lib.wait(1000) // for security reasons
+
+        const { email } = req.body
+
+        // Verify that this email exists in our DB
+        const user = await User.findOne({ where: { email }, user: SystemUser })
+
+        // No such user
+        lib.assert(user, "No user found using this email", BadRequest)
+
+        // Re-generate the activationCode
+        const newActivationCode = Crypto.randomBytes(32).toString("hex")
+
+        // Also reset user.createdAt
+        await user.update({
+            activationCode: newActivationCode,
+            activateUntil : moment().add(config.userResetExpireAfterHours, "hours").toDate()
+        }, { user: SystemUser })
+
+        // Send email with reset link
+        await mail.sendResetPasswordEmail({
+            baseUrl: lib.getRequestBaseURL(req),
+            code   : newActivationCode,
+            email
+        })
+
+        res.end("Password reset email sent")
+    }
+})
 
 export default router

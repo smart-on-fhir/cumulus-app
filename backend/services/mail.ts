@@ -148,6 +148,45 @@ export async function inviteUser({
     })
 }
 
+export async function sendResetPasswordEmail({
+    email,
+    baseUrl,
+    code
+}: {
+    email: string
+    baseUrl: string
+    code: string
+}) {
+
+    const href = new URL("/password-reset", baseUrl)
+    href.searchParams.set("code", code)
+
+    let html = [
+        `<h2>Password Change Requested</h2>`,
+        `<p>A password change has been requested. If you didn't do this you can ` +
+        `safely ignore this email. Otherwise, please use the following link within ${
+            moment.duration(config.userResetExpireAfterHours, "hours").humanize()
+        } to change your password:</p>`,
+        `<p><a href="${href}" target="_blank">${href}</a></p>`
+    ];
+
+    html.push(`<br /><br />Regards,<br/>The Cumulus team`)
+    
+    debug("Sending password reset email:", JSON.stringify({
+        from   : config.appEmail,
+        to     : email,
+        subject: "Activate your account",
+        html   : html.join("\n")
+    }, null, 4));
+
+    return client.messages.create(config.mailGun.domain, {
+        from   : config.appEmail,
+        to     : email,
+        subject: "Change your cumulus password",
+        html   : html.join("\n")
+    })
+}
+
 // -----------------------------------------------------------------------------
 
 /**

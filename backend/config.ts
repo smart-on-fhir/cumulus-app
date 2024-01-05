@@ -51,6 +51,9 @@ const config: Config = {
     // many people are used to that so we add one more hour to get "7 days"!
     userInviteExpireAfterHours: 24 * 7 + 1,
 
+    // How long are password reset links good for
+    userResetExpireAfterHours: 24,
+
     docker: {
         containerName: DB_DOCKER_CONTAINER
     },
