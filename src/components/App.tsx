@@ -1,26 +1,29 @@
-import { Routes, Route, BrowserRouter }         from "react-router-dom";
-import { AuthProvider, RequireAuth, LoginPage } from "../auth";
-import Header                                   from "./Header";
-import Home                                     from "./Home";
-import EditView                                 from "./Dashboard/EditView";
-import CopyView                                 from "./Dashboard/CopyView";
-import RequestDataForm                          from "./Dashboard/RequestDataForm";
-import Subscriptions                            from "./DataRequests";
-import RequestGroups                            from "./RequestGroups";
-import DataSiteListPage                         from "./DataSites";
-import Navigation                               from "./Navigation";
-import Views                                    from "./Views";
-import Users                                    from "./Users";
-import Invite                                   from "./Users/Invite";
-import Account                                  from "./Users/Account";
-import Activate                                 from "./Users/Activate";
-import Projects                                 from "./Projects";
-import Tags                                     from "./Tags";
-import { ContextMenu }                          from "./generic/Menu";
-import Tooltip                                  from "./generic/Tooltip";
-import PermissionsManager                       from "./Permissions";
-import UserGroups                               from "./UserGroups";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { AuthProvider, RequireAuth }    from "../auth";
+import Header                           from "./Header";
+import Home                             from "./Home";
+import EditView                         from "./Dashboard/EditView";
+import CopyView                         from "./Dashboard/CopyView";
+import RequestDataForm                  from "./Dashboard/RequestDataForm";
+import Subscriptions                    from "./DataRequests";
+import RequestGroups                    from "./RequestGroups";
+import DataSiteListPage                 from "./DataSites";
+import Navigation                       from "./Navigation";
+import Views                            from "./Views";
+import Users                            from "./Users";
+import LoginPage                        from "./Users/LoginPage"
+import Invite                           from "./Users/Invite";
+import Account                          from "./Users/Account";
+import Activate                         from "./Users/Activate";
+import PasswordReset                    from "./Users/PasswordReset";
+import Projects                         from "./Projects";
+import Tags                             from "./Tags";
+import { ContextMenu }                  from "./generic/Menu";
+import Tooltip                          from "./generic/Tooltip";
+import PermissionsManager               from "./Permissions";
+import UserGroups                       from "./UserGroups";
 import "../styles/main.scss";
+
 
 export default function App()
 {
@@ -46,18 +49,19 @@ export default function App()
                                     </Route>
                                 </Route>
 
-                                <Route path="requests/*"    element={ <RequireAuth><Subscriptions /></RequireAuth> } />
-                                <Route path="sites/*"       element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
-                                <Route path="groups/*"      element={ <RequireAuth><RequestGroups /></RequireAuth> } />
-                                <Route path="projects/*"    element={ <RequireAuth><Projects /></RequireAuth> } />
-                                <Route path="tags/*"        element={ <RequireAuth><Tags /></RequireAuth> } />
-                                <Route path="login"         element={ <LoginPage /> } />
-                                <Route path="activate"      element={ <Activate /> } />
-                                <Route path="user"          element={ <RequireAuth><Account /></RequireAuth> } />
-                                <Route path="users/invite"  element={ <RequireAuth><Invite /></RequireAuth> } />
-                                <Route path="users"         element={ <RequireAuth><Users /></RequireAuth> } />
-                                <Route path="permissions"   element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
-                                <Route path="user-groups/*" element={ <RequireAuth><UserGroups /></RequireAuth> } />
+                                <Route path="requests/*"     element={ <RequireAuth><Subscriptions /></RequireAuth> } />
+                                <Route path="sites/*"        element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
+                                <Route path="groups/*"       element={ <RequireAuth><RequestGroups /></RequireAuth> } />
+                                <Route path="projects/*"     element={ <RequireAuth><Projects /></RequireAuth> } />
+                                <Route path="tags/*"         element={ <RequireAuth><Tags /></RequireAuth> } />
+                                <Route path="login"          element={ <LoginPage /> } />
+                                <Route path="activate"       element={ <Activate /> } />
+                                <Route path="password-reset" element={ <PasswordReset /> } />
+                                <Route path="user"           element={ <RequireAuth><Account /></RequireAuth> } />
+                                <Route path="users/invite"   element={ <RequireAuth><Invite /></RequireAuth> } />
+                                <Route path="users"          element={ <RequireAuth><Users /></RequireAuth> } />
+                                <Route path="permissions"    element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
+                                <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
                                 
                                 <Route path="*" element="Page Not Found" />
                             </Route>

@@ -49,6 +49,7 @@ export default class User extends BaseModel<InferAttributes<User>, InferCreation
     declare status        : CreationOptional<string | null>;
     declare createdAt     : CreationOptional<Date>;
     declare updatedAt     : CreationOptional<Date>;
+    declare activateUntil : CreationOptional<Date | null>;
 
     private _permissions: Record<string, boolean> | Promise<Record<string, boolean>> = null!;
 
@@ -194,7 +195,11 @@ export default class User extends BaseModel<InferAttributes<User>, InferCreation
             },
 
             createdAt: DataTypes.DATE,
-            updatedAt: DataTypes.DATE
+            updatedAt: DataTypes.DATE,
+            activateUntil: {
+                type: DataTypes.DATE,
+                allowNull: true
+            }
         }, {
             sequelize,
             modelName: "User",
