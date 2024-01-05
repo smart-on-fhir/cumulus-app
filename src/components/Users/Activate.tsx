@@ -1,15 +1,10 @@
-import { useEffect, useState }   from "react";
-import { Link } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
-import { useAuth }    from "../../auth";
-import { request }    from "../../backend";
-import { AlertError } from "../generic/Alert";
+import { useEffect, useState }   from "react"
+import { Link, useSearchParams } from "react-router-dom"
+import { useAuth }               from "../../auth"
+import { request }               from "../../backend"
+import { AlertError }            from "../generic/Alert"
+import { CreatePassword }        from "./lib"
 
-function Check({ condition, label }: { condition: any, label: any }) {
-    return condition ?
-        <div><i className="fa-solid fa-circle-check color-green" /> { label }</div> :
-        <div><i className="fa-solid fa-circle-xmark color-red" /> { label }</div>;
-}
 
 export default function Wrap()
 {
@@ -54,8 +49,6 @@ export function Activate({ code }: { code: string })
     const [name               , setName               ] = useState(user?.name || "");
     const [newPassword1       , setNewPassword1       ] = useState("");
     const [newPassword2       , setNewPassword2       ] = useState("");
-    const [newPassword1Visible, setNewPassword1Visible] = useState(false);
-    const [newPassword2Visible, setNewPassword2Visible] = useState(false);
     const [activated          , setActivated          ] = useState(false);
 
     let passwordsValid = (() => {
@@ -68,17 +61,6 @@ export function Activate({ code }: { code: string })
             newPassword1 === newPassword2
         );
     })();
-
-    const passwordValidation = (
-        <div className="small color-muted">
-            <Check key="1" condition={newPassword1.length >= 8} label="At least 8 characters" />
-            <Check key="2" condition={newPassword1.match(/[A-Z]/)} label="At least one upper-case letter" />
-            <Check key="3" condition={newPassword1.match(/[a-z]/)} label="At least one lower-case letter" />
-            <Check key="4" condition={newPassword1.match(/[0-9]/)} label="At least one digit" />
-            <Check key="5" condition={newPassword1.match(/(\$|@|,|#|!|%|~|&|\*|\^)/)} label={ <>At least one special character (<b>@</b>,<b>#</b>,<b>!</b>,<b>$</b>,<b>%</b>,<b>~</b>,<b>&amp;</b>,<b>*</b>,<b>^</b>)</>} />
-            <Check key="6" condition={newPassword1 === newPassword2} label="Two passwords must match" />
-        </div>
-    );
 
     async function submit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -125,7 +107,7 @@ export function Activate({ code }: { code: string })
                 { error && <AlertError>{ error + "" }</AlertError> }
                 <div className="row gap mb-1">
                     <div className="col">
-                        <label htmlFor="role">Display Name</label>
+                        <label htmlFor="role">Display Name *</label>
                         <input
                             name="name"
                             id="name"
@@ -141,67 +123,14 @@ export function Activate({ code }: { code: string })
                         </div>
                     </div>
                 </div>
-                <div className="row gap mb-1">
-                    <div className="col">
-                        <label htmlFor="newPassword1">Password * </label>
-                        <div className="row">
-                            <div className="col">
-                                <input
-                                    name="newPassword1"
-                                    id="newPassword1"
-                                    autoComplete="new-password"
-                                    type={ newPassword1Visible ? "text" : "password" }
-                                    value={newPassword1}
-                                    onChange={e => setNewPassword1(e.target.value)}
-                                    disabled={ loading }
-                                />
-                            </div>
-                            <div className="col col-0 center middle color-muted pl-05" style={{ flexBasis: "2em" }}>
-                                { newPassword1Visible ?
-                                <i className="fa-solid fa-eye" title="Click to hide password" onClick={() => setNewPassword1Visible(false)} style={{ cursor: "pointer" }} /> :
-                                <i className="fa-solid fa-eye-slash" title="Click to show password" onClick={() => setNewPassword1Visible(true)} style={{ cursor: "pointer" }} /> }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="row gap">
-                    <div className="col">
-                        <label htmlFor="newPassword2">Repeat Password * </label>
-                        <div className="row">
-                            <div className="col">
-                                <input
-                                    name="newPassword2"
-                                    id="newPassword2"
-                                    autoComplete="new-password"
-                                    type={ newPassword2Visible ? "text" : "password" }
-                                    value={newPassword2}
-                                    onChange={e => setNewPassword2(e.target.value)}
-                                    disabled={ loading }
-                                />
-                            </div>
-                            <div className="col col-0 center middle color-muted pl-05" style={{ flexBasis: "2em" }}>
-                                { newPassword2Visible ?
-                                <i className="fa-solid fa-eye" title="Click to hide password" onClick={() => setNewPassword2Visible(false)} style={{ cursor: "pointer" }} /> :
-                                <i className="fa-solid fa-eye-slash" title="Click to show password" onClick={() => setNewPassword2Visible(true)} style={{ cursor: "pointer" }} /> }
-                            </div>
-                        </div>
-                        <div className="color-muted small mt-05"></div>
-                    </div>
-                </div>
-                <div className="row gap mb-1">
-                    <div className="col">
-                        { passwordValidation }
-                    </div>
-                </div>
+                <CreatePassword password1={newPassword1} password2={newPassword2} setPassword1={setNewPassword1} setPassword2={setNewPassword2} />
                 <div className="center mt-1">
                     <hr className="mb-2"/>
                     <button
                         className={ "btn pl-2 pr-2" + (loading || !passwordsValid ? "" : " btn-blue") }
                         style={{ minWidth: "10em" }}
-                        disabled={ loading || !passwordsValid }
-                    >
-                        { loading && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
-                        Submit
+                        disabled={ loading || !passwordsValid }>
+                        { loading && <i className="fas fa-circle-notch fa-spin"/> } Submit
                     </button>
                 </div>
             </div>
