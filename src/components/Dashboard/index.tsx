@@ -506,7 +506,14 @@ export default function Dashboard({
     });
 
     // Convert filters to search parameters
-    const noRightOps = ["isNull", "isNotNull", "isTrue", "isFalse", "isNotTrue", "isNotFalse"];
+    const noRightOps = [
+        // "isNull",
+        // "isNotNull", 
+        "isTrue",
+        "isFalse",
+        "isNotTrue",
+        "isNotFalse"
+    ];
     const filterParams: string[] = []
     let chain: string[] = [];
     filters.forEach(filter => {
