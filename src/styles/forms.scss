@@ -137,7 +137,7 @@
         box-shadow: 0 0 0 3px rgba(37, 139, 255, 0.3);
     }
   
-    &:invalid, &.invalid {
+    &:invalid, &.invalid, &[aria-invalid="true"] {
         border-color: rgb(204, 41, 0);  
         &:focus {
             box-shadow: 0 0 0 3px rgba(204, 41, 0, 0.3);

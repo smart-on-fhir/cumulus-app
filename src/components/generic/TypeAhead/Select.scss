@@ -1,0 +1,84 @@
+@import "../../../styles/variables.scss";
+
+
+.type-ahead-component {
+    position       : relative;
+    user-select    : none;
+    text-align     : left;
+    display        : inline-block;
+    background     : url(../../../styles/caret-down.svg) 100% center no-repeat;
+    background-size: 22px 14px;
+
+    &:after {
+        content  : "▾";
+        position : absolute;
+        right    : 0;
+        top      : 50%;
+        width    : 1em;
+        padding  : 1px;
+        transform: translate(-1px, -50%);
+    }
+
+    .type-ahead-component-value {
+        position: relative;
+        padding-right: 1.4em;
+    }
+
+    .select-component-placeholder {
+        color: #999;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .select-component-menu {
+        position     : absolute;
+        z-index      : 1000;
+        top          : 100%;
+        left         : 1px;
+        right        : 1px;
+        margin-top   : 1px;
+        padding      : 2px;
+        border-radius: 3px;
+        background   : #FFF;
+        box-shadow   : 0 0 0 1px rgba(0, 0, 0, 0.2), 0px 5px 10px -5px rgba(0, 0, 0, 0.5);
+        display      : none;
+        
+        .select-component-menu-wrap {
+            max-height: 40vh;
+            overflow  : auto;
+        }
+
+        &.open {
+            display: block;
+        }
+    }
+
+    .select-component-option {
+        padding      : 0.2em 12px;
+        white-space  : nowrap;
+        cursor       : default;
+        border-radius: 2px;
+        position     : relative;
+        overflow     : hidden;
+        text-overflow: ellipsis;
+
+        &:hover {
+            background: linear-gradient(90deg, rgba(129, 171, 214, 0.3), rgba(129, 171, 214, 0.32));
+            box-shadow: 0 0 0 0.5px rgb(154, 178, 201) inset;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        &.selected {
+            background: linear-gradient(90deg, #369, rgb(28, 79, 129));
+            box-shadow: 0 0 0 0.75px #036 inset;
+            color: #FFF;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        &.disabled {
+            color: #999;
+            pointer-events: none;
+        }
+    }
+}
