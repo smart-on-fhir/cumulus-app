@@ -3,6 +3,7 @@ import { classList }  from "../../utils"
 import ColumnSelector from "./ColumnSelector"
 import { operators }  from "./config"
 import { app }        from "../../types"
+import TypeAhead from "../generic/TypeAhead"
 
 
 const emptyFilter: app.Filter = {
@@ -35,7 +36,7 @@ function Filter({
     const leftColumn   = filter.left ? cols.find(c => c.name === filter.left) : null;
     const leftDataType = leftColumn ? leftColumn.dataType : "";
 
-    const noRightOps = ["isNull", "isNotNull", "isTrue", "isFalse", "isNotTrue", "isNotFalse"];
+    const noRightOps = [/*"isNull", "isNotNull", */"isTrue", "isFalse", "isNotTrue", "isNotFalse"];
     
 
     return (
@@ -51,7 +52,7 @@ function Filter({
                     />
                 </div>
             </div>
-            { filter.left && <div className="row">
+            {/* { filter.left && <div className="row">
                 <div className="col" style={{ margin: "3px 0" }}>
                     <select
                         value={ operators.find(op => op.id === filter.operator)?.id }
@@ -73,7 +74,29 @@ function Filter({
                         ).map((o, i) => <option key={i} value={ o.id }>{ o.label }</option>) }
                     </select>
                 </div>
+            </div> } */}
+
+            { filter.left && <div className="row">
+                <div className="col" style={{ margin: "3px 0" }}>
+                    <TypeAhead
+                        placeholder="Select Operator"
+                        value={ operators.find(op => op.id === filter.operator)?.id || "" }
+                        onChange={ value => {
+                            const op = operators.find(op => op.id === value)!
+                            onChange({
+                                ...filter,
+                                operator: op?.id,
+                                right: {
+                                    type : filter.right.type || "value",
+                                    value: filter.right.value
+                                }
+                            })
+                        }}
+                        options={operators.filter(o => o.type.includes(leftDataType)).map(o => ({ value: o.id, label: o.label }))}
+                    />
+                </div>
             </div> }
+
             {  filter.left && filter.operator && !noRightOps.includes(filter.operator) && <>
                     { (leftDataType === "integer" || leftDataType === "float") &&
                         <div className="row"><div className="col"><input
