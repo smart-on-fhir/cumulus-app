@@ -511,15 +511,35 @@ export default function Dashboard({
     let chain: string[] = [];
     filters.forEach(filter => {
         const { left, operator, right, join } = filter
-        // Skip incomplete filters
-        if (left && operator && (right.value !== undefined || noRightOps.includes(operator))) {
-            if (join === "and" && chain.length) {
-                filterParams.push(chain.join(","))
-                chain = []
-            }
-            chain.push([left, operator, right.value].join(":"))
+        
+        // incomplete filter - column not selected yet
+        if (!left) {
+            return
         }
+
+        // incomplete filter - operator not selected yet
+        if (!operator) {
+            return
+        }
+
+        // incomplete filter - right.value required but empty
+        if (!noRightOps.includes(operator) && (right.value === undefined || right.value === "")) {
+            return;
+        }
+
+        if (join === "and" && chain.length) {
+            filterParams.push(chain.join(","))
+            chain = []
+        }
+
+        const parts: any[] = [left, operator]
+        if (!noRightOps.includes(operator)) {
+            parts.push(right.value)
+        }
+
+        chain.push(parts.join(":"))
     })
+
     if (chain.length) filterParams.push(chain.join(","))
 
     // Variables that control if new data needs to be fetched
