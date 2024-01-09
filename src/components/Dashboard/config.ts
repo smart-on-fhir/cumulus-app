@@ -160,6 +160,6 @@ export const operators: FilterConfig[] = [
     { id: "isNotTrue"         , label: "IS NOT TRUE"                           , type: ["boolean"          ] },
     { id: "isNotFalse"        , label: "IS NOT FALSE"                          , type: ["boolean"          ] },
     
-    { id: "isNull"            , label: "IS NULL"                               , type: ["*"                ] },
-    { id: "isNotNull"         , label: "IS NOT NULL"                           , type: ["*"                ] },
+    // { id: "isNull"            , label: "IS NULL"                               , type: ["*"                ] },
+    // { id: "isNotNull"         , label: "IS NOT NULL"                           , type: ["*"                ] },
 ];
