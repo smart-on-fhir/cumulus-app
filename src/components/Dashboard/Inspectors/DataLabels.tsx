@@ -44,7 +44,7 @@ export function getOptions(options: PlotSeriesDataLabelsOptions, onChange: (o: P
             name: "Background Color",
             type: "color",
             value: options?.backgroundColor,
-            onChange: (backgroundColor?: string) => onChange({ backgroundColor })
+            onChange: (backgroundColor?: string) => onChange({ backgroundColor: backgroundColor || "none" })
         },
         {
             name: "Padding",
