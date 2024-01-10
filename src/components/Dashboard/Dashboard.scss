@@ -218,6 +218,18 @@
         //     //     @include highlight(1px, 1px);
         //     // }
         // }
+
+        // Data Labels ---------------------------------------------------------
+        .highcharts-data-labels:not(.highcharts-pie-series) {
+            .highcharts-data-label {
+                outline-color: #06C0;
+            }
+
+            &:hover .highcharts-data-label {
+                @include highlight(2px, 0px);
+                border-radius: 1px;
+            }
+        }
     }
 }
 

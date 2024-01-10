@@ -1,4 +1,4 @@
-import { Options, SeriesOptionsType } from "highcharts"
+import { DataLabelsOptions, Options, SeriesOptionsType } from "highcharts"
 import { getColorForSeries, getIndexOfSeriesId, getSeriesById, getSeriesUpdater } from "../lib"
 import Collapse from "../../../generic/Collapse"
 import PropertyGrid from "../../../generic/PropertyGrid"
@@ -11,6 +11,7 @@ import { getOptions as getColumnOptions    } from "./Column"
 import { getOptions as getPieOptions       } from "./Pie"
 import { getOptions as getAreaRangeOptions } from "./AreaRange"
 import { getOptions as getErrorBarOptions  } from "./ErrorBar"
+import { getOptions as getDataLabelsOptions} from "../DataLabels"
 
 
 export function getOptions(options : Options, onChange: (o: Partial<Options>) => void, seriesId: string) {
@@ -102,6 +103,15 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
     }
     else if (seriesType === "errorbar") {
         props.push(...getErrorBarOptions(options, onChange, seriesId))
+    }
+
+    if (seriesType !== "pie") {
+        props.push({
+            name: "Data Labels",
+            type: "group",
+            // @ts-ignore
+            value: getDataLabelsOptions((series.dataLabels || {}) as DataLabelsOptions, dataLabels => onSeriesChange({ dataLabels: dataLabels as any }))
+        })
     }
 
     return props
