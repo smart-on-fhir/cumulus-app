@@ -1,4 +1,6 @@
-import { expect }                from "chai"
+import { expect, use }           from "chai"
+import chaiAsPromised            from "chai-as-promised"
+import { Sequelize, QueryTypes } from "sequelize"
 import setupDB                   from "../../../backend/db"
 import config                    from "../../../backend/config"
 import DataRequests              from "../../fixtures/DataRequests"
@@ -12,13 +14,19 @@ import {
 } from "../../test-lib"
 
 
+
+use(chaiAsPromised);
+
+
 describe("Subscriptions", () => {
+
+    let dbConnection: Sequelize;
     
     beforeEach(async () => {
         await resetTable("Tag", Tags)
         await resetTable("DataRequest", DataRequests)
 
-        const dbConnection = await setupDB(config);
+        dbConnection = await setupDB(config);
 
         await dbConnection.query(`DROP table if exists "subscription_data_1"`)
         await dbConnection.query(
@@ -173,6 +181,219 @@ describe("Subscriptions", () => {
                     expect(res.status).to.equal(role === "guest" ? 401 : 403)
                 })
             }
+        })
+    })
+
+    describe("import subscription data", () => {
+
+        async function upload({
+            types,
+            labels,
+            descriptions,
+            body
+        }: {
+            types : string
+            labels: string
+            descriptions: string
+            body: string
+        }) {
+            const url = new URL("/api/requests/1/data", server.baseUrl)
+            url.searchParams.set("types" , types )
+            url.searchParams.set("labels", labels)
+            url.searchParams.set("descriptions", descriptions)
+            const cookie = getCookie("admin")
+            const res = await fetch(url, {
+                method: "PUT",
+                headers: { "content-type": "text/plain;charset=UTF-8", cookie },
+                body
+            });
+
+            if (res.status !== 200) {
+                const msg = await res.text()
+                throw new Error(msg)
+            }
+
+            return dbConnection.query(
+                `SELECT * FROM "subscription_data_1"`,
+                { type: QueryTypes.SELECT }
+            )
+        }
+
+        it (`error in case if incorrect column count`, async () => {
+            await expect(
+                upload({
+                    types       : "integer,string,string,string",
+                    labels      : "cnt,a,b,c",
+                    descriptions: "cnt,a,b,c",
+                    body        : 'cnt,a,b,c\n15,,,\n10,,,,,,'
+                })
+            ).to.be.eventually.rejectedWith(
+                "Number of cells exceeds the number of columns (line: 3)"
+            );
+        })
+
+        it (`error in case if incorrect column count in types parameter`, async () => {
+            await expect(
+                upload({
+                    types       : "integer,string,string,string,string",
+                    labels      : "cnt,a,b,c",
+                    descriptions: "cnt,a,b,c",
+                    body        : 'cnt,a,b,c\n15,,,\n10,,,'
+                })
+            ).to.be.eventually.rejectedWith("The number of data types does not match the number of columns");
+        })
+
+        it (`error in case of duplicate values`, async () => {
+            await expect(
+                upload({
+                    types       : "integer,string,string,string",
+                    labels      : "cnt,a,b,c",
+                    descriptions: "cnt,a,b,c",
+                    body        : 'cnt,a,b,c\n15,,,\n10,a,b,c\n10,a,b,c'
+                })
+            ).to.eventually.be.rejectedWith(
+                /duplicate key value violates unique constraint.*?Key \(a, b, c\)=\(a, b, c\) already exists/
+            );
+        })
+
+        it (`can upload csv with unquoted strings`, async () => {
+            const cube = await upload({
+                types       : "integer,string,string,string",
+                labels      : "cnt,a,b,c",
+                descriptions: "cnt,a,b,c",
+                body        : 'cnt,a,b,c\n15,,,\n10,x y,z,'
+            });
+
+            expect(cube).to.deep.equal([
+                { cnt: 15, a: null, b: null, c: null },
+                { cnt: 10, a: 'x y', b: "z", c: null }
+            ])
+        })
+
+        it (`can upload csv with quoted strings`, async () => {
+            const cube = await upload({
+                types       : "integer,string,string,string",
+                labels      : "cnt,a,b,c",
+                descriptions: "cnt,a,b,c",
+                body        : 'cnt,a,b,c\n15,,,\n10,"x y","z",""'
+            });
+
+            expect(cube).to.deep.equal([
+                { cnt: 15, a: null , b: null, c: null },
+                { cnt: 10, a: 'x y', b: "z" , c: ""   }
+            ])
+        })
+
+        it (`can upload csv with quoted strings containing delimiters`, async () => {
+            const cube = await upload({
+                types       : "integer,string,string,string",
+                labels      : "cnt,a,b,c",
+                descriptions: "cnt,a,b,c",
+                body        : 'cnt,a,b,c\n15,,,\n10,"x, y",",",'
+            });
+
+            expect(cube).to.deep.equal([
+                { cnt: 15, a: null  , b: null, c: null },
+                { cnt: 10, a: 'x, y', b: "," , c: null }
+            ])
+        })
+
+        it (`can upload csv with numeric values`, async () => {
+            const cube = await upload({
+                types       : "integer,integer,integer,float,float",
+                labels      : "cnt,a,b,c,d",
+                descriptions: "cnt,a,b,c,d",
+                body        : 'cnt,a,b,c,d\n15,,,,\n10,9,-9,8.2,-7.4'
+            });
+
+            expect(cube).to.deep.equal([
+                { cnt: 15, a: null, b: null, c: null , d: null   },
+                { cnt: 10, a: "9" , b: "-9", c: "8.2", d: "-7.4" }
+            ])
+        })
+
+        it (`can upload csv with year values`, async () => {
+            const cube = await upload({
+                types       : "integer,year,date:YYYY",
+                labels      : "cnt,a,b",
+                descriptions: "cnt,a,b",
+                body        : 'cnt,a,b\n15,,\n10,2024-05-23,2024-05-23'
+            });
+
+            expect(cube).to.deep.equal([
+                { cnt: 15, a: null, b: null },
+                { cnt: 10, a: "2024-01-01T00:00:00Z", b: "2024-01-01T00:00:00Z" }
+            ])
+        })
+
+        it (`can upload csv with month values`, async () => {
+            const cube = await upload({
+                types       : "integer,month,date:YYYY-MM",
+                labels      : "cnt,a,b",
+                descriptions: "cnt,a,b",
+                body        : 'cnt,a,b\n15,,\n10,2024-05-23,2024-05-23'
+            });
+
+            expect(cube).to.deep.equal([
+                { cnt: 15, a: null, b: null },
+                { cnt: 10, a: "2024-05-01T00:00:00Z", b: "2024-05-01T00:00:00Z" }
+            ])
+        })
+
+        it (`can upload csv with week values`, async () => {
+            const cube = await upload({
+                types       : "integer,week,date:YYYY wk W",
+                labels      : "cnt,a,b",
+                descriptions: "cnt,a,b",
+                body        : 'cnt,a,b\n15,,\n10,2024-05-23,2024-05-23'
+            });
+
+            expect(cube).to.deep.equal([
+                { cnt: 15, a: null, b: null },
+                { cnt: 10, a: "2024-05-19T00:00:00Z", b: "2024-05-19T00:00:00Z" }
+            ])
+        })
+
+        it (`can upload csv with day values`, async () => {
+            const cube = await upload({
+                types       : "integer,day,date:YYYY-MM-DD",
+                labels      : "cnt,a,b",
+                descriptions: "cnt,a,b",
+                body        : 'cnt,a,b\n15,,\n10,2024-05-23,2024-05-23'
+            });
+
+            expect(cube).to.deep.equal([
+                { cnt: 15, a: null, b: null },
+                { cnt: 10, a: "2024-05-23T00:00:00Z", b: "2024-05-23T00:00:00Z" }
+            ])
+        })
+
+        it (`can upload csv with nonnumeric values quoted`, async () => {
+            const cube = await upload({
+                types       : "integer,day,boolean,float,string",
+                labels      : "cnt,a,b,c,d",
+                descriptions: "cnt,a,b,c,d",
+                body        : 'cnt,a,b,c,d\n15,,,,\n10,"2024-05-23","false",3.5,"test"'
+            });
+
+            expect(cube).to.deep.equal([
+                { cnt: 15, a: null, b: null, c: null, d: null },
+                { cnt: 10, a: "2024-05-23T00:00:00Z", b: "false", c: "3.5", d: "test" }
+            ])
+        })
+
+        it (`can upload csv with all values quoted`, async () => {
+            const cube = await upload({
+                types       : "integer,day,boolean,float,string",
+                labels      : "cnt,a,b,c,d",
+                descriptions: "cnt,a,b,c,d",
+                body        : 'cnt,a,b,c,d\n"15",,,,\n"10","2024-05-23","false","3.5","test"'
+            });
+
+            expect(cube).to.deep.equal([
+                { cnt: 15, a: null, b: null, c: null, d: null },
+                { cnt: 10, a: "2024-05-23T00:00:00Z", b: "false", c: "3.5", d: "test" }
+            ])
         })
     })
 });
