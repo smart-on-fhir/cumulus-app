@@ -36,7 +36,7 @@ export default class ImportJob
 
     static async create() {
         const client = await pool.connect();
-        
+        client.setMaxListeners(20)
         client.on('error', err => console.error('ImportJob error:', err.stack));
         client.on('end', () => console.log("ImportJob: database connection closed"));
         client.on('notification', msg => console.log("ImportJob notification:", msg));
