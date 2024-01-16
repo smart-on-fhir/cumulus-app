@@ -60,11 +60,15 @@ export default class ImportJob
         this.columnNames = []
     }
 
-    async handleError(error: Error) {
+    async handleError(error: any, res: Response) {
         await this.rollback();
         this.client.release();
         delete JOBS[this.id];
-        throw error
+
+        let message = error.message
+        if (error.detail) message += ` -> ${error.detail}`
+        if (error.line  ) message += ` (line: ${error.line})`
+        res.status(500).end(message)
     }
 
     async rollback() {
@@ -105,15 +109,13 @@ export default class ImportJob
 
         const shouldContinue = req.headers["x-continue"] === "true";
 
+        const txtStream = new Text2Lines();
+
         try {
         
-            await pipeline(req, new Text2Lines(), new Line2CSV(), csv2db)
-            
-            // .catch(err => {
-            //     // @ts-ignore
-            //     throw new Error(err.original ? err.original.detail || err.message : err.message)
-            // });
 
+            await pipeline(req, txtStream, new Line2CSV(), csv2db)
+            
             this.columnNames = csv2db.columnNames
 
             if (shouldContinue) {
@@ -130,7 +132,9 @@ export default class ImportJob
                 res.status(200).end("Data imported successfully")
             }
         } catch (e) {
-            await this.handleError(e)
+            // @ts-ignore
+            e.line = txtStream!.currentLine
+            await this.handleError(e, res)
         }
     }
 
@@ -148,6 +152,10 @@ export default class ImportJob
                 type: QueryTypes.SELECT
             }
         );
+
+        if (countRow.length === 0) {
+            throw new Error("Unable to find a total row where any column other than 'cnt' is NULL")
+        }
         
         // @ts-ignore
         await subscription.update({
