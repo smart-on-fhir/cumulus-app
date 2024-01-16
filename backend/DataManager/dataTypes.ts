@@ -1,75 +1,124 @@
-import { bool } from "../lib"
-export { bool } from "../lib"
+import moment, { Moment } from "moment"
+import { bool }           from "../lib"
+export { bool }           from "../lib"
+
+
+const NAMESPACE_PREFIX = "cumulus__"
+
+function isPrivateValue(x: any) {
+    return typeof x === "string" && x.startsWith(NAMESPACE_PREFIX)
+}
+
+function createSetter(fn: (x: string) => string) {
+    return (x: string | null) => {
+        if (x === null || isPrivateValue(x)) {
+            return x
+        } else {
+            return fn(x)
+        }
+    }
+}
+
+function createGetter(fn: (x: string) => any) {
+    return (x: string | null) => {
+        if (x === null || isPrivateValue(x)) {
+            return x
+        } else {
+            return fn(x)
+        }
+    }
+}
 
 export const DATA_TYPES = {
-    "integer"        : int,
-    "float"          : float,
-    "string"         : String,
-    "boolean"        : bool,
-    "day"            : day,
-    "week"           : week,
-    "month"          : month,
-    "year"           : year,
-    "date:YYYY-MM-DD": day,
-    "date:YYYY wk W" : week,
-    "date:YYYY-MM"   : month,
-    "date:YYYY"      : year
+    "integer": {
+        set: createSetter((x: string) => int(x) + ""),
+        get: createGetter((x: string) => int(x)),
+    },
+    "float": {
+        set: createSetter((x: string) => float(x) + ""),
+        get: createGetter((x: string) => float(x)),
+    },
+    "boolean": {
+        set: createSetter((x: string) => bool(x) + ""),
+        get: createGetter((x: string) => bool(x)),
+    },
+    "string": {
+        set: createSetter(String),
+        get: createGetter(String),
+    },
+    "day": {
+        set: createSetter((x: string) => date(x).startOf("day").format()),
+        get: createGetter((x: string) => date(x).format("YYYY-MM-DD")),
+    },
+    "week": {
+        set: createSetter((x: string) => date(x).startOf("week").format()),
+        get: createGetter((x: string) => date(x).format("YYYY-MM-DD")),
+    },
+    "month": {
+        set: createSetter((x: string) => date(x).startOf("month").format()),
+        get: createGetter((x: string) => date(x).format("YYYY-MM")),
+    },
+    "year": {
+        set: createSetter((x: string) => date(x).startOf("year").format()),
+        get: createGetter((x: string) => date(x).format("YYYY")),
+    },
+    "date:YYYY-MM-DD": {
+        set: createSetter((x: string) => date(x).startOf("day").format()),
+        get: createGetter((x: string) => date(x).format("YYYY-MM-DD")),
+    },
+    "date:YYYY wk W": {
+        set: createSetter((x: string) => date(x).startOf("week").format()),
+        get: createGetter((x: string) => date(x).format("YYYY-MM-DD")),
+    },
+    "date:YYYY-MM": {
+        set: createSetter((x: string) => date(x).startOf("month").format()),
+        get: createGetter((x: string) => date(x).format("YYYY-MM")),
+    },
+    "date:YYYY": {
+        set: createSetter((x: string) => date(x).startOf("year").format()),
+        get: createGetter((x: string) => date(x).format("YYYY")),
+    }
 };
 
-export function int(x: any): number | null {
-    x = parseInt(x + "", 10);
-    if (isNaN(x) || !isFinite(x)) {
-        x = null;
+
+function int(x: any): number {
+    const n = parseInt(x + "", 10);
+    if (isNaN(n)) {
+        throw new TypeError(`Value ${x} is not an integer`);
     }
-    return x
-}
-
-export function float(x: any): number | null {
-    x = parseFloat(x + "");
-    if (isNaN(x) || !isFinite(x)) {
-        x = null;
+    if (!isFinite(n)) {
+        throw new TypeError(`Value ${x} is infinite`);
     }
-    return x
-}
-
-/**
- * @param dateString YYYY-MM-DD
- * @returns YYYY-MM-DD string or null
- */
-export function day(dateString: string): string | null {
-    return dateString || null
-}
-
-/**
- * @param dateString YYYY-MM-DD
- * @returns YYYY-MM-DD string or null
- */
-export function week(dateString: string) {
-    return dateString || null
-}
-
-/**
- * @param dateString YYYY-MM-DD
- * @returns YYYY-MM-01 string or null
- */
-export function month(dateString: string) {
-    return dateString || null
-}
-
-/**
- * @param dateString YYYY-MM-DD
- * @returns YYYY-01-01 string or null
- */
-export function year(dateString: string) {
-    return dateString || null
-}
-
-export function evaluate(value: string, dataType: keyof typeof DATA_TYPES) {
-    const fn = DATA_TYPES[dataType];
-    if (!fn) {
-        throw new Error(`Unknown data type "${dataType}"`)
+    if (n > Number.MAX_SAFE_INTEGER) {
+        throw new TypeError(`Value ${x} is too big`);
     }
-    return fn(value)
+    if (n < Number.MIN_SAFE_INTEGER) {
+        throw new TypeError(`Value ${x} is too small`);
+    }
+    return n
 }
 
-export const string = String
+function float(x: any): number {
+    const n = parseFloat(x + "");
+    if (isNaN(n)) {
+        throw new TypeError(`Value ${x} is not a number`);
+    }
+    if (!isFinite(n)) {
+        throw new TypeError(`Value ${x} is infinite`);
+    }
+    if (n > Number.MAX_VALUE) {
+        throw new TypeError(`Value ${x} is too big`);
+    }
+    if (n < -Number.MAX_VALUE) {
+        throw new TypeError(`Value ${x} is too small (less than ${Number.MIN_VALUE})`);
+    }
+    return n
+}
+
+function date(dateString: string): Moment {
+    const date = moment(dateString)
+    if (!date.isValid()) {
+        throw new TypeError(`Value "${dateString}" is not a valid date"`);
+    }
+    return date.utc()
+}

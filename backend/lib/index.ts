@@ -228,9 +228,9 @@ export function* walkSync(dir: string): IterableIterator<string> {
  * @param [stringDelimiter='"']
  * @returns The cells as array of strings
  */
-export function parseDelimitedLine(line: string, delimiters: string[] = [","], stringDelimiter: string = '"'): string[]
+export function parseDelimitedLine(line: string, delimiters: string[] = [","], stringDelimiter: string = '"'): (string | EmptyString)[]
 {   
-    const out: string[] = [];
+    const out: (string | EmptyString)[] = [];
     
     const len = line.length;
 
@@ -259,7 +259,7 @@ export function parseDelimitedLine(line: string, delimiters: string[] = [","], s
             // Close string
             else {
                 expect = null;
-                out.push(buffer);
+                out.push(buffer || new EmptyString());
                 buffer = "";
                 idx++;
             }
@@ -292,6 +292,12 @@ export function parseDelimitedLine(line: string, delimiters: string[] = [","], s
     }
 
     return out//.map(s => s.trim());
+}
+
+export class EmptyString extends String {
+    constructor(arg?: any) {
+        super("")
+    }
 }
 
 export function parseDelimitedString(

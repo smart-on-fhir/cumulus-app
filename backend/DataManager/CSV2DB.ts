@@ -2,7 +2,7 @@ import { Transform }     from "stream"
 import { PoolClient }    from "pg"
 import { DATA_TYPES }    from "./dataTypes"
 import { sql as logSql } from "../services/logger"
-import { PoolClient } from "pg";
+import { EmptyString }   from "../lib"
 
 
 /**
@@ -133,6 +133,16 @@ export default class CSV2DB extends Transform
         let sql = `CREATE TABLE "${this.tableName}" `;
 
         sql += "(\n" + this.columnNames.map((name, i) => {
+            if (name === "cnt" || name.startsWith("cnt_")) {
+                return JSON.stringify(name) + " INTEGER";
+            }
+
+            const type = this.dataTypes[i];
+
+            if (!Object.keys(DATA_TYPES).includes(type)) {
+                throw new Error(`Invalid data type "${type}"`)
+            }
+            return JSON.stringify(name) + " TEXT";
         }).join(",\n") + ");"
 
         // Drop the table if exists
@@ -179,15 +189,19 @@ export default class CSV2DB extends Transform
         }
 
         return `(${values.map((v, i) => {
-                let value = evaluate(v, this.dataTypes[i])
-                if (value === null || v === null || value === "" || v === "") {
-                    value = "NULL"
-                }
-                else if (typeof value === "string") {
-                    value = this.client.escapeLiteral(value)
-                }
-                return value
-            }).join(", ")
-        })`;
+            if (v instanceof EmptyString) {
+                return "''"
+            }
+            
+            if (v === "") {
+                return "NULL"
+            }
+
+            const value = DATA_TYPES[this.dataTypes[i]].set(v)
+            if (value === null || value === "") {
+                return "NULL"
+            }
+            return this.client.escapeLiteral(value)
+        }).join(", ")})`;
     }
 }
