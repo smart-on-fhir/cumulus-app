@@ -1,10 +1,9 @@
-import { Transform } from"stream"
-import { DATA_TYPES, evaluate } from "./dataTypes"
+import { Transform }     from "stream"
+import { PoolClient }    from "pg"
+import { DATA_TYPES }    from "./dataTypes"
 import { sql as logSql } from "../services/logger"
 import { PoolClient } from "pg";
 
-
-// TODO: org_id column special?
 
 /**
  * Convert stream of CSV lines (including a header in the first line)
@@ -77,18 +76,23 @@ export default class CSV2DB extends Transform
 
     _transform(line: string[], _encoding: any, next: (err?: Error | null) => void)
     {
-        if (!this.columnNames.length) {
-            this.columnNames = line
-            this.writeMetaData()
-            .then(() => this.createDataTable(this.columnNames))
-            .then(() => next(), next);
-        } else {
-            const len = this.insertRowsBuffer.push(this.valueList(line));
-            if (len >= this.insertRowsBufferMaxLength) {
-                this.insertData(next);
+        try {
+            if (!this.columnNames.length) {
+                this.columnNames = line
+                this.writeMetaData()
+                .then(() => this.createDataTable())
+                .then(() => next(), next);
             } else {
-                next()
+                const len = this.insertRowsBuffer.push(this.valueList(line));
+                if (len >= this.insertRowsBufferMaxLength) {
+                    this.insertData(next);
+                } else {
+                    next()
+                }
             }
+        }
+        catch(e) {
+            next(e as Error)
         }
     }
 
@@ -125,32 +129,10 @@ export default class CSV2DB extends Transform
         );
     }
 
-    private async createDataTable(columnNames: string[]) {
+    private async createDataTable() {
         let sql = `CREATE TABLE "${this.tableName}" `;
 
-        sql += "(\n" + columnNames.map((name, i) => {
-            switch (this.dataTypes[i]) {
-                case "boolean":
-                    return JSON.stringify(name) + " BOOLEAN";
-                case "integer":
-                    return JSON.stringify(name) + " INTEGER";
-                case "float":
-                    return JSON.stringify(name) + " REAL";
-                case "string":
-                    return JSON.stringify(name) + " TEXT";
-
-                case "date:YYYY-MM-DD":
-                case "date:YYYY wk W":
-                case "date:YYYY-MM":
-                case "date:YYYY":
-                case "day":
-                case "week":
-                case "month":
-                case "year":
-                    return JSON.stringify(name) + " DATE";
-                default:
-                    throw new Error(`Invalid data type "${this.dataTypes[i]}"`)
-            }
+        sql += "(\n" + this.columnNames.map((name, i) => {
         }).join(",\n") + ");"
 
         // Drop the table if exists
@@ -163,8 +145,14 @@ export default class CSV2DB extends Transform
         await this.query(sql);
 
         // Create unique index to reject invalid powersets
-        await this.query(`CREATE UNIQUE INDEX "${this.tableName}_unique" ON "${this.tableName
-            }" USING btree(${columnNames.filter(c => c !== "cnt").map(c => `"${c}" Asc NULLS Last`).join(", ")})`);
+        await this.query(`CREATE UNIQUE INDEX "${this.tableName}_unique" ON "${
+            this.tableName}" USING btree(${this.getDataColumns().map(
+                c => `"${c}" Asc NULLS Last`).join(", ")})`
+            );
+    }
+
+    private getDataColumns() {
+        return this.columnNames.filter(c => !c.match(/^cnt_?/))
     }
 
     private async insertData(next: (err?: Error | null) => void) {
@@ -179,7 +167,13 @@ export default class CSV2DB extends Transform
         }
     }
 
-    private valueList(values: any[]) {
+    private valueList(values: any[]): string {
+
+        if (values.length > this.columnNames.length) {
+            throw new Error(`Number of cells exceeds the number of columns`)
+        }
+
+        // if values are less then columns - append nulls
         for (let i = values.length; i < this.columnNames.length; i++) {
             values.push(null)
         }
