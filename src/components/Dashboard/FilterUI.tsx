@@ -37,7 +37,21 @@ function Filter({
     const leftDataType = leftColumn ? leftColumn.dataType : "";
 
     const noRightOps = [/*"isNull", "isNotNull", */"isTrue", "isFalse", "isNotTrue", "isNotFalse"];
-    
+
+    const types = operators.find(o => o.id === filter.operator)?.type || [];
+
+    let rightType = "none"
+    if (filter.left && filter.operator && !noRightOps.includes(filter.operator)) {
+        rightType = types.includes("integer") ?
+            "integer" :
+            types.includes("float") ?
+                "float" :
+                types.includes("string") ?
+                    "string" :
+                    types.includes("boolean") ?
+                        "boolean" :
+                        "date";
+    }
 
     return (
         <div style={{ background: "#EFEFEF", padding: 3, borderRadius: 7, border: "1px solid #D9D9D9" }}>
@@ -92,42 +106,45 @@ function Filter({
                                 }
                             })
                         }}
-                        options={operators.filter(o => o.type.includes(leftDataType)).map(o => ({ value: o.id, label: o.label }))}
+                        options={
+                            operators
+                                .filter(o => o.type.includes("string") || o.type.includes(leftDataType))
+                                .map(o => ({ value: o.id, label: o.label }))
+                        }
                     />
                 </div>
             </div> }
 
-            {  filter.left && filter.operator && !noRightOps.includes(filter.operator) && <>
-                    { (leftDataType === "integer" || leftDataType === "float") &&
-                        <div className="row"><div className="col"><input
-                            type="number"
-                            value={isNaN(filter.right.value as number) ? "" : filter.right.value + ""}
-                            onChange={e => onChange({ ...filter, right: { ...filter.right, value: e.target.valueAsNumber } })}
-                            placeholder="Enter value"
-                        /></div></div>
-                    }
+            { (rightType === "integer" || rightType === "float") &&
+                <div className="row"><div className="col"><input
+                    type="number"
+                    value={isNaN(filter.right.value as number) ? "" : filter.right.value + ""}
+                    onChange={e => onChange({ ...filter, right: { ...filter.right, value: e.target.valueAsNumber } })}
+                    placeholder="Enter value"
+                /></div></div>
+            }
 
-                    { leftDataType.startsWith("date") && <div className="row"><div className="col"><input type="date"
-                        value={ filter.right.value ? moment(filter.right.value).utc().format("YYYY-MM-DD") : "" }
-                        onChange={e => {
-                            const m = moment(e.target.valueAsDate)
-                            onChange({
-                                ...filter,
-                                right: {
-                                    ...filter.right,
-                                    value: m.isValid() ? m.utc().format("YYYY-MM-DD") : undefined
-                                }
-                            })
-                        }}
-                    /></div></div> }
+            { rightType === "date" && <div className="row"><div className="col"><input type="date"
+                value={ filter.right.value ? moment(filter.right.value).utc().format("YYYY-MM-DD") : "" }
+                onChange={e => {
+                    const m = moment(e.target.valueAsDate)
+                    onChange({
+                        ...filter,
+                        right: {
+                            ...filter.right,
+                            value: m.isValid() ? m.utc().format("YYYY-MM-DD") : undefined
+                        }
+                    })
+                }}
+            /></div></div> }
 
-                    { leftDataType === "string" && <div className="row"><div className="col"><input type="text"
-                        value={filter.right.value as string || ""}
-                        onChange={e => onChange({ ...filter, right: { ...filter.right, value: e.target.value } })}
-                        style={ filter.operator === "matches" || filter.operator === "matchesCI" ? { fontFamily: "monospace" } : undefined }
-                        placeholder="Enter value"
-                    /></div></div> }
-            </> }
+            { rightType === "string" && <div className="row"><div className="col"><input type="text"
+                value={filter.right.value as string || ""}
+                onChange={e => onChange({ ...filter, right: { ...filter.right, value: e.target.value } })}
+                style={ filter.operator.match(/matches/i) ? { fontFamily: "monospace" } : undefined }
+                placeholder="Enter value"
+            /></div></div> }
+
             <div className="row" style={{ marginTop: 3 }}>
                 { up && <><div className="col col-0">
                     <button className="btn small" onClick={up}>
