@@ -531,7 +531,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
 
                 if (!res.ok) {
                     const errorMessage = await res.text()
-                    this.setState({ errorMessage })
+                    this.setState({ errorMessage, uploadedBytes: 0, loading: false, uploading: false })
                     throw new Error(errorMessage)
                 }
 
@@ -566,7 +566,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
                 }
             }).then(res => res.text().then(txt => {
                 if (!res.ok) {
-                    this.setState({ errorMessage: txt })
+                    this.setState({ errorMessage: txt, uploadedBytes: 0, loading: false, uploading: false })
                     throw new Error(txt)
                 } else {
                     if (res.status === 202) {
