@@ -20,7 +20,7 @@ export default class Text2Lines extends Transform
     /**
      * The line that is currently being processed
      */
-    protected _line = 0;
+    protected _line = 1;
 
     /**
      * The current buffer char size (length)
@@ -33,6 +33,11 @@ export default class Text2Lines extends Transform
             writableObjectMode: false,
             readableObjectMode: true,
         });
+    }
+
+    get currentLine()
+    {
+        return this._line
     }
 
     validateLineLength()
