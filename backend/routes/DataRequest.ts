@@ -17,6 +17,7 @@ import { sql as logSql }                                          from "../servi
 import ImportJob                                                  from "../DataManager/ImportJob"
 import { getFindOptions, assert, rw, parseDelimitedString, uInt } from "../lib"
 import { version as pkgVersion }                                  from "../../package.json"
+import { DATA_TYPES }                                             from "../DataManager/dataTypes"
 
 
 const router = module.exports = express.Router({ mergeParams: true });
@@ -46,42 +47,44 @@ const FilterConfig: Record<string, (col: string) => string> = {
     notMatchesCI      : col => `"${col}" !~* ?`,
     
     // Dates ------------------------------------------------------------------
-    sameDay           : col => `date_trunc('day'  , "${col}") =  date_trunc('day'  , TIMESTAMP ?)`,
-    sameWeek          : col => `date_trunc('week' , "${col}") =  date_trunc('week' , TIMESTAMP ?)`,
-    sameMonth         : col => `date_trunc('month', "${col}") =  date_trunc('month', TIMESTAMP ?)`,
-    sameYear          : col => `date_trunc('year' , "${col}") =  date_trunc('year' , TIMESTAMP ?)`,
-    sameDayOrBefore   : col => `date_trunc('day'  , "${col}") <= date_trunc('day'  , TIMESTAMP ?)`,
-    sameWeekOrBefore  : col => `date_trunc('week' , "${col}") <= date_trunc('week' , TIMESTAMP ?)`,
-    sameMonthOrBefore : col => `date_trunc('month', "${col}") <= date_trunc('month', TIMESTAMP ?)`,
-    sameYearOrBefore  : col => `date_trunc('year' , "${col}") <= date_trunc('year' , TIMESTAMP ?)`,
-    sameDayOrAfter    : col => `date_trunc('day'  , "${col}") >= date_trunc('day'  , TIMESTAMP ?)`,
-    sameWeekOrAfter   : col => `date_trunc('week' , "${col}") >= date_trunc('week' , TIMESTAMP ?)`,
-    sameMonthOrAfter  : col => `date_trunc('month', "${col}") >= date_trunc('month', TIMESTAMP ?)`,
-    sameYearOrAfter   : col => `date_trunc('year' , "${col}") >= date_trunc('year' , TIMESTAMP ?)`,
-    beforeDay         : col => `date_trunc('day'  , "${col}") <  date_trunc('day'  , TIMESTAMP ?)`,
-    beforeWeek        : col => `date_trunc('week' , "${col}") <  date_trunc('week' , TIMESTAMP ?)`,
-    beforeMonth       : col => `date_trunc('month', "${col}") <  date_trunc('month', TIMESTAMP ?)`,
-    beforeYear        : col => `date_trunc('year' , "${col}") <  date_trunc('year' , TIMESTAMP ?)`,
-    afterDay          : col => `date_trunc('day'  , "${col}") >  date_trunc('day'  , TIMESTAMP ?)`,
-    afterWeek         : col => `date_trunc('week' , "${col}") >  date_trunc('week' , TIMESTAMP ?)`,
-    afterMonth        : col => `date_trunc('month', "${col}") >  date_trunc('month', TIMESTAMP ?)`,
-    afterYear         : col => `date_trunc('year' , "${col}") >  date_trunc('year' , TIMESTAMP ?)`,
+    sameDay           : col => `date_trunc('day'  , "${col}"::TIMESTAMP) =  date_trunc('day'  , TIMESTAMP ?)`,
+    sameWeek          : col => `date_trunc('week' , "${col}"::TIMESTAMP) =  date_trunc('week' , TIMESTAMP ?)`,
+    sameMonth         : col => `date_trunc('month', "${col}"::TIMESTAMP) =  date_trunc('month', TIMESTAMP ?)`,
+    sameYear          : col => `date_trunc('year' , "${col}"::TIMESTAMP) =  date_trunc('year' , TIMESTAMP ?)`,
+    sameDayOrBefore   : col => `date_trunc('day'  , "${col}"::TIMESTAMP) <= date_trunc('day'  , TIMESTAMP ?)`,
+    sameWeekOrBefore  : col => `date_trunc('week' , "${col}"::TIMESTAMP) <= date_trunc('week' , TIMESTAMP ?)`,
+    sameMonthOrBefore : col => `date_trunc('month', "${col}"::TIMESTAMP) <= date_trunc('month', TIMESTAMP ?)`,
+    sameYearOrBefore  : col => `date_trunc('year' , "${col}"::TIMESTAMP) <= date_trunc('year' , TIMESTAMP ?)`,
+    sameDayOrAfter    : col => `date_trunc('day'  , "${col}"::TIMESTAMP) >= date_trunc('day'  , TIMESTAMP ?)`,
+    sameWeekOrAfter   : col => `date_trunc('week' , "${col}"::TIMESTAMP) >= date_trunc('week' , TIMESTAMP ?)`,
+    sameMonthOrAfter  : col => `date_trunc('month', "${col}"::TIMESTAMP) >= date_trunc('month', TIMESTAMP ?)`,
+    sameYearOrAfter   : col => `date_trunc('year' , "${col}"::TIMESTAMP) >= date_trunc('year' , TIMESTAMP ?)`,
+    beforeDay         : col => `date_trunc('day'  , "${col}"::TIMESTAMP) <  date_trunc('day'  , TIMESTAMP ?)`,
+    beforeWeek        : col => `date_trunc('week' , "${col}"::TIMESTAMP) <  date_trunc('week' , TIMESTAMP ?)`,
+    beforeMonth       : col => `date_trunc('month', "${col}"::TIMESTAMP) <  date_trunc('month', TIMESTAMP ?)`,
+    beforeYear        : col => `date_trunc('year' , "${col}"::TIMESTAMP) <  date_trunc('year' , TIMESTAMP ?)`,
+    afterDay          : col => `date_trunc('day'  , "${col}"::TIMESTAMP) >  date_trunc('day'  , TIMESTAMP ?)`,
+    afterWeek         : col => `date_trunc('week' , "${col}"::TIMESTAMP) >  date_trunc('week' , TIMESTAMP ?)`,
+    afterMonth        : col => `date_trunc('month', "${col}"::TIMESTAMP) >  date_trunc('month', TIMESTAMP ?)`,
+    afterYear         : col => `date_trunc('year' , "${col}"::TIMESTAMP) >  date_trunc('year' , TIMESTAMP ?)`,
 
     // Booleans ---------------------------------------------------------------
-    isTrue            : col => `"${col}" IS TRUE`,
-    isNotTrue         : col => `"${col}" IS NOT TRUE`,
-    isFalse           : col => `"${col}" IS FALSE`,
-    isNotFalse        : col => `"${col}" IS NOT FALSE`,
+    isTrue            : col => `"${col}"::BOOLEAN IS TRUE`,
+    isNotTrue         : col => `"${col}"::BOOLEAN IS NOT TRUE`,
+    isFalse           : col => `"${col}"::BOOLEAN IS FALSE`,
+    isNotFalse        : col => `"${col}"::BOOLEAN IS NOT FALSE`,
+
+    // Numbers ----------------------------------------------------------------
+    eq                : col => `"${col}"::NUMERIC  = ?` ,
+    ne                : col => `"${col}"::NUMERIC != ?`,
+    gt                : col => `"${col}"::NUMERIC  > ?` ,
+    gte               : col => `"${col}"::NUMERIC >= ?`,
+    lt                : col => `"${col}"::NUMERIC  < ?` ,
+    lte               : col => `"${col}"::NUMERIC <= ?`,
 
     // Any --------------------------------------------------------------------
     isNull            : col => `"${col}" IS NULL`,
     isNotNull         : col => `"${col}" IS NOT NULL`,
-    eq                : col => `"${col}" = ?` ,
-    ne                : col => `"${col}" != ?`,
-    gt                : col => `"${col}" > ?` ,
-    gte               : col => `"${col}" >= ?`,
-    lt                : col => `"${col}" < ?` ,
-    lte               : col => `"${col}" <= ?`,
 };
 
 const filtersWithoutParams = [
@@ -318,8 +321,10 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
     // Verify that column is not "cnt"
     if (column === "cnt") throw new Error(`Must select a column other than "cnt"`)
 
+    const columnMeta = allColumns.find(x => x.name === column)
+
     // Verify that column exists
-    if (!allColumns.find(x => x.name === column)) throw new Error(`No such column "${column}"`)
+    if (!columnMeta) throw new Error(`No such column "${column}"`)
 
     // Verify that stratifier exists
     if (stratifier && !allColumns.find(c => c.name === stratifier)) {
@@ -494,7 +499,7 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
             type: QueryTypes.SELECT
         });
 
-        totals.forEach(row => counts[row.stratifier] = row.total)
+        totals.forEach(row => counts[DATA_TYPES[columnMeta.dataType].get(row.stratifier)] = row.total)
     }
 
     result.forEach(row => {
@@ -506,8 +511,16 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
             data.push(group)
         }
         group.rows.push(hasErrorBars ?
-            [ row.x, row.y, row.y_min, row.y_max ] :
-            [ row.x, row.y ]
+            [
+                DATA_TYPES[columnMeta.dataType].get(row.x),
+                row.y,
+                row.y_min,
+                row.y_max
+            ] :
+            [
+                DATA_TYPES[columnMeta.dataType].get(row.x),
+                row.y
+            ]
         )
     })
 
