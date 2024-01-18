@@ -85,6 +85,9 @@ const FilterConfig: Record<string, (col: string) => string> = {
     // Any --------------------------------------------------------------------
     isNull            : col => `"${col}" IS NULL`,
     isNotNull         : col => `"${col}" IS NOT NULL`,
+
+    // isNull            : col => `"${col}"  = 'cumulus__null'`,
+    // isNotNull         : col => `"${col}" != 'cumulus__null'`,
 };
 
 const filtersWithoutParams = [
