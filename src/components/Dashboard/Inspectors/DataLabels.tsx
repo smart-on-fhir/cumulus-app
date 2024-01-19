@@ -1,5 +1,6 @@
 import { AlignValue, DataLabelsOverflowValue, PlotSeriesDataLabelsOptions, VerticalAlignValue } from "highcharts"
 import PropertyGrid from "../../generic/PropertyGrid"
+import { getStyleOptions } from "./Style"
 
 
 export function getOptions(options: PlotSeriesDataLabelsOptions, onChange: (o: Partial<PlotSeriesDataLabelsOptions>) => void) {
@@ -118,6 +119,21 @@ export function getOptions(options: PlotSeriesDataLabelsOptions, onChange: (o: P
             description: "See https://www.highcharts.com/docs/chart-concepts/labels-and-string-formatting",
             value: options?.format,
             onChange: (format: string) => onChange({ format: format || undefined })
+        },
+        {
+            name : "Style",
+            type : "group",
+            open : true,
+            value: getStyleOptions(options?.style ?? {}, style => {
+                onChange({ style: { ...options?.style, ...style }})
+            }, [
+                "color",
+                "fontSize",
+                "fontWeight",
+                "fontStyle",
+                "textDecoration",
+                "textOutline"
+            ])
         }
     ] as any[]
 }
