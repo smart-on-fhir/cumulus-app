@@ -1,4 +1,19 @@
-import { DataLabelsOptions, Options, SeriesOptionsType } from "highcharts"
+import {
+    DataLabelsOptions,
+    Options,
+    SeriesAreaOptions,
+    SeriesArearangeOptions,
+    SeriesAreasplineOptions,
+    SeriesAreasplinerangeOptions,
+    SeriesBarOptions,
+    SeriesColumnOptions,
+    SeriesColumnrangeOptions,
+    SeriesErrorbarOptions,
+    SeriesLineOptions,
+    SeriesSplineOptions,
+    SeriesOptionsType,
+    SeriesPieOptions
+} from "highcharts"
 import { getColorForSeries, getIndexOfSeriesId, getSeriesById, getSeriesUpdater } from "../lib"
 import Collapse from "../../../generic/Collapse"
 import PropertyGrid from "../../../generic/PropertyGrid"
@@ -14,9 +29,23 @@ import { getOptions as getErrorBarOptions  } from "./ErrorBar"
 import { getOptions as getDataLabelsOptions} from "../DataLabels"
 
 
+type SupportedSeriesOptions =
+    SeriesAreaOptions |
+    SeriesArearangeOptions |
+    SeriesAreasplineOptions |
+    SeriesAreasplinerangeOptions |
+    SeriesBarOptions |
+    SeriesColumnOptions |
+    SeriesColumnrangeOptions |
+    SeriesErrorbarOptions |
+    SeriesLineOptions |
+    SeriesSplineOptions |
+    SeriesPieOptions;
+
+
 export function getOptions(options : Options, onChange: (o: Partial<Options>) => void, seriesId: string) {
 
-    const series         = getSeriesById(options, seriesId) as SeriesOptionsType
+    const series         = getSeriesById(options, seriesId) as SupportedSeriesOptions
     const seriesIndex    = getIndexOfSeriesId(options, seriesId)
     const onSeriesChange = getSeriesUpdater<SeriesOptionsType>(options, onChange, seriesId)
     const color          = getColorForSeries(options, seriesId)
@@ -109,8 +138,13 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
         props.push({
             name: "Data Labels",
             type: "group",
-            // @ts-ignore
-            value: getDataLabelsOptions((series.dataLabels || {}) as DataLabelsOptions, dataLabels => onSeriesChange({ dataLabels: dataLabels as any }))
+            value: getDataLabelsOptions(
+                {
+                    ...options.plotOptions?.series?.dataLabels,
+                    ...series.dataLabels
+                } as DataLabelsOptions,
+                dataLabels => onSeriesChange({ dataLabels: dataLabels as any })
+            )
         })
     }
 
