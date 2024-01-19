@@ -183,6 +183,14 @@ const DefaultChartOptions: Options = {
             animation: {
                 duration: 0,//400,
                 defer: 0,
+            },
+            dataLabels: {
+                style: {
+                    fontSize   : "0.7em",
+                    color      : "contrast",
+                    textOutline: "1px contrast",
+                    fontWeight : "700"
+                }
             }
         },
         pie: {
@@ -194,7 +202,6 @@ const DefaultChartOptions: Options = {
             // size            : "75%",
             dataLabels: {
                 enabled: true,
-
             }
         },
         column: {
