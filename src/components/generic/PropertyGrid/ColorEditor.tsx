@@ -16,7 +16,7 @@ function parse(s: any) {
 
 export default function ColorEditor({ prop }: { prop: EditableProperty }) {
 
-    let c = parse(prop.value)
+    let c = parse(prop.value || "")
 
     return (
         <span className="color-editor" style={{ display: "flex" }}>
