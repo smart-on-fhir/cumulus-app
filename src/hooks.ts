@@ -85,16 +85,21 @@ export function useServerEvent() {
 }
 
 async function ping() {
-    let response = await fetch("/api/sse");
-    if (response.status === 502) {
-        await ping(); // reconnect after timeout!
-    } else if (response.status !== 200) {
-        // console.error(response.statusText);
+    try {
+        let response = await fetch("/api/sse");
+        if (response.status === 502) {
+            await ping(); // reconnect after timeout!
+        } else if (response.status !== 200) {
+            // console.error(response.statusText);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await ping();
+        } else {
+            let { type, data } = await response.json();
+            eventHandlers[type]?.forEach(cb => cb(data))
+            await ping();
+        }
+    } catch {
         await new Promise(resolve => setTimeout(resolve, 1000));
-        await ping();
-    } else {
-        let { type, data } = await response.json();
-        eventHandlers[type]?.forEach(cb => cb(data))
         await ping();
     }
 }
