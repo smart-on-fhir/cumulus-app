@@ -80,9 +80,9 @@
         
         pointer-events: none;
 
+        background    : #8881;
         &, & * {
             color         : #8888;
-            background    : #8881;
             border-color  : #8883;
             text-shadow   : 0 1px 0 #FFF8;
             filter        : grayscale(1);
@@ -409,7 +409,7 @@ select option.empty-option {
             border-bottom-right-radius: $border-radius;
         }
 
-        &.disabled {
+        &.disabled, &[disabled] {
             background: #FFF;
             opacity: 1;
             color: #CCC;
