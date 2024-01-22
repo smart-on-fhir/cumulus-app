@@ -336,6 +336,56 @@ export default function ConfigPanel({
                         To avoid that try to configure your <b>Data</b> and <b>Filters</b> settings
                         first.
                     </div>
+                    <div style={{ position: "relative" }}>
+                        { state.stratifyBy && <div className="dashboard-sidebar-swap-btn-wrap">
+                            <div className="fas fa-exchange-alt" onClick={() => {
+                                onChange({
+                                    ...state,
+                                    groupBy: state.stratifyBy,
+                                    stratifyBy: state.groupBy,
+                                })
+                            }} data-tooltip="Swap selected columns" />
+                        </div> }
+                        <div className="pt-1">
+                            <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
+                            <ColumnSelector
+                                cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max") }
+                                value={ state.groupBy }
+                                disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
+                                onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
+                            />
+                            <p className="small color-muted"> {
+                                isPie ?
+                                    "Select which data column provides the slices of the pie" :
+                                    `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
+                            }</p>
+                        </div>
+                        { !isPie && <>
+                            <div className="pt-1 pb-1">
+                                <label>Stratifier</label>
+                                <ColumnSelector
+                                    cols={ cols }
+                                    placeholder="Select Column"
+                                    addEmptyOption="start"
+                                    value={ state.stratifyBy }
+                                    disabled={[
+                                        "cnt",
+                                        "cnt_min",
+                                        "cnt_max",
+                                        state.groupBy,
+                                        state.column2
+                                    ].filter(Boolean)}
+                                    onChange={ (stratifyBy: string) => onChange({
+                                        ...state,
+                                        stratifyBy,
+                                        denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
+                                    }) }
+                                />
+                                <p className="small color-muted">
+                                    Stratify the data into multiple series based on the chosen column. For example,
+                                    this would produce multiple lines in a line chart.
+                                </p>
+                            </div>
                             <label>Denominator</label>
                             <Select
                                 options={[
@@ -394,41 +444,41 @@ export default function ConfigPanel({
                             <p className="small color-muted">
                                 If set, renders the values as percentages of the given denominator
                             </p>
-                        </div>
-                        { state.ranges && <div className="pt-1">
-                            <label>Confidence Intervals</label>
-                            <Select value={ state.ranges?.type || "" } options={[
-                                {
-                                    value: "",
-                                    icon : "fa-solid fa-plus-minus color-muted",
-                                    label: "None"
-                                },
-                                {
-                                    label: "Error Bars",
-                                    value: "errorbar",
-                                    icon : "fa-solid fa-plus-minus color-blue"
-                                },
-                                {
-                                    label: "Area",
-                                    value: "areasplinerange",
-                                    icon : "fa-solid fa-plus-minus color-blue"
-                                },
-                                {
-                                    label: "Bars / Columns",
-                                    value: "column",
-                                    icon : "fa-solid fa-plus-minus color-blue"
-                                },
-                            ]} onChange={type => onRangeOptionsChange({ type, enabled: !!type })} />
-                            <p className="small color-muted">
-                                If information is available, add the error ranges to the chart
-                            </p>
-                        </div> }
+                            { state.ranges && <div className="pt-1">
+                                <label>Confidence Intervals</label>
+                                <Select value={ state.ranges?.type || "" } options={[
+                                    {
+                                        value: "",
+                                        icon : "fa-solid fa-plus-minus color-muted",
+                                        label: "None"
+                                    },
+                                    {
+                                        label: "Error Bars",
+                                        value: "errorbar",
+                                        icon : "fa-solid fa-plus-minus color-blue"
+                                    },
+                                    {
+                                        label: "Area",
+                                        value: "areasplinerange",
+                                        icon : "fa-solid fa-plus-minus color-blue"
+                                    },
+                                    {
+                                        label: "Bars / Columns",
+                                        value: "column",
+                                        icon : "fa-solid fa-plus-minus color-blue"
+                                    },
+                                ]} onChange={type => onRangeOptionsChange({ type, enabled: !!type })} />
+                                <p className="small color-muted">
+                                    If information is available, add the error ranges to the chart
+                                </p>
+                            </div> }
 
-                        <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onSecondaryDataOptionsChange} />
-                    </> }
+                            <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onSecondaryDataOptionsChange} />
+                        </> }
 
-                    { isPie && <SliceEditor state={state} onChange={onChange} /> }
-                    <br />
+                        { isPie && <SliceEditor state={state} onChange={onChange} /> }
+                        <br />
+                    </div>
                 </Collapse>
 
                 <Collapse collapsed header="Filters">

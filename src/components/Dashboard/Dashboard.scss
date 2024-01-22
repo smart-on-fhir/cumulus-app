@@ -396,6 +396,47 @@
     }
 }
 
+.dashboard-sidebar-swap-btn-wrap {
+    background: $color-grey;
+    height    : 3.8em;
+    width     : 1px;
+    position  : absolute;
+    top       : 4.5em;
+    right     : 1em;
+
+    > div {
+        position     : absolute;
+        width        : 2.2em;
+        height       : 2.2em;
+        top          : 50%;
+        left         : 50%;
+        margin       : -1.1em auto auto -1.1em;
+        box-shadow   : 0 0 0 1px $color-grey;
+        border-radius: 30px;
+        background   : $color-grey-light;
+        text-align   : center;
+        line-height  : 2.2em;
+        color        : darken($color-grey, 15%);
+        cursor       : pointer;
+        text-shadow  : 1px 1px 1px #FFF;
+        user-select  : none;
+        rotate       : 90deg;
+        font-size    : 12px;
+
+        &:hover {
+            color     : darken($color-grey, 30%);
+            background: #FFF;
+        }
+        
+        &:active {
+            color      : darken($color-grey, 50%);
+            background : $color-grey;
+            box-shadow : 0 0 0 1px #0008, 4px 0 6px 1px #0003 inset;
+            text-shadow: 0 0 2px #FFF;
+        }
+    }
+}
+
 @media (max-width: 960px) {
     .dashboard-sidebar {
         display: none;
