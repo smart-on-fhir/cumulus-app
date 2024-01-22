@@ -328,47 +328,14 @@ export default function ConfigPanel({
                 </Collapse>
 
                 <Collapse collapsed header="Data">
-                    <div className="pt-1">
-                        <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
-                        <ColumnSelector
-                            cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max") }
-                            value={ state.groupBy }
-                            disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
-                            onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
-                        />
-                        <p className="small color-muted"> {
-                            isPie ?
-                                "Select which data column provides the slices of the pie" :
-                                `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
-                        }</p>
+                    <div className="color-muted small mt-1" style={{ padding: "0 0 0 1.5em", margin: "1em 0 0" }}>
+                        <i className="fas fa-exclamation-circle" style={{ color: "#D30", width: "1.2em", margin: "0 0.2em 0 -1.5em" }} />
+                        Changing these settings may result in new data being fetched.
+                        That will create a different chart using different series and
+                        some of your visualization settings may have to be re-applied.
+                        To avoid that try to configure your <b>Data</b> and <b>Filters</b> settings
+                        first.
                     </div>
-                    { !isPie && <>
-                        <div className="pt-1">
-                            <label>Stratifier</label>
-                            <ColumnSelector
-                                cols={ cols }
-                                placeholder="Select Column"
-                                addEmptyOption="start"
-                                value={ state.stratifyBy }
-                                disabled={[
-                                    "cnt",
-                                    "cnt_min",
-                                    "cnt_max",
-                                    state.groupBy,
-                                    state.column2
-                                ].filter(Boolean)}
-                                onChange={ (stratifyBy: string) => onChange({
-                                    ...state,
-                                    stratifyBy,
-                                    denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
-                                }) }
-                            />
-                            <p className="small color-muted">
-                                Stratify the data into multiple series based on the chosen column. For example,
-                                this would produce multiple lines in a line chart.
-                            </p>
-                        </div>
-                        <div className="pt-1">
                             <label>Denominator</label>
                             <Select
                                 options={[
@@ -465,6 +432,14 @@ export default function ConfigPanel({
                 </Collapse>
 
                 <Collapse collapsed header="Filters">
+                    <div className="color-muted small mt-1" style={{ padding: "0 0 0 1.5em", margin: "1em 0 0" }}>
+                        <i className="fas fa-exclamation-circle" style={{ color: "#D30", width: "1.2em", margin: "0 0.2em 0 -1.5em" }} />
+                        Changing these settings may result in new data being fetched.
+                        That will create a different chart using different series and
+                        some of your visualization settings may have to be re-applied.
+                        To avoid that try to configure your <b>Data</b> and <b>Filters</b> settings
+                        first.
+                    </div>
                     <div className="pt-1 pb-1">
                         <FilterUI
                             onChange={filters => onChange({ ...state, filters })}
