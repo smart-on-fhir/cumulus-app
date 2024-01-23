@@ -28,8 +28,5 @@ export const ReadOnlyPaths = [
     "xAxis.type",
     "xAxis.crosshair",
     "lang",
-    "noData",
-    "legend.useHTML",
-    "legend.itemStyle.fontFamily",
-    "legend.itemStyle.fontSize"
+    "noData"
 ];

@@ -594,11 +594,9 @@ export function buildChartOptions({
             },
         },
         legend: {
-            useHTML: true,
-            itemStyle: {
-                fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
-                fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
-            }
+            useHTML: false,
+            // @ts-ignore - a hack to force highcharts to reflow the legend
+            dirty: Date.now()
         },
         lang: {
             noData: `
