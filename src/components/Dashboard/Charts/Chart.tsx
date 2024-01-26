@@ -1,6 +1,6 @@
 import React, { MouseEvent }       from "react"
 import { Color, merge, Series }    from "highcharts"
-// import moment                      from "moment"
+import moment                      from "moment"
 import { defer, lengthToEm, roundToPrecision } from "../../../utils"
 import Loader                      from "../../generic/Loader"
 import { MenuItemConfig }          from "../../generic/Menu"
@@ -105,57 +105,7 @@ function getLocalDenominator(data: app.ServerResponses.StratifiedDataResponse, p
     return out
 }
 
-function getPoint({
-    row,
-    xType,
-    denominator,
-    isErrorRange
-}: {
-    row: [string, number, number?, number?]
-    xType: "category" | "linear" | "datetime"
-    denominator?: number
-    isErrorRange?: boolean
-}): Highcharts.XrangePointOptionsObject | number | number[] {
-
-    const point: any = {
-        y: pct(row[1], denominator),
-
-        // The name of the point as shown in the legend, tooltip, dataLabels, etc.
-        name: String(row[0]),
-
-        custom: {
-            data: {
-                cnt    : row[1],
-                low    : row[2],
-                high   : row[3],
-                lowPct : pct(row[2] ?? 0, denominator),
-                highPct: pct(row[3] ?? 0, denominator)
-            },
-            isErrorRange: !!isErrorRange,
-            denominator
-        }
-    };
-
-    if (isErrorRange) {
-        point.low  = pct(row[2] ?? 0, denominator)
-        point.y = point.high = pct(row[3] ?? 0, denominator)
-    }
-
-    // For datetime axes, the X value is the timestamp in milliseconds since 1970.
-    if (xType === "datetime") {
-        // point.x = moment(row[0]).utc().valueOf()
-        point.x = +new Date(row[0])// 2020-08-01
-    }
-
-    // For linear (numeric) axes, the X value is the numeric value or 0.
-    if (xType === "linear") {
-        point.x = +(row[0] || 0)
-    }
-    
-    return point
-}
-
-function getSeries({
+function getSeriesAndExceptions({
     column,
     data,
     data2,
@@ -175,9 +125,114 @@ function getSeries({
     xType           : "category" | "linear" | "datetime"
     serverOptions   : Highcharts.Options
     ranges          : app.RangeOptions
-}): SeriesOptions[]
+}): { series: SeriesOptions[], exceptions: [any, any, any?, any?][] }
 {
     let series: SeriesOptions[] = []
+
+    const exceptions: any[] = [];
+
+    function filterOutExceptions(rows: [any, any, any?, any?][]) {
+        return rows.filter(row => {
+
+            function pushException() {
+                const x   = row[0]
+                const y   = +row[1]
+                const msg = `There are <b>${y.toLocaleString()}</b> records where <b>${column.label}</b> equals to <b>${x}</b>`
+                if (!exceptions.includes(msg)) {
+                    exceptions.push(msg)
+                }
+            }
+
+            if (xType === "linear") {
+                const n = +row[0]
+                if (isNaN(n) || !isFinite(n)) {
+                    pushException()
+                    return false
+                }
+            }
+            else if (xType === "datetime" && !moment(row[0], false).isValid()) {
+                pushException()
+                return false
+            }
+            return true
+        })
+    }
+
+    function getPoint({
+        row,
+        xType,
+        denominator,
+        isErrorRange
+    }: {
+        row: [string, number, number?, number?]
+        xType: "category" | "linear" | "datetime"
+        denominator?: number
+        isErrorRange?: boolean
+    }): Highcharts.XrangePointOptionsObject | number | number[] | null {
+    
+        if (isNaN(row[1]) || !isFinite(row[1])) {
+            const msg = "Some invalid values detected. See console for details."
+            if (!exceptions.includes(msg)) {
+                exceptions.push(msg)
+            }
+            console.warn('Invalid point value "%s". Row: %o', row[1], row)
+            return null
+        }
+    
+        const point: any = {
+            y: pct(row[1], denominator),
+    
+            // The name of the point as shown in the legend, tooltip, dataLabels, etc.
+            name: String(row[0]),
+    
+            custom: {
+                data: {
+                    cnt    : row[1],
+                    low    : row[2],
+                    high   : row[3],
+                    lowPct : pct(row[2] ?? 0, denominator),
+                    highPct: pct(row[3] ?? 0, denominator)
+                },
+                isErrorRange: !!isErrorRange,
+                denominator
+            }
+        };
+    
+        if (isErrorRange) {
+            point.low  = pct(row[2] ?? 0, denominator)
+            point.y = point.high = pct(row[3] ?? 0, denominator)
+        }
+    
+        // For datetime axes, the X value is the timestamp in milliseconds since 1970.
+        if (xType === "datetime") {
+            const x = moment(row[0], false)
+            if (!x.isValid()) {
+                const msg = "Some invalid dates detected. See console for details."
+                if (!exceptions.includes(msg)) {
+                    exceptions.push(msg)
+                }
+                console.log('Invalid date "%s". Row: %o', row[0], row)
+                return null
+            }
+            point.x = x.valueOf()
+        }
+    
+        // For linear (numeric) axes, the X value is the numeric value or 0.
+        if (xType === "linear") {
+            const x = +row[0]
+            if (isNaN(x) || !isFinite(x)) {
+                const msg = "Some non-numeric values detected. See console for details."
+                if (!exceptions.includes(msg)) {
+                    exceptions.push(msg)
+                }
+                console.log('Invalid number "%s". Row: %o', row[0], row)
+                return null
+            }
+            point.x = x
+        }
+        
+        return point as Highcharts.XrangePointOptionsObject
+    }
 
     function addSeries(options: any, secondary = false) {
 
@@ -252,7 +307,7 @@ function getSeries({
 
         let keys: any[] = [];
         data.data.forEach(group => {
-            group.rows.forEach(row => {
+            filterOutExceptions(group.rows).forEach(row => {
                 if (!keys.includes(row[0])) {
                     keys.push(row[0])
                 }
@@ -280,9 +335,7 @@ function getSeries({
                     const row = group.rows.find(row => row[0] === key)
                     return row ?
                         getPoint({ row, xType, denominator: getDenominator(data, denominator, row, denominatorCache) }) :
-                        // (type === "column" || type === "bar") && data.data.length > 1 ?
-                        //     getPoint({ row: [key, 0], xType, denominator: 100 }) :
-                            null
+                        null
                 }).filter(Boolean)
             }, secondary)
 
@@ -297,9 +350,7 @@ function getSeries({
                         const row = group.rows.find(row => row[0] === key)
                         return row ?
                             getPoint({ row, xType, denominator: getDenominator(data, denominator, row, denominatorCache), isErrorRange: true,  }) :
-                            // (type === "column" || type === "bar") && data.data.length > 1 ?
-                            //     getPoint({ row: [key, 0], xType, denominator: 100, isErrorRange: true }) :
-                                null
+                            null
                     }).filter(Boolean)
                 });
             }
@@ -316,11 +367,11 @@ function getSeries({
                 type,
                 id,
                 name: old?.name ?? name,
-                data: data.data[0].rows.map(row => getPoint({
+                data: filterOutExceptions(data.data[0].rows).map(row => getPoint({
                     row,
                     xType,
                     denominator: getDenominator(data, denominator, row, denominatorCache)
-                }))
+                })).filter(Boolean)
             });
 
             if (ranges?.enabled) {
@@ -335,7 +386,7 @@ function getSeries({
                         xType,
                         denominator: getDenominator(data, denominator, row, denominatorCache),
                         isErrorRange: true
-                    }))
+                    })).filter(Boolean)
                 });
             }
         }
@@ -348,7 +399,7 @@ function getSeries({
         stratify(data2, true)
     }
 
-    return series
+    return { series, exceptions }
 }
 
 export function buildChartOptions({
@@ -383,7 +434,7 @@ export function buildChartOptions({
 
     // const is3d = !!options.chart?.options3d?.enabled
 
-    const series = getSeries({
+    const { series, exceptions } = getSeriesAndExceptions({
         data,
         data2,
         column,
@@ -618,6 +669,19 @@ export function buildChartOptions({
     };
 
     const result = merge(options, dynamicOptions) as Highcharts.Options
+
+    result.caption = { text: "" };
+
+    if (exceptions.length) {
+        result.caption = {
+            text: "⚠️ " + exceptions.join("<br />⚠️ "),
+            margin: 0,
+            style: {
+                color: "#BB0000",
+                fontSize: "0.9em"
+            }
+        }
+    }
 
     // Convert px to em in old chart annotations
     result.annotations?.[0]?.labels?.forEach((l, i) => {
