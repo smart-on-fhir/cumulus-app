@@ -21,9 +21,13 @@ function createSetter(fn: (x: string) => string) {
 
 function createGetter(fn: (x: string) => any) {
     return (x: string | null) => {
-        if (x === null || isPrivateValue(x)) {
+        if (x === null) {
             return x
-        } else {
+        } 
+        if (isPrivateValue(x)) {
+            return x.slice(NAMESPACE_PREFIX.length)
+        }
+        else {
             return fn(x)
         }
     }
