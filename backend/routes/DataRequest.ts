@@ -431,7 +431,9 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
     if (stratifier) sql += `"${stratifier}" as stratifier, `
 
     // Select the column as "x"
-    sql += `"${column}" AS x`
+    sql += columnMeta!.dataType === "integer" || columnMeta!.dataType === "float" ?
+        `"${column}"::NUMERIC AS x` :
+        `"${column}" AS x`
 
     // Select the count as "y"
     sql += `, sum(cnt::float) AS y `
@@ -457,7 +459,13 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
 
 
     function compileCountSQL(stratifier: string) {
-        let sql = `SELECT "${column}" as stratifier, sum(cnt::float) AS total FROM "${table}"`
+        let sql = `SELECT `;
+        
+        sql += columnMeta!.dataType === "integer" || columnMeta!.dataType === "float" ?
+            `"${column}"::NUMERIC AS stratifier` :
+            `"${column}" AS stratifier`
+        
+        sql += `, sum(cnt::float) AS total FROM "${table}"`
 
         let where: string[] = [ `"${stratifier}" IS NULL` ]
 
@@ -472,8 +480,8 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         }
 
         sql += ` WHERE ${where.join(" AND ")}`
-        sql += ` GROUP BY "${column}"`
-        sql += ` ORDER BY "${column}"`
+        sql += ` GROUP BY stratifier`
+        sql += ` ORDER BY stratifier`
         
         return sql
     }
