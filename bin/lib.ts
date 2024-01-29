@@ -83,7 +83,7 @@ export async function ask(
  * @param width Char width of the entire progress bar
  */
 export function progress(pct: number, message = "", width = 100) {
-    pct = Math.round(pct)
+    pct = Math.floor(pct)
     const done = Math.floor( width / 100 * pct)
     let out = ""
     for (let i = 0; i < width; i++) {

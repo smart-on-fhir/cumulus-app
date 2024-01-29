@@ -14,7 +14,7 @@ export async function copyDataTable(options: {
     console.log("Please wait...")
 
     const { src, dst, srcTableName, dstTableName = srcTableName, transaction } = options
-    const BATCH_SIZE = 10_000
+    const BATCH_SIZE = 100_000
 
     const cntRow: any = (await src.query(`SELECT COUNT(*) FROM "${srcTableName}"`, { type: QueryTypes.SELECT }))[0]
     const cnt = cntRow.count * 1
@@ -47,17 +47,23 @@ export async function copyDataTable(options: {
     
     await dst.query(sql1, { transaction })
     
+    const queryInterface = dst.connection.getQueryInterface()
+    
     let offset = 0, size = 0
     do {
+        const sort = Object.keys(cols)
+            .filter(k => k !== "cnt" && k !== "cnt_min" && k !== "cnt_max")
+            .map(k => `"${k}" Asc NULLS Last`)
+            .join(", ")
         const rows: any[] = await src.query(
-            `SELECT * FROM "${srcTableName}" LIMIT ${BATCH_SIZE} OFFSET ${offset}`,
+            `SELECT * FROM "${srcTableName}" ORDER BY ${sort} LIMIT ${BATCH_SIZE} OFFSET ${offset}`,
             { type: QueryTypes.SELECT }
         )
         size = rows.length
         if (size) {
+            await queryInterface.bulkInsert(dstTableName, rows, { raw: true, transaction })
             offset += size
-            await dst.connection.getQueryInterface().bulkInsert(dstTableName, rows, { raw: true, transaction })
-            progress(offset/cnt * 100, `Copied ${offset} of ${cnt} rows`)
+            progress(offset/cnt * 100, `Copied ${offset.toLocaleString()} of ${cnt.toLocaleString()} rows`)
         }
     } while (size)
 
