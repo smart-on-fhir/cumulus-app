@@ -12,9 +12,20 @@ const clients: Record<number, Response> = {}
 
 
 export function longPollingHandler(request: AppRequest, response: Response) {
+    const id = request.user!.id
     response.setHeader("Cache-Control", "no-cache, must-revalidate");
-    clients[request.user!.id] = response;
-    response.on('close', () => { delete clients[request.user!.id]; });
+    clients[id] = response;
+    
+    const timer = setTimeout(() => {
+        if (clients[id]) {
+            clients[id].sendStatus(205)
+        }
+    }, 28_000).unref()
+
+    response.on('close', () => {
+        delete clients[id];
+        clearTimeout(timer)
+    });
 }
 
 export function emit(event: ClientEvent, userId?: number) {
