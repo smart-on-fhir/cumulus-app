@@ -18,6 +18,6 @@ export class PrintChart extends Command
     }
 
     execute() {
-        Highcharts.charts[Highcharts.charts.length-1].print()
+        Highcharts.charts[Highcharts.charts.length-1]!.print()
     }
 }
