@@ -297,8 +297,8 @@ export default function Dashboard({
     const navigate  = useNavigate();
     const auth      = useAuth();
     const isOwner   = auth.user && view.creatorId === auth.user.id;
-    const canUpdate = isOwner || requestPermission({ user: auth.user!, resource: "Graphs", resource_id: view.id, action: "update" })
-    const canCreate = requestPermission({ user: auth.user!, resource: "Graphs", action: "create" })
+    const canUpdate = isOwner || requestPermission({ user: auth.user, resource: "Graphs", resource_id: view.id, action: "update" })
+    const canCreate = requestPermission({ user: auth.user, resource: "Graphs", action: "create" })
 
     const { cols = [] } = dataRequest.metadata ?? {}
 

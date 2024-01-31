@@ -39,7 +39,7 @@ export class OpenInAnalyticEnvironment extends Command
             !!this.subscriptionId &&
             !!process.env.REACT_APP_NOTEBOOK_URL &&
             requestPermission({
-                user       : this.user!,
+                user       : this.user,
                 resource   : "Subscriptions",
                 resource_id: this.subscriptionId,
                 action     : "export"

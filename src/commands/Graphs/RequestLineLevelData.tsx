@@ -36,13 +36,13 @@ export class RequestLineLevelData extends Command
     enabled() {
         return (
             requestPermission({
-                user       : this.user!,
+                user       : this.user,
                 resource   : "Graphs",
                 resource_id: this.graphId,
                 action     : "read"
             })
             && requestPermission({
-                user       : this.user!,
+                user       : this.user,
                 resource   : "Subscriptions",
                 action     : "requestLineLevelData"
             })

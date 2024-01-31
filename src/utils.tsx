@@ -486,13 +486,13 @@ export function buildPermissionId({
 }
 
 export function requestPermission({ user, resource, resource_id, action }: {
-    user        : app.CurrentUser
+    user       ?: app.CurrentUser | null
     resource    : string
     action      : string
     resource_id?: number
 }, onReject?: ((message: string) => void))
 {
-    const { role = "guest", id = -1, permissions = [] } = user
+    const { role = "guest", id = -1, permissions = [] } = user || {}
 
     if (role === "system" || role === "owner") {
         return true
