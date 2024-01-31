@@ -48,7 +48,7 @@ export class DeleteGraph extends Command
     enabled() {
         const isOwner = this.user && this.user.id === this.ownerId
         return isOwner || (!!this.graphId && requestPermission({
-            user       : this.user!,
+            user       : this.user,
             resource   : "Graphs",
             resource_id: this.graphId,
             action     : "delete"

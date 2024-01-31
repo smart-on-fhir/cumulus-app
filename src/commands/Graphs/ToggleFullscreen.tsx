@@ -1,6 +1,5 @@
 import { Command } from "../Command"
-
-declare var Highcharts: any
+import Highcharts  from "../../highcharts"
 
 
 export class ToggleFullscreen extends Command
@@ -18,6 +17,6 @@ export class ToggleFullscreen extends Command
     }
 
     execute() {
-        Highcharts.charts[Highcharts.charts.length-1].fullscreen.toggle()
+        Highcharts.charts[Highcharts.charts.length-1]!.fullscreen!.toggle()
     }
 }
