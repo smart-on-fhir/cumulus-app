@@ -777,17 +777,21 @@ export default class Chart extends React.Component<ChartProps>
         if (enabled) {
             this.chart.container.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
             const el = document.getElementById("chart-text-color")! as HTMLStyleElement
-            el.innerText = fontColor && fontColorEnabled ? 
-                `.main-chart .highcharts-container text { color: ${fontColor} !important; fill: ${fontColor} !important; }` +
-                `.main-chart .highcharts-container svg * { color: ${fontColor} !important; }` +
-                `.main-chart .highcharts-container .highcharts-data-labels .highcharts-data-label > span { color: ${fontColor} !important; }` +
-                `.main-chart .highcharts-container .highcharts-legend-item-hidden > text { filter: grayscale(1) opacity(0.5) !important; }` :
-                ""
-            el.sheet!.disabled = false
+            if (el) {
+                el.innerText = fontColor && fontColorEnabled ? 
+                    `.main-chart .highcharts-container text { color: ${fontColor} !important; fill: ${fontColor} !important; }` +
+                    `.main-chart .highcharts-container svg * { color: ${fontColor} !important; }` +
+                    `.main-chart .highcharts-container .highcharts-data-labels .highcharts-data-label > span { color: ${fontColor} !important; }` +
+                    `.main-chart .highcharts-container .highcharts-legend-item-hidden > text { filter: grayscale(1) opacity(0.5) !important; }` :
+                    ""
+                el.sheet!.disabled = false
+            }
         } else {
             this.chart.container.style.filter = "none"
             const el = document.getElementById("chart-text-color")! as HTMLStyleElement
-            el.sheet!.disabled = true
+            if (el) {
+                el.sheet!.disabled = true
+            }
         }
     }
 
