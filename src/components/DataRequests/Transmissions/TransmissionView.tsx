@@ -1,8 +1,6 @@
-import React   from "react"
-import { app } from "../../../types"
-
-
-declare var Highcharts: any
+import React     from "react"
+import { app }   from "../../../types"
+import Highcharts from "../../../highcharts"
 
 
 interface ChartProps {

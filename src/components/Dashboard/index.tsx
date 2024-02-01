@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useReducer }    from "react"
-import { useNavigate }                           from "react-router-dom"
+import { useNavigate, Link }                     from "react-router-dom"
 import { HelmetProvider, Helmet }                from "react-helmet-async"
-import Highcharts, { Chart }                     from "highcharts"
-import { Link }                                  from "react-router-dom"
+import Highcharts, { Chart }                     from "../../highcharts"
 import { useBackend, useCommand }                from "../../hooks"
 import { createOne, updateOne, request }         from "../../backend"
 import { useAuth }                               from "../../auth"
@@ -469,7 +468,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
     }
 
     const onTransitionEnd = () => {
-        window.Highcharts.charts.forEach(c => c?.reflow())
+        Highcharts.charts.forEach(c => c?.reflow())
     };
 
     // Save

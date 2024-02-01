@@ -1,5 +1,5 @@
 import React, { MouseEvent }       from "react"
-import { Color, merge, Series }    from "highcharts"
+import Highcharts, { Color, merge, Series } from "../../../highcharts"
 import moment                      from "moment"
 import { defer, lengthToEm, roundToPrecision } from "../../../utils"
 import Loader                      from "../../generic/Loader"
@@ -14,8 +14,6 @@ import {
     INSPECTORS
 } from "../config"
 
-
-declare var Highcharts: any
 
 type SeriesOptions = (
     Highcharts.SeriesPieOptions |

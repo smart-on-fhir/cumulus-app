@@ -1,6 +1,5 @@
 import { Command } from "../Command"
-
-declare var Highcharts: any
+import Highcharts  from "../../highcharts"
 
 
 export class PrintChart extends Command
