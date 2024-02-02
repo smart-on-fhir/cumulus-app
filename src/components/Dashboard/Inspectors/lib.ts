@@ -42,7 +42,7 @@ export function getColorForSeries(options: Options, seriesId: string) {
         series.color ||
         // @ts-ignore
         series.colors?.[index % series.colors!.length] ||
-        options.colors![index % options.colors!.length] ||
+        options.colors?.[index % options.colors!.length] ||
         DEFAULT_COLORS[index % DEFAULT_COLORS.length] ||
         "#888888"
     );

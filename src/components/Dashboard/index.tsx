@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useReducer }    from "react"
-import { useNavigate }                           from "react-router-dom"
+import { useNavigate, Link }                     from "react-router-dom"
 import { HelmetProvider, Helmet }                from "react-helmet-async"
-import Highcharts, { Chart }                     from "highcharts"
-import { Link }                                  from "react-router-dom"
+import Highcharts, { Chart }                     from "../../highcharts"
 import { useBackend, useCommand }                from "../../hooks"
 import { createOne, updateOne, request }         from "../../backend"
 import { useAuth }                               from "../../auth"
@@ -274,11 +273,7 @@ function hasRanges(data: app.ServerResponses.DataResponse | null, data2: app.Ser
     );
 }
 
-export default function Dashboard({
-    view,
-    dataRequest,
-    copy
-}: {
+export interface DashboardProps {
     /**
      * The view object that we are editing. If this is an empty object
      * or a partial which does not have an `id` property, then the
@@ -293,12 +288,14 @@ export default function Dashboard({
     dataRequest: app.DataRequest,
     
     copy?: boolean
-}) {
+}
+
+export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
     const navigate  = useNavigate();
     const auth      = useAuth();
     const isOwner   = auth.user && view.creatorId === auth.user.id;
-    const canUpdate = isOwner || requestPermission({ user: auth.user!, resource: "Graphs", resource_id: view.id, action: "update" })
-    const canCreate = requestPermission({ user: auth.user!, resource: "Graphs", action: "create" })
+    const canUpdate = isOwner || requestPermission({ user: auth.user, resource: "Graphs", resource_id: view.id, action: "update" })
+    const canCreate = requestPermission({ user: auth.user, resource: "Graphs", action: "create" })
 
     const { cols = [] } = dataRequest.metadata ?? {}
 
@@ -471,7 +468,7 @@ export default function Dashboard({
     }
 
     const onTransitionEnd = () => {
-        window.Highcharts.charts.forEach(c => c?.reflow())
+        Highcharts.charts.forEach(c => c?.reflow())
     };
 
     // Save
@@ -769,6 +766,7 @@ export default function Dashboard({
                                 maxLength={500}
                                 text={viewDescription || "no description provided"}
                                 onChange={ viewDescription => dispatch({ type: "UPDATE", payload: { viewDescription }}) }
+                                id="view-description"
                             />
                         </div>
                         <div className="row wrap">
@@ -930,8 +928,8 @@ export default function Dashboard({
                             <div className="col">
                                 <b>Subscription</b>
                                 <hr className="small"/>
-                                <Link className="link mt-05" to={`/requests/${dataRequest.id}`}>
-                                    <i className="fa-solid fa-database color-brand-2" /> { dataRequest.name }
+                                <Link className="link mt-05 subscription-link" to={`/requests/${dataRequest.id}`}>
+                                    <i className="fa-solid fa-database color-brand-2" /> <span>{ dataRequest.name }</span>
                                 </Link>
                             </div>
                         
@@ -939,8 +937,8 @@ export default function Dashboard({
                                 <b>Subscription Group</b>
                                 <hr className="small"/>
                                 { dataRequest.group ?
-                                    <Link className="link mt-05 ellipsis" to={`/groups/${dataRequest.group.id}`} title={ dataRequest.group.description }>
-                                        <i className="fa-solid fa-folder color-brand-2" /> { dataRequest.group.name }
+                                    <Link className="link mt-05 ellipsis subscription-group-link" to={`/groups/${dataRequest.group.id}`} title={ dataRequest.group.description }>
+                                        <i className="fa-solid fa-folder color-brand-2" /> <span>{ dataRequest.group.name }</span>
                                     </Link> :
                                     <span className="color-muted">GENERAL</span> }
                             </div>

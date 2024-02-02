@@ -40,7 +40,7 @@ export class ShareGraph extends Command
             return true
         }
         return requestPermission({
-            user       : this.user!,
+            user       : this.user,
             resource_id: this.graph.id!,
             resource   : "Graphs",
             action     : "share"

@@ -1,5 +1,6 @@
 import { ViewState } from "../../components/Dashboard"
-import { Command }  from "../Command"
+import Highcharts    from "../../highcharts"
+import { Command }   from "../Command"
 
 
 export class GenerateCaption extends Command

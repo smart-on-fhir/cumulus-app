@@ -1,5 +1,5 @@
 import React, { MouseEvent }       from "react"
-import { Color, merge, Series }    from "highcharts"
+import Highcharts, { Color, merge, Series } from "../../../highcharts"
 import moment                      from "moment"
 import { defer, lengthToEm, roundToPrecision } from "../../../utils"
 import Loader                      from "../../generic/Loader"
@@ -14,8 +14,6 @@ import {
     INSPECTORS
 } from "../config"
 
-
-declare var Highcharts: any
 
 type SeriesOptions = (
     Highcharts.SeriesPieOptions |
@@ -777,17 +775,21 @@ export default class Chart extends React.Component<ChartProps>
         if (enabled) {
             this.chart.container.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
             const el = document.getElementById("chart-text-color")! as HTMLStyleElement
-            el.innerText = fontColor && fontColorEnabled ? 
-                `.main-chart .highcharts-container text { color: ${fontColor} !important; fill: ${fontColor} !important; }` +
-                `.main-chart .highcharts-container svg * { color: ${fontColor} !important; }` +
-                `.main-chart .highcharts-container .highcharts-data-labels .highcharts-data-label > span { color: ${fontColor} !important; }` +
-                `.main-chart .highcharts-container .highcharts-legend-item-hidden > text { filter: grayscale(1) opacity(0.5) !important; }` :
-                ""
-            el.sheet!.disabled = false
+            if (el) {
+                el.innerText = fontColor && fontColorEnabled ? 
+                    `.main-chart .highcharts-container text { color: ${fontColor} !important; fill: ${fontColor} !important; }` +
+                    `.main-chart .highcharts-container svg * { color: ${fontColor} !important; }` +
+                    `.main-chart .highcharts-container .highcharts-data-labels .highcharts-data-label > span { color: ${fontColor} !important; }` +
+                    `.main-chart .highcharts-container .highcharts-legend-item-hidden > text { filter: grayscale(1) opacity(0.5) !important; }` :
+                    ""
+                el.sheet!.disabled = false
+            }
         } else {
             this.chart.container.style.filter = "none"
             const el = document.getElementById("chart-text-color")! as HTMLStyleElement
-            el.sheet!.disabled = true
+            if (el) {
+                el.sheet!.disabled = true
+            }
         }
     }
 

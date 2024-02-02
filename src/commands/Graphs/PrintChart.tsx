@@ -1,6 +1,5 @@
 import { Command } from "../Command"
-
-declare var Highcharts: any
+import Highcharts  from "../../highcharts"
 
 
 export class PrintChart extends Command
@@ -18,6 +17,6 @@ export class PrintChart extends Command
     }
 
     execute() {
-        Highcharts.charts[Highcharts.charts.length-1].print()
+        Highcharts.charts[Highcharts.charts.length-1]!.print()
     }
 }
