@@ -18,7 +18,7 @@ export default function CreateView()
 
     // Fetch the subscription by ID
     const { loading, error, result } = useBackend(
-        useCallback(() => request("/api/requests/" + id), [id]),
+        useCallback(() => request("/api/requests/" + id + "?group=true&projects=true"), [id]),
         true
     );
 
