@@ -946,11 +946,11 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                             <div className="col">
                                 <b>Study Areas</b>
                                 <hr className="small"/>
-                                <div className="mt-05">
+                                <div className="mt-05 view-projects">
                                 { dataRequest.Projects?.length ?
                                     dataRequest.Projects.map((p, i) => (
                                         <div key={i} className="ellipsis">
-                                            <Link className="link" to={`/projects/${p.id}`}>
+                                            <Link className="link project-link" to={`/projects/${p.id}`}>
                                                 <i className="fa-solid fa-book color-brand-2" /> { p.name }
                                             </Link>
                                         </div>
@@ -963,7 +963,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                             <div className="col">
                                 <b>Tags</b>
                                 <hr className="small"/>
-                                <div className="mt-05">{ tags.length ? 
+                                <div className="mt-05 view-tags">{ tags.length ? 
                                     tags.map((t, i) => <Tag tag={t} key={i} />) :
                                     <span className="color-muted">None</span>
                                 }</div>
