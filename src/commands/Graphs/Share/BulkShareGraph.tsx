@@ -38,9 +38,9 @@ export class BulkShareGraph extends Command
                 return true
             }
             return requestPermission({
-                user: this.user!,
-                resource: "Graphs",
-                action: "share",
+                user       : this.user,
+                resource   : "Graphs",
+                action     : "share",
                 resource_id: g.id
             })
         });

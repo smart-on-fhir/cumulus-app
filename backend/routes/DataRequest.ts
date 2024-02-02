@@ -620,6 +620,14 @@ route(router, {
                 optional: true,
                 isBoolean: true,
                 toBoolean: true
+            },
+
+            // If set include related Projects
+            projects: {
+                in: ["query"],
+                optional: true,
+                isBoolean: true,
+                toBoolean: true
             }
         }
     },
@@ -637,6 +645,10 @@ route(router, {
 
         if (req.query.graphs) {
             include.push({ association: "Views" })
+        }
+
+        if (req.query.projects) {
+            include.push({ association: "Projects" })
         }
 
         const model = await Model.findByPk(req.params.id, { include, user: req.user })

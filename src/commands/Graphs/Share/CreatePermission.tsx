@@ -29,7 +29,7 @@ export class CreatePermission extends Command
     }
 
     available() {
-        return !!this.user && requestPermission({
+        return requestPermission({
             user    : this.user,
             resource: "Permissions",
             action  : "create"
