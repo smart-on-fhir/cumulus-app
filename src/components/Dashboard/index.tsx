@@ -807,7 +807,9 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                     <button
                                         className="btn"
                                         onClick={save}
-                                        data-tooltip="Save Changes">
+                                        data-tooltip="Save Changes"
+                                        disabled={ viewType !== "overview" }
+                                    >
                                         <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
                                     </button>
                                 </div>
