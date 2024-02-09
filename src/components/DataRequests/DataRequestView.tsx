@@ -132,7 +132,7 @@ export default function DataRequestView(): JSX.Element
                                 <tr><th className="right pr-1 pl-1">Created:</th><td><Format value={ model.createdAt } format="date-time" /></td></tr>
                                 { model.dataURL && (
                                     <tr>
-                                        <th className="right pr-1 pl-1 top">Data&nbsp;URL:</th>
+                                        <th className="right pr-1 pl-1 top nowrap">Data URL:</th>
                                         <td className="color-muted" style={{ wordBreak: "break-all" }}>{ model.dataURL }</td>
                                     </tr>
                                 )}
@@ -147,7 +147,7 @@ export default function DataRequestView(): JSX.Element
                                     </tr>
                                 )}
                                 { model.metadata?.total && <tr>
-                                    <th className="right pr-1 pl-1">Total rows:</th>
+                                    <th className="right pr-1 pl-1 nowrap">Total rows:</th>
                                     <td>{ Number(model.metadata.total).toLocaleString()}</td>
                                 </tr>}
                             </tbody>
