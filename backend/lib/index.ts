@@ -8,7 +8,7 @@ import { app } from "../.."
 import { IncludeOptions } from "sequelize"
 
 
-const RE_FALSE = /^(0|no|false|off|null|undefined|NaN|)$/i;
+const RE_FALSE = /^(0|no|false|off|null|undefined|NaN|none|)$/i;
 
 export function wait(ms: number) {
     return new Promise(resolve => {
