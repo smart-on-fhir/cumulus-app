@@ -42,7 +42,7 @@ export default class Text2Lines extends Transform
 
     validateLineLength()
     {
-        const max = 500000; // TODO: put this in config?
+        const max = 500_000; // TODO: put this in config?
         if (this._bufferSize > max) {
             this._stringBuffer = "";
             this._bufferSize   = 0;
@@ -67,7 +67,7 @@ export default class Text2Lines extends Transform
         try {
             this.validateLineLength()
         } catch (ex) {
-            return next(ex);
+            return next(ex as Error);
         }
 
         let pos = this._stringBuffer.search(/\n/);
@@ -99,7 +99,7 @@ export default class Text2Lines extends Transform
             try {
                 this.validateLineLength()
             } catch (ex) {
-                return next(ex);
+                return next(ex as Error);
             }
             this.push(this._stringBuffer);
             this._stringBuffer = "";

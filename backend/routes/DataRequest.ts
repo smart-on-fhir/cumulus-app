@@ -20,7 +20,9 @@ import { version as pkgVersion }                                  from "../../pa
 import { DATA_TYPES }                                             from "../DataManager/dataTypes"
 
 
-const router = module.exports = express.Router({ mergeParams: true });
+const router = express.Router({ mergeParams: true });
+
+export default router
 
 const FilterConfig: Record<string, (col: string) => string> = {
     
@@ -715,7 +717,7 @@ route(router, {
         try {
             await model.update(req.body, { user: req.user, transaction })
             if (Array.isArray(req.body.Tags)) {
-                await model.setTags(req.body.Tags.map(t => t.id))
+                await model.setTags(req.body.Tags.map((t: any) => t.id))
             }
             await transaction.commit()
             res.json(model)
@@ -727,7 +729,7 @@ route(router, {
                 throw ex
             }
             const error = new InternalServerError("Updating subscription failed", { tags: ["DATA"] })
-            error.cause = ex.stack
+            error.cause = (ex as Error).stack
             throw error
         }
     }
@@ -761,7 +763,7 @@ route(router, {
     handler: async (req, res) => {
         const model = await Model.create(req.body, { user: req.user })
         if (Array.isArray(req.body.Tags)) {
-            await model.setTags(req.body.Tags.map(t => t.id))
+            await model.setTags(req.body.Tags.map((t: any) => t.id))
         }
         res.json(model)
     }
