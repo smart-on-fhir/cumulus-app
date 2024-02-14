@@ -23,7 +23,23 @@ import { getMetadataFromHeaders }                  from "./lib"
  * @TODO: Perhaps send an API Key here?
  * @TODO: Should we require HTTPS unless running on DEV?
  */
-async function request(url: URL): Promise<IncomingMessage>
+async function request(url: URL, {
+    timeout = 30,
+    redirects = 10
+}: {
+    /**
+     * Connect timeout
+     */
+    timeout?: number
+    
+    /**
+     * How many redirects to follow
+     */
+    redirects?: number
+} = {}, _previousResponses: IncomingMessage[] = []): Promise<{
+    response: IncomingMessage,
+    previousResponses: IncomingMessage[]
+}>
 {
     return new Promise((resolve, reject) => {
         const requestFn = url.protocol === "https:" ? httpsRequest : httpRequest;
@@ -34,7 +50,17 @@ async function request(url: URL): Promise<IncomingMessage>
             }
         });
 
+        const timer = setTimeout(() => {
+            req.destroy()
+            const error = new DOMException(
+                `Request timed out in ${timeout} seconds and was aborted`,
+                "AbortError"
+            )
+            reject(error)
+        }, timeout * 1000)
+
         req.once("error", (error: any) => {
+            clearTimeout(timer)
             if (error.code === 'EPROTO') {
                 reject(new BadRequest("Invalid protocol", error))
             } else {
@@ -43,8 +69,33 @@ async function request(url: URL): Promise<IncomingMessage>
         })
 
         req.once("response", (response) => {
-            if (response.statusCode === 200) {
-                resolve(response)
+            clearTimeout(timer);
+
+            if ([301, 302, 303, 307, 308].includes(response.statusCode ?? 0) && redirects) {
+
+                const { location } = response.headers
+
+                // Receiving a redirect response without location is considered
+                // an error here (but we ignore that if `redirects` is `0`
+                // because we are not going to try to redirect).
+                if (!location) {
+                    return reject(new BadRequest(
+                        `Got a ${response.statusCode} redirect response but location header was not included`
+                    ))
+                }
+
+                // Modified version of options for the redirect request
+                const params = { timeout, redirects: redirects - 1 }
+
+                // Make the new request
+                return request(
+                    new URL(location, url),
+                    params,
+                    [ ..._previousResponses, response ]
+                ).then(resolve, reject)
+
+            } else if (response.statusCode === 200) {
+                resolve({ response, previousResponses: _previousResponses })
             } else {
 
                 response.setEncoding('utf8');
@@ -99,7 +150,7 @@ export async function fetchSubscriptionData(subscription: Subscription)
 
     const url = new URL(dataURL)
 
-    const response = await request(url)
+    const { response, previousResponses } = await request(url)
 
     response.setEncoding("utf8")
 
@@ -113,8 +164,10 @@ export async function fetchSubscriptionData(subscription: Subscription)
         separators = ["\t"]
     }
     
-    const meta = getMetadataFromHeaders(response)
-    
+    const headers = [response, ...previousResponses].map(r => r.headers)
+
+    const meta = getMetadataFromHeaders(headers)
+
     const transaction = await subscription.sequelize.transaction()
 
     try {

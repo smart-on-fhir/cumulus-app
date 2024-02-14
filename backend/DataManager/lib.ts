@@ -1,5 +1,4 @@
-import { IncomingMessage } from "http"
-import { DATA_TYPES }      from "./dataTypes"
+import { DATA_TYPES } from "./dataTypes"
 
 
 export interface ColumnMetadata
@@ -24,35 +23,41 @@ export enum ColumnMetadataHeaders {
 
 
 /**
- * Given a response object, collect the metadata from its custom headers:
+ * Given an array of response headers object, collect metadata from custom headers:
  * - `x-column-names` for human-friendly labels
  * - `x-column-types` for data types
  * - `x-column-descriptions` for column descriptions
  * 
- * These header are optional, but if provided, they must be used together and
- * contain equal amounts of comma-separated values
+ * These header are optional, but if provided, they must contain equal amounts
+ * of comma-separated values
  */
-export function getMetadataFromHeaders(response: IncomingMessage): MultiColumnMetadata
+export function getMetadataFromHeaders(headers: Record<string, any>[]): MultiColumnMetadata
 {
-    const names = String(response.headers[ColumnMetadataHeaders.labels] || "")
+    const names = String(lookUp(ColumnMetadataHeaders.labels, headers) || "")
         .trim()
         .split(/\s*,\s*/)
         .map(decodeURIComponent)
         .filter(Boolean);
     
-    const dataTypes = String(response.headers[ColumnMetadataHeaders.dataTypes] || "")
+    const dataTypes = String(lookUp(ColumnMetadataHeaders.dataTypes, headers) || "")
         .trim()
         .split(/\s*,\s*/)
         .map(decodeURIComponent)
         .filter(Boolean) as (keyof typeof DATA_TYPES)[]
     
-    const descriptions = String(response.headers[ColumnMetadataHeaders.descriptions] || "")
+    const descriptions = String(lookUp(ColumnMetadataHeaders.descriptions, headers) || "")
         .trim()
         .split(/\s*,\s*/)
         .map(decodeURIComponent)
         .filter(Boolean)
     
     return { names, dataTypes, descriptions };
+}
+
+function lookUp(property: string, scopes: Record<string, any>[])
+{
+    const scope = scopes.find(s => property in s)
+    return scope ? scope[property] : undefined
 }
 
 export function detectDateType(meta: { code: string }[])
