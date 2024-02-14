@@ -23,6 +23,20 @@ declare module app {
 
     type UserRole = "admin" | "manager" | "owner" | "user" | "guest"
 
+    type CsvDataType =
+        "string" |
+        "integer" |
+        "float" |
+        "boolean" |
+        "day" |
+        "week" |
+        "month" |
+        "year" |
+        "date:YYYY wk W" |
+        "date:YYYY-MM-DD" |
+        "date:YYYY-MM" |
+        "date:YYYY"
+
     interface ColumnDescriptor {
         name: string
         alias?: string
@@ -164,7 +178,7 @@ declare module app {
          * The type of data this column is supposed to contain. Used for
          * formatting in the UI
          */
-        dataType: "string" | "integer" | "float" | "boolean" | "date:YYYY-MM-DD" | "date:YYYY-MM" | "date:YYYY"
+        dataType: CsvDataType
 
     }
 
