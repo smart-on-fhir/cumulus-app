@@ -295,6 +295,38 @@ describe("Subscriptions", () => {
             expect(res.status).to.equal(400)
         })
 
+        it ("redirects", async () => {
+            await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv1` }, { where: { id: 1 }, user: SystemUser })
+            mockServer.mock("/csv1", {
+                status: 302,
+                headers: {
+                    "x-column-descriptions": "cnt-desc, a-desc, b-desc, c-desc",
+                    "x-column-types"       : "integer, string, float, float",
+                    location: "/csv2"
+                }
+            })
+            mockServer.mock("/csv2", {
+                headers: {
+                    "content-type"         : "text/csv",
+                    "x-column-names"       : "cnt    , a     , b    , c",
+                    "x-column-types"       : "integer, string, float, boolean",
+                    // "x-column-descriptions": "cnt    , a     , b   , c"
+                },
+                body: 'cnt,a,b,c\n1,2,3,4\n5,6,7,8\n9,,,'
+            })
+            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
+            const json = await res.json()
+            expect(json.metadata).to.deep.equal({
+                cols: [
+                    { name: 'cnt', label: 'cnt', dataType: 'integer', description: 'cnt-desc' },
+                    { name: 'a'  , label: 'a'  , dataType: 'string' , description: 'a-desc'   },
+                    { name: 'b'  , label: 'b'  , dataType: 'float'  , description: 'b-desc'   },
+                    { name: 'c'  , label: 'c'  , dataType: 'boolean', description: 'c-desc'   }
+                ],
+                total: 9
+            })
+        })
+
         it ("Works as expected", async () => {
             const model = (await Subscription.findByPk(1, { user: SystemUser }))!
             await model.update({ dataURL: `${mockServer.baseUrl}/csv` }, { user: SystemUser })

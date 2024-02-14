@@ -124,7 +124,7 @@ export default class DataRequest extends BaseModel<InferAttributes<DataRequest>,
             },
 
             dataURL: {
-                type: DataTypes.STRING(500)
+                type: DataTypes.STRING(50_000)
             },
 
             transmissions: {
