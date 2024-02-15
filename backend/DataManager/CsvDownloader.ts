@@ -24,7 +24,7 @@ import { getMetadataFromHeaders }                  from "./lib"
  * @TODO: Should we require HTTPS unless running on DEV?
  */
 async function request(url: URL, {
-    timeout = 30,
+    timeout   = 25_000, // Heroku has a timeout of 30 seconds
     redirects = 10
 }: {
     /**
@@ -45,22 +45,16 @@ async function request(url: URL, {
         const requestFn = url.protocol === "https:" ? httpsRequest : httpRequest;
 
         const req = requestFn(url, {
-            headers: {
-                "user-agent": `CumulusApp/${version}`
-            }
+            timeout,
+            headers: { "user-agent": `CumulusApp/${version}` }
         });
 
-        const timer = setTimeout(() => {
+        req.once("timeout", () => {
             req.destroy()
-            const error = new DOMException(
-                `Request timed out in ${timeout} seconds and was aborted`,
-                "AbortError"
-            )
-            reject(error)
-        }, timeout * 1000)
+            reject(new DOMException("Request timed out and was aborted", "AbortError"))
+        })
 
         req.once("error", (error: any) => {
-            clearTimeout(timer)
             if (error.code === 'EPROTO') {
                 reject(new BadRequest("Invalid protocol", error))
             } else {
@@ -69,8 +63,6 @@ async function request(url: URL, {
         })
 
         req.once("response", (response) => {
-            clearTimeout(timer);
-
             if ([301, 302, 303, 307, 308].includes(response.statusCode ?? 0) && redirects) {
 
                 const { location } = response.headers
