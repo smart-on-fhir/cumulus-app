@@ -138,11 +138,6 @@ describe("Chart View", () => {
         refresh  : "none",
         status   : "completed",
         completed: "2020-02-02",
-        data: { // DEPRECATED!
-            cols: [], // DataRequestDataColumn[]
-            rows: [], // any[][]
-            // src?: string
-        },
         requestedData: null,
         dataURL: null,
         dataSourceType: "file",

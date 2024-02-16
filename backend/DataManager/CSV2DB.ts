@@ -124,8 +124,8 @@ export default class CSV2DB extends Transform
         };
 
         await this.query(
-            `UPDATE "DataRequests" SET "metadata" = $1 WHERE id = $2`,
-            [ JSON.stringify(metadata), this.subscriptionID ]
+            `UPDATE "DataRequests" SET "metadata" = $1, completed = $2 WHERE id = $3`,
+            [ JSON.stringify(metadata), new Date(), this.subscriptionID ]
         );
     }
 
