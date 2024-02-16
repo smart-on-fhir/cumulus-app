@@ -43,7 +43,7 @@ function setupAuth(app: Application)
 function setupAPI(app: Application)
 {
     app.use("/api/request-groups", require("./routes/groups"      ).default);
-    app.use("/api/requests"      , require("./routes/DataRequest" ));
+    app.use("/api/requests"      , require("./routes/DataRequest" ).default);
     app.use("/api/views"         , require("./routes/views"       ).default);
     app.use("/api/users"         , require("./routes/users"       ).default);
     app.use("/api/projects"      , require("./routes/projects"    ).default);

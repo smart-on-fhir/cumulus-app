@@ -89,10 +89,10 @@ export default function DataRequestView(): JSX.Element
                     <h5>Status</h5>
                     <hr/>
                     <div className="left">
-                        <table>
+                        <table style={{ tableLayout: "fixed" }}>
                             <tbody>
                                 <tr>
-                                    <th className="right pr-1 pl-1">Group:</th>
+                                    <th className="right pr-1 pl-1" style={{ width: "8em" }}>Group:</th>
                                     <td>{
                                         model.group ?
                                             <Link to={`/groups/${model.group.id}`} className="link" title={model.group.description}>{ model.group.name }</Link> :
@@ -116,12 +116,12 @@ export default function DataRequestView(): JSX.Element
                                                 "link ml-1": true,
                                                 "grey-out": refreshing || loading
                                             })} onClick={refresh}>
-                                                { model.data ? "Refresh Now" : "Fetch Data" }
+                                                { model.completed ? "Refresh Now" : "Fetch Data" }
                                                 &nbsp;
                                                 <i className={ classList({
                                                     "fa-solid": true,
-                                                    "fa-rotate": refreshing || !!model.data,
-                                                    "fa-cloud-arrow-down": !refreshing && !model.data,
+                                                    "fa-rotate": refreshing || !!model.completed,
+                                                    "fa-cloud-arrow-down": !refreshing && !model.completed,
                                                     "fa-spin grey-out": refreshing
                                                 })} />
                                             </b>
@@ -132,8 +132,10 @@ export default function DataRequestView(): JSX.Element
                                 <tr><th className="right pr-1 pl-1">Created:</th><td><Format value={ model.createdAt } format="date-time" /></td></tr>
                                 { model.dataURL && (
                                     <tr>
-                                        <th className="right pr-1 pl-1 top">Data&nbsp;URL:</th>
-                                        <td className="color-muted" style={{ wordBreak: "break-all" }}>{ model.dataURL }</td>
+                                        <th className="right pr-1 pl-1 top nowrap">Data URL:</th>
+                                        <td className="color-muted ellipsis" title={ model.dataURL }>
+                                            { model.dataURL }
+                                        </td>
                                     </tr>
                                 )}
                                 { model.Tags && (
@@ -147,7 +149,7 @@ export default function DataRequestView(): JSX.Element
                                     </tr>
                                 )}
                                 { model.metadata?.total && <tr>
-                                    <th className="right pr-1 pl-1">Total rows:</th>
+                                    <th className="right pr-1 pl-1 nowrap">Total rows:</th>
                                     <td>{ Number(model.metadata.total).toLocaleString()}</td>
                                 </tr>}
                             </tbody>

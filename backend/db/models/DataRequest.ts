@@ -27,10 +27,7 @@ export default class DataRequest extends BaseModel<InferAttributes<DataRequest>,
     declare transmissions: CreationOptional<Record<string, any> | null>;
     declare createdAt    : CreationOptional<Date>;
     declare updatedAt    : CreationOptional<Date>;
-
-    /** @deprecated */
-    declare data         : CreationOptional<Record<string, any> | null>;
-
+    
     declare setTags: HasManySetAssociationsMixin<Tag, number>;
 
     getPublicName() {
@@ -73,58 +70,12 @@ export default class DataRequest extends BaseModel<InferAttributes<DataRequest>,
                 type: DataTypes.JSONB
             },
             
-            data: {
-                type: DataTypes.JSONB,
-                defaultValue: null,
-                validate: {
-                    /**
-                     * 
-                     * @param {import("../../../index").app.DataRequestData} data 
-                     */
-                    isValidData(data) {
-                        if (data !== null)  {
-                            const cntColumn = data.cols.find(c => c.name === "cnt");
-                            const colsLength = data.cols.length;
-                            
-                            if (!cntColumn) {
-                                throw new Error('Data must have "cnt" column for aggregate counts');
-                            }
-                            
-                            if (cntColumn.dataType !== "integer") {
-                                throw new Error('The dataType of the "cnt" column must be "integer"');
-                            }
-
-                            // If we have data already, then column names cannot 
-
-                            data.rows.forEach((row, rowIndex) => {
-
-                                for (let i = row.length; i < colsLength; i++) {
-                                    row.push(null)
-                                }
-
-                                const rowLength = row.length
-                                if (rowLength !== colsLength) {
-                                    throw new Error(`Invalid data at row ${rowIndex}. Expected ${colsLength} columns but found ${rowLength}`);
-                                }
-
-                                // TODO: Validate data types
-                                // row.forEach(cell => {
-
-                                // })
-                            })
-                        }
-                    }
-                }
-            },
-
             groupId: {
-                type        : DataTypes.INTEGER,
-                // allowNull   : false,
-                // defaultValue: 1
+                type: DataTypes.INTEGER
             },
 
             dataURL: {
-                type: DataTypes.STRING(500)
+                type: DataTypes.STRING(50_000)
             },
 
             transmissions: {
@@ -145,28 +96,13 @@ export default class DataRequest extends BaseModel<InferAttributes<DataRequest>,
             sequelize,
             modelName: "DataRequest",
             hooks: {
-
-                /**
-                 * When data is imported, make sure we update the "completed"
-                 * column to the current date.
-                 * @param {DataRequest} model 
-                 */
-                async beforeUpdate(model) {
-                    if (model.changed("data")) {
-                        model.set("completed", new Date())
-                    }
-                },
-
                 async afterCreate(model) {
                     // Note that we don't wait for this to complete
                     sendDataRequest(model.toJSON() as any).catch(error => {
                         logger.error("Failed sending data request: " + error, error)
                     });
-
                 }
             }
         });
     }
-
 };
-

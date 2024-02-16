@@ -1,6 +1,3 @@
-import { ClientRequest, IncomingMessage, request as httpRequest } from "http"
-import { request as httpsRequest }                                from "https"
-import { URL }                                                    from "url"
 import crypto                                                     from "crypto"
 import express, { Response }                                      from "express"
 import slug                                                       from "slug"
@@ -15,12 +12,15 @@ import ViewModel                                                  from "../db/mo
 import ColumnsMetadata                                            from "../cumulus_library_columns.json"
 import { sql as logSql }                                          from "../services/logger"
 import ImportJob                                                  from "../DataManager/ImportJob"
-import { getFindOptions, assert, rw, parseDelimitedString, uInt } from "../lib"
+import { getFindOptions, assert, rw, uInt }                       from "../lib"
 import { version as pkgVersion }                                  from "../../package.json"
 import { DATA_TYPES }                                             from "../DataManager/dataTypes"
+import { fetchSubscriptionData }                                  from "../DataManager/CsvDownloader"
 
 
-const router = module.exports = express.Router({ mergeParams: true });
+const router = express.Router({ mergeParams: true });
+
+export default router
 
 const FilterConfig: Record<string, (col: string) => string> = {
     
@@ -182,10 +182,13 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
 
 // Refresh Data endpoint ------------------------------------------------------
 router.get("/:id/refresh", rw(async (req: AppRequest, res: Response) => {
+    requestPermission({ user: req.user, resource: "Subscriptions", action: "refresh" })
+    requestPermission({ user: req.user, resource: "Subscriptions", action: "update"  })
+    requestPermission({ user: req.user, resource: "Subscriptions", action: "read"    })
     const model = await Model.findByPk(req.params.id, { ...getFindOptions(req), user: req.user })
     assert(model, "Model not found", NotFound)
-    const data = await fetchData(model)
-    await model.update({ data, completed: new Date() }, { user: req.user })
+    await fetchSubscriptionData(model)
+    await model.reload({ user: req.user })
     res.json(model)
 }));
 
@@ -715,7 +718,7 @@ route(router, {
         try {
             await model.update(req.body, { user: req.user, transaction })
             if (Array.isArray(req.body.Tags)) {
-                await model.setTags(req.body.Tags.map(t => t.id))
+                await model.setTags(req.body.Tags.map((t: any) => t.id))
             }
             await transaction.commit()
             res.json(model)
@@ -727,7 +730,7 @@ route(router, {
                 throw ex
             }
             const error = new InternalServerError("Updating subscription failed", { tags: ["DATA"] })
-            error.cause = ex.stack
+            error.cause = (ex as Error).stack
             throw error
         }
     }
@@ -761,86 +764,8 @@ route(router, {
     handler: async (req, res) => {
         const model = await Model.create(req.body, { user: req.user })
         if (Array.isArray(req.body.Tags)) {
-            await model.setTags(req.body.Tags.map(t => t.id))
+            await model.setTags(req.body.Tags.map((t: any) => t.id))
         }
         res.json(model)
     }
 });
-
-export async function fetchData(model: Model) {
-
-    // Will throw if model.dataURL is not valid URL
-    const url = new URL(model.getDataValue("dataURL")!)
-
-    const { result, response } = await request(url)
-    
-    const type = response.headers["content-type"];
-
-    if (!type) {
-        throw new Error("The data url endpoint did not reply with Content-Type header");
-    }
-
-    if ((/\bjson\b/i).test(type)) {
-        return JSON.parse(result)
-    }
-    else if ((/\btext\/csv\b/i).test(type)) {
-        return parseDelimitedString(result, { separators: [","], stringDelimiter: '"' })
-    }
-    else if ((/\btext\/tsv\b/i).test(type)) {
-        return parseDelimitedString(result, { separators: ["\t"], stringDelimiter: '"' })
-    }
-    else if ((/\btext\b/i).test(type)) {
-        return parseDelimitedString(result, { separators: [",", "\t"], stringDelimiter: '"' })
-    }
-    
-    throw new Error(`Unsupported content type "${type}"`)
-}
-
-async function request(url: URL): Promise<{
-    request : ClientRequest
-    response: IncomingMessage
-    result  : string
-}> {
-
-    return new Promise((resolve, reject) => {
-
-        const requestFn = url.protocol === "https:" ? httpsRequest : httpRequest;
-
-        const req = requestFn(url, {
-            headers: {
-                "user-agent": "CumulusApp/0.0.1"
-            }
-        });
-
-        req.once("error", (e: Error) => {
-            console.error(`problem with request: ${e.message}`);
-            reject(e)
-        });
-
-        req.once("response", (res: IncomingMessage) => {
-
-            req.once("error", (e: Error) => {
-                console.error(`problem with response: ${e.message}`);
-                reject(e)
-            });
-
-            res.setEncoding('utf8');
-            
-            let data = "";
-            
-            res.on("data", (chunk) => {
-                data += chunk;
-            });
-
-            res.on("end", () => {
-                console.log("No more data in response.");
-                resolve({ request: req, response: res, result: data })
-            });
-        });
-
-        req.end();
-
-        // Check if it is JSON or Delimited
-    })
-}
-

@@ -124,8 +124,8 @@ export default class CSV2DB extends Transform
         };
 
         await this.query(
-            `UPDATE "DataRequests" SET "metadata" = $1 WHERE id = $2`,
-            [ JSON.stringify(metadata), this.subscriptionID ]
+            `UPDATE "DataRequests" SET "metadata" = $1, completed = $2 WHERE id = $3`,
+            [ JSON.stringify(metadata), new Date(), this.subscriptionID ]
         );
     }
 
@@ -161,10 +161,6 @@ export default class CSV2DB extends Transform
             );
     }
 
-    private getDataColumns() {
-        return this.columnNames.filter(c => !c.match(/^cnt_?/))
-    }
-
     private async insertData(next: (err?: Error | null) => void) {
         try {
             await this.query(`INSERT INTO "${this.tableName}" (${
@@ -173,7 +169,7 @@ export default class CSV2DB extends Transform
             this.insertRowsBuffer = [];
             next()
         } catch (ex) {
-            next(ex)
+            next(ex as Error)
         }
     }
 
@@ -203,5 +199,13 @@ export default class CSV2DB extends Transform
             }
             return this.client.escapeLiteral(value)
         }).join(", ")})`;
+    }
+
+    /**
+     * Returns an array of column metadata objects for every data column,
+     * meaning that count columns (cnt, xnt_min, cnt_max) are not included
+     */
+    private getDataColumns() {
+        return this.columnNames.filter(c => !c.match(/^cnt_?/))
     }
 }
