@@ -11,13 +11,14 @@ import { DATA_TYPES }              from "../DataManager/dataTypes"
 import Subscription                from "../db/models/DataRequest"
 import { assert }                  from "../lib"
 import { AppRequest, CurrentUser } from "../types"
+import * as logger                 from "../services/logger"
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
 });
 
-const JOBS = {};
+const JOBS: Record<string, ImportJob> = {};
 
 
 export default class ImportJob
@@ -26,7 +27,7 @@ export default class ImportJob
 
     client: PoolClient;
 
-    timer: NodeJS.Timeout;
+    timer?: NodeJS.Timeout;
 
     columnNames: string[];
 
@@ -37,9 +38,9 @@ export default class ImportJob
     static async create() {
         const client = await pool.connect();
         client.setMaxListeners(20)
-        client.on('error', err => console.error('ImportJob error:', err.stack));
-        client.on('end', () => console.log("ImportJob: database connection closed"));
-        client.on('notification', msg => console.log("ImportJob notification:", msg));
+        client.on('error'       , err => logger.error('ImportJob error:', err.stack));
+        client.on('end'         , ()  => logger.log("ImportJob: database connection closed"));
+        client.on('notification', msg => logger.log("ImportJob notification:", msg));
 
         try {
             // await client.query(`ALTER SYSTEM SET min_wal_size = '1GB'`)

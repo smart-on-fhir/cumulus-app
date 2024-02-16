@@ -3,7 +3,7 @@ import { bool }           from "../lib"
 export { bool }           from "../lib"
 
 
-const NAMESPACE_PREFIX = "cumulus__"
+export const NAMESPACE_PREFIX = "cumulus__"
 
 function isPrivateValue(x: any) {
     return typeof x === "string" && x.startsWith(NAMESPACE_PREFIX)
@@ -52,11 +52,11 @@ export const DATA_TYPES = {
     },
     "day": {
         set: createSetter((x: string) => date(x).startOf("day").format()),
-        get: createGetter((x: string) => date(x).format("YYYY-MM-DD")),
+        get: createGetter((x: string) => date(x).startOf("day").format("YYYY-MM-DD")),
     },
     "week": {
         set: createSetter((x: string) => date(x).startOf("week").format()),
-        get: createGetter((x: string) => date(x).format("YYYY-MM-DD")),
+        get: createGetter((x: string) => date(x).startOf("week").format("YYYY-MM-DD")),
     },
     "month": {
         set: createSetter((x: string) => date(x).startOf("month").format()),
@@ -86,18 +86,19 @@ export const DATA_TYPES = {
 
 
 function int(x: any): number {
-    const n = parseInt(x + "", 10);
-    if (isNaN(n)) {
+    const f = parseFloat(x + "");
+    if (isNaN(f)) {
         throw new TypeError(`Value ${x} is not an integer`);
     }
-    if (!isFinite(n)) {
+    if (!isFinite(f)) {
         throw new TypeError(`Value ${x} is infinite`);
     }
+    const n = parseInt(x + "", 10);
     if (n > Number.MAX_SAFE_INTEGER) {
-        throw new TypeError(`Value ${x} is too big`);
+        throw new TypeError(`Value ${x} is greater then the MAX_SAFE_INTEGER`);
     }
     if (n < Number.MIN_SAFE_INTEGER) {
-        throw new TypeError(`Value ${x} is too small`);
+        throw new TypeError(`Value ${x} is smaller then the MIN_SAFE_INTEGER`);
     }
     return n
 }
@@ -109,12 +110,6 @@ function float(x: any): number {
     }
     if (!isFinite(n)) {
         throw new TypeError(`Value ${x} is infinite`);
-    }
-    if (n > Number.MAX_VALUE) {
-        throw new TypeError(`Value ${x} is too big`);
-    }
-    if (n < -Number.MAX_VALUE) {
-        throw new TypeError(`Value ${x} is too small (less than ${Number.MIN_VALUE})`);
     }
     return n
 }

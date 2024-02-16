@@ -129,13 +129,19 @@ function getSeriesAndExceptions({
 
     const exceptions: any[] = [];
 
-    function filterOutExceptions(rows: [any, any, any?, any?][]) {
+    function filterOutExceptions(rows: [any, any, any?, any?][], seriesName?: string) {
         return rows.filter(row => {
 
             function pushException() {
                 const x   = row[0]
                 const y   = +row[1]
-                const msg = `There are <b>${y.toLocaleString()}</b> records where <b>${column.label}</b> equals to <b>${x}</b>`
+                let msg = y === 1 ? 
+                    `There is <b>1</b> record ` :
+                    `There are <b>${y.toLocaleString()}</b> records `;
+                if (seriesName) {
+                    msg += `in the <b>${seriesName}</b> series `
+                }
+                msg += `where <b>${column.label}</b> equals <b>${x}</b>`
                 if (!exceptions.includes(msg)) {
                     exceptions.push(msg)
                 }
@@ -305,7 +311,7 @@ function getSeriesAndExceptions({
 
         let keys: any[] = [];
         data.data.forEach(group => {
-            filterOutExceptions(group.rows).forEach(row => {
+            filterOutExceptions(group.rows, group.stratifier).forEach(row => {
                 if (!keys.includes(row[0])) {
                     keys.push(row[0])
                 }
@@ -365,7 +371,7 @@ function getSeriesAndExceptions({
                 type,
                 id,
                 name: old?.name ?? name,
-                data: filterOutExceptions(data.data[0].rows).map(row => getPoint({
+                data: filterOutExceptions(data.data[0].rows, name).map(row => getPoint({
                     row,
                     xType,
                     denominator: getDenominator(data, denominator, row, denominatorCache)

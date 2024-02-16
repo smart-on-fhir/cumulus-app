@@ -1,8 +1,9 @@
-import moment        from "moment"
-import { Op }        from "sequelize"
-import DataRequest   from "../db/models/DataRequest"
-import { fetchData } from "../routes/DataRequest"
-import * as logger   from "../services/logger"
+import moment                    from "moment"
+import { Op }                    from "sequelize"
+import DataRequest               from "../db/models/DataRequest"
+import * as logger               from "../services/logger"
+import SystemUser                from "../SystemUser"
+import { fetchSubscriptionData } from "../DataManager/CsvDownloader"
 
 
 async function run() {
@@ -27,7 +28,8 @@ async function synchronize()
                     [Op.not]: null
                 }
             }
-        }
+        },
+        user: SystemUser
     });
 
     for (const row of rows) {
@@ -56,8 +58,7 @@ async function synchronize()
         if (refreshAt.isSameOrBefore(moment(), "minute")) {
             logger.info(`Refreshing data for ${row}...`)
             try {
-                const data = await fetchData(row)
-                await row.set({ data, completed: new Date() }).save();
+                await fetchSubscriptionData(row)
             } catch (error) {
                 logger.error(`Error while trying to refresh data for ${row}: ${error}`)
             }
