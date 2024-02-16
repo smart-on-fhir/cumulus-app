@@ -53,11 +53,7 @@ export default function EditDataRequestForm()
     // Save (update) DataRequest -----------------------------------------------
     const { execute: save, loading: saving, error: savingError } = useBackend(
         useCallback(
-            () => {
-                let payload = { ...state }
-                delete payload.data
-                return updateOne("requests", id + "", payload).then(setState)
-            },
+            () => updateOne("requests", id + "", { ...state }).then(setState),
             [id, state]
         )
     );

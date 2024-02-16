@@ -107,11 +107,6 @@ declare module app {
          * case of subscriptions)
          */
         completed: string | null
-        
-        /**
-         * @deprecated
-         */
-        data: DataRequestData
 
         metadata: SubscriptionMetaData | null
 
@@ -146,15 +141,6 @@ declare module app {
         name: string
         description: string
         label?: string
-    }
-
-    interface DataRequestData {
-
-        cols: DataRequestDataColumn[]
-
-        rows: any[][]
-
-        src?: string
     }
 
     interface DataRequestDataColumn {

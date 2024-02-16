@@ -25,13 +25,15 @@ export default function DataRequestLink({
     // let type = request.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION"
     let info = null
     let iconType: "ok"|"pending"|"working" = "ok"
+    
     if (!request.completed) {
         info = <div className="color-muted small">PENDING SUBSCRIPTION</div>
         iconType = "pending"
     }
-    else if (request.refresh) {
+    
+    else if ([/*"none", "manually", */"daily", "weekly", "monthly", "yearly"].includes(request.refresh)) {
         info = (<div className="color-muted small">
-            SUBSCRIPTION (Last refreshed on <Format value={request.completed} format="date" />)
+            Last refreshed on <Format value={request.completed} format="date" />
         </div>)
         iconType = "working"
     }

@@ -168,8 +168,6 @@ export declare module app {
          * case of subscriptions)
          */
         completed: string | null
-        
-        data: DataRequestData
 
         requestedData: RequestedData | null
 

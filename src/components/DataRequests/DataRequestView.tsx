@@ -116,12 +116,12 @@ export default function DataRequestView(): JSX.Element
                                                 "link ml-1": true,
                                                 "grey-out": refreshing || loading
                                             })} onClick={refresh}>
-                                                { model.data ? "Refresh Now" : "Fetch Data" }
+                                                { model.completed ? "Refresh Now" : "Fetch Data" }
                                                 &nbsp;
                                                 <i className={ classList({
                                                     "fa-solid": true,
-                                                    "fa-rotate": refreshing || !!model.data,
-                                                    "fa-cloud-arrow-down": !refreshing && !model.data,
+                                                    "fa-rotate": refreshing || !!model.completed,
+                                                    "fa-cloud-arrow-down": !refreshing && !model.completed,
                                                     "fa-spin grey-out": refreshing
                                                 })} />
                                             </b>
