@@ -401,7 +401,7 @@ export function parseDelimitedString(
     }
 }
 
-export function toTitleCase(str: string) {
+export function toTitleCase(str: string | String) {
     return str.replace(/([A-Z])/g, " $1")
         .replace(/[^a-zA-Z0-9]+/g, " ")
         .replace(/\b[a-z]/g, x => x.toUpperCase())
