@@ -148,7 +148,7 @@ declare module app {
         /**
          * The name as it appears in the first CSV row
          */
-        name: string
+        name: string | String
 
         /**
          * Human-readable name

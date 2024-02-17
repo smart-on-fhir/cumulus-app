@@ -137,7 +137,7 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
     // cols --------------------------------------------------------------------
     let colNames = String(req.query.cols || "").split(",").map(s => s.trim()).filter(Boolean);
     if (!colNames.length) {
-        colNames = cols.map(c => c.name);
+        colNames = cols.map(c => c.name + "");
     } else {
         colNames = colNames.filter(x => cols.find(c => c.name === x));
     }
