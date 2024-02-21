@@ -227,10 +227,8 @@ route(router, {
     async handler(req, res) {
         const model = await User.findByPk(+req.params?.id, { user: req.user });
         lib.assert(model, "User not found", NotFound);
-        const payload = { ...req.body }
-        delete payload.id;
-        delete payload.email;
-        await model.update(payload, { user: req.user });
+        const { name, role } = req.body
+        await model.update({ name, role }, { user: req.user });
         res.json(secure(model))
     }
 });
