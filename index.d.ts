@@ -51,7 +51,7 @@ declare module app {
         id: string
         name: string
         description: string
-        DataRequestId: number | null
+        subscriptionId: number | null
         settings?: {
             viewType?: string
             showOptions?: boolean

@@ -489,7 +489,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                 return alert("You don't have permission to create graphs")
             }
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
-            await createOne("views", { ...runtimeView, DataRequestId: dataRequest.id, screenShot, }).then(
+            await createOne("views", { ...runtimeView, subscriptionId: dataRequest.id, screenShot, }).then(
                 v => defer(() => navigate("/views/" + v.id)),
                 e => alert(e.message)
             );
@@ -681,7 +681,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
     const toggleFullscreen     = useCommand(new ToggleFullscreen());
     const printChart           = useCommand(new PrintChart());
     const requestLineData      = useCommand(new RequestLineLevelData(view.id || 0, auth.user, navigate))
-    const openInAE             = useCommand(new OpenInAnalyticEnvironment(view.DataRequestId || 0, auth.user))
+    const openInAE             = useCommand(new OpenInAnalyticEnvironment(view.subscriptionId || 0, auth.user))
     const generateCaption      = useCommand(new GenerateCaption(state.chartOptions, state, c => dispatch({ type: "UPDATE", payload: { caption: c }})))
 
     return (
