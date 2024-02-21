@@ -10,7 +10,7 @@ import {
 } from "../errors"
 
 
-const router = Router({ mergeParams: true });
+export const router = Router({ mergeParams: true });
 
 
 // list ------------------------------------------------------------------------

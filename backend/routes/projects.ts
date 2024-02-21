@@ -6,7 +6,7 @@ import { assert, getFindOptions } from "../lib"
 import View                       from "../db/models/View"
 
 
-const router = express.Router({ mergeParams: true });
+export const router = express.Router({ mergeParams: true });
 
 // List all --------------------------------------------------------------------
 route(router, {

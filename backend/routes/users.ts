@@ -23,7 +23,7 @@ import {
 
 const debug = debuglog("app");
 
-const router = express.Router({ mergeParams: true });
+export const router = express.Router({ mergeParams: true });
 
 /**
  * Strip some fields from user JSON for security reasons
