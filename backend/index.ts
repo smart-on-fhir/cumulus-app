@@ -9,6 +9,7 @@ import * as Auth                from "./routes/Auth"
 import setupDB                  from "./db"
 import settings                 from "./config"
 import * as logger              from "./services/logger"
+import * as api                 from "./routes"
 import { Config, AppErrorRequestHandler } from "./types"
 
 
@@ -42,17 +43,17 @@ function setupAuth(app: Application)
 
 function setupAPI(app: Application)
 {
-    app.use("/api/request-groups", require("./routes/groups"      ).default);
-    app.use("/api/requests"      , require("./routes/DataRequest" ).default);
-    app.use("/api/views"         , require("./routes/views"       ).default);
-    app.use("/api/users"         , require("./routes/users"       ).default);
-    app.use("/api/projects"      , require("./routes/projects"    ).default);
-    app.use("/api/tags"          , require("./routes/tags"        ).default);
-    app.use("/api/data-sites"    , require("./routes/sites"       ).default);
-    app.use("/api/aggregator"    , require("./routes/aggregator"  ).default);
-    app.use("/api/permissions"   , require("./routes/permissions" ).default);
-    app.use("/api/user-groups"   , require("./routes/userGroups"  ).default);
-    app.use("/api/sse"           , require("./services/SSE"       ).longPollingHandler);
+    app.use("/api/request-groups", api.groupsRouter       );
+    app.use("/api/requests"      , api.subscriptionsRouter);
+    app.use("/api/views"         , api.viewsRouter        );
+    app.use("/api/users"         , api.usersRouter        );
+    app.use("/api/projects"      , api.studyAreasRouter   );
+    app.use("/api/tags"          , api.tagsRouter         );
+    app.use("/api/data-sites"    , api.dataSitesRouter    );
+    app.use("/api/aggregator"    , api.aggregatorRouter   );
+    app.use("/api/permissions"   , api.permissionsRouter  );
+    app.use("/api/user-groups"   , api.userGroupsRouter   );
+    app.use("/api/sse"           , api.longPollingHandler );
     logger.verbose("✔ REST API set up");
 }
 

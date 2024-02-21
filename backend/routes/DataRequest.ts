@@ -18,7 +18,7 @@ import { DATA_TYPES }                                             from "../DataM
 import { fetchSubscriptionData }                                  from "../DataManager/CsvDownloader"
 
 
-const router = express.Router({ mergeParams: true });
+export const router = express.Router({ mergeParams: true });
 
 export default router
 

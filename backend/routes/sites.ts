@@ -5,7 +5,7 @@ import { NotFound, Unauthorized } from "../errors"
 import { assert, getFindOptions } from "../lib"
 
 
-const router = express.Router({ mergeParams: true });
+export const router = express.Router({ mergeParams: true });
 
 // List all --------------------------------------------------------------------
 route(router, {
