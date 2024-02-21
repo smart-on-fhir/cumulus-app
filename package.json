@@ -54,7 +54,10 @@
     "eject": "react-scripts eject",
     "test": "DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov ts-mocha -p test/tsconfig.json",
     "test:frontend": "react-scripts test",
-    "test:server:watch": "nodemon -w backend -w test -e ts,json -x 'npm test'"
+    "test:server:watch": "nodemon -w backend -w test -e ts,json -x 'npm test'",
+    "openapi:lint": "redocly lint backend/api.yaml",
+    "openapi:build": "redocly build-docs backend/api.yaml --output=docs/api.html",
+    "openapi:watch": "nodemon -w backend/api.yaml -x 'npm run openapi:lint && npm run openapi:build'"
   },
   "eslintConfig": {
     "extends": [
@@ -75,6 +78,7 @@
     ]
   },
   "devDependencies": {
+    "@redocly/cli": "^1.9.1",
     "@types/bcryptjs": "^2.4.2",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.8",

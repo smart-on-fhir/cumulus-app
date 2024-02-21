@@ -1,0 +1,696 @@
+openapi: 3.0.3
+info:
+  title: Cumulus dashboard
+  description: |-
+    OpenAPI specification for the Cumulus dashboard backend
+
+    Some useful links:
+    - [GitHub Repository](https://github.com/smart-on-fhir/cumulus-app)
+    - [Test Instance](https://smart-cumulus-test.herokuapp.com/)
+
+  # termsOfService: http://swagger.io/terms/
+  # contact:
+  #  email: apiteam@swagger.io
+  license:
+   name: Apache 2.0
+   url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+# externalDocs:
+#   description: Find out more about Swagger
+#   url: http://swagger.io
+servers:
+  - url: https://smart-cumulus-test.herokuapp.com/api
+security: 
+- session_id: []
+
+paths:
+  /tags:
+    get:
+      summary: Get all Tags
+      operationId: getTags
+      tags: 
+        - Tags
+      description: |-
+        Typically used to retrieve all tags at once but some filters can be applied to restrict the returned results.
+
+        The current user is required to have `Tags.read` permission, or or multiple explicit permissions to read every single tag record (`Tags#1.read`, `Tags#2.read`, etc.)
+      parameters:
+        - $ref: '#/components/parameters/where'
+        - $ref: '#/components/parameters/attributes'
+        - $ref: '#/components/parameters/pick'
+        - $ref: '#/components/parameters/omit'
+        - $ref: '#/components/parameters/include'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses: 
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+        '401':
+          description: If the user is not authorized and guest users are not allowed to view tags
+        '403':
+          description: If the user is not allowed to view tags
+        '400':
+          description: Bad request due to invalid parameters
+    post:
+      summary: Creates new Tag
+      operationId: createTag
+      tags: 
+        - Tags
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                description:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+      responses:
+        '200':
+          description: Returns the created Tag object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '400':
+          description: In case of invalid parameters
+        '401':
+          description: If the user is not authorized and guest users are not allowed to create tags
+        '403':
+          description: If the user is not allowed to create tags
+  /tags/{id}:
+    get:
+      summary: Get Tag by ID
+      operationId: getTag
+      tags: 
+        - Tags
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+        - name: creator
+          in: query
+          required: false
+          description: If provided, includes the id and the email of the user who created this tag
+          schema:
+            type: boolean
+        - name: graphs
+          in: query
+          required: false
+          description: If provided, includes the graphs using this tag. Note that only the `id`, `name`, `description`, and `subscriptionId` fields of graphs are included.
+          schema:
+            type: boolean
+        - name: subscriptions
+          in: query
+          required: false
+          description: If provided, includes the subscriptions using this tag. Note that only the `id`, `name`, `description`, `completed`, and `refresh` subscription fields are included.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Returns the requested Tag object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '400':
+          description: In case of invalid parameters
+        '401':
+          description: If the user is not authorized and guest users are not allowed to view this model instance
+        '403':
+          description: If the user is not allowed to view this model instance
+        '404':
+          description: If the id cannot be found in the database
+    put:
+      summary: Update Tag
+      operationId: updateTag
+      tags: 
+        - Tags
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                description:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+      responses:
+        '200':
+          description: Returns the updated Tag object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '400':
+          description: In case of invalid parameters
+        '401':
+          description: If the user is not authorized and guest users are not allowed to view or update this model instance
+        '403':
+          description: If the user is not allowed to view or update this model instance
+        '404':
+          description: If the id cannot be found in the database
+    delete:
+      summary: Delete Tag by ID
+      operationId: deleteTag
+      tags: 
+        - Tags
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+      responses:
+        '200':
+          description: Returns the Tag object that was deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '401':
+          description: If the user is not authorized and guest users are not allowed to delete tags
+        '403':
+          description: If the user is not allowed to delete tags
+        '404':
+          description: If the id cannot be found in the database
+  /data-sites:
+    get:
+      summary: Get all DataSites
+      operationId: getDataSites
+      tags: 
+        - DataSites
+      description: |-
+        Typically used to retrieve all sites at once but some filters can be applied to restrict the returned results.
+
+        The current user is required to have `DataSites.read` permission, or or multiple explicit permissions to read every single DataSites record (`DataSites#1.read`, `DataSites#2.read`, etc.)
+      parameters:
+        - $ref: '#/components/parameters/where'
+        - $ref: '#/components/parameters/attributes'
+        - $ref: '#/components/parameters/pick'
+        - $ref: '#/components/parameters/omit'
+        - $ref: '#/components/parameters/include'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses: 
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DataSite'
+        '401':
+          description: If the user is not authorized and guest users are not allowed to view DataSites
+        '403':
+          description: If the user is not allowed to view DataSites
+        '400':
+          description: Bad request due to invalid parameters
+    post:
+      summary: Create new DataSite
+      operationId: createDataSite
+      tags: 
+        - DataSites
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/standardName'
+                description:
+                  $ref: '#/components/schemas/standardDescription'
+      responses:
+        '200':
+          description: Returns the created DataSite object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataSite'
+        '400':
+          description: In case of invalid parameters
+        '401':
+          description: If the user is not authorized and guest users are not allowed to create DataSites
+        '403':
+          description: If the user is not allowed to create DataSites
+
+  /data-sites/{id}:
+    get:
+      summary: Get DataSite by ID
+      operationId: getDataSite
+      tags: 
+        - DataSites
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+      responses:
+        '200':
+          description: Returns the requested DataSite object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataSite'
+        '400':
+          description: In case of invalid parameters
+        '401':
+          description: If the user is not authorized and guest users are not allowed to view this model instance
+        '403':
+          description: If the user is not allowed to view this model instance
+        '404':
+          description: If the given id cannot be found in the database
+    put:
+      summary: Update DataSite
+      operationId: updateDataSite
+      tags: 
+        - DataSites
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  $ref: '#/components/schemas/standardName'
+                description:
+                  $ref: '#/components/schemas/standardDescription'
+                lat:
+                  type: integer
+                  description: Latitude
+                  minimum: 0
+                  maximum: 90
+                long:
+                  type: integer
+                  description: Longitude
+                  minimum: -180
+                  maximum: 180
+      responses:
+        '200':
+          description: Returns the updated DataSite object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataSite'
+        '400':
+          description: In case of invalid parameters
+        '401':
+          description: If the user is not authorized and guest users are not allowed to view or update this model instance
+        '403':
+          description: If the user is not allowed to view or update this model instance
+        '404':
+          description: If the id cannot be found in the database
+    delete:
+      summary: Delete DataSite by ID
+      operationId: deleteDataSite
+      tags: 
+        - DataSites
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+      responses:
+        '200':
+          description: Returns the DataSite object that was deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataSite'
+        '401':
+          description: If the user is not authorized and guest users are not allowed to delete DataSites
+        '403':
+          description: If the user is not allowed to delete DataSites
+        '404':
+          description: If the id cannot be found in the database
+
+  /users:
+    get:
+      summary: Get all Users
+      operationId: getUsers
+      tags: 
+        - Users
+      description: Note that some attributes of users (like sid and password) are excluded for security reasons
+      responses: 
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: If the user is not authorized and guest users are not allowed to view Users
+        '403':
+          description: If the user is not allowed to view Users
+
+  /users/{id}:
+    get:
+      summary: Get User by ID
+      operationId: getUser
+      tags: 
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+      responses:
+        '200':
+          description: Returns the requested User object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: In case of invalid parameters
+        '401':
+          description: If the user is not authorized and guest users are not allowed to view this model instance
+        '403':
+          description: If the user is not allowed to view this model instance
+        '404':
+          description: If the id cannot be found in the database
+    put:
+      summary: Update User
+      operationId: updateUser
+      description: |-
+        Updates the user with the specified ID. **NOTE:** for security reasons most fields cannot
+        be updated and are ignored! The only properties you can update are `name` (user's display name) and `role`.
+      tags: 
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                  example: User display name
+                role:
+                  type: string
+                  enum: 
+                    - user
+                    - manager
+                    - admin
+                
+      responses:
+        '200':
+          description: Returns the updated DataSite object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: In case of invalid parameters
+        '401':
+          description: If the user is not authorized and guest users are not allowed to view or update this model instance
+        '403':
+          description: If the user is not allowed to view or update this model instance
+        '404':
+          description: If the id cannot be found in the database
+
+  # /users/activate/{code}:
+  #   get:
+  #     summary: Activates the user account with the given code
+  #     description: When an user is invited, an invitation email is sent to the invited user's email. It contains a link that points to this route. At this point the new user is created but is in incomplete/pending state state. It has an unique activation code which we use to identify the user, and which is valid for limited amount of time.
+  #     operationId: checkUserActivationStatus
+  #     tags: 
+  #       - Users
+  #     parameters:
+  #       - name: code
+  #         in: path
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       '200':
+  #         description: Successful operation
+  #         content:
+  #           text/plain:
+  #             example: Pending activation
+  #             # schema:
+  #             #   type: string
+  #             #   value:
+  #             #     Pending activation
+  #             # schema: 
+  #             #   type: string
+  #             #   contains: 'Pending activation'
+  #       '404':
+  #         description: Invalid or expired invitation
+  #       '409':
+  #         description: Account already activated
+  #       '410':
+  #         description: Expired invitation
+  # /users/me:
+  #   get:
+  #     summary: The current user gets information about himself
+  #     description: This is mostly useful for enabling certain functionalities on the front-end
+  #     tags: 
+  #       - Users
+  #       - UI-Specific
+components:
+  parameters:
+    where:
+      name: where
+      in: query
+      schema:
+        type: string
+      description: |-
+        Can contain zero or more comma-separated where conditions.
+        
+        #### *Examples*:
+        - ***name:value** pairs - `name:John`*
+        - ***name:operator:value** - `age:lt:10`*
+        - ***multiple conditions** - `name:John,age:gt:5`*
+      required: false
+      allowEmptyValue: true
+    attributes:
+      name: attributes
+      in: query
+      schema:
+        type: string
+      description: |-
+        Comma-separated list of model attributes to include in the response
+
+        ***Example**: `id, name, age`*
+      required: false
+      allowEmptyValue: true
+    pick:
+      name: pick
+      in: query
+      schema:
+        type: string
+      description: |-
+        Comma-separated list of model attributes to include in the response.
+        
+        **NOTE:** This parameter is ignored when the `attributes` parameter is used
+
+        ***Example**: `id, name, age`*
+      required: false
+      allowEmptyValue: true
+
+    omit:
+      name: omit
+      in: query
+      schema:
+        type: string
+      description: |-
+        Comma-separated list of model attributes to exclude from the response.
+        
+        **NOTE:** This parameter is ignored when the `attributes` parameter is used
+
+        ***Example**: `id, name, age`*
+      required: false
+      allowEmptyValue: true
+    include:
+      name: include
+      in: query
+      schema:
+        type: string
+      description: |-
+        Comma-separated list of associations to include. Each item in the list can be:
+        
+        ***Examples**:*
+        - *`model` - The name of the model to include*
+        - *`model:attribute1|attribute2...` - Specify what attributes to include for each model*
+        - *`model:attribute1:alias1|attribute2...` - Can also specify aliases for included attributes*
+      required: false
+      allowEmptyValue: true
+    order:
+      name: order
+      in: query
+      schema: 
+        type: string
+      description: |-
+        Sorting instruction(s)
+
+        ***Example**: `name:ask,age:desc`*
+      required: false
+      allowEmptyValue: true
+    limit:
+      name: limit
+      in: query
+      schema:
+        type: string
+      description: |-
+        limit or limits for each included model
+
+        ***Examples**:*
+        - Basic limit: `10`
+        - Also specify limits for included models: `10,Users:30`
+      required: false
+      allowEmptyValue: true
+    offset:
+      name: offset
+      in: query
+      description: How many records to skip
+      required: false
+      allowEmptyValue: true
+      schema: 
+        type: integer
+
+  schemas:
+    standardID:
+      type: integer
+      format: int64
+      # example: 10
+      minimum: 1
+    standardName:
+      type: string
+    standardDescription:
+      type: string
+    autoTimestamp:
+      type: string
+      format: date-time
+
+    Tag:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/standardID'
+        name:
+          $ref: '#/components/schemas/standardName'
+        description:
+          $ref: '#/components/schemas/standardDescription'
+        creatorId:
+          $ref: '#/components/schemas/standardID'
+        createdAt:
+          $ref: '#/components/schemas/autoTimestamp'
+        updatedAt:
+          $ref: '#/components/schemas/autoTimestamp'
+    DataSite:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/standardID'
+        name:
+          $ref: '#/components/schemas/standardName'
+        description:
+          $ref: '#/components/schemas/standardDescription'
+        lat:
+          type: integer
+          format: int64
+        long:
+          type: integer
+          format: int64
+        createdAt:
+          $ref: '#/components/schemas/autoTimestamp'
+        updatedAt:
+          $ref: '#/components/schemas/autoTimestamp'
+    User:
+      type: object
+      properties: 
+        id:
+            $ref: '#/components/schemas/standardID'
+        name:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          maxLength: 100
+          format: email
+        role:
+          type: string
+          enum: 
+            - user
+            - manager
+            - admin
+        # password:
+          # type: string
+        # sid:
+          # type: string
+        lastLogin:
+          type: string
+          format: date-time
+        activationCode:
+          type: string
+          minLength: 32
+          maxLength: 32
+        invitedBy:
+          $ref: '#/components/schemas/standardID'
+        status:
+          type: string
+          enum:
+            - Logged in
+            - Not logged in
+            - Never logged in
+            - Expired invitation
+            - Pending invitation
+        activateUntil:
+          type: string
+          format: date-time
+        createdAt:
+          $ref: '#/components/schemas/autoTimestamp'
+        updatedAt:
+          $ref: '#/components/schemas/autoTimestamp'
+  securitySchemes:
+    session_id:
+      type: apiKey
+      name: sid
+      in: cookie
