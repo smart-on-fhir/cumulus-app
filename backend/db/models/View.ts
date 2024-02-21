@@ -20,7 +20,7 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
 {
     declare id              : CreationOptional<number>;
     declare name            : string;
-    declare DataRequestId   : number;
+    declare subscriptionId  : number;
     declare description     : CreationOptional<string | null>;
     declare screenShot      : CreationOptional<string | null>;
     declare settings        : CreationOptional<Record<string, any> | null>;
@@ -76,7 +76,7 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
                 type: DataTypes.JSONB
             },
 
-            DataRequestId: DataTypes.INTEGER,
+            subscriptionId: DataTypes.INTEGER,
 
             creatorId: DataTypes.INTEGER,
             

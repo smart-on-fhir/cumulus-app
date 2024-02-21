@@ -39,7 +39,7 @@ export default function ViewThumbnail({
     const bulkDeleteCommand  = useCommand(new BulkDelete({ graphs: selection?.items || [], user: auth.user }))
     const viewCommand        = useCommand(new View(view.id, auth.user, navigate))
     const requestLineData    = useCommand(new RequestLineLevelData(view.id, auth.user, navigate))
-    const openInAE           = useCommand(new OpenInAnalyticEnvironment(view.DataRequestId || 0, auth.user))
+    const openInAE           = useCommand(new OpenInAnalyticEnvironment(view.subscriptionId || 0, auth.user))
     const shareCommand       = useCommand(new ShareGraph(view, auth.user));
     // const bulkShareGraph     = useCommand(new BulkShareGraph({ graphs: selection?.items || [], user: auth.user }))
     const permissionsCommand = useCommand(new ManagePermissions(view, auth.user));

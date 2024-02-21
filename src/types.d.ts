@@ -44,7 +44,7 @@ export declare module app {
         updatedAt     : string
         createdAt     : string
         creator      ?: Pick<User, "id" | "email">
-        graphs       ?: Pick<View, "id" | "name" | "description" | "DataRequestId">[]
+        graphs       ?: Pick<View, "id" | "name" | "description" | "subscriptionId">[]
         subscriptions?: Pick<DataRequest, "id" | "name" | "description" | "completed" | "refresh">[]
     }
 
@@ -89,7 +89,7 @@ export declare module app {
         id: number
         name: string
         description: string
-        DataRequestId: number | null
+        subscriptionId: number | null
         screenShot?: string
         settings?: ViewSettings
         creatorId?: number | null
