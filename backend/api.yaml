@@ -788,6 +788,8 @@ paths:
             application/json:
               example:
                 message: "Logged out"
+        '400':
+          description: Unexpected error
 
   # Study Areas ----------------------------------------------------------------
   /projects:
@@ -907,6 +909,103 @@ paths:
           description: If the user is not allowed to view included resources
         '400':
           description: Bad request due to invalid parameters
+    post:
+      summary: Create View
+      description: Creates new View
+      operationId: createView
+      tags: 
+        - Views
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                  example: View display name
+                description:
+                  type: string
+                  maxLength: 500
+                  example: View description
+                screenShot:
+                  type: string
+                  example: base64imageData...
+                Tags:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Tag'
+                settings:
+                  type: object
+                subscriptionId:
+                  type: integer
+                  minimum: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/View'
+                  - type: object
+                    properties:
+                      Tags:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              $ref: '#/components/schemas/standardID'
+                            name:
+                              type: string
+                              maxLength: 50
+                            description:
+                              type: string
+                              maxLength: 200
+                      DataRequest:
+                        type: object
+                        properties:
+                          id:
+                            $ref: '#/components/schemas/standardID'
+                          name:
+                            type: string
+                            maxLength: 100
+        '401':
+          description: If the user is not authorized and guest users are not
+            allowed to create views
+        '403':
+          description: If the user is not allowed to create views
+        '400':
+          description: Bad request due to invalid parameters
+    delete:
+      summary: Delete Multiple Views
+      operationId: bulkDeleteView
+      description: Deletes multiple Views
+      tags: 
+        - Views
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Comma-separated list of IDs to delete
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              example:
+                message: Deleted 5 graphs
+        '401':
+          description: If the user is not authorized and guest users are not
+            allowed to delete included resources
+        '403':
+          description: If the user is not allowed to delete included resources
+        '400':
+          description: Bad request due to invalid parameters
 
   /views/{id}:
     get:
@@ -1019,6 +1118,13 @@ paths:
     put:
       summary: Update a View
       operationId: updateView
+      description: |-
+        Updates a View
+        - The payload is a partial View object
+        - Payload properties like `id`, `subscriptionId`, `createdAt` and
+          `updatedAt` are ignored.
+        - If `Tags` array is provided, it can contain partial tag objects but
+          we only need/use their `id` property.
       tags: 
         - Views
       parameters:
@@ -1053,7 +1159,177 @@ paths:
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/View'
+        '401':
+          description: If the user is not authorized and guest users are not
+            allowed to update included resources
+        '403':
+          description: If the user is not allowed to update included resources
+        '400':
+          description: Bad request due to invalid parameters
+        '500':
+          description: Updating graph failed
+    delete:
+      summary: Delete a View
+      operationId: deleteView
+      description: Deletes a View
+      tags: 
+        - Views
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/View'
+        '401':
+          description: If the user is not authorized and guest users are not
+            allowed to delete included resources
+        '403':
+          description: If the user is not allowed to delete included resources
+        '400':
+          description: Deleting failed
+        '404':
+          description: No View with this ID found
 
+  /views/{id}/screenshot:
+    get:
+      summary: Get View Screenshot
+      description: View have thumbnail images stored as base64 image data. If
+        such data exists then convert it to an image file and serve it with
+        proper caching headers. Otherwise serve the default view icon file.
+      operationId: getViewScreenshot
+      tags: 
+        - Views
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            Cache-Control:
+              description: Disable caching
+              schema:
+                type: string
+                example: max-age=31536000, no-cache
+            Vary:
+              description: Control caching using ETag
+              schema:
+                type: string
+                example: Origin, ETag
+            ETag:
+              description: ETag for this image
+              schema:
+                type: string
+            Content-Type:
+              description: Image mime type
+              schema:
+                type: string
+            Content-Length:
+              description: Image byte size
+              schema:
+                type: integer
+          content:
+            image/png:
+              schema:
+                type: string
+              example: BINARY IMAGE DATA
+
+        '304':
+          description: If the client provides a `if-none-match` header matching
+            the current ETag of the image
+        '400':
+          description: Invalid base64 image data
+        '401':
+          description: If the user is not authorized and guest users are not
+            allowed to view included resources
+        '403':
+          description: If the user is not allowed to view included resources
+        '404':
+          description: View not found
+
+  /views/{id}/request-linelevel-data:
+    post:
+      summary: Request Linelevel Data
+      description: This is not fully implemented yet. It will either change, or
+        will be removed in the future
+      deprecated: true
+      operationId: requestLinelevelData
+      tags: 
+        - Views
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subscription:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                view:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                type:
+                  type: string
+                  enum:
+                    - required
+                    - preferred
+                    - optional
+                reason:
+                  type: string
+                user:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                dataElements:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      need:
+                        type: string
+      responses:
+        '200':
+          description: Returns empty response on success
+        '401':
+          description: If the user is not authorized and guest users are not
+            allowed to request linelevel data
+        '403':
+          description: If the user is not allowed to request linelevel data
+        '400':
+          description: Bad request due to invalid parameters
+        # '404':
+        #   description: View not found
 
 components:
   parameters:
