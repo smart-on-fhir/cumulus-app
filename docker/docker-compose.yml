@@ -47,6 +47,7 @@ services:
       - AGGREGATOR_API_KEY=$AGGREGATOR_API_KEY
       - AGGREGATOR_ENABLED=$AGGREGATOR_ENABLED
       - NODE_DEBUG=$NODE_DEBUG
+      - API_KEYS=$API_KEYS
     volumes:
       - ../backend:/app/backend
       - ../build:/app/build

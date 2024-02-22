@@ -8,6 +8,7 @@ import Text2Lines                                  from "./Text2Lines"
 import Line2CSV                                    from "./Line2CSV"
 import RemoteCsvToDb                               from "./RemoteCsvToDb"
 import { getMetadataFromHeaders }                  from "./lib"
+import config                                      from "../config"
 
 
 /**
@@ -43,11 +44,14 @@ async function request(url: URL, {
 {
     return new Promise((resolve, reject) => {
         const requestFn = url.protocol === "https:" ? httpsRequest : httpRequest;
+        const headers = { "user-agent": `CumulusApp/${version}` }
+        const apiKey = config.apiKeys[url.host]
 
-        const req = requestFn(url, {
-            timeout,
-            headers: { "user-agent": `CumulusApp/${version}` }
-        });
+        if (apiKey) {
+            headers["x-api-key"] = apiKey
+        }
+
+        const req = requestFn(url, { timeout, headers });
 
         req.once("timeout", () => {
             req.destroy()
