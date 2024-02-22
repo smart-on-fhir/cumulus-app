@@ -234,29 +234,29 @@ route(router, {
 });
 
 // Create user -----------------------------------------------------------------
-route(router, {
-    path: "/",
-    method: "post",
-    request: {
-        schema: {
-            email: {
-                in: "body",
-                isEmail: true,
-                toLowerCase: true
-            },
-            role: {
-                in: "body",
-                isIn: {
-                    options: [["user", "manager", "admin"]],
-                }
-            }
-        }
-    },
-    async handler(req, res) {
-        const user = await User.create(req.body, { user: req.user })
-        res.json(secure(user))
-    }
-});
+// route(router, {
+//     path: "/",
+//     method: "post",
+//     request: {
+//         schema: {
+//             email: {
+//                 in: "body",
+//                 isEmail: true,
+//                 toLowerCase: true
+//             },
+//             role: {
+//                 in: "body",
+//                 isIn: {
+//                     options: [["user", "manager", "admin"]],
+//                 }
+//             }
+//         }
+//     },
+//     async handler(req, res) {
+//         const user = await User.create(req.body, { user: req.user })
+//         res.json(secure(user))
+//     }
+// });
 
 // Invite new user -------------------------------------------------------------
 route(router, {
