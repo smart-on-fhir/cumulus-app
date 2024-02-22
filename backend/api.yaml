@@ -20,10 +20,17 @@ info:
 #   url: http://swagger.io
 servers:
   - url: https://smart-cumulus-test.herokuapp.com/api
+  - url: https://smart-cumulus-ucdavis.herokuapp.com/api
+  - url: https://smart-cumulus-regi-e973987fb5b9.herokuapp.com/api
+  - url: https://smart-cumulus-staging.herokuapp.com/api
+  - url: https://smart-cumulus.herokuapp.com/api
 security: 
 - session_id: []
 
 paths:
+
+  # Tags -----------------------------------------------------------------------
+
   /tags:
     get:
       summary: Get all Tags
@@ -90,6 +97,7 @@ paths:
           description: If the user is not authorized and guest users are not allowed to create tags
         '403':
           description: If the user is not allowed to create tags
+  
   /tags/{id}:
     get:
       summary: Get Tag by ID
@@ -199,6 +207,9 @@ paths:
           description: If the user is not allowed to delete tags
         '404':
           description: If the id cannot be found in the database
+
+  # DataSites ------------------------------------------------------------------
+
   /data-sites:
     get:
       summary: Get all DataSites
@@ -360,6 +371,8 @@ paths:
         '404':
           description: If the id cannot be found in the database
 
+  # Users ----------------------------------------------------------------------
+
   /users:
     get:
       summary: Get all Users
@@ -376,10 +389,178 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+        '400':
+          description: If the client attempts to use the `where` or `include` parameters
         '401':
           description: If the user is not authorized and guest users are not allowed to view Users
         '403':
           description: If the user is not allowed to view Users
+
+  /users/invite:
+    post:
+      summary: Invite new user
+      operationId: inviteUser
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                role:
+                  type: string
+                  enum: 
+                    - user
+                    - manager
+                    - admin
+      responses:
+        '200':
+          description: User invited
+          content:
+            application/json:
+              example: 
+                message: "User invited"
+        '401':
+          description: Guest cannot invite users
+        '403':
+          description: User has no permission to invite others
+        '400':
+          description: User already invited, or invalid body parameters
+        '500':
+          description: Failed to invite user
+
+  /users/me:
+    get:
+      summary: Current user info
+      description: Get info about the current user (even if it is a guest, i.e. not logged in)
+      operationId: getMyInfo
+      tags: 
+        - Users
+      responses: 
+        '200':
+          description: Returns the current user augmented with `permissions` property which is an
+            array of permissions granted to this user
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                    properties:
+                      permissions:
+                        $ref: '#/components/schemas/permissionList'
+        '400':
+          description: Unexpected error
+    put:
+      summary: Update my Account
+      description: Update the account of the current user
+      operationId: updateMyInfo
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                newPassword1:
+                  type: string
+                newPassword2:
+                  type: string
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Successful update
+          content:
+            application/json:
+              example:
+                email: email@example.com,
+                name: userDisplayName,
+                role: user
+        '400':
+          description: Error updating account
+        '403':
+          description: Invalid password
+        '404':
+          description: User not found
+
+  /users/reset:
+    post:
+      summary: Initiate Password Reset
+      description: |-
+        - The user enters an `email` and submits a POST form to this endpoint
+        - An email with reset link is sent to the given email
+        - Only users having access to the given email can complete the reset flow
+        - An attacker might be tempted to brute-force this endpoint trying to discover
+          what emails are registered in our DB, To discourage that we enforce one
+          second delay!
+      operationId: initiatePasswordReset
+      tags: 
+        - Users
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Password reset email sent
+          content:
+            text/plain:
+              example: Pending activation
+              schema:
+                type: string
+        '400':
+          description: No user found using this email
+        '500':
+          description: If we can't send the email
+  
+  /users/update-password:
+    post:
+      summary: Complete Password Reset
+      operationId: completePasswordReset
+      description: The user receives a password reset email with link pointing to
+        an HTML form and containing an unique reset code that expires after a while.
+        Then they have a chance to enter new password and submit to this route.
+      tags: 
+        - Users
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  example: 062ec1a1fcdcef0a048702d63fe5b2ef3810bf50acb2d32a694e198ac803455a
+                password:
+                  type: string
+                  example: myNew-password2345
+      responses:
+        '200':
+          description: Password updated
+          content:
+            text/plain:
+              example: Password updated
+              schema:
+                type: string
+        '400':
+          description: Invalid password reset code or error updating account
+        '410':
+          description: Expired password reset link
 
   /users/{id}:
     get:
@@ -400,8 +581,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        '400':
-          description: In case of invalid parameters
         '401':
           description: If the user is not authorized and guest users are not allowed to view this model instance
         '403':
@@ -413,7 +592,7 @@ paths:
       operationId: updateUser
       description: |-
         Updates the user with the specified ID. **NOTE:** for security reasons most fields cannot
-        be updated and are ignored! The only properties you can update are `name` (user's display name) and `role`.
+        be updated and are **ignored**! The only properties you can update are `name` (user's display name) and `role`.
       tags: 
         - Users
       parameters:
@@ -422,7 +601,7 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/standardID'
-      requestBody: 
+      requestBody:
         content:
           application/json:
             schema:
@@ -454,46 +633,428 @@ paths:
           description: If the user is not allowed to view or update this model instance
         '404':
           description: If the id cannot be found in the database
+    delete:
+      summary: Delete User by ID
+      operationId: deleteUser
+      tags: 
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+      responses:
+        '200':
+          description: Returns the User object that was deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: If the user is not authorized and guest users are not allowed to delete Users
+        '403':
+          description: If the user is not allowed to delete Users
+        '404':
+          description: If the id cannot be found in the database
 
-  # /users/activate/{code}:
-  #   get:
-  #     summary: Activates the user account with the given code
-  #     description: When an user is invited, an invitation email is sent to the invited user's email. It contains a link that points to this route. At this point the new user is created but is in incomplete/pending state state. It has an unique activation code which we use to identify the user, and which is valid for limited amount of time.
-  #     operationId: checkUserActivationStatus
-  #     tags: 
-  #       - Users
-  #     parameters:
-  #       - name: code
-  #         in: path
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: Successful operation
-  #         content:
-  #           text/plain:
-  #             example: Pending activation
-  #             # schema:
-  #             #   type: string
-  #             #   value:
-  #             #     Pending activation
-  #             # schema: 
-  #             #   type: string
-  #             #   contains: 'Pending activation'
-  #       '404':
-  #         description: Invalid or expired invitation
-  #       '409':
-  #         description: Account already activated
-  #       '410':
-  #         description: Expired invitation
-  # /users/me:
-  #   get:
-  #     summary: The current user gets information about himself
-  #     description: This is mostly useful for enabling certain functionalities on the front-end
-  #     tags: 
-  #       - Users
-  #       - UI-Specific
+  /users/activate:
+    post:
+      summary: Activate account
+      description: Invited users fill a form to complete and activate their
+        account. The form submits to this endpoint anf is the activation is
+        successful, the user can proceed to login and start using the dashboard.
+      operationId: activateAccount
+      security: []
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Successful activation
+          content:
+            application/json:
+              example: 
+                name: User display name
+        '400':
+          description: Passwords do not match, bad parameters, or error activating account
+        '404':
+          description: Invalid or expired invitation
+        '409':
+          description: Account already activated
+        '410':
+          description: Expired invitation
+  /users/activate/{code}:
+    get:
+      summary: Check activation status
+      description: When an user is invited, they receive an invitation email. It
+        contains a link that points to activation form. When this form is loaded
+        we use this endpoint to check for errors with this activation link and the
+        code that is contains.
+      operationId: checkUserActivationStatus
+      security: []
+      tags: 
+        - Users
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pending activation
+          content:
+            text/plain:
+              example: Pending activation
+        '400':
+          description: Missing code parameter
+        '404':
+          description: Invalid or expired invitation
+        '409':
+          description: Account already activated
+        '410':
+          description: Expired invitation
+  
+  # Auth -----------------------------------------------------------------------
+
+  /auth/login:
+    post:
+      summary: login
+      description: |-
+        Here is all this does in order:
+        - Looks for a user with the given `email` (although the parameter is called `username`)
+        - If the user is not found replies with "Invalid email or password" error. The real reason can be seen in STDERR, but is not sent to the client.
+        - Checks the password. If invalid, exits with an error error same as above.
+        - Creates new session ID (sid)
+        - Updates the user to have the new `sid` and the current date as `lastLogin`
+        - Sets new cookie called `sid` and containing the session ID. If `remember` is set, the
+          cookie will expire in one year. Otherwise, it is a session cookie. In both cases is
+          has the `httpOnly` flag set to true so that it is read-only for the client.
+        - Finally, replies with an object having some properties of the user, the `remember` value,
+          and the list of granted permissions for that user.
+      operationId: login
+      security: []
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  format: email
+                  description: Note that this is still called `username` but is in fact the email of the user!
+                password:
+                  type: string
+                  format: password
+                  example: my#Password2345
+                remember:
+                  type: boolean
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              example:
+                id: 2
+                name: John Doe
+                email: john.doe@example.com
+                role: user
+                remember: true
+                permissions:
+                  - Views.read
+                  - Tags.read
+                  - ...
+        '400':
+          description: Invalid email or password
+        '401':
+          description: Login failed
+  /auth/logout:
+    get:
+      summary: logout
+      description: If the user is currently logged in, then updates it to clear
+        the `sid` and clears the `sid` cookie. For security reasons we enforce
+        one second delay to this operation.
+      tags:
+        - Auth
+      operationId: logout
+      security: []
+      responses:
+        '200':
+          description: Successful logout
+          content:
+            application/json:
+              example:
+                message: "Logged out"
+
+  # Study Areas ----------------------------------------------------------------
+  /projects:
+    get:
+      summary: Get All Study Areas
+      operationId: getStudyAreas
+      tags: 
+        - Study Areas
+      description: |-
+        Typically used to retrieve all study areas at once but some filters can
+        be applied to restrict the returned results.
+
+        **Note** that the response will always include the subscriptions of each
+        study area and the views of each subscription.
+
+      parameters:
+        - $ref: '#/components/parameters/where'
+        - $ref: '#/components/parameters/attributes'
+        # - $ref: '#/components/parameters/pick'
+        # - $ref: '#/components/parameters/omit'
+        # - $ref: '#/components/parameters/include'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              example:
+                id: 1
+                name: Example Study Area
+                description: Example Study Area Description
+                creatorId: 2
+                createdAt: 2024-02-22T13:36:17.315Z
+                updatedAt: 2024-02-22T13:36:17.315Z
+                Subscriptions: []
+        '401':
+          description: If the user is not authorized and guest users are not
+            allowed to view included resources
+        '403':
+          description: If the user is not allowed to view included resources
+        '400':
+          description: Bad request due to invalid parameters
+
+  # Views ----------------------------------------------------------------------
+  /views:
+    get:
+      summary: Get All Views
+      description: Retrieve an array of all the views that the current user 
+        is allowed to see
+      operationId: getViews
+      tags: 
+        - Views
+      parameters:
+        - $ref: '#/components/parameters/order'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: 10
+          required: false
+          allowEmptyValue: true
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/attributes'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/View'
+                    - type: object
+                      properties:
+                        Tags:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                $ref: '#/components/schemas/standardID'
+                              name:
+                                type: string
+                                maxLength: 50
+                              description:
+                                type: string
+                                maxLength: 200
+                        DataRequest:
+                          type: object
+                          properties:
+                            id:
+                              $ref: '#/components/schemas/standardID'
+                            name:
+                              type: string
+                              maxLength: 100
+              example:
+                - id: 1
+                  name: Example View
+                  description: Example View Description
+                  screenShot: Base 64 image data...
+                  settings: {}
+                  subscriptionId: 1
+                  creatorId: 2
+                  createdAt: 2024-02-22T13:36:17.315Z
+                  updatedAt: 2024-02-22T13:36:17.315Z
+                  Tags: []
+                  DataRequest:
+                    id: 1
+                    name: Subscription Name
+        '401':
+          description: If the user is not authorized and guest users are not
+            allowed to view included resources
+        '403':
+          description: If the user is not allowed to view included resources
+        '400':
+          description: Bad request due to invalid parameters
+
+  /views/{id}:
+    get:
+      summary: Get View by ID
+      operationId: getView
+      tags: 
+        - Views
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+        - name: tags
+          in: query
+          required: false
+          description: If set include related tags with id, name and description
+          schema:
+            type: boolean
+        - name: subscription
+          in: query
+          required: false
+          description: If set include the subscription
+          schema:
+            type: boolean
+        - name: group
+          in: query
+          required: false
+          description: If set include the subscription and its group
+          schema:
+            type: boolean
+        - name: projects
+          in: query
+          required: false
+          description: If set include the subscription and its projects
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/View'
+                  - type: object
+                    properties:
+                      Tags:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              $ref: '#/components/schemas/standardID'
+                            name:
+                              type: string
+                              maxLength: 50
+                            description:
+                              type: string
+                              maxLength: 200
+                      DataRequest:
+                        type: object
+                        properties:
+                          id:
+                            $ref: '#/components/schemas/standardID'
+                          name:
+                            type: string
+                            maxLength: 100
+                      group:
+                        $ref: '#/components/schemas/SubscriptionGroup'
+                      Projects:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/StudyArea'
+
+              example:
+                id: 1
+                name: Example View
+                description: Example View Description
+                screenShot: Base 64 image data...
+                settings: {}
+                subscriptionId: 1
+                creatorId: 2
+                createdAt: 2024-02-22T13:36:17.315Z
+                updatedAt: 2024-02-22T13:36:17.315Z
+                Tags:
+                  - id: 1
+                    name: Tag 1
+                    description: Tag 1 description
+                DataRequest:
+                  id: 1
+                  name: Subscription Name
+                group:
+                  id: 1
+                  name: Group 1
+                  description: Group 1 description
+                  createdAt: 2024-02-22T13:36:17.315Z
+                  updatedAt: 2024-02-22T13:36:17.315Z
+                Projects: []
+
+        '401':
+          description: If the user is not authorized and guest users are not
+            allowed to view included resources
+        '403':
+          description: If the user is not allowed to view included resources
+        '400':
+          description: Bad request due to invalid parameters
+        '404':
+          description: View not found
+    put:
+      summary: Update a View
+      operationId: updateView
+      tags: 
+        - Views
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/standardID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                  example: View display name
+                description:
+                  type: string
+                  maxLength: 500
+                  example: View description
+                screenShot:
+                  type: string
+                  example: base64imageData...
+                Tags:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Tag'
+                settings:
+                  type: object
+      responses:
+        '200':
+          description: successful operation
+
+
 components:
   parameters:
     where:
@@ -534,7 +1095,6 @@ components:
         ***Example**: `id, name, age`*
       required: false
       allowEmptyValue: true
-
     omit:
       name: omit
       in: query
@@ -599,7 +1159,6 @@ components:
     standardID:
       type: integer
       format: int64
-      # example: 10
       minimum: 1
     standardName:
       type: string
@@ -608,6 +1167,10 @@ components:
     autoTimestamp:
       type: string
       format: date-time
+    permissionList:
+      type: array
+      items:
+        type: string
 
     Tag:
       type: object
@@ -689,6 +1252,112 @@ components:
           $ref: '#/components/schemas/autoTimestamp'
         updatedAt:
           $ref: '#/components/schemas/autoTimestamp'
+    
+    StudyArea:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/standardID'
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        creatorId:
+          type: integer
+          minimum: 1
+          nullable: true
+        createdAt:
+          $ref: '#/components/schemas/autoTimestamp'
+        updatedAt:
+          $ref: '#/components/schemas/autoTimestamp'
+      
+    Subscription:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/standardID'
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+        refresh:
+          type: string
+          enum:
+            - manually
+            - yearly
+            - monthly
+            - weekly
+            - daily
+        completed:
+          type: string
+          format: date-time
+          nullable: true
+        requestedData:
+          type: object
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+        groupId:
+          type: integer
+          minimum: 1
+          nullable: true
+        dataURL:
+          type: string
+          nullable: true
+        transmissions:
+          type: object
+          nullable: true
+        createdAt:
+          $ref: '#/components/schemas/autoTimestamp'
+        updatedAt:
+          $ref: '#/components/schemas/autoTimestamp'
+
+    SubscriptionGroup:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/standardID'
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        createdAt:
+          $ref: '#/components/schemas/autoTimestamp'
+        updatedAt:
+          $ref: '#/components/schemas/autoTimestamp'
+
+
+    View:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/standardID'
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        screenShot:
+          type: string
+          nullable: true
+        settings:
+          type: object
+        subscriptionId:
+          $ref: '#/components/schemas/standardID'
+        creatorId:
+          $ref: '#/components/schemas/standardID'
+        createdAt:
+          $ref: '#/components/schemas/autoTimestamp'
+        updatedAt:
+          $ref: '#/components/schemas/autoTimestamp'
+  
   securitySchemes:
     session_id:
       type: apiKey
