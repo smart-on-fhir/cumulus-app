@@ -5,7 +5,7 @@ import { rw }                         from "../lib"
 import config                         from "../config"
 
 
-const router = express.Router({ mergeParams: true })
+export const router = express.Router({ mergeParams: true })
 
 
 // These are the only paths we recognize and proxy to the aggregator

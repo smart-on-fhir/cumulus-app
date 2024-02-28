@@ -16,6 +16,7 @@ import SystemUser                from "../SystemUser"
 import { notifyForGraphsAccess } from "../services/mail"
 import { requestPermission }     from "../services/acl"
 import { CurrentUser }           from "../types"
+import * as loggers              from "../services/logger"
 import {
     BadRequest,
     Forbidden,
@@ -71,7 +72,7 @@ interface InputParams {
     permission   : boolean
 }
 
-const router = Router({ mergeParams: true });
+export const router = Router({ mergeParams: true });
 
 function makeArray(x: any) {
     if (Array.isArray(x)) {
@@ -97,18 +98,18 @@ export async function emailsToUserIDs(emails: string[]) {
 /**
  * Validates body parameters and converts them to their expected shape
  * @param body.resource - The resource type. Must be keyof SHAREABLE_MODELS
- * @param [body.resource_id = null] - If set, it means we are managing only the resource(s)
- * with the specified ID(s). Can a number or an array of numbers or null. Defaults
- * to null, which means all resources.
+ * @param [body.resource_id = null] - If set, it means we are managing only the
+ * resource(s) with the specified ID(s). Can be a number or an array of numbers
+ * or null. Defaults to null, which means all resources.
  * @param [body.user_group_id = null] - The ID(s) of the userGroup(s) we are
- * going to share with. Can a number or an array of numbers or null. If set, then 
- * email and role must be null or omitted! 
+ * going to share with. Can be a number or an array of numbers or null. If set,
+ * then email and role must be null or omitted! 
  * @param [body.role = null] - The role(s) we are going to share with. Can be an
  * array of strings or null. If set, then email and user_group_id must be null
  * or omitted! 
  * @param [body.email = null] - The email(s) of the user(s) we are going to share
- * with. Can a string or an array of strings or null. If set, then user_group_id
- * and role must be null or omitted! 
+ * with. Can be a string or an array of strings or null. If set, then
+ * user_group_id and role must be null or omitted!
  * @param body.action - what action are we managing
  * @param body.permission - true to grant permission or false to revoke it
  */
@@ -394,7 +395,7 @@ route(router, {
         const model = await Model.findByPk(+req.query.resource_id!, { user: SystemUser })
 
         if (!model) {
-            throw new Forbidden("Model not found");
+            throw new NotFound("Model not found");
         }
 
         const isOwner = model.isOwnedBy(req.user)
@@ -564,7 +565,7 @@ route(router, {
 
             res.json({ ok: true })
         } catch (error) {
-            console.error(error)
+            loggers.error(error as any)
             await transaction.rollback()
             throw error
         }
@@ -572,29 +573,30 @@ route(router, {
 });
 
 // Revoke ----------------------------------------------------------------------
-route(router, {
-    path: "/revoke",
-    method: "post",
-    async handler(req, res) {
-        const transaction = await Permission.sequelize!.transaction()
-        try {
-            const params = await validate({ ...req.body, permission: false })
-            const rows = lib.explode([params])
-            for (const row of rows) {
-                await Permission.destroy({
-                    where: { ...row, permission: false },
-                    transaction
-                })
-            }
-            await transaction.commit()
-            res.json({ ok: true })
-        } catch (error) {
-            console.error(error)
-            await transaction.rollback()
-            res.status(500).json({ ok: false })
-        }
-    }
-});
+// route(router, {
+//     path: "/revoke",
+//     method: "post",
+//     async handler(req, res) {
+//         const transaction = await Permission.sequelize!.transaction()
+//         try {
+//             const params = await validate({ ...req.body, permission: false })
+//             const rows = lib.explode([params])
+//             for (const row of rows) {
+//                 canShare(req.user!, { ...row, action: "share" })
+//                 await Permission.destroy({
+//                     where: { ...row, permission: false },
+//                     transaction
+//                 })
+//             }
+//             await transaction.commit()
+//             res.json({ ok: true })
+//         } catch (error) {
+//             loggers.error(error)
+//             await transaction.rollback()
+//             res.status(500).json({ ok: false })
+//         }
+//     }
+// });
 
 // Bulk Delete -----------------------------------------------------------------
 route(router, {

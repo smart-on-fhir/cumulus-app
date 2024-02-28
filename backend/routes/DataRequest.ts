@@ -2,7 +2,7 @@ import crypto                                                     from "crypto"
 import express, { Response }                                      from "express"
 import slug                                                       from "slug"
 import { Includeable, QueryTypes }                                from "sequelize"
-import { NotFound, InternalServerError, HttpError }               from "../errors"
+import { NotFound, InternalServerError, HttpError, BadRequest }   from "../errors"
 import Model                                                      from "../db/models/DataRequest"
 import { AppRequest }                                             from "../types"
 import { route }                                                  from "../lib/route"
@@ -18,7 +18,7 @@ import { DATA_TYPES }                                             from "../DataM
 import { fetchSubscriptionData }                                  from "../DataManager/CsvDownloader"
 
 
-const router = express.Router({ mergeParams: true });
+export const router = express.Router({ mergeParams: true });
 
 export default router
 
@@ -103,7 +103,7 @@ const filtersWithoutParams = [
 // Views -----------------------------------------------------------------------
 router.get("/:id/views", rw(async (req: AppRequest, res: Response) => {
     const options = getFindOptions(req);
-    options.where = { DataRequestId: +req.params.id };
+    options.where = { subscriptionId: +req.params.id };
     const views = await ViewModel.scope({ method: ['visible', req.user] }).findAll({ ...options, user: req.user });
     res.json(views);
 }));
@@ -123,7 +123,7 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
     // format ------------------------------------------------------------------
     const format = String(req.query.format || "csv");
     if (!["csv","tsv"].includes(format)) {
-        throw new Error(`Unsupported format "${format}"`);
+        throw new BadRequest(`Unsupported format "${format}"`);
     }
 
     // Reply inline or download a file -----------------------------------------
@@ -137,7 +137,7 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
     // cols --------------------------------------------------------------------
     let colNames = String(req.query.cols || "").split(",").map(s => s.trim()).filter(Boolean);
     if (!colNames.length) {
-        colNames = cols.map(c => c.name);
+        colNames = cols.map(c => c.name + "");
     } else {
         colNames = colNames.filter(x => cols.find(c => c.name === x));
     }
@@ -185,7 +185,7 @@ router.get("/:id/refresh", rw(async (req: AppRequest, res: Response) => {
     requestPermission({ user: req.user, resource: "Subscriptions", action: "refresh" })
     requestPermission({ user: req.user, resource: "Subscriptions", action: "update"  })
     requestPermission({ user: req.user, resource: "Subscriptions", action: "read"    })
-    const model = await Model.findByPk(req.params.id, { ...getFindOptions(req), user: req.user })
+    const model = await Model.findByPk(req.params.id, { user: req.user })
     assert(model, "Model not found", NotFound)
     await fetchSubscriptionData(model)
     await model.reload({ user: req.user })

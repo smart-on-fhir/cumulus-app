@@ -163,7 +163,7 @@ export default function Preload() {
     const { loading, error, result } = useBackend<{subscription: app.DataRequest, view: app.View}>(
         useCallback(() => {
             return request("/api/views/" + id).then(view => {
-                return request("/api/requests/" + view.DataRequestId).then(subscription => ({
+                return request("/api/requests/" + view.subscriptionId).then(subscription => ({
                     subscription,
                     view
                 }));
@@ -177,7 +177,7 @@ export default function Preload() {
     if (error) return <AlertError>{`Error fetching view with id "${id}": ${error}`}</AlertError>
     if (!result) return <AlertError>{`Error fetching data"`}</AlertError>
     if (!result.view) return <AlertError>{`Error fetching view with id "${id}"`}</AlertError>
-    if (!result.subscription) return <AlertError>{`Error fetching subscription with id "${result.view.DataRequestId}"`}</AlertError>
+    if (!result.subscription) return <AlertError>{`Error fetching subscription with id "${result.view.subscriptionId}"`}</AlertError>
 
     const { view, subscription } = result || {};
 

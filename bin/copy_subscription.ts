@@ -166,7 +166,7 @@ export async function copySubscriptionGraphs(options: {
 
     const { src, dst, srcSubscriptionId, dstSubscriptionId, transaction } = options
 
-    const viewRows: any[] = await src.connection.query(`SELECT * FROM "Views" WHERE "DataRequestId" = ?`, {
+    const viewRows: any[] = await src.connection.query(`SELECT * FROM "Views" WHERE "subscriptionId" = ?`, {
         type: QueryTypes.SELECT,
         replacements: [ srcSubscriptionId ]
     })
@@ -175,7 +175,7 @@ export async function copySubscriptionGraphs(options: {
     if (size) {
         console.log(`Found ${size} graphs for this subscription in the source database. Copying...`)
         await dst.connection?.getQueryInterface().bulkInsert("Views", viewRows.map(r => {
-            r.DataRequestId = dstSubscriptionId
+            r.subscriptionId = dstSubscriptionId
             delete r["id"]
             r.settings = JSON.stringify(r.settings)
             return r

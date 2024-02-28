@@ -162,7 +162,7 @@ export function init(connection: Sequelize) {
     // Graphs ------------------------------------------------------------------
 
     // Graphs have one subscription as View.DataRequest
-    View.belongsTo(DataRequest, { foreignKey: "DataRequestId", targetKey: "id" });
+    View.belongsTo(DataRequest, { foreignKey: "subscriptionId", targetKey: "id" });
 
     // Graphs have many tags as View.DataRequest
     View.belongsToMany(Tag, { through: "ViewsTags", timestamps: false });
@@ -172,7 +172,7 @@ export function init(connection: Sequelize) {
     // Subscriptions -----------------------------------------------------------
     
     // Subscriptions have many graphs as DataRequest.Views
-    DataRequest.hasMany(View, { foreignKey: "DataRequestId", constraints: true, hooks: true, onDelete: "CASCADE" });
+    DataRequest.hasMany(View, { foreignKey: "subscriptionId", constraints: true, hooks: true, onDelete: "CASCADE" });
 
     // Subscriptions belong to one RequestGroup as DataRequest.group
     DataRequest.belongsTo(RequestGroup, { as: "group", onDelete: "SET NULL" });

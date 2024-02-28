@@ -46,7 +46,7 @@ describe("Graphs", () => {
             {
                 name: "Record name",
                 description: "Record description",
-                DataRequestId: 1,
+                subscriptionId: 1,
                 settings: {},
                 Tags: [{ id: 1 }]
             }
@@ -61,7 +61,7 @@ describe("Graphs", () => {
             {
                 name: "Record name 2",
                 description: "Record description 2",
-                DataRequestId: 1,
+                subscriptionId: 1,
                 settings: {},
                 Tags: [{ id: 2 }]
             }
