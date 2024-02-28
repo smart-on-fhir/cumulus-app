@@ -573,29 +573,30 @@ route(router, {
 });
 
 // Revoke ----------------------------------------------------------------------
-route(router, {
-    path: "/revoke",
-    method: "post",
-    async handler(req, res) {
-        const transaction = await Permission.sequelize!.transaction()
-        try {
-            const params = await validate({ ...req.body, permission: false })
-            const rows = lib.explode([params])
-            for (const row of rows) {
-                await Permission.destroy({
-                    where: { ...row, permission: false },
-                    transaction
-                })
-            }
-            await transaction.commit()
-            res.json({ ok: true })
-        } catch (error) {
-            console.error(error)
-            await transaction.rollback()
-            res.status(500).json({ ok: false })
-        }
-    }
-});
+// route(router, {
+//     path: "/revoke",
+//     method: "post",
+//     async handler(req, res) {
+//         const transaction = await Permission.sequelize!.transaction()
+//         try {
+//             const params = await validate({ ...req.body, permission: false })
+//             const rows = lib.explode([params])
+//             for (const row of rows) {
+//                 canShare(req.user!, { ...row, action: "share" })
+//                 await Permission.destroy({
+//                     where: { ...row, permission: false },
+//                     transaction
+//                 })
+//             }
+//             await transaction.commit()
+//             res.json({ ok: true })
+//         } catch (error) {
+//             loggers.error(error)
+//             await transaction.rollback()
+//             res.status(500).json({ ok: false })
+//         }
+//     }
+// });
 
 // Bulk Delete -----------------------------------------------------------------
 route(router, {
