@@ -185,7 +185,7 @@ router.get("/:id/refresh", rw(async (req: AppRequest, res: Response) => {
     requestPermission({ user: req.user, resource: "Subscriptions", action: "refresh" })
     requestPermission({ user: req.user, resource: "Subscriptions", action: "update"  })
     requestPermission({ user: req.user, resource: "Subscriptions", action: "read"    })
-    const model = await Model.findByPk(req.params.id, { ...getFindOptions(req), user: req.user })
+    const model = await Model.findByPk(req.params.id, { user: req.user })
     assert(model, "Model not found", NotFound)
     await fetchSubscriptionData(model)
     await model.reload({ user: req.user })
