@@ -98,18 +98,18 @@ export async function emailsToUserIDs(emails: string[]) {
 /**
  * Validates body parameters and converts them to their expected shape
  * @param body.resource - The resource type. Must be keyof SHAREABLE_MODELS
- * @param [body.resource_id = null] - If set, it means we are managing only the resource(s)
- * with the specified ID(s). Can a number or an array of numbers or null. Defaults
- * to null, which means all resources.
+ * @param [body.resource_id = null] - If set, it means we are managing only the
+ * resource(s) with the specified ID(s). Can be a number or an array of numbers
+ * or null. Defaults to null, which means all resources.
  * @param [body.user_group_id = null] - The ID(s) of the userGroup(s) we are
- * going to share with. Can a number or an array of numbers or null. If set, then 
- * email and role must be null or omitted! 
+ * going to share with. Can be a number or an array of numbers or null. If set,
+ * then email and role must be null or omitted! 
  * @param [body.role = null] - The role(s) we are going to share with. Can be an
  * array of strings or null. If set, then email and user_group_id must be null
  * or omitted! 
  * @param [body.email = null] - The email(s) of the user(s) we are going to share
- * with. Can a string or an array of strings or null. If set, then user_group_id
- * and role must be null or omitted! 
+ * with. Can be a string or an array of strings or null. If set, then
+ * user_group_id and role must be null or omitted!
  * @param body.action - what action are we managing
  * @param body.permission - true to grant permission or false to revoke it
  */
