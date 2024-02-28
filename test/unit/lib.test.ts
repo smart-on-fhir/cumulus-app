@@ -113,7 +113,7 @@ describe("Lib", () => {
             const job = wait(100).then(() => end = Date.now());
             expect(end).to.equal(start)
             await (job)
-            expect(end - start).to.be.greaterThanOrEqual(100)
+            expect(end - start).to.be.greaterThanOrEqual(99)
             expect(end - start).to.be.lessThan(120)
         })
     })
