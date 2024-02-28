@@ -2,7 +2,7 @@ import crypto                                                     from "crypto"
 import express, { Response }                                      from "express"
 import slug                                                       from "slug"
 import { Includeable, QueryTypes }                                from "sequelize"
-import { NotFound, InternalServerError, HttpError }               from "../errors"
+import { NotFound, InternalServerError, HttpError, BadRequest }   from "../errors"
 import Model                                                      from "../db/models/DataRequest"
 import { AppRequest }                                             from "../types"
 import { route }                                                  from "../lib/route"
@@ -123,7 +123,7 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
     // format ------------------------------------------------------------------
     const format = String(req.query.format || "csv");
     if (!["csv","tsv"].includes(format)) {
-        throw new Error(`Unsupported format "${format}"`);
+        throw new BadRequest(`Unsupported format "${format}"`);
     }
 
     // Reply inline or download a file -----------------------------------------
