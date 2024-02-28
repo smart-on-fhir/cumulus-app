@@ -327,6 +327,43 @@ describe("Subscriptions", () => {
             })
         })
 
+        it ("ignores empty x-column-names headers", async () => {
+            const model = (await Subscription.findByPk(1, { user: SystemUser }))!
+            await model.update({ dataURL: `${mockServer.baseUrl}/csv` }, { user: SystemUser })
+            mockServer.mock("/csv", {
+                headers: {
+                    "content-type"  : "text/csv",
+                    "x-column-names": "",
+                    "x-column-types": "integer, string, string, string",
+                },
+                body: [
+                    "cnt,a,b,c",
+                    '20,,,',
+                    '10,x,,""',
+                    "12,,y,",
+                    "2,,,z"
+                ].join("\n")
+            })
+            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, {
+                headers: {
+                    cookie: getCookie("manager")
+                }
+            })
+            await model.reload({ user: SystemUser })
+
+            // console.log(await res.text())
+            expect(res.status).to.equal(200)
+            expect(model.metadata).to.deep.equal({
+                cols: [
+                    { name: "cnt", label: "Count", dataType: "integer", description: "Count" },
+                    { name: "a"  , label: "A"    , dataType: "string" , description: "" },
+                    { name: "b"  , label: "B"    , dataType: "string" , description: "" },
+                    { name: "c"  , label: "C"    , dataType: "string" , description: "" }
+                ],
+                total: 20
+            })
+        })
+
         it ("Works as expected", async () => {
             const model = (await Subscription.findByPk(1, { user: SystemUser }))!
             await model.update({ dataURL: `${mockServer.baseUrl}/csv` }, { user: SystemUser })
