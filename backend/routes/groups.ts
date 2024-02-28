@@ -7,7 +7,7 @@ import { assert }      from "../lib"
 import { route }       from "../lib/route"
 
 
-const router = express.Router({ mergeParams: true })
+export const router = express.Router({ mergeParams: true })
 
 
 // getAll ----------------------------------------------------------------------

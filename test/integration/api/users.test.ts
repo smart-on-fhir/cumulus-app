@@ -96,24 +96,24 @@ describe("Users", () => {
         })
     })
 
-    describe("create (POST /api/users)", () => {
+    // describe("create (POST /api/users)", () => {
 
-        testEndpoint("Users.create", "POST", "/api/users", { email: "test@whatever.org", role: "user" })
+    //     testEndpoint("Users.create", "POST", "/api/users", { email: "test@whatever.org", role: "user" })
 
-        it ("handles bad parameter errors", async () => {
-            const res = await fetch(`${server.baseUrl}/api/users`, {
-                method: "POST",
-                body: JSON.stringify({ email: "test", role: "bad-role" }),
-                headers: {
-                    Cookie: "sid=" + admin.sid,
-                    "content-type": "application/json"
-                }
-            })
-            expect(res.status).to.equal(400)
-            // expect(await res.text()).to.equal("Error creating user")
-            // console.log(await res.text())
-        })
-    })
+    //     it ("handles bad parameter errors", async () => {
+    //         const res = await fetch(`${server.baseUrl}/api/users`, {
+    //             method: "POST",
+    //             body: JSON.stringify({ email: "test", role: "bad-role" }),
+    //             headers: {
+    //                 Cookie: "sid=" + admin.sid,
+    //                 "content-type": "application/json"
+    //             }
+    //         })
+    //         expect(res.status).to.equal(400)
+    //         // expect(await res.text()).to.equal("Error creating user")
+    //         // console.log(await res.text())
+    //     })
+    // })
     
     describe("update (PUT /api/users/:id)", () => {
 

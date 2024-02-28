@@ -17,7 +17,7 @@ import {
 } from "../errors"
 
 
-const router = Router({ mergeParams: true });
+export const router = Router({ mergeParams: true });
 
 
 // list ------------------------------------------------------------------------
@@ -250,7 +250,7 @@ route(router, {
         const transaction = await model.sequelize.transaction()
 
         try {
-            delete req.body.DataRequestId
+            delete req.body.subscriptionId
             delete req.body.createdAt
             delete req.body.updatedAt
 
@@ -305,7 +305,7 @@ route(router, {
                 in: ['body'],
                 isObject: true
             },
-            DataRequestId: {
+            subscriptionId: {
                 in: ['body'],
                 isInt: {
                     options: {

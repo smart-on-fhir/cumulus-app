@@ -51,7 +51,7 @@ declare module app {
         id: string
         name: string
         description: string
-        DataRequestId: number | null
+        subscriptionId: number | null
         settings?: {
             viewType?: string
             showOptions?: boolean
@@ -148,7 +148,7 @@ declare module app {
         /**
          * The name as it appears in the first CSV row
          */
-        name: string
+        name: string | String
 
         /**
          * Human-readable name

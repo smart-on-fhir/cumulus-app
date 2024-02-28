@@ -23,7 +23,7 @@ import {
 
 const debug = debuglog("app");
 
-const router = express.Router({ mergeParams: true });
+export const router = express.Router({ mergeParams: true });
 
 /**
  * Strip some fields from user JSON for security reasons
@@ -227,38 +227,36 @@ route(router, {
     async handler(req, res) {
         const model = await User.findByPk(+req.params?.id, { user: req.user });
         lib.assert(model, "User not found", NotFound);
-        const payload = { ...req.body }
-        delete payload.id;
-        delete payload.email;
-        await model.update(payload, { user: req.user });
+        const { name, role } = req.body
+        await model.update({ name, role }, { user: req.user });
         res.json(secure(model))
     }
 });
 
 // Create user -----------------------------------------------------------------
-route(router, {
-    path: "/",
-    method: "post",
-    request: {
-        schema: {
-            email: {
-                in: "body",
-                isEmail: true,
-                toLowerCase: true
-            },
-            role: {
-                in: "body",
-                isIn: {
-                    options: [["user", "manager", "admin"]],
-                }
-            }
-        }
-    },
-    async handler(req, res) {
-        const user = await User.create(req.body, { user: req.user })
-        res.json(secure(user))
-    }
-});
+// route(router, {
+//     path: "/",
+//     method: "post",
+//     request: {
+//         schema: {
+//             email: {
+//                 in: "body",
+//                 isEmail: true,
+//                 toLowerCase: true
+//             },
+//             role: {
+//                 in: "body",
+//                 isIn: {
+//                     options: [["user", "manager", "admin"]],
+//                 }
+//             }
+//         }
+//     },
+//     async handler(req, res) {
+//         const user = await User.create(req.body, { user: req.user })
+//         res.json(secure(user))
+//     }
+// });
 
 // Invite new user -------------------------------------------------------------
 route(router, {

@@ -292,13 +292,16 @@ export function objectDiff<T=Record<string, any>|any[]>(a: T, b: T): T {
         const typeB  = Object.prototype.toString.call(valueB);
 
         if (typeA !== typeB) {
+            // @ts-ignore
             out[key] = valueA
         } else if (typeA === "[object Object]" || typeA === "[object Array]") {
             const child = objectDiff(valueA, valueB)
             if (!isEmptyObject(child)) {
+                // @ts-ignore
                 out[key] = child
             }
         } else if (valueA !== valueB) {
+            // @ts-ignore
             out[key] = valueA
         }
     })
@@ -320,8 +323,10 @@ export function strip(
         forEach(a, (value, key) => {
             if (!paths.includes([..._path, "[]", key].join("."))) {
                 if (value && typeof value === "object") {
+                    // @ts-ignore
                     out[key] = strip(value, paths, [..._path, "[]"])
                 } else {
+                    // @ts-ignore
                     out[key] = value
                 }
             }
@@ -330,8 +335,10 @@ export function strip(
         forEach(a, (value, key) => {
             if (!paths.includes([..._path, key].join("."))) {
                 if (value && typeof value === "object") {
+                    // @ts-ignore
                     out[key] = strip(value, paths, [..._path, key])
                 } else {
+                    // @ts-ignore
                     out[key] = value
                 }
             }

@@ -166,7 +166,7 @@ describe("Chart View", () => {
     
     const baseView: app.View = {
         id           : 1,
-        DataRequestId: 1,
+        subscriptionId: 1,
         name         : "Test Chart",
         description  : "Test Chart Description",
         DataRequest  : baseDataRequest,

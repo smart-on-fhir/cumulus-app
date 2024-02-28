@@ -6,7 +6,7 @@ import { NotFound }    from "../errors"
 import { assert }      from "../lib"
 import { route }       from "../lib/route"
 
-const router = Router({ mergeParams: true });
+export const router = Router({ mergeParams: true });
 
 
 // list ------------------------------------------------------------------------
@@ -39,7 +39,8 @@ route(router, {
             creator: {
                 in: ["query"],
                 optional: true,
-                isBoolean: true
+                isBoolean: true,
+                toBoolean: true
             },
 
             // If set include the graphs count
@@ -74,7 +75,7 @@ route(router, {
                     "id",
                     "name",
                     "description",
-                    "DataRequestId"
+                    "subscriptionId"
                 ]
             })
         }

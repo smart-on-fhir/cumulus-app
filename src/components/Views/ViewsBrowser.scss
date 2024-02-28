@@ -67,6 +67,10 @@
         img {
             display: block;
             image-rendering: optimizeQuality;
+            aspect-ratio: 5/3;
+            object-fit: contain;
+            object-position: center;
+            width: 100%;
         }
     }
 

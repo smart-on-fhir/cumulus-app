@@ -1,11 +1,12 @@
 import { expect } from "chai"
-import User       from "../../backend/db/models/User";
+import User       from "../../backend/db/models/User"
+import SystemUser from "../../backend/SystemUser"
 
 
 describe("Permissions", () => {
     it ("User.getPermissions", async () => {
-        const user = await User.findByPk(5, { user: { role: "system" }})
-        const permissions = await user.getPermissions()
+        const user = await User.findByPk(5, { user: SystemUser })
+        const permissions = await user!.getPermissions()
 
         // Explicit permissions --------------------------------------------
 
