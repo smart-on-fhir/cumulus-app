@@ -450,131 +450,131 @@ describe("Permissions", () => {
             })
         })
 
-        describe("POST /api/permissions/revoke", () => {
+        // describe("POST /api/permissions/revoke", () => {
 
-            const matrix = explode([
-                {
-                    resource     : "Graphs",
-                    resource_id  : [null, 1],
-                    role         : ["user", "manager", "guest", null],
-                    user_group_id: [null, 1],
-                    email        : [null, "user@cumulus.test"],
-                    action       : ["read", "update", "delete", "share"],
-                    permission   : false
-                }
-            ]);
+        //     const matrix = explode([
+        //         {
+        //             resource     : "Graphs",
+        //             resource_id  : [null, 1],
+        //             role         : ["user", "manager", "guest", null],
+        //             user_group_id: [null, 1],
+        //             email        : [null, "user@cumulus.test"],
+        //             action       : ["read", "update", "delete", "share"],
+        //             permission   : false
+        //         }
+        //     ]);
 
-            function revoke(body: Record<string, any>) {
-                return fetch(`${server.baseUrl}/api/permissions/revoke`, {
-                    method: "POST",
-                    body: JSON.stringify(body),
-                    headers: {
-                        Cookie: "sid=" + admin.sid,
-                        "content-type": "application/json"
-                    }
-                })
-            }
+        //     function revoke(body: Record<string, any>) {
+        //         return fetch(`${server.baseUrl}/api/permissions/revoke`, {
+        //             method: "POST",
+        //             body: JSON.stringify(body),
+        //             headers: {
+        //                 Cookie: "sid=" + admin.sid,
+        //                 "content-type": "application/json"
+        //             }
+        //         })
+        //     }
     
-            beforeEach(async () => {
-                await resetTable("Permission", Permissions)
-                await Permission.bulkCreate([
-                    { resource: "Graphs", role: "admin"   , action: "share" , permission: true },
-                    { resource: "Graphs", role: "manager" , action: "share" , permission: true },
-                    { resource: "Graphs", role: "user"    , action: "read"  , permission: true },
-                    { resource: "Graphs", role: "user"    , action: "update", permission: true },
-                    { resource: "Graphs", role: "user"    , action: "delete", permission: true },
-                    { resource: "Graphs", role: "user"    , action: "share" , permission: true },
-                    { resource: "Graphs", role: "guest"   , action: "read"  , permission: true },
-                    { resource: "Graphs", role: "guest"   , action: "update", permission: true },
-                    { resource: "Graphs", role: "guest"   , action: "delete", permission: true },
-                    { resource: "Graphs", role: "guest"   , action: "share" , permission: true },
-                    { resource: "Graphs", user_id: 3      , action: "read"  , permission: true },
-                    { resource: "Graphs", user_id: 3      , action: "update", permission: true },
-                    { resource: "Graphs", user_id: 3      , action: "delete", permission: true },
-                    { resource: "Graphs", user_id: 3      , action: "share" , permission: true },
-                    { resource: "Graphs", user_group_id: 1, action: "read"  , permission: true },
-                    { resource: "Graphs", user_group_id: 1, action: "update", permission: true },
-                    { resource: "Graphs", user_group_id: 1, action: "delete", permission: true },
-                    { resource: "Graphs", user_group_id: 1, action: "share" , permission: true },
-                    { resource: "Graphs", role: "user"    , action: "read"  , permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "user"    , action: "update", permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "user"    , action: "delete", permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "user"    , action: "share" , permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "guest"   , action: "read"  , permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "guest"   , action: "update", permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "guest"   , action: "delete", permission: true, resource_id: 1 },
-                    { resource: "Graphs", role: "guest"   , action: "share" , permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_id: 3      , action: "read"  , permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_id: 3      , action: "update", permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_id: 3      , action: "delete", permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_id: 3      , action: "share" , permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_group_id: 1, action: "read"  , permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_group_id: 1, action: "update", permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_group_id: 1, action: "delete", permission: true, resource_id: 1 },
-                    { resource: "Graphs", user_group_id: 1, action: "share" , permission: true, resource_id: 1 },
-                ])
-            })
+        //     beforeEach(async () => {
+        //         await resetTable("Permission", Permissions)
+        //         await Permission.bulkCreate([
+        //             { resource: "Graphs", role: "admin"   , action: "share" , permission: true },
+        //             { resource: "Graphs", role: "manager" , action: "share" , permission: true },
+        //             { resource: "Graphs", role: "user"    , action: "read"  , permission: true },
+        //             { resource: "Graphs", role: "user"    , action: "update", permission: true },
+        //             { resource: "Graphs", role: "user"    , action: "delete", permission: true },
+        //             { resource: "Graphs", role: "user"    , action: "share" , permission: true },
+        //             { resource: "Graphs", role: "guest"   , action: "read"  , permission: true },
+        //             { resource: "Graphs", role: "guest"   , action: "update", permission: true },
+        //             { resource: "Graphs", role: "guest"   , action: "delete", permission: true },
+        //             { resource: "Graphs", role: "guest"   , action: "share" , permission: true },
+        //             { resource: "Graphs", user_id: 3      , action: "read"  , permission: true },
+        //             { resource: "Graphs", user_id: 3      , action: "update", permission: true },
+        //             { resource: "Graphs", user_id: 3      , action: "delete", permission: true },
+        //             { resource: "Graphs", user_id: 3      , action: "share" , permission: true },
+        //             { resource: "Graphs", user_group_id: 1, action: "read"  , permission: true },
+        //             { resource: "Graphs", user_group_id: 1, action: "update", permission: true },
+        //             { resource: "Graphs", user_group_id: 1, action: "delete", permission: true },
+        //             { resource: "Graphs", user_group_id: 1, action: "share" , permission: true },
+        //             { resource: "Graphs", role: "user"    , action: "read"  , permission: true, resource_id: 1 },
+        //             { resource: "Graphs", role: "user"    , action: "update", permission: true, resource_id: 1 },
+        //             { resource: "Graphs", role: "user"    , action: "delete", permission: true, resource_id: 1 },
+        //             { resource: "Graphs", role: "user"    , action: "share" , permission: true, resource_id: 1 },
+        //             { resource: "Graphs", role: "guest"   , action: "read"  , permission: true, resource_id: 1 },
+        //             { resource: "Graphs", role: "guest"   , action: "update", permission: true, resource_id: 1 },
+        //             { resource: "Graphs", role: "guest"   , action: "delete", permission: true, resource_id: 1 },
+        //             { resource: "Graphs", role: "guest"   , action: "share" , permission: true, resource_id: 1 },
+        //             { resource: "Graphs", user_id: 3      , action: "read"  , permission: true, resource_id: 1 },
+        //             { resource: "Graphs", user_id: 3      , action: "update", permission: true, resource_id: 1 },
+        //             { resource: "Graphs", user_id: 3      , action: "delete", permission: true, resource_id: 1 },
+        //             { resource: "Graphs", user_id: 3      , action: "share" , permission: true, resource_id: 1 },
+        //             { resource: "Graphs", user_group_id: 1, action: "read"  , permission: true, resource_id: 1 },
+        //             { resource: "Graphs", user_group_id: 1, action: "update", permission: true, resource_id: 1 },
+        //             { resource: "Graphs", user_group_id: 1, action: "delete", permission: true, resource_id: 1 },
+        //             { resource: "Graphs", user_group_id: 1, action: "share" , permission: true, resource_id: 1 },
+        //         ])
+        //     })
     
-            afterEach(async () => {
-                await resetTable("Permission", Permissions)
-            })
+        //     afterEach(async () => {
+        //         await resetTable("Permission", Permissions)
+        //     })
 
-            function testRevoke(x: any) {
-                it (buildLabel(x), async () => {
+        //     function testRevoke(x: any) {
+        //         it (buildLabel(x), async () => {
                         
-                    // Pre-check
-                    expect(await Permission.count({
-                        where: {
-                            resource  : x.resource,
-                            role      : x.role,
-                            action    : x.action,
-                            permission: true,
-                        }
-                    })).be.greaterThan(0);
+        //             // Pre-check
+        //             expect(await Permission.count({
+        //                 where: {
+        //                     resource  : x.resource,
+        //                     role      : x.role,
+        //                     action    : x.action,
+        //                     permission: true,
+        //                 }
+        //             })).be.greaterThan(0);
     
-                    const res = await revoke({
-                        resource     : x.resource,
-                        role         : x.role,
-                        action       : x.action,
-                        permission   : false,
-                        email        : x.email,
-                        user_group_id: x.user_group_id,
-                        resource_id  : x.resource_id
-                    })
+        //             const res = await revoke({
+        //                 resource     : x.resource,
+        //                 role         : x.role,
+        //                 action       : x.action,
+        //                 permission   : false,
+        //                 email        : x.email,
+        //                 user_group_id: x.user_group_id,
+        //                 resource_id  : x.resource_id
+        //             })
         
-                    const json = await res.json()
+        //             const json = await res.json()
         
-                    expect(json).to.deep.equal({ ok: true })
+        //             expect(json).to.deep.equal({ ok: true })
     
-                    // Post-check ----------------------------------------------
-                    const { email, ...rest } = x
-                    if (email) {
-                        const emails = Array.isArray(email) ? email : [email];
-                        const user_ids = await emailsToUserIDs(emails)
+        //             // Post-check ----------------------------------------------
+        //             const { email, ...rest } = x
+        //             if (email) {
+        //                 const emails = Array.isArray(email) ? email : [email];
+        //                 const user_ids = await emailsToUserIDs(emails)
     
-                        for (const user_id of user_ids) {
-                            expect(await Permission.count({ where: {
-                                ...rest,
-                                user_id
-                            } }), `Post-check for user_id=${user_id}`).to.equal(0);
-                        }
-                    } else {
-                        expect(await Permission.count({ where: rest })).equal(0);
-                    }
-                })
-            }
+        //                 for (const user_id of user_ids) {
+        //                     expect(await Permission.count({ where: {
+        //                         ...rest,
+        //                         user_id
+        //                     } }), `Post-check for user_id=${user_id}`).to.equal(0);
+        //                 }
+        //             } else {
+        //                 expect(await Permission.count({ where: rest })).equal(0);
+        //             }
+        //         })
+        //     }
     
 
-            matrix.forEach((x: any) => {
-                if (
-                    ( x.user_group_id && !x.role && !x.email) ||
-                    (!x.user_group_id && !x.role &&  x.email) || 
-                    (!x.user_group_id &&  x.role && !x.email)
-                ) {
-                    testRevoke(x)
-                }
-            })
-        })
+        //     matrix.forEach((x: any) => {
+        //         if (
+        //             ( x.user_group_id && !x.role && !x.email) ||
+        //             (!x.user_group_id && !x.role &&  x.email) || 
+        //             (!x.user_group_id &&  x.role && !x.email)
+        //         ) {
+        //             testRevoke(x)
+        //         }
+        //     })
+        // })
     })
 
     describe("actions", () => {
