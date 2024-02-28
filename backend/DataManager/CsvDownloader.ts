@@ -9,6 +9,7 @@ import Line2CSV                                    from "./Line2CSV"
 import RemoteCsvToDb                               from "./RemoteCsvToDb"
 import { getMetadataFromHeaders }                  from "./lib"
 import config                                      from "../config"
+import * as loggers                                from "../services/logger"
 
 
 /**
@@ -175,7 +176,7 @@ export async function fetchSubscriptionData(subscription: Subscription)
         )
         await transaction.commit()
     } catch (ex) {
-        // console.error(ex)
+        loggers.error(ex)
         await transaction.rollback()
         throw new BadRequest((ex as Error).message, { reason: ex })
     }
