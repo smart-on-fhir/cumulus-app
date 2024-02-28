@@ -16,6 +16,7 @@ import SystemUser                from "../SystemUser"
 import { notifyForGraphsAccess } from "../services/mail"
 import { requestPermission }     from "../services/acl"
 import { CurrentUser }           from "../types"
+import * as loggers              from "../services/logger"
 import {
     BadRequest,
     Forbidden,
@@ -394,7 +395,7 @@ route(router, {
         const model = await Model.findByPk(+req.query.resource_id!, { user: SystemUser })
 
         if (!model) {
-            throw new Forbidden("Model not found");
+            throw new NotFound("Model not found");
         }
 
         const isOwner = model.isOwnedBy(req.user)
@@ -564,7 +565,7 @@ route(router, {
 
             res.json({ ok: true })
         } catch (error) {
-            console.error(error)
+            loggers.error(error as any)
             await transaction.rollback()
             throw error
         }
