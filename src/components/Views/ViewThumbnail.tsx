@@ -101,17 +101,14 @@ export default function ViewThumbnail({
                  <img src={`${(process.env.REACT_APP_BACKEND_HOST || "")}/api/views/${ view.id }/screenshot?v=${+new Date(view.updatedAt!)}`} loading="lazy" alt={view.name} />
             </div>
             <div className="view-thumbnail-title">
-                
-                <span dangerouslySetInnerHTML={{ __html: search ? highlight(view.name, search) : view.name }}/>
-                
+                { search ? highlight(view.name, search) : view.name }
                 { showDescription > 0 && <div className="view-thumbnail-description color-muted" title={ view.description || undefined }>
                     { view.description ?
-                        <span dangerouslySetInnerHTML={{
-                            __html: search ?
-                                highlight(ellipsis(view.description, showDescription), search) :
-                                ellipsis(view.description, showDescription)
-                        }}/> :
-                        "No description" }
+                        search ?
+                            highlight(ellipsis(view.description, showDescription), search) :
+                            ellipsis(view.description, showDescription) :
+                        "No description"
+                    }
                 </div> }
             </div>            
         </Link>
