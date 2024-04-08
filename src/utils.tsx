@@ -356,15 +356,26 @@ export function highlight(str: string, stringToFind = "") {
     if (!stringToFind) {
         return str
     }
-    let temp  = str;
-    let index = str.toLocaleLowerCase().indexOf(stringToFind.toLocaleLowerCase());
+
+    const fragments = []
+    const q = stringToFind.toLowerCase()
+
+    let i = 0;
+    let temp = str;
+    let index = temp.toLowerCase().indexOf(q);
     while (index > -1) {
-        const replacement = `<span class="search-match">${temp.substr(index, stringToFind.length)}</span>`;
-        const endIndex = index + stringToFind.length;
-        temp  = temp.substring(0, index) + replacement + temp.substring(endIndex);
-        index = temp.toLocaleLowerCase().indexOf(stringToFind.toLocaleLowerCase(), index + replacement.length);
+        fragments.push(temp.substring(0, index))
+        const endIndex = index + q.length;
+        fragments.push(<span className="search-match" key={i++}>{ temp.substring(index, endIndex) }</span>)
+        temp  = temp.substring(endIndex);
+        index = temp.toLowerCase().indexOf(q);
     }
-    return temp;
+
+    if (temp) {
+        fragments.push(temp)
+    }
+
+    return fragments;
 }
 
 export function Json(data: any, indent = 0): any {

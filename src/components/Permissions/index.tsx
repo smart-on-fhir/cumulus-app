@@ -150,8 +150,6 @@ function PermissionCheckbox({ permission } : { permission: app.Permission }) {
             .catch(e => alert(e.message));
     });
 
-    const label = permission.comment?.replace(/\b(read|search|create|update|delete|refresh|export|share|add|exclude|flip|invite|request line-level data)\b/g, "<b>$1</b>") || permission.action
-
     return (
         <label className="permission-checkbox-label" aria-disabled={permission.role === "admin"} data-tooltip={permission.comment}>
             { loading ? <i className="fas fa-circle-notch fa-spin"/> :
@@ -159,8 +157,7 @@ function PermissionCheckbox({ permission } : { permission: app.Permission }) {
                 checked={ checked }
                 onChange={ toggle }
             /> }
-            {/* { permission.action } */}
-            <span dangerouslySetInnerHTML={{ __html: label }} />
+            { permission.comment || permission.action }
         </label>
     )
 }

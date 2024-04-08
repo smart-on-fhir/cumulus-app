@@ -269,7 +269,7 @@ export default function StaticGrid({
                         c.value(rec, c) + "" : 
                         rec[c.name] + "";
                 if (search && c.searchable && (typeof value === "string" || typeof value === "number")) {
-                    value = <div dangerouslySetInnerHTML={{ __html: highlight(value + "", search) }} />
+                    value = <div>{ highlight(value + "", search) }</div>
                 }
                 return <td key={i} style={c.style}>{ value }</td>
             }) }
