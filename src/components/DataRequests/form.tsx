@@ -1,6 +1,5 @@
 import React              from "react"
 import { Link }           from "react-router-dom"
-import ContentEditable    from "react-contenteditable"
 import { Format }         from "../Format"
 import Panel              from "../generic/Panel"
 import Select             from "../generic/Select"
@@ -323,12 +322,13 @@ export default function DataRequestForm({
                         <label className="col col-0">Description</label>
                         <span className="col color-muted small" style={{ padding: "1em 0 0.2em 0" }}>(HTML enabled)</span>
                     </div>
-                    <div className="row row-10 stretch">
-                        <div className="col stretch">
-                            <ContentEditable
-                                html={ description || "" }
-                                onChange={e => onChange({ ...record, description: e.target.value })}
+                    <div className="row row-10">
+                        <div className="col">
+                            <textarea
+                                value={ description || "" }
+                                onChange={ e => onChange({ ...record, description: e.target.value }) }
                                 className="form-control description-editor"
+                                style={{ minHeight: "100%", maxHeight: "none" }}
                             />
                         </div>
                     </div>
