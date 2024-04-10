@@ -54,7 +54,7 @@ code, pre {
   font-size: 90%;
 }
 
-code {
+code:not(pre code) {
   background: #C001;
   color: #A00;
   padding: 1px 1px;
@@ -229,6 +229,12 @@ ul {
 .markdown {
   li {
     margin: 0;
+  }
+  pre {
+    background   : #FFFC;
+    border-radius: 0.25rem;
+    padding      : 0.25rem;
+    border       : 1px solid #0002;
   }
 }
 

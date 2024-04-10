@@ -320,7 +320,7 @@ export default function DataRequestForm({
                 <div className="col col-4 mt-1 responsive">
                     <div className="row gap top">
                         <label className="col col-0">Description</label>
-                        <span className="col color-muted small" style={{ padding: "1em 0 0.2em 0" }}>(HTML enabled)</span>
+                        <span className="col color-muted small" style={{ padding: "1em 0 0.2em 0" }}>(Markdown enabled)</span>
                     </div>
                     <div className="row row-10">
                         <div className="col">
