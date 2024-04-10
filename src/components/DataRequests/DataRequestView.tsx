@@ -2,6 +2,7 @@ import { useCallback, useState }  from "react"
 import { useParams }              from "react-router"
 import { Link }                   from "react-router-dom"
 import { HelmetProvider, Helmet } from "react-helmet-async"
+import Markdown                   from "markdown-to-jsx"
 import { useAuth }                from "../../auth"
 import { request }                from "../../backend"
 import { useBackend }             from "../../hooks"
@@ -82,7 +83,19 @@ export default function DataRequestView(): JSX.Element
                 { name: model.name }
             ]}/>
             <h3><i className="fas fa-database" /> { model.name }</h3>
-            <p className="color-muted" dangerouslySetInnerHTML={{ __html: model.description || "" }}/>
+            <div className="markdown">
+                <Markdown options={{
+                    overrides: {
+                        a: {
+                            props: {
+                                className: 'link',
+                                target: "_blank",
+                                rel: "noreferrer noopener"
+                            },
+                        },
+                    },
+                }}>{ model.description || "" }</Markdown>
+            </div>
             <br/>
             <div className="row gap-2 wrap">
                 <div className="col col-6 responsive">
