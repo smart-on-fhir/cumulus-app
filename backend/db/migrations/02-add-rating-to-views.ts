@@ -1,8 +1,8 @@
-import { QueryInterface } from "sequelize";
-import { DataTypes } from "sequelize"
+import { DataTypes }         from "sequelize"
+import { MigrationFunction } from "../../types"
     
 
-export async function up(queryInterface: QueryInterface) {
+export const up: MigrationFunction = async ({ context: queryInterface }) => {
 
     const cols = await queryInterface.describeTable("Views");
 
@@ -31,7 +31,7 @@ export async function up(queryInterface: QueryInterface) {
     }
 }
 
-export async function down(queryInterface: QueryInterface) {
+export const down: MigrationFunction = async ({ context: queryInterface }) => {
     const cols = await queryInterface.describeTable("Views");
 
     if ('rating' in cols) {

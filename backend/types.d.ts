@@ -1,4 +1,4 @@
-import { InstanceDestroyOptions, Options } from "sequelize"
+import { InstanceDestroyOptions, Options, QueryInterface } from "sequelize"
 import { ParsedQs } from "qs"
 import {
     Request,
@@ -133,3 +133,16 @@ export type AppErrorRequestHandler<
     res: Response<ResBody, Locals>,
     next: NextFunction,
 ) => void;
+
+export type MigrationContext = {
+    /** Full path to the migration file */
+    path: string
+    
+    /** The name of the migration file */
+    name: string
+
+    /** The QueryInterface */
+    context: QueryInterface
+}
+
+export type MigrationFunction = (ctx: MigrationContext) => Promise<void>
