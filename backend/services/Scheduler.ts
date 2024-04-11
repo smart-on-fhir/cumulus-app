@@ -6,11 +6,15 @@ import SystemUser                from "../SystemUser"
 import { fetchSubscriptionData } from "../DataManager/CsvDownloader"
 
 
-async function run() {
-    await synchronize()
-    setTimeout(run, 1000 * 60 * 60).unref()
+let timer: NodeJS.Timeout;
+export async function runScheduler() {
+    if (timer) {
+        timer.refresh()
+    } else {
+        await synchronize()
+        timer = setTimeout(runScheduler, 1000 * 60 * 60).unref()
+    }
 }
-
 
 async function synchronize()
 {
@@ -65,5 +69,3 @@ async function synchronize()
         }
     }
 }
-
-run();
