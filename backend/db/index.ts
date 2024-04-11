@@ -110,7 +110,7 @@ async function applySeeds(options: Config, dbConnection: Sequelize)
                 logger.verbose("- Seeding default permissions...");
                 const path = join(seedPath, "permissions.ts")
                 try {
-                    const data = require(path).default;
+                    const data = await import(path);
                     await seedTable(dbConnection, "Permission", data)
                 } catch (error) {
                     logger.error("Applying seeds failed %o", error)
@@ -119,7 +119,7 @@ async function applySeeds(options: Config, dbConnection: Sequelize)
                 logger.verbose(`✔ Applied seeds from ${path.replace(__dirname, "")}`);
             }
         } else {
-            const { seed } = require(seedPath);
+            const { seed } = await import(seedPath);
             try {
                 await seed(dbConnection);
             } catch (error) {
