@@ -1,10 +1,16 @@
-import { QueryInterface } from "sequelize"
+import { MigrationFunction } from "../../types"
 
 
-export async function up(queryInterface: QueryInterface) {
-    await queryInterface.renameColumn('Views', 'DataRequestId', 'subscriptionId');
+export const up: MigrationFunction = async ({ context: queryInterface }) => {
+    const cols = await queryInterface.describeTable("Views");
+    if ('DataRequestId' in cols) {
+        await queryInterface.renameColumn('Views', 'DataRequestId', 'subscriptionId');
+    }
 }
 
-export async function down(queryInterface: QueryInterface) {
-    await queryInterface.renameColumn('Views', 'subscriptionId', 'DataRequestId');
+export const down: MigrationFunction = async ({ context: queryInterface }) => {
+    const cols = await queryInterface.describeTable("Views");
+    if ('subscriptionId' in cols) {
+        await queryInterface.renameColumn('Views', 'subscriptionId', 'DataRequestId');
+    }
 }

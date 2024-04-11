@@ -76,22 +76,7 @@ async function applyMigrations(options: Config, dbConnection: Sequelize)
 
     const umzug = new Umzug({
         context: dbConnection.getQueryInterface(),
-        migrations: {
-            glob: ["migrations/*.ts", { cwd: __dirname }],
-            resolve: ({ name, path, context }) => {
-
-                // @ts-ignore
-                const migration = require(path);
-                
-                // adjust the parameters Umzug will
-                // pass to migration methods when called
-                return {
-                    name,
-                    up: async () => migration.up(context),
-                    down: async () => migration.down(context),
-                };
-            }
-        },
+        migrations: { glob: ["migrations/*.ts", { cwd: __dirname }] },
         storage: new SequelizeStorage({ sequelize: dbConnection }),
         logger: {
             debug: msg => logger.debug(msg.event + " " + msg.name, { ...msg }),

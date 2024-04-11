@@ -1,12 +1,13 @@
-import { DataTypes, QueryInterface } from "sequelize"
+import { DataTypes }         from "sequelize"
+import { MigrationFunction } from "../../types"
 
-export async function up(queryInterface: QueryInterface) {
+export const up: MigrationFunction = async ({ context: queryInterface }) => {
     await queryInterface.changeColumn('RequestGroups', 'description', {
         type: DataTypes.TEXT
     });
 }
 
-export async function down(queryInterface: QueryInterface) {
+export const down: MigrationFunction = async ({ context: queryInterface }) => {
 	await queryInterface.changeColumn('RequestGroups', 'description', {
         type: DataTypes.STRING(255)
     });
