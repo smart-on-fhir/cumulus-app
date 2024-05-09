@@ -169,7 +169,7 @@ export default function DataRequestView(): JSX.Element
                         </table>
                     </div>
 
-                    <h5 className="mt-3">Included Fields</h5>
+                    <h5 className="mt-3">Data Elements</h5>
                     <hr/>
                     <ColumnsTable model={model} />
                     {/* { model.requestedData && <div className="mt-2">
