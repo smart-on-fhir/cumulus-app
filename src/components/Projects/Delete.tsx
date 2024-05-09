@@ -23,7 +23,7 @@ export default function Delete()
             })
 
             return <>
-                <div className="mt-2 mb-1" style={{ whiteSpace: "pre-wrap" }}>
+                <div className="mt-2 mb-1" style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
                     <Clip max={400} txt={ data.description } />
                 </div>
 
