@@ -53,7 +53,7 @@ export default function List()
                                 return (
                                     <div className="col project" key={i} onClick={() => navigate(`/projects/${project.id}`)}>
                                         <h3>{ project.name }</h3>
-                                        <p style={{ whiteSpace: "pre-wrap" }}><Clip max={600} txt={ project.description } /></p>
+                                        <p style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}><Clip max={600} txt={ project.description } /></p>
                                         <br/>
                                         <br/>
                                         <div style={{ flex: 1 }}/>
