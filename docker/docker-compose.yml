@@ -1,5 +1,3 @@
-version: '3.1'
-
 services:
 
   # NginX Server for the dashboard frontend static content
