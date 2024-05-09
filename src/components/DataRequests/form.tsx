@@ -459,7 +459,7 @@ export default function DataRequestForm({
 
             <div className="row gap-2 mt-2 wrap">
                 <div className="col col-6 mb-2 responsive">
-                    <h4>Included Fields</h4>
+                    <h4>Data Elements</h4>
                     <hr/>
                     <FieldsEditor fields={requestedData.fields} onChange={ fields => onChange({
                         ...record,
