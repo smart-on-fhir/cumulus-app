@@ -79,7 +79,7 @@ export default class Chart extends React.Component<ChartProps>
         return {
             chart: {
                 inverted: true,
-                height: Math.max(series.length * 52 + 20, 150),
+                height: Math.max(series.length * 80 + 20, 150),
                 backgroundColor: "transparent",
                 plotBackgroundColor: "#FFF",
                 plotShadow: true,
@@ -102,9 +102,10 @@ export default class Chart extends React.Component<ChartProps>
                     padding: 0,
                     align: "right",
                     style: {
-                        fontSize: "14px",
+                        fontSize: "13px",
                         fontWeight: "bold",
-                        width: 120
+                        width: 120,
+                        lineHeight: "15px"
                     }
                 },
                 plotBands: series.map((s, i) => {
@@ -123,7 +124,7 @@ export default class Chart extends React.Component<ChartProps>
                             align  : "center",
                             style: {
                                 color: "#0007",
-                                fontSize: "14px"
+                                fontSize: "13px"
                             }
                         }
                     } : null
