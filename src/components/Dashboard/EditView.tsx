@@ -6,7 +6,7 @@ import { useBackend }  from "../../hooks";
 import { AlertError }  from "../generic/Alert";
 import Loader          from "../generic/Loader";
 
-export default function EditView({ copy }: { copy?: boolean })
+export default function EditView()
 {
     // The subscription ID from the URL params
     const { id } = useParams()

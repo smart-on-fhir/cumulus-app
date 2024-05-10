@@ -35,7 +35,7 @@ export default function ViewThumbnail({
     const link              = useRef<HTMLAnchorElement>(null)
     
     const deleteCommand      = useCommand(new DeleteGraph({ graphId: view.id || 0, user: auth.user, navigate, ownerId: view.creatorId }));
-    const copyCommand        = useCommand(new CopyGraph(view.id || 0, auth.user, navigate));
+    const copyCommand        = useCommand(new CopyGraph(view, auth.user, navigate));
     const bulkDeleteCommand  = useCommand(new BulkDelete({ graphs: selection?.items || [], user: auth.user }))
     const viewCommand        = useCommand(new View(view.id, auth.user, navigate))
     const requestLineData    = useCommand(new RequestLineLevelData(view.id, auth.user, navigate))

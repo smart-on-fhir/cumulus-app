@@ -673,7 +673,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
     }
 
     const deleteCommand        = useCommand(new DeleteGraph({ graphId: view.id || 0, user: auth.user, navigate, ownerId: view.creatorId }));
-    const copyCommand          = useCommand(new CopyGraph(view.id || 0, auth.user, navigate, runtimeView));
+    const copyCommand          = useCommand(new CopyGraph(view, auth.user, navigate, runtimeView));
     const shareCommand         = useCommand(new ShareGraph(view, auth.user));
     const managePermissionsCmd = useCommand(new ManagePermissions(view, auth.user));
     const downloadPNG          = useCommand(new DownloadScreenshotAsPNG(runtimeView));
