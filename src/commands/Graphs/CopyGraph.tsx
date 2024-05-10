@@ -6,17 +6,37 @@ import { requestPermission } from "../../utils"
 
 export class CopyGraph extends Command
 {
-    private graphId?: number
+    /**
+     * The Graph we want to copy
+     */
+    private view: Partial<app.View>
+
+    /**
+     * The current user. Note that we accept null for guests but this will never
+     * happen in reality because this command is not used in publicly available
+     * locations.
+     */
     private user?: app.User | null
-    private navigate?: NavigateFunction
-    private view?: Partial<app.View>
     
-    constructor(graphId: number, user?: app.User | null, navigate?: NavigateFunction, view?: Partial<app.View>) {
+    /**
+     * The navigate function. If not provided, normal window.location navigation
+     * will be performed
+     */
+    private navigate?: NavigateFunction
+
+    /**
+     * What we want to copy. This basically `this.view` with some modifications.
+     * This is used to inject the runtime state if the command is invoked from
+     * the chart edit page and we also wanna copy any unsaved runtime changes.
+     */
+    private payload?: Partial<app.View>
+    
+    constructor(view: Partial<app.View>, user: app.User | null, navigate?: NavigateFunction, payload?: Partial<app.View>) {
         super()
-        this.graphId = graphId
-        this.user = user
+        this.view     = view
+        this.user     = user
         this.navigate = navigate
-        this.view = view
+        this.payload  = payload
     }
 
     label() {
@@ -37,22 +57,25 @@ export class CopyGraph extends Command
             !!this.user
 
             // Not available for charts that are not saved yet
-            && !!this.graphId
+            && !!this.view.id
 
-            // Not available for those who can't create charts
-            && requestPermission({
-                user     : this.user,
-                resource : "Graphs",
-                action   : "create"
-            })
+            && (this.view.creatorId === this.user.id || (
 
-            // Not available for those who can't read this chart
-            && requestPermission({
-                user       : this.user,
-                resource   : "Graphs",
-                resource_id: this.graphId,
-                action     : "read"
-            })
+                // Not available for those who can't create charts
+                requestPermission({
+                    user     : this.user,
+                    resource : "Graphs",
+                    action   : "create"
+                })
+
+                // Not available for those who can't read this chart
+                && requestPermission({
+                    user       : this.user,
+                    resource   : "Graphs",
+                    resource_id: this.view.id,
+                    action     : "read"
+                })
+            ))
         );
     }
 
@@ -63,9 +86,13 @@ export class CopyGraph extends Command
     execute() {
         setTimeout(() => {
             if (this.navigate) {
-                this.navigate(`/views/${this.graphId}/copy`, { state: { view: this.view }, replace: false })
+                if (this.payload) {
+                    this.navigate(`/views/${this.view.id}/copy`, { state: { view: this.payload }, replace: false })
+                } else {
+                    this.navigate(`/views/${this.view.id}/copy`, { replace: false })
+                }
             } else {
-                const url = new URL(`/views/${this.graphId}/copy`, window.location.origin)
+                const url = new URL(`/views/${this.view.id}/copy`, window.location.origin)
                 window.location.href = url.href
             }
         })
