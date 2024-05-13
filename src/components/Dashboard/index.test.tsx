@@ -170,6 +170,7 @@ describe("Chart View", () => {
         name         : "Test Chart",
         description  : "Test Chart Description",
         DataRequest  : baseDataRequest,
+        isDraft      : false,
         Tags         : [
             { id: 1, name: "Tag 1", description: "Tag 1 Description" },
             { id: 2, name: "Tag 2", description: "Tag 2 Description" },

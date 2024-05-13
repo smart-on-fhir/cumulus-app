@@ -363,6 +363,39 @@ select option.empty-option {
     border-radius: $border-radius + 1px;
     white-space: nowrap;
     margin: -1px;
+
+    > .menu-button {
+        
+        .menu-button-btn {
+            background   : #FFF;
+            border       : 1px solid rgba(0, 0, 0, 0);
+            border-radius: 0;
+            margin       : 1px 1px 1px 0;
+            font         : inherit;
+            display      : flex;
+            flex         : 1 1 0;
+            white-space  : pre;
+            align-items  : center;
+        }
+
+        &:active, &:focus {
+            .menu-button-btn {
+                background: #FFF8;
+                box-shadow: 0 3px 10px -2px #0001 inset;
+            }
+        }
+
+        &:first-child .menu-button-btn {
+            border-top-left-radius: $border-radius;
+            border-bottom-left-radius: $border-radius;
+            margin-left: 1px;
+        }
+
+        &:last-child .menu-button-btn {
+            border-top-right-radius: $border-radius;
+            border-bottom-right-radius: $border-radius;
+        }
+    }
     
     > .btn {
         border       : 1px solid rgba(0, 0, 0, 0);

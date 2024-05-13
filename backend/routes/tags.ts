@@ -75,7 +75,8 @@ route(router, {
                     "id",
                     "name",
                     "description",
-                    "subscriptionId"
+                    "subscriptionId",
+                    "isDraft"
                 ]
             })
         }

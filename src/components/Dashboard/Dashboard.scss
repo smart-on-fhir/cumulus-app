@@ -28,6 +28,27 @@
     }
 }
 
+.draft-label {
+    position: absolute;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    background: #E60C;
+    color     : #FFF;
+    font-size  : 10px;
+    font-weight: 600;
+    font-weight: 600;
+    line-height: 1;
+    text-align : center;
+    padding: 2px 8px;
+    width  : 80px;
+    height : 14px;
+    transform-origin: 0 0;
+    transform  : translate(-14px, 44px) rotate(-45deg);
+    box-shadow : 0 0 0 0.5px #B30C inset;
+    text-shadow: 0 0px 2px rgb(145, 63, 0);
+}
+
 .main-chart {
     // width: 100%;
     aspect-ratio: 5/3;

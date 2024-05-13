@@ -21,10 +21,11 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
     declare id              : CreationOptional<number>;
     declare name            : string;
     declare subscriptionId  : number;
-    declare description     : CreationOptional<string | null>;
-    declare screenShot      : CreationOptional<string | null>;
+    declare isDraft         : boolean | null;
+    declare description     : string | null;
+    declare screenShot      : string | null;
     declare settings        : CreationOptional<Record<string, any> | null>;
-    declare creatorId       : CreationOptional<number | null>;
+    declare creatorId       : number | null;
     declare createdAt       : CreationOptional<Date>;
     declare updatedAt       : CreationOptional<Date>;
 
@@ -79,6 +80,12 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
             subscriptionId: DataTypes.INTEGER,
 
             creatorId: DataTypes.INTEGER,
+
+            isDraft: {
+                type        : DataTypes.BOOLEAN,
+                allowNull   : true,
+                defaultValue: false
+            },
             
             createdAt: DataTypes.DATE,
             updatedAt: DataTypes.DATE
@@ -86,6 +93,7 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
             sequelize,
             modelName: "View",
             scopes: {
+                
                 visible: function(user: CurrentUser) {
                     
                     // If the current user has permission to read any graph, or

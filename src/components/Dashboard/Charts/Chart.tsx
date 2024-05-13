@@ -757,6 +757,7 @@ interface ChartProps {
     contextMenuItems?: (MenuItemConfig | "-")[]
     visualOverrides: app.VisualOverridesState
     onInspectionChange?: (result: string[], ctx: Partial<app.InspectionContext>) => void
+    isDraft?: boolean
 }
 
 export default class Chart extends React.Component<ChartProps>
@@ -835,8 +836,9 @@ export default class Chart extends React.Component<ChartProps>
     }
 
     render() {
-        const { loading, onInspectionChange } = this.props
-        return <div style={{ position: "relative" }} className={ loading ? "loading" : undefined } onMouseDown={ e => this.onMouseDown(e) }>
+        const { loading, onInspectionChange, isDraft } = this.props
+        return <div style={{ position: "relative", overflow: "hidden" }} className={ loading ? "loading" : undefined } onMouseDown={ e => this.onMouseDown(e) }>
+            { isDraft && <div className="draft-label">DRAFT</div> }
             <div id="chart" className={ "main-chart" + (onInspectionChange ? " inspecting" : "") } onContextMenu={e => {
 
                 // @ts-ignore

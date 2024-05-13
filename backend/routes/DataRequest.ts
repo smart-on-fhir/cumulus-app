@@ -12,7 +12,7 @@ import ViewModel                                                  from "../db/mo
 import ColumnsMetadata                                            from "../cumulus_library_columns.json"
 import { sql as logSql }                                          from "../services/logger"
 import ImportJob                                                  from "../DataManager/ImportJob"
-import { getFindOptions, assert, rw, uInt }                       from "../lib"
+import { getFindOptions, assert, rw, uInt, bool }                 from "../lib"
 import { version as pkgVersion }                                  from "../../package.json"
 import { DATA_TYPES }                                             from "../DataManager/dataTypes"
 import { fetchSubscriptionData }                                  from "../DataManager/CsvDownloader"
@@ -104,7 +104,11 @@ const filtersWithoutParams = [
 router.get("/:id/views", rw(async (req: AppRequest, res: Response) => {
     const options = getFindOptions(req);
     options.where = { subscriptionId: +req.params.id };
-    const views = await ViewModel.scope({ method: ['visible', req.user] }).findAll({ ...options, user: req.user });
+    const views = await ViewModel.scope({ method: ['visible', req.user] }).findAll({
+        where: { isDraft: bool(req.query.drafts) },
+        ...options,
+        user: req.user
+    });
     res.json(views);
 }));
 
