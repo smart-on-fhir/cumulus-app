@@ -51,6 +51,7 @@ export default function CopyView()
     // @ts-ignore
     delete view.id
     view.creatorId = user!.id // change ownership
+    view.isDraft = true // Start as draft
 
     // @ts-ignore
     return <Dashboard copy view={view} dataRequest={view.DataRequest} />
