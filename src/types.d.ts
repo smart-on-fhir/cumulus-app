@@ -95,6 +95,7 @@ export declare module app {
         creatorId?: number | null
         Tags?: Pick<Tag, "id" | "name" | "description">[]
         DataRequest?: Pick<DataRequest, "id" | "name">
+        isDraft?: boolean
         createdAt?: Date
         updatedAt?: Date
     }
