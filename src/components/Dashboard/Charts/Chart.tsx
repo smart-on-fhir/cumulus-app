@@ -838,7 +838,7 @@ export default class Chart extends React.Component<ChartProps>
     render() {
         const { loading, onInspectionChange, isDraft } = this.props
         return <div style={{ position: "relative", overflow: "hidden" }} className={ loading ? "loading" : undefined } onMouseDown={ e => this.onMouseDown(e) }>
-            { isDraft && <div className="draft-label">Draft</div> }
+            { isDraft && <div className="draft-label">DRAFT</div> }
             <div id="chart" className={ "main-chart" + (onInspectionChange ? " inspecting" : "") } onContextMenu={e => {
 
                 // @ts-ignore
