@@ -28,6 +28,23 @@
     }
 }
 
+.draft-label {
+    position: absolute;
+    z-index: 100;
+    background: #E60C;
+    font-weight: 600;
+    color: #FFF;
+    padding: 2px 8px;
+    width: 100px;
+    height: 26px;
+    line-height: 22px;
+    text-align: center;
+    transform-origin: 0 0;
+    transform: translate(-20px, 49px) rotate(-45deg);
+    box-shadow: 0 0 0 1px #E609 inset;
+    text-shadow: 0 0px 1px rgb(145, 63, 0);
+}
+
 .main-chart {
     // width: 100%;
     aspect-ratio: 5/3;
