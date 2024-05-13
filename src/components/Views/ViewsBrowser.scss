@@ -74,6 +74,38 @@
         }
     }
 
+    .view-thumbnail.draft {
+        position: relative;
+        overflow: hidden;
+        &:after {
+            content: "DRAFT";
+
+            top: 0;
+            left: 0;
+
+            position: absolute;
+            z-index : 100;
+
+            background: #E60C;
+            color     : #FFF;
+            
+            font-size  : 10px;
+            font-weight: 600;
+            font-weight: 600;
+            line-height: 1;
+            text-align : center;
+
+
+            padding: 2px 8px;
+            width  : 60px;
+            height : 10px;
+            transform-origin: 0 0;
+            transform  : translate(-14px, 40px) rotate(-45deg);
+            box-shadow : 0 0 0 0.5px #B30C inset;
+            text-shadow: 0 0px 2px rgb(145, 63, 0);
+        }
+    }
+
     .plus-icon-wrapper {
         position: relative;
         padding-bottom: 60%;
