@@ -1,7 +1,7 @@
-import { QueryInterface, DataTypes } from "sequelize"
+import { DataTypes } from "sequelize"
     
 
-export async function up(queryInterface: QueryInterface) {
+export async function up({ context: queryInterface }) {
     const cols = await queryInterface.describeTable("Views");
     if (!('isDraft' in cols)) {
         await queryInterface.addColumn('Views', 'isDraft', {
@@ -12,7 +12,7 @@ export async function up(queryInterface: QueryInterface) {
     }
 }
 
-export async function down(queryInterface: QueryInterface) {
+export async function down({ context: queryInterface }) {
     const cols = await queryInterface.describeTable("Views");
     if ('isDraft' in cols) {
         await queryInterface.removeColumn('Views', 'isDraft');
