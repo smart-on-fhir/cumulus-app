@@ -4,7 +4,7 @@ import { FindOptions, Op }      from "sequelize"
 import crypto                   from "crypto"
 import Model                    from "../db/models/View"
 import { route }                from "../lib/route"
-import { assert }               from "../lib"
+import { assert, bool }         from "../lib"
 import * as logger              from "../services/logger"
 import { requestLineLevelData } from "../services/mail"
 import { requestPermission }    from "../services/acl"
@@ -73,6 +73,7 @@ route(router, {
                 { association: "Tags", attributes: ["id", "name", "description"] },
                 { association: "DataRequest", attributes: ["id", "name"] }
             ],
+            where: { isDraft: bool(req.query.drafts) },
             user: SystemUser
         };
 

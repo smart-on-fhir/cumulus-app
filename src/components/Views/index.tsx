@@ -10,7 +10,7 @@ type SortType = "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | ""
 type ViewType = "grid" | "column" | "list"
 type GroupBy  = "tag" | "subscription" | ""
 
-export default function Views()
+export default function Views({ drafts }: { drafts?: boolean })
 {
     const url = new URL(window.location.href)
 
@@ -18,6 +18,8 @@ export default function Views()
     const [ search  , setSearch   ] = useState(url.searchParams.get("q") || "")
     const [ groupBy , setGroupBy  ] = useState<GroupBy>(String(url.searchParams.get("group") || "") as GroupBy)
     const [ sort    , setSort     ] = useState<SortType>(String(url.searchParams.get("sort") || "") as SortType)
+
+    const draftsMode = drafts ?? !!url.searchParams.get("drafts")
 
     const onSearch = (q: string) => {
         url.searchParams.set("q", q)
@@ -55,14 +57,19 @@ export default function Views()
         <div>
             <HelmetProvider>
                 <Helmet>
-                    <title>Cumulus Graphs</title>
+                    <title>{ draftsMode ? "Draft Graphs" : "Cumulus Graphs" }</title>
                 </Helmet>
             </HelmetProvider>
             <div className="row half-gap middle wrap">
                 <div className="col col-0 mb-05 nowrap">
-                    <h4 className="m-0">
-                        <i className="icon fa-solid fa-chart-pie color-brand-2" /> Graphs
-                    </h4>
+                    { draftsMode ? 
+                        <h4 className="m-0">
+                            <i className="icon fa-solid fa-pen-to-square color-brand-2" /> Draft Graphs
+                        </h4> :
+                        <h4 className="m-0">
+                            <i className="icon fa-solid fa-chart-pie color-brand-2" /> Graphs
+                        </h4>
+                    }
                 </div>
                 <div className="col col-0 responsive"/>
                 <div className="col col-3 mb-05 right responsive">
@@ -151,6 +158,7 @@ export default function Views()
                 search={search}
                 sort={sort}
                 groupBy={groupBy}
+                drafts={draftsMode}
             />
         </div>
     )

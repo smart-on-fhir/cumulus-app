@@ -15,6 +15,7 @@ import { getDefaultChartOptions }                from "./Charts/DefaultChartOpti
 import Tag                                       from "../Tags/Tag"
 import Grid                                      from "../generic/Grid"
 import Breadcrumbs                               from "../generic/Breadcrumbs"
+import MenuButton                                from "../generic/MenuButton"
 import { getScreenShot }                         from "../../commands/lib"
 import CommandButton                             from "../../commands/CommandButton"
 import { DownloadScreenshotAsPNG }               from "../../commands/Graphs/DownloadScreenshotAsPNG"
@@ -64,6 +65,7 @@ export interface ViewState
     ranges          : app.RangeOptions
     visualOverrides : app.VisualOverridesState
     inspection      : app.Inspection
+    isDraft         : boolean
 }
 
 interface ViewAction
@@ -246,6 +248,13 @@ export function getViewReducer({
             return nextState;
         }
 
+        if (action.type === "MERGE") {
+            return {
+                ...state,
+                ...action.payload
+            };
+        }
+
         return state
     }
 }
@@ -383,7 +392,9 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                 selectedPlotLineAxis   : "",
                 selectedSeriesId       : ""
             }
-        }
+        },
+
+        isDraft: !!view.isDraft
 
     } as ViewState);
 
@@ -407,7 +418,8 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
         loadingData,
         dataTabIndex,
         tags,
-        ranges
+        ranges,
+        isDraft
     } = state;
 
     const stratifierName = viewGroupBy?.name
@@ -420,6 +432,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
         name       : viewName,
         description: viewDescription,
         Tags       : tags,
+        isDraft    : isDraft,
         settings: {
             ...view.settings,
             groupBy: stratifierName || "",
@@ -480,7 +493,9 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                 return alert("You don't have permission to update graphs")
             }
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
-            await updateOne("views", view.id, { ...runtimeView, screenShot }).catch(e => alert(e.message));
+            const result = await updateOne("views", view.id, { ...runtimeView, screenShot }).catch(e => alert(e.message));
+
+            dispatch({ type: "MERGE", payload: { isDraft: result!.isDraft }})
         }
 
         // Create
@@ -744,11 +759,11 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                         />
                     </div>
                 </div>
-                <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start", minWidth: "32rem", maxWidth: 1200 }}>
+                <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start", minWidth: "26rem", maxWidth: 1200 }}>
                     <div style={{ position: "sticky", top: 2 }}>
                         <Breadcrumbs links={[
                             { name: "Home"  , href: "/" },
-                            { name: "Graphs", href: "/views" },
+                            isDraft ? { name: "Draft Graphs", href: "/drafts" } : { name: "Graphs", href: "/views" },
                             { name: viewName }
                         ]}/>
                         <h2 style={{ margin: "0 0 0.5ex", lineHeight: 1.2 }}>
@@ -804,14 +819,25 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                         disabled={!view.id || !canUpdate || viewType !== "overview" }>
                                         <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
                                     </button>
-                                    <button
-                                        className="btn"
-                                        onClick={save}
-                                        data-tooltip="Save Changes"
-                                        disabled={ viewType !== "overview" }
-                                    >
-                                        <i className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" } /> Save
-                                    </button>
+                                    <MenuButton title="Save" items={[
+                                        <div style={{ cursor: "default" }} onClick={() => {
+                                            runtimeView.isDraft = false;
+                                            save()
+                                        }}>
+                                            { runtimeView.isDraft ? "Publish" : "Save Changes" }
+                                        </div>,
+                                        <div style={{ cursor: "default" }} onClick={() => {
+                                            runtimeView.isDraft = true;
+                                            save()
+                                        }}>
+                                            { runtimeView.isDraft ? "Save Draft" : "Switch to Draft" }
+                                        </div>
+                                    ]}>
+                                        <i
+                                            className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" }
+                                            style={{ color: isDraft ? "#E60" : "inherit" }}
+                                        /> Save <i className="fa-solid fa-caret-down small" />
+                                    </MenuButton>
                                 </div>
                             </div>
                             <div className="col mb-1"></div>
@@ -862,6 +888,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                             options={ state.chartOptions }
                             visualOverrides={ state.visualOverrides }
                             onInspectionChange={ state.inspection.enabled ? onInspectionChange : undefined }
+                            isDraft={ isDraft }
                             contextMenuItems={[
                                 {
                                     label: "Save Changes",
