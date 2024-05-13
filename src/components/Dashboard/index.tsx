@@ -763,7 +763,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                     <div style={{ position: "sticky", top: 2 }}>
                         <Breadcrumbs links={[
                             { name: "Home"  , href: "/" },
-                            { name: "Graphs", href: "/views" },
+                            isDraft ? { name: "Draft Graphs", href: "/drafts" } : { name: "Graphs", href: "/views" },
                             { name: viewName }
                         ]}/>
                         <h2 style={{ margin: "0 0 0.5ex", lineHeight: 1.2 }}>

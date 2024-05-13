@@ -18,7 +18,8 @@ export default function ViewsBrowser({
     requestId,
     search = "",
     sort = "",
-    groupBy
+    groupBy,
+    drafts
 }: {
     layout?: "grid" | "column" | "list",
     requestId?: string | number,
@@ -26,6 +27,7 @@ export default function ViewsBrowser({
     search?: string
     sort?: "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | "",
     groupBy?: "tag" | "subscription" | ""
+    drafts?: boolean
 }) {
 
     let { user } = useAuth();
@@ -34,7 +36,7 @@ export default function ViewsBrowser({
 
     const query = new URLSearchParams()
 
-    query.set("attributes", "id,creatorId,name,description,updatedAt,screenShot")
+    query.set("attributes", "id,creatorId,name,description,updatedAt,screenShot,isDraft")
 
     switch (sort) {
         case "mod-asc":
@@ -56,6 +58,10 @@ export default function ViewsBrowser({
                 query.set("order", "name:asc,createdAt:asc")
             }
         break;
+    }
+
+    if (drafts) {
+        query.set("drafts", "true")
     }
 
     const url = requestId ?
