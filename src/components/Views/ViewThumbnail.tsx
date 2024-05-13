@@ -1,19 +1,18 @@
-import { useRef }                    from "react"
-import { Link, useNavigate }         from "react-router-dom"
-import { CustomSelection }           from "../generic/WithSelection"
-import { app }                       from "../../types"
-import { useAuth }                   from "../../auth"
-import { useCommand }                from "../../hooks"
-import { ellipsis, highlight }       from "../../utils"
-import { BulkDelete }                from "../../commands/Graphs/BulkDelete"
-import { CopyGraph }                 from "../../commands/Graphs/CopyGraph"
-import { DeleteGraph }               from "../../commands/Graphs/DeleteGraph"
-import { OpenInAnalyticEnvironment } from "../../commands/Subscriptions/OpenInAnalyticEnvironment"
-import { RequestLineLevelData }      from "../../commands/Graphs/RequestLineLevelData"
-import { View }                      from "../../commands/Graphs/View"
-import { ShareGraph }                from "../../commands/Graphs/Share/ShareGraph"
-// import { BulkShareGraph }            from "../../commands/Graphs/Share/BulkShareGraph"
-import { ManagePermissions }         from "../../commands/Graphs/Share/ManagePermissions"
+import { useRef }                         from "react"
+import { Link, useNavigate }              from "react-router-dom"
+import { CustomSelection }                from "../generic/WithSelection"
+import { app }                            from "../../types"
+import { useAuth }                        from "../../auth"
+import { useCommand }                     from "../../hooks"
+import { classList, ellipsis, highlight } from "../../utils"
+import { BulkDelete }                     from "../../commands/Graphs/BulkDelete"
+import { CopyGraph }                      from "../../commands/Graphs/CopyGraph"
+import { DeleteGraph }                    from "../../commands/Graphs/DeleteGraph"
+import { OpenInAnalyticEnvironment }      from "../../commands/Subscriptions/OpenInAnalyticEnvironment"
+import { RequestLineLevelData }           from "../../commands/Graphs/RequestLineLevelData"
+import { View }                           from "../../commands/Graphs/View"
+import { ShareGraph }                     from "../../commands/Graphs/Share/ShareGraph"
+import { ManagePermissions }              from "../../commands/Graphs/Share/ManagePermissions"
 
 
 export default function ViewThumbnail({
@@ -48,7 +47,11 @@ export default function ViewThumbnail({
         <Link
             ref={link}
             to={ "/views/" + view.id }
-            className={"view-thumbnail" + (selection?.includes(view) ? " selected" : "")}
+            className={ classList({
+                "view-thumbnail": true,
+                "selected": !!selection?.includes(view),
+                "draft": !!view.isDraft
+            })}
             title={ showDescription ? undefined : view.description || undefined }
             onClick={e => {
                 if (selection && e.metaKey) {
