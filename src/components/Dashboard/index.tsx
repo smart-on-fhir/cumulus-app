@@ -818,7 +818,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                         disabled={!view.id || !canUpdate || viewType !== "overview" }>
                                         <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
                                     </button>
-                                    <MenuButton title="Save" right items={[
+                                    <MenuButton title="Save" items={[
                                         <div style={{ cursor: "default" }} onClick={() => {
                                             runtimeView.isDraft = false;
                                             save()
