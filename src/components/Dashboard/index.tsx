@@ -806,7 +806,6 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                                 }
                                             } 
                                         })}>
-                                        {/* <i className="fa-solid fa-arrow-pointer"/> */}
                                         <i className="fa-solid fa-crosshairs"/>
                                     </button>
                                     <CommandButton { ...copyCommand } label={ "" } />
@@ -819,18 +818,28 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                         disabled={!view.id || !canUpdate || viewType !== "overview" }>
                                         <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
                                     </button>
-                                    <MenuButton title="Save" items={[
+                                    <MenuButton title="Save" right items={[
                                         <div style={{ cursor: "default" }} onClick={() => {
                                             runtimeView.isDraft = false;
                                             save()
                                         }}>
-                                            { runtimeView.isDraft ? "Publish" : "Save Changes" }
+                                            <div className="color-green" style={{ "fontWeight": 500 }}>
+                                                { runtimeView.isDraft ? "Publish" : "Save Changes" }
+                                            </div>
+                                            <div className="small color-muted">
+                                                Save changes and make this graph is visible in lists
+                                            </div>
                                         </div>,
                                         <div style={{ cursor: "default" }} onClick={() => {
                                             runtimeView.isDraft = true;
                                             save()
                                         }}>
-                                            { runtimeView.isDraft ? "Save Draft" : "Switch to Draft" }
+                                            <div className="color-brand-2" style={{ "fontWeight": 500 }}>
+                                                { runtimeView.isDraft ? "Save Draft" : "Switch to Draft" }
+                                            </div>
+                                            <div className="small color-muted">
+                                                Save changes and hide this graph from graph lists
+                                            </div>
                                         </div>
                                     ]}>
                                         <i

@@ -38,5 +38,5 @@ export default function CreateView()
     }
 
     // Eventually render a Breadcrumbs and the dashboard
-    return <Dashboard view={{ creatorId: user!.id }} dataRequest={result as app.DataRequest} />
+    return <Dashboard view={{ creatorId: user!.id, isDraft: true }} dataRequest={result as app.DataRequest} />
 }
