@@ -98,7 +98,7 @@ route(router, {
             })
         }
 
-        const model = await Model.findByPk(req.params.id, { include, user: req.user, logging: console.log });
+        const model = await Model.findByPk(req.params.id, { include, user: req.user });
         assert(model, NotFound);
         res.json(model)
     }
