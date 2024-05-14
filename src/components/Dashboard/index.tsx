@@ -818,7 +818,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                         disabled={!view.id || !canUpdate || viewType !== "overview" }>
                                         <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
                                     </button>
-                                    <div className="btn">
+                                    { requestPermission({ user: auth.user, resource: "Graphs", action: view.id ? "update" : "create" }) && <div className="btn">
                                         <span className="menu-button-btn pr-1" onClick={() => save()}>
                                             <i
                                                 className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" }
@@ -835,7 +835,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                                     { runtimeView.isDraft ? "Publish" : "Save Changes" }
                                                 </div>
                                                 <div className="small color-muted">
-                                                    Save changes and make this graph visible in lists
+                                                    Save changes and make this visible in the graphs list
                                                 </div>
                                             </div>,
                                             <div style={{ cursor: "default" }} onClick={() => {
@@ -846,13 +846,13 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                                     { runtimeView.isDraft ? "Save Draft" : "Switch to Draft" }
                                                 </div>
                                                 <div className="small color-muted">
-                                                    Save changes and hide this graph from graph lists
+                                                    Save changes and hide this from the graphs list
                                                 </div>
                                             </div>
                                         ]}>
                                             <i className="fa-solid fa-caret-down small" />
                                         </MenuButton>
-                                    </div>
+                                    </div> }
                                 </div>
                             </div>
                             <div className="col mb-1"></div>
