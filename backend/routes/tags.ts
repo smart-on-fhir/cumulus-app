@@ -5,6 +5,7 @@ import * as lib        from "../lib"
 import { NotFound }    from "../errors"
 import { assert }      from "../lib"
 import { route }       from "../lib/route"
+import View            from "../db/models/View"
 
 export const router = Router({ mergeParams: true });
 
@@ -70,13 +71,15 @@ route(router, {
 
         if (req.query.graphs) {
             include.push({
-                association: "graphs",
+                model: View.scope({ method: ['visible', req.user] }),
+                as: "graphs",
                 attributes: [
                     "id",
                     "name",
                     "description",
                     "subscriptionId",
-                    "isDraft"
+                    "isDraft",
+                    "updatedAt"
                 ]
             })
         }
@@ -94,7 +97,7 @@ route(router, {
             })
         }
 
-        const model = await Model.findByPk(req.params.id, { include, user: req.user });
+        const model = await Model.findByPk(req.params.id, { include, user: req.user, logging: console.log });
         assert(model, NotFound);
         res.json(model)
     }
