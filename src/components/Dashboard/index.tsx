@@ -818,35 +818,41 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                         disabled={!view.id || !canUpdate || viewType !== "overview" }>
                                         <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
                                     </button>
-                                    <MenuButton title="Save" items={[
-                                        <div style={{ cursor: "default" }} onClick={() => {
-                                            runtimeView.isDraft = false;
-                                            save()
-                                        }}>
-                                            <div className="color-green" style={{ "fontWeight": 500 }}>
-                                                { runtimeView.isDraft ? "Publish" : "Save Changes" }
+                                    <div className="btn">
+                                        <span className="menu-button-btn pr-1" onClick={() => save()}>
+                                            <i
+                                                className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" }
+                                                style={{ width: "1.2em", color: isDraft ? "#E60" : "inherit" }}
+                                                onClick={() => save()}
+                                            /> Save
+                                        </span>
+                                        <MenuButton right items={[
+                                            <div style={{ cursor: "default" }} onClick={() => {
+                                                runtimeView.isDraft = false;
+                                                save()
+                                            }}>
+                                                <div className="color-grey-dark" style={{ "fontWeight": 500 }}>
+                                                    { runtimeView.isDraft ? "Publish" : "Save Changes" }
+                                                </div>
+                                                <div className="small color-muted">
+                                                    Save changes and make this graph visible in lists
+                                                </div>
+                                            </div>,
+                                            <div style={{ cursor: "default" }} onClick={() => {
+                                                runtimeView.isDraft = true;
+                                                save()
+                                            }}>
+                                                <div className="color-brand-2" style={{ "fontWeight": 500 }}>
+                                                    { runtimeView.isDraft ? "Save Draft" : "Switch to Draft" }
+                                                </div>
+                                                <div className="small color-muted">
+                                                    Save changes and hide this graph from graph lists
+                                                </div>
                                             </div>
-                                            <div className="small color-muted">
-                                                Save changes and make this graph is visible in lists
-                                            </div>
-                                        </div>,
-                                        <div style={{ cursor: "default" }} onClick={() => {
-                                            runtimeView.isDraft = true;
-                                            save()
-                                        }}>
-                                            <div className="color-brand-2" style={{ "fontWeight": 500 }}>
-                                                { runtimeView.isDraft ? "Save Draft" : "Switch to Draft" }
-                                            </div>
-                                            <div className="small color-muted">
-                                                Save changes and hide this graph from graph lists
-                                            </div>
-                                        </div>
-                                    ]}>
-                                        <i
-                                            className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" }
-                                            style={{ color: isDraft ? "#E60" : "inherit" }}
-                                        /> Save <i className="fa-solid fa-caret-down small" />
-                                    </MenuButton>
+                                        ]}>
+                                            <i className="fa-solid fa-caret-down small" />
+                                        </MenuButton>
+                                    </div>
                                 </div>
                             </div>
                             <div className="col mb-1"></div>
