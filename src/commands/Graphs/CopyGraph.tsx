@@ -85,14 +85,15 @@ export class CopyGraph extends Command
     
     execute() {
         setTimeout(() => {
+            const path = `/${this.view.isDraft ? "drafts" : "views"}/${this.view.id}/copy`
             if (this.navigate) {
                 if (this.payload) {
-                    this.navigate(`/views/${this.view.id}/copy`, { state: { view: this.payload }, replace: false })
+                    this.navigate(path, { state: { view: this.payload }, replace: false })
                 } else {
-                    this.navigate(`/views/${this.view.id}/copy`, { replace: false })
+                    this.navigate(path, { replace: false })
                 }
             } else {
-                const url = new URL(`/views/${this.view.id}/copy`, window.location.origin)
+                const url = new URL(path, window.location.origin)
                 window.location.href = url.href
             }
         })

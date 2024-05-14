@@ -46,7 +46,7 @@ export default function ViewThumbnail({
     return (
         <Link
             ref={link}
-            to={ "/views/" + view.id }
+            to={ view.isDraft ? "/drafts/" + view.id : "/views/" + view.id }
             className={ classList({
                 "view-thumbnail": true,
                 "selected": !!selection?.includes(view),

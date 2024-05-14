@@ -48,7 +48,14 @@ export default function App()
                                         <Route path="copy"         element={ <RequireAuth><CopyView /></RequireAuth> } />
                                     </Route>
                                 </Route>
-                                <Route path="drafts" element={ <RequireAuth><Views drafts /></RequireAuth> } />
+                                <Route path="drafts">
+                                    <Route index element={ <RequireAuth><Views drafts /></RequireAuth> } />
+                                    <Route path=":id">
+                                        <Route index               element={ <RequireAuth><EditView /></RequireAuth> } />
+                                        <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />
+                                        <Route path="copy"         element={ <RequireAuth><CopyView /></RequireAuth> } />
+                                    </Route>
+                                </Route>
 
                                 <Route path="requests/*"     element={ <RequireAuth><Subscriptions /></RequireAuth> } />
                                 <Route path="sites/*"        element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
