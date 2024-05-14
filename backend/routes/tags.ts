@@ -73,6 +73,7 @@ route(router, {
             include.push({
                 model: View.scope({ method: ['visible', req.user] }),
                 as: "graphs",
+                required: false,
                 attributes: [
                     "id",
                     "name",
