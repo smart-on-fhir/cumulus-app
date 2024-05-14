@@ -1,7 +1,7 @@
 import crypto                                                     from "crypto"
 import express, { Response }                                      from "express"
 import slug                                                       from "slug"
-import { Includeable, QueryTypes }                                from "sequelize"
+import { Includeable, QueryTypes, Op }                            from "sequelize"
 import { NotFound, InternalServerError, HttpError, BadRequest }   from "../errors"
 import Model                                                      from "../db/models/DataRequest"
 import { AppRequest }                                             from "../types"
@@ -103,11 +103,10 @@ const filtersWithoutParams = [
 // Views -----------------------------------------------------------------------
 router.get("/:id/views", rw(async (req: AppRequest, res: Response) => {
     const options = getFindOptions(req);
-    options.where = { subscriptionId: +req.params.id };
     const views = await ViewModel.scope({ method: ['visible', req.user] }).findAll({
-        where: { isDraft: bool(req.query.drafts) },
         ...options,
-        user: req.user
+        where: { subscriptionId: +req.params.id },
+        user: req.user,
     });
     res.json(views);
 }));
