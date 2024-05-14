@@ -829,7 +829,11 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                         <MenuButton right items={[
                                             <div style={{ cursor: "default" }} onClick={() => {
                                                 runtimeView.isDraft = false;
-                                                save()
+                                                save().then(() => {
+                                                    if (view.id) {
+                                                        navigate(`/views/${view.id}`)
+                                                    }
+                                                })
                                             }}>
                                                 <div className="color-grey-dark" style={{ "fontWeight": 500 }}>
                                                     { runtimeView.isDraft ? "Publish" : "Save Changes" }
@@ -840,7 +844,11 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                             </div>,
                                             <div style={{ cursor: "default" }} onClick={() => {
                                                 runtimeView.isDraft = true;
-                                                save()
+                                                save().then(() => {
+                                                    if (view.id) {
+                                                        navigate(`/drafts/${view.id}`)
+                                                    }
+                                                })
                                             }}>
                                                 <div className="color-brand-2" style={{ "fontWeight": 500 }}>
                                                     { runtimeView.isDraft ? "Save Draft" : "Switch to Draft" }
