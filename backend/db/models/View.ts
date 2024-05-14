@@ -114,29 +114,35 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
                                 // Graphs created by me
                                 { creatorId: user.id },
 
-                                // Graphs shared with me
-                                { id: {
-                                    [Op.in]: sequelize.literal(`(
-                                        SELECT "resource_id"
-                                          FROM "Permissions"
-                                         WHERE "user_id" = ${+user.id}
-                                           AND "resource" = 'Graphs'
-                                           AND "action" = 'read'
-                                           AND "permission" IS TRUE
-                                    ) `)
-                                }},
+                                { [Op.and] : [
+                                    { isDraft: false },
 
-                                // Graphs shared with groups I'm a member of
-                                { id: {
-                                    [Op.in]: this.sequelize.literal(`(
-                                        SELECT "resource_id"
-                                          FROM "Permissions"
-                                         WHERE "user_group_id" IN (SELECT "UserGroupId" FROM "UserGroupUsers" WHERE "UserId" = ${+user.id})
-                                           AND "resource" = 'Graphs'
-                                           AND "action" = 'read'
-                                           AND "permission" IS TRUE
-                                    ) `)
-                                }}
+                                    { [Op.or]: [
+                                        // Graphs shared with me
+                                        { id: {
+                                            [Op.in]: sequelize.literal(`(
+                                                SELECT "resource_id"
+                                                FROM "Permissions"
+                                                WHERE "user_id" = ${+user.id}
+                                                AND "resource" = 'Graphs'
+                                                AND "action" = 'read'
+                                                AND "permission" IS TRUE
+                                            ) `)
+                                        }},
+
+                                        // Graphs shared with groups I'm a member of
+                                        { id: {
+                                            [Op.in]: this.sequelize.literal(`(
+                                                SELECT "resource_id"
+                                                FROM "Permissions"
+                                                WHERE "user_group_id" IN (SELECT "UserGroupId" FROM "UserGroupUsers" WHERE "UserId" = ${+user.id})
+                                                AND "resource" = 'Graphs'
+                                                AND "action" = 'read'
+                                                AND "permission" IS TRUE
+                                            ) `)
+                                        }}
+                                    ]}
+                                ]}
                             ]
                         }
                     }
