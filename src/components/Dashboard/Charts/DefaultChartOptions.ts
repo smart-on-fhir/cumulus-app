@@ -128,7 +128,7 @@ const DefaultChartOptions: Options = {
         // margin: 0,
         // padding: 0
     },
-    colors: generateColors(16),
+    colors: generateColors(32, 80, 55, 0.314, 220),
     yAxis: {
         title: {
             text: "",
