@@ -818,7 +818,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                         disabled={!view.id || !canUpdate || viewType !== "overview" }>
                                         <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
                                     </button>
-                                    { requestPermission({ user: auth.user, resource: "Graphs", action: view.id ? "update" : "create" }) && <div className="btn">
+                                    { (view.creatorId === auth.user!.id || requestPermission({ user: auth.user, resource: "Graphs", action: view.id ? "update" : "create" })) && <div className="btn">
                                         <span className="menu-button-btn pr-1" onClick={() => save()}>
                                             <i
                                                 className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" }
@@ -916,7 +916,8 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                 {
                                     label: "Save Changes",
                                     execute: save,
-                                    icon: <i className="fas fa-save" />
+                                    icon: <i className="fas fa-save" />,
+                                    enabled: view.creatorId === auth.user!.id || requestPermission({ user: auth.user, resource: "Graphs", action: view.id ? "update" : "create" }),
                                 },
                                 deleteCommand,
                                 copyCommand,
