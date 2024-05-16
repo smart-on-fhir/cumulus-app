@@ -100,7 +100,25 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
                     // if the current user belongs to user-group which is
                     // allowed to read any graph, then allow any graph
                     if (user.permissions["Graphs.read"]) {
-                        return {}
+                        return {
+                            user,
+                            where : {
+                                [Op.or]: [
+                                    { isDraft: false },
+                                    {
+                                        [Op.and]: [
+                                            { isDraft: true },
+                                            {
+                                                [Op.or]: [
+                                                    { creatorId: user.id },
+                                                    { creatorId: null }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
                     }
 
                     // Otherwise pretend this is a system query so that the lack
