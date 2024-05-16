@@ -363,6 +363,7 @@ select option.empty-option {
     border-radius: $border-radius + 1px;
     white-space: nowrap;
     margin: -1px;
+    display: flex;
 
     .menu-button {
         display      : flex;
