@@ -74,7 +74,7 @@ route(router, {
                 { association: "DataRequest", attributes: ["id", "name"] }
             ],
             where: { isDraft: bool(req.query.drafts) },
-            user: SystemUser
+            user: req.user
         };
 
         if (req.query.order) {
@@ -95,7 +95,7 @@ route(router, {
         if (req.query.attributes) {
             options.attributes = String(req.query.attributes).split(",")
         }
-
+        
         res.json(await Model.scope({ method: ['visible', req.user] }).findAll(options))
     }
 })
