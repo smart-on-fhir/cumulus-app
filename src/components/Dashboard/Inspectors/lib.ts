@@ -1,5 +1,4 @@
 import { merge, Options, SeriesOptions } from "highcharts";
-import { DEFAULT_COLORS } from "../config";
 
 export function getIndexOfSeriesId(options: Options, seriesId: string) {
     return options.series?.findIndex(s => s.id === seriesId) ?? -1
@@ -43,7 +42,6 @@ export function getColorForSeries(options: Options, seriesId: string) {
         // @ts-ignore
         series.colors?.[index % series.colors!.length] ||
         options.colors?.[index % options.colors!.length] ||
-        DEFAULT_COLORS[index % DEFAULT_COLORS.length] ||
         "#888888"
     );
     return color
