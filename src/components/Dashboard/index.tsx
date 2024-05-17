@@ -699,6 +699,8 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
     const openInAE             = useCommand(new OpenInAnalyticEnvironment(view.subscriptionId || 0, auth.user))
     const generateCaption      = useCommand(new GenerateCaption(state.chartOptions, state, c => dispatch({ type: "UPDATE", payload: { caption: c }})))
 
+    // console.log(state.chartOptions)
+
     return (
         <div className={ "dashboard " + (saving || deleteCommand.working ? "grey-out" : "") + (showOptions ? " sidebar-open" : "") }>
             <HelmetProvider>

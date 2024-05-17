@@ -27,8 +27,9 @@ import {
 import {
     SupportedChartTypes,
     ChartIcons,
-    DEFAULT_COLORS,
-    DASH_STYLES
+    DASH_STYLES,
+    COLOR_THEMES,
+    DEFAULT_COLOR_THEME
 } from "./config"
 
 
@@ -213,6 +214,37 @@ export default function ConfigPanel({
                         />
                         <br/>
                     </div>
+
+                    <div className="mt-1">
+                        <label>Color Theme</label>
+                        <Select
+                            // @ts-ignore
+                            value={ state.chartOptions.custom?.theme ?? DEFAULT_COLOR_THEME }
+                            onChange={ (id) => {
+                                const theme = COLOR_THEMES.find(t => t.id === id)
+                                onChartOptionsChange({
+                                    colors: theme!.colors,
+                                    // @ts-ignore
+                                    custom: { theme: id }
+                                })
+                            }}
+                            options={COLOR_THEMES.map((theme, i) => ({
+                                value: theme.id,
+                                label: theme.name,
+                                right: <>{ theme.colors.map((c, i) => <div key={i} style={{
+                                    background: c,
+                                    display: "inline-block",
+                                    width: "8px",
+                                    height: "1.36em",
+                                    margin: "0 0.5px",
+                                    boxShadow: "0 0 0 0.5px #0008 inset, 0 0 0 0.5px #FFF",
+                                    verticalAlign: "top"
+                                }} />)}</>,
+                                icon: "fas fa-palette color-muted"
+                            }))}
+                        />
+                    </div>
+
                     { isBarOrColumn && state.stratifyBy && 
                         <div className="mt-1">
                             <label>
