@@ -64,7 +64,7 @@ export default function Views({ drafts }: { drafts?: boolean })
                 <div className="col col-0 mb-05 nowrap">
                     { draftsMode ? 
                         <h4 className="m-0">
-                            <i className="icon fa-solid fa-pen-to-square color-brand-2" /> Draft Graphs
+                            <i className="icon fa-solid fa-pen-to-square color-brand-2" /> My Draft Graphs
                         </h4> :
                         <h4 className="m-0">
                             <i className="icon fa-solid fa-chart-pie color-brand-2" /> Graphs
