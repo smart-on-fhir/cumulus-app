@@ -19,7 +19,9 @@ import Area               from "./Area"
 import {
     SupportedChartTypes,
     DEFAULT_FONT_SIZE,
-    DEFAULT_FONT_FAMILY
+    DEFAULT_FONT_FAMILY,
+    COLOR_THEMES,
+    DEFAULT_COLOR_THEME
 } from "../config"
 
 
@@ -40,6 +42,8 @@ const marker: PointMarkerOptionsObject = {
         }
     }
 }
+
+const colors = COLOR_THEMES.find(t => t.id === DEFAULT_COLOR_THEME)!.colors
 
 const DefaultChartOptions: Options = {
     chart: {
@@ -128,7 +132,7 @@ const DefaultChartOptions: Options = {
         // margin: 0,
         // padding: 0
     },
-    colors: generateColors(32, 80, 55, 0.314, 220),
+    colors,
     yAxis: {
         title: {
             text: "",

@@ -8,10 +8,11 @@ import { app }                     from "../../../types"
 import {
     SupportedNativeChartTypes,
     SupportedChartTypes,
-    DEFAULT_COLORS,
     DEFAULT_FONT_FAMILY,
     DEFAULT_FONT_SIZE,
-    INSPECTORS
+    INSPECTORS,
+    COLOR_THEMES,
+    DEFAULT_COLOR_THEME
 } from "../config"
 
 
@@ -244,7 +245,9 @@ function getSeriesAndExceptions({
         // @ts-ignore
         const prev = serverOptions.plotOptions?.[options.type || "series"] ?? {}
 
-        const colors: string[] = serverOptions.colors as string[]
+        const themeId = options.custom?.theme || DEFAULT_COLOR_THEME
+
+        const colors: string[] = serverOptions.colors as string[] || COLOR_THEMES.find(t => t.id === themeId)!.colors
 
         const color = colors[series.length % colors.length]
 
@@ -254,7 +257,7 @@ function getSeriesAndExceptions({
             id: options.id
         }
 
-        if ((options.type === "area" || options.type === "areaspline") && color && S?.visible !== false) {
+        if ((options.type === "area" || options.type === "areaspline") && color) {
             // @ts-ignore
             const fillOpacity = S?.fillOpacity ?? prev.fillOpacity ?? 0.75
             cfg.fillColor = {
@@ -267,7 +270,7 @@ function getSeriesAndExceptions({
         }
 
         if (secondary) {
-            if (options.type?.includes("column") && color && S?.visible !== false) {
+            if (options.type?.includes("column") && color) {
                 cfg.color = {
                     linearGradient: { x1: 1, y1: 0, x2: 0, y2: 1 },
                     stops: [
@@ -284,7 +287,7 @@ function getSeriesAndExceptions({
             //         pattern: {
             //             path: {
             //                 d: 'M 0 0 L 0 6',
-            //                 strokeWidth: 10
+            //                 strokeWidth: 11.25
             //             },
             //             width : 6,
             //             height: 6,
@@ -406,6 +409,32 @@ function getSeriesAndExceptions({
     return { series, exceptions }
 }
 
+function computeColors(chartType: string, series: any[], options: any)
+{
+    // @ts-ignore What theme is currently being used
+    const themeId = options.custom?.theme || DEFAULT_COLOR_THEME
+    
+    // @ts-ignore Start with the initial colors - from DB or from the theme
+    const orig = options.colors || COLOR_THEMES.find(t => t.id === themeId)!.colors
+
+    // The colors to be used in the current chart
+    let colors = [...orig]
+
+    // Do we need to recreate the colors?
+    const newLength = Math.max(chartType === "pie" ? series[0]?.data?.length ?? 0 : series.length, 12)
+    const oldLength = colors.length
+    if (oldLength > newLength) {
+        colors = colors.slice(0, newLength)
+    } else if (newLength > oldLength) {
+        colors = []
+        for (let i = 0; i < newLength; i++) {
+            colors.push(orig[i % orig.length])
+        }
+    }
+
+    return colors
+}
+
 export function buildChartOptions({
     options = {},
     column,
@@ -462,6 +491,7 @@ export function buildChartOptions({
                 easing
             },
         },
+        colors: computeColors(type, series, options),
         title: {
             style: {
                 fontSize: lengthToEm(options.title?.style?.fontSize ?? "2em") + "em"
