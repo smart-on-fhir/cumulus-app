@@ -552,7 +552,7 @@ export function buildChartOptions({
                 fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
                 fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
             },
-            formatter(): any {
+            formatter(ctx): any {
                 const rows = [];
 
                 let x: any
@@ -567,7 +567,8 @@ export function buildChartOptions({
                 // Bullet ------------------------------------------------------
                 rows.push(`<tr><td colspan="2"><b style="color:${
                     // @ts-ignore
-                    this.point.color?.pattern?.color || this.point.series?.color?.stops?.[0]?.[1] || this.point.color || DEFAULT_COLORS[this.point.series.index % DEFAULT_COLORS.length]
+                    this.point.color?.pattern?.color || this.point.series?.color?.stops?.[0]?.[1] || this.point.color ||
+                    ctx.chart.options.colors?.[this.point.series.index % ctx.chart.options.colors.length] || "#888888"
                 };-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
                 
                 // Header ------------------------------------------------------

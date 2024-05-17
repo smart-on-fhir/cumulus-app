@@ -56,8 +56,6 @@ export const SingleDimensionChartTypes: (keyof typeof SupportedChartTypes)[] = [
 
 export const TURBO_THRESHOLD = 1000
 
-export const DEFAULT_COLORS = generateColors(36)
-
 export const DEFAULT_FONT_SIZE = 16
 
 export const DEFAULT_FONT_FAMILY = "'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif"
