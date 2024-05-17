@@ -1,5 +1,4 @@
 import { merge, Options, PointMarkerOptionsObject } from "highcharts"
-import { generateColors } from "../../../utils"
 import Pie                from "./Pie"
 import Pie3d              from "./Pie3d"
 import Donut              from "./Donut"
