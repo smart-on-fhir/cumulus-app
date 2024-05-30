@@ -11,12 +11,24 @@ import {
     expiredUser,
     testEndpoint
 } from "../../test-lib"
+import setupDB from "../../../backend/db";
+import config from "../../../backend/config";
+import SystemUser from "../../../backend/SystemUser";
+import { ValidationError } from "sequelize";
 
 
 
 describe("Users", () => {
 
     afterEach(async () => await resetTable("User", Users))
+
+    it("rejects duplicate emails", async () => {
+        const dbConnection = await setupDB(config)
+        const { User } = dbConnection.models
+        await User.create({ email: "name@domain.tld", role : "user" }, { user: SystemUser })
+        await expect(User.create({ email: "Name@domain.tld", role : "user" }, { user: SystemUser }))
+            .to.be.eventually.rejectedWith(ValidationError)
+    })
     
     describe("list (GET /api/users)", () => {
 
