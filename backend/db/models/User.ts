@@ -109,7 +109,7 @@ export default class User extends BaseModel<InferAttributes<User>, InferCreation
             email: {
                 type     : DataTypes.STRING(100),
                 allowNull: false,
-                unique   : true,
+                unique   : false,
                 validate: {
                     isEmail: true
                 }
@@ -209,7 +209,13 @@ export default class User extends BaseModel<InferAttributes<User>, InferCreation
                         logger.info(`${model} ${model.sid ? "logged in" : "logged out"}`)
                     }
                 }
-            }
+            },
+            indexes: [
+                {
+                    unique: true,
+                    fields: [sequelize.fn('LOWER', sequelize.col('email'))]
+                }
+            ]
         });
     };
 }
