@@ -2,6 +2,7 @@ import { useAuth }        from "../../auth"
 import DataRequestLink    from "../DataRequests/DataRequestLink"
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import Grid               from "../generic/Grid"
+import Markdown           from "../generic/Markdown"
 import ViewThumbnail      from "../Views/ViewThumbnail"
 import { app }            from "../../types"
 
@@ -28,8 +29,10 @@ export default function View() {
             })
             
             return <>
-                <div className="mt-2 mb-1" style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{ data.description }</div>
-                
+                <div className="mt-2 mb-1">
+                    <Markdown>{ data.description }</Markdown>
+                </div>
+
                 <div className="row gap-2 mt-2 wrap">
                     <div className="col col-5 mb-2 responsive">
                         <h5>
