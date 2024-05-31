@@ -4,6 +4,7 @@ import { Link }                   from "react-router-dom"
 import { useAuth }                from "../../auth"
 import { app }                    from "../../types"
 import EndpointListWrapper        from "../generic/EndpointListWrapper"
+import StudyAreaCard              from "../Projects/Card"
 import "./home.scss"
 
 
@@ -46,11 +47,7 @@ function Projects() {
                 return (
                     <div className="projects">
                         { data.map((project, i) => (
-                            <Link to={ `/projects/${project.id}` } className="card card-project" key={i} title={ project.description || undefined }>
-                                <h4>{ project.name }</h4>
-                                <hr/>
-                                <p>{ project.description }</p>
-                            </Link>
+                            <StudyAreaCard key={i} model={project} short />
                         ))}
                     </div>
                 )

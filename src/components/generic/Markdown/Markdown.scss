@@ -1,0 +1,18 @@
+.markdown {
+
+    :first-child {
+        margin-top: 0;
+    }
+
+    :last-child {
+        margin-bottom: 0;
+    }
+
+    ol, ul {
+        padding: 0 0 0 2rem;
+        li {
+            list-style-position: outside;
+            margin: 0.25rem 0;
+        }
+    }
+}
