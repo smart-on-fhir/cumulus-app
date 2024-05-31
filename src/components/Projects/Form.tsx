@@ -42,6 +42,7 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
                                 value={name}
                                 onChange={e => setName(e.target.value)}
                                 disabled={ !!loading }
+                                maxLength={100}
                             />
                         </div>
                     </div>
