@@ -74,7 +74,7 @@ route(router, {
                 { association: "DataRequest", attributes: ["id", "name"] }
             ],
             where: { isDraft: bool(req.query.drafts) },
-            user: req.user
+            user: SystemUser
         };
 
         if (req.query.order) {
