@@ -41,8 +41,9 @@
     }
 
     .main-wrap {
-        position: relative;
+        position  : relative;
         background: #FFF;
+        height    : 100%;
 
         &:after {
             content : "";
@@ -76,10 +77,12 @@
     }
 
     &.short {
+        border-radius: 0.5rem;
 
         > header {
             min-height: 0;
             justify-content: start;
+            border-radius: 0.5rem 0.5rem 0 0;
     
             > h3 {
                 display: block;
