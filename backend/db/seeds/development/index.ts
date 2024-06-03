@@ -1,7 +1,7 @@
 import { Sequelize }    from "sequelize"
 import users            from "./users"
 import data_sites       from "./data_sites"
-import projects         from "./projects"
+import study_areas      from "./study_areas"
 import request_groups   from "./request_groups"
 import data_requests    from "./data_requests"
 import views            from "./views"
@@ -15,7 +15,7 @@ import { seedTable }    from "../lib"
 export async function seed(connection: Sequelize) {
     await seedTable(connection, "User"        , users         )
     await seedTable(connection, "DataSite"    , data_sites    )
-    await seedTable(connection, "Project"     , projects      )
+    await seedTable(connection, "StudyArea"   , study_areas   )
     await seedTable(connection, "RequestGroup", request_groups)
     await seedTable(connection, "DataRequest" , data_requests )
     await seedTable(connection, "View"        , views         )

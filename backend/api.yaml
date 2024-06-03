@@ -792,7 +792,7 @@ paths:
           description: Unexpected error
 
   # Study Areas ----------------------------------------------------------------
-  /projects:
+  /study-areas:
     get:
       summary: Get All Study Areas
       operationId: getStudyAreas
@@ -881,7 +881,7 @@ paths:
         '500':
           description: Fail to create Study Area
 
-  /projects/{id}:
+  /study-areas/{id}:
     get:
       summary: Get Study Area
       description: Get Study Area by ID
@@ -1208,10 +1208,10 @@ paths:
           description: If set include the subscription and its group
           schema:
             type: boolean
-        - name: projects
+        - name: study_areas
           in: query
           required: false
-          description: If set include the subscription and its projects
+          description: If set include the subscription and its study areas
           schema:
             type: boolean
       responses:
@@ -1247,7 +1247,7 @@ paths:
                             maxLength: 100
                       group:
                         $ref: '#/components/schemas/SubscriptionGroup'
-                      Projects:
+                      StudyAreas:
                         type: array
                         items:
                           $ref: '#/components/schemas/StudyArea'
@@ -1275,7 +1275,7 @@ paths:
                   description: Group 1 description
                   createdAt: 2024-02-22T13:36:17.315Z
                   updatedAt: 2024-02-22T13:36:17.315Z
-                Projects: []
+                StudyAreas: []
 
         '401':
           description: If the user is not authorized and guest users are not
@@ -1953,7 +1953,7 @@ paths:
           description: If set include related Views
           schema:
             type: boolean
-        - name: projects
+        - name: study_areas
           in: query
           required: false
           description: If set include related Study Areas
@@ -1994,7 +1994,7 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/View'
-                      Projects:
+                      StudyAreas:
                         type: array
                         items:
                           $ref: '#/components/schemas/StudyArea'

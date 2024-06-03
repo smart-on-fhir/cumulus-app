@@ -1,6 +1,6 @@
 import BaseModel       from "./BaseModel"
 import Tag             from "./Tag"
-import Project         from "./Project"
+import StudyArea       from "./StudyArea"
 import { CurrentUser } from "../../types"
 import SystemUser      from "../../SystemUser"
 import {
@@ -29,7 +29,7 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
     declare createdAt       : CreationOptional<Date>;
     declare updatedAt       : CreationOptional<Date>;
 
-    declare projects?: NonAttribute<Project[]>;
+    declare projects?: NonAttribute<StudyArea[]>;
 
     declare setTags: HasManySetAssociationsMixin<Tag, number>;
 

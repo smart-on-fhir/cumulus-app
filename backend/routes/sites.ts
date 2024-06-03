@@ -160,7 +160,7 @@ route(router, {
         }
     },
     async handler(req, res) {
-        assert(req.user?.id, "Guest cannot create projects", Unauthorized)
+        assert(req.user?.id, "Guest cannot create this record", Unauthorized)
         const model = await Model.create({ ...req.body, creatorId: req.user?.id }, { user: req.user })
         res.json(model)
     }

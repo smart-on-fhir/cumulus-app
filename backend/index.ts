@@ -47,7 +47,7 @@ function setupAPI(app: Application)
     app.use("/api/requests"      , api.subscriptionsRouter);
     app.use("/api/views"         , api.viewsRouter        );
     app.use("/api/users"         , api.usersRouter        );
-    app.use("/api/projects"      , api.studyAreasRouter   );
+    app.use("/api/study-areas"   , api.studyAreasRouter   );
     app.use("/api/tags"          , api.tagsRouter         );
     app.use("/api/data-sites"    , api.dataSitesRouter    );
     app.use("/api/aggregator"    , api.aggregatorRouter   );

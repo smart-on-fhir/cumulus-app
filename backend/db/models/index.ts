@@ -3,7 +3,7 @@ import * as logger       from "../../services/logger"
 import BaseModel         from "./BaseModel"
 import DataRequest       from "./DataRequest"
 import DataSite          from "./DataSite"
-import Project           from "./Project"
+import StudyArea         from "./StudyArea"
 import RequestGroup      from "./RequestGroup"
 import Tag               from "./Tag"
 import User              from "./User"
@@ -149,7 +149,7 @@ export function init(connection: Sequelize) {
     Tag.initialize(connection);
     DataSite.initialize(connection);
     DataRequest.initialize(connection);
-    Project.initialize(connection);
+    StudyArea.initialize(connection);
     RequestGroup.initialize(connection);
     View.initialize(connection);
     Permission.initialize(connection);
@@ -177,8 +177,8 @@ export function init(connection: Sequelize) {
     // Subscriptions belong to one RequestGroup as DataRequest.group
     DataRequest.belongsTo(RequestGroup, { as: "group", onDelete: "SET NULL" });
 
-    // Subscriptions belong to many StudyAreas as Projects
-    DataRequest.belongsToMany(Project, { through: "ProjectsSubscriptions", as: "Projects", timestamps: false });
+    // Subscriptions belong to many StudyAreas
+    DataRequest.belongsToMany(StudyArea, { through: "ProjectsSubscriptions", as: "StudyAreas", timestamps: false });
 
     // Subscriptions have many Tags
     DataRequest.belongsToMany(Tag, { through: "DataRequestsTags", timestamps: false });
@@ -195,7 +195,7 @@ export function init(connection: Sequelize) {
     // StudyAreas --------------------------------------------------------------
 
     // StudyArea has many Subscriptions
-    Project.belongsToMany(DataRequest, { through: "ProjectsSubscriptions", as: "Subscriptions", timestamps: false });
+    StudyArea.belongsToMany(DataRequest, { through: "ProjectsSubscriptions", as: "Subscriptions", timestamps: false, foreignKey: "ProjectId" });
     
 
 

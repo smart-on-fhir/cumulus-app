@@ -187,7 +187,16 @@ export declare module app {
 
         transmissions: Transmission[] | null
 
-        Projects?: Project[]
+        StudyAreas?: StudyArea[]
+    }
+
+    interface StudyArea {
+        id: number
+        name: string
+        description: string
+        creatorId: number
+        createdAt: string
+        updatedAt: string
     }
 
     interface Transmission {
@@ -337,7 +346,7 @@ export declare module app {
         yAxis: number | string | null
     }
 
-    interface Project {
+    interface StudyArea {
         id         : number
         name       : string
         description: string

@@ -4,7 +4,7 @@ import { Link }                   from "react-router-dom"
 import { useAuth }                from "../../auth"
 import { app }                    from "../../types"
 import EndpointListWrapper        from "../generic/EndpointListWrapper"
-import StudyAreaCard              from "../Projects/Card"
+import StudyAreaCard              from "../StudyAreas/Card"
 import "./home.scss"
 
 
@@ -17,7 +17,7 @@ export default function Home() {
                 </Helmet>
             </HelmetProvider>
             <div className="home-page container">
-                <Projects />
+                <StudyAreas />
                 <Graphs />
                 <Subscriptions />
                 <Sites />
@@ -26,18 +26,18 @@ export default function Home() {
     )
 }
 
-function Projects() {
+function StudyAreas() {
     const { user } = useAuth();
     const canCreate = user?.permissions.includes("StudyAreas.create")
     return (
-        <EndpointListWrapper endpoint="/api/projects?order=updatedAt:desc">
-            { (data: app.Project[]) => {
+        <EndpointListWrapper endpoint="/api/study-areas?order=updatedAt:desc">
+            { (data: app.StudyArea[]) => {
                 if (!data.length) {
-                    return <div className="projects center card">
+                    return <div className="study-areas center card">
                         <div>
                         <p>No Study Areas found in the database.</p>
                         { canCreate && <div className="mt-1 mb-1">
-                            <Link to="/projects/new" className="link bold color-green">
+                            <Link to="/study-areas/new" className="link bold color-green">
                                 <i className="fa-solid fa-circle-plus" /> Create Study Area
                             </Link>
                         </div> }
@@ -45,9 +45,9 @@ function Projects() {
                     </div>
                 }
                 return (
-                    <div className="projects">
-                        { data.map((project, i) => (
-                            <StudyAreaCard key={i} model={project} short />
+                    <div className="study-areas">
+                        { data.map((model, i) => (
+                            <StudyAreaCard key={i} model={model} short />
                         ))}
                     </div>
                 )
@@ -62,7 +62,7 @@ function Graphs() {
 
     return (
         <EndpointListWrapper endpoint="/api/views?order=updatedAt:desc&limit=7&attributes=id,name,description,updatedAt">
-            { (data: app.Project[]) => {
+            { (data: app.StudyArea[]) => {
 
                 if (!selected && data.length) {
                     setTimeout(() => setSelected(data[0].id))

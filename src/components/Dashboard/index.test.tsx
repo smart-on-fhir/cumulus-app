@@ -157,10 +157,10 @@ describe("Chart View", () => {
         // Tags?: Pick<Tag, "id" | "name" | "description">[]
         // Views?: View[]s
         transmissions: null,
-        Projects: [
-            { id: 1, name: "Project 1", description: "Project 1 Description" } as app.Project,
-            { id: 2, name: "Project 2", description: "Project 2 Description" } as app.Project,
-            { id: 3, name: "Project 3", description: "Project 3 Description" } as app.Project
+        StudyAreas: [
+            { id: 1, name: "StudyArea 1", description: "StudyArea 1 Description" } as app.StudyArea,
+            { id: 2, name: "StudyArea 2", description: "StudyArea 2 Description" } as app.StudyArea,
+            { id: 3, name: "StudyArea 3", description: "StudyArea 3 Description" } as app.StudyArea
         ]
     }
     
@@ -258,11 +258,11 @@ describe("Chart View", () => {
         })
 
         // Study Areas ---------------------------------------------------------
-        const projectLinks = document.querySelectorAll<HTMLLinkElement>(".view-projects a.project-link")
-        expect(projectLinks.length).toEqual(baseDataRequest.Projects!.length)
-        projectLinks.forEach((link, i) => {
-            expect(link).toHaveAttribute("href", `/projects/${baseDataRequest.Projects![i].id}`)
-            expect(link).toHaveTextContent(baseDataRequest.Projects![i].name)
+        const studyAreaLinks = document.querySelectorAll<HTMLLinkElement>(".view-study-areas a.study-area-link")
+        expect(studyAreaLinks.length).toEqual(baseDataRequest.StudyAreas!.length)
+        studyAreaLinks.forEach((link, i) => {
+            expect(link).toHaveAttribute("href", `/study-areas/${baseDataRequest.StudyAreas![i].id}`)
+            expect(link).toHaveTextContent(baseDataRequest.StudyAreas![i].name)
         })
     });
 })

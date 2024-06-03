@@ -628,8 +628,8 @@ route(router, {
                 toBoolean: true
             },
 
-            // If set include related Projects
-            projects: {
+            // If set include related StudyAreas
+            study_areas: {
                 in: ["query"],
                 optional: true,
                 isBoolean: true,
@@ -653,8 +653,8 @@ route(router, {
             include.push({ association: "Views" })
         }
 
-        if (req.query.projects) {
-            include.push({ association: "Projects" })
+        if (req.query.study_areas) {
+            include.push({ association: "StudyAreas" })
         }
 
         const model = await Model.findByPk(req.params.id, { include, user: req.user })

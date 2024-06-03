@@ -141,8 +141,8 @@ route(router, {
                 toBoolean: true
             },
 
-            // If set include the subscription and its projects
-            projects: {
+            // If set include the subscription and its Study Areas
+            study_areas: {
                 in       : [ "query" ],
                 optional : true,
                 isBoolean: true,
@@ -158,14 +158,14 @@ route(router, {
             include.push({ association: "Tags", attributes: ["id", "name", "description"] })
         }
 
-        if (req.query.subscription || req.query.group || req.query.projects) {
+        if (req.query.subscription || req.query.group || req.query.study_areas) {
             const subscriptionIncludes: any[] = [];
 
             if (req.query.group) {
                 subscriptionIncludes.push({ association: "group" })
             }
-            if (req.query.projects) {
-                subscriptionIncludes.push({ association: "Projects" })
+            if (req.query.study_areas) {
+                subscriptionIncludes.push({ association: "StudyAreas" })
             }
 
             const association: any = { association: "DataRequest" }
