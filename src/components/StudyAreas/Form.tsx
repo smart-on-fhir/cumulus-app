@@ -48,7 +48,14 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
                     </div>
                     <div className="row row-10">
                         <div className="col mb-1 stretch">
-                            <label htmlFor="description">Description</label>
+                            <div className="row gap" style={{ marginBottom: "0.25rem" }}>
+                                <div className="col col-0 middle">
+                                    <label className="p-0" htmlFor="description">Description</label>
+                                </div>
+                                <div className="col right middle">
+                                    <span className="small color-muted">Markdown enabled</span>
+                                </div>
+                            </div>
                             <textarea
                                 id="description"
                                 name="description"

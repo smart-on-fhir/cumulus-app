@@ -1,5 +1,5 @@
 import { expect }                from "chai"
-import Projects                  from "../../fixtures/Projects"
+import StudyAreas                from "../../fixtures/StudyAreas"
 import Subscriptions             from "../../fixtures/DataRequests"
 import {
     server,
@@ -11,37 +11,37 @@ import {
 } from "../../test-lib"
 
 
-describe("Projects", () => {
+describe("StudyAreas", () => {
 
-    afterEach(async () => await resetTable("Project", Projects))
+    afterEach(async () => await resetTable("StudyArea", StudyAreas))
     
-    describe("list (GET /api/projects)", () => {
+    describe("list (GET /api/study-areas)", () => {
 
-        testEndpoint("StudyAreas.read", "GET", "/api/projects")
+        testEndpoint("StudyAreas.read", "GET", "/api/study-areas")
         
         // it ("handles bad parameter errors", async () => {
-        //     const res = await fetch(`${server.baseUrl}/api/projects?order=x`, { headers: { Cookie: "sid=" + admin.sid }})
+        //     const res = await fetch(`${server.baseUrl}/api/study-areas?order=x`, { headers: { Cookie: "sid=" + admin.sid }})
         //     expect(res.status).to.equal(400)
         // })
     })
 
-    describe("view (GET /api/projects/:id)", () => {
+    describe("view (GET /api/study-areas/:id)", () => {
         
-        testEndpoint("StudyAreas.read", "GET", "/api/projects/1")
+        testEndpoint("StudyAreas.read", "GET", "/api/study-areas/1")
 
         it ("handles bad parameter errors", async () => {
-            const res1 = await fetch(`${server.baseUrl}/api/projects/100`, { headers: { Cookie: "sid=" + admin.sid }})
+            const res1 = await fetch(`${server.baseUrl}/api/study-areas/100`, { headers: { Cookie: "sid=" + admin.sid }})
             expect(res1.status).to.equal(404)
 
-            const res = await fetch(`${server.baseUrl}/api/projects/x`, { headers: { Cookie: "sid=" + admin.sid }})
+            const res = await fetch(`${server.baseUrl}/api/study-areas/x`, { headers: { Cookie: "sid=" + admin.sid }})
             expect(res.status).to.equal(400)
         })
     })
 
-    describe("create (POST /api/projects)", () => {
+    describe("create (POST /api/study-areas)", () => {
 
-        testEndpoint("StudyAreas.create", "POST", "/api/projects", { name: "Project name", description: "Project description" });
-        // testEndpoint("Projects.create", "POST", "/api/projects", { name: "Project name", description: "Project description", Subscriptions });
+        testEndpoint("StudyAreas.create", "POST", "/api/study-areas", { name: "Study Area name", description: "Study Area description" });
+        // testEndpoint("StudyAreas.create", "POST", "/api/study-areas", { name: "Study Area name", description: "Study Area description", Subscriptions });
 
         ["guest", "user", "manager", "admin"].forEach(role => {
             const permissions = getPermissionsForRole(role as any);
@@ -57,23 +57,23 @@ describe("Projects", () => {
             options.headers = headers
     
             if (permissions.includes("Tags.create")) {
-                it (`${role} can create projects with subscriptions`, async () => {
-                    const res = await fetch(`${server.baseUrl}/api/projects`, options)
+                it (`${role} can create study-areas with subscriptions`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/study-areas`, options)
                     expect(res.status).to.equal(200)
                     const json = await res.json()
                     expect(json).to.include({ name: "Record name", description: "Record description" })
                     expect(json).to.haveOwnProperty("Subscriptions").that.is.an("array")
                 })
             } else {
-                it (`${role} cannot create projects with subscriptions`, async () => {
-                    const res = await fetch(`${server.baseUrl}/api/projects`, options)
+                it (`${role} cannot create study-areas with subscriptions`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/study-areas`, options)
                     expect(res.status).to.equal(role === "guest" ? 401 : 403)
                 })
             }
         })
 
         it ("handles bad parameter errors", async () => {
-            const res = await fetch(`${server.baseUrl}/api/projects`, {
+            const res = await fetch(`${server.baseUrl}/api/study-areas`, {
                 method: "POST",
                 body: JSON.stringify({ field: "value" }),
                 headers: {
@@ -85,9 +85,9 @@ describe("Projects", () => {
         })
     })
     
-    describe("update (PUT /api/projects/:id)", () => {
+    describe("update (PUT /api/study-areas/:id)", () => {
 
-        testEndpoint("StudyAreas.update", "PUT", "/api/projects/1", { name: "Project name 2", description: "Project description 2" });
+        testEndpoint("StudyAreas.update", "PUT", "/api/study-areas/1", { name: "Study Area name 2", description: "Study Area description 2" });
 
         ["guest", "user", "manager", "admin"].forEach(role => {
             const permissions = getPermissionsForRole(role as any);
@@ -103,23 +103,23 @@ describe("Projects", () => {
             options.headers = headers
     
             if (permissions.includes("Tags.update")) {
-                it (`${role} can update projects with subscriptions`, async () => {
-                    const res = await fetch(`${server.baseUrl}/api/projects/1`, options)
+                it (`${role} can update study-areas with subscriptions`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/study-areas/1`, options)
                     expect(res.status).to.equal(200)
                     const json = await res.json()
                     expect(json).to.include({ name: "Record name 2", description: "Record description 2" })
                     expect(json).to.haveOwnProperty("Subscriptions").that.is.an("array")
                 })
             } else {
-                it (`${role} cannot update projects with subscriptions`, async () => {
-                    const res = await fetch(`${server.baseUrl}/api/projects/1`, options)
+                it (`${role} cannot update study-areas with subscriptions`, async () => {
+                    const res = await fetch(`${server.baseUrl}/api/study-areas/1`, options)
                     expect(res.status).to.equal(role === "guest" ? 401 : 403)
                 })
             }
         })
 
         it ("handles bad parameter errors", async () => {
-            const res = await fetch(`${server.baseUrl}/api/projects/1`, {
+            const res = await fetch(`${server.baseUrl}/api/study-areas/1`, {
                 method: "PUT",
                 body: JSON.stringify({ description: "" }),
                 headers: {
@@ -128,19 +128,19 @@ describe("Projects", () => {
                 }
             })
             expect(res.status).to.equal(400)
-            // expect(await res.text()).to.equal("Error updating project")
+            // expect(await res.text()).to.equal("Error updating Study Area")
         })
     })
     
-    describe("delete (DELETE /api/projects/:id)", () => {
+    describe("delete (DELETE /api/study-areas/:id)", () => {
         
-        testEndpoint("StudyAreas.delete", "DELETE", "/api/projects/1")
+        testEndpoint("StudyAreas.delete", "DELETE", "/api/study-areas/1")
 
         it ("handles bad parameter errors", async () => {
-            const res1 = await fetch(`${server.baseUrl}/api/projects/10`, { method: "DELETE", headers: { Cookie: "sid=" + admin.sid }})
+            const res1 = await fetch(`${server.baseUrl}/api/study-areas/10`, { method: "DELETE", headers: { Cookie: "sid=" + admin.sid }})
             expect(res1.status).to.equal(404)
 
-            const res2 = await fetch(`${server.baseUrl}/api/projects/x`, { method: "DELETE", headers: { Cookie: "sid=" + admin.sid }})
+            const res2 = await fetch(`${server.baseUrl}/api/study-areas/x`, { method: "DELETE", headers: { Cookie: "sid=" + admin.sid }})
             expect(res2.status).to.equal(400)
         })
     })

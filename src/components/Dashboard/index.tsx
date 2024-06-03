@@ -1001,11 +1001,11 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                             <div className="col">
                                 <b>Study Areas</b>
                                 <hr className="small"/>
-                                <div className="mt-05 view-projects">
-                                { dataRequest.Projects?.length ?
-                                    dataRequest.Projects.map((p, i) => (
+                                <div className="mt-05 view-study-areas">
+                                { dataRequest.StudyAreas?.length ?
+                                    dataRequest.StudyAreas.map((p, i) => (
                                         <div key={i} className="ellipsis">
-                                            <Link className="link project-link" to={`/projects/${p.id}`}>
+                                            <Link className="link study-area-link" to={`/study-areas/${p.id}`}>
                                                 <i className="fa-solid fa-book color-brand-2" /> { p.name }
                                             </Link>
                                         </div>

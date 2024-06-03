@@ -11,9 +11,9 @@ export default function View() {
 
     const { user } = useAuth();
 
-    return createViewPage<app.Project>({
-        basePath  : "/projects",
-        endpoint  : "/api/projects",
+    return createViewPage<app.StudyArea>({
+        basePath  : "/study-areas",
+        endpoint  : "/api/study-areas",
         namePlural: "Study Areas",
         icon      : <i className="fa-solid fa-book color-brand-2" />,
         canUpdate : user?.permissions.includes("Tags.update"),

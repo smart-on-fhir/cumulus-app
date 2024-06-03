@@ -4,7 +4,7 @@ import { createListPage } from "../generic/EndpointListWrapper"
 import Grid               from "../generic/Grid"
 import { useAuth }        from "../../auth"
 import { app }            from "../../types"
-import "./Projects.scss"
+import "./StudyAreas.scss"
 
 
 export default function List()
@@ -12,9 +12,9 @@ export default function List()
     const { user } = useAuth();
     const canCreate = user?.permissions.includes("StudyAreas.create")
 
-    return createListPage<app.Project[]>({
+    return createListPage<app.StudyArea[]>({
         namePlural: "Study Areas",
-        endpoint  : "/api/projects",
+        endpoint  : "/api/study-areas",
         icon      : <i className="fa-solid fa-book color-brand-2" />,        
         canCreate,
         renderList: data => {
@@ -30,12 +30,12 @@ export default function List()
 
             return (
                 <Grid cols="22em" gap="1rem">
-                    { data.map((project, i) => {
-                        const graphsCount = project.Subscriptions?.reduce((prev, cur) => {
+                    { data.map((model, i) => {
+                        const graphsCount = model.Subscriptions?.reduce((prev, cur) => {
                             return prev + (cur.Views?.length || 0)
                         }, 0) || 0
                         
-                        return <StudyAreaCard key={i} model={project} footer={{ graphsCount }} />
+                        return <StudyAreaCard key={i} model={model} footer={{ graphsCount }} />
                     }) }
                 </Grid>
             )

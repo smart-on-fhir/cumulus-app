@@ -3,7 +3,7 @@ import chaiAsPromised                from "chai-as-promised"
 import DataRequest                   from "../../../backend/db/models/DataRequest"
 import DataSite                      from "../../../backend/db/models/DataSite"
 import Permission                    from "../../../backend/db/models/Permission"
-import Project                       from "../../../backend/db/models/Project"
+import StudyArea                     from "../../../backend/db/models/StudyArea"
 import RequestGroup                  from "../../../backend/db/models/RequestGroup"
 import Tag                           from "../../../backend/db/models/Tag"
 import User                          from "../../../backend/db/models/User"
@@ -15,7 +15,7 @@ import SystemUser                    from "../../../backend/SystemUser"
 import DataRequests                  from "../../fixtures/DataRequests"
 import DataSites                     from "../../fixtures/DataSites"
 import Permissions                   from "../../fixtures/Permissions"
-import Projects                      from "../../fixtures/Projects"
+import StudyAreas                    from "../../fixtures/StudyAreas"
 import RequestGroups                 from "../../fixtures/RequestGroups"
 import Tags                          from "../../fixtures/Tags"
 import UserGroups                    from "../../fixtures/UserGroups"
@@ -611,7 +611,7 @@ describe("Permissions", () => {
             await resetTable("UserGroup"   , UserGroups   )
             await resetTable("RequestGroup", RequestGroups)
             await resetTable("Tag"         , Tags         )
-            await resetTable("Project"     , Projects     )
+            await resetTable("StudyArea"   , StudyAreas   )
         })
 
         it ("When a Graph is deleted, any associated permissions are also deleted", async () => {
@@ -737,7 +737,7 @@ describe("Permissions", () => {
             ])
 
             expect(await Permission.count({ where: { resource: "StudyAreas", resource_id: 1 } })).to.be.greaterThan(0)
-            const rec = await Project.findByPk(1, { user: SystemUser,  })
+            const rec = await StudyArea.findByPk(1, { user: SystemUser,  })
             await rec!.destroy({ user: SystemUser })
             expect(await Permission.count({ where: { resource: "StudyAreas", resource_id: 1 } })).to.equal(0)
         })

@@ -8,8 +8,8 @@ import { app }              from "../../types"
 
 export default function Delete()
 {
-    return createDeletePage<app.Project>({
-        endpoint    : "/api/projects",
+    return createDeletePage<app.StudyArea>({
+        endpoint    : "/api/study-areas",
         namePlural  : "Study Areas",
         nameSingular: "Study Area",
         icon        : <i className="fa-solid fa-book color-brand-2" />,

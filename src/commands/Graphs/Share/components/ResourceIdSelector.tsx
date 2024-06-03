@@ -10,7 +10,7 @@ const map = {
     Graphs            : { url: "/api/views?attributes=id,name" },
     Subscriptions     : { url: "/api/requests?attributes=id,name" },
     DataSites         : { url: "/api/data-sites?attributes=id,name" },
-    StudyAreas        : { url: "/api/projects?attributes=id,name" },
+    StudyAreas        : { url: "/api/study-areas?attributes=id,name" },
     Tags              : { url: "/api/tags?attributes=id,name" },
     UserGroups        : { url: "/api/user-groups?attributes=id,name" },
 }

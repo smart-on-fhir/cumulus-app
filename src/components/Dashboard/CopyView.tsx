@@ -21,7 +21,7 @@ export default function CopyView()
     // Fetch the subscription by ID
     const { loading, error, result: view } = useBackend<app.View>(
         useCallback(() => {
-            return request("/api/views/" + id + "?tags=true&subscription=true&group=true&projects=true");
+            return request("/api/views/" + id + "?tags=true&subscription=true&group=true&study_areas=true");
         }, [id]),
         true
     );

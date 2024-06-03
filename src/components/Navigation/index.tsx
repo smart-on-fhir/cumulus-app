@@ -58,7 +58,7 @@ export default function Navigation()
     const canReadSubscriptions = user.permissions.includes("Subscriptions.read")
     const canListGroups        = user.permissions.includes("SubscriptionGroups.read")
     const canReadTags          = user.permissions.includes("Tags.read")
-    const canReadProjects      = user.permissions.includes("StudyAreas.read")
+    const canReadStudyAreas    = user.permissions.includes("StudyAreas.read")
     const canReadUsers         = user.permissions.includes("Users.read")
     const canManagePermissions = user.permissions.includes("Permissions.read")
     const canReadUserGroups    = user.permissions.includes("UserGroups.read")
@@ -68,7 +68,7 @@ export default function Navigation()
         <div className="navigation">
             <div className="navigation-wrap">
                 <NavLink to="/"><i className="icon fa-solid fa-house-chimney"></i> Home</NavLink>
-                { canReadProjects && <NavLink to="/projects"><i className="icon fa-solid fa-book" /> Study Areas</NavLink> }
+                { canReadStudyAreas && <NavLink to="/study-areas"><i className="icon fa-solid fa-book" /> Study Areas</NavLink> }
                 <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" /> Graphs</NavLink>
                 <NavLink to="/drafts"><i className="icon fa-solid fa-pen-to-square" /> My Draft Graphs</NavLink>
                 { canReadSites && <NavLink to="/sites"><i className="icon fa-solid fa-location-dot" /> Healthcare Sites</NavLink> }

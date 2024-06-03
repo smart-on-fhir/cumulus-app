@@ -1,4 +1,4 @@
-import BaseModel from "./BaseModel"
+import BaseModel   from "./BaseModel"
 import DataRequest from "./DataRequest"
 import {
     Sequelize,
@@ -7,13 +7,12 @@ import {
     InferAttributes,
     InferCreationAttributes,
     Association,
-    HasManySetAssociationsMixin,
-    NonAttribute
+    HasManySetAssociationsMixin
 } from "sequelize"
 
 
 
-export default class Project extends BaseModel<InferAttributes<Project>, InferCreationAttributes<Project>>
+export default class StudyArea extends BaseModel<InferAttributes<StudyArea>, InferCreationAttributes<StudyArea>>
 {
     declare id: CreationOptional<number>;
     declare name: string;
@@ -22,12 +21,10 @@ export default class Project extends BaseModel<InferAttributes<Project>, InferCr
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 
-    declare projects?: NonAttribute<DataRequest[]>;
-
     declare setSubscriptions: HasManySetAssociationsMixin<DataRequest, number>;
 
     declare static associations: {
-        Subscriptions: Association<DataRequest, Project>;
+        Subscriptions: Association<DataRequest, StudyArea>;
     };
 
     public isOwnedBy(user: any): boolean {
@@ -39,7 +36,7 @@ export default class Project extends BaseModel<InferAttributes<Project>, InferCr
     }
 
     static initialize(sequelize: Sequelize) {
-        Project.init({
+        StudyArea.init({
             id: {
                 type         : DataTypes.INTEGER,
                 allowNull    : false,
@@ -69,7 +66,8 @@ export default class Project extends BaseModel<InferAttributes<Project>, InferCr
             updatedAt: DataTypes.DATE
         }, {
             sequelize,
-            modelName: "Project"
+            modelName: "StudyArea",
+            tableName: "Projects"
         });
     }
 }

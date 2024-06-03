@@ -16,7 +16,7 @@ describe("Graphs", () => {
     })
 
     describe("view", () => {
-        testEndpoint("Graphs.read", "GET", "/api/views/1?tags=true&group=true&projects=true&subscription=true")
+        testEndpoint("Graphs.read", "GET", "/api/views/1?tags=true&group=true&study_areas=true&subscription=true")
         
         it("get the screenshot", async () => {
             const res = await fetch(`${server.baseUrl}/api/views/1/screenshot`, { headers: { Cookie: "sid=" + admin.sid } })

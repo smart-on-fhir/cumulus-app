@@ -3,11 +3,11 @@ import { useNavigate } from "react-router"
 import Markdown        from "../generic/Markdown"
 import Grid            from "../generic/Grid"
 import { app }         from "../../types"
-import "./Projects.scss"
+import "./StudyAreas.scss"
 
 
 export default function StudyAreaCard({ model, footer, short }: {
-    model: app.Project
+    model: app.StudyArea
     short?: boolean
     footer?: {
         graphsCount: number
@@ -17,7 +17,7 @@ export default function StudyAreaCard({ model, footer, short }: {
     const navigate = useNavigate();
 
     return (
-        <div className={"col project" + (short ? " short" : "") } onClick={() => navigate(`/projects/${model.id}`)}>
+        <div className={"col study-area" + (short ? " short" : "") } onClick={() => navigate(`/study-areas/${model.id}`)}>
             <header><h3><i className="fa-solid fa-book color-muted" /> { model.name }</h3></header>
             <div className="main-wrap small">
                 <main>

@@ -7,7 +7,7 @@ import UserGroup                 from "../db/models/UserGroup"
 import DataRequest               from "../db/models/DataRequest"
 import RequestGroup              from "../db/models/RequestGroup"
 import DataSite                  from "../db/models/DataSite"
-import Project                   from "../db/models/Project"
+import StudyArea                   from "../db/models/StudyArea"
 import Tag                       from "../db/models/Tag"
 import * as lib                  from "../lib"
 import { assert }                from "../lib"
@@ -47,7 +47,7 @@ const SHAREABLE_MODELS: Record<string, { Model: any, actions: Action[] }> = {
         actions: ["read", "update", "delete", "share"]
     },
     StudyAreas: {
-        Model: Project as any,
+        Model: StudyArea as any,
         actions: ["read", "update", "delete", "share"]
     },
     Tags: {

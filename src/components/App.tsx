@@ -16,7 +16,7 @@ import Invite                           from "./Users/Invite";
 import Account                          from "./Users/Account";
 import Activate                         from "./Users/Activate";
 import PasswordReset                    from "./Users/PasswordReset";
-import Projects                         from "./Projects";
+import StudyAreas                       from "./StudyAreas";
 import Tags                             from "./Tags";
 import { ContextMenu }                  from "./generic/Menu";
 import Tooltip                          from "./generic/Tooltip";
@@ -60,7 +60,7 @@ export default function App()
                                 <Route path="requests/*"     element={ <RequireAuth><Subscriptions /></RequireAuth> } />
                                 <Route path="sites/*"        element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
                                 <Route path="groups/*"       element={ <RequireAuth><RequestGroups /></RequireAuth> } />
-                                <Route path="projects/*"     element={ <RequireAuth><Projects /></RequireAuth> } />
+                                <Route path="study-areas/*"  element={ <RequireAuth><StudyAreas /></RequireAuth> } />
                                 <Route path="tags/*"         element={ <RequireAuth><Tags /></RequireAuth> } />
                                 <Route path="login"          element={ <LoginPage /> } />
                                 <Route path="activate"       element={ <Activate /> } />

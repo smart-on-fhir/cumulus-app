@@ -68,7 +68,7 @@ export default [
     { user_id: null, role: "user"   , user_group_id: null, resource: "DataSites", action: "update", resource_id: null, permission: 0, comment: "Can update sites" },
     { user_id: null, role: "user"   , user_group_id: null, resource: "DataSites", action: "delete", resource_id: null, permission: 0, comment: "Can delete sites" },
           
-    // Projects
+    // StudyAreas
     { user_id: null, role: "admin"  , user_group_id: null, resource: "StudyAreas", action: "read"  , resource_id: null, permission: 1, comment: "Can read study areas"   },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "StudyAreas", action: "create", resource_id: null, permission: 1, comment: "Can create study areas" },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "StudyAreas", action: "update", resource_id: null, permission: 1, comment: "Can update study areas" },
@@ -141,7 +141,7 @@ export default [
     { user_id: null, role: "user"   , user_group_id: null, resource: "GraphTags", action: "update", resource_id: null, permission: 0, comment: "Can update graph tags" },
     { user_id: null, role: "user"   , user_group_id: null, resource: "GraphTags", action: "delete", resource_id: null, permission: 0, comment: "Can delete graph tags" },
 
-    // ProjectsSubscriptions
+    // StudyAreaSubscriptions
     { user_id: null, role: "admin"  , user_group_id: null, resource: "StudyAreaSubscriptions", action: "read"  , resource_id: null, permission: 1, comment: "Can read which subscriptions are included in study area"   },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "StudyAreaSubscriptions", action: "create", resource_id: null, permission: 1, comment: "Can add subscriptions to study area"                       },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "StudyAreaSubscriptions", action: "update", resource_id: null, permission: 1, comment: "Can update which subscriptions are included in study area" },

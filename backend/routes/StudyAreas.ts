@@ -1,5 +1,5 @@
 import express                    from "express"
-import Model                      from "../db/models/Project"
+import Model                      from "../db/models/StudyArea"
 import { route }                  from "../lib/route"
 import { NotFound, Unauthorized } from "../errors"
 import { assert, getFindOptions } from "../lib"
@@ -149,7 +149,7 @@ route(router, {
         }
     },
     handler: async (req, res) => {
-        assert(req.user?.id, "Guest cannot create projects", Unauthorized)
+        assert(req.user?.id, "Guest cannot create this record", Unauthorized)
         const model = await Model.create({ ...req.body, creatorId: req.user?.id }, { user: req.user })
         if (Array.isArray(req.body.Subscriptions)) {
             await model.setSubscriptions(req.body.Subscriptions, { user: req.user })
