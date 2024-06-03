@@ -473,13 +473,11 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         
         sql += `, sum(cnt::float) AS total FROM "${table}"`
 
-        let where: string[] = [ `"${stratifier}" IS NULL` ]
+        let where: string[] = []
 
         if (unusedColumns.length) {
             where.push(...unusedColumns.map(c => `"${c.name}" IS NULL`))
         }
-
-        // TODO: issue if stratifier is also in filters...
         
         if (filterWhere) {
             where.push(`(${ filterWhere })`)
