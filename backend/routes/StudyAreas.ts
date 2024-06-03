@@ -61,7 +61,7 @@ route(router, {
                         {
                             model: View.scope({ method: ['visible', req.user] }),
                             attributes: [
-                                "id","creatorId","name","description","updatedAt","screenShot"
+                                "id","creatorId","name","description","updatedAt","screenShot","isDraft"
                             ]
                         }
                     ]
