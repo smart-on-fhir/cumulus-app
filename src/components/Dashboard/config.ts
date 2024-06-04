@@ -54,7 +54,7 @@ export type SupportedNativeChartTypes = "pie" | "line" | "spline" | "area" | "ar
  */
 export const SingleDimensionChartTypes: (keyof typeof SupportedChartTypes)[] = ["pie", "pie3d", "donut", "donut3d"]
 
-export const TURBO_THRESHOLD = 1000
+export const TURBO_THRESHOLD = 10000
 
 export const DEFAULT_FONT_SIZE = 16
 
