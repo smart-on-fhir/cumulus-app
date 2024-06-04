@@ -20,7 +20,8 @@ import {
     DEFAULT_FONT_SIZE,
     DEFAULT_FONT_FAMILY,
     COLOR_THEMES,
-    DEFAULT_COLOR_THEME
+    DEFAULT_COLOR_THEME,
+    TURBO_THRESHOLD
 } from "../config"
 
 
@@ -194,7 +195,8 @@ const DefaultChartOptions: Options = {
                     textOutline: "1px contrast",
                     fontWeight : "700"
                 }
-            }
+            },
+            turboThreshold: TURBO_THRESHOLD
         },
         pie: {
             startAngle      : 0,
