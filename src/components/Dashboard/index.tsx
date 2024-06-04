@@ -5,7 +5,7 @@ import Highcharts, { Chart }                     from "../../highcharts"
 import { useBackend, useCommand }                from "../../hooks"
 import { createOne, updateOne, request }         from "../../backend"
 import { useAuth }                               from "../../auth"
-import { AlertError }                            from "../generic/Alert"
+import Alert, { AlertError }                     from "../generic/Alert"
 import ConfigPanel                               from "./ConfigPanel"
 import {buildChartOptions, default as BaseChart} from "./Charts/Chart"
 import CaptionEditor                             from "./CaptionEditor"
@@ -903,10 +903,10 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                             </AlertError>
                         ) }
                         { viewType === "overview" && turbo && (
-                            <AlertError>
+                            <Alert color="orange" className="mb-1" icon="fa-solid fa-circle-exclamation">
                                 The data is too big to render properly in the chart view. We did our best but there might be some issues.
                                 Please change your settings and perhaps add some filters to reduce the data size.
-                            </AlertError>
+                            </Alert>
                         ) }
                         { viewColumn && viewType === "overview" && <BaseChart
                             loading={ loadingData }
