@@ -404,7 +404,7 @@ export default function ConfigPanel({
                                     onChange={ (stratifyBy: string) => onChange({
                                         ...state,
                                         stratifyBy,
-                                        denominator: state.denominator === "local" && !stratifyBy ? "" : state.denominator
+                                        denominator: (state.denominator === "local" || state.denominator === "count") && !stratifyBy ? "" : state.denominator
                                     }) }
                                 />
                                 <p className="small color-muted">
