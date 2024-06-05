@@ -911,6 +911,18 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                             </Alert>
                         ) }
                         { loadingDataError && <AlertError><b>Error loading data:</b> { loadingDataError + "" }</AlertError> }
+                        { viewGroupBy?.name && state.denominator === "count" && filters.some(f => f.left === viewGroupBy.name) && (
+                            <Alert color="orange" className="mb-1" icon="fa-solid fa-circle-exclamation">
+                                <div style={{ fontFamily: "sans-serif" }}>
+                                    You have stratified the data by "{ viewGroupBy.name }" and selected a Stratified Count denominator.
+                                    However, you have also applied some filters affecting the "{ viewGroupBy.name }" column. This can make it
+                                    impossible to properly compute a stratified count denominator resulting in values grater than 100% on the Y axis!
+                                    <p>
+                                        <b>To fix this, use different denominator or remove filters on the "{ viewGroupBy.name }" column.</b>
+                                    </p>
+                                </div>
+                            </Alert>
+                        )}
                         { viewColumn && viewType === "overview" && <BaseChart
                             loading={ loadingData }
                             options={ state.chartOptions }
