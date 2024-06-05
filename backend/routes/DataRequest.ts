@@ -325,19 +325,19 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
     const allColumns = subscription.metadata.cols;
 
     // Verify that at least one column is requested
-    if (!column) throw new Error(`No column requested`)
+    if (!column) throw new BadRequest(`No column requested`)
 
     // Verify that column is not "cnt"
-    if (column === "cnt") throw new Error(`Must select a column other than "cnt"`)
+    if (column === "cnt") throw new BadRequest(`Must select a column other than "cnt"`)
 
     const columnMeta = allColumns.find(x => x.name === column)
 
     // Verify that column exists
-    if (!columnMeta) throw new Error(`No such column "${column}"`)
+    if (!columnMeta) throw new BadRequest(`No such column "${column}"`)
 
     // Verify that stratifier exists
     if (stratifier && !allColumns.find(c => c.name === stratifier)) {
-        throw new Error(`No such column "${stratifier}" (used as stratifier)`)
+        throw new BadRequest(`No such column "${stratifier}" (used as stratifier)`)
     }
 
     const hasErrorBars = allColumns.find(x => x.name === "cnt_min") && allColumns.find(x => x.name === "cnt_max");
@@ -356,17 +356,17 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         f.split(/\s*,\s*/).filter(Boolean).forEach((cond, i) => {
             const parts = cond.split(":");
             if (parts.length < 2) {
-                throw new Error("Each filter must have at least 2 parts");
+                throw new BadRequest("Each filter must have at least 2 parts");
             }
             
             const [column, operator, right] = parts;
 
             if (!right && !filtersWithoutParams.includes(operator)) {
-                throw new Error(`Missing filter value for "${cond}"`);
+                throw new BadRequest(`Missing filter value for "${cond}"`);
             }
             
             if (typeof FilterConfig[operator] !== "function") {
-                throw new Error(`Filter operator "${operator}" is not implemented`);
+                throw new BadRequest(`Filter operator "${operator}" is not implemented`);
             }
 
             const sql = FilterConfig[operator](column)
