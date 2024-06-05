@@ -44,28 +44,29 @@ import "./Dashboard.scss"
 
 export interface ViewState
 {
-    viewType        : "overview" | "data",
-    showOptions     : boolean
-    viewName        : string
-    viewDescription : string
-    viewColumn      : app.DataRequestDataColumn
-    viewGroupBy    ?: app.DataRequestDataColumn
-    filters         : app.Filter[]
-    chartType       : string
-    chartOptions    : Partial<Highcharts.Options>
-    denominator     : app.DenominatorType
-    column2        ?: app.DataRequestDataColumn
-    column2type    ?: keyof typeof SupportedChartTypes
-    caption         : string
-    data            : app.ServerResponses.DataResponse | null
-    data2           : app.ServerResponses.StratifiedDataResponse | null
-    loadingData     : boolean
-    dataTabIndex    : number
-    tags            : Pick<app.Tag, "id"|"name"|"description">[]
-    ranges          : app.RangeOptions
-    visualOverrides : app.VisualOverridesState
-    inspection      : app.Inspection
-    isDraft         : boolean
+    viewType         : "overview" | "data",
+    showOptions      : boolean
+    viewName         : string
+    viewDescription  : string
+    viewColumn       : app.DataRequestDataColumn
+    viewGroupBy     ?: app.DataRequestDataColumn
+    filters          : app.Filter[]
+    chartType        : string
+    chartOptions     : Partial<Highcharts.Options>
+    denominator      : app.DenominatorType
+    column2         ?: app.DataRequestDataColumn
+    column2type     ?: keyof typeof SupportedChartTypes
+    caption          : string
+    data             : app.ServerResponses.DataResponse | null
+    data2            : app.ServerResponses.StratifiedDataResponse | null
+    loadingData      : boolean
+    dataTabIndex     : number
+    tags             : Pick<app.Tag, "id"|"name"|"description">[]
+    ranges           : app.RangeOptions
+    visualOverrides  : app.VisualOverridesState
+    inspection       : app.Inspection
+    isDraft          : boolean
+    loadingDataError?: Error | string | null 
 }
 
 interface ViewAction
@@ -419,7 +420,8 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
         dataTabIndex,
         tags,
         ranges,
-        isDraft
+        isDraft,
+        loadingDataError
     } = state;
 
     const stratifierName = viewGroupBy?.name
@@ -908,6 +910,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                 Please change your settings and perhaps add some filters to reduce the data size.
                             </Alert>
                         ) }
+                        { loadingDataError && <AlertError><b>Error loading data:</b> { loadingDataError + "" }</AlertError> }
                         { viewColumn && viewType === "overview" && <BaseChart
                             loading={ loadingData }
                             options={ state.chartOptions }
