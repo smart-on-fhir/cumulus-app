@@ -56,9 +56,10 @@
     min-height: 300px;
     overflow: hidden;
     position: relative;
-    pointer-events: none;
-
+    pointer-events: initial;
+    
     .highcharts-container {
+        user-select: auto;
         left: 0 !important;
         top : 0 !important;
     }
