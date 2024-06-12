@@ -365,6 +365,7 @@ interface DataUploader2State {
     importCompleted    : boolean
     uploading          : boolean
     estimate           : number
+    dataType           : "cube" | "flat"
 }
 
 class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
@@ -388,7 +389,8 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
             requestResult   : null,
             importCompleted : false,
             uploading       : false,
-            estimate        : 1000
+            estimate        : 1000,
+            dataType        : "cube"
         };
 
         this.upload = this.upload.bind(this)
@@ -463,7 +465,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
     }
 
     async upload() {
-        const { file, cols } = this.state;
+        const { file, cols, dataType } = this.state;
 
         if (!file) {
             return Promise.reject(new Error("No file"));
@@ -477,6 +479,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
         params.set("types", _cols.map(c => encodeURIComponent(c.dataType)).join(","))
         params.set("labels", _cols.map(c => encodeURIComponent(c.label)).join(","))
         params.set("descriptions", _cols.map(c => encodeURIComponent(c.description)).join(","))
+        params.set("data_type", dataType)
         
         let url = "/api/requests/" + this.props.requestID + "/data?" + params.toString();
         
@@ -607,7 +610,8 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
             importCompleted,
             uploading,
             estimate,
-            errorMessage
+            errorMessage,
+            dataType
         } = this.state;
 
         if (requestLoading) {
@@ -681,6 +685,26 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
                             }}>{file ? file.name : ""}</div>
                         </div>
                     </div>
+                    <div className="col col-0">
+                        <label>CSV Data Type</label>
+                        <div className="toolbar flex">
+                            <button
+                                className={"btn" + (dataType === "cube" ? " active" : "")}
+                                onClick={() => this.setState({ dataType: "cube" })}
+                                data-tooltip="PowerSet Cube Data"
+                                style={{ minWidth: "6em" }}
+                                >
+                                <i className="fa-solid fa-cube" /> Cube
+                            </button>
+                            <button
+                                className={"btn" + (dataType === "flat" ? " active" : "")}
+                                onClick={() => this.setState({ dataType: "flat" })}
+                                data-tooltip="Normal Table Data"
+                                style={{ minWidth: "6em" }}
+                                ><i className="fas fa-th" /> Flat
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
                 { !!file && <>
@@ -700,8 +724,6 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
                         onSelectionChange={ selectedColIndex => this.setState({ selectedColIndex }) }
                     />
                     <hr className="mt-1"/>
-               
-                    
                 </> }
                 </fieldset>
                 { !!file && <div className="col center mt-1 mb-2">
