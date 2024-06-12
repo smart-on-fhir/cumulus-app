@@ -40,6 +40,7 @@ import "./Dashboard.scss"
 import { GraphBreadcrumbs } from "./GraphBreadcrumbs"
 import { GraphTitle }       from "./GraphTitle"
 import { GraphDescription } from "./GraphDescription"
+import { GraphToolbar }     from "./GraphToolbar"
 
 
 // =============================================================================
@@ -489,7 +490,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
     };
 
     // Save
-    const { execute: save, loading: saving } = useBackend(async () => {
+    const { execute: saveChart, loading: saving } = useBackend(async () => {
         
         // Update
         if (view.id) {
@@ -515,11 +516,10 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
         }
     });
 
-    // Take Screenshot
-    const { execute: takeScreenshot, loading: takingScreenshot } = useBackend(async () => {
-        const screenShot = await getScreenShot();
-        await updateOne("views", view.id!, { screenShot }).catch(e  => alert(e.message));
-    });
+    const save = (props: Partial<app.View> = {}) => {
+        Object.assign(runtimeView, props)
+        return saveChart()
+    }
 
     // Convert filters to search parameters
     const noRightOps = [
@@ -771,6 +771,16 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                         <GraphTitle value={state.viewName} onChange={ (viewName: string) => dispatch({ type: "MERGE", payload: { viewName }}) } />
                         <hr/>
                         <GraphDescription value={state.viewDescription} onChange={ viewDescription => dispatch({ type: "MERGE", payload: { viewDescription }}) } />
+                        <GraphToolbar
+                            state={state}
+                            dispatch={dispatch}
+                            save={save}
+                            graph={{ ...view, isDraft }}
+                            saving={saving}
+                            deleteCommand={deleteCommand}
+                            copyCommand={copyCommand}
+                            shareCommand={shareCommand}
+                        />
 
                         { viewType === "data" && <>
                             <div className="tab-panel mt-1">
@@ -815,7 +825,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                             contextMenuItems={[
                                 {
                                     label: "Save Changes",
-                                    execute: save,
+                                    execute: () => save(),
                                     icon: <i className="fas fa-save" />,
                                     enabled: view.creatorId === auth.user!.id || requestPermission({ user: auth.user, resource: "Graphs", action: view.id ? "update" : "create" }),
                                 },
@@ -823,13 +833,6 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                 copyCommand,
                                 shareCommand,
                                 managePermissionsCmd,
-                                {
-                                    label: "Update Graph Thumbnail",
-                                    execute: takeScreenshot,
-                                    enabled: !!view.id,
-                                    icon: <i className="fa-solid fa-camera" />,
-                                    description: "Take new screenshot of this graph as it currently looks"
-                                },
                                 // {
                                 //     label: showOptions ? "Hide Chart Options" : "Show Chart Options",
                                 //     execute: () => dispatch({ type: "TOGGLE_OPTIONS" }),
