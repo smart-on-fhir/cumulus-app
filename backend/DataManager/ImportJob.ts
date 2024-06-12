@@ -99,6 +99,8 @@ export default class ImportJob
             req.query.descriptions || ""
         ).split(/\s*,\s*/).filter(Boolean).map(decodeURIComponent);
 
+        const type = String(req.query.data_type || "cube") as "cube" | "flat"
+
         const csv2db = new CSV2DB(
             this.client,
             +req.params.id,
@@ -127,7 +129,7 @@ export default class ImportJob
                 res.status(202).end(this.id)
             } else {
                 await this.client.query('COMMIT');
-                await this.writeCounts(+req.params.id, req.user)
+                await this.finalize(+req.params.id, type, req.user)
                 this.client.release()
                 delete JOBS[this.id];
                 res.status(200).end("Data imported successfully")
@@ -139,30 +141,37 @@ export default class ImportJob
         }
     }
 
-    async writeCounts(subscriptionID: number, user?: CurrentUser) {
+    async finalize(subscriptionID: number, type: "cube" | "flat" = "cube",  user?: CurrentUser) {
+
         const subscription = await Subscription.findByPk(subscriptionID, { user });
         
         assert(subscription, "Subscription not found", HttpError.NotFound)
 
-        const countRow = await subscription.sequelize.query(
-            `SELECT "cnt" FROM "subscription_data_${subscriptionID}" WHERE ${
-                this.columnNames.map(c => c === "cnt" ? "" : `"${c}" IS NULL`)
-                .filter(Boolean)
-                .join(" AND ")
-            } LIMIT 1`, {
-                type: QueryTypes.SELECT
-            }
-        );
+        const patch = {
+            metadata: { ...subscription.metadata, type },
+            completed: new Date()
+        }
 
-        if (countRow.length === 0) {
-            throw new Error("Unable to find a total row where any column other than 'cnt' is NULL")
+        if (type === "cube") {
+
+            const countRow = await subscription.sequelize.query<any>(
+                `SELECT "cnt" FROM "subscription_data_${subscriptionID}" WHERE ${
+                    this.columnNames.map(c => c === "cnt" ? "" : `"${c}" IS NULL`)
+                    .filter(Boolean)
+                    .join(" AND ")
+                } LIMIT 1`, {
+                    type: QueryTypes.SELECT
+                }
+            );
+
+            if (countRow.length === 0) {
+                throw new Error("Unable to find a total row where any column other than 'cnt' is NULL")
+            }
+
+            patch.metadata.total = countRow[0].cnt
         }
         
         // @ts-ignore
-        await subscription.update({
-            // @ts-ignore
-            metadata: { ...subscription.metadata, total: countRow[0].cnt },
-            completed: new Date()
-        }, { user });
+        await subscription.update(patch, { user });
     }
 }
