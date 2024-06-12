@@ -1,20 +1,23 @@
 import { useCallback, useEffect, useReducer }    from "react"
 import { useNavigate, Link }                     from "react-router-dom"
 import { HelmetProvider, Helmet }                from "react-helmet-async"
-import Highcharts, { Chart }                     from "../../highcharts"
-import { useBackend, useCommand }                from "../../hooks"
-import { createOne, updateOne, request }         from "../../backend"
-import { useAuth }                               from "../../auth"
-import Alert, { AlertError }                     from "../generic/Alert"
 import ConfigPanel                               from "./ConfigPanel"
 import {buildChartOptions, default as BaseChart} from "./Charts/Chart"
 import CaptionEditor                             from "./CaptionEditor"
-import EditInPlace                               from "../generic/EditInPlace"
-import { defer, Json, requestPermission, strip } from "../../utils"
 import { getDefaultChartOptions }                from "./Charts/DefaultChartOptions"
+import { GraphBreadcrumbs }                      from "./GraphBreadcrumbs"
+import { GraphTitle }                            from "./GraphTitle"
+import { GraphDescription }                      from "./GraphDescription"
+import { GraphToolbar }                          from "./GraphToolbar"
 import Tag                                       from "../Tags/Tag"
+import Alert, { AlertError }                     from "../generic/Alert"
 import Grid                                      from "../generic/Grid"
-import MenuButton                                from "../generic/MenuButton"
+import { app }                                   from "../../types"
+import { createOne, updateOne, request }         from "../../backend"
+import { useBackend, useCommand }                from "../../hooks"
+import Highcharts, { Chart }                     from "../../highcharts"
+import { defer, Json, requestPermission, strip } from "../../utils"
+import { useAuth }                               from "../../auth"
 import { getScreenShot }                         from "../../commands/lib"
 import CommandButton                             from "../../commands/CommandButton"
 import { DownloadScreenshotAsPNG }               from "../../commands/Graphs/DownloadScreenshotAsPNG"
@@ -28,7 +31,6 @@ import { GenerateCaption }                       from "../../commands/Graphs/Gen
 import { ShareGraph }                            from "../../commands/Graphs/Share/ShareGraph"
 import { ManagePermissions }                     from "../../commands/Graphs/Share/ManagePermissions"
 import { OpenInAnalyticEnvironment }             from "../../commands/Subscriptions/OpenInAnalyticEnvironment"
-import { app }                                   from "../../types"
 import {
     ReadOnlyPaths,
     SupportedChartTypes,
@@ -37,10 +39,6 @@ import {
 } from "./config"
 
 import "./Dashboard.scss"
-import { GraphBreadcrumbs } from "./GraphBreadcrumbs"
-import { GraphTitle }       from "./GraphTitle"
-import { GraphDescription } from "./GraphDescription"
-import { GraphToolbar }     from "./GraphToolbar"
 
 
 // =============================================================================
