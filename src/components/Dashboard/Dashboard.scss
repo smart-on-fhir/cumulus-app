@@ -56,6 +56,7 @@
     min-height: 300px;
     overflow: hidden;
     position: relative;
+    pointer-events: none;
 
     .highcharts-container {
         left: 0 !important;
@@ -66,6 +67,7 @@
 
         $cursor: crosshair;
         $outline: 2px solid #06C9;
+        pointer-events: initial;
         
         * {
             cursor: $cursor !important;
