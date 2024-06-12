@@ -177,8 +177,9 @@ export declare module app {
         dataSourceType: "file" | "url"
 
         metadata: {
-            cols : DataRequestDataColumn[],
-            total: number
+            cols  : DataRequestDataColumn[],
+            total?: number
+            type ?: "cube" | "flat"
         } | null
 
         Tags?: Pick<Tag, "id" | "name" | "description">[]

@@ -42,12 +42,6 @@ interface StaticGridProps<T = JSONObject> {
     rows: T[]
 
     /**
-     * The name of the unique identifier property used to identify selected
-     * rows and as react key for table rows. Defaults to "id".
-     */
-    idProperty?: string
-
-    /**
      * Is set and not null, this is the name of the property to
      * group by.
      */
@@ -77,7 +71,6 @@ interface StaticGridProps<T = JSONObject> {
 export default function StaticGrid({
     columns,
     rows,
-    idProperty = "id",
     groupBy = null,
     groupLabel,
     selection = [],
@@ -221,7 +214,7 @@ export default function StaticGrid({
                                 </tr>
                                 {
                                     groupMap[label] !== false ?
-                                        groups[label].map(u => renderRow(u)) :
+                                        groups[label].map(u => renderRow(u, i)) :
                                         null
                                 }
                             </Fragment>
@@ -233,15 +226,15 @@ export default function StaticGrid({
 
         return (
             <tbody>
-                { recs.map(u => renderRow(u)) }
+                { recs.map((u, i) => renderRow(u, i)) }
             </tbody>
         )
     }
 
-    const renderRow = (rec: any) => {
+    const renderRow = (rec: any, key: string | number) => {
         const selected = !!(selectionType !== "none" && !!selection.find(x => equals(x, rec)))
         return <tr
-            key={ rec[idProperty] }
+            key={key}
             className={ selected ? "selected" : undefined }
             data-tooltip={ rowTitle ? rowTitle(rec) : undefined }
             data-tooltip-position="center bottom">
