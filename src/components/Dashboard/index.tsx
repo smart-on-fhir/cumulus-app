@@ -14,7 +14,6 @@ import { defer, Json, requestPermission, strip } from "../../utils"
 import { getDefaultChartOptions }                from "./Charts/DefaultChartOptions"
 import Tag                                       from "../Tags/Tag"
 import Grid                                      from "../generic/Grid"
-import Breadcrumbs                               from "../generic/Breadcrumbs"
 import MenuButton                                from "../generic/MenuButton"
 import { getScreenShot }                         from "../../commands/lib"
 import CommandButton                             from "../../commands/CommandButton"
@@ -38,6 +37,7 @@ import {
 } from "./config"
 
 import "./Dashboard.scss"
+import { GraphBreadcrumbs } from "./GraphBreadcrumbs"
 
 
 // =============================================================================
@@ -765,20 +765,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                 </div>
                 <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start", minWidth: "26rem", maxWidth: 1200 }}>
                     <div style={{ position: "sticky", top: 2 }}>
-                        <Breadcrumbs links={[
-                            { name: "Home"  , href: "/" },
-                            isDraft ? { name: "Draft Graphs", href: "/drafts" } : { name: "Graphs", href: "/views" },
-                            { name: viewName }
-                        ]}/>
-                        <h2 style={{ margin: "0 0 0.5ex", lineHeight: 1.2 }}>
-                            <EditInPlace
-                                required
-                                maxLength={100}
-                                text={state.viewName}
-                                onChange={ viewName => dispatch({ type: "UPDATE", payload: { viewName }}) }
-                                id="view-name"
-                            />
-                        </h2>
+                        <GraphBreadcrumbs graph={{ isDraft, name: viewName }} />
                         <hr/>
                         <div className="color-muted" style={{ margin: "1ex 0 2ex", lineHeight: 1.2 }}>
                             <EditInPlace
