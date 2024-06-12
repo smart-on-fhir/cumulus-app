@@ -39,6 +39,7 @@ import {
 import "./Dashboard.scss"
 import { GraphBreadcrumbs } from "./GraphBreadcrumbs"
 import { GraphTitle }       from "./GraphTitle"
+import { GraphDescription } from "./GraphDescription"
 
 
 // =============================================================================
@@ -769,114 +770,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                         <GraphBreadcrumbs graph={{ isDraft, name: viewName }} />
                         <GraphTitle value={state.viewName} onChange={ (viewName: string) => dispatch({ type: "MERGE", payload: { viewName }}) } />
                         <hr/>
-                        <div className="color-muted" style={{ margin: "1ex 0 2ex", lineHeight: 1.2 }}>
-                            <EditInPlace
-                                maxLength={500}
-                                text={viewDescription || "no description provided"}
-                                onChange={ viewDescription => dispatch({ type: "UPDATE", payload: { viewDescription }}) }
-                                id="view-description"
-                            />
-                        </div>
-                        <div className="row wrap">
-                            <div className="col col-0 mb-1">
-                                <div className="toolbar flex">
-                                    <button
-                                        className={ "btn" + (showOptions ? " active" : "")}
-                                        onClick={() => dispatch({ type: "TOGGLE_OPTIONS" })}
-                                        data-tooltip={showOptions ? "Hide Options" : "Show Options"}>
-                                        <i className="fas fa-cog" />
-                                    </button>
-                                    <button
-                                        className={ "btn" + (state.inspection.enabled ? " active" : "") }
-                                        data-tooltip="Inspect elements by click"
-                                        onClick={() => dispatch({
-                                            type: "UPDATE",
-                                            payload: {
-                                                inspection: {
-                                                    enabled: !state.inspection.enabled,
-                                                    match  : [],
-                                                    context: {}
-                                                }
-                                            } 
-                                        })}>
-                                        <i className="fa-solid fa-crosshairs"/>
-                                    </button>
-                                    <CommandButton { ...copyCommand } label={ "" } />
-                                    <CommandButton { ...shareCommand } label={ "" } />
-                                    <CommandButton { ...deleteCommand } label={ "" } />
-                                    <button
-                                        className="btn"
-                                        onClick={ takeScreenshot }
-                                        data-tooltip="Update Screenshot"
-                                        disabled={!view.id || !canUpdate || viewType !== "overview" }>
-                                        <i className={ takingScreenshot ? "fas fa-circle-notch fa-spin" : "fa-solid fa-camera" } />
-                                    </button>
-                                    { (view.creatorId === auth.user!.id || requestPermission({ user: auth.user, resource: "Graphs", action: view.id ? "update" : "create" })) && <div className="btn">
-                                        <span className="menu-button-btn pr-1" onClick={() => save()}>
-                                            <i
-                                                className={ saving ? "fas fa-circle-notch fa-spin" : "fas fa-save" }
-                                                style={{ width: "1.2em", color: isDraft ? "#E60" : "inherit" }}
-                                                onClick={() => save()}
-                                            /> Save
-                                        </span>
-                                        <MenuButton right items={[
-                                            <div style={{ cursor: "default" }} onClick={() => {
-                                                runtimeView.isDraft = false;
-                                                save().then(() => {
-                                                    if (view.id) {
-                                                        navigate(`/views/${view.id}`)
-                                                    }
-                                                })
-                                            }}>
-                                                <div className="color-grey-dark" style={{ "fontWeight": 500 }}>
-                                                    { runtimeView.isDraft ? "Publish" : "Save Changes" }
-                                                </div>
-                                                <div className="small color-muted">
-                                                    Save changes and make this visible in the graphs list
-                                                </div>
-                                            </div>,
-                                            <div style={{ cursor: "default" }} onClick={() => {
-                                                runtimeView.isDraft = true;
-                                                save().then(() => {
-                                                    if (view.id) {
-                                                        navigate(`/drafts/${view.id}`)
-                                                    }
-                                                })
-                                            }}>
-                                                <div className="color-brand-2" style={{ "fontWeight": 500 }}>
-                                                    { runtimeView.isDraft ? "Save Draft" : "Switch to Draft" }
-                                                </div>
-                                                <div className="small color-muted">
-                                                    Save changes and hide this from the graphs list
-                                                </div>
-                                            </div>
-                                        ]}>
-                                            <i className="fa-solid fa-caret-down small" />
-                                        </MenuButton>
-                                    </div> }
-                                </div>
-                            </div>
-                            <div className="col mb-1"></div>
-                            <div className="col col-0 mb-1">
-                                <div className="toolbar flex">
-                                    <button
-                                        className={"btn" + (viewType === "overview" ? " active" : "")}
-                                        onClick={() => dispatch({ type: "SET_VIEW_TYPE", payload: "overview" })}
-                                        data-tooltip="Show the Chart"
-                                        style={{ minWidth: "7em" }}
-                                        >
-                                        <i className="fas fa-chart-pie" /> Overview
-                                    </button>
-                                    <button
-                                        className={"btn" + (viewType === "data"     ? " active" : "")}
-                                        onClick={() => dispatch({ type: "SET_VIEW_TYPE", payload: "data"})}
-                                        data-tooltip="Show the Input Data"
-                                        style={{ minWidth: "7em" }}
-                                        ><i className="fas fa-th" /> Data
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <GraphDescription value={state.viewDescription} onChange={ viewDescription => dispatch({ type: "MERGE", payload: { viewDescription }}) } />
 
                         { viewType === "data" && <>
                             <div className="tab-panel mt-1">
