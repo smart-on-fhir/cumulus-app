@@ -38,6 +38,7 @@ import {
 
 import "./Dashboard.scss"
 import { GraphBreadcrumbs } from "./GraphBreadcrumbs"
+import { GraphTitle }       from "./GraphTitle"
 
 
 // =============================================================================
@@ -766,6 +767,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                 <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start", minWidth: "26rem", maxWidth: 1200 }}>
                     <div style={{ position: "sticky", top: 2 }}>
                         <GraphBreadcrumbs graph={{ isDraft, name: viewName }} />
+                        <GraphTitle value={state.viewName} onChange={ (viewName: string) => dispatch({ type: "MERGE", payload: { viewName }}) } />
                         <hr/>
                         <div className="color-muted" style={{ margin: "1ex 0 2ex", lineHeight: 1.2 }}>
                             <EditInPlace
