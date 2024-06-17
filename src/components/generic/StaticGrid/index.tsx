@@ -1,6 +1,6 @@
 import { CSSProperties, Fragment, useState } from "react"
 import { JSONObject, JSONValue }             from "../../../types"
-import { highlight }                         from "../../../utils"
+import { classList, highlight }              from "../../../utils"
 import "./StaticGrid.scss"
 
 
@@ -47,7 +47,7 @@ interface StaticGridProps<T = JSONObject> {
      */
     groupBy?: string | null
 
-    groupLabel?: (value: JSONValue) => JSX.Element | string
+    groupLabel?: (value: JSONValue, search?: string) => JSX.Element | string
     
     /**
      * List of selected IDs
@@ -142,7 +142,7 @@ export default function StaticGrid({
                     </th> }
                     { columns.filter(c => c.name !== groupBy).map((c, i) => (
                         <th
-                            key={i}
+                            key={"header-" + i}
                             style={c.style}
                             onMouseDown={() => onHeaderClick(c.name)}
                             className={sortColumn === c.name ? "sorted" : ""}
@@ -196,9 +196,9 @@ export default function StaticGrid({
 
             return (
                 <tbody>
-                    { Object.keys(groups).map((label, i) => {
+                    { Object.keys(groups).map(label => {
                         return (
-                            <Fragment key={i}>
+                            <Fragment key={label}>
                                 <tr>
                                     <td
                                         colSpan={colLength}
@@ -209,12 +209,12 @@ export default function StaticGrid({
                                             groupMap[label] === false ?
                                                 <i className="fas icon fa-angle-right"/> :
                                                 <i className="fas icon fa-angle-down"/>
-                                        } { groupLabel ? groupLabel(label) : `${groupBy} = ${label}` }
+                                        } { groupLabel ? groupLabel(label, search) : highlight(label, search) }
                                     </td>
                                 </tr>
                                 {
                                     groupMap[label] !== false ?
-                                        groups[label].map(u => renderRow(u, i)) :
+                                        groups[label].map((u, i) => renderRow(u, label + "-" + i)) :
                                         null
                                 }
                             </Fragment>
@@ -226,7 +226,7 @@ export default function StaticGrid({
 
         return (
             <tbody>
-                { recs.map((u, i) => renderRow(u, i)) }
+                { recs.map((u, i) => renderRow(u, "row--" + i)) }
             </tbody>
         )
     }
@@ -264,7 +264,7 @@ export default function StaticGrid({
                 if (search && c.searchable && (typeof value === "string" || typeof value === "number")) {
                     value = <div>{ highlight(value + "", search) }</div>
                 }
-                return <td key={i} style={c.style}>{ value }</td>
+                return <td key={"cell-" + i} style={c.style}>{ value }</td>
             }) }
         </tr>
     }
@@ -294,7 +294,11 @@ export default function StaticGrid({
     return (
         <>
             { renderSearch() }
-            <div className="static-grid-wrapper" style={{ maxHeight, minHeight, height }}>
+            <div className={classList({
+                "static-grid-wrapper": true,
+                "grouped": !!groupBy,
+                "searchable": searchableCols.length > 0
+             })} style={{ maxHeight, minHeight, height }}>
                 <table className="static-grid-table">
                     { renderHeader() }
                     { renderBody() }

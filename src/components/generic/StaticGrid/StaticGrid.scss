@@ -15,10 +15,6 @@
         tr {
             background: #FFF;
 
-            &:nth-child(odd) {
-                background: #F8F8F8;
-            }
-
             &:hover {
                 background: #F0F0F0;
             }
@@ -34,9 +30,16 @@
                 margin: 0 auto;
                 line-height: inherit;
             }
+            border-top: 0.5px solid #00000013;
+            border-bottom: 0.5px solid #00000013;
+            border-left: 1px solid #00000013;
+            &:first-child {
+                border-left: 0;
+            }
         }
 
         th {
+            padding       : 3px 6px;
             user-select: none;
             border-bottom: 1px solid #0003;
             background: linear-gradient(#F9F9F9, #F0F0F0);
@@ -49,12 +52,14 @@
             &.sorted {
                 box-shadow: 0 -2px 0 0 #F906 inset;
                 background: linear-gradient(#FFF, #FFF);
+                border-bottom-color: #C608;
             }
         }
 
         tr.selected td {
-            background: highlight;
-            color: highlightText;
+            background: fade-out($color-blue, 0.75);
+            color: #000C;
+            text-shadow: 0 1px 0 #FFF8;
         }
 
         thead th {
@@ -70,29 +75,23 @@
 
         .group-header {
             background: #FFF;
-            border-bottom: 2px solid $color-blue;
             color: $color-blue;
+            font-weight: 500;
             cursor: pointer;
             padding       : 2px 6px 2px 4px;
             transition: all 0.2s;
-
-            &.closed {
-                border-bottom: 1px dashed #0002;
-            }
-
-            &.opened {
-                padding   : 18px 6px 2px 4px;
-            }
-
+            border-top-color: #FFF;
+            
             .icon {
                 width: 1.2em;
                 text-align: center;
                 color: #0004;
             }
-
-            &:hover {
-                background: #e4f1ff;
-            }
         }
+    }
+
+    &.grouped .static-grid-table tr td:first-child:not(.group-header),
+    &.grouped .static-grid-table tr th:first-child:not(.group-header) {
+        padding-left: 28px;
     }
 }
