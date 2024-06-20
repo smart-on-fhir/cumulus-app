@@ -4,7 +4,7 @@ import { classList, highlight }              from "../../../utils"
 import "./StaticGrid.scss"
 
 
-interface Column {
+export interface Column {
     /**
      * The property name (as should be found in data rows)
      */
@@ -65,6 +65,8 @@ interface StaticGridProps<T = JSONObject> {
     maxHeight        ?: number | string
     minHeight        ?: number | string
     height           ?: number | string
+
+    filter?: (row: T, index: number, all: T[]) => boolean
 }
 
 
@@ -80,7 +82,8 @@ export default function StaticGrid({
     maxHeight,
     minHeight,
     height,
-    equals = (a, b) => a === b
+    equals = (a, b) => a === b,
+    filter = () => true
 }: StaticGridProps) {
 
     const searchableCols = columns.filter(c => c.searchable === true)
@@ -143,9 +146,10 @@ export default function StaticGrid({
                     { columns.filter(c => c.name !== groupBy).map((c, i) => (
                         <th
                             key={"header-" + i}
-                            style={c.style}
+                            // style={c.style}
                             onMouseDown={() => onHeaderClick(c.name)}
                             className={sortColumn === c.name ? "sorted" : ""}
+                            title={ c.label && c.label !== c.name ? `Original column name: "${c.name}"` : undefined }
                         >
                             { c.label ?? c.name } {
                             sortColumn === c.name ?
@@ -192,8 +196,6 @@ export default function StaticGrid({
                 group.push(row)
             });
 
-            
-
             return (
                 <tbody>
                     { Object.keys(groups).map(label => {
@@ -226,7 +228,7 @@ export default function StaticGrid({
 
         return (
             <tbody>
-                { recs.map((u, i) => renderRow(u, "row--" + i)) }
+                { recs.filter(filter).map((u, i) => renderRow(u, "row--" + i)) }
             </tbody>
         )
     }
