@@ -103,7 +103,7 @@ export default function StaticGrid({
             _rows = _rows.filter(row => {
                 return searchableCols.some(c => {
                     const val = c.value ? c.value(row, c) : row[c.name];
-                    return String(val).includes(search)
+                    return String(val).toLowerCase().includes(search.toLowerCase())
                 })
             })
         }
