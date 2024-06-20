@@ -114,7 +114,7 @@ export default function StaticGrid({
                 if (col.type === "number") {
                     return (b[sortColumn] - a[sortColumn]) * (sortDir === "asc" ? -1 : 1)
                 }
-                return String(b[sortColumn] || "").localeCompare(String(a[sortColumn] || "")) * (sortDir === "asc" ? 1 : -1)
+                return String(b[sortColumn] || "").localeCompare(String(a[sortColumn] || ""), "en-US", { numeric: true }) * (sortDir === "asc" ? 1 : -1)
             })
         }
 
