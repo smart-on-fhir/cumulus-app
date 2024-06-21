@@ -50,12 +50,10 @@ export function GraphToolbar({
                             type: "MERGE",
                             payload: {
                                 inspection: {
-                                    // match: [],
-                                    // context: {},
                                     ...state.inspection!,
-                                    enabled: !state.inspection!.enabled,
-                                    // match  : [],
-                                    // context: {}
+                                    match: [],
+                                    // context: {},
+                                    enabled: !state.inspection!.enabled
                                 }
                             } 
                         })}>
