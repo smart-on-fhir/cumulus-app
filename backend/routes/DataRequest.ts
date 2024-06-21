@@ -554,6 +554,40 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
     });
 }));
 
+router.get("/:id/raw-data", rw(async (req: AppRequest, res: Response) => {
+
+    const subscription = await Model.findByPk(req.params.id, { user: req.user })
+
+    assert(subscription, "Subscription not found", NotFound)
+    assert(subscription.metadata, "Subscription data not found", NotFound)
+
+    const table = "subscription_data_" + req.params.id
+
+    const cacheKey = crypto.createHash("sha1").update([
+        table,
+        subscription.completed + "",
+        pkgVersion
+    ].join("-")).digest("hex");
+
+    res.setHeader('Cache-Control', `max-age=31536000, no-cache`)
+    res.setHeader('Vary', 'Origin, ETag')
+    res.setHeader('ETag', cacheKey)
+
+    let ifNoneMatchValue = req.headers['if-none-match']
+    if (ifNoneMatchValue && ifNoneMatchValue === cacheKey) {
+        res.statusCode = 304
+        return res.end()
+    }
+
+    // Execute the query
+    const result = await subscription.sequelize.query<any>(`SELECT * FROM "${table}"`, {
+        logging: logSql,
+        type: QueryTypes.SELECT
+    });
+
+    res.json(result);
+}));
+
 // Get all ---------------------------------------------------------------------
 route(router, {
     path: "/",
