@@ -15,6 +15,7 @@ import { classList, humanizeColumnName } from "../../utils"
 import Tag                        from "../Tags/Tag"
 import TransmissionView           from "./Transmissions/TransmissionView"
 import { app }                    from "../../types"
+import DataViewer                 from "./DataViewer"
 
 
 export default function DataRequestView(): JSX.Element
@@ -69,6 +70,8 @@ export default function DataRequestView(): JSX.Element
     //     phenotypes,
     //     procedures
     // } = requestedData.fields;
+
+    const isFlatData = model.metadata?.type === "flat"
 
     return (
         <div className="container">
@@ -187,31 +190,35 @@ export default function DataRequestView(): JSX.Element
                             </div>
                         </Collapse>
                     </div> } */}
+
+                    { model.metadata?.type === "flat" && <div className="mt-2"><DataViewer subscription={model} /></div>}
                 </div>
-                <div className="col col-4 responsive" style={{ minWidth: "20rem" }}>
-                    { model.completed && <><h5>Dependent Graphs</h5>
-                    <hr/>
-                    <ViewsBrowser layout="column" requestId={ model.id } />
-                    </> }
-                    { model.transmissions && (
-                        <>
-                            <h5 className="mt-3">Data Transmissions</h5>
-                            <hr/>
-                            <div className="row gap">
-                                <div className="col mt-1 mb-1">
-                                    <TransmissionView
-                                        sites={ model.requestedData?.dataSites || [] }
-                                        transmissions={ model.transmissions }
-                                    />
+                { !isFlatData && 
+                    <div className="col col-4 responsive" style={{ minWidth: "20rem" }}>
+                        { model.completed && <><h5>Dependent Graphs</h5>
+                        <hr/>
+                        <ViewsBrowser layout="column" requestId={ model.id } />
+                        </> }
+                        { model.transmissions && (
+                            <>
+                                <h5 className="mt-3">Data Transmissions</h5>
+                                <hr/>
+                                <div className="row gap">
+                                    <div className="col mt-1 mb-1">
+                                        <TransmissionView
+                                            sites={ model.requestedData?.dataSites || [] }
+                                            transmissions={ model.transmissions }
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        </>
-                    )}
-                    {/* <h5 className="grey-out">Healthcare Sites</h5> */}
-                    {/* <SimpleMap center={{ lat: 42.346710208505826, lng: -71.08435192324642 }} zoom={10} /> */}
-                    {/* <img src={ map } alt="Sites Map" className="grey-out" /> */}
-                    <br/>
-                </div>
+                            </>
+                        )}
+                        {/* <h5 className="grey-out">Healthcare Sites</h5> */}
+                        {/* <SimpleMap center={{ lat: 42.346710208505826, lng: -71.08435192324642 }} zoom={10} /> */}
+                        {/* <img src={ map } alt="Sites Map" className="grey-out" /> */}
+                        <br/>
+                    </div>
+                }
             </div>
             <hr className="center mt-1"/>
             <div className="center mt-1 mb-1">

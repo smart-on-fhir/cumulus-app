@@ -24,7 +24,7 @@ export interface Column {
 
     style ?: CSSProperties
 
-    render?: (row: any, c: Column) => JSX.Element
+    render?: (row: any, c: Column, search?: string) => JSX.Element
 
     value?: (row: any, c: Column) => any
 }
@@ -351,7 +351,7 @@ export default function StaticGrid({
             </td> }
             { columns.filter(c => c.name !== groupBy).map((c, i) => {
                 let value: any = c.render ?
-                    c.render(rec, c) :
+                    c.render(rec, c, search) :
                     c.value ?
                         c.value(rec, c) + "" : 
                         rec[c.name] + "";
