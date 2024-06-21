@@ -17,7 +17,7 @@ export default function CreateView()
     const { user } = useAuth()
 
     // Fetch the subscription by ID
-    const { loading, error, result } = useBackend(
+    const { loading, error, result } = useBackend<app.DataRequest>(
         useCallback(() => request("/api/requests/" + id + "?group=true&study_areas=true"), [id]),
         true
     );

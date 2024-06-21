@@ -1,6 +1,6 @@
-import { useAuth } from "../../auth"
-import CommandButton from "../../commands/CommandButton"
-import { app } from "../../types"
+import { useAuth }    from "../../auth"
+import CommandButton  from "../../commands/CommandButton"
+import { app }        from "../../types"
 import { requestPermission } from "../../utils"
 import { DashboardState, ViewAction } from "../Dashboard2/types"
 import { SaveChartButton } from "./SaveChartButton"
@@ -43,22 +43,24 @@ export function GraphToolbar({
                         data-tooltip={state.showOptions ? "Hide Options" : "Show Options"}>
                         <i className="fas fa-cog" />
                     </button>
-                    <button
+                    { state.inspection && <button
                         className={ "btn" + (state.inspection.enabled ? " active" : "") }
                         data-tooltip="Inspect elements by click"
                         onClick={() => dispatch({
                             type: "MERGE",
                             payload: {
                                 inspection: {
-                                    ...state.inspection,
-                                    enabled: !state.inspection.enabled,
+                                    // match: [],
+                                    // context: {},
+                                    ...state.inspection!,
+                                    enabled: !state.inspection!.enabled,
                                     // match  : [],
                                     // context: {}
                                 }
                             } 
                         })}>
                         <i className="fa-solid fa-crosshairs"/>
-                    </button>
+                    </button> }
                     <CommandButton { ...copyCommand } label={ "" } />
                     <CommandButton { ...shareCommand } label={ "" } />
                     <CommandButton { ...deleteCommand } label={ "" } />

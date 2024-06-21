@@ -2,7 +2,7 @@ import {
     getChartTitleText,
     getDateFormat,
     getXType,
-} from "./Chart"
+} from "./lib"
 
 
 describe("Chart", () => {
