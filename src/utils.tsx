@@ -58,7 +58,8 @@ const dictionaryMap = new Map([
     [/\bpcr\b/gi               , "PCR"      ],
     [/\bnlp\b/gi               , "NLP"      ],
     [/\bdx\b/gi                , "Diagnosis"],
-    [/\bed\b/gi                , "ED"       ]
+    [/\bed\b/gi                , "ED"       ],
+    [/\bstd dev\b/gi           , "Standard Deviation"]
 ]);
 
 export function humanizeColumnName(str: string) {
