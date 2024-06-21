@@ -47,7 +47,7 @@ interface StaticGridProps<T = JSONObject> {
      */
     groupBy?: string | null
 
-    groupLabel?: (value: JSONValue, search?: string) => JSX.Element | string
+    groupLabel?: (value: JSONValue, children: T[], search?: string) => JSX.Element | string
     
     /**
      * List of selected IDs
@@ -69,6 +69,16 @@ interface StaticGridProps<T = JSONObject> {
     filter?: (row: T, index: number, all: T[]) => boolean
 }
 
+function createComparator(type: string, sortDir: "asc" | "desc", getValue?: (row: any) => any) {
+    return (a: any, b: any) => {
+        const _a = getValue ? getValue(a) : a
+        const _b = getValue ? getValue(b) : b
+        if (type === "number") {
+            return (_b - _a) * (sortDir === "asc" ? -1 : 1)
+        }
+        return String(_b || "").localeCompare(String(_a || ""), "en-US", { numeric: true }) * (sortDir === "asc" ? 1 : -1)
+    }
+}
 
 export default function StaticGrid({
     columns,
@@ -86,7 +96,7 @@ export default function StaticGrid({
     filter = () => true
 }: StaticGridProps) {
 
-    const searchableCols = columns.filter(c => c.searchable === true)
+    const searchableCols = columns.filter(c => c.searchable === true && c.name !== groupBy)
 
     const [search    , setSearch    ] = useState("")
     const [sortColumn, setSortColumn] = useState("")
@@ -100,28 +110,65 @@ export default function StaticGrid({
 
     const prepareData = () => {
 
+        // ---------------------------------------------------------------------
+        // Start with a copy of the entire input data
+        // ---------------------------------------------------------------------
         let _rows = [...rows];
 
-        if (search) {
-            _rows = _rows.filter(row => {
-                return searchableCols.some(c => {
-                    const val = c.value ? c.value(row, c) : row[c.name];
-                    return String(val).toLowerCase().includes(search.toLowerCase())
-                })
-            })
+
+        // ---------------------------------------------------------------------
+        // Organize in groups if needed
+        // ---------------------------------------------------------------------
+        const groups: Record<string, any[]> = {};
+        if (groupBy) {
+            _rows.forEach(row => {
+                let label = row[groupBy];
+                let group = groups[label];
+                if (!group) {
+                    group = groups[label] = [];
+                }
+                group.push(row)
+            });
+        } else {
+            groups.__ALL__ = _rows;
         }
 
+        // ---------------------------------------------------------------------
+        // Apply search and exclude empty groups
+        // ---------------------------------------------------------------------
+        if (search) {
+            for (let groupLabel in groups) {
+                groups[groupLabel] = groups[groupLabel].filter(row => {
+                    return searchableCols.some(c => {
+                        let val = c.value ? c.value(row, c) : row[c.name];
+                        return String(val).toLowerCase().includes(search.toLowerCase())
+                    })
+                })
+
+                if (!groups[groupLabel].length) {
+                    delete groups[groupLabel]
+                }
+            }
+        }
+
+        
+        // ---------------------------------------------------------------------
+        // Sort
+        // ---------------------------------------------------------------------
+        let out: Map<string, any[]> = new Map()
+        const keys = Object.keys(groups).sort(createComparator("string", "desc"))
         if (sortColumn) {
             const col = columns.find(c => c.name === sortColumn)!
-            _rows = _rows.sort((a: any, b: any) => {
-                if (col.type === "number") {
-                    return (b[sortColumn] - a[sortColumn]) * (sortDir === "asc" ? -1 : 1)
-                }
-                return String(b[sortColumn] || "").localeCompare(String(a[sortColumn] || ""), "en-US", { numeric: true }) * (sortDir === "asc" ? 1 : -1)
+            const comparator = createComparator(col.type, sortDir, row => row[sortColumn])
+            keys.forEach(groupLabel => {
+                out.set(groupLabel, groups[groupLabel].sort(comparator))
+            })
+        } else {
+            keys.forEach(groupLabel => {
+                out.set(groupLabel, groups[groupLabel])
             })
         }
-
-        return _rows
+        return out
     }
 
     const renderHeader = () => {
@@ -166,11 +213,11 @@ export default function StaticGrid({
     }
 
     const renderBody = () => {
-        const recs = prepareData()
+        const groups = prepareData()
 
         const colLength = columns.length + (selectionType !== "none" && onSelectionChange ? 1: 0)
 
-        if (!recs.length) {
+        if (!groups.size) {
             return (
                 <tbody>
                     <tr>
@@ -185,38 +232,83 @@ export default function StaticGrid({
         }
 
         if (groupBy) {
-            const groups: Record<string, any[]> = {};
-
-            recs.forEach(row => {
-                let label = row[groupBy];
-                let group = groups[label];
-                if (!group) {
-                    group = groups[label] = [];
-                }
-                group.push(row)
-            });
-
             return (
                 <tbody>
-                    { Object.keys(groups).map(label => {
+                    { Array.from(groups.entries()).map(([label, children], i) => {
+
+                        let headerCells = [];
+                        
+                        const headerValues = groupLabel ?
+                            groupLabel(
+                                label,
+                                // groups[label],
+                                // rows,
+                                children,
+                                search
+                            ) :
+                            highlight(label + "", search);
+
+                            
+
+                        if (Array.isArray(headerValues)) {
+                            headerCells.push(
+                                <td
+                                    key={ "group-header-" + label }
+                                    className={ "group-header" + (groupMap[label] === false ? " closed": " opened") }
+                                    onClick={() => setGroupMap({ ...groupMap, [label]: groupMap[label] === false ? true : false })}
+                                >
+                                    {
+                                        groupMap[label] === false ?
+                                            <i className="fas icon fa-angle-right"/> :
+                                            <i className="fas icon fa-angle-down"/>
+                                    } {headerValues[0]}
+                                </td>
+                            )
+
+                            for (let i = 1; i < colLength - 1; i++) {
+                                headerCells.push(<td key={ "group-header-cell-" + i }>{ headerValues[i] }</td>)
+                            }
+                        } else {
+                            headerCells.push(
+                                <td
+                                    key={ "group-header-" + label }
+                                    colSpan={colLength}
+                                    className={ "group-header" + (groupMap[label] === false ? " closed": " opened") }
+                                    onClick={() => setGroupMap({ ...groupMap, [label]: groupMap[label] === false ? true : false })}
+                                >
+                                    {
+                                        groupMap[label] === false ?
+                                            <i className="fas icon fa-angle-right"/> :
+                                            <i className="fas icon fa-angle-down"/>
+                                    } {headerValues}
+                                </td>
+                            )
+                        }
+
+                        const childRows = children.filter(filter)
+
+                        if (!childRows.length) {
+                            return null
+                        }
+
                         return (
                             <Fragment key={label}>
-                                <tr>
-                                    <td
-                                        colSpan={colLength}
-                                        className={ "group-header" + (groupMap[label] === false ? " closed": " opened") }
-                                        onClick={() => setGroupMap({ ...groupMap, [label]: groupMap[label] === false ? true : false })}
-                                    >
-                                        {
-                                            groupMap[label] === false ?
-                                                <i className="fas icon fa-angle-right"/> :
-                                                <i className="fas icon fa-angle-down"/>
-                                        } { groupLabel ? groupLabel(label, search) : highlight(label, search) }
-                                    </td>
+                                <tr className={classList({
+                                    "group-header-row": true,
+                                    open: groupMap[label] !== false
+                                })}>
+                                    { headerCells }
                                 </tr>
                                 {
                                     groupMap[label] !== false ?
-                                        groups[label].map((u, i) => renderRow(u, label + "-" + i)) :
+                                        childRows.length > 0 ?
+                                            // @ts-ignore
+                                            childRows.map((u, i) => renderRow(u, label + "-" + i)) :
+                                            <tr>
+                                                <td colSpan={colLength} className="color-muted">
+                                                    No Items
+                                                </td>
+                                            </tr> :
                                         null
                                 }
                             </Fragment>
@@ -228,7 +320,7 @@ export default function StaticGrid({
 
         return (
             <tbody>
-                { recs.filter(filter).map((u, i) => renderRow(u, "row--" + i)) }
+                { groups.get("__ALL__")!.filter(filter).map((u, i) => renderRow(u, "row--" + i)) }
             </tbody>
         )
     }

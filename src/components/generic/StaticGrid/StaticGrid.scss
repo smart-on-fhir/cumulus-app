@@ -65,6 +65,7 @@
         thead th {
             position: sticky;
             top: 0;
+            z-index: 2;
         }
 
         td.no-data {
@@ -73,19 +74,29 @@
             color: #900;
         }
 
-        .group-header {
-            background: #FFF;
-            color: $color-blue;
-            font-weight: 500;
-            cursor: pointer;
-            padding       : 2px 6px 2px 4px;
-            transition: all 0.2s;
-            border-top-color: #FFF;
-            
-            .icon {
-                width: 1.2em;
-                text-align: center;
-                color: #0004;
+        .group-header-row {
+            background: mix($color-blue, #FFFFFF, 5%);
+            td {
+                color: $color-blue;
+                cursor: pointer;
+                transition: all 0.2s;
+
+                &:first-child {
+                    font-weight: 500;
+                    padding       : 2px 6px 2px 4px;
+                }
+
+                .icon {
+                    width: 1.2em;
+                    text-align: center;
+                    color: #0004;
+                }
+            }
+
+            &:hover {
+                background: mix($color-blue, #FFFFFF, 10%);
+                border-top-color: #00000023;
+                border-bottom-color: #00000023;
             }
         }
     }
