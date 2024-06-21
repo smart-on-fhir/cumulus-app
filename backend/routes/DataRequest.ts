@@ -493,11 +493,15 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
     // console.log(sql)
     
     // Execute the query
-    const result = await subscription.sequelize.query<any>(sql, {
-        replacements,
-        logging: logSql,
-        type: QueryTypes.SELECT
-    });
+    try {
+        var result = await subscription.sequelize.query<any>(sql, {
+            replacements,
+            logging: logSql,
+            type: QueryTypes.SELECT
+        });
+    } catch (ex) {
+        throw new BadRequest(ex)
+    }
 
     // Do some post-processing
     let data: any[] = [];
