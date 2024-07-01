@@ -98,6 +98,7 @@ export default function StaticGrid({
     height,
     equals = (a, b) => a === b,
     comparator,
+    filter = () => true,
 }: StaticGridProps) {
 
     const searchableCols = columns.filter(c => c.searchable === true && c.name !== groupBy)

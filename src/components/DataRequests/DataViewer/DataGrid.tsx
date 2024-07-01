@@ -41,7 +41,7 @@ export default function DataGrid({
                 return <>{ highlight(strValue, search) }</>
             }
         }))}
-        rows={rows}
+        rows={rows.filter(row => row[groupBy] !== CUMULUS_ALL)}
         groupBy={groupBy}
         height={"calc(100% - 3.22rem)"} // exclude search-bar height
         filter={ row => row[stratifyBy] !== CUMULUS_ALL }
