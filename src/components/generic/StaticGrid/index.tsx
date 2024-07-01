@@ -74,10 +74,10 @@ interface StaticGridProps<T = JSONObject> {
 }
 
 function defaultComparator(a: any, b: typeof a): number {
-    if (typeof a === null) {
+    if (a === null) {
         return Infinity
     }
-    if (typeof b === null) {
+    if (b === null) {
         return -Infinity
     }
     if (typeof a === "number") {
