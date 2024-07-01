@@ -307,10 +307,6 @@ export default function StaticGrid({
 
                         const childRows = children.filter(filter)
 
-                        if (!childRows.length) {
-                            return null
-                        }
-
                         return (
                             <Fragment key={label}>
                                 <tr className={classList({
