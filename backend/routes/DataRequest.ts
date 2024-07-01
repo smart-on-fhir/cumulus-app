@@ -585,7 +585,23 @@ router.get("/:id/raw-data", rw(async (req: AppRequest, res: Response) => {
         type: QueryTypes.SELECT
     });
 
-    res.json(result);
+    res.json(result.map(row => {
+        for (let key in row) {
+            const col = subscription.metadata!.cols.find(c => c.name === key) 
+            switch (col?.dataType) {
+                case "float":
+                    row[key] = parseFloat(row[key])
+                break;
+                case "integer":
+                    row[key] = parseInt(row[key], 10)
+                break;
+                case "boolean":
+                    row[key] = bool(row[key])
+                break;
+            }
+        }
+        return row
+    }));
 }));
 
 // Get all ---------------------------------------------------------------------

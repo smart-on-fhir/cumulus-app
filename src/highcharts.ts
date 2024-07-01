@@ -8,10 +8,11 @@ import noDataToDisplay  from "highcharts/modules/no-data-to-display"
 import patternFill      from "highcharts/modules/pattern-fill"
 import annotations      from "highcharts/modules/annotations"
 import accessibility    from "highcharts/modules/accessibility"
-// import cylinder         from "highcharts/modules/cylinder"
+// import cylinder      from "highcharts/modules/cylinder"
 import drilldown        from "highcharts/modules/drilldown"
-// import funnel           from "highcharts/modules/funnel"
-// import heatmap          from "highcharts/modules/heatmap"
+// import funnel        from "highcharts/modules/funnel"
+// import heatmap       from "highcharts/modules/heatmap"
+// import treemap       from "highcharts/modules/treemap"
 // import venn          from "highcharts/modules/venn"
 
 // Initialize modules
@@ -26,6 +27,7 @@ annotations(Highcharts)
 accessibility(Highcharts)
 // cylinder(Highcharts)
 drilldown(Highcharts)
+// treemap(Highcharts)
 // funnel(Highcharts)
 // heatmap(Highcharts)
 // venn(Highcharts)
