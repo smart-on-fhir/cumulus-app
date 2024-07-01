@@ -826,7 +826,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                     label: "Save Changes",
                                     execute: () => save(),
                                     icon: <i className="fas fa-save" />,
-                                    enabled: view.creatorId === auth.user!.id || requestPermission({ user: auth.user, resource: "Graphs", action: view.id ? "update" : "create" }),
+                                    enabled: view.creatorId === auth.user?.id || requestPermission({ user: auth.user, resource: "Graphs", action: view.id ? "update" : "create" }),
                                 },
                                 deleteCommand,
                                 copyCommand,
