@@ -57,5 +57,12 @@ export default function DataGrid({
             }
             return value
         }}
+        comparator={(a, b) => {
+            if (a === CUMULUS_NONE) return Infinity
+            if (b === CUMULUS_NONE) return -Infinity
+            if (a === CUMULUS_ALL) return -Infinity
+            if (b === CUMULUS_ALL) return Infinity
+            return 0
+        }}
     />
 }
