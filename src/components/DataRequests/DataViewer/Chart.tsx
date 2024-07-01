@@ -23,8 +23,6 @@ export default function Chart({ options }: { options: Highcharts.Options })
         };
     }, [options])
 
-    // console.log(options)
-
     return <div className="chart" ref={ containerRef } />
 }
 

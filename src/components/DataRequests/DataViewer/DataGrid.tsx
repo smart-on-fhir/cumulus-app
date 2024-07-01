@@ -6,10 +6,14 @@ import { highlight, humanizeColumnName } from "../../../utils"
 
 export default function DataGrid({
     cols,
-    rows
+    rows,
+    groupBy,
+    stratifyBy
 }: {
     cols: app.DataRequestDataColumn[]
     rows: Record<string, any>[]
+    groupBy: string
+    stratifyBy: string
 })
 {
     return <StaticGrid
@@ -28,21 +32,23 @@ export default function DataGrid({
                     "number" :
                     "string",
             render(row, col, search) {
-                const strValue = String(row[col.name])
+                const strValue = (c.dataType === "float" || c.dataType === "integer") ?
+                    Number(row[c.name]).toLocaleString() :
+                    String(row[c.name]);
                 if (strValue === CUMULUS_NONE) {
-                    return <b className="color-muted">{highlight("none", search)}</b>
+                    return <i className="color-muted">No known {stratifyBy}</i>
                 }
                 return <>{ highlight(strValue, search) }</>
             }
         }))}
         rows={rows}
-        groupBy="id"
+        groupBy={groupBy}
         height={"calc(100% - 3.22rem)"} // exclude search-bar height
-        filter={ row => row.category !== CUMULUS_ALL }
+        filter={ row => row[stratifyBy] !== CUMULUS_ALL }
         groupLabel={(value, children, search) => {
-            const allRow = children.find(r => r.id === value && r?.category === CUMULUS_ALL)
+            const allRow = children.find(r => r[groupBy] === value && r?.[stratifyBy] === CUMULUS_ALL)
             if (allRow) {
-                return Object.keys(allRow).filter(k => k !== "category").map(k => {
+                return Object.keys(allRow).filter(k => k !== stratifyBy).map(k => {
                     const col = cols.find(c => c.name === k)
                     return col?.dataType === "float" || col?.dataType === "integer" ?
                         highlight(Number(allRow[k]).toLocaleString(), search) :
