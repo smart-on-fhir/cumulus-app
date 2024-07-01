@@ -1,33 +1,31 @@
 import { useCallback, useEffect, useState } from "react"
-import NestedChart                          from "./NestedChart"
-import FlatChart                            from "./FlatChart"
+import MetricsChart                         from "./MetricsChart"
 import DataGrid                             from "./DataGrid"
 import { AlertError }                       from "../../generic/Alert"
 import { Tabs }                             from "../../generic/Tabs"
 import Loader                               from "../../generic/Loader"
 import { app }                              from "../../../types"
 import { request }                          from "../../../backend"
-import FlatGrid from "./FlatGrid"
 
 const aspectRatio = "2/1";
 const chartHeight = "50%";
 
-function getDataType(metadata: app.DataRequest["metadata"]) {
-    if (metadata?.type !== "flat") {
-        return "cube"
-    }
 
-    const colNames = metadata.cols.map(c => c.name)
-    
-    if (colNames.includes("id") && colNames.includes("numerator") && colNames.includes("denominator") && colNames.includes("percentage")) {
-        return "flat"
-    }
 
-    if (colNames.includes("id") && colNames.includes("category") && colNames.includes("average") && colNames.includes("max")) {
-        return "nested"
-    }
+function pickColumns(metadata: app.DataRequest["metadata"])
+{
+    const cols = [ ...metadata!.cols.filter(c => !["denominator", "std_dev", "max"].includes(c.name)) ]
+    const out  = { groupBy: "", stratifyBy: "", valueColumn: "" }
 
-    return "other"
+    let i = cols.findIndex(c => c.name === "resource" || c.name === "id")
+    out.groupBy = cols.splice(i, 1)[0].name
+
+    i = cols.findIndex(c => c.name === "numerator" || c.name === "percentage" || c.name === "average")
+    out.valueColumn = cols.splice(i, 1)[0].name
+
+    out.stratifyBy = cols[0].name
+
+    return out;
 }
 
 export default function DataViewer({ subscription }: { subscription: app.DataRequest }) {
@@ -60,43 +58,32 @@ export default function DataViewer({ subscription }: { subscription: app.DataReq
         return null
     }
 
-    const type = getDataType(subscription.metadata)
+    const cols = pickColumns(subscription.metadata)
 
-    if (type === "flat") {
-        return <Tabs>
-            {[
-                {
-                    name: "Data Graph",
-                    children: <div className="pl-05 pr-05" style={{ aspectRatio }}>
-                        <FlatChart data={data} height={chartHeight} />
-                    </div>
-                }, {
-                    name: "Data Grid",
-                    children: <div className="p-05 pt-1" style={{ aspectRatio }}>
-                        <FlatGrid cols={subscription.metadata!.cols} rows={data} />
-                    </div>
-                }
-            ]}
-        </Tabs>
-    }
-
-    if (type === "nested") {
-        return <Tabs>
-            {[
-                {
-                    name: "Data Graph",
-                    children: <div className="pl-05 pr-05" style={{ aspectRatio }}>
-                        <NestedChart data={data} height={chartHeight} />
-                    </div>
-                }, {
-                    name: "Data Grid",
-                    children: <div className="p-05 pt-1" style={{ aspectRatio }}>
-                        <DataGrid cols={subscription.metadata!.cols} rows={data} />
-                    </div>
-                }
-            ]}
-        </Tabs>
-    }
-
-    return null
+    return <Tabs selectedIndex={0}>
+        {[
+            {
+                name: "Data Graph",
+                children: <div className="pl-05 pr-05" style={{ aspectRatio }}>
+                    <MetricsChart
+                        data={data}
+                        height={chartHeight}
+                        groupBy={cols.groupBy}
+                        stratifyBy={cols.stratifyBy}
+                        valueColumn={cols.valueColumn}
+                    />
+                </div>
+            }, {
+                name: "Data Grid",
+                children: <div className="p-05 pt-1" style={{ aspectRatio }}>
+                    <DataGrid
+                        cols={subscription.metadata!.cols}
+                        rows={data}
+                        groupBy={cols.groupBy}
+                        stratifyBy={cols.stratifyBy}
+                    />
+                </div>
+            }
+        ]}
+    </Tabs>
 }

@@ -241,14 +241,10 @@ export default function StaticGrid({
                         const headerValues = groupLabel ?
                             groupLabel(
                                 label,
-                                // groups[label],
-                                // rows,
                                 children,
                                 search
                             ) :
                             highlight(label + "", search);
-
-                            
 
                         if (Array.isArray(headerValues)) {
                             headerCells.push(
@@ -306,7 +302,7 @@ export default function StaticGrid({
                                             childRows.map((u, i) => renderRow(u, label + "-" + i)) :
                                             <tr>
                                                 <td colSpan={colLength} className="color-muted">
-                                                    No Items
+                                                    <i>No Items</i>
                                                 </td>
                                             </tr> :
                                         null
