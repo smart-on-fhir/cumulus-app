@@ -70,6 +70,8 @@ interface StaticGridProps<T = JSONObject> {
 
     comparator?: (a: any, b: typeof a) => number
 
+    contains?: (x: any, search: string) => boolean
+}
 
 function defaultComparator(a: any, b: typeof a): number {
     if (typeof a === null) {
@@ -99,6 +101,7 @@ export default function StaticGrid({
     equals = (a, b) => a === b,
     comparator,
     filter = () => true,
+    contains
 }: StaticGridProps) {
 
     const searchableCols = columns.filter(c => c.searchable === true && c.name !== groupBy)
@@ -146,7 +149,9 @@ export default function StaticGrid({
                 groups[groupLabel] = groups[groupLabel].filter(row => {
                     return searchableCols.some(c => {
                         let val = c.value ? c.value(row, c) : row[c.name];
-                        return String(val).toLowerCase().includes(search.toLowerCase())
+                        return contains ?
+                            contains(val, search) :
+                            String(val).toLowerCase().includes(search.toLowerCase())
                     })
                 })
 

@@ -65,5 +65,10 @@ export default function DataGrid({
             if (b === CUMULUS_ALL) return Infinity
             return 0
         }}
+        contains={(x, search) => (
+            x === CUMULUS_ALL || x === CUMULUS_NONE ?
+                false :
+                String(x).toLowerCase().includes(search.toLowerCase())
+        )}
     />
 }
