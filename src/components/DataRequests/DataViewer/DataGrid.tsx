@@ -44,7 +44,8 @@ export default function DataGrid({
         rows={rows.filter(row => row[groupBy] !== CUMULUS_ALL)}
         groupBy={groupBy}
         height={"calc(100% - 3.22rem)"} // exclude search-bar height
-        filter={ row => row[stratifyBy] !== CUMULUS_ALL }
+        // Filter out the group meta rows and placeholder rows
+        filter={ row => row[stratifyBy] !== CUMULUS_ALL && row[stratifyBy] !== null}
         groupLabel={(value, children, search) => {
             const allRow = children.find(r => r[groupBy] === value && r?.[stratifyBy] === CUMULUS_ALL)
             if (allRow) {
