@@ -67,17 +67,21 @@ interface StaticGridProps<T = JSONObject> {
     height           ?: number | string
 
     filter?: (row: T, index: number, all: T[]) => boolean
-}
 
-function createComparator(type: string, sortDir: "asc" | "desc", getValue?: (row: any) => any) {
-    return (a: any, b: any) => {
-        const _a = getValue ? getValue(a) : a
-        const _b = getValue ? getValue(b) : b
-        if (type === "number") {
-            return (_b - _a) * (sortDir === "asc" ? -1 : 1)
-        }
-        return String(_b || "").localeCompare(String(_a || ""), "en-US", { numeric: true }) * (sortDir === "asc" ? 1 : -1)
+    comparator?: (a: any, b: typeof a) => number
+
+
+function defaultComparator(a: any, b: typeof a): number {
+    if (typeof a === null) {
+        return Infinity
     }
+    if (typeof b === null) {
+        return -Infinity
+    }
+    if (typeof a === "number") {
+        return b - a
+    }
+    return String(b || "").localeCompare(String(a || ""), "en-US", { numeric: true })
 }
 
 export default function StaticGrid({
@@ -93,7 +97,7 @@ export default function StaticGrid({
     minHeight,
     height,
     equals = (a, b) => a === b,
-    filter = () => true
+    comparator,
 }: StaticGridProps) {
 
     const searchableCols = columns.filter(c => c.searchable === true && c.name !== groupBy)
@@ -156,12 +160,31 @@ export default function StaticGrid({
         // Sort
         // ---------------------------------------------------------------------
         let out: Map<string, any[]> = new Map()
-        const keys = Object.keys(groups).sort(createComparator("string", "desc"))
+        const keys = Object.keys(groups).sort((a, b) => defaultComparator(a, b) * -1)//(sortDir === "asc" ? -1 : 1))
         if (sortColumn) {
-            const col = columns.find(c => c.name === sortColumn)!
-            const comparator = createComparator(col.type, sortDir, row => row[sortColumn])
             keys.forEach(groupLabel => {
-                out.set(groupLabel, groups[groupLabel].sort(comparator))
+                out.set(groupLabel, groups[groupLabel].sort((a, b) => {
+                    const _a = a[sortColumn]
+                    const _b = b[sortColumn]
+                    let n = 0
+
+                    // Call the custom comparator if provided
+                    if (comparator) {
+                        n = comparator(_a, _b)
+                    }
+
+                    // If the custom comparator returned 0 call the built-in one too
+                    if (n === 0) {
+                        n = defaultComparator(_a, _b)
+                    }
+
+                    // Unless the result is infinity, respect the sort direction
+                    if (isFinite(n)) {
+                        return n * (sortDir === "asc" ? -1 : 1)
+                    }
+
+                    return n
+                }))
             })
         } else {
             keys.forEach(groupLabel => {
