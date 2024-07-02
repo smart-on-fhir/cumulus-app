@@ -1,9 +1,11 @@
-import formData     from "form-data"
-import Mailgun      from "mailgun.js"
-import moment       from "moment"
-import { debuglog } from "util"
-import { app }      from "../.."
-import config       from "../config"
+import formData              from "form-data"
+import Mailgun               from "mailgun.js"
+import moment                from "moment"
+import { debuglog }          from "util"
+import { app }               from "../.."
+import config                from "../config"
+import { AppRequest }        from "../types"
+import { getRequestBaseURL } from "../lib"
 
 
 const debug = debuglog("app:email");
@@ -53,29 +55,28 @@ export async function sendDataRequest(dataRequest: app.DataRequest) {
     })
 }
 
-export async function requestLineLevelData({
-    subscription,
-    view,
-    user,
-    dataElements,
-    reason,
-    type
-}: {
-    subscription: { id: number; name: string }
-    view: { id: number; name: string }
-    type: "required" | "preferred" | "optional"
-    reason: string
-    user: { username: string }
-    dataElements: { name: string, need: string }[]
-}) {
+export async function requestLineLevelData(req: AppRequest) {
+
+    const {
+        subscription,
+        view,
+        type,
+        reason,
+        user,
+        dataElements
+    } = req.body;
+
+    const baseUrl = getRequestBaseURL(req)
+    const subscriptionUrl = new URL(`/requests/${subscription.id}`, baseUrl)
+    const chartUrl = new URL(`/views/${view.id}`, baseUrl)
 
     let html = [
         `<h2>New Line-level Data Request</h2>`,
         `<b>From: </b>${user.username}@cumulus<br/>`,
         `<b>To: </b>Subscription Group: MA DPH Subscriptions to the Massachusetts regional cluster<br />`,
         `<br />`,
-        `<b>Subscription: </b><a href="https://smart-cumulus.herokuapp.com/requests/${subscription.id}">${subscription.name} (${subscription.id})</a>`,
-        `<b>Chart View: </b><a href="https://smart-cumulus.herokuapp.com/views/${view.id}">${view.id} (#${view.id})</a>`,
+        `<b>Subscription: </b><a href="${subscriptionUrl}">${subscription.name} (${subscription.id})</a>`,
+        `<b>Chart View: </b><a href="${chartUrl}">${view.name} (#${view.id})</a>`,
         `<br />`,
         `<b>Reason for investigation</b><br/>`,
         reason,
