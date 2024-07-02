@@ -166,7 +166,7 @@ export default function StaticGrid({
         // Sort
         // ---------------------------------------------------------------------
         let out: Map<string, any[]> = new Map()
-        const keys = Object.keys(groups).sort((a, b) => defaultComparator(a, b) * -1)//(sortDir === "asc" ? -1 : 1))
+        const keys = Object.keys(groups).sort((a, b) => defaultComparator(a, b) * (sortDir === "asc" ? -1 : 1))
         if (sortColumn) {
             keys.forEach(groupLabel => {
                 out.set(groupLabel, groups[groupLabel].sort((a, b) => {
