@@ -121,3 +121,15 @@ replaced with real ones. To do so:
 ```            
 npm test
 ```
+
+## Important Note for Contributors
+This project uses Highcharts for data visualization. Highcharts no longer offers
+a free license for non-commercial use. While our team has obtained a commercial
+license for development purposes, this license does not extend to individual
+users or contributors. Therefore, if you plan to deploy this project, you are
+responsible for securing your own Highcharts license.
+
+For more information on Highcharts licensing, please visit the official
+[Highcharts licensing page](https://shop.highcharts.com/).
+
+Thank you for your understanding and compliance.
