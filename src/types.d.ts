@@ -415,7 +415,6 @@ export declare module app {
             status: string
             // online: boolean
             // activated: boolean
-
         }
     }
 }

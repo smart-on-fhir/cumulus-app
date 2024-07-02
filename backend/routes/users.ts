@@ -30,8 +30,8 @@ export const router = express.Router({ mergeParams: true });
  */
 function secure(user: User|object) {
     const out: Record<string, any> = user instanceof User ? user.toJSON() : user
-    delete out.password // remove for security reasons
-    delete out.sid      // remove for security reasons
+    delete out.password
+    delete out.sid
     return out
 }
 

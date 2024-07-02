@@ -21,7 +21,7 @@ const {
     DB_DOCKER_CONTAINER    = "",
     MAILGUN_API_KEY        = "missing mailgun api key",
     MAILGUN_DOMAIN         = "smarthealthit.org",
-    APP_EMAIL_FROM         = "admin@cumulus.org",
+    APP_EMAIL_FROM         = "",
     CUMULUS_ADMIN_EMAIL    = "",
     REGIONAL_CLUSTER_EMAIL = "",
     AGGREGATOR_URL         = "",
