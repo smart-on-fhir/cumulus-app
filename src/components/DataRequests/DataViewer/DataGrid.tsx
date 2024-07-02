@@ -47,15 +47,26 @@ export default function DataGrid({
         // Filter out the group meta rows and placeholder rows
         filter={ row => row[stratifyBy] !== CUMULUS_ALL && row[stratifyBy] !== null}
         groupLabel={(value, children, search) => {
+            const count = rows.filter(r => (r[groupBy] === value && r[stratifyBy] !== null)).length - 1
             const allRow = children.find(r => r[groupBy] === value && r?.[stratifyBy] === CUMULUS_ALL)
             if (allRow) {
-                return Object.keys(allRow).filter(k => k !== stratifyBy).map(k => {
+                const arr = Object.keys(allRow).filter(k => k !== stratifyBy).map(k => {
                     const col = cols.find(c => c.name === k)
                     return col?.dataType === "float" || col?.dataType === "integer" ?
                         highlight(Number(allRow[k]).toLocaleString(), search) :
                         highlight(allRow[k], search)
                 })
+                if (count > 0) {
+                    arr[0] = <>{arr[0]} <b className="badge">{ count }</b></> as any
+                }
+                return arr
             }
+
+            
+            if (count > 0) {
+                return <>{value} <b className="badge">{ count }</b></> as any
+            }
+            
             return value
         }}
         comparator={(a, b) => {
