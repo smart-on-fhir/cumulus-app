@@ -1,5 +1,5 @@
 import { Router }                 from "express"
-import { Includeable }            from "sequelize/types"
+import { Includeable }            from "sequelize"
 import Model                      from "../db/models/UserGroup"
 import { assert, getFindOptions } from "../lib"
 import { route }                  from "../lib/route"

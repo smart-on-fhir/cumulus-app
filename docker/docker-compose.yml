@@ -46,6 +46,8 @@ services:
       - AGGREGATOR_ENABLED=$AGGREGATOR_ENABLED
       - NODE_DEBUG=$NODE_DEBUG
       - API_KEYS=$API_KEYS
+      - CUMULUS_ADMIN_EMAIL=$CUMULUS_ADMIN_EMAIL
+      - REGIONAL_CLUSTER_EMAIL=$REGIONAL_CLUSTER_EMAIL
     volumes:
       - ../backend:/app/backend
       - ../build:/app/build

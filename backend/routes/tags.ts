@@ -1,5 +1,5 @@
 import { Router }      from "express"
-import { Includeable } from "sequelize/types"
+import { Includeable } from "sequelize"
 import Model           from "../db/models/Tag"
 import * as lib        from "../lib"
 import { NotFound }    from "../errors"

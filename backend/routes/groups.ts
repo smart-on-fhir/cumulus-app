@@ -1,5 +1,5 @@
 import express         from "express"
-import { Includeable } from "sequelize/types"
+import { Includeable } from "sequelize"
 import DataRequest     from "../db/models/DataRequest"
 import Model           from "../db/models/RequestGroup"
 import * as HttpError  from "../errors"
