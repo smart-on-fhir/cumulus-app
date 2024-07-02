@@ -453,8 +453,8 @@ route(router, {
     method: "post",
     path  : "/:id/request-linelevel-data",
     async handler(req, res) {
-        requestPermission({ user: req.user, resource: "Subscription", action: "requestLineLevelData" })
-        requestLineLevelData(req.body).then(
+        requestPermission({ user: req.user, resource: "Subscriptions", action: "requestLineLevelData" })
+        requestLineLevelData(req).then(
             () => res.end(),
             (e: any) => {
                 logger.error(e)
