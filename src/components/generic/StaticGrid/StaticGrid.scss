@@ -18,6 +18,16 @@
             &:hover {
                 background: #F0F0F0;
             }
+
+            &.summary {
+                td {
+                    background: #FFF8EE !important;
+                    color: #777;
+                    // color: $color-blue;
+                    cursor: default !important;
+                    box-shadow: 0 0.5px 0 0 #0002 inset, 0 -0.5px 0 0 #0003 inset;
+                }
+            }
         }
 
         th, td {
@@ -30,9 +40,10 @@
                 margin: 0 auto;
                 line-height: inherit;
             }
-            border-top: 0.5px solid #00000013;
-            border-bottom: 0.5px solid #00000013;
+            // border-top: 0.5px solid #00000013;
+            // border-bottom: 0.5px solid #00000013;
             border-left: 1px solid #00000013;
+            box-shadow: 0 0.5px 0 0 #00000012 inset, 0 -0.5px 0 0 #00000012 inset;
             &:first-child {
                 border-left: 0;
             }
@@ -78,10 +89,10 @@
             background: mix($color-blue, #FFFFFF, 5%);
             td {
                 color: $color-blue;
-                cursor: pointer;
                 transition: all 0.2s;
 
                 &:first-child {
+                    cursor: pointer;
                     font-weight: 500;
                     padding       : 2px 6px 2px 4px;
                 }
