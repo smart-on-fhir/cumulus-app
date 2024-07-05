@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react"
 import MetricsChart                         from "./MetricsChart"
-import DataGrid                             from "./DataGrid"
+import MetricsStaticGrid                    from "./MetricsStaticGrid"
 import { AlertError }                       from "../../generic/Alert"
 import { Tabs }                             from "../../generic/Tabs"
 import Loader                               from "../../generic/Loader"
 import { app }                              from "../../../types"
 import { request }                          from "../../../backend"
+import { humanizeColumnName }               from "../../../utils"
 
 const aspectRatio = "2/1";
 const chartHeight = "50%";
@@ -76,11 +77,21 @@ export default function DataViewer({ subscription }: { subscription: app.DataReq
             }, {
                 name: "Data Grid",
                 children: <div className="p-05 pt-1" style={{ aspectRatio }}>
-                    <DataGrid
-                        cols={subscription.metadata!.cols}
+                    <MetricsStaticGrid
+                        columns={subscription.metadata!.cols.map(c => ({
+                            name : c.name,
+                            label: humanizeColumnName(c.name),
+                            searchable: true,
+                            type: c.dataType === "boolean" ?
+                                "boolean" :
+                                (c.dataType === "float" || c.dataType === "integer") ?
+                                    "number" :
+                                    "string",
+                        }))}
                         rows={data}
                         groupBy={cols.groupBy}
                         stratifyBy={cols.stratifyBy}
+                        height={"calc(100% - 3.22rem)"} // exclude search-bar height
                     />
                 </div>
             }
