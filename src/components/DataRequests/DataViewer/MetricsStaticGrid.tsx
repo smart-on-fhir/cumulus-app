@@ -102,8 +102,14 @@ export default function MetricsStaticGrid({
         // ---------------------------------------------------------------------
         if (sortColumn) {
             _rows.sort((a, b) => {
-                const _a = a[sortColumn]
-                const _b = b[sortColumn]
+                let _a = a[sortColumn]
+                let _b = b[sortColumn]
+                // if (_a === CUMULUS_ALL && sortColumn === stratifyBy) {
+                //     _a = a[groupBy]
+                // }
+                // if (_b === CUMULUS_ALL && sortColumn === stratifyBy) {
+                //     _b = b[groupBy]
+                // }
                 if (_a === CUMULUS_NONE) return  Infinity
                 if (_b === CUMULUS_NONE) return -Infinity
                 if (_a === CUMULUS_ALL ) return  Infinity
