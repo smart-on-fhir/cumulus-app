@@ -33,3 +33,7 @@ export interface EditableGroupProperty {
     open?: boolean
     description?: string
 }
+
+export interface EditableBooleanProperty extends EditableProperty {
+    indeterminate?: boolean
+}

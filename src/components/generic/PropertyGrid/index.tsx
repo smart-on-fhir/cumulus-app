@@ -7,6 +7,7 @@ import BooleanEditor from "./BooleanEditor"
 import OptionsEditor from "./OptionsEditor"
 import ShadowEditor  from "./ShadowEditor"
 import {
+    EditableBooleanProperty,
     EditableDateProperty,
     EditableGroupProperty,
     EditableNumberProperty,
@@ -20,7 +21,7 @@ import DateEditor from "./DateEditor"
 function PropertyEditor({ prop, level = 1 }: { prop: EditableProperty, level?: number }): JSX.Element {
     switch (prop.type) {
         case "boolean":
-            return <BooleanEditor prop={ prop } />
+            return <BooleanEditor prop={ prop as EditableBooleanProperty } />
         case "number":
             return <NumberEditor prop={ prop as EditableNumberProperty } />
         case "length":

@@ -955,6 +955,16 @@ function AllSeriesEditor({
         })
     }
 
+    const allShowInLegendN = state.chartOptions.series?.every(s => !!s.showInLegend === false)
+    const allShowInLegendY = state.chartOptions.series?.every(s => s.showInLegend !== false )
+    props.push({
+        name : "Show in Legend",
+        type : "boolean",
+        value: allShowInLegendY,
+        indeterminate: !allShowInLegendY && !allShowInLegendN,
+        onChange: (showInLegend: boolean) => change({ showInLegend })
+    })
+
     props.push({
         name: "Dash Style",
         type: "options",
