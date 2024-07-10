@@ -1,9 +1,8 @@
-import { useAuth }    from "../../auth"
-import CommandButton  from "../../commands/CommandButton"
-import { app }        from "../../types"
+import { useAuth }           from "../../auth"
+import CommandButton         from "../../commands/CommandButton"
+import { app }               from "../../types"
 import { requestPermission } from "../../utils"
-import { DashboardState, ViewAction } from "../Dashboard2/types"
-import { SaveChartButton } from "./SaveChartButton"
+import { SaveChartButton }   from "./SaveChartButton"
 
 export function GraphToolbar({
     state,
@@ -15,8 +14,8 @@ export function GraphToolbar({
     shareCommand,
     deleteCommand
 }: {
-    state: Pick<DashboardState, "inspection"|"viewType"|"showOptions">
-    dispatch: (action: ViewAction) => void
+    state: Pick<app.DashboardState, "inspection"|"viewType"|"showOptions">
+    dispatch: (action: app.ViewAction) => void
     graph: Partial<app.View>
     save: () => Promise<void>
     saving: boolean
@@ -73,7 +72,7 @@ export function GraphToolbar({
     )
 }
 
-export function ViewTypeSelector({ value, onChange }: { value: DashboardState["viewType"]; onChange: (value: DashboardState["viewType"]) => void }) {
+export function ViewTypeSelector({ value, onChange }: { value: app.DashboardState["viewType"]; onChange: (value: app.DashboardState["viewType"]) => void }) {
     return (
         <div className="toolbar flex">
             <button
