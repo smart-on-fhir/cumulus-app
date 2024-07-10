@@ -417,4 +417,45 @@ export declare module app {
             // activated: boolean
         }
     }
+
+    interface DashboardProps {
+        /**
+         * The view object that we are editing. If this is an empty object
+         * or a partial which does not have an `id` property, then the
+         * dashboard is in "create mode"
+         */
+        view: Partial<View>
+    
+        /**
+         * The subscription that this view is (or is going to be)
+         * assigned to.
+         */
+        dataRequest: DataRequest,
+        
+        copy?: boolean
+    }
+    
+    interface DashboardState {
+        graph            : Partial<View>
+        viewType         : "overview" | "data"
+        showOptions      : boolean
+        chartOptions     : Partial<Highcharts.Options>
+        data            ?: Record<string, JSONScalar>[] | null
+        loadingData     ?: boolean
+        loadingDataError?: Error | string | null
+        subscription     : DataRequest
+        xAxisColumn     ?: string | null
+        saving          ?: boolean
+        savingError     ?: Error | string | null
+        inspection      ?: Inspection
+        visualOverrides  : VisualOverridesState
+    }
+    
+    type ToggleOptionsAction   = { type: "TOGGLE_OPTIONS" }
+    type SetViewTypeAction     = { type: "SET_VIEW_TYPE"    , payload: DashboardState["viewType"]  }
+    type MergeAction           = { type: "MERGE"            , payload: Partial<DashboardState>     }
+    type SetChartOptionsAction = { type: "SET_CHART_OPTIONS", payload: Partial<Highcharts.Options> }
+    type SetXAxisAction        = { type: "SET_X_AXIS"       , payload: string                      }
+    
+    type ViewAction = ToggleOptionsAction | SetViewTypeAction | MergeAction | SetChartOptionsAction | SetXAxisAction
 }
