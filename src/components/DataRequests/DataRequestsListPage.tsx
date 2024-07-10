@@ -1,4 +1,4 @@
-import { useCallback }            from "react"
+import { useCallback, useState }  from "react"
 import { HelmetProvider, Helmet } from "react-helmet-async"
 import { Link }                   from "react-router-dom"
 import DataRequestLink            from "./DataRequestLink"
@@ -19,6 +19,7 @@ import "./DataRequestsListPage.scss";
 export default function DataRequestsListPage()
 {
     const { user } = useAuth();
+    const [search, setSearch] = useState("")
 
     const { loading, error, result: groups } = useBackend(
         useCallback(() => request<app.RequestGroup[]>("/api/requests/by-group"), []),
@@ -46,15 +47,22 @@ export default function DataRequestsListPage()
                 { name: "Home", href: "/" },
                 { name: "Subscriptions" }
             ]} />
-            <div className="row gap">
-                <div className="col middle">
-                    <h3><i className="icon fa-solid fa-database color-brand-2" /> Subscriptions</h3>
+            <div className="row wrap mt-2">
+                <h3 className="col middle center mt-05 mb-1 nowrap" style={{ flex: "1 1 8em" }}>
+                    <div>
+                        <i className="icon fa-solid fa-database color-brand-2" /> Subscriptions
+                    </div>
+                </h3>
+                <div className="col col-4 middle center mt-05 mb-1 pl-1" style={{ flex: "200 1 10em" }}>
+                    <input type="search" placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
                 </div>
-                { user?.permissions.includes("Subscriptions.create") && (<div className="col col-0 middle">
-                    <Link className="btn color-blue-dark btn-virtual" to="/requests/new">
-                        <b className="color-green"><i className="fa-solid fa-circle-plus" /> New Subscription</b>
-                    </Link>
-                </div>) }
+                { user?.permissions.includes("Subscriptions.create") && (
+                    <div className="col middle center mt-05 mb-1" style={{ flex: "1 1 200px" }}>
+                        <Link className="btn color-blue-dark btn-virtual" to="/requests/new">
+                            <b className="color-green"><i className="fa-solid fa-circle-plus" /> New Subscription</b>
+                        </Link>
+                    </div>
+                ) }
             </div>
             <hr className="mb-2"/>
 
@@ -65,18 +73,26 @@ export default function DataRequestsListPage()
                     <br/>
                     <Link to="./new" className="btn btn-blue-dark pl-2 pr-2">Create Data Subscription</Link>
                 </div> :
-                groupsData.map((group, i) => (
+                groupsData.map((group, i) => {
+                    const links = group.requests.filter(r => {
+                        if (search) {
+                            return r.name.toLowerCase().includes(search.toLowerCase())
+                        }
+                        return true
+                    }).map((item, y) => (
+                        <DataRequestLink request={item} href="/requests/:id" key={y} search={search} />
+                    ));
 
-                    <Collapse key={i} header={
-                        <><i className="fa-regular fa-folder"/> { group.name }</>
-                    }>
-                        <Grid cols="22em" key={i} className="link-list mt-05 mb-2">
-                            { group.requests.map((item, y) => (
-                                <DataRequestLink request={item} href="/requests/:id" key={y} />
-                            ))}
-                        </Grid>
-                    </Collapse>
-                ))
+                    if (links.length > 0) {
+                        return (
+                            <Collapse key={i} header={<><i className="fa-regular fa-folder"/> { group.name }</>}>
+                                <Grid cols="22em" key={i} className="link-list mt-05 mb-2">{ links }</Grid>
+                            </Collapse>
+                        )
+                    }
+
+                    return null
+                })
             }
         </div>
     )

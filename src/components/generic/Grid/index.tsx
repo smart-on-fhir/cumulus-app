@@ -1,10 +1,12 @@
+import { ReactNode } from "react"
+
 export default function Grid({
     children,
     className,
     gap,
     cols = "100%"
 }: {
-    children?: JSX.Element | string | null | undefined | (JSX.Element | string | undefined | null)[]
+    children?: ReactNode
     gap?: string
     className?: string
     cols?: string

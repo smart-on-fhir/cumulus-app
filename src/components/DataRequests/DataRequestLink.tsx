@@ -1,5 +1,5 @@
 import { Link }      from "react-router-dom"
-import { stripTags } from "../../utils"
+import { highlight, stripTags } from "../../utils"
 import { Format }    from "../Format"
 import { app }       from "../../types"
 
@@ -16,10 +16,12 @@ function Icon(props: { type: "ok"|"pending"|"working" }) {
 
 export default function DataRequestLink({
     request,
-    href = "/requests/:id"
+    href = "/requests/:id",
+    search
 }: {
     request: app.DataRequest,
     href?: string
+    search?: string
 }) {
 
     // let type = request.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION"
@@ -47,7 +49,7 @@ export default function DataRequestLink({
     return (
         <Link to={ href.replace(":id", request.id + "") } className="icon-item" title={ request.description ? stripTags(request.description) : undefined}>
             <Icon type={iconType} />
-            <b>{ request.name }</b>&nbsp;
+            <b>{ search ? highlight(request.name, search) : request.name }</b>&nbsp;
             {info}
         </Link>
     )
