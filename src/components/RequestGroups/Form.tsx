@@ -1,5 +1,6 @@
-import { FormEvent } from "react"
-import { app }       from "../../types"
+import { FormEvent, useState } from "react"
+import MarkdownEditor          from "../generic/MarkdownEditor"
+import { app }                 from "../../types"
 import "./RequestGroups.scss"
 
 
@@ -13,12 +14,11 @@ export default function Form({
     onSubmit: (record: Partial<app.RequestGroup>) => void
 })
 {
+    const [name, setName] = useState(record.name)
+    const [description, setDescription] = useState(record.description)
  
     function _onSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault()
-        const formData    = new FormData(e.currentTarget)
-        const name        = formData.get("requestGroupName") as string
-        const description = formData.get("requestGroupDescription") as string
         onSubmit({ name, description })
     }
 
@@ -26,11 +26,15 @@ export default function Form({
         <form onSubmit={ _onSubmit }>
             <fieldset className="mt-1">
                 <label>Name</label>
-                <input type="text" name="requestGroupName" defaultValue={ record.name } required />
+                <input type="text" name="requestGroupName" value={name} onChange={e => setName(e.target.value)} required />
             </fieldset>
             <fieldset className="mt-2">
-                <label>Description</label>
-                <textarea name="requestGroupDescription" defaultValue={ record.description } rows={6} />
+                <MarkdownEditor height="30vh" textarea={{
+                    name    : "requestGroupDescription",
+                    value   : description,
+                    rows    : 10,
+                    onChange: e => setDescription(e.target.value)
+                }} />
             </fieldset>
             <hr className="mt-2 mb-2" />
             <div className="center mb-2">

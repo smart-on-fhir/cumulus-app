@@ -2,8 +2,10 @@ import { Link }           from "react-router-dom"
 import Alert              from "../generic/Alert"
 import { createListPage } from "../generic/EndpointListWrapper"
 import IfAllowed          from "../generic/IfAllowed"
+import Markdown           from "../generic/Markdown"
 import { useAuth }        from "../../auth"
 import { app }            from "../../types"
+import { ellipsis }       from "../../utils"
 import "../generic/EndpointListTable.scss"
 
 export default function RequestGroupList()
@@ -34,7 +36,7 @@ export default function RequestGroupList()
                             <thead>
                                 <tr>
                                     <th style={{ width: "2em" }}>ID</th>
-                                    <th style={{ width: "60%" }}>Name</th>
+                                    <th>Name</th>
                                     <th>Description</th>
                                     <IfAllowed showError={false} permissions="SubscriptionGroups.update" element={ <th style={{ width: "2.5em" }} /> } />
                                     <IfAllowed showError={false} permissions="SubscriptionGroups.delete" element={ <th style={{ width: "2.5em" }} /> } />
@@ -45,7 +47,7 @@ export default function RequestGroupList()
                                     <tr key={i}>
                                         <td>{row.id}</td>
                                         <td><Link title={row.name} to={"./" + row.id} className="link">{row.name}</Link></td>
-                                        <td>{row.description || ""}</td>
+                                        <td className="color-muted"><Markdown options={{createElement: (tag, props, ...children) => <>{children} </>}}>{ ellipsis(row.description || "", 70) }</Markdown></td>
                                         <IfAllowed showError={false} permissions="SubscriptionGroups.update" element={ <td className="right nowrap">
                                             <Link title="Edit" className="btn small color-brand-2 btn-virtual" to={ row.id + "/edit" }>
                                                 <i className="fa-solid fa-pen-to-square" />

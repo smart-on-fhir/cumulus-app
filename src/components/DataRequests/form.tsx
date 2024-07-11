@@ -8,6 +8,7 @@ import CheckboxList       from "../generic/CheckboxList"
 import DemographicsEditor from "./DemographicsEditor"
 import TransmissionEditor from "./Transmissions/TransmissionEditor"
 import EditorList         from "../generic/EditorList"
+import MarkdownEditor     from "../generic/MarkdownEditor"
 import { useAuth }        from "../../auth"
 // import { request }        from "../../backend"
 // import LoadableSelect     from "../generic/Select/DatasetSelect"
@@ -317,20 +318,14 @@ export default function DataRequestForm({
                     </div>
                 </div>
                 
-                <div className="col col-4 mt-1 responsive">
-                    <div className="row gap top">
-                        <label className="col col-0">Description</label>
-                        <span className="col color-muted small" style={{ padding: "1em 0 0.2em 0" }}>(Markdown enabled)</span>
-                    </div>
-                    <div className="row row-10">
-                        <div className="col">
-                            <textarea
-                                value={ description || "" }
-                                onChange={ e => onChange({ ...record, description: e.target.value }) }
-                                className="form-control description-editor"
-                                style={{ minHeight: "100%", maxHeight: "none" }}
-                            />
-                        </div>
+                <div className="col col-4 mt-1 mb-0 responsive">
+                    <div className="row row-10 stretch">
+                        <MarkdownEditor textarea={{
+                            value: description || "",
+                            onChange: e => onChange({ ...record, description: e.target.value }),
+                            className: "form-control description-editor"
+                        }}
+                        height="10em" />
                     </div>
                 </div>
             </div>
