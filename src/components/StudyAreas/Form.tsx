@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react"
 import Loader                  from "../generic/Loader"
 import LinkWidget              from "./LinkWidget"
 import { app }                 from "../../types"
+import MarkdownEditor from "../generic/MarkdownEditor"
 
 export default function Form({ data = {}, onSubmit, loading, error }: {
     data?: Record<string, any>
@@ -30,7 +31,7 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
     return (
         <form onSubmit={ submit } autoComplete="off">
             <div className="row gap-2 mt-2 wrap stretch">
-                <div className="col col-6 responsive">
+                <div className="col col-6 pb-1 stretch responsive">
                     <div className="row">
                         <div className="col mb-1">
                             <label htmlFor="name">Name</label>
@@ -46,28 +47,16 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
                             />
                         </div>
                     </div>
-                    <div className="row row-10">
-                        <div className="col mb-1 stretch">
-                            <div className="row gap" style={{ marginBottom: "0.25rem" }}>
-                                <div className="col col-0 middle">
-                                    <label className="p-0" htmlFor="description">Description</label>
-                                </div>
-                                <div className="col right middle">
-                                    <span className="small color-muted">Markdown enabled</span>
-                                </div>
-                            </div>
-                            <textarea
-                                id="description"
-                                name="description"
-                                placeholder="Study Area description (reason for the study, types of intended analyses)"
-                                // rows={8}
-                                style={{ height: "100%", minHeight: "10em" }}
-                                required
-                                value={description}
-                                onChange={e => setDescription(e.target.value)}
-                                disabled={ !!loading }
-                            />
-                        </div>
+                    <div className="row row-10" style={{ minHeight: "16rem" }}>
+                        <MarkdownEditor textarea={{
+                            name: "description",
+                            placeholder: "Study Area description (reason for the study, types of intended analyses)",
+                            value: description,
+                            onChange: e => setDescription(e.target.value),
+                            required: true,
+                            disabled: !!loading,
+                            style: { resize: "none" }
+                        }} />
                     </div>
                 </div>
                 <div className="col col-6 mb-1 responsive">

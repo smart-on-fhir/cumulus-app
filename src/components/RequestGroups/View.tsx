@@ -1,7 +1,7 @@
 import { Link }           from "react-router-dom"
 import { createViewPage } from "../generic/EndpointViewWrapper"
-import Clip               from "../generic/Clip"
 import Grid               from "../generic/Grid"
+import Markdown           from "../generic/Markdown"
 import DataRequestLink    from "../DataRequests/DataRequestLink"
 import { useAuth }        from "../../auth"
 import { app }            from "../../types"
@@ -24,13 +24,7 @@ export default function RequestGroupView()
         canDelete,
         canUpdate,
         renderView : data => <>
-            <div className="mt-2 mb-1" style={{ whiteSpace: "pre-wrap" }}>
-                <b>Description:</b> {
-                    data.description ?
-                        <Clip max={400} txt={ data.description } /> :
-                        <span className="color-muted">No description provided</span>
-                }
-            </div>
+            { data.description ? <Markdown>{ data.description }</Markdown> : <span className="color-muted">No description provided</span> }
             <div className="mt-2 row gap wrap">
                 <div className="col col-4 responsive">
                     <div className="row gap mt-2">

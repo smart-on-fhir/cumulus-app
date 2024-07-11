@@ -89,6 +89,7 @@
     &.bottom { justify-content: flex-end;   align-self: flex-end;   }
     // &.stretch{ justify-content: stretch;   align-self: stretch;   }
 
+    &.col-auto { flex: 1 1 0%; }
     &.col-0  { flex: 0 1 auto; }
     &.col-1  { flex: 0 1 10%; }
     &.col-2  { flex: 0 1 20%; }
