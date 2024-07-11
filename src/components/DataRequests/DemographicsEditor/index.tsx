@@ -1,4 +1,5 @@
-import CheckboxList from "../../generic/CheckboxList";
+import CheckboxList from "../../generic/CheckboxList"
+import Grid         from "../../generic/Grid"
 import { app }      from "../../../types"
 
 const AVAILABLE_DEMOGRAPHICS = [
@@ -56,26 +57,30 @@ export default function DemographicsEditor({
             </div>
             <hr/>
             <div className="row gap mt-1 wrap">
-                <CheckboxList
-                    items={ AVAILABLE_DEMOGRAPHICS }
-                    isSelected={ item => !!demographics.find(x => x.name === item.name) }
-                    toggle={ item => {
-                        const index = demographics.findIndex(x => x.name === item.name)
-                        if (index > -1) {
-                            const newSelection = [ ...demographics ];
-                            newSelection.splice(index, 1)
-                            onChange(newSelection)
-                        } else {
-                            onChange([
-                                ...demographics,
-                                {
-                                    ...item,
-                                    description: String(item.description)
+                <div className="col middle">
+                    <Grid gap="0 1rex" cols="12em">
+                        <CheckboxList
+                            items={ AVAILABLE_DEMOGRAPHICS }
+                            isSelected={ item => !!demographics.find(x => x.name === item.name) }
+                            toggle={ item => {
+                                const index = demographics.findIndex(x => x.name === item.name)
+                                if (index > -1) {
+                                    const newSelection = [ ...demographics ];
+                                    newSelection.splice(index, 1)
+                                    onChange(newSelection)
+                                } else {
+                                    onChange([
+                                        ...demographics,
+                                        {
+                                            ...item,
+                                            description: String(item.description)
+                                        }
+                                    ])
                                 }
-                            ])
-                        }
-                    }}
-                />
+                            }}
+                        />
+                    </Grid>
+                </div>
             </div>
         </>
     )
