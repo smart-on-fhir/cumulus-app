@@ -1,11 +1,12 @@
-import Path from "path"
-import { readdirSync, statSync } from "fs"
-import { FindAttributeOptions, FindOptions, Op, Order, Sequelize } from "sequelize"
-import { ValidationChain, validationResult } from "express-validator"
-import * as logger from "../services/logger"
-import { NextFunction, Request, Response } from "express-serve-static-core"
-import { app } from "../.."
-import { IncludeOptions } from "sequelize"
+import { Request, RequestHandler } from "express"
+import {
+    FindAttributeOptions,
+    FindOptions,
+    Op,
+    Order,
+    Sequelize,
+    IncludeOptions
+} from "sequelize"
 
 
 const RE_FALSE = /^(0|no|false|off|null|undefined|NaN|none|)$/i;
@@ -28,11 +29,7 @@ export function uInt(x: any, defaultValue = 0) {
     return x;
 }
 
-/**
- * @param {import("express").Request} req
- * @returns {import("sequelize").FindOptions}
- */
-export function getFindOptions(req)
+export function getFindOptions(req: Request): FindOptions
 {
     const options: FindOptions = {
         where: {},
@@ -163,14 +160,8 @@ export function getFindOptions(req)
 /**
  * Creates and returns a route-wrapper function that allows for using an async
  * route handlers without try/catch.
- * @param {import("express").RequestHandler} fn
- * @returns {(
- *   req: import("express").Request,
- *   res: import("express").Response,
- *   next: import("express").NextFunction
- * ) => Promise<void>}
  */
-export function rw(fn) {
+export function rw(fn: RequestHandler): RequestHandler {
     return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 }
 
@@ -181,40 +172,6 @@ export function assert(condition: any, error?: string | ErrorConstructor, ctor =
         }
         else {
             throw new ctor(error || "Assertion failed")
-        }
-    }
-}
-
-/**
- * Walk a directory recursively and find files that match the @filter if its a
- * RegExp, or for which @filter returns true if its a function.
- */
-export function* filterFiles(dir: string, filter: RegExp|Function): IterableIterator<String> {
-    const files = walkSync(dir);
-    for (const file of files) {
-        if (filter instanceof RegExp && !filter.test(file)) {
-            continue;
-        }
-        if (typeof filter == "function" && !filter(file)) {
-            continue;
-        }
-        yield file;
-    }
-}
-
-/**
- * List all files in a directory recursively in a synchronous fashion.
- */
-export function* walkSync(dir: string): IterableIterator<string> {
-    const files = readdirSync(dir);
-
-    for (const file of files) {
-        const pathToFile = Path.join(dir, file);
-        const isDirectory = statSync(pathToFile).isDirectory();
-        if (isDirectory) {
-            yield *walkSync(pathToFile);
-        } else {
-            yield pathToFile;
         }
     }
 }
@@ -300,168 +257,11 @@ export class EmptyString extends String {
     }
 }
 
-export function parseDelimitedString(
-    input: string,
-    options: {
-        separators: string[],
-        stringDelimiter: string
-    } = {
-        separators     : [","],
-        stringDelimiter: '"'
-    }
-): {
-    rows: string[][]
-    cols: app.DataRequestDataColumn[]
-} {
-    
-    let rows: any[][] = []
-
-    let cols: app.DataRequestDataColumn[] = []
-    
-    const unParsedRows: string[] = input.split("\n").map(s => s.trim()).filter(Boolean);
-    
-    const { separators, stringDelimiter } = options;
-    
-    if (unParsedRows.length > 1) {
-
-        const headerRow = String(unParsedRows.shift());
-
-        rows = unParsedRows.map(row => {
-            if (separators.length) {
-                return parseDelimitedLine(row, separators, stringDelimiter)
-            }
-            return [row]
-        });
-
-        cols = parseDelimitedLine(headerRow, separators, stringDelimiter).map(
-            (col, i) => {
-                if (col === "cnt") {
-                    return {
-                        name       : "cnt",
-                        label      : "Count",
-                        description: "Count",
-                        dataType   : "integer"
-                    }
-                }
-
-                const title = toTitleCase(col)
-                return {
-                    name       : col,
-                    label      : title,
-                    description: title.charAt(0) + title.substring(1).toLowerCase(),
-                    dataType   : detectDataTypeAt(i, rows) as app.DataRequestDataColumn["dataType"]
-                }
-            }
-        );
-
-        rows = rows.map(row => {
-            cols.forEach((col, i) => {
-                const type = col.dataType;
-                
-                let value = row[i];
-                
-                if (type === "integer") {
-                    
-                    /**
-                     * @type {number|null}
-                     */
-                    value = parseInt(value, 10);
-                    if (isNaN(value) || !isFinite(value)) {
-                        value = null
-                    }
-
-                    row[i] = value
-                }
-
-                else if (type === "float") {
-                    
-                    /**
-                     * @type {number|null}
-                     */
-                    value = parseFloat(value);
-                    if (isNaN(value) || !isFinite(value)) {
-                        value = null
-                    }
-
-                    row[i] = value
-                }
-
-                else if (!value) {
-                    row[i] = null
-                }
-            })
-
-            return row
-        })
-    }
-
-    return {
-        cols,
-        rows
-    }
-}
-
 export function toTitleCase(str: string | String) {
     return str.replace(/([A-Z])/g, " $1")
         .replace(/[^a-zA-Z0-9]+/g, " ")
         .replace(/\b[a-z]/g, x => x.toUpperCase())
         .trim();
-}
-
-export function detectDataTypeAt(i: number, rows: string[][]) {
-    let type = "";
-
-    for (let row of rows) {
-        let col = String(row[i] || "").trim()
-        let t = valueToDataType(col)
-
-        if (t === "") {
-            continue
-        }
-
-        if (type === "") {
-            type = t
-        }
-        else {
-            if (type && type !== t) {
-                return "string"
-            }
-        }
-    }
-
-    return type || "hidden"
-}
-
-/**
- * Given a string representation of a value, parses it and returns the best
- * guess for its data type.
- * - If the value is empty returns ""
- * - If the value is number returns "integer" or "float"
- * - If the value starts with NNNN-NN-NN returns "date:YYYY-MM-DD" 
- * - If the value starts with NNNN-NN-01 returns "date:YYYY-MM" 
- * - If the value starts with NNNN-01-01 returns "date:YYYY" 
- * - Otherwise returns "string"
- */
-export function valueToDataType(x: string) {
-    if (!x) {
-        return ""
-    }
-    if ((/^(-|\+)?[0-9]+$/).test(x)) {
-        return "integer"
-    }
-    if ((/^(-|\+)?[0-9]*\.[0-9]+$/).test(x)) {
-        return "float"
-    }
-    if ((/^\d{4}-01-01/).test(x)) {
-        return "date:YYYY"
-    }
-    if ((/^\d{4}-\d{2}-01/).test(x)) {
-        return "date:YYYY-MM"
-    }
-    if ((/^\d{4}-\d{2}-\d{2}/).test(x)) {
-        return "date:YYYY-MM-DD"
-    }
-    return "string"
 }
 
 /**
@@ -502,28 +302,6 @@ export async function fixAutoIncrement(connection: Sequelize, tableName: string,
             true
         )`
     );
-}
-
-export function validateRequest(...validations: ValidationChain[]) {
-    return async (req: Request, res: Response, next: NextFunction) => {
-        for (let validation of validations) {
-            const result = await validation.run(req);
-            if (!result.isEmpty()) break;
-        }
-
-        const errors = validationResult(req).formatWith(({ location, msg, param, value, nestedErrors }) => {
-            // Build your resulting errors however you want! String, object, whatever - it works!
-            return `${param}: ${msg}`;
-        });
-
-        if (errors.isEmpty()) {
-            return next()
-        }
-
-        logger.error("Request validation error", errors)
-
-        res.status(400).json({ errors: errors.array() });
-    };
 }
 
 export function buildPermissionId({
@@ -576,7 +354,7 @@ export function parseDbUrl(url: string) {
         host    : match[4],
         port    : match[5],
         database: match[6],
-        query   : {}
+        query   : {} as Record<string, string>
     };
     new URLSearchParams(match[7] || "").forEach((value, key) => {
         out.query[key] = value

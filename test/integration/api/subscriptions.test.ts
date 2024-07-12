@@ -35,12 +35,14 @@ describe("Subscriptions", () => {
         await dbConnection.query(
             `CREATE table "subscription_data_1" (
                 "cnt" Integer,
-                "gender" Text
+                "gender" Text,
+                "_float" Float,
+                "_boolean" Boolean
             )`
         )
         await dbConnection.query(
-            `INSERT INTO "subscription_data_1" ("gender", "cnt") VALUES
-            ('M', 100), ('F', 200), (NULL, 300)`
+            `INSERT INTO "subscription_data_1" ("gender", "cnt", "_float", "_boolean") VALUES
+            ('M', 100, 1.2, true), ('F', 200, 3.4, false), (NULL, 300, 5.0, true)`
         )
     })
 
@@ -49,7 +51,7 @@ describe("Subscriptions", () => {
     })
 
     describe("view", () => {
-        testEndpoint("Subscriptions.read", "GET", "/api/requests/1?group=true&tags=true&graphs=true")
+        testEndpoint("Subscriptions.read", "GET", "/api/requests/1?group=true&tags=true&graphs=true&study_areas=true")
     })
 
     describe("create", () => {
@@ -76,6 +78,19 @@ describe("Subscriptions", () => {
                 Tags: [{ id: 1 }]
             }
         )
+
+        it ("produces the expected error message on failure", async () => {
+            const res = await fetch(`${server.baseUrl}/api/requests/1`, {
+                method: "PUT",
+                headers: {
+                    "content-type": "application/json",
+                    cookie: getCookie("admin")
+                },
+                body: JSON.stringify({ name: null })
+            });
+            const text = await res.text()
+            expect(text).to.match(/Updating subscription failed/)
+        })
     })
 
     describe("delete", () => {
@@ -159,6 +174,10 @@ describe("Subscriptions", () => {
                 })
             }
         })
+    })
+
+    describe("raw-data", () => {
+        testEndpoint("Subscriptions.read", "GET", "/api/requests/1/raw-data")
     })
 
     describe("refresh subscription data", () => {

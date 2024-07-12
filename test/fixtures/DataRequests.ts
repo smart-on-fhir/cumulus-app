@@ -6,8 +6,10 @@ export default [
         refresh: 'manually',
         metadata: {
             cols: [
-                {"name": "gender", "label": "Gender", "dataType": "string", "description": "Gender"},
-                {"name": "cnt", "label": "Cnt", "dataType": "integer", "description": "Cnt"}
+                {"name": "gender"  , "label": "Gender" , "dataType": "string" , "description": "Gender" },
+                {"name": "cnt"     , "label": "Cnt"    , "dataType": "integer", "description": "Cnt"    },
+                {"name": "_float"  , "label": "Float"  , "dataType": "float"  , "description": "Float"  },
+                {"name": "_boolean", "label": "Boolean", "dataType": "boolean", "description": "Boolean"}
             ],
             total: 3
         }
