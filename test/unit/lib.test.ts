@@ -1,14 +1,16 @@
 import { expect } from "chai"
 import { Op } from "sequelize"
-import { getFindOptions, roundToPrecision, toTitleCase, uInt, valueToDataType, wait } from "../../backend/lib"
+import {
+    assert,
+    getFindOptions,
+    roundToPrecision,
+    toTitleCase,
+    uInt,
+    wait
+} from "../../backend/lib"
 
 
 describe("Lib", () => {
-    // describe("validateRequest", () => {
-    //     it ("validateRequest", async () => {
-
-    //     })
-    // })
 
     describe("roundToPrecision", () => {
 
@@ -40,35 +42,6 @@ describe("Lib", () => {
             expect(roundToPrecision(1.5555, 4)).to.equal(1.5555)
             expect(roundToPrecision(1.5555, 5)).to.equal(1.5555)
         })
-    })
-
-    describe("valueToDataType", () => {
-
-        const map = {
-            ""                  : "",
-            "0"                 : "integer",
-            "-0"                : "integer",
-            "+0"                : "integer",
-            "123"               : "integer",
-            "0.0"               : "float",
-            "-0.0"              : "float",
-            "+0.0"              : "float",
-            "123.02"            : "float",
-            "1234-01-01"        : "date:YYYY",
-            "1234-01-01whatever": "date:YYYY",
-            "1234-11-01"        : "date:YYYY-MM",
-            "1234-11-01whatever": "date:YYYY-MM",
-            "1234-11-11"        : "date:YYYY-MM-DD",
-            "1234-11-11whatever": "date:YYYY-MM-DD",
-            "whatever"          : "string"
-        }
-
-        for (const input in map) {
-            const output = map[input as keyof typeof map];
-            it (JSON.stringify(input) + " => " + JSON.stringify(output), () => {
-                expect(valueToDataType(input), input + " should be " + output).to.equal(output)
-            }) 
-        }
     })
 
     describe("toTitleCase", () => {
@@ -171,6 +144,12 @@ describe("Lib", () => {
             const result = getFindOptions({ query: { limit: "2,c:4", include: "c" }})
             expect(result.limit).to.equal(2)
             expect(result.include).to.deep.equal([{ association: "c", separate: true, limit: 4 }])
+        })
+    })
+
+    describe("assert", () => {
+        it ("Default message", () => {
+            expect(() => assert(0)).to.throw("Assertion failed")
         })
     })
 })
