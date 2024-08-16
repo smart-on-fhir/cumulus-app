@@ -60,99 +60,101 @@ export default function Views({ drafts }: { drafts?: boolean })
                     <title>{ draftsMode ? "Draft Graphs" : "Cumulus Graphs" }</title>
                 </Helmet>
             </HelmetProvider>
-            <div className="row half-gap middle wrap">
-                <div className="col col-0 mb-05 nowrap">
-                    { draftsMode ? 
-                        <h4 className="m-0">
-                            <i className="icon fa-solid fa-pen-to-square color-brand-2" /> My Draft Graphs
-                        </h4> :
-                        <h4 className="m-0">
-                            <i className="icon fa-solid fa-chart-pie color-brand-2" /> Graphs
-                        </h4>
-                    }
-                </div>
-                <div className="col col-0 responsive"/>
-                <div className="col col-3 mb-05 right responsive">
-                    <input
-                        type="search"
-                        placeholder="Search Graphs by Name"
-                        value={search}
-                        onChange={e => onSearch(e.target.value)}
-                    />
-                </div>
-                {/* <div className="col col-0 responsive"/> */}
-                <div className="col col-4 mb-05 nowrap responsive right">
-                    <div className="row">
-                        <MenuButton right title="Sort By" items={[
-                            <Checkbox onChange={() => onSetSort("name-asc"   )} checked={ sort === "name-asc"   } name="sort" type="radio" label={<>Sort by Name <span className="color-muted">(A-Z)</span></>} />,
-                            <Checkbox onChange={() => onSetSort("name-desc"  )} checked={ sort === "name-desc"  } name="sort" type="radio" label={<>Sort by Name <span className="color-muted">(Z-A)</span></>} />,
-                            "separator",
-                            <Checkbox onChange={() => onSetSort("mod-desc"   )} checked={ sort === "mod-desc"   } name="sort" type="radio" label={<>Sort by Date <span className="color-muted">(newest first)</span></>} />,
-                            <Checkbox onChange={() => onSetSort("mod-asc"    )} checked={ sort === "mod-asc"    } name="sort" type="radio" label={<>Sort by Date <span className="color-muted">(oldest first)</span></>} />,
-                            "separator",
-                            <Checkbox onChange={() => onSetSort("")} checked={ !sort } name="sort" type="radio" label={ <><b>Default Sort</b> <span className="color-muted">(name, date)</span></> } />
-                        ]}>
-                            <i className={ classList({
-                                "material-symbols-rounded": true,
-                                "color-brand-2": !!sort
-                             }) }>sort_by_alpha</i> Sort
-                            <span className="color-muted"> ▾</span>
-                        </MenuButton>
-                        <MenuButton right title="Group By" items={[
-                            <Checkbox
-                                onChange={() => onSetGroupBy("subscription")}
-                                checked={ groupBy === "subscription"}
-                                name="groupBy"
-                                type="radio"
-                                label="Group by Subscription"
-                            />,
-                            <Checkbox
-                                onChange={() => onSetGroupBy("tag")}
-                                checked={ groupBy === "tag"}
-                                name="groupBy"
-                                type="radio"
-                                label="Group by Tag"
-                            />,
-                            "separator",
-                            <Checkbox
-                                onChange={() => onSetGroupBy("")}
-                                checked={ !groupBy }
-                                name="groupBy"
-                                type="radio"
-                                label={ <b>No Grouping</b> }
-                            />
-                        ]}>
-                            <i className={ classList({
-                                "material-symbols-rounded": true,
-                                "color-brand-2": !!groupBy
-                            })}>layers</i> Group
-                            <span className="color-muted"> ▾</span>                            
-                        </MenuButton>
+            <header className="view-browser-header">
+                <div className="row half-gap middle wrap">
+                    <div className="col col-0 mb-05 nowrap">
+                        { draftsMode ? 
+                            <h4 className="m-0">
+                                <i className="icon fa-solid fa-pen-to-square color-brand-2" /> My Draft Graphs
+                            </h4> :
+                            <h4 className="m-0">
+                                <i className="icon fa-solid fa-chart-pie color-brand-2" /> Graphs
+                            </h4>
+                        }
+                    </div>
+                    <div className="col col-0 responsive"/>
+                    <div className="col col-3 mb-05 right responsive">
+                        <input
+                            type="search"
+                            placeholder="Search Graphs by Name"
+                            value={search}
+                            onChange={e => onSearch(e.target.value)}
+                        />
+                    </div>
+                    {/* <div className="col col-0 responsive"/> */}
+                    <div className="col col-4 mb-05 nowrap responsive right">
+                        <div className="row">
+                            <MenuButton right title="Sort By" items={[
+                                <Checkbox onChange={() => onSetSort("name-asc"   )} checked={ sort === "name-asc"   } name="sort" type="radio" label={<>Sort by Name <span className="color-muted">(A-Z)</span></>} />,
+                                <Checkbox onChange={() => onSetSort("name-desc"  )} checked={ sort === "name-desc"  } name="sort" type="radio" label={<>Sort by Name <span className="color-muted">(Z-A)</span></>} />,
+                                "separator",
+                                <Checkbox onChange={() => onSetSort("mod-desc"   )} checked={ sort === "mod-desc"   } name="sort" type="radio" label={<>Sort by Date <span className="color-muted">(newest first)</span></>} />,
+                                <Checkbox onChange={() => onSetSort("mod-asc"    )} checked={ sort === "mod-asc"    } name="sort" type="radio" label={<>Sort by Date <span className="color-muted">(oldest first)</span></>} />,
+                                "separator",
+                                <Checkbox onChange={() => onSetSort("")} checked={ !sort } name="sort" type="radio" label={ <><b>Default Sort</b> <span className="color-muted">(name, date)</span></> } />
+                            ]}>
+                                <i className={ classList({
+                                    "material-symbols-rounded": true,
+                                    "color-brand-2": !!sort
+                                }) }>sort_by_alpha</i> Sort
+                                <span className="color-muted"> ▾</span>
+                            </MenuButton>
+                            <MenuButton right title="Group By" items={[
+                                <Checkbox
+                                    onChange={() => onSetGroupBy("subscription")}
+                                    checked={ groupBy === "subscription"}
+                                    name="groupBy"
+                                    type="radio"
+                                    label="Group by Subscription"
+                                />,
+                                <Checkbox
+                                    onChange={() => onSetGroupBy("tag")}
+                                    checked={ groupBy === "tag"}
+                                    name="groupBy"
+                                    type="radio"
+                                    label="Group by Tag"
+                                />,
+                                "separator",
+                                <Checkbox
+                                    onChange={() => onSetGroupBy("")}
+                                    checked={ !groupBy }
+                                    name="groupBy"
+                                    type="radio"
+                                    label={ <b>No Grouping</b> }
+                                />
+                            ]}>
+                                <i className={ classList({
+                                    "material-symbols-rounded": true,
+                                    "color-brand-2": !!groupBy
+                                })}>layers</i> Group
+                                <span className="color-muted"> ▾</span>                            
+                            </MenuButton>
+                        </div>
+                    </div>
+                    <div className="col col-0 mb-05">
+                        <div className="toolbar flex">
+                            <button
+                                className={"btn" + (viewType === "grid" ? " active" : "")}
+                                onClick={() => onSetViewType("grid")}
+                                title="Grid View"
+                            ><i className="material-symbols-rounded">grid_view</i></button>
+                            <button
+                                className={"btn" + (viewType === "column" ? " active" : "")}
+                                onClick={() => onSetViewType("column")}
+                                title="Column View"
+                                ><i className="material-symbols-rounded">view_week</i></button>
+                            <button
+                                className={"btn" + (viewType === "list" ? " active" : "")}
+                                onClick={() => onSetViewType("list")}
+                                title="List View"
+                                ><i className="material-symbols-rounded">table_rows</i>
+                                </button>
+                            
+                        </div>    
                     </div>
                 </div>
-                <div className="col col-0 mb-05">
-                    <div className="toolbar flex">
-                        <button
-                            className={"btn" + (viewType === "grid" ? " active" : "")}
-                            onClick={() => onSetViewType("grid")}
-                            title="Grid View"
-                        ><i className="material-symbols-rounded">grid_view</i></button>
-                        <button
-                            className={"btn" + (viewType === "column" ? " active" : "")}
-                            onClick={() => onSetViewType("column")}
-                            title="Column View"
-                            ><i className="material-symbols-rounded">view_week</i></button>
-                        <button
-                            className={"btn" + (viewType === "list" ? " active" : "")}
-                            onClick={() => onSetViewType("list")}
-                            title="List View"
-                            ><i className="material-symbols-rounded">table_rows</i>
-                            </button>
-                        
-                    </div>    
-                </div>
-            </div>
-            <hr className="mt-05 mb-1"/>
+                <hr className="mt-05 mb-1"/>
+            </header>
             <ViewsBrowser
                 layout={ viewType || "grid" }
                 search={search}

@@ -19,6 +19,14 @@
     }
 }
 
+.view-browser-header {
+    position: sticky;
+    top: 4rem;
+    padding-top: 1rem;
+    margin-top: -1rem;
+    background-color: $color-grey-light;
+}
+
 .view-browser {
     margin-top: $gap;
     margin-bottom: $gap;
