@@ -134,3 +134,34 @@ export function useCommand(command: Command) {
         description: command.description({ working, error })
     }
 }
+
+export function useLocalStorage(storageKey: string) {
+    const [storageValue, setStorageValue] = useState(localStorage.getItem(storageKey));
+
+    useEffect(() => {
+        const handleStorageChange = (event: any) => {
+            if (event.key === storageKey) {
+                setStorageValue(event.newValue);
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        // For same tab changes
+        const handleSameTabChange = () => {
+            setStorageValue(localStorage.getItem(storageKey));
+        };
+
+        window.addEventListener('localStorageUpdate', handleSameTabChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('localStorageUpdate', handleSameTabChange);
+        };
+    }, [storageKey])
+
+    return [storageValue, (val: string) => {
+        setStorageValue(val)
+        window.dispatchEvent(new Event('localStorageUpdate'));
+    }]
+}
