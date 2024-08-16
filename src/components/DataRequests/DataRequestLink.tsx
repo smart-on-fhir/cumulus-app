@@ -29,7 +29,7 @@ export default function DataRequestLink({
     const id = request.id + ""
     const ToggleFavoriteCmd = new ToggleFavorite(id, "starredSubscriptions")
     const toggleFavorite    = useCommand(ToggleFavoriteCmd)
-    const on = ToggleFavoriteCmd.active()
+    const on = ToggleFavoriteCmd.on()
 
     
     // let type = request.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION"

@@ -20,18 +20,18 @@ export class ToggleFavorite extends Command
         return String(window.localStorage[this.group] || "").trim().split(/\s*,\s*/)
     }
 
-    active() {
+    on() {
         return this.getList().includes(this.id)
     }
     
     label() {
-        return this.active() ?
+        return this.on() ?
             "Remove from favorites" :
             "Add to favorites"
     }
 
     icon() {
-        return this.active() ?
+        return this.on() ?
             <i className="fa-regular fa-star" /> :
             <i className="fa-solid fa-star" />;
     }
