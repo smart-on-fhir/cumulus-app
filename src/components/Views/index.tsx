@@ -18,6 +18,7 @@ export default function Views({ drafts }: { drafts?: boolean })
     const [ search  , setSearch   ] = useState(url.searchParams.get("q") || "")
     const [ groupBy , setGroupBy  ] = useState<GroupBy>(String(url.searchParams.get("group") || "") as GroupBy)
     const [ sort    , setSort     ] = useState<SortType>(String(url.searchParams.get("sort") || "") as SortType)
+    const [ starOnly, setStarOnly ] = useState<Boolean>(url.searchParams.get("star") === "1")
 
     const draftsMode = drafts ?? !!url.searchParams.get("drafts")
 
@@ -31,6 +32,16 @@ export default function Views({ drafts }: { drafts?: boolean })
         url.searchParams.set("view", t)
         window.history.replaceState(null, "", url.href)
         setViewType(t)
+    };
+
+    const toggleStar = () => {
+        if (starOnly) {
+            url.searchParams.delete("star")
+        } else {
+            url.searchParams.set("star", "1")
+        }
+        window.history.replaceState(null, "", url.href)
+        setStarOnly(!starOnly)
     };
 
     const onSetGroupBy = (t: "subscription" | "tag" | "") => {
@@ -84,6 +95,9 @@ export default function Views({ drafts }: { drafts?: boolean })
                     {/* <div className="col col-0 responsive"/> */}
                     <div className="col col-4 mb-05 nowrap responsive right">
                         <div className="row">
+                            <button className="btn btn-virtual" data-tooltip="Toggle show starred only" onClick={toggleStar}>
+                                { starOnly ? <i className="fa-solid fa-star color-brand-2" /> : <i className="fa-regular fa-star color-muted" /> }
+                            </button>
                             <MenuButton right title="Sort By" items={[
                                 <Checkbox onChange={() => onSetSort("name-asc"   )} checked={ sort === "name-asc"   } name="sort" type="radio" label={<>Sort by Name <span className="color-muted">(A-Z)</span></>} />,
                                 <Checkbox onChange={() => onSetSort("name-desc"  )} checked={ sort === "name-desc"  } name="sort" type="radio" label={<>Sort by Name <span className="color-muted">(Z-A)</span></>} />,
@@ -161,6 +175,7 @@ export default function Views({ drafts }: { drafts?: boolean })
                 sort={sort}
                 groupBy={groupBy}
                 drafts={draftsMode}
+                starOnly={!!starOnly}
             />
         </div>
     )
