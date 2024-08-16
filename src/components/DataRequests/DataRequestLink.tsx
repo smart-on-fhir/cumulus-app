@@ -1,7 +1,9 @@
 import { Link }      from "react-router-dom"
-import { highlight, stripTags } from "../../utils"
+import { highlight } from "../../utils"
 import { Format }    from "../Format"
 import { app }       from "../../types"
+import { ToggleFavorite } from "../../commands/ToggleFavorite"
+import { useCommand } from "../../hooks"
 
 function Icon(props: { type: "ok"|"pending"|"working" }) {
     return (
@@ -24,6 +26,12 @@ export default function DataRequestLink({
     search?: string
 }) {
 
+    const id = request.id + ""
+    const ToggleFavoriteCmd = new ToggleFavorite(id, "starredSubscriptions")
+    const toggleFavorite    = useCommand(ToggleFavoriteCmd)
+    const on = ToggleFavoriteCmd.active()
+
+    
     // let type = request.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION"
     let info = null
     let iconType: "ok"|"pending"|"working" = "ok"
@@ -47,9 +55,13 @@ export default function DataRequestLink({
     }
 
     return (
-        <Link to={ href.replace(":id", request.id + "") } className="icon-item" title={ request.description ? stripTags(request.description) : undefined}>
+        <Link to={ href.replace(":id", id) } className="icon-item" onContextMenu={e => {
+            // @ts-ignore
+            e.nativeEvent.menuItems = [toggleFavorite]
+        }}>
             <Icon type={iconType} />
-            <b>{ search ? highlight(request.name, search) : request.name }</b>&nbsp;
+            <b className="nowrap">{
+                on && <i className="fa-solid fa-star star"/> } <span className="wrap">{ search ? highlight(request.name, search) : request.name }</span></b>&nbsp;
             {info}
         </Link>
     )
