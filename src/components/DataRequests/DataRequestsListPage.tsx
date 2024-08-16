@@ -2,7 +2,7 @@ import { useCallback, useState }  from "react"
 import { HelmetProvider, Helmet } from "react-helmet-async"
 import { Link }                   from "react-router-dom"
 import DataRequestLink            from "./DataRequestLink"
-import { useBackend }             from "../../hooks"
+import { useBackend, useLocalStorage } from "../../hooks"
 import { request }                from "../../backend"
 import Breadcrumbs                from "../generic/Breadcrumbs"
 import { useAuth }                from "../../auth"
@@ -18,8 +18,22 @@ import "./DataRequestsListPage.scss";
 
 export default function DataRequestsListPage()
 {
+    const url = new URL(window.location.href)
     const { user } = useAuth();
     const [search, setSearch] = useState("")
+    const [ starOnly, setStarOnly ] = useState<Boolean>(url.searchParams.get("star") === "1")
+    const [starredSubscriptions] = useLocalStorage("starredSubscriptions")
+    const list = String(starredSubscriptions || "").trim().split(/\s*,\s*/);
+
+    const toggleStar = () => {
+        if (starOnly) {
+            url.searchParams.delete("star")
+        } else {
+            url.searchParams.set("star", "1")
+        }
+        window.history.replaceState(null, "", url.href)
+        setStarOnly(!starOnly)
+    };
 
     const { loading, error, result: groups } = useBackend(
         useCallback(() => request<app.RequestGroup[]>("/api/requests/by-group"), []),
@@ -34,7 +48,19 @@ export default function DataRequestsListPage()
         return <AlertError><b>Error Loading Subscriptions: </b>{ error + "" }</AlertError>
     }
 
-    const groupsData = groups?.filter(g => g.requests.length > 0)
+    let groupsData: app.RequestGroup[] = [];
+
+    
+
+    (groups || []).forEach(g => {
+        if (starOnly) {
+            groupsData.push({ ...g, requests: g.requests.filter((r: any) => list.includes(r.id + "")) })
+        } else {
+            groupsData.push({ ...g })
+        }
+    })
+
+    groupsData = groupsData?.filter(g => g.requests.length > 0)
 
     return (
         <div>
@@ -60,6 +86,9 @@ export default function DataRequestsListPage()
                     { user?.permissions.includes("Subscriptions.create") && (
                         <div className="col middle center mt-05 mb-05" style={{ flex: "1 1 240px" }}>
                             <div className="row">
+                                <button className="btn btn-virtual mr-05" data-tooltip="Toggle show starred only" onClick={toggleStar}>
+                                    { starOnly ? <i className="fa-solid fa-star color-brand-2" /> : <i className="fa-regular fa-star color-muted" /> }
+                                </button>
                                 <Link className="btn color-blue-dark btn-virtual" to="/requests/new">
                                     <b className="color-green"><i className="fa-solid fa-circle-plus" /> New Subscription</b>
                                 </Link>
