@@ -5,7 +5,7 @@ import { AlertError }                     from "../generic/Alert"
 import Collapse                           from "../generic/Collapse"
 import Loader                             from "../generic/Loader"
 import { CustomSelection, WithSelection } from "../generic/WithSelection"
-import { useBackend }                     from "../../hooks"
+import { useBackend, useLocalStorage }  from "../../hooks"
 import { request }                        from "../../backend"
 import { classList }                      from "../../utils"
 import { app }                            from "../../types"
@@ -19,7 +19,8 @@ export default function ViewsBrowser({
     search = "",
     sort = "",
     groupBy,
-    drafts
+    drafts,
+    starOnly
 }: {
     layout?: "grid" | "column" | "list",
     requestId?: string | number,
@@ -28,9 +29,12 @@ export default function ViewsBrowser({
     sort?: "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | "",
     groupBy?: "tag" | "subscription" | ""
     drafts?: boolean
+    starOnly?: boolean
 }) {
 
     let { user } = useAuth();
+
+    const [ favoriteGraphs ] = useLocalStorage("favoriteGraphs")
 
     const canCreateGraphs = user?.permissions.includes("Graphs.create")
 
@@ -89,6 +93,18 @@ export default function ViewsBrowser({
             existing <Link to="/requests" className="link">subscriptions</Link> and
             then create new graph from it's data.
         </p>
+    }
+
+    if (starOnly) {
+        const list = String(favoriteGraphs || "").trim().split(/\s*,\s*/)
+        
+        result = result.filter(view => list.includes(view.id + ""));
+
+        if (!result.length) {
+            return <p className="center bold color-orange">
+                No starred Graphs found!
+            </p>
+        }
     }
 
     if (search) {

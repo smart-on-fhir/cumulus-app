@@ -13,6 +13,7 @@ import { RequestLineLevelData }           from "../../commands/Graphs/RequestLin
 import { View }                           from "../../commands/Graphs/View"
 import { ShareGraph }                     from "../../commands/Graphs/Share/ShareGraph"
 import { ManagePermissions }              from "../../commands/Graphs/Share/ManagePermissions"
+import { ToggleFavorite }                 from "../../commands/ToggleFavorite"
 
 
 export default function ViewThumbnail({
@@ -32,6 +33,9 @@ export default function ViewThumbnail({
     const auth              = useAuth()
     const navigate          = useNavigate()
     const link              = useRef<HTMLAnchorElement>(null)
+
+    const ToggleFavoriteCmd = new ToggleFavorite(view.id, "favoriteGraphs")
+
     
     const deleteCommand      = useCommand(new DeleteGraph({ graphId: view.id || 0, user: auth.user, navigate, ownerId: view.creatorId }));
     const copyCommand        = useCommand(new CopyGraph(view, auth.user, navigate));
@@ -42,6 +46,7 @@ export default function ViewThumbnail({
     const shareCommand       = useCommand(new ShareGraph(view, auth.user));
     // const bulkShareGraph     = useCommand(new BulkShareGraph({ graphs: selection?.items || [], user: auth.user }))
     const permissionsCommand = useCommand(new ManagePermissions(view, auth.user));
+    const toggleFavorite     = useCommand(ToggleFavoriteCmd)
 
     return (
         <Link
@@ -70,7 +75,8 @@ export default function ViewThumbnail({
                     deleteCommand,
                     copyCommand,
                     shareCommand,
-                    permissionsCommand
+                    permissionsCommand,
+                    toggleFavorite
                 ];
 
                 if (selection && selection.size() > 1 && selection.includes(view)) {
@@ -104,6 +110,7 @@ export default function ViewThumbnail({
                  <img src={`${(process.env.REACT_APP_BACKEND_HOST || "")}/api/views/${ view.id }/screenshot?v=${+new Date(view.updatedAt!)}`} loading="lazy" alt={view.name} />
             </div>
             <div className="view-thumbnail-title">
+                { ToggleFavoriteCmd.on() && <i className="fa-solid fa-star star pr-05"/> }
                 { search ? highlight(view.name, search) : view.name }
                 { showDescription > 0 && <div className="view-thumbnail-description color-muted" title={ view.description || undefined }>
                     { view.description ?
