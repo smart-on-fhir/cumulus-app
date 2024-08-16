@@ -47,24 +47,28 @@ export default function DataRequestsListPage()
                 { name: "Home", href: "/" },
                 { name: "Subscriptions" }
             ]} />
-            <div className="row wrap mt-2">
-                <h3 className="col middle center mt-05 mb-1 nowrap" style={{ flex: "1 1 8em" }}>
-                    <div>
-                        <i className="icon fa-solid fa-database color-brand-2" /> Subscriptions
+            <header className="requests-header">
+                <div className="row wrap mt-2">
+                    <h3 className="col middle center mt-05 mb-05 nowrap" style={{ flex: "1 1 8em" }}>
+                        <div>
+                            <i className="icon fa-solid fa-database color-brand-2" /> Subscriptions
+                        </div>
+                    </h3>
+                    <div className="col col-4 middle center mt-05 mb-05 pl-1" style={{ flex: "200 1 10em" }}>
+                        <input type="search" placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
                     </div>
-                </h3>
-                <div className="col col-4 middle center mt-05 mb-1 pl-1" style={{ flex: "200 1 10em" }}>
-                    <input type="search" placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
+                    { user?.permissions.includes("Subscriptions.create") && (
+                        <div className="col middle center mt-05 mb-05" style={{ flex: "1 1 240px" }}>
+                            <div className="row">
+                                <Link className="btn color-blue-dark btn-virtual" to="/requests/new">
+                                    <b className="color-green"><i className="fa-solid fa-circle-plus" /> New Subscription</b>
+                                </Link>
+                            </div>
+                        </div>
+                    ) }
                 </div>
-                { user?.permissions.includes("Subscriptions.create") && (
-                    <div className="col middle center mt-05 mb-1" style={{ flex: "1 1 200px" }}>
-                        <Link className="btn color-blue-dark btn-virtual" to="/requests/new">
-                            <b className="color-green"><i className="fa-solid fa-circle-plus" /> New Subscription</b>
-                        </Link>
-                    </div>
-                ) }
-            </div>
-            <hr className="mb-2"/>
+                <hr className="mb-2"/>
+            </header>
 
             { !groupsData?.length ?
                 <div className="center">

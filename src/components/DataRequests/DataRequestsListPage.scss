@@ -1,5 +1,13 @@
 @import "../../styles/variables.scss";
 
+.requests-header {
+    position: sticky;
+    top: 4rem;
+    // padding-top: 1rem;
+    background-color: $color-grey-light !important;
+    z-index: 20;
+}
+
 .requests-grid {
     
     grid-template-rows: 1fr auto;
