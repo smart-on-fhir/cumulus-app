@@ -14,7 +14,7 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
     const [ name         , setName          ] = useState(data.name        || "")
     const [ description  , setDescription   ] = useState(data.description || "")
     const [ subscriptions, setSubscriptions ] = useState(
-        (data.Subscriptions || []).map((s: app.DataRequest) => s.id).join(",")
+        (data.Subscriptions || []).map((s: app.Subscription) => s.id).join(",")
     )
 
     const valid = name && description

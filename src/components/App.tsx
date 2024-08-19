@@ -5,7 +5,7 @@ import Home                             from "./Home";
 import EditView                         from "./Dashboard/EditView";
 import CopyView                         from "./Dashboard/CopyView";
 import RequestDataForm                  from "./Dashboard/RequestDataForm";
-import Subscriptions                    from "./DataRequests";
+import Subscriptions                    from "./Subscriptions";
 import RequestGroups                    from "./RequestGroups";
 import DataSiteListPage                 from "./DataSites";
 import Navigation                       from "./Navigation";

@@ -33,7 +33,7 @@ function emToPx(em: number) {
     return Math.round(DEFAULT_FONT_SIZE * em) + "px"
 }
 
-export function getChartTitleText(column: app.DataRequestDataColumn, groupBy?: app.DataRequestDataColumn | null): string {
+export function getChartTitleText(column: app.SubscriptionDataColumn, groupBy?: app.SubscriptionDataColumn | null): string {
     let txt = column.label || column.name
     if (groupBy) {
         txt += ` by ${groupBy.label || groupBy.name}`
@@ -41,7 +41,7 @@ export function getChartTitleText(column: app.DataRequestDataColumn, groupBy?: a
     return txt
 }
 
-export function getXType(column: app.DataRequestDataColumn): "category" | "linear" | "datetime" {
+export function getXType(column: app.SubscriptionDataColumn): "category" | "linear" | "datetime" {
     
     let xType: "category" | "linear" | "datetime" = "category";
 
@@ -56,7 +56,7 @@ export function getXType(column: app.DataRequestDataColumn): "category" | "linea
     return xType;
 }
 
-export function getDateFormat({ dataType }: app.DataRequestDataColumn, forMoment = false) {
+export function getDateFormat({ dataType }: app.SubscriptionDataColumn, forMoment = false) {
     if (forMoment) {
         return dataType === "date:YYYY" ?
             "YYYY" :
@@ -113,7 +113,7 @@ function getSeriesAndExceptions({
 }: {
     data            : app.ServerResponses.DataResponse
     data2           : app.ServerResponses.StratifiedDataResponse | null
-    column          : app.DataRequestDataColumn
+    column          : app.SubscriptionDataColumn
     type            : SupportedNativeChartTypes 
     denominator     : app.DenominatorType
     column2type    ?: keyof typeof SupportedChartTypes
@@ -448,8 +448,8 @@ export function buildChartOptions({
     data              : app.ServerResponses.DataResponse
     data2             : app.ServerResponses.StratifiedDataResponse | null
     options          ?: Highcharts.Options
-    column            : app.DataRequestDataColumn
-    groupBy          ?: app.DataRequestDataColumn
+    column            : app.SubscriptionDataColumn
+    groupBy          ?: app.SubscriptionDataColumn
     type              : SupportedNativeChartTypes
     denominator      ?: app.DenominatorType
     column2type      ?: keyof typeof SupportedChartTypes

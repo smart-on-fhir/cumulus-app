@@ -13,7 +13,7 @@ const chartHeight = "50%";
 
 
 
-function pickColumns(metadata: app.DataRequest["metadata"])
+function pickColumns(metadata: app.Subscription["metadata"])
 {
     const cols = [ ...metadata!.cols.filter(c => !["denominator", "std_dev", "max"].includes(c.name)) ]
     const out  = { groupBy: "", stratifyBy: "", valueColumn: "" }
@@ -29,7 +29,7 @@ function pickColumns(metadata: app.DataRequest["metadata"])
     return out;
 }
 
-export default function DataViewer({ subscription }: { subscription: app.DataRequest }) {
+export default function DataViewer({ subscription }: { subscription: app.Subscription }) {
     
     const [loading, setLoading] = useState(false)
     const [error  , setError  ] = useState<Error | string | null>(null)

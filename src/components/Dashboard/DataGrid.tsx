@@ -3,7 +3,7 @@ import { app }        from "../../types"
 
 interface State
 {
-    cols: app.DataRequestDataColumn[]
+    cols: app.SubscriptionDataColumn[]
     rows: any[][]
     sortedRows: any[][]
     sortBy: string | null
@@ -58,7 +58,7 @@ function reducer(state: State, action: Action): State {
     return state
 }
 
-export default function DataGrid({ data }: { data: app.DataRequestData })
+export default function DataGrid({ data }: { data: app.SubscriptionData })
 {
     const [state, dispatch] = useReducer(reducer, {
         cols   : data.cols,

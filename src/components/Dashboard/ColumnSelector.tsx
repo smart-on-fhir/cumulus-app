@@ -20,7 +20,7 @@ export default function ColumnSelector({
     /**
      * Array of tables containing columns
      */
-    cols: app.DataRequestDataColumn[]
+    cols: app.SubscriptionDataColumn[]
 
     /**
      * A function used to sort the options
@@ -32,7 +32,7 @@ export default function ColumnSelector({
     /**
      * A function to filter out unwanted options
      */
-    filter?: (col: app.DataRequestDataColumn) => boolean
+    filter?: (col: app.SubscriptionDataColumn) => boolean
 
     /**
      * Other props to be passed to the select element

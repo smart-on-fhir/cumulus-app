@@ -361,7 +361,7 @@ interface DataUploader2State {
     totalBytes         : number
     requestLoading     : boolean
     requestError       : Error | null
-    requestResult      : app.DataRequest | null
+    requestResult      : app.Subscription | null
     importCompleted    : boolean
     uploading          : boolean
     estimate           : number

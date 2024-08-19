@@ -2,7 +2,7 @@ import { Link }           from "react-router-dom"
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import Grid               from "../generic/Grid"
 import Markdown           from "../generic/Markdown"
-import DataRequestLink    from "../DataRequests/DataRequestLink"
+import SubscriptionLink    from "../Subscriptions/SubscriptionLink"
 import { useAuth }        from "../../auth"
 import { app }            from "../../types"
 
@@ -45,7 +45,7 @@ export default function RequestGroupView()
                     { data.requests && data.requests.length ?
                         <Grid gap="0 1rem" cols="22em" className="link-list mt-05">{
                             data.requests?.map((s, i) => (
-                                <DataRequestLink key={i} request={s} href={"/requests/" + s.id} />
+                                <SubscriptionLink key={i} request={s} href={"/requests/" + s.id} />
                             ))
                         }</Grid> :
                         <div className="mt-1">

@@ -34,5 +34,5 @@ export default function EditView()
         return <AlertError>{`Fetching graph with id "${id}" produced empty response`}</AlertError>
     }
 
-    return <Dashboard view={view} dataRequest={view.DataRequest} />
+    return <Dashboard view={view} subscription={view.DataRequest} />
 }

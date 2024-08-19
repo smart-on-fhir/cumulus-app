@@ -165,7 +165,7 @@ export default function ViewsBrowser({
     function renderBySubscription(selection: CustomSelection<app.View>) {
         const groups: Record<string, any[]> = {};
         (result || []).forEach(item => {
-            let label = item.DataRequest!.name;
+            let label = item.subscription!.name;
             let group = groups[label];
             if (!group) {
                 group = groups[label] = [];

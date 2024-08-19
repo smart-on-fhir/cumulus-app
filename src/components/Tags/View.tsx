@@ -1,6 +1,6 @@
 import { Link }           from "react-router-dom"
 import { useAuth }        from "../../auth"
-import DataRequestLink    from "../DataRequests/DataRequestLink"
+import SubscriptionLink    from "../Subscriptions/SubscriptionLink"
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import ViewThumbnail      from "../Views/ViewThumbnail"
 import { app }            from "../../types"
@@ -59,7 +59,7 @@ export default function View() {
                             <div className="link-list mt-05">
                             { data.subscriptions.map((s, i) => (
                                 // @ts-ignore
-                                <DataRequestLink key={i} request={s} href={"/requests/" + s.id}/>
+                                <SubscriptionLink key={i} request={s} href={"/requests/" + s.id}/>
                             ))}
                             </div>
                         </> :

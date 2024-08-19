@@ -7,28 +7,28 @@ import { useBackend }             from "../../hooks"
 import { AlertError }             from "../generic/Alert"
 import Breadcrumbs                from "../generic/Breadcrumbs"
 import Loader                     from "../generic/Loader"
-import DataRequestForm            from "./form"
+import SubscriptionForm           from "./form"
 import { app }                    from "../../types"
 
 import "./form.scss";
 
 
-export default function CreateDataRequestForm()
+export default function CreateSubscriptionForm()
 {
     const [ searchParams ] = useSearchParams()
-    const [ state, setState ] = useState<Partial<app.DataRequest>>({
+    const [ state, setState ] = useState<Partial<app.Subscription>>({
         groupId: +(searchParams.get("groupId") || 0) || undefined
     })
-    const [ savedRecord, setSavedRecord ] = useState<app.DataRequest|null>(null)
+    const [ savedRecord, setSavedRecord ] = useState<app.Subscription|null>(null)
 
-    // onSubmit create new DataRequest and redirect to its edit page
+    // onSubmit create new Subscription and redirect to its edit page
     const { execute: save, loading: saving, error: savingError } = useBackend(
         useCallback(async () => {
-            await createOne("requests", state as app.DataRequest).then(setSavedRecord);
+            await createOne("requests", state as app.Subscription).then(setSavedRecord);
         }, [state])
     );
 
-    // onMount fetch DataRequestGroups
+    // onMount fetch SubscriptionGroups
     const {
         loading: loadingRequestGroups,
         error: loadingRequestGroupsError,
@@ -82,7 +82,7 @@ export default function CreateDataRequestForm()
                     { saving && <Loader msg="Saving..."/> }
                 </div>
             </div>
-            <DataRequestForm
+            <SubscriptionForm
                 saveRequest={save}
                 onChange={setState}
                 record={state}

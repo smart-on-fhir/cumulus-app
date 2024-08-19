@@ -160,7 +160,7 @@ function PriorityEditor({
 export default function Preload() {
     const { id } = useParams();
 
-    const { loading, error, result } = useBackend<{subscription: app.DataRequest, view: app.View}>(
+    const { loading, error, result } = useBackend<{subscription: app.Subscription, view: app.View}>(
         useCallback(() => {
             return request("/api/views/" + id).then(view => {
                 return request("/api/requests/" + view.subscriptionId).then(subscription => ({
@@ -199,7 +199,7 @@ export function RequestDataForm({
     dataElements
 }: {
     view: app.View
-    subscription: app.DataRequest
+    subscription: app.Subscription
     dataElements: DataElement[]
 })
 {

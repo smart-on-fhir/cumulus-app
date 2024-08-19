@@ -37,15 +37,15 @@ type SupportedChartType = keyof typeof SupportedChartTypes
 
 function SecondaryDataEditor({
     state,
-    dataRequest,
+    subscription,
     onChange
 }: {
     state: ChartConfigPanelState
-    dataRequest: app.DataRequest
+    subscription: app.Subscription
     onChange: (payload: { column?: string, type?: string }) => void
 }) {
     
-    const { cols } = dataRequest.metadata || { cols: [] }
+    const { cols } = subscription.metadata || { cols: [] }
 
     return (
         <>
@@ -124,7 +124,7 @@ interface ChartConfigPanelState {
     column2        : string
     column2type   ?: string
     annotations    : app.Annotation[]
-    xCol           : app.DataRequestDataColumn
+    xCol           : app.SubscriptionDataColumn
     tags           : Pick<app.Tag, "id"|"name"|"description">[]
     ranges         : app.RangeOptions | null
     visualOverrides: app.VisualOverridesState
@@ -132,7 +132,7 @@ interface ChartConfigPanelState {
 }
 
 export default function ConfigPanel({
-    dataRequest,
+    subscription,
     state,
     onChange,
     onChartTypeChange,
@@ -140,7 +140,7 @@ export default function ConfigPanel({
     onRangeOptionsChange,
     onSecondaryDataOptionsChange
 } : {
-    dataRequest: app.DataRequest
+    subscription: app.Subscription
     view?: Partial<app.View>
     state: ChartConfigPanelState
     viewType: "overview" | "data"
@@ -150,7 +150,7 @@ export default function ConfigPanel({
     onRangeOptionsChange: (ranges: app.RangeOptions) => void
     onSecondaryDataOptionsChange: (payload: { column?: string, type?: string }) => void
 }) {
-    const { cols } = dataRequest.metadata || { cols: [] }
+    const { cols } = subscription.metadata || { cols: [] }
 
     const { chartOptions, chartType } = state;
 
@@ -499,7 +499,7 @@ export default function ConfigPanel({
                                 </p>
                             </div> }
 
-                            <SecondaryDataEditor state={state} dataRequest={dataRequest} onChange={onSecondaryDataOptionsChange} />
+                            <SecondaryDataEditor state={state} subscription={subscription} onChange={onSecondaryDataOptionsChange} />
                         </> }
 
                         { isPie && <SliceEditor state={state} onChange={onChange} /> }

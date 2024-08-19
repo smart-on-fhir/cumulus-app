@@ -16,12 +16,12 @@ function Icon(props: { type: "ok"|"pending"|"working" }) {
     )
 }
 
-export default function DataRequestLink({
+export default function SubscriptionLink({
     request,
     href = "/requests/:id",
     search
 }: {
-    request: app.DataRequest,
+    request: app.Subscription,
     href?: string
     search?: string
 }) {

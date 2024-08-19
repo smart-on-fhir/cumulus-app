@@ -185,7 +185,7 @@ class FieldsEditor extends React.Component<FieldsEditorProps>
     }
 }
 
-export default function DataRequestForm({
+export default function SubscriptionForm({
     saveRequest,
     deleteRequest,
     record = {},
@@ -196,8 +196,8 @@ export default function DataRequestForm({
 }: {
     saveRequest: () => void
     deleteRequest?: () => void
-    record?: Partial<app.DataRequest>
-    onChange: (state: Partial<app.DataRequest>) => void
+    record?: Partial<app.Subscription>
+    onChange: (state: Partial<app.Subscription>) => void
     requestGroups: app.RequestGroup[]
     sites: app.DataSite[]
     working?: "deleting" | "saving"

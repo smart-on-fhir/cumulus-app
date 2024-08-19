@@ -17,7 +17,7 @@ export default function CreateView()
     const { user } = useAuth()
 
     // Fetch the subscription by ID
-    const { loading, error, result } = useBackend<app.DataRequest>(
+    const { loading, error, result } = useBackend<app.Subscription>(
         useCallback(() => request("/api/requests/" + id + "?group=true&study_areas=true"), [id]),
         true
     );
@@ -38,5 +38,5 @@ export default function CreateView()
     }
 
     // Eventually render a Breadcrumbs and the dashboard
-    return <Dashboard view={{ creatorId: user!.id, isDraft: true }} dataRequest={result as app.DataRequest} />
+    return <Dashboard view={{ creatorId: user!.id, isDraft: true }} subscription={result as app.Subscription} />
 }

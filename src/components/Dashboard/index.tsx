@@ -50,13 +50,13 @@ export interface ViewState
     showOptions      : boolean
     viewName         : string
     viewDescription  : string
-    viewColumn       : app.DataRequestDataColumn
-    viewGroupBy     ?: app.DataRequestDataColumn
+    viewColumn       : app.SubscriptionDataColumn
+    viewGroupBy     ?: app.SubscriptionDataColumn
     filters          : app.Filter[]
     chartType        : string
     chartOptions     : Partial<Highcharts.Options>
     denominator      : app.DenominatorType
-    column2         ?: app.DataRequestDataColumn
+    column2         ?: app.SubscriptionDataColumn
     column2type     ?: keyof typeof SupportedChartTypes
     caption          : string
     data             : app.ServerResponses.DataResponse | null
@@ -297,19 +297,19 @@ export interface DashboardProps {
      * The subscription that this view is (or is going to be)
      * assigned to.
      */
-    dataRequest: app.DataRequest,
+    subscription: app.Subscription,
     
     copy?: boolean
 }
 
-export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
+export default function Dashboard({ view, subscription, copy }: DashboardProps) {
     const navigate  = useNavigate();
     const auth      = useAuth();
     const isOwner   = auth.user && view.creatorId === auth.user.id;
     const canUpdate = isOwner || requestPermission({ user: auth.user, resource: "Graphs", resource_id: view.id, action: "update" })
     const canCreate = requestPermission({ user: auth.user, resource: "Graphs", action: "create" })
 
-    const { cols = [] } = dataRequest.metadata ?? {}
+    const { cols = [] } = subscription.metadata ?? {}
 
     const viewSettings = view.settings || {} as Partial<app.ViewSettings>
 
@@ -429,7 +429,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
     const stratifierName = viewGroupBy?.name
     const secColumnName  = column2?.name || ""
     const viewColumnName = viewColumn.name
-    const requestId      = dataRequest.id
+    const requestId      = subscription.id
 
     const runtimeView: Partial<app.View> = {
         id         : view.id,
@@ -508,7 +508,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                 return alert("You don't have permission to create graphs")
             }
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
-            await createOne("views", { ...runtimeView, subscriptionId: dataRequest.id, screenShot, }).then(
+            await createOne("views", { ...runtimeView, subscriptionId: subscription.id, screenShot, }).then(
                 v => defer(() => navigate("/views/" + v.id)),
                 e => alert(e.message)
             );
@@ -716,7 +716,7 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                 <div className="col col-0">
                     <div onTransitionEnd={onTransitionEnd} className="dashboard-sidebar">
                         <ConfigPanel
-                            dataRequest={dataRequest}
+                            subscription={subscription}
                             viewType={viewType}
                             view={view}
                             onChartTypeChange={ (type: string) => dispatch({ type: "SET_CHART_TYPE", payload: type }) }
@@ -883,17 +883,17 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                             <div className="col">
                                 <b>Subscription</b>
                                 <hr className="small"/>
-                                <Link className="link mt-05 subscription-link" to={`/requests/${dataRequest.id}`}>
-                                    <i className="fa-solid fa-database color-brand-2" /> <span>{ dataRequest.name }</span>
+                                <Link className="link mt-05 subscription-link" to={`/requests/${subscription.id}`}>
+                                    <i className="fa-solid fa-database color-brand-2" /> <span>{ subscription.name }</span>
                                 </Link>
                             </div>
                         
                             <div className="col">
                                 <b>Subscription Group</b>
                                 <hr className="small"/>
-                                { dataRequest.group ?
-                                    <Link className="link mt-05 ellipsis subscription-group-link" to={`/groups/${dataRequest.group.id}`} title={ dataRequest.group.description }>
-                                        <i className="fa-solid fa-folder color-brand-2" /> <span>{ dataRequest.group.name }</span>
+                                { subscription.group ?
+                                    <Link className="link mt-05 ellipsis subscription-group-link" to={`/groups/${subscription.group.id}`} title={ subscription.group.description }>
+                                        <i className="fa-solid fa-folder color-brand-2" /> <span>{ subscription.group.name }</span>
                                     </Link> :
                                     <span className="color-muted">GENERAL</span> }
                             </div>
@@ -902,8 +902,8 @@ export default function Dashboard({ view, dataRequest, copy }: DashboardProps) {
                                 <b>Study Areas</b>
                                 <hr className="small"/>
                                 <div className="mt-05 view-study-areas">
-                                { dataRequest.StudyAreas?.length ?
-                                    dataRequest.StudyAreas.map((p, i) => (
+                                { subscription.StudyAreas?.length ?
+                                    subscription.StudyAreas.map((p, i) => (
                                         <div key={i} className="ellipsis">
                                             <Link className="link study-area-link" to={`/study-areas/${p.id}`}>
                                                 <i className="fa-solid fa-book color-brand-2" /> { p.name }
