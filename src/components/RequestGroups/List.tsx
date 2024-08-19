@@ -35,7 +35,7 @@ export default function RequestGroupList()
                         <table className="endpoint-list-table">
                             <thead>
                                 <tr>
-                                    <th style={{ width: "2em" }}>ID</th>
+                                    <th style={{ width: "2.5em" }}>ID</th>
                                     <th>Name</th>
                                     <th>Description</th>
                                     <IfAllowed showError={false} permissions="SubscriptionGroups.update" element={ <th style={{ width: "2.5em" }} /> } />
