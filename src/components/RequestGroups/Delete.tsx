@@ -1,6 +1,6 @@
 import { createDeletePage } from "../generic/EndpointDeleteWrapper"
 import Clip                 from "../generic/Clip"
-import DataRequestLink      from "../DataRequests/DataRequestLink"
+import SubscriptionLink      from "../Subscriptions/SubscriptionLink"
 import Grid                 from "../generic/Grid"
 import { app }              from "../../types"
 
@@ -32,7 +32,7 @@ export default function DeleteRequestGroup()
                             <hr/>
                             <Grid gap="0 1rem" cols="22em" className="link-list mt-05">{
                                 data.requests?.map((s, i) => (
-                                    <DataRequestLink key={i} request={s} href={"/requests/" + s.id} />
+                                    <SubscriptionLink key={i} request={s} href={"/requests/" + s.id} />
                                 ))
                             }</Grid>
                         </> :

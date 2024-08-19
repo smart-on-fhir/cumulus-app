@@ -120,7 +120,7 @@ describe("Dashboard", () => {
 
 describe("Chart View", () => {
 
-    const baseDataRequest: app.DataRequest = {
+    const baseSubscription: app.Subscription = {
         id: 1,
         name: "Test Subscription",
         description: "Test Subscription Description",
@@ -169,7 +169,7 @@ describe("Chart View", () => {
         subscriptionId: 1,
         name         : "Test Chart",
         description  : "Test Chart Description",
-        DataRequest  : baseDataRequest,
+        subscription : baseSubscription,
         isDraft      : false,
         Tags         : [
             { id: 1, name: "Tag 1", description: "Tag 1 Description" },
@@ -220,7 +220,7 @@ describe("Chart View", () => {
 
     it('name and description', () => {
         // localStorage.setItem("user", '{"role":"admin"}')
-        render(<WrappedChartView dataRequest={ baseDataRequest } view={{ ...baseView }} />);
+        render(<WrappedChartView subscription={ baseSubscription } view={{ ...baseView }} />);
         
         expect(document.querySelector("#view-name")).toHaveValue(baseView.name);
         
@@ -233,11 +233,11 @@ describe("Chart View", () => {
         expect(document.querySelector(".highcharts-xaxis .highcharts-axis-title")).toHaveTextContent("X Axis Title")
         expect(document.querySelector(".highcharts-yaxis .highcharts-axis-title")).toHaveTextContent("Y Axis Title")
 
-        expect(document.querySelector(".subscription-link"     )).toHaveAttribute("href", "/requests/" + baseDataRequest.id)
-        expect(document.querySelector(".subscription-link span")).toHaveTextContent(baseDataRequest.name)
+        expect(document.querySelector(".subscription-link"     )).toHaveAttribute("href", "/requests/" + baseSubscription.id)
+        expect(document.querySelector(".subscription-link span")).toHaveTextContent(baseSubscription.name)
 
-        expect(document.querySelector(".subscription-group-link"     )).toHaveAttribute("href", "/groups/" + baseDataRequest.group!.id)
-        expect(document.querySelector(".subscription-group-link span")).toHaveTextContent(baseDataRequest.group!.name)
+        expect(document.querySelector(".subscription-group-link"     )).toHaveAttribute("href", "/groups/" + baseSubscription.group!.id)
+        expect(document.querySelector(".subscription-group-link span")).toHaveTextContent(baseSubscription.group!.name)
 
         const xAxisLabels: string[] = []
         const yAxisLabels: string[] = []
@@ -259,10 +259,10 @@ describe("Chart View", () => {
 
         // Study Areas ---------------------------------------------------------
         const studyAreaLinks = document.querySelectorAll<HTMLLinkElement>(".view-study-areas a.study-area-link")
-        expect(studyAreaLinks.length).toEqual(baseDataRequest.StudyAreas!.length)
+        expect(studyAreaLinks.length).toEqual(baseSubscription.StudyAreas!.length)
         studyAreaLinks.forEach((link, i) => {
-            expect(link).toHaveAttribute("href", `/study-areas/${baseDataRequest.StudyAreas![i].id}`)
-            expect(link).toHaveTextContent(baseDataRequest.StudyAreas![i].name)
+            expect(link).toHaveAttribute("href", `/study-areas/${baseSubscription.StudyAreas![i].id}`)
+            expect(link).toHaveTextContent(baseSubscription.StudyAreas![i].name)
         })
     });
 })

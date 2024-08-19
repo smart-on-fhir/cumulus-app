@@ -45,7 +45,7 @@ export declare module app {
         createdAt     : string
         creator      ?: Pick<User, "id" | "email">
         graphs       ?: Pick<View, "id" | "name" | "description" | "subscriptionId">[]
-        subscriptions?: Pick<DataRequest, "id" | "name" | "description" | "completed" | "refresh">[]
+        subscriptions?: Pick<Subscription, "id" | "name" | "description" | "completed" | "refresh">[]
     }
 
     interface Permission {
@@ -94,7 +94,7 @@ export declare module app {
         settings?: ViewSettings
         creatorId?: number | null
         Tags?: Pick<Tag, "id" | "name" | "description">[]
-        DataRequest?: Pick<DataRequest, "id" | "name">
+        subscription?: Pick<Subscription, "id" | "name">
         isDraft?: boolean
         createdAt?: Date
         updatedAt?: Date
@@ -123,7 +123,7 @@ export declare module app {
         fontColorEnabled ?: boolean
     }
 
-    interface DataRequest {
+    interface Subscription {
 
         /**
          * Unique ID for this request
@@ -177,7 +177,7 @@ export declare module app {
         dataSourceType: "file" | "url"
 
         metadata: {
-            cols  : DataRequestDataColumn[],
+            cols  : SubscriptionDataColumn[],
             total?: number
             type ?: "cube" | "flat"
         } | null
@@ -231,16 +231,16 @@ export declare module app {
         label?: string
     }
 
-    interface DataRequestData {
+    interface SubscriptionData {
 
-        cols: DataRequestDataColumn[]
+        cols: SubscriptionDataColumn[]
 
         rows: any[][]
 
         src?: string
     }
 
-    interface DataRequestDataColumn {
+    interface SubscriptionDataColumn {
 
         /**
          * The name as it appears in the first CSV row
@@ -275,7 +275,7 @@ export declare module app {
         updatedAt  : string
         createdAt  : string
         description: string
-        requests   : DataRequest[]
+        requests   : Subscription[]
     }
 
     interface DataSite {
@@ -354,7 +354,7 @@ export declare module app {
         creatorId  : number
         updatedAt  : string
         createdAt  : string
-        Subscriptions?: DataRequest[]
+        Subscriptions?: Subscription[]
     }
 
     interface Inspection {
@@ -430,7 +430,7 @@ export declare module app {
          * The subscription that this view is (or is going to be)
          * assigned to.
          */
-        dataRequest: DataRequest,
+        subscription: Subscription,
         
         copy?: boolean
     }
@@ -443,7 +443,7 @@ export declare module app {
         data            ?: Record<string, JSONScalar>[] | null
         loadingData     ?: boolean
         loadingDataError?: Error | string | null
-        subscription     : DataRequest
+        subscription     : Subscription
         xAxisColumn     ?: string | null
         saving          ?: boolean
         savingError     ?: Error | string | null

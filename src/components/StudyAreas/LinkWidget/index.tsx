@@ -125,7 +125,7 @@ function Subscription({
     onChange,
     selected
 }: {
-    subscription: app.DataRequest
+    subscription: app.Subscription
     onChange: (selected: boolean) => void
     selected: boolean
 })

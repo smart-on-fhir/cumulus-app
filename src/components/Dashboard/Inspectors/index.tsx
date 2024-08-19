@@ -22,7 +22,7 @@ export default function DynamicInspector({
     xCol
 }: {
     chartOptions: Partial<Highcharts.Options>
-    xCol        : app.DataRequestDataColumn
+    xCol        : app.SubscriptionDataColumn
     onChange    : (state: Partial<Highcharts.Options>) => void
     chartType   : keyof typeof SupportedChartTypes
     inspection  : app.Inspection
@@ -58,7 +58,7 @@ function Editor({
     chartOptions: Partial<Highcharts.Options>
     onChange    : (state: Partial<Highcharts.Options>) => void
     collapsed  ?: boolean
-    xCol        : app.DataRequestDataColumn
+    xCol        : app.SubscriptionDataColumn
     chartType   : keyof typeof SupportedChartTypes
     context     : app.InspectionContext
 }) {

@@ -1,19 +1,19 @@
-import { useCallback } from "react"
-import { Link }        from "react-router-dom"
-import DataRequestLink from "./DataRequestLink"
-import { AlertError }  from "../generic/Alert"
-import Loader          from "../generic/Loader"
-import { request }     from "../../backend"
-import { useBackend }  from "../../hooks"
-import { useAuth }     from "../../auth"
-import { app }         from "../../types"
+import { useCallback }  from "react"
+import { Link }         from "react-router-dom"
+import SubscriptionLink from "./SubscriptionLink"
+import { AlertError }   from "../generic/Alert"
+import Loader           from "../generic/Loader"
+import { request }      from "../../backend"
+import { useBackend }   from "../../hooks"
+import { useAuth }      from "../../auth"
+import { app }          from "../../types"
 
 
 function List({
     items,
     href = "/requests/:id"
 }: {
-    items: app.DataRequest[]
+    items: app.Subscription[]
     href?: string
 })
 {
@@ -22,7 +22,7 @@ function List({
             { items.map((item, i) => {
                 return (
                     <li key={i}>
-                        <DataRequestLink request={item} href={href} />
+                        <SubscriptionLink request={item} href={href} />
                     </li>
                 )
             })}
@@ -30,7 +30,7 @@ function List({
     );
 }
 
-export default function DataRequestsList()
+export default function SubscriptionsList()
 {
     const { user } = useAuth();
 

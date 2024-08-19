@@ -1,5 +1,5 @@
 import { useAuth }        from "../../auth"
-import DataRequestLink    from "../DataRequests/DataRequestLink"
+import SubscriptionLink    from "../Subscriptions/SubscriptionLink"
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import Grid               from "../generic/Grid"
 import Markdown           from "../generic/Markdown"
@@ -43,7 +43,7 @@ export default function View() {
                         { data.Subscriptions?.length ? 
                             <div className="link-list">
                                 { data.Subscriptions.map((s, i) => (
-                                    <DataRequestLink key={i} request={s} href={"/requests/" + s.id}/>
+                                    <SubscriptionLink key={i} request={s} href={"/requests/" + s.id}/>
                                 )) }
                             </div> :
                             <p className="color-muted">No subscriptions attached yet</p>

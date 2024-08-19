@@ -18,12 +18,12 @@ import { app }                    from "../../types"
 import DataViewer                 from "./DataViewer"
 
 
-export default function DataRequestView(): JSX.Element
+export default function SubscriptionView(): JSX.Element
 {
     const { id } = useParams()
     const { user } = useAuth();
 
-    const { loading, error, result: model, execute: fetch } = useBackend<app.DataRequest>(
+    const { loading, error, result: model, execute: fetch } = useBackend<app.Subscription>(
         useCallback(() => request("/api/requests/" + id + "?group=true&graphs=true&tags=true"), [id]),
         true
     )
@@ -33,7 +33,7 @@ export default function DataRequestView(): JSX.Element
         error  : refreshError,
         execute: refresh
     } = useBackend(
-        useCallback(() => request<app.DataRequest>(`/api/requests/${id}/refresh`).then(fetch), [id, fetch])
+        useCallback(() => request<app.Subscription>(`/api/requests/${id}/refresh`).then(fetch), [id, fetch])
     );
 
     if (loading && !model) {
@@ -45,7 +45,7 @@ export default function DataRequestView(): JSX.Element
     }
 
     if (!model) {
-        return <AlertError>Failed to load DataRequest</AlertError>
+        return <AlertError>Failed to load Subscription</AlertError>
     }
 
     // const requestedData = model.requestedData || {
@@ -244,7 +244,7 @@ export default function DataRequestView(): JSX.Element
     )
 }
 
-function ColumnsTable({ model }: { model: app.DataRequest })
+function ColumnsTable({ model }: { model: app.Subscription })
 {
     if (!model.metadata?.cols?.length) {
         return <p className="col col-10 color-muted">No data available yet</p>
@@ -263,7 +263,7 @@ function ColumnsTable({ model }: { model: app.DataRequest })
     )
 }
 
-function ColumnsTableItem({ col }: { col: app.DataRequestDataColumn })
+function ColumnsTableItem({ col }: { col: app.SubscriptionDataColumn })
 {
     const [open, setOpen] = useState(false);
 

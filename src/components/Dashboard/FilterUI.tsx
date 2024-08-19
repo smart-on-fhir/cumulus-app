@@ -25,7 +25,7 @@ function Filter({
     down,
     up
 }: {
-    cols    : app.DataRequestDataColumn[]
+    cols    : app.SubscriptionDataColumn[]
     filter  : app.Filter
     onChange: (f: app.Filter) => void
     onRemove: () => void
@@ -178,7 +178,7 @@ export default function FilterUI({
     onChange,
     cols
 }: {
-    cols: app.DataRequestDataColumn[]
+    cols: app.SubscriptionDataColumn[]
     current: app.Filter[]
     onChange: (current: app.Filter[]) => void
 })

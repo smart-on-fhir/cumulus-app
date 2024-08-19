@@ -1,7 +1,7 @@
 import { useCallback, useState }  from "react"
 import { HelmetProvider, Helmet } from "react-helmet-async"
 import { Link }                   from "react-router-dom"
-import DataRequestLink            from "./DataRequestLink"
+import SubscriptionLink            from "./SubscriptionLink"
 import { useBackend, useLocalStorage } from "../../hooks"
 import { request }                from "../../backend"
 import Breadcrumbs                from "../generic/Breadcrumbs"
@@ -12,11 +12,11 @@ import Grid                       from "../generic/Grid"
 import Collapse                   from "../generic/Collapse"
 import { app }                    from "../../types"
 
-import "./DataRequestsListPage.scss";
+import "./ListPage.scss";
 
 
 
-export default function DataRequestsListPage()
+export default function SubscriptionsListPage()
 {
     const url = new URL(window.location.href)
     const { user } = useAuth();
@@ -113,7 +113,7 @@ export default function DataRequestsListPage()
                         }
                         return true
                     }).map((item, y) => (
-                        <DataRequestLink request={item} href="/requests/:id" key={y} search={search} />
+                        <SubscriptionLink request={item} href="/requests/:id" key={y} search={search} />
                     ));
 
                     if (links.length > 0) {

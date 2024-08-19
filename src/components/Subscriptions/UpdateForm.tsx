@@ -6,20 +6,20 @@ import { useBackend }             from "../../hooks"
 import Breadcrumbs                from "../generic/Breadcrumbs"
 import Loader                     from "../generic/Loader"
 import { AlertError }             from "../generic/Alert"
-import DataRequestForm            from "./form"
+import SubscriptionForm           from "./form"
 import { app }                    from "../../types"
 
 import "./form.scss";
 
-export default function EditDataRequestForm()
+export default function EditSubscriptionForm()
 {
     const { id } = useParams();
 
-    const [ state  , setState   ] = useState<Partial<app.DataRequest>>({})
+    const [ state  , setState   ] = useState<Partial<app.Subscription>>({})
     const [ deleted, setDeleted ] = useState(false)
 
 
-    // Fetch DataRequestGroups -------------------------------------------------
+    // Fetch Subscription Groups -----------------------------------------------
     const {
         loading: loadingData,
         error  : loadingRequestGroupsError,
@@ -35,11 +35,11 @@ export default function EditDataRequestForm()
         true
     );
 
-    // Fetch DataRequest -------------------------------------------------------
+    // Fetch Subscription ------------------------------------------------------
     const {
         loading,
         error
-    } = useBackend<app.DataRequest>(
+    } = useBackend<app.Subscription>(
         useCallback(
             () => request(`/api/requests/${id}?tags=true`).then(x => {
                 setState(x);
@@ -50,7 +50,7 @@ export default function EditDataRequestForm()
         true
     );
 
-    // Save (update) DataRequest -----------------------------------------------
+    // Save (update) Subscription ----------------------------------------------
     const { execute: save, loading: saving, error: savingError } = useBackend(
         useCallback(
             () => updateOne("requests", id + "", { ...state }).then(setState),
@@ -58,7 +58,7 @@ export default function EditDataRequestForm()
         )
     );
 
-    // Delete DataRequest ------------------------------------------------------
+    // Delete Subscription -----------------------------------------------------
     const { execute: deleteRequest, loading: deleting, error: deletingError } = useBackend(
         useCallback(
             async () => {
@@ -125,7 +125,7 @@ export default function EditDataRequestForm()
                     { deletingError && <AlertError><b>Error deleting subscription:</b> { deletingError + "" }</AlertError> }
                 </div>
             </div>
-            <DataRequestForm
+            <SubscriptionForm
                 saveRequest={save}
                 deleteRequest={deleteRequest}
                 onChange={setState}

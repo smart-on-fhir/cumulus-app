@@ -1,6 +1,6 @@
 import { createDeletePage } from "../generic/EndpointDeleteWrapper"
 import Clip                 from "../generic/Clip"
-import DataRequestLink      from "../DataRequests/DataRequestLink"
+import SubscriptionLink      from "../Subscriptions/SubscriptionLink"
 import ViewThumbnail        from "../Views/ViewThumbnail"
 import { app }              from "../../types"
 
@@ -53,7 +53,7 @@ export default function Delete()
                                 <hr/>
                                 <div className="link-list mt-05">
                                 { data.subscriptions!.map((s: any, i: number) => (
-                                    <DataRequestLink key={i} request={s} href={"/requests/" + s.id} />
+                                    <SubscriptionLink key={i} request={s} href={"/requests/" + s.id} />
                                 ))}
                                 </div>
                             </div>

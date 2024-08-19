@@ -1,4 +1,4 @@
-interface DataRequest
+interface Subscription
 {
     /**
      * Unique ID for this request
@@ -47,7 +47,7 @@ interface DataRequest
 }
 
 
-const DataRequests: DataRequest[] = [
+const Subscriptions: Subscription[] = [
     {
         id         : "request-1",
         name       : "Positive test + loss of taste or smell by demographics",
@@ -111,4 +111,4 @@ const DataRequests: DataRequest[] = [
 
 const Views = [];
 
-export default DataRequests;
+export default Subscriptions;

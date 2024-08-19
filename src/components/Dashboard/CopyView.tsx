@@ -54,5 +54,5 @@ export default function CopyView()
     view.isDraft = true // Start as draft
 
     // @ts-ignore
-    return <Dashboard copy view={view} dataRequest={view.DataRequest} />
+    return <Dashboard copy view={view} subscription={view.DataRequest} />
 }
