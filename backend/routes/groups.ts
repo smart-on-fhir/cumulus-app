@@ -1,6 +1,6 @@
 import express         from "express"
 import { Includeable } from "sequelize"
-import DataRequest     from "../db/models/DataRequest"
+import Subscription     from "../db/models/Subscription"
 import Model           from "../db/models/RequestGroup"
 import * as HttpError  from "../errors"
 import { assert }      from "../lib"
@@ -42,7 +42,7 @@ route(router, {
         }
         
         const models = await Model.findAll({ include, user: req.user });
-        const general = await DataRequest.findAll({
+        const general = await Subscription.findAll({
             where: {
                 "groupId": null
             },

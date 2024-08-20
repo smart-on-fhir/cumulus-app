@@ -1,7 +1,7 @@
 import { Sequelize, Op } from "sequelize"
 import * as logger       from "../../services/logger"
 import BaseModel         from "./BaseModel"
-import DataRequest       from "./DataRequest"
+import Subscription      from "./Subscription"
 import DataSite          from "./DataSite"
 import StudyArea         from "./StudyArea"
 import RequestGroup      from "./RequestGroup"
@@ -148,7 +148,7 @@ export function init(connection: Sequelize) {
     User.initialize(connection);
     Tag.initialize(connection);
     DataSite.initialize(connection);
-    DataRequest.initialize(connection);
+    Subscription.initialize(connection);
     StudyArea.initialize(connection);
     RequestGroup.initialize(connection);
     View.initialize(connection);
@@ -161,41 +161,41 @@ export function init(connection: Sequelize) {
     
     // Graphs ------------------------------------------------------------------
 
-    // Graphs have one subscription as View.DataRequest
-    View.belongsTo(DataRequest, { foreignKey: "subscriptionId", targetKey: "id" });
+    // Graphs have one subscription as View.Subscription
+    View.belongsTo(Subscription, { foreignKey: "subscriptionId", targetKey: "id" });
 
-    // Graphs have many tags as View.DataRequest
+    // Graphs have many tags as View.Tags
     View.belongsToMany(Tag, { through: "ViewsTags", timestamps: false });
 
 
     
     // Subscriptions -----------------------------------------------------------
     
-    // Subscriptions have many graphs as DataRequest.Views
-    DataRequest.hasMany(View, { foreignKey: "subscriptionId", constraints: true, hooks: true, onDelete: "CASCADE" });
+    // Subscriptions have many graphs as Subscription.Views
+    Subscription.hasMany(View, { foreignKey: "subscriptionId", constraints: true, hooks: true, onDelete: "CASCADE" });
 
-    // Subscriptions belong to one RequestGroup as DataRequest.group
-    DataRequest.belongsTo(RequestGroup, { as: "group", onDelete: "SET NULL" });
+    // Subscriptions belong to one RequestGroup as Subscription.group
+    Subscription.belongsTo(RequestGroup, { as: "group", onDelete: "SET NULL" });
 
     // Subscriptions belong to many StudyAreas
-    DataRequest.belongsToMany(StudyArea, { through: "ProjectsSubscriptions", as: "StudyAreas", timestamps: false });
+    Subscription.belongsToMany(StudyArea, { through: "ProjectsSubscriptions", as: "StudyAreas", timestamps: false });
 
     // Subscriptions have many Tags
-    DataRequest.belongsToMany(Tag, { through: "DataRequestsTags", timestamps: false });
+    Subscription.belongsToMany(Tag, { through: "DataRequestsTags", timestamps: false, foreignKey: "DataRequestId" });
 
 
 
     // SubscriptionGroups ------------------------------------------------------
 
     // SubscriptionGroup have many Subscriptions as requests
-    RequestGroup.hasMany(DataRequest, { as: "requests", foreignKey: "groupId", onDelete: "SET DEFAULT" });
+    RequestGroup.hasMany(Subscription, { as: "requests", foreignKey: "groupId", onDelete: "SET DEFAULT" });
 
 
 
     // StudyAreas --------------------------------------------------------------
 
     // StudyArea has many Subscriptions
-    StudyArea.belongsToMany(DataRequest, { through: "ProjectsSubscriptions", as: "Subscriptions", timestamps: false, foreignKey: "ProjectId" });
+    StudyArea.belongsToMany(Subscription, { through: "ProjectsSubscriptions", as: "Subscriptions", timestamps: false, foreignKey: "ProjectId" });
     
 
 
@@ -218,7 +218,7 @@ export function init(connection: Sequelize) {
     Tag.belongsTo(User, { foreignKey: "creatorId", as: "creator", onDelete: "SET NULL" });
 
     // belongs to many Subscriptions as subscriptions
-    Tag.belongsToMany(DataRequest, { through: "DataRequestsTags", timestamps: false, as: "subscriptions" });
+    Tag.belongsToMany(Subscription, { through: "DataRequestsTags", timestamps: false, as: "subscriptions" });
 
 
 

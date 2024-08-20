@@ -2,9 +2,9 @@ import { expect, use }           from "chai"
 import chaiAsPromised            from "chai-as-promised"
 import { Sequelize, QueryTypes } from "sequelize"
 import setupDB                   from "../../../backend/db"
-import Subscription              from "../../../backend/db/models/DataRequest"
+import Subscription              from "../../../backend/db/models/Subscription"
 import config                    from "../../../backend/config"
-import DataRequests              from "../../fixtures/DataRequests"
+import Subscriptions             from "../../fixtures/Subscriptions"
 import Tags                      from "../../fixtures/Tags"
 import {
     getCookie,
@@ -27,7 +27,7 @@ describe("Subscriptions", () => {
     
     beforeEach(async () => {
         await resetTable("Tag", Tags)
-        await resetTable("DataRequest", DataRequests)
+        await resetTable("Subscription", Subscriptions)
 
         dbConnection = await setupDB(config);
 

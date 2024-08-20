@@ -13,7 +13,7 @@ import {
 } from "sequelize"
 
 
-export default class DataRequest extends BaseModel<InferAttributes<DataRequest>, InferCreationAttributes<DataRequest>>
+export default class Subscription extends BaseModel<InferAttributes<Subscription>, InferCreationAttributes<Subscription>>
 {
     declare id           : CreationOptional<number>;
     declare name         : string;
@@ -35,7 +35,7 @@ export default class DataRequest extends BaseModel<InferAttributes<DataRequest>,
     }
 
     static initialize(sequelize: Sequelize) {
-        DataRequest.init({
+        Subscription.init({
             id: {
                 type         : DataTypes.INTEGER,
                 allowNull    : false,
@@ -94,7 +94,8 @@ export default class DataRequest extends BaseModel<InferAttributes<DataRequest>,
             }
         }, {
             sequelize,
-            modelName: "DataRequest",
+            modelName: "Subscription",
+            tableName: "DataRequests",
             hooks: {
                 async afterCreate(model) {
                     // Note that we don't wait for this to complete

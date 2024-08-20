@@ -1,5 +1,5 @@
-import BaseModel   from "./BaseModel"
-import DataRequest from "./DataRequest"
+import BaseModel    from "./BaseModel"
+import Subscription from "./Subscription"
 import {
     Sequelize,
     DataTypes,
@@ -21,10 +21,10 @@ export default class StudyArea extends BaseModel<InferAttributes<StudyArea>, Inf
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
 
-    declare setSubscriptions: HasManySetAssociationsMixin<DataRequest, number>;
+    declare setSubscriptions: HasManySetAssociationsMixin<Subscription, number>;
 
     declare static associations: {
-        Subscriptions: Association<DataRequest, StudyArea>;
+        Subscriptions: Association<Subscription, StudyArea>;
     };
 
     public isOwnedBy(user: any): boolean {

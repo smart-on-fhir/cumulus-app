@@ -281,7 +281,7 @@ export default function SubscriptionForm({
                         type="text"
                         value={ name || "" }
                         onChange={e => onChange({ ...record, name: e.target.value })}
-                        name="DataRequestName"
+                        name="SubscriptionName"
                         placeholder="Subscription Name"
                         required
                     />

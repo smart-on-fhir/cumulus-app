@@ -61,7 +61,7 @@ declare module app {
         }
     }
 
-    interface DataRequest {
+    interface Subscription {
 
         /**
          * Unique ID for this request
@@ -118,7 +118,7 @@ declare module app {
     }
 
     interface SubscriptionMetaData {
-        cols : DataRequestDataColumn[]
+        cols : SubscriptionDataColumn[]
         total: number
     }
 
@@ -143,7 +143,7 @@ declare module app {
         label?: string
     }
 
-    interface DataRequestDataColumn {
+    interface SubscriptionDataColumn {
 
         /**
          * The name as it appears in the first CSV row

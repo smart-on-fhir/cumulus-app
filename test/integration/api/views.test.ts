@@ -1,13 +1,13 @@
 import { expect }                   from "chai"
 import Views                        from "../../fixtures/Views"
-import DataRequests                 from "../../fixtures/DataRequests"
+import Subscriptions                from "../../fixtures/Subscriptions"
 import { admin, resetTable, server, testEndpoint } from "../../test-lib"
 
 
 describe("Graphs", () => {
     
     beforeEach(async () => {
-        await resetTable("DataRequest", DataRequests)
+        await resetTable("Subscription", Subscriptions)
         await resetTable("View", Views)
     })
 

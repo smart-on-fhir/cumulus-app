@@ -117,7 +117,7 @@ export async function copySubscription(options: {
     })
 
     const newSubscriptionId = result[0][0].id
-    console.log(`Created new "DataRequests" record with id "${newSubscriptionId}" in the destination database`)
+    console.log(`Created new "Subscriptions" record with id "${newSubscriptionId}" in the destination database`)
 
     // Check if data is available at src
     // -------------------------------------------------------------------------
