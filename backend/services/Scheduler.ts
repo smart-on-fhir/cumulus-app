@@ -1,6 +1,6 @@
 import moment                    from "moment"
 import { Op }                    from "sequelize"
-import DataRequest               from "../db/models/DataRequest"
+import Subscription              from "../db/models/Subscription"
 import * as logger               from "../services/logger"
 import SystemUser                from "../SystemUser"
 import { fetchSubscriptionData } from "../DataManager/CsvDownloader"
@@ -19,9 +19,9 @@ export async function runScheduler() {
 async function synchronize()
 {
     /**
-     * Get all DataRequest models that should be updated (now or in the future)
+     * Get all Subscription models that should be updated (now or in the future)
      */
-    const rows: any[] = await DataRequest.findAll({
+    const rows: any[] = await Subscription.findAll({
         order: [["completed", "desc"]],
         where: {
             [Op.and]: {

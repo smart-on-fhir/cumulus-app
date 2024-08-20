@@ -71,7 +71,7 @@ route(router, {
         const options: FindOptions = {
             include: [
                 { association: "Tags", attributes: ["id", "name", "description"] },
-                { association: "DataRequest", attributes: ["id", "name"] }
+                { association: "Subscription", attributes: ["id", "name"] }
             ],
             where: { isDraft: bool(req.query.drafts) },
             user: SystemUser
@@ -168,7 +168,7 @@ route(router, {
                 subscriptionIncludes.push({ association: "StudyAreas" })
             }
 
-            const association: any = { association: "DataRequest" }
+            const association: any = { association: "Subscription" }
             if (subscriptionIncludes.length) {
                 association.include = subscriptionIncludes
             }

@@ -4,7 +4,7 @@ import Permission                from "../db/models/Permission"
 import Graph                     from "../db/models/View"
 import User                      from "../db/models/User"
 import UserGroup                 from "../db/models/UserGroup"
-import DataRequest               from "../db/models/DataRequest"
+import Subscription               from "../db/models/Subscription"
 import RequestGroup              from "../db/models/RequestGroup"
 import DataSite                  from "../db/models/DataSite"
 import StudyArea                 from "../db/models/StudyArea"
@@ -35,7 +35,7 @@ const SHAREABLE_MODELS: Record<string, { Model: any, actions: Action[] }> = {
         actions: ["read", "update", "delete", "share"]
     },
     Subscriptions: {
-        Model: DataRequest as any,
+        Model: Subscription as any,
         actions: ["read", "update", "delete", "share"]
     },
     SubscriptionGroups: {

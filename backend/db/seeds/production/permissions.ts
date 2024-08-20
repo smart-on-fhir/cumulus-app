@@ -31,7 +31,7 @@ export default [
     { user_id: null, role: "user"   , user_group_id: null, resource: "Graphs", action: "delete", resource_id: null, permission: 0, comment: "Can delete graphs" },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Graphs", action: "share" , resource_id: null, permission: 0, comment: "Can share graphs"  },
 
-    // DataRequests
+    // Subscriptions
     { user_id: null, role: "admin"  , user_group_id: null, resource: "Subscriptions", action: "read"                 , resource_id: null, permission: 1, comment: "Can read subscriptions"                         },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "Subscriptions", action: "create"               , resource_id: null, permission: 1, comment: "Can create subscriptions"                       },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "Subscriptions", action: "update"               , resource_id: null, permission: 1, comment: "Can update subscriptions"                       },
@@ -113,7 +113,7 @@ export default [
     { user_id: null, role: "user"   , user_group_id: null, resource: "Tags" , action: "update", resource_id: null, permission: 0, comment: "Can update tags" },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Tags" , action: "delete", resource_id: null, permission: 0, comment: "Can delete tags" },
     
-    // DataRequestsTags
+    // SubscriptionTags
     { user_id: null, role: "admin"  , user_group_id: null, resource: "SubscriptionTags", action: "read"  , resource_id: null, permission: 1, comment: "Can read subscription tags"   },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "SubscriptionTags", action: "create", resource_id: null, permission: 1, comment: "Can create subscription tags" },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "SubscriptionTags", action: "update", resource_id: null, permission: 1, comment: "Can update subscription tags" },

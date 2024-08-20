@@ -1051,7 +1051,7 @@ paths:
                               description:
                                 type: string
                                 maxLength: 200
-                        DataRequest:
+                        Subscription:
                           type: object
                           properties:
                             id:
@@ -1070,7 +1070,7 @@ paths:
                   createdAt: 2024-02-22T13:36:17.315Z
                   updatedAt: 2024-02-22T13:36:17.315Z
                   Tags: []
-                  DataRequest:
+                  Subscription:
                     id: 1
                     name: Subscription Name
         '401':
@@ -1135,7 +1135,7 @@ paths:
                             description:
                               type: string
                               maxLength: 200
-                      DataRequest:
+                      Subscription:
                         type: object
                         properties:
                           id:
@@ -1237,7 +1237,7 @@ paths:
                             description:
                               type: string
                               maxLength: 200
-                      DataRequest:
+                      Subscription:
                         type: object
                         properties:
                           id:
@@ -1266,7 +1266,7 @@ paths:
                   - id: 1
                     name: Tag 1
                     description: Tag 1 description
-                DataRequest:
+                Subscription:
                   id: 1
                   name: Subscription Name
                 group:

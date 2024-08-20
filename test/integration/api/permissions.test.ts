@@ -1,6 +1,6 @@
 import { expect, use }               from "chai"
 import chaiAsPromised                from "chai-as-promised"
-import DataRequest                   from "../../../backend/db/models/DataRequest"
+import Subscription                  from "../../../backend/db/models/Subscription"
 import DataSite                      from "../../../backend/db/models/DataSite"
 import Permission                    from "../../../backend/db/models/Permission"
 import StudyArea                     from "../../../backend/db/models/StudyArea"
@@ -12,7 +12,7 @@ import View                          from "../../../backend/db/models/View"
 import { explode }                   from "../../../backend/lib"
 import { emailsToUserIDs, validate } from "../../../backend/routes/permissions"
 import SystemUser                    from "../../../backend/SystemUser"
-import DataRequests                  from "../../fixtures/DataRequests"
+import Subscriptions                 from "../../fixtures/Subscriptions"
 import DataSites                     from "../../fixtures/DataSites"
 import Permissions                   from "../../fixtures/Permissions"
 import StudyAreas                    from "../../fixtures/StudyAreas"
@@ -606,7 +606,7 @@ describe("Permissions", () => {
         afterEach(async () => {
             await resetTable("Permission"  , Permissions  )
             await resetTable("User"        , Users        )
-            await resetTable("DataRequest" , DataRequests )
+            await resetTable("Subscription", Subscriptions )
             await resetTable("DataSite"    , DataSites    )
             await resetTable("UserGroup"   , UserGroups   )
             await resetTable("RequestGroup", RequestGroups)
@@ -654,7 +654,7 @@ describe("Permissions", () => {
             ])
 
             expect(await Permission.count({ where: { resource: "Subscriptions", resource_id: 1 } })).to.be.greaterThan(0)
-            const sub = await DataRequest.findByPk(1, { user: SystemUser,  })
+            const sub = await Subscription.findByPk(1, { user: SystemUser,  })
             await sub!.destroy({ user: SystemUser })
             expect(await Permission.count({ where: { resource: "Subscriptions", resource_id: 1 } })).to.equal(0)
         })

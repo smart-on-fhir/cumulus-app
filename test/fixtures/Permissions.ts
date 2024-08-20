@@ -28,7 +28,7 @@ export default [
     { id: 23, user_id: null, role: "user"   , resource: "Graphs"                 , action: "update"               , user_group_id: null, resource_id : null, permission: 0, attribute: null       , comment: "Users can update graphs"                                           },
     { id: 24, user_id: null, role: "user"   , resource: "Graphs"                 , action: "delete"               , user_group_id: null, resource_id : null, permission: 0, attribute: null       , comment: "Users can delete graphs"                                           },
     
-    // DataRequests
+    // Subscriptions
     { id: 29, user_id: null, role: "admin"  , resource: "Subscriptions"          , action: "read"                 , user_group_id: null, resource_id: null, permission: 1, attribute: null        , comment: "Admins can read subscriptions"                                      },
     { id: 30, user_id: null, role: "admin"  , resource: "Subscriptions"          , action: "create"               , user_group_id: null, resource_id: null, permission: 1, attribute: null        , comment: "Admins can create subscriptions"                                    },
     { id: 31, user_id: null, role: "admin"  , resource: "Subscriptions"          , action: "update"               , user_group_id: null, resource_id: null, permission: 1, attribute: null        , comment: "Admins can update subscriptions"                                    },

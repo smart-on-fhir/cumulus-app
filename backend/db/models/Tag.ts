@@ -8,7 +8,7 @@ import {
 } from "sequelize"
 import { ModelDestroyOptions } from "../../types"
 import BaseModel               from "./BaseModel"
-import DataRequest             from "./DataRequest"
+import Subscription             from "./Subscription"
 import View                    from "./View"
 
 
@@ -24,7 +24,7 @@ export default class Tag extends BaseModel<InferAttributes<Tag>, InferCreationAt
     declare updatedAt: CreationOptional<Date>;
 
     declare getGraphs: HasManyGetAssociationsMixin<View>; // Note the null assertions!
-    declare getSubscriptions: HasManyGetAssociationsMixin<DataRequest>;
+    declare getSubscriptions: HasManyGetAssociationsMixin<Subscription>;
     declare destroy: (options?: ModelDestroyOptions) => Promise<void>;
 
     public isOwnedBy(user: any): boolean {

@@ -29,23 +29,23 @@ function list(html: string[], name: string, items?: { label?: string, name: stri
     }
 }
 
-export async function sendDataRequest(dataRequest: app.DataRequest) {
+export async function sendDataRequest(subscription: app.Subscription) {
     
     let html = [
         `<h2>New Data Request</h2>`,
-        `<h3>${dataRequest.name}</h3>`,
-        `<p style="color:#999">${dataRequest.name}</p>`,
+        `<h3>${subscription.name}</h3>`,
+        `<p style="color:#999">${subscription.name}</p>`,
         '<hr />'
     ];
 
-    list(html, "Requested data from the following data sites", dataRequest.requestedData?.dataSites);
-    list(html, "Requested Demographics"                      , dataRequest.requestedData?.fields.demographics);
-    list(html, "Requested Labs"                              , dataRequest.requestedData?.fields.labs);
-    list(html, "Requested Diagnoses"                         , dataRequest.requestedData?.fields.diagnoses);
-    list(html, "Requested Immunizations"                     , dataRequest.requestedData?.fields.immunizations);
-    list(html, "Requested Procedures"                        , dataRequest.requestedData?.fields.procedures);
-    list(html, "Requested Medications"                       , dataRequest.requestedData?.fields.medications);
-    list(html, "Requested Computable Phenotypes"             , dataRequest.requestedData?.fields.phenotypes);
+    list(html, "Requested data from the following data sites", subscription.requestedData?.dataSites);
+    list(html, "Requested Demographics"                      , subscription.requestedData?.fields.demographics);
+    list(html, "Requested Labs"                              , subscription.requestedData?.fields.labs);
+    list(html, "Requested Diagnoses"                         , subscription.requestedData?.fields.diagnoses);
+    list(html, "Requested Immunizations"                     , subscription.requestedData?.fields.immunizations);
+    list(html, "Requested Procedures"                        , subscription.requestedData?.fields.procedures);
+    list(html, "Requested Medications"                       , subscription.requestedData?.fields.medications);
+    list(html, "Requested Computable Phenotypes"             , subscription.requestedData?.fields.phenotypes);
 
     return client.messages.create(config.mailGun.domain, {
         from   : config.appEmail,

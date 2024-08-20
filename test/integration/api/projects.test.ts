@@ -1,6 +1,6 @@
 import { expect }                from "chai"
 import StudyAreas                from "../../fixtures/StudyAreas"
-import Subscriptions             from "../../fixtures/DataRequests"
+import Subscriptions             from "../../fixtures/Subscriptions"
 import {
     server,
     resetTable,
