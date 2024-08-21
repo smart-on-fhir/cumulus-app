@@ -8,7 +8,7 @@ import {
 } from "sequelize"
 
 
-export default class RequestGroup extends BaseModel<InferAttributes<RequestGroup>, InferCreationAttributes<RequestGroup>>
+export default class SubscriptionGroup extends BaseModel<InferAttributes<SubscriptionGroup>, InferCreationAttributes<SubscriptionGroup>>
 {
     declare id: CreationOptional<number>;
     declare name: string;
@@ -21,7 +21,7 @@ export default class RequestGroup extends BaseModel<InferAttributes<RequestGroup
     }
 
     static initialize(sequelize: Sequelize) {
-        RequestGroup.init({
+        SubscriptionGroup.init({
             id: {
                 type         : DataTypes.INTEGER,
                 allowNull    : false,
@@ -40,7 +40,7 @@ export default class RequestGroup extends BaseModel<InferAttributes<RequestGroup
             updatedAt: DataTypes.DATE
         }, {
             sequelize,
-            modelName: "RequestGroup"
+            modelName: "SubscriptionGroup"
         });
     };
 }

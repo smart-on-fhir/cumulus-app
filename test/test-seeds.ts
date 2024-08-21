@@ -3,7 +3,7 @@ import { fixAutoIncrement } from "../backend/lib"
 import Users                from "./fixtures/Users"
 import DataSites            from "./fixtures/DataSites"
 import StudyAreas           from "./fixtures/StudyAreas"
-import RequestGroups        from "./fixtures/RequestGroups"
+import SubscriptionGroups   from "./fixtures/SubscriptionGroups"
 import Subscriptions        from "./fixtures/Subscriptions"
 import Views                from "./fixtures/Views"
 import Permissions          from "./fixtures/Permissions"
@@ -23,8 +23,8 @@ export async function seed(connection: Sequelize) {
     await models.StudyArea.bulkCreate(StudyAreas);
     await fixAutoIncrement(connection, models.StudyArea.tableName, "id");
 
-    await models.RequestGroup.bulkCreate(RequestGroups);
-    await fixAutoIncrement(connection, models.RequestGroup.tableName, "id");
+    await models.SubscriptionGroup.bulkCreate(SubscriptionGroups);
+    await fixAutoIncrement(connection, models.SubscriptionGroup.tableName, "id");
 
     await models.Subscription.bulkCreate(Subscriptions);
     await fixAutoIncrement(connection, models.Subscription.tableName, "id");

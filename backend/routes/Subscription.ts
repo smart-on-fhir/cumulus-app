@@ -6,7 +6,7 @@ import { NotFound, InternalServerError, HttpError, BadRequest }   from "../error
 import Model                                                      from "../db/models/Subscription"
 import { AppRequest }                                             from "../types"
 import { route }                                                  from "../lib/route"
-import GroupModel                                                 from "../db/models/RequestGroup"
+import GroupModel                                                 from "../db/models/SubscriptionGroup"
 import { requestPermission }                                      from "../services/acl"
 import ViewModel                                                  from "../db/models/View"
 import ColumnsMetadata                                            from "../cumulus_library_columns.json"

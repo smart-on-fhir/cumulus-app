@@ -190,7 +190,7 @@ export default function SubscriptionForm({
     deleteRequest,
     record = {},
     onChange,
-    requestGroups,
+    subscriptionGroups,
     sites,
     working
 }: {
@@ -198,7 +198,7 @@ export default function SubscriptionForm({
     deleteRequest?: () => void
     record?: Partial<app.Subscription>
     onChange: (state: Partial<app.Subscription>) => void
-    requestGroups: app.RequestGroup[]
+    subscriptionGroups: app.SubscriptionGroup[]
     sites: app.DataSite[]
     working?: "deleting" | "saving"
 })
@@ -297,7 +297,7 @@ export default function SubscriptionForm({
                     </div>
                     <select value={groupId || undefined} onChange={e => onChange({ ...record, groupId: +e.target.value })}>
                         <option>None (GENERAL)</option>
-                        {requestGroups.map((g, i) => (
+                        {subscriptionGroups.map((g, i) => (
                             <option key={i} value={g.id}>{g.name}</option>
                         ))}
                     </select>

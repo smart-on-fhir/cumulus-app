@@ -1,10 +1,10 @@
-import RequestGroups                from "../../fixtures/RequestGroups"
+import SubscriptionGroups           from "../../fixtures/SubscriptionGroups"
 import { resetTable, testEndpoint } from "../../test-lib"
 
 
 describe("SubscriptionGroups", () => {
     
-    beforeEach(async () => await resetTable("RequestGroup", RequestGroups))
+    beforeEach(async () => await resetTable("SubscriptionGroup", SubscriptionGroups))
 
     describe("list", () => {
         testEndpoint("SubscriptionGroups.read", "GET", "/api/request-groups?subscriptions=true")

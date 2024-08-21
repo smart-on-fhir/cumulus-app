@@ -4,7 +4,7 @@ import BaseModel         from "./BaseModel"
 import Subscription      from "./Subscription"
 import DataSite          from "./DataSite"
 import StudyArea         from "./StudyArea"
-import RequestGroup      from "./RequestGroup"
+import SubscriptionGroup from "./SubscriptionGroup"
 import Tag               from "./Tag"
 import User              from "./User"
 import View              from "./View"
@@ -150,7 +150,7 @@ export function init(connection: Sequelize) {
     DataSite.initialize(connection);
     Subscription.initialize(connection);
     StudyArea.initialize(connection);
-    RequestGroup.initialize(connection);
+    SubscriptionGroup.initialize(connection);
     View.initialize(connection);
     Permission.initialize(connection);
     UserGroup.initialize(connection);
@@ -174,8 +174,8 @@ export function init(connection: Sequelize) {
     // Subscriptions have many graphs as Subscription.Views
     Subscription.hasMany(View, { foreignKey: "subscriptionId", constraints: true, hooks: true, onDelete: "CASCADE" });
 
-    // Subscriptions belong to one RequestGroup as Subscription.group
-    Subscription.belongsTo(RequestGroup, { as: "group", onDelete: "SET NULL" });
+    // Subscriptions belong to one SubscriptionGroup as Subscription.group
+    Subscription.belongsTo(SubscriptionGroup, { as: "group", onDelete: "SET NULL" });
 
     // Subscriptions belong to many StudyAreas
     Subscription.belongsToMany(StudyArea, { through: "ProjectsSubscriptions", as: "StudyAreas", timestamps: false });
@@ -188,7 +188,7 @@ export function init(connection: Sequelize) {
     // SubscriptionGroups ------------------------------------------------------
 
     // SubscriptionGroup have many Subscriptions as requests
-    RequestGroup.hasMany(Subscription, { as: "requests", foreignKey: "groupId", onDelete: "SET DEFAULT" });
+    SubscriptionGroup.hasMany(Subscription, { as: "requests", foreignKey: "groupId", onDelete: "SET DEFAULT" });
 
 
 

@@ -22,12 +22,12 @@ export default function EditSubscriptionForm()
     // Fetch Subscription Groups -----------------------------------------------
     const {
         loading: loadingData,
-        error  : loadingRequestGroupsError,
+        error  : loadingSubscriptionGroupsError,
         result : data
-    } = useBackend<{ groups: app.RequestGroup[], sites: app.DataSite[] }>(
+    } = useBackend<{ groups: app.SubscriptionGroup[], sites: app.DataSite[] }>(
         useCallback(
             () => Promise.all([
-                request<app.RequestGroup[]>("/api/request-groups"),
+                request<app.SubscriptionGroup[]>("/api/request-groups"),
                 request<app.DataSite[]>("/api/data-sites")
             ]).then(([groups, sites]) => ({ groups, sites })),
             []
@@ -80,10 +80,10 @@ export default function EditSubscriptionForm()
         return <Loader msg="Loading Subscription Groups..." />
     }
 
-    if (loadingRequestGroupsError) {
+    if (loadingSubscriptionGroupsError) {
         return (
             <AlertError>
-                <b>Error loading subscription groups:</b> { loadingRequestGroupsError + "" }
+                <b>Error loading subscription groups:</b> { loadingSubscriptionGroupsError + "" }
             </AlertError>
         );
     }
@@ -130,7 +130,7 @@ export default function EditSubscriptionForm()
                 deleteRequest={deleteRequest}
                 onChange={setState}
                 record={state}
-                requestGroups={groups}
+                subscriptionGroups={groups}
                 sites={sites}
                 working={ saving ? "saving" : deleting ? "deleting" : undefined }
             />

@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react"
 import MarkdownEditor          from "../generic/MarkdownEditor"
 import { app }                 from "../../types"
-import "./RequestGroups.scss"
+import "./SubscriptionGroups.scss"
 
 
 export default function Form({
@@ -9,9 +9,9 @@ export default function Form({
     saving,
     onSubmit
 }: {
-    record?: Partial<app.RequestGroup>
+    record?: Partial<app.SubscriptionGroup>
     saving?: boolean
-    onSubmit: (record: Partial<app.RequestGroup>) => void
+    onSubmit: (record: Partial<app.SubscriptionGroup>) => void
 })
 {
     const [name, setName] = useState(record.name)
@@ -26,11 +26,11 @@ export default function Form({
         <form onSubmit={ _onSubmit }>
             <fieldset className="mt-1">
                 <label>Name</label>
-                <input type="text" name="requestGroupName" value={name} onChange={e => setName(e.target.value)} required />
+                <input type="text" name="subscriptionGroupName" value={name} onChange={e => setName(e.target.value)} required />
             </fieldset>
             <fieldset className="mt-2">
                 <MarkdownEditor height="30vh" textarea={{
-                    name    : "requestGroupDescription",
+                    name    : "subscriptionGroupDescription",
                     value   : description,
                     rows    : 10,
                     onChange: e => setDescription(e.target.value)

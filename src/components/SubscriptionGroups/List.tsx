@@ -8,13 +8,13 @@ import { app }            from "../../types"
 import { ellipsis }       from "../../utils"
 import "../generic/EndpointListTable.scss"
 
-export default function RequestGroupList()
+export default function SubscriptionGroupList()
 {
     const { user } = useAuth();
 
     const canCreate = user?.permissions.includes("SubscriptionGroups.create")
 
-    return createListPage<app.RequestGroup[]>({
+    return createListPage<app.SubscriptionGroup[]>({
         nameSingular: "Subscription Group",
         namePlural  : "Subscription Groups",
         endpoint    : "/api/request-groups",

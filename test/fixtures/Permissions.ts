@@ -1,6 +1,6 @@
 export default [
     
-    // RequestGroups
+    // SubscriptionGroups
     { id: 1 , user_id: null, role: "admin"  , resource: "SubscriptionGroups"     , action: "read"                 , user_group_id: null, resource_id : null, permission: 1, attribute: null       , comment: "Admins can read request groups"                                    },
     { id: 2 , user_id: null, role: "admin"  , resource: "SubscriptionGroups"     , action: "create"               , user_group_id: null, resource_id : null, permission: 1, attribute: null       , comment: "Admins can create request groups"                                  },
     { id: 3 , user_id: null, role: "admin"  , resource: "SubscriptionGroups"     , action: "update"               , user_group_id: null, resource_id : null, permission: 1, attribute: null       , comment: "Admins can update request groups"                                  },

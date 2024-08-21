@@ -36,7 +36,7 @@ export default function SubscriptionsListPage()
     };
 
     const { loading, error, result: groups } = useBackend(
-        useCallback(() => request<app.RequestGroup[]>("/api/requests/by-group"), []),
+        useCallback(() => request<app.SubscriptionGroup[]>("/api/requests/by-group"), []),
         true
     );
 
@@ -48,7 +48,7 @@ export default function SubscriptionsListPage()
         return <AlertError><b>Error Loading Subscriptions: </b>{ error + "" }</AlertError>
     }
 
-    let groupsData: app.RequestGroup[] = [];
+    let groupsData: app.SubscriptionGroup[] = [];
 
     
 

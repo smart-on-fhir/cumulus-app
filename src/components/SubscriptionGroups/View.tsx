@@ -2,12 +2,12 @@ import { Link }           from "react-router-dom"
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import Grid               from "../generic/Grid"
 import Markdown           from "../generic/Markdown"
-import SubscriptionLink    from "../Subscriptions/SubscriptionLink"
+import SubscriptionLink   from "../Subscriptions/SubscriptionLink"
 import { useAuth }        from "../../auth"
 import { app }            from "../../types"
 
 
-export default function RequestGroupView()
+export default function SubscriptionGroupView()
 {
     const { user } = useAuth();
 
@@ -15,7 +15,7 @@ export default function RequestGroupView()
     const canDelete    = user?.permissions.includes("SubscriptionGroups.delete")
     const canCreateSub = user?.permissions.includes("Subscriptions.create")
 
-    return createViewPage<app.RequestGroup>({
+    return createViewPage<app.SubscriptionGroup>({
         basePath: "/groups",
         endpoint: "/api/request-groups",
         namePlural: "Request Groups",

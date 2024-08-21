@@ -9,7 +9,7 @@ export default function LinkWidget({ onChange, value }: { onChange: (selection: 
 {
     return (
         <Wrapper endpoint="/api/request-groups?subscriptions=true">{
-            (data: app.RequestGroup[]) => <Root data={data} onChange={onChange} value={value} />
+            (data: app.SubscriptionGroup[]) => <Root data={data} onChange={onChange} value={value} />
         }</Wrapper>
     )
 }
@@ -19,7 +19,7 @@ function Root({
     onChange,
     value = ""
 }: {
-    data: app.RequestGroup[]
+    data: app.SubscriptionGroup[]
     onChange: (selection: string) => void
     value?: string
 })
@@ -47,7 +47,7 @@ function SubscriptionGroup({
     onChange,
     selection
 }: {
-    group: app.RequestGroup
+    group: app.SubscriptionGroup
     selection: number[]
     onChange: (selection: number[]) => void
 })
