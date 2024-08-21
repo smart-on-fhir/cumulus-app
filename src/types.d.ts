@@ -145,7 +145,7 @@ export declare module app {
         /**
          * Optional group (used by the UI to render requests in groups)
          */
-        group?: RequestGroup
+        group?: SubscriptionGroup
 
         /**
          * Date when the request has been initially created
@@ -269,7 +269,7 @@ export declare module app {
 
     type supportedDataType = "string" | "integer" | "float" | "boolean" | "date:YYYY-MM-DD" | "date:YYYY-MM" | "date:YYYY"
 
-    interface RequestGroup {
+    interface SubscriptionGroup {
         id         : number
         name       : string
         updatedAt  : string

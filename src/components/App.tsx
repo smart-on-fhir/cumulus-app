@@ -6,7 +6,7 @@ import EditView                         from "./Dashboard/EditView";
 import CopyView                         from "./Dashboard/CopyView";
 import RequestDataForm                  from "./Dashboard/RequestDataForm";
 import Subscriptions                    from "./Subscriptions";
-import RequestGroups                    from "./RequestGroups";
+import SubscriptionGroups               from "./SubscriptionGroups";
 import DataSiteListPage                 from "./DataSites";
 import Navigation                       from "./Navigation";
 import Views                            from "./Views";
@@ -59,7 +59,7 @@ export default function App()
 
                                 <Route path="requests/*"     element={ <RequireAuth><Subscriptions /></RequireAuth> } />
                                 <Route path="sites/*"        element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
-                                <Route path="groups/*"       element={ <RequireAuth><RequestGroups /></RequireAuth> } />
+                                <Route path="groups/*"       element={ <RequireAuth><SubscriptionGroups /></RequireAuth> } />
                                 <Route path="study-areas/*"  element={ <RequireAuth><StudyAreas /></RequireAuth> } />
                                 <Route path="tags/*"         element={ <RequireAuth><Tags /></RequireAuth> } />
                                 <Route path="login"          element={ <LoginPage /> } />

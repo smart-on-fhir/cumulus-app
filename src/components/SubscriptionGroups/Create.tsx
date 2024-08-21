@@ -1,12 +1,12 @@
 import { createCreatePage } from "../generic/EndpointCreateWrapper"
 import Form                 from "./Form"
 import { app }              from "../../types"
-import "./RequestGroups.scss"
+import "./SubscriptionGroups.scss"
 
 
-export default function RequestGroupCreate()
+export default function SubscriptionGroupCreate()
 {
-    return createCreatePage<app.RequestGroup>({
+    return createCreatePage<app.SubscriptionGroup>({
         nameSingular: "Subscription Group",
         namePlural  : "Subscription Groups",
         basePath    : "/groups",

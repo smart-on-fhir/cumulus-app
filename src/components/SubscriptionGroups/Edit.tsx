@@ -1,12 +1,12 @@
 import { createEditPage } from "../generic/EndpointEditWrapper"
 import Form               from "./Form"
 import { app }            from "../../types"
-import "./RequestGroups.scss"
+import "./SubscriptionGroups.scss"
 
 
-export default function RequestGroupEdit()
+export default function SubscriptionGroupEdit()
 {
-    return createEditPage<app.RequestGroup>({
+    return createEditPage<app.SubscriptionGroup>({
         namePlural  : "Subscription Groups",
         nameSingular: "Subscription Group",
         basePath    : "/groups",

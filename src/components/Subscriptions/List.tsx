@@ -35,7 +35,7 @@ export default function SubscriptionsList()
     const { user } = useAuth();
 
     const { loading, error, result: groups } = useBackend(
-        useCallback(() => request<app.RequestGroup[]>(
+        useCallback(() => request<app.SubscriptionGroup[]>(
             "/api/requests/by-group?groupLimit=4&requestLimit=3"
         ), []),
         true

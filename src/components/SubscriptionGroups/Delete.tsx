@@ -5,9 +5,9 @@ import Grid                 from "../generic/Grid"
 import { app }              from "../../types"
 
 
-export default function DeleteRequestGroup()
+export default function DeleteSubscriptionGroup()
 {
-    return createDeletePage<app.RequestGroup>({
+    return createDeletePage<app.SubscriptionGroup>({
         endpoint: "/api/request-groups",
         namePlural: "Subscription Groups",
         nameSingular: "Subscription Group",

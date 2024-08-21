@@ -23,7 +23,7 @@ async function copySubscriptionGroup(options: {
     // Find the group at src
     // -------------------------------------------------------------------------
     const group: any = (await src.connection.query(
-        `SELECT * FROM "RequestGroups" WHERE "id" = ?`,
+        `SELECT * FROM "SubscriptionGroups" WHERE "id" = ?`,
         {
             type: QueryTypes.SELECT,
             replacements: [ srcSubscriptionGroupId ]
@@ -40,7 +40,7 @@ async function copySubscriptionGroup(options: {
     // Create the group at dst
     // -------------------------------------------------------------------------
     const result = await dst.connection.query(
-        `INSERT INTO "RequestGroups" ("description", "name") VALUES (?, ?) RETURNING "id"`,
+        `INSERT INTO "SubscriptionGroups" ("description", "name") VALUES (?, ?) RETURNING "id"`,
         {
             transaction,
             type: QueryTypes.INSERT,

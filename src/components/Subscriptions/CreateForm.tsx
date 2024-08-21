@@ -30,13 +30,13 @@ export default function CreateSubscriptionForm()
 
     // onMount fetch SubscriptionGroups
     const {
-        loading: loadingRequestGroups,
-        error: loadingRequestGroupsError,
+        loading: loadingSubscriptionGroups,
+        error: loadingSubscriptionGroupsError,
         result: data
-    } = useBackend<{ groups: app.RequestGroup[], sites: app.DataSite[] }>(
+    } = useBackend<{ groups: app.SubscriptionGroup[], sites: app.DataSite[] }>(
         useCallback(
             () => Promise.all([
-                request<app.RequestGroup[]>("/api/request-groups"),
+                request<app.SubscriptionGroup[]>("/api/request-groups"),
                 request<app.DataSite[]>("/api/data-sites")
             ]).then(([groups, sites]) => ({ groups, sites })),
             []
@@ -48,12 +48,12 @@ export default function CreateSubscriptionForm()
         return <Navigate to={ "/requests/" + savedRecord.id } />
     }
 
-    if (loadingRequestGroups) {
+    if (loadingSubscriptionGroups) {
         return <Loader msg="Loading Subscription Groups..." />
     }
 
-    if (loadingRequestGroupsError) {
-        return <AlertError><b>Error loading subscription groups:</b> { loadingRequestGroupsError + "" }</AlertError>
+    if (loadingSubscriptionGroupsError) {
+        return <AlertError><b>Error loading subscription groups:</b> { loadingSubscriptionGroupsError + "" }</AlertError>
     }
 
     if (!data) {
@@ -86,7 +86,7 @@ export default function CreateSubscriptionForm()
                 saveRequest={save}
                 onChange={setState}
                 record={state}
-                requestGroups={groups}
+                subscriptionGroups={groups}
                 sites={sites}
                 working={ saving ? "saving" : undefined }
             />

@@ -4,7 +4,7 @@ import Subscription                  from "../../../backend/db/models/Subscripti
 import DataSite                      from "../../../backend/db/models/DataSite"
 import Permission                    from "../../../backend/db/models/Permission"
 import StudyArea                     from "../../../backend/db/models/StudyArea"
-import RequestGroup                  from "../../../backend/db/models/RequestGroup"
+import SubscriptionGroup             from "../../../backend/db/models/SubscriptionGroup"
 import Tag                           from "../../../backend/db/models/Tag"
 import User                          from "../../../backend/db/models/User"
 import UserGroup                     from "../../../backend/db/models/UserGroup"
@@ -16,7 +16,7 @@ import Subscriptions                 from "../../fixtures/Subscriptions"
 import DataSites                     from "../../fixtures/DataSites"
 import Permissions                   from "../../fixtures/Permissions"
 import StudyAreas                    from "../../fixtures/StudyAreas"
-import RequestGroups                 from "../../fixtures/RequestGroups"
+import SubscriptionGroups            from "../../fixtures/SubscriptionGroups"
 import Tags                          from "../../fixtures/Tags"
 import UserGroups                    from "../../fixtures/UserGroups"
 import Users                         from "../../fixtures/Users"
@@ -604,14 +604,14 @@ describe("Permissions", () => {
         // })
 
         afterEach(async () => {
-            await resetTable("Permission"  , Permissions  )
-            await resetTable("User"        , Users        )
-            await resetTable("Subscription", Subscriptions )
-            await resetTable("DataSite"    , DataSites    )
-            await resetTable("UserGroup"   , UserGroups   )
-            await resetTable("RequestGroup", RequestGroups)
-            await resetTable("Tag"         , Tags         )
-            await resetTable("StudyArea"   , StudyAreas   )
+            await resetTable("Permission"       , Permissions       )
+            await resetTable("User"             , Users             )
+            await resetTable("Subscription"     , Subscriptions     )
+            await resetTable("DataSite"         , DataSites         )
+            await resetTable("UserGroup"        , UserGroups        )
+            await resetTable("SubscriptionGroup", SubscriptionGroups)
+            await resetTable("Tag"              , Tags              )
+            await resetTable("StudyArea"        , StudyAreas        )
         })
 
         it ("When a Graph is deleted, any associated permissions are also deleted", async () => {
@@ -697,7 +697,7 @@ describe("Permissions", () => {
             expect(await Permission.count({ where: { user_group_id: 1 } })).to.equal(0)
         })
 
-        it ("When a RequestGroup is deleted, any associated permissions are also deleted", async () => {
+        it ("When a SubscriptionGroup is deleted, any associated permissions are also deleted", async () => {
             await Permission.bulkCreate([
                 { resource: "SubscriptionGroups", user_id: 3, action: "read"  , permission: true, resource_id: 1 },
                 { resource: "SubscriptionGroups", user_id: 3, action: "update", permission: true, resource_id: 1 },
@@ -707,7 +707,7 @@ describe("Permissions", () => {
             ])
 
             expect(await Permission.count({ where: { resource: "SubscriptionGroups", resource_id: 1 } })).to.be.greaterThan(0)
-            const rec = await RequestGroup.findByPk(1, { user: SystemUser,  })
+            const rec = await SubscriptionGroup.findByPk(1, { user: SystemUser,  })
             await rec!.destroy({ user: SystemUser })
             expect(await Permission.count({ where: { resource: "SubscriptionGroups", resource_id: 1 } })).to.equal(0)
         })
