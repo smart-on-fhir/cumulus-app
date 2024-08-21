@@ -94,7 +94,7 @@ export declare module app {
         settings?: ViewSettings
         creatorId?: number | null
         Tags?: Pick<Tag, "id" | "name" | "description">[]
-        subscription?: Pick<Subscription, "id" | "name">
+        Subscription?: Pick<Subscription, "id" | "name">
         isDraft?: boolean
         createdAt?: Date
         updatedAt?: Date

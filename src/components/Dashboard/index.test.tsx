@@ -169,7 +169,7 @@ describe("Chart View", () => {
         subscriptionId: 1,
         name         : "Test Chart",
         description  : "Test Chart Description",
-        subscription : baseSubscription,
+        Subscription : baseSubscription,
         isDraft      : false,
         Tags         : [
             { id: 1, name: "Tag 1", description: "Tag 1 Description" },
