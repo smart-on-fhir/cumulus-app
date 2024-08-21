@@ -148,11 +148,11 @@ export default async function setupDB(options: Config): Promise<Sequelize>
     // Load models and call their init method
     initModels(connection)
 
-    // Create missing tables (or recreate all of them if sync = 'force')
-    await syncModels(options)
-
     // Run pending migrations (if any)
     await applyMigrations(options, connection)
+
+    // Create missing tables (or recreate all of them if sync = 'force')
+    await syncModels(options)
 
     // Insert seeds (if enabled)
     await applySeeds(options, connection)
