@@ -40,7 +40,8 @@ export default class SubscriptionGroup extends BaseModel<InferAttributes<Subscri
             updatedAt: DataTypes.DATE
         }, {
             sequelize,
-            modelName: "SubscriptionGroup"
+            modelName: "SubscriptionGroup",
+            tableName: "SubscriptionGroups"
         });
     };
 }
