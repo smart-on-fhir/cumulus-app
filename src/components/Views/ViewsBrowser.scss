@@ -9,6 +9,19 @@
     .collapse-header {
         font-size: 110%;
         font-weight: 500;
+
+        .collapse-header-link {
+            opacity         : 0;
+            margin-left     : 2em;
+            font-size       : 75%;
+            transition      : all 0.4s linear 0;
+            transform-origin: 0 50%;
+        }
+
+        &:hover .collapse-header-link {
+            opacity   : 1;
+            transition: all 0.4s linear 0.1s;
+        }
     }
 
     &:not(.collapsed) {

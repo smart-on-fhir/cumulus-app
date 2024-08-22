@@ -13,6 +13,14 @@ import { useAuth }                        from "../../auth"
 import "./ViewsBrowser.scss"
 
 
+interface GroupEntry {
+    items: any[]
+    link?: {
+        to: string
+        txt: string
+    }
+}
+
 export default function ViewsBrowser({
     layout = "grid",
     requestId,
@@ -163,23 +171,26 @@ export default function ViewsBrowser({
     }
 
     function renderBySubscription(selection: CustomSelection<app.View>) {
-        const groups: Record<string, any[]> = {};
+        const groups: Record<string, GroupEntry> = {};
         (result || []).forEach(item => {
             let label = item.Subscription!.name;
             let group = groups[label];
             if (!group) {
-                group = groups[label] = [];
+                group = groups[label] = {
+                    link: { to: `/requests/${item.Subscription!.id}`, txt: "View Subscription" },
+                    items: []
+                };
             }
-            group.push(item)
+            group.items.push(item)
         });
 
         return renderGroups(groups, "database", selection)
     }
 
     function renderByTag(selection: CustomSelection<app.View>) {
-        const groups: Record<string, any[]> = {};
+        const groups: Record<string, GroupEntry> = {};
         
-        const unTagged: any[] = [];
+        const unTagged: GroupEntry = { items: [] };
         
         (result || []).forEach(item => {
             if (item.Tags && item.Tags.length) {
@@ -187,28 +198,40 @@ export default function ViewsBrowser({
                     let label = tag.name;
                     let group = groups[label];
                     if (!group) {
-                        group = groups[label] = [];
+                        group = groups[label] = {
+                            link: { to: `/tags/${tag.id}`, txt: "View Tag" },
+                            items: []
+                        };
                     }
-                    group.push(item)
+                    group.items.push(item)
                 })
             } else {
-                unTagged.push(item)
+                unTagged.items.push(item)
             }
         });
 
-        if (unTagged.length) {
+        if (unTagged.items.length) {
             groups["NO TAGS"] = unTagged
         }
 
         return renderGroups(groups, "sell", selection)
     }
 
-    function renderGroups(groups: Record<string, any[]>, icon: string, selection: CustomSelection<app.View>) {
+    function renderGroups(groups: Record<string, GroupEntry>, icon: string, selection: CustomSelection<app.View>) {
         return <>
             {
                 Object.keys(groups).map((k, i) => (
                     <Collapse key={i} header={
-                        <><i className="material-symbols-rounded bottom">{icon}</i> {k}</>
+                        <span>
+                            <i className="material-symbols-rounded bottom">{icon}</i> {k}
+                            {
+                                groups[k].link ?
+                                    <Link className="collapse-header-link link" to={groups[k].link!.to}>
+                                        {groups[k].link!.txt} <i className="fa-solid fa-arrow-up-right-from-square" />
+                                    </Link> :
+                                    ""
+                            }
+                        </span>
                     }>
                         <div className={ classList({
                             ["view-browser view-browser-" + layout] : true,
@@ -216,7 +239,7 @@ export default function ViewsBrowser({
                             "mb-2": true
                         })}>
                         {
-                            groups[k].map((v, y) => (
+                            groups[k].items.map((v, y) => (
                                 <ViewThumbnail
                                     key={y}
                                     view={ v }
