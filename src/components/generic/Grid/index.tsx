@@ -4,12 +4,14 @@ export default function Grid({
     children,
     className,
     gap,
-    cols = "100%"
+    cols = "100%",
+    style = {}
 }: {
     children?: ReactNode
     gap?: string
     className?: string
     cols?: string
+    style?: React.CSSProperties
 })
 {
     if (!Array.isArray(children)) {
@@ -22,7 +24,7 @@ export default function Grid({
         `repeat(auto-fill, minmax(${_cols[0] || "100%"}, 1fr))`
 
     return (
-        <div className={className} style={{ display: "grid", gridGap: gap, gridTemplateColumns }}>
+        <div className={className} style={{ ...style, display: "grid", gridGap: gap, gridTemplateColumns }}>
             { children }
         </div>
     )
