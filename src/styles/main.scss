@@ -129,6 +129,7 @@ b, .bold {
 .bg-grey-dark  { background-color: fade-out($color: $color-grey-dark , $amount: 0.9) }
 .bg-green      { background-color: fade-out($color: $color-green     , $amount: 0.9) }
 .bg-brand-2    { background-color: fade-out($color: $color-brand-2   , $amount: 0.9) }
+.bg-white      { background-color: #FFF }
 // .bg-muted      { background-color; 0.65 } 
 
 // Paddings --------------------------------------------------------------------
@@ -447,8 +448,8 @@ table {
 }
 
 .panel {
-  border: 1px solid #DDD;
-  background: #FFF;
+  border: 1px solid #0001;
+  // background: #FFF;
   border-radius: 0.5rem;
   padding: 2rem;
 
