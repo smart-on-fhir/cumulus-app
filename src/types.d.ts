@@ -174,7 +174,7 @@ export declare module app {
 
         dataURL: string | null
 
-        dataSourceType: "file" | "url"
+        dataSourceType: "file" | "url" | "aggregator"
 
         metadata: {
             cols  : SubscriptionDataColumn[],

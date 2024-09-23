@@ -18,7 +18,7 @@ const AGGREGATOR_PATHS = [
     "/metadata",
 
     // subscriptions
-    "/subscriptions",
+    "/data_packages",
 
     // chart-data
     "/chart-data/:subscription_name",
