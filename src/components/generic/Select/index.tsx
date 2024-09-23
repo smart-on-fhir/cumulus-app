@@ -1,4 +1,4 @@
-import { KeyboardEvent, useState } from "react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { classList } from "../../../utils"
 import "./Select.scss"
 
@@ -43,10 +43,12 @@ export default function Select({
     
     const [ highlightedIndex, setHighlightedIndex ] = useState(selectedIndex)
     const [ menuOpen, setMenuOpen ] = useState(false)
+    const wrapper = useRef<HTMLDivElement>(null)
 
-    // const minWidth = (options.sort(
-    //     (a, b) => b.label.length - a.label.length
-    // )[0]?.label?.length || 10) * 0.6 + "em";
+    useEffect(() => {
+        // @ts-ignore
+        wrapper?.current?.querySelector(".select-component-option.highlighted")?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" })
+    })
 
     function onKeyDown(e: KeyboardEvent) 
     {
@@ -111,6 +113,7 @@ export default function Select({
             onBlur={ closeMenu }
             onMouseDown={ toggleMenu }
             title={ title }
+            ref={ wrapper }
         >
             <div className="select-component-value">{
                 selectedOption ?
@@ -121,7 +124,7 @@ export default function Select({
                     </>:
                     <div className="select-component-placeholder">{ placeholder || <>&nbsp;</> }</div>
             }</div>
-            <div className={ classList({ "select-component-menu": true, open: menuOpen })}>
+            <div className={ classList({ "select-component-menu": true, open: menuOpen })} onMouseDown={e => { e.stopPropagation(); e.preventDefault(); }}>
             { options.length ? options.map((option, i) => {
                 return (
                     <div key={i} className={ classList({
