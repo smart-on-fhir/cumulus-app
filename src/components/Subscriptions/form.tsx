@@ -221,10 +221,15 @@ export default function SubscriptionForm({
         name = "",
         description = "",
         groupId,
-        refresh = "manually",
-        dataURL = "",
-        dataSourceType = record.dataURL ? "url" : "file"
+        refresh = "manually"
     } = record
+
+    const dataURL = record.dataURL ?? ""
+    const dataSourceType = record.dataSourceType || (
+        dataURL?.startsWith("aggregator://") ?
+            "aggregator" :
+            dataURL ? "url" : "file"
+    );
 
     let requestedData = record.requestedData || {
         dataSites: [sites[0]] as app.DataListItem[],
@@ -335,7 +340,7 @@ export default function SubscriptionForm({
 
             <div className="row gap mt-1 baseline">
                 
-                <div className="col col-2">
+                <div className="col col-3">
                     <Select
                         options={[
                             {

@@ -106,36 +106,47 @@ export default function SubscriptionView(): JSX.Element
                                         }
                                     </td>
                                 </tr>
-                                {/* <tr><th className="right pr-1 pl-1">Type:</th><td>{ model.refresh === "manually" ? "REQUEST" : "SUBSCRIPTION" }</td></tr> */}
-                                <tr><th className="right pr-1 pl-1">Status:</th><td>{
-                                        model.completed ?
-                                        <>completed <Format value={ model.completed } format="date-time" /></> :
-                                        <span className="color-red">Pending</span>
-                                    }
-                                </td></tr>
+                                { !model.dataURL?.startsWith("aggregator://") && 
+                                    <>
+                                        <tr>
+                                            <th className="right pr-1 pl-1">Status:</th>
+                                            <td>
+                                                {
+                                                    model.completed ?
+                                                    <>completed <Format value={ model.completed } format="date-time" /></> :
+                                                    <span className="color-red">Pending</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th className="right pr-1 pl-1 top">Refresh:</th>
+                                            <td>
+                                                { model.refresh }
+                                                { user?.role === "admin" && model.refresh !== "none" && model.dataURL && (
+                                                    <b className={classList({
+                                                        "link ml-1": true,
+                                                        "grey-out": refreshing || loading
+                                                    })} onClick={refresh}>
+                                                        { model.completed ? "Refresh Now" : "Fetch Data" }
+                                                        &nbsp;
+                                                        <i className={ classList({
+                                                            "fa-solid": true,
+                                                            "fa-rotate": refreshing || !!model.completed,
+                                                            "fa-cloud-arrow-down": !refreshing && !model.completed,
+                                                            "fa-spin grey-out": refreshing
+                                                        })} />
+                                                    </b>
+                                                )}
+                                                { refreshError && <AlertError>{ refreshError + "" }</AlertError> }
+                                            </td>
+                                        </tr>
+                                    </>
+                                }
+                                
                                 <tr>
-                                    <th className="right pr-1 pl-1 top">Refresh:</th>
-                                    <td>
-                                        { model.refresh }
-                                        { user?.role === "admin" && model.refresh !== "none" && model.dataURL && (
-                                            <b className={classList({
-                                                "link ml-1": true,
-                                                "grey-out": refreshing || loading
-                                            })} onClick={refresh}>
-                                                { model.completed ? "Refresh Now" : "Fetch Data" }
-                                                &nbsp;
-                                                <i className={ classList({
-                                                    "fa-solid": true,
-                                                    "fa-rotate": refreshing || !!model.completed,
-                                                    "fa-cloud-arrow-down": !refreshing && !model.completed,
-                                                    "fa-spin grey-out": refreshing
-                                                })} />
-                                            </b>
-                                        )}
-                                        { refreshError && <AlertError>{ refreshError + "" }</AlertError> }
-                                    </td>
+                                    <th className="right pr-1 pl-1">Created:</th>
+                                    <td><Format value={ model.createdAt } format="date-time" /></td>
                                 </tr>
-                                <tr><th className="right pr-1 pl-1">Created:</th><td><Format value={ model.createdAt } format="date-time" /></td></tr>
                                 { model.dataURL && (
                                     <tr>
                                         <th className="right pr-1 pl-1 top nowrap">Data URL:</th>
