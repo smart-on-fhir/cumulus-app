@@ -356,6 +356,8 @@
     height        : calc(100vh - 8rem);
     overflow      : hidden;
     margin-left   : -3px;
+    padding-bottom: 3rem;
+    scroll-padding-block: 3rem;
 }
 
 .dashboard.sidebar-open .dashboard-sidebar {
