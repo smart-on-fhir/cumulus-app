@@ -121,7 +121,7 @@ export function createDeletePage<T = unknown>({
                             ]} />
                             <h1 className="color-brand-2 center mt-2 mb-2">Please Confirm!</h1>
                             { error && <AlertError>{ error }</AlertError> }
-                            <div className="panel panel-danger mt-1">
+                            <div className="panel panel-danger bg-white mt-1">
                                 <div className="row gap">
                                     <div className="col col-0">
                                         <h4>{icon}</h4>
