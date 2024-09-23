@@ -428,3 +428,13 @@ export function requestPermission({ user, resource, resource_id, action }: {
 
     return false
 }
+
+export function cachedPromise<T>(fn: () => Promise<T>) {
+    let cache: any;
+    return function() {
+        if (!cache) {
+            cache = fn() as Promise<T>
+        }
+        return cache as Promise<T>
+    }
+}
