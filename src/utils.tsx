@@ -53,19 +53,19 @@ const dictionaryMap = new Map([
     [/\bnlp\b/gi               , "NLP"      ],
     [/\bdx\b/gi                , "Diagnosis"],
     [/\bed\b/gi                , "ED"       ],
-    [/\bstd dev\b/gi           , "Standard Deviation"]
+    [/\bstd\s+dev\b/gi         , "Standard Deviation"]
 ]);
 
 export function humanizeColumnName(str: string) {
-    let out = toTitleCase(str)
+    let out = str
     dictionaryMap.forEach((replacement, re) => {
         out = out.replace(re, replacement)
     })
-    return out
+    return toTitleCase(out).replaceAll("COVID 19", "COVID-19")
 }
 
 export function toTitleCase(str: string) {
-    return str.replace(/([A-Z])/g, " $1")
+    return str.replace(/([A-Z]+)/g, " $1")
         .replace(/[^a-zA-Z0-9]+/g, " ")
         .replace(/\b[a-z]/g, x => x.toUpperCase())
         .trim();
@@ -109,35 +109,32 @@ export function generateColors(count: number, saturation = 75, lightness = 50, v
     return colors;
 }
 
-export function stripValue<T=Record<string, any> | any[]>(o: T, needle: any): number {
-    let strips = 0
-
+export function stripValue<T=Record<string, any> | any[]>(o: T, needle: any): T {
     if (Array.isArray(o)) {
+        let out = []
         for (let i = 0; i < o.length; i++) {
             let value = o[i];
-            if (value === needle) {
-                o.splice(i, 1)
-                strips += 1
-                i -= 1
-            }
-            else if (value && typeof value === "object") {
-                strips += stripValue(o[i], needle)
+            if (value !== needle) {
+                out.push(
+                    value && typeof value === "object" ?
+                        stripValue(value, needle) :
+                        value
+                )
             }
         }
+        return out as T
     } else {
+        let out = {} as any
         for (let key in o) {
             let value = o[key];
-            if (value === needle) {
-                delete o[key]
-                strips += 1
-            }
-            else if (value && typeof value === "object") {
-                strips += stripValue(o[key], needle)
+            if (value !== needle) {
+                out[key] = value && typeof value === "object" ?
+                    stripValue(value, needle) :
+                    value
             }
         }
+        return out as T
     }
-
-    return strips
 }
 
 export function isEmptyObject(x: Record<string, any>): boolean {
@@ -159,37 +156,6 @@ export function forEach<T=Record<string, any>|any[]>(o: T, cb: (item: any, key: 
     }
 }
 
-export function objectDiff<T=Record<string, any>|any[]>(a: T, b: T): T {
-    
-    const isArray = Array.isArray(a);
-
-    let out = isArray ? [] as any[] : {} as Record<string, any>;
-
-    forEach(a, (value, key) => {
-        const valueA = value;
-        // @ts-ignore
-        const valueB = b[key];
-        const typeA  = Object.prototype.toString.call(valueA);
-        const typeB  = Object.prototype.toString.call(valueB);
-
-        if (typeA !== typeB) {
-            // @ts-ignore
-            out[key] = valueA
-        } else if (typeA === "[object Object]" || typeA === "[object Array]") {
-            const child = objectDiff(valueA, valueB)
-            if (!isEmptyObject(child)) {
-                // @ts-ignore
-                out[key] = child
-            }
-        } else if (valueA !== valueB) {
-            // @ts-ignore
-            out[key] = valueA
-        }
-    })
-
-    return out as T;
-}
-
 export function strip(
     a: Record<string, any> | any[],
     paths: string[],
@@ -205,10 +171,10 @@ export function strip(
             if (!paths.includes([..._path, "[]", key].join("."))) {
                 if (value && typeof value === "object") {
                     // @ts-ignore
-                    out[key] = strip(value, paths, [..._path, "[]"])
+                    out.push(strip(value, paths, [..._path, "[]"]))
                 } else {
                     // @ts-ignore
-                    out[key] = value
+                    out.push(value)
                 }
             }
         })
@@ -344,7 +310,25 @@ export function lengthToEm(length?: string, base = 16) {
     return 1
 }
 
-export function buildPermissionLabel({ user_group_id, role, user_id, permission, action, resource_id, resource, attribute }: app.Permission) {
+export function buildPermissionLabel({
+    user_group_id,
+    role,
+    user_id,
+    permission,
+    action,
+    resource_id,
+    resource,
+    attribute
+}: {
+    user_group_id?: app.Permission["user_group_id"]
+    role         ?: app.Permission["role"]
+    user_id      ?: app.Permission["user_id"]
+    permission    : app.Permission["permission"]
+    action        : app.Permission["action"]
+    attribute     : app.Permission["attribute"]
+    resource_id   : app.Permission["resource_id"]
+    resource      : app.Permission["resource"]
+}) {
     let label = "";
 
     if (user_group_id) {
@@ -356,7 +340,7 @@ export function buildPermissionLabel({ user_group_id, role, user_id, permission,
     }
 
     label += `${permission ? "" : " not"} allowed to ${action}`
-    label += attribute ? `the "${attribute}" attribute of` : ""
+    label += attribute ? ` the "${attribute}" attribute of` : ""
     label += resource_id ? ` ${resource}#${ resource_id }` : ` all ${resource}`
     return label;
 }
@@ -421,7 +405,7 @@ export function requestPermission({ user, resource, resource_id, action }: {
         let msg = role === "guest" ?
             "Guest" :
             `User${id > 0 ? `#${id}` : ""}(role="${role}")`;
-        msg += `${msg} needs at least one of the following permissions: "${tried.join('", "')}".`
+        msg += ` needs at least one of the following permissions: "${tried.join('", "')}".`
         console.info(msg)
         onReject(msg);
     }

@@ -37,10 +37,9 @@
     "sass": "^1.45.1",
     "sequelize": "^6.16.0",
     "slug": "^5.2.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.5.4",
-    "umzug": "^3.1.1",
-    "web-vitals": "^2.1.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2",
+    "umzug": "^3.1.1"
   },
   "scripts": {
     "build": "react-scripts build",
@@ -54,7 +53,7 @@
     "start:hmr": "PORT=$HMR_PORT react-scripts start dotenv_config_path=.env.development.local",
     "eject": "react-scripts eject",
     "test": "DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov ts-mocha -p test/tsconfig.json",
-    "test:frontend": "react-scripts test",
+    "test:frontend": "react-scripts test --watch --coverage",
     "test:server:watch": "nodemon -w backend -w test -e ts,json -x 'npm test'",
     "openapi:lint": "redocly lint backend/api.yaml",
     "openapi:build": "redocly build-docs backend/api.yaml --output=docs/api.html",

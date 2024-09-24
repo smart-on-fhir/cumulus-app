@@ -25,6 +25,7 @@ export declare module app {
         createdAt: string // Date
         updatedAt: string // Date
         permissions: string[]
+        status?: string
     }
 
     interface UserGroup {

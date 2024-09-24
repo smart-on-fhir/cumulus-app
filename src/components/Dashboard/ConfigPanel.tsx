@@ -235,7 +235,7 @@ export default function ConfigPanel({
                                     background: c,
                                     display: "inline-block",
                                     width: "8px",
-                                    height: "1.36em",
+                                    height: "1.3em",
                                     margin: "0 0.5px",
                                     boxShadow: "0 0 0 0.5px #0008 inset, 0 0 0 0.5px #FFF",
                                     verticalAlign: "top"
