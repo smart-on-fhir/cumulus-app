@@ -99,7 +99,8 @@ async function login(req: Request, res: Response) {
             email: user.get("email"),
             role : user.get("role"),
             remember,
-            permissions: Object.keys(permissions).filter(k => !!permissions[k])
+            permissions: Object.keys(permissions).filter(k => !!permissions[k]),
+            status: user.get("status")
         });
 
     } catch (ex) {

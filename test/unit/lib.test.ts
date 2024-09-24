@@ -8,6 +8,7 @@ import {
     uInt,
     wait
 } from "../../backend/lib"
+import { Request } from "express"
 
 
 describe("Lib", () => {
@@ -94,43 +95,43 @@ describe("Lib", () => {
     describe("getFindOptions", () => {
         it ("where", () => {
             expect(
-                getFindOptions({ query: { where: "a:5" }}).where
+                getFindOptions({ query: { where: "a:5" }} as unknown as Request).where
             ).to.deep.equal({a: 5})
             expect(
-                getFindOptions({ query: { where: "a:5,b:6" }}).where
+                getFindOptions({ query: { where: "a:5,b:6" }} as unknown as Request).where
             ).to.deep.equal({ a: 5, b: 6 })
             expect(
-                getFindOptions({ query: { where: "a:gt:5,b:6" }}).where
+                getFindOptions({ query: { where: "a:gt:5,b:6" }} as unknown as Request).where
             ).to.deep.equal({ a: { [Op.gt]: 5 }, b: 6 })
             expect(
-                getFindOptions({ query: { where: "a:5,b:x" }}).where
+                getFindOptions({ query: { where: "a:5,b:x" }} as unknown as Request).where
             ).to.deep.equal({ a: 5, b: "x" })
         })
 
         it("pick", () => {
             expect(
-                getFindOptions({ query: { pick: "a,b,c" }}).attributes
+                getFindOptions({ query: { pick: "a,b,c" }} as unknown as Request).attributes
             ).to.deep.equal({ include: ["a", "b", "c"] })
         })
 
         it("omit", () => {
             expect(
-                getFindOptions({ query: { omit: "a,b,c" }}).attributes
+                getFindOptions({ query: { omit: "a,b,c" }} as unknown as Request).attributes
             ).to.deep.equal({ include:[], exclude: ["a", "b", "c"] })
         })
 
         it ("order", () => {
             expect(
-                getFindOptions({ query: { order: "a,b:desc,c:asc" }}).order
+                getFindOptions({ query: { order: "a,b:desc,c:asc" }} as unknown as Request).order
             ).to.deep.equal([["a"], ["b", "desc"], ["c", "asc"]])
         })
 
         it ("offset", () => {
-            expect(getFindOptions({ query: { offset: 3 }}).offset).to.equal(3)
+            expect(getFindOptions({ query: { offset: 3 }} as unknown as Request).offset).to.equal(3)
         })
 
         it ("include", () => {
-            expect(getFindOptions({ query: { include: "t1:a1:c1|c2,t2:c3|c4" }}).include)
+            expect(getFindOptions({ query: { include: "t1:a1:c1|c2,t2:c3|c4" }} as unknown as Request).include)
                 .to.deep.equal([
                     { association: "t1", attributes: [ 'c1', 'c2' ], as: "a1" },
                     { association: "t2", attributes: [ 'c3', 'c4' ] }
@@ -138,12 +139,12 @@ describe("Lib", () => {
         })
 
         it ("limit", () => {
-            expect(getFindOptions({ query: { limit: "2" }}).limit).to.equal(2)
-            expect(getFindOptions({ query: { limit: "-2" }}).limit).to.be.undefined
+            expect(getFindOptions({ query: { limit: "2" }} as unknown as Request).limit).to.equal(2)
+            expect(getFindOptions({ query: { limit: "-2" }} as unknown as Request).limit).to.be.undefined
 
-            const result = getFindOptions({ query: { limit: "2,c:4", include: "c" }})
+            const result = getFindOptions({ query: { limit: "2,c:4", include: "c" }} as unknown as Request)
             expect(result.limit).to.equal(2)
-            expect(result.include).to.deep.equal([{ association: "c", separate: true, limit: 4 }])
+            expect(result.include).to.deep.equal([{ association: "c", separate: true, limit: 4 }] as unknown as Request)
         })
     })
 

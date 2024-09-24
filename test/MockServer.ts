@@ -103,11 +103,11 @@ export default class MockServer
                 }
         
                 if (mock.body) {
-                    res.send(
-                        mock.body && typeof mock.body == "object" ?
-                            JSON.stringify(mock.body) :
-                            mock.body
-                    );
+                    if (mock.body && typeof mock.body == "object") {
+                        res.json(mock.body)
+                    } else {
+                        res.send(mock.body)
+                    }
                 }
         
                 if (mock.file) {

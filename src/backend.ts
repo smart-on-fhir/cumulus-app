@@ -6,7 +6,7 @@ export async function request<T=any>(path: string, options: RequestInit = {}): P
     path = path.replace(/^\//, (process.env.REACT_APP_BACKEND_HOST || "") + "/");
     const res = await fetch(path, {
         mode: "cors",
-        credentials: "include",
+        credentials: "same-origin",
         ...options
     });
     
@@ -62,7 +62,6 @@ export const auth = {
             mode   : "cors",
             method : "POST",
             body   : JSON.stringify({ username, password, remember }),
-            credentials: "include",
             headers: {
                 "content-type": "application/json"
             }
