@@ -1,4 +1,4 @@
-import { sendDataRequest } from "../../services/mail"
+import { sendDataRequest } from "../../services/email"
 import { app }             from "../../.."
 import * as logger         from "../../services/logger"
 import BaseModel           from "./BaseModel"

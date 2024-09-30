@@ -11,7 +11,7 @@ COPY package-lock.json /app/package-lock.json
 
 # /app/backend, /app/build and /app/logs mounted as volumes
 
-RUN npm install
+RUN npm ci
 
 EXPOSE 80
 

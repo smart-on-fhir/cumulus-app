@@ -1,11 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "target": "es6",
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -13,15 +8,17 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "commonjs",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": false,
     "noEmit": true,
     "jsx": "react-jsx"
   },
+  "ts-node": {
+    "transpileOnly": true
+  },
   "include": [
-    ".",
-    "../backend"
+    "backend"
   ]
 }

@@ -159,3 +159,4 @@ backend/db/cumulus.db
 notes.txt
 backend/db/postgres-data
 trash/*
+backend/services/email/test.ts

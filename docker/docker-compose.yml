@@ -48,6 +48,7 @@ services:
       - API_KEYS=$API_KEYS
       - CUMULUS_ADMIN_EMAIL=$CUMULUS_ADMIN_EMAIL
       - REGIONAL_CLUSTER_EMAIL=$REGIONAL_CLUSTER_EMAIL
+      - APP_EMAIL_FROM=$APP_EMAIL_FROM
     volumes:
       - ../backend:/app/backend
       - ../build:/app/build

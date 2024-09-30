@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 import HTTP                     from "http"
 import Path                     from "path"
 import express, { Application } from "express"
