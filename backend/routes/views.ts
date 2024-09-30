@@ -6,7 +6,7 @@ import Model                    from "../db/models/View"
 import { route }                from "../lib/route"
 import { assert, bool }         from "../lib"
 import * as logger              from "../services/logger"
-import { requestLineLevelData } from "../services/mail"
+import { requestLineLevelData } from "../services/email"
 import { requestPermission }    from "../services/acl"
 import SystemUser               from "../SystemUser"
 import {
