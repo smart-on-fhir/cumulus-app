@@ -30,7 +30,7 @@ export default function LoadableSelect(props: LoadableSelectProps)
     }
 
     if (error) {
-        return <AlertError>{ error + "" }</AlertError>
+        return <AlertError className="form-control pl-2" style={{ margin: 0 }}>{ error + "" }</AlertError>
     }
 
     return (
