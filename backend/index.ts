@@ -59,6 +59,7 @@ function setupStaticContent(app: Application)
 {
     app.get("/favicon.ico", (req, res) => res.status(404).end());
     app.use(express.static(Path.join(__dirname, "../build/")));
+    app.get("/cumulus_library_columns.json", (req, res) => res.sendFile("cumulus_library_columns.json", { root: __dirname }));
     app.get("*", (req, res) => res.sendFile("index.html", { root: Path.join(__dirname, "../build/") }));
     logger.verbose("✔ Static content hosted");
 }
