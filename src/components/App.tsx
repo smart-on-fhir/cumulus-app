@@ -22,6 +22,7 @@ import { ContextMenu }                  from "./generic/Menu";
 import Tooltip                          from "./generic/Tooltip";
 import PermissionsManager               from "./Permissions";
 import UserGroups                       from "./UserGroups";
+import StudyBuilder                     from "./Study";
 import "../styles/main.scss";
 
 
@@ -70,6 +71,7 @@ export default function App()
                                 <Route path="users"          element={ <RequireAuth><Users /></RequireAuth> } />
                                 <Route path="permissions"    element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
                                 <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
+                                <Route path="study"          element={ <RequireAuth><StudyBuilder /></RequireAuth>} />
                                 
                                 <Route path="*" element="Page Not Found" />
                             </Route>
