@@ -47,11 +47,16 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
         path: req.url,
         headers: {
             Host: hostname,
-            "x-api-key": apiKey
+            "x-api-key": apiKey,
+            accept: "application/json"
         }
     }
 
-    https.get(requestOptions, aggRes => aggRes.pipe(res));
+    https.get(requestOptions, aggRes => {
+        res.header(aggRes.headers)
+        res.status(aggRes.statusCode!)
+        aggRes.pipe(res)
+    });
 }))
 
 export default router
