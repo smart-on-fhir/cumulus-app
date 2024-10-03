@@ -168,6 +168,7 @@ export default function SubscriptionView(): JSX.Element
                         <h5 className="color-blue-dark">Data Elements</h5>
                         <hr/>
                         <ColumnsTable cols={model.metadata?.cols} />
+                        <br/>
 
                         { model.metadata?.type === "flat" && <div className="mt-2"><DataViewer subscription={model} /></div> }
                     </div>
