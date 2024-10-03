@@ -1,6 +1,7 @@
-import React     from "react"
-import { app }   from "../../../types"
-import Highcharts from "../../../highcharts"
+import React                      from "react"
+import { DEFAULT_FONT_FAMILY }    from "../../Dashboard/config"
+import { app }                    from "../../../types"
+import Highcharts, { AlignValue } from "../../../highcharts"
 
 
 interface ChartProps {
@@ -82,9 +83,14 @@ export default class Chart extends React.Component<ChartProps>
                 height: Math.max(series.length * 80 + 20, 150),
                 backgroundColor: "transparent",
                 plotBackgroundColor: "#FFF",
-                plotShadow: true,
+                plotBorderColor: "#0002",
+                plotBorderWidth: 1,
+                plotShadow: {
+                    color: "#0003"
+                },
                 spacingTop: 20,
-                spacingRight: 3
+                spacingRight: 3,
+                spacingLeft: 1
             },
             credits: {
                 enabled: false
@@ -99,14 +105,7 @@ export default class Chart extends React.Component<ChartProps>
                 categories: series.map(s => s.site.name),
                 lineWidth: 0,
                 labels: {
-                    padding: 0,
-                    align: "right",
-                    style: {
-                        fontSize: "13px",
-                        fontWeight: "bold",
-                        width: 120,
-                        lineHeight: "15px"
-                    }
+                    enabled: false
                 },
                 plotBands: series.map((s, i) => {
                     return (!s.dataStart || !s.dataEnd || !s.lastUpdate) ?
@@ -179,7 +178,8 @@ export default class Chart extends React.Component<ChartProps>
                             text     : new Date(overlapStart).toLocaleDateString(),
                             rotation : 0,
                             y        : -8,
-                            textAlign: "center",
+                            x        : -8,
+                            textAlign: "left",
                             style: {
                                 color     : "#069C",
                                 fontWeight: "bold"
@@ -197,7 +197,8 @@ export default class Chart extends React.Component<ChartProps>
                             text     : new Date(overlapEnd).toLocaleDateString(),
                             rotation : 0,
                             y        : -8,
-                            textAlign: "center",
+                            x        : 8,
+                            textAlign: "right",
                             style: {
                                 color: "#069C",
                                 fontWeight: "bold"
@@ -253,12 +254,34 @@ export default class Chart extends React.Component<ChartProps>
                     data: series.map(s => ({
                         low: s.dataStart,
                         high: s.dataEnd,
-                        color: s.failed ? "rgba(255,170,0,0.7)" : "rgba(100,170,250,0.7)",
-                        borderColor: s.failed ? "rgb(220,0,0)" : "rgba(1, 1, 1, 0.5)",
+                        color: s.failed ? "rgba(255,170,0,0.7)" : "rgba(100,170,250,0.5)",
+                        borderColor: s.failed ? "rgb(220,0,0)" : "rgba(0, 0, 0, 0.3)",
                         custom: {
                             lastUpdate: s.lastUpdate,
                             failed: !!s.failed,
                             comment: s.comment
+                        },
+                        dataLabels: {
+                            enabled : true,
+                            align   : 'left' as AlignValue,
+                            color   : '#369',
+                            overflow: "allow",
+                            filter : {
+                                property: "y",
+                                operator: "<",
+                                value   : s.dataEnd
+                            },
+                            formatter() {
+                                return this.x
+                            },
+                            x: 10,
+                            style: {
+                                textOutline: "0 #FFFC",
+                                fontSize   : "16px ",
+                                fontFamily : DEFAULT_FONT_FAMILY,
+                                textShadow : "0px 0px 1px #FFF, 0.5px 0.5px 1px #FFF3",
+                                fontWeight : "600"
+                            }
                         }
                     })),
                     edgeWidth   : 0.5,
@@ -278,7 +301,6 @@ export default class Chart extends React.Component<ChartProps>
 
     componentDidMount() {
         const options = this.buildChartOptions()
-        console.log(this.props.transmissions, options)
         Highcharts.chart("transmission-chart", options);
     }
 
