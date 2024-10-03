@@ -14,13 +14,14 @@ export async function request<T=any>(path: string, options: RequestInit = {}): P
 
     let body = await res.text();
 
-    if (!res.ok) {
-        throw new HttpError(res.status, body || res.statusText)
-        // throw new Error(body || res.statusText)
-    }
-
     if (body.length && type.match(/\bjson\b/i)) {
         body = JSON.parse(body);
+    }
+
+    if (!res.ok) {
+        // @ts-ignore
+        throw new HttpError(res.status, body.message || body || res.statusText)
+        // throw new Error(body || res.statusText)
     }
 
     // @ts-ignore
