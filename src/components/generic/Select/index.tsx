@@ -18,6 +18,7 @@ export interface SelectProps {
     right?: boolean
     onChange: (value: any) => void
     title?: string
+    disabled?: boolean
 }
 
 export interface SelectOption {
@@ -35,7 +36,8 @@ export default function Select({
     value,
     onChange,
     right,
-    title
+    title,
+    disabled
 }: SelectProps)
 {
     const selectedIndex  = options.findIndex(opt => opt.value === value)
@@ -113,6 +115,7 @@ export default function Select({
             onMouseDown={ toggleMenu }
             title={ title }
             ref={ wrapper }
+            aria-disabled={ !!disabled }
         >
             <div className="select-component-value">{
                 selectedOption ?
