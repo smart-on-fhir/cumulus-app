@@ -32,5 +32,17 @@ drilldown(Highcharts)
 // heatmap(Highcharts)
 // venn(Highcharts)
 
+// Fix for zombie tooltip containers
+// See https://github.com/highcharts/highcharts/issues/18490
+Highcharts.wrap(Highcharts.Tooltip.prototype, 'hide', function(p, delay) {
+    // @ts-ignore
+    const tooltip = this;
+    if (tooltip.options.destroyWhenHiding) {
+        tooltip.destroy()
+    } else {
+        p(delay)
+    }
+});
+
 export * from "highcharts"
 export default Highcharts
