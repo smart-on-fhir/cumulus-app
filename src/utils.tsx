@@ -422,3 +422,14 @@ export function cachedPromise<T>(fn: () => Promise<T>) {
         return cache as Promise<T>
     }
 }
+
+export function assert(condition: any, error?: string | ErrorConstructor, ctor: any = Error): asserts condition {
+    if (!(condition)) {
+        if (typeof error === "function") {
+            throw new error()
+        }
+        else {
+            throw new ctor(error || "Assertion failed")
+        }
+    }
+}

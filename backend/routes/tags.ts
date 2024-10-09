@@ -93,7 +93,9 @@ route(router, {
                     "name",
                     "description",
                     "completed",
-                    "refresh"
+                    "refresh",
+                    "dataURL",
+                    "metadata"
                 ]
             })
         }

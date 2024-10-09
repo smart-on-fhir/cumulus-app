@@ -8,6 +8,7 @@ import Loader                     from "../generic/Loader"
 import { AlertError }             from "../generic/Alert"
 import SubscriptionForm           from "./form"
 import { app }                    from "../../types"
+import aggregator                 from "../../Aggregator"
 
 import "./form.scss";
 
@@ -23,15 +24,9 @@ export default function EditSubscriptionForm()
     const {
         loading: loadingData,
         error  : loadingSubscriptionGroupsError,
-        result : data
-    } = useBackend<{ groups: app.SubscriptionGroup[], sites: app.DataSite[] }>(
-        useCallback(
-            () => Promise.all([
-                request<app.SubscriptionGroup[]>("/api/request-groups"),
-                request<app.DataSite[]>("/api/data-sites")
-            ]).then(([groups, sites]) => ({ groups, sites })),
-            []
-        ),
+        result : groups
+    } = useBackend<app.SubscriptionGroup[]>(
+        useCallback(() => request<app.SubscriptionGroup[]>("/api/request-groups"), []),
         true
     );
 
@@ -41,10 +36,18 @@ export default function EditSubscriptionForm()
         error
     } = useBackend<app.Subscription>(
         useCallback(
-            () => request(`/api/requests/${id}?tags=true`).then(x => {
-                setState(x);
-                return x;
-            }),
+            async () => {
+                const subscription: app.SubscriptionWithPackage = await request(`/api/requests/${id}?tags=true`)
+                
+                // If package ID is set fetch the dataPackage for further info
+                if (subscription.dataURL) {
+                    const dataPackage = await aggregator.getPackage(subscription.dataURL)
+                    subscription.dataPackage = dataPackage
+                }
+
+                setState(subscription);
+                return subscription;
+            },
             [id]
         ),
         true
@@ -53,7 +56,7 @@ export default function EditSubscriptionForm()
     // Save (update) Subscription ----------------------------------------------
     const { execute: save, loading: saving, error: savingError } = useBackend(
         useCallback(
-            () => updateOne("requests", id + "", { ...state }).then(setState),
+            () => updateOne("requests", id + "", { ...state }).then(s => setState({ ...state, ...s })),
             [id, state]
         )
     );
@@ -88,11 +91,9 @@ export default function EditSubscriptionForm()
         );
     }
 
-    if (!data) {
-        return <AlertError><b>Error loading data</b></AlertError>;
+    if (!groups) {
+        return <AlertError><b>Error loading subscription groups</b></AlertError>;
     }
-
-    const { groups, sites } = data
 
     return (
         <div className="container">
@@ -125,15 +126,17 @@ export default function EditSubscriptionForm()
                     { deletingError && <AlertError><b>Error deleting subscription:</b> { deletingError + "" }</AlertError> }
                 </div>
             </div>
-            <SubscriptionForm
-                saveRequest={save}
-                deleteRequest={deleteRequest}
-                onChange={setState}
-                record={state}
-                subscriptionGroups={groups}
-                sites={sites}
-                working={ saving ? "saving" : deleting ? "deleting" : undefined }
-            />
+            { loading ?
+                <p><Loader msg="Loading Subscription..." /></p> :
+                <SubscriptionForm
+                    saveRequest={save}
+                    deleteRequest={deleteRequest}
+                    onChange={setState}
+                    record={state}
+                    subscriptionGroups={groups}
+                    working={ saving ? "saving" : deleting ? "deleting" : undefined }
+                />
+            }
         </div>
     )
 }

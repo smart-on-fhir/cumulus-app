@@ -232,7 +232,7 @@ route(router, {
             attributes: ["id", "name", "description", "createdAt"],
             include: {
                 association: "requests",
-                attributes : ["id", "name", "description", "refresh", "completed"],
+                attributes : ["id", "name", "description", "refresh", "completed", "dataURL", "metadata"],
                 right      : true
             },
             order: [["name", "asc"]],
