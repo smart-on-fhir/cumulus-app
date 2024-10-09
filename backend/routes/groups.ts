@@ -33,7 +33,9 @@ route(router, {
                 attributes: [
                     "id",
                     "name",
-                    "completed"
+                    "completed",
+                    "metadata",
+                    "dataURL"
                 ],
                 include: [
                     { association: "Views", attributes: ["name"] }
@@ -49,7 +51,9 @@ route(router, {
             attributes: [
                 "id",
                 "name",
-                "completed"
+                "completed",
+                "metadata",
+                "dataURL"
             ],
             include: [
                 { association: "Views", attributes: ["name"] }
@@ -97,7 +101,9 @@ route(router, {
                 attributes: [
                     "id",
                     "name",
-                    "completed"
+                    "completed",
+                    "metadata",
+                    "dataURL"
                 ]
             })
         }

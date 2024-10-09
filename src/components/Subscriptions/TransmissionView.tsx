@@ -1,7 +1,7 @@
 import React                      from "react"
-import { DEFAULT_FONT_FAMILY }    from "../../Dashboard/config"
-import { app }                    from "../../../types"
-import Highcharts, { AlignValue } from "../../../highcharts"
+import { DEFAULT_FONT_FAMILY }    from "../Dashboard/config"
+import { app }                    from "../../types"
+import Highcharts, { AlignValue } from "../../highcharts"
 
 
 interface ChartProps {
@@ -80,7 +80,7 @@ export default class Chart extends React.Component<ChartProps>
         return {
             chart: {
                 inverted: true,
-                height: Math.max(series.length * 80 + 20, 150),
+                height: Math.max(series.length * 50 + 20, 180),
                 backgroundColor: "transparent",
                 plotBackgroundColor: "#FFF",
                 plotBorderColor: "#0002",
@@ -89,8 +89,9 @@ export default class Chart extends React.Component<ChartProps>
                     color: "#0003"
                 },
                 spacingTop: 20,
+                spacingBottom: 50,
                 spacingRight: 3,
-                spacingLeft: 1
+                spacingLeft: 1,
             },
             credits: {
                 enabled: false
@@ -127,22 +128,49 @@ export default class Chart extends React.Component<ChartProps>
                             }
                         }
                     } : null
-                }).filter(Boolean) as any
+                }).filter(Boolean) as any,
+                min: -0.1,
+                max: series.length - 0.9,
+                angle: 0,
             },  
             yAxis: {
                 type          : "datetime",
-                offset        : 0,
+                // offset        : 0,
                 startOnTick   : false,
-                endOnTick     : false,
-                panningEnabled: true,
-                minPadding    : 0.02,
-                maxPadding    : 0.2,
+                // endOnTick     : false,
+                // panningEnabled: true,
+                // minPadding    : 0.02,
+                // maxPadding    : 0.2,
                 lineWidth     : 0,
-                lineColor     : "#999",
-                gridLineColor : "#EEE",
+                // lineColor     : "#999",
+                gridLineColor : "#0001",
                 gridLineWidth : 1,
+                // gridLineDashStyle: "Dash",
                 gridZIndex    : 0,
-                max           : Date.now() + 1000*60*60*24*100,
+                tickColor: "#0002",
+                tickLength: 10,
+                tickWidth: 1,
+                labels: {
+                    // rotation: 0,
+                    padding: 100,
+                    // autoRotation: false,
+                    // allowOverlap: true,
+                    reserveSpace: false,
+                    // distance: "10px",
+                    // step: 2
+                },
+                // angle: 0,
+                // max           : Date.now() + 1000*60*60*24*130,
+                dateTimeLabelFormats: {
+                    // millisecond: '%H:%M:%S.%L',
+                    // second: '%H:%M:%S',
+                    // minute: '%H:%M',
+                    // hour: '%H:%M',
+                    day: '%m/%d/%Y',
+                    week: '%m/%d/%Y',
+                    month: '%b %Y',
+                    year: '%Y'
+                },
                 title: {
                     text: ""
                 },
@@ -158,6 +186,7 @@ export default class Chart extends React.Component<ChartProps>
                         value: lastUpdate,
                         color: "#E00",
                         width: 2,
+                        zIndex: 4,
                         label: {
                             text : "LAST UPDATE",
                             style: {
@@ -174,12 +203,12 @@ export default class Chart extends React.Component<ChartProps>
                         color    : "#069A",
                         width    : 1,
                         dashStyle: "Dash",
+                        zIndex: 4,
                         label: {
                             text     : new Date(overlapStart).toLocaleDateString(),
                             rotation : 0,
                             y        : -8,
-                            x        : -8,
-                            textAlign: "left",
+                            textAlign: "center",
                             style: {
                                 color     : "#069C",
                                 fontWeight: "bold"
@@ -193,12 +222,12 @@ export default class Chart extends React.Component<ChartProps>
                         color    : "#069A",
                         width    : 1,
                         dashStyle: "Dash",
+                        zIndex   : 4,
                         label: {
                             text     : new Date(overlapEnd).toLocaleDateString(),
                             rotation : 0,
                             y        : -8,
-                            x        : 8,
-                            textAlign: "right",
+                            textAlign: "center",
                             style: {
                                 color: "#069C",
                                 fontWeight: "bold"
@@ -215,6 +244,8 @@ export default class Chart extends React.Component<ChartProps>
                 outside        : true,
                 followPointer  : true,
                 hideDelay      : 60,
+                // @ts-ignore
+                destroyWhenHiding: true,
                 pointFormatter() {
                     return String(
                         `<b style="font-size: 15px" class="color-blue-dark">${this.category}</b><hr/>` +
@@ -254,7 +285,7 @@ export default class Chart extends React.Component<ChartProps>
                     data: series.map(s => ({
                         low: s.dataStart,
                         high: s.dataEnd,
-                        color: s.failed ? "rgba(255,170,0,0.7)" : "rgba(100,170,250,0.5)",
+                        color: s.failed ? "rgba(255,170,0,0.7)" : "rgba(100,170,250,0.3)",
                         borderColor: s.failed ? "rgb(220,0,0)" : "rgba(0, 0, 0, 0.3)",
                         custom: {
                             lastUpdate: s.lastUpdate,
@@ -264,7 +295,7 @@ export default class Chart extends React.Component<ChartProps>
                         dataLabels: {
                             enabled : true,
                             align   : 'left' as AlignValue,
-                            color   : '#369',
+                            color   : '#1b5dab',
                             overflow: "allow",
                             filter : {
                                 property: "y",
@@ -288,8 +319,9 @@ export default class Chart extends React.Component<ChartProps>
                     borderWidth : 0.5,
                     borderRadius: 3,
                     pointPadding: 0.1,
-                    groupPadding: 0.05,
-                    showInLegend: false
+                    groupPadding: 0.0,
+                    showInLegend: false,
+                    animation   : false
                 }
             ]
         }

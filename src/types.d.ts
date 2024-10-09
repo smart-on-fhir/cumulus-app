@@ -192,6 +192,10 @@ export declare module app {
         StudyAreas?: StudyArea[]
     }
 
+    interface SubscriptionWithPackage extends app.Subscription {
+        dataPackage: DataPackage | null
+    }
+
     interface StudyArea {
         id: number
         name: string

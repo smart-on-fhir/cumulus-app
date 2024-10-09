@@ -16,15 +16,17 @@ import "./form.scss";
 export default function CreateSubscriptionForm()
 {
     const [ searchParams ] = useSearchParams()
-    const [ state, setState ] = useState<Partial<app.Subscription>>({
+    const [ state, setState ] = useState<Partial<app.SubscriptionWithPackage>>({
         groupId: +(searchParams.get("groupId") || 0) || undefined
     })
-    const [ savedRecord, setSavedRecord ] = useState<app.Subscription|null>(null)
+    const [ savedRecord, setSavedRecord ] = useState<app.SubscriptionWithPackage|null>(null)
 
     // onSubmit create new Subscription and redirect to its edit page
     const { execute: save, loading: saving, error: savingError } = useBackend(
         useCallback(async () => {
-            await createOne("requests", state as app.Subscription).then(setSavedRecord);
+            delete state.dataSourceType
+            delete state.dataPackage
+            await createOne("requests", state as app.Subscription).then(sub => setSavedRecord(sub as app.SubscriptionWithPackage));
         }, [state])
     );
 
@@ -32,15 +34,9 @@ export default function CreateSubscriptionForm()
     const {
         loading: loadingSubscriptionGroups,
         error: loadingSubscriptionGroupsError,
-        result: data
-    } = useBackend<{ groups: app.SubscriptionGroup[], sites: app.DataSite[] }>(
-        useCallback(
-            () => Promise.all([
-                request<app.SubscriptionGroup[]>("/api/request-groups"),
-                request<app.DataSite[]>("/api/data-sites")
-            ]).then(([groups, sites]) => ({ groups, sites })),
-            []
-        ),
+        result: groups
+    } = useBackend<app.SubscriptionGroup[]>(
+        useCallback(() => request<app.SubscriptionGroup[]>("/api/request-groups"), []),
         true
     );
 
@@ -56,11 +52,9 @@ export default function CreateSubscriptionForm()
         return <AlertError><b>Error loading subscription groups:</b> { loadingSubscriptionGroupsError + "" }</AlertError>
     }
 
-    if (!data) {
-        return <AlertError><b>Failed loading data</b></AlertError>
+    if (!groups) {
+        return <AlertError><b>Failed loading groups data</b></AlertError>
     }
-
-    const { groups, sites } = data;
 
     return (
         <div className="container">
@@ -87,7 +81,6 @@ export default function CreateSubscriptionForm()
                 onChange={setState}
                 record={state}
                 subscriptionGroups={groups}
-                sites={sites}
                 working={ saving ? "saving" : undefined }
             />
         </div>

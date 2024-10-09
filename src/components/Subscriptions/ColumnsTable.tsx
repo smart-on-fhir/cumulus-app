@@ -103,24 +103,26 @@ function CoddingValuesTable({
     const rows = remainder ? values.slice(0, limit) : values;
     return (
         <table className="nowrap">
-            <tr className="color-muted">
-                <th>Code</th>
-                <th>Display</th>
-                <th>{ rows.some(v => !!v.system) && "System" }</th>
-            </tr>
-            { rows.map((x, i) => (
-                <tr key={i}>
-                    <td className="color-green nowrap"><b>{ x.code }</b></td>
-                    <td>{ x.display }</td>
-                    <td>{ x.system && <a href={x.system} target="_blank" rel="noreferrer noopener" className="link">{x.system.split("/").pop()}</a> }</td>
+            <tbody>
+                <tr className="color-muted">
+                    <th>Code</th>
+                    <th>Display</th>
+                    <th>{ rows.some(v => !!v.system) && "System" }</th>
                 </tr>
-            )) }
-            { remainder > 0 && <tr>
-                <td colSpan={3}>
-                    <hr style={{ height: 1 }} />
-                    <div className="color-muted">{remainder} more values not shown...</div>
-                </td>
-            </tr>}
+                { rows.map((x, i) => (
+                    <tr key={i}>
+                        <td className="color-green nowrap"><b>{ x.code }</b></td>
+                        <td>{ x.display }</td>
+                        <td>{ x.system && <a href={x.system} target="_blank" rel="noreferrer noopener" className="link">{x.system.split("/").pop()}</a> }</td>
+                    </tr>
+                )) }
+                { remainder > 0 && <tr>
+                    <td colSpan={3}>
+                        <hr style={{ height: 1 }} />
+                        <div className="color-muted">{remainder} more values not shown...</div>
+                    </td>
+                </tr>}
+            </tbody>
         </table>
     )
 }
@@ -129,19 +131,21 @@ function CoddingValueTable({ value }: { value: CoddingValue })
 {
     return (
         <table className="nowrap">
-            <tr className="color-muted">
-                <th>Code</th>
-                <th>Display</th>
-                <th>{ !!value.system && "System" }</th>
-            </tr>
-            <tr>
-                <td className="color-green nowrap"><b>{ value.code }</b></td>
-                <td>{ value.display }</td>
-                <td>{
-                    value.system &&
-                    <a href={value.system} target="_blank" rel="noreferrer noopener" className="link">{value.system.split("/").pop()}</a>
-                }</td>
-            </tr>
+            <tbody>
+                <tr className="color-muted">
+                    <th>Code</th>
+                    <th>Display</th>
+                    <th>{ !!value.system && "System" }</th>
+                </tr>
+                <tr>
+                    <td className="color-green nowrap"><b>{ value.code }</b></td>
+                    <td>{ value.display }</td>
+                    <td>{
+                        value.system &&
+                        <a href={value.system} target="_blank" rel="noreferrer noopener" className="link">{value.system.split("/").pop()}</a>
+                    }</td>
+                </tr>
+            </tbody>
         </table>
     )
 }

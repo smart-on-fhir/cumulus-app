@@ -1,189 +1,20 @@
-import React              from "react"
-import { Link }           from "react-router-dom"
-import { Format }         from "../Format"
-import Panel              from "../generic/Panel"
-import Select             from "../generic/Select"
-import TagSelector        from "../Tags/TagSelector"
-import CheckboxList       from "../generic/CheckboxList"
-import DemographicsEditor from "./DemographicsEditor"
-import TransmissionEditor from "./Transmissions/TransmissionEditor"
-import EditorList         from "../generic/EditorList"
-import MarkdownEditor     from "../generic/MarkdownEditor"
-import { useAuth }        from "../../auth"
-// import { request }        from "../../backend"
-// import LoadableSelect     from "../generic/Select/DatasetSelect"
-import { app }            from "../../types"
+import React, { useCallback } from "react"
+import { Link }               from "react-router-dom"
+import DataPackageViewer      from "./DataPackageViewer"
+import { Format }             from "../Format"
+import Select                 from "../generic/Select"
+import TagSelector            from "../Tags/TagSelector"
+import MarkdownEditor         from "../generic/MarkdownEditor"
+import Loader                 from "../generic/Loader"
+import { AlertError }         from "../generic/Alert"
+import { useAuth }            from "../../auth"
+import { app }                from "../../types"
+import { humanizeColumnName } from "../../utils"
+import { useBackend }         from "../../hooks"
+import aggregator             from "../../Aggregator"
+import { DataPackage, Study } from "../../Aggregator"
+import "./form.scss"
 
-import "./form.scss";
-
-// const RE_URL = /^(http|https):\/\/[^ "]+$/;
-
-
-// FieldEditor =================================================================
-
-function FieldEditor({
-    field,
-    namePlaceHolder = "Name or code",
-    descriptionPlaceHolder = "Description",
-    onChange
-}: {
-    field: app.DataListItem
-    namePlaceHolder?: string
-    descriptionPlaceHolder?: string
-    onChange: (f: Partial<app.DataListItem>) => void
-})
-{
-    return (
-        <div className="row">
-            <div className="col col-3" style={{ paddingRight: "0.5em" }}>
-                <input
-                    type="text"
-                    placeholder={ namePlaceHolder }
-                    value={ field.name }
-                    onChange={ e => onChange({ name: e.target.value }) }
-                />
-            </div>
-            <div className="col">
-                <input
-                    type="text"
-                    placeholder={ descriptionPlaceHolder }
-                    value={ field.description || "" }
-                    onChange={ e => onChange({ description: e.target.value }) }
-                />
-            </div>
-        </div>
-    )
-}
-
-
-// FieldEditorList =============================================================
-
-interface FieldEditorListProps {
-    label                  : string
-    namePlaceHolder       ?: string
-    descriptionPlaceHolder?: string
-    list                   : app.DataListItem[]
-    onChange               : (list: app.DataListItem[]) => void
-}
-
-class FieldEditorList extends React.Component<FieldEditorListProps>
-{
-    add() {
-        this.props.onChange([ ...this.props.list, {
-            name: "",
-            description: ""
-        }]);
-    }
-
-    remove(index: number) {
-        const list = [ ...this.props.list ];
-        list.splice(index, 1)
-        this.props.onChange(list)
-    }
-
-    update(index: number, payload: Partial<app.DataListItem>) {
-        const list    = [ ...this.props.list ]
-        const oldItem = list[index]
-        const newItem = { ...oldItem, ...payload }
-        list.splice(index, 1, newItem)
-        this.props.onChange(list)
-    }
-
-    render() {
-        const { label, namePlaceHolder, descriptionPlaceHolder, list } = this.props
-
-        return (
-            <div className="field-editor-list">
-                <div className="row">
-                    <div className="col middle">
-                        <label>{ label } {  list.length > 0 && <b className="badge">{ list.length }</b> }</label>
-                    </div>
-                    <div className="col col-0 middle">
-                        <span className="btn small color-green btn-virtual" onClick={() => this.add()}>Add</span>
-                    </div>
-                </div>
-                <hr/>
-                { list.map((field, i) => (
-                    <div key={i} className="row half-gap">
-                        <div className="col">
-                            <FieldEditor
-                                field={field}
-                                onChange={x => this.update(i, x)}
-                                namePlaceHolder={namePlaceHolder}
-                                descriptionPlaceHolder={descriptionPlaceHolder}
-                            />
-                        </div>
-                        <div className="col col-0 middle">
-                            <span className="btn color-red" onClick={() => this.remove(i)}>
-                                <i className="fas fa-trash-alt"/>    
-                            </span>    
-                        </div>
-                    </div>
-                ))}
-                <div className={ list.length > 0 ? "mb-3" : "mb-2" } />
-            </div>
-        )
-    }
-}
-
-
-// FieldsEditor ================================================================
-interface FieldsEditorProps {
-    fields: {
-        labs         : app.DataListItem[]
-        diagnoses    : app.DataListItem[]
-        immunizations: app.DataListItem[]
-        medications  : app.DataListItem[]
-        procedures   : app.DataListItem[]
-        phenotypes   : app.DataListItem[]
-        demographics : app.DataListItem[]
-    },
-    onChange: (state: app.RequestedDataFields) => void
-}
-
-class FieldsEditor extends React.Component<FieldsEditorProps>
-{
-    constructor(props: FieldsEditorProps) {
-        super(props)
-        this.onChange = this.onChange.bind(this)
-    }
-
-    onChange(type: keyof app.RequestedDataFields, list: app.DataListItem[]) {
-        this.props.onChange({
-            ...this.props.fields,
-            [type]: list
-        })
-    }
-    
-    render()
-    {
-        const {
-            labs,
-            diagnoses,
-            immunizations,
-            medications,
-            procedures,
-            phenotypes,
-            demographics
-        } = this.props.fields
-
-        return (
-            <div>
-                <br/>
-                <FieldEditorList list={ labs          } onChange={ list => this.onChange("labs"         , list) } label="Labs" />
-                <FieldEditorList list={ diagnoses     } onChange={ list => this.onChange("diagnoses"    , list) } label="Diagnoses" />
-                <FieldEditorList list={ immunizations } onChange={ list => this.onChange("immunizations", list) } label="Immunizations" />
-                <FieldEditorList list={ medications   } onChange={ list => this.onChange("medications"  , list) } label="Medications" />
-                <FieldEditorList list={ procedures    } onChange={ list => this.onChange("procedures"   , list) } label="Procedures" />
-                <FieldEditorList list={ phenotypes    } onChange={ list => this.onChange("phenotypes"   , list) } label="Computable Phenotypes" />
-                <DemographicsEditor
-                    demographics={demographics}
-                    onChange={ demographics => this.onChange("demographics", demographics) }
-                />
-            </div>
-        )
-    }
-}
 
 export default function SubscriptionForm({
     saveRequest,
@@ -191,15 +22,13 @@ export default function SubscriptionForm({
     record = {},
     onChange,
     subscriptionGroups,
-    sites,
     working
 }: {
     saveRequest: () => void
     deleteRequest?: () => void
-    record?: Partial<app.Subscription>
-    onChange: (state: Partial<app.Subscription>) => void
+    record?: Partial<app.SubscriptionWithPackage>
+    onChange: (state: Partial<app.SubscriptionWithPackage>) => void
     subscriptionGroups: app.SubscriptionGroup[]
-    sites: app.DataSite[]
     working?: "deleting" | "saving"
 })
 {
@@ -221,46 +50,11 @@ export default function SubscriptionForm({
         name = "",
         description = "",
         groupId,
-        refresh = "manually"
+        dataURL = "",
+        dataPackage
     } = record
 
-    const dataURL = record.dataURL ?? ""
-    const dataSourceType = record.dataSourceType || (
-        dataURL?.startsWith("aggregator://") ?
-            "aggregator" :
-            dataURL ? "url" : "file"
-    );
-
-    let requestedData = record.requestedData || {
-        dataSites: [sites[0]] as app.DataListItem[],
-        fields: {
-            labs         : [] as app.DataListItem[],
-            diagnoses    : [] as app.DataListItem[],
-            immunizations: [] as app.DataListItem[],
-            medications  : [] as app.DataListItem[],
-            procedures   : [] as app.DataListItem[],
-            phenotypes   : [] as app.DataListItem[],
-            demographics : [] as app.DataListItem[],
-        }
-    } as app.RequestedData;
-
-    function toggleDataSite(site: app.DataSite) {
-        const sites = [...requestedData.dataSites];
-        const siteIndex = sites.findIndex(x => x.name === site.name)
-        if (siteIndex < 0) {
-            sites.push(site)
-        } else {
-            sites.splice(siteIndex, 1)
-        }
-
-        onChange({
-            ...record,
-            requestedData: {
-                ...requestedData,
-                dataSites: sites
-            }
-        })
-    }
+    const dataSourceType = record.dataSourceType || (dataURL ? "aggregator" : "file");
 
     return (
         <form onSubmit={ onSubmit }>
@@ -277,7 +71,7 @@ export default function SubscriptionForm({
             </div> }
             <div className="row gap-2 wrap">
                 
-                <div className="col col-6 mt-1 responsive">
+                <div className="col col-5 mt-1 responsive">
                     <div className="row gap middle">
                         <label className="col">Name</label>
                         <span className="col right color-muted small">Up to 100 characters&nbsp;</span>
@@ -323,7 +117,7 @@ export default function SubscriptionForm({
                     </div>
                 </div>
                 
-                <div className="col col-4 mt-1 mb-0 responsive">
+                <div className="col col-5 mt-1 mb-0 responsive">
                     <div className="row row-10 stretch">
                         <MarkdownEditor textarea={{
                             value: description || "",
@@ -335,197 +129,215 @@ export default function SubscriptionForm({
                 </div>
             </div>
 
-            <label className="row mt-2">Data Source</label>
-            <hr />
-
-            <div className="row gap mt-1 baseline">
-                
-                <div className="col col-3">
-                    <Select
-                        options={[
-                            {
-                                value: "file",
-                                icon: "fa-regular fa-file color-blue",
-                                label: (
-                                    <div>
-                                        <div>File</div>
-                                        <div className="color-muted small">Data is inserted by manually uploading a CSV or TSV file</div>
-                                    </div>
-                                )
-                            },
-                            {
-                                value: "url",
-                                icon: "fa-solid fa-earth-americas color-blue",
-                                label: (
-                                    <div>
-                                        <div>URL</div>
-                                        <div className="color-muted small">The application pulls the data from the provided URL</div>
-                                    </div>
-                                )
-                            },
-                            {
-                                value: "aggregator",
-                                icon: "fa-solid fa-network-wired color-blue",
-                                label: (
-                                    <div>
-                                        <div>Aggregator</div>
-                                        <div className="color-muted small">The application pulls the data from the Cumulus Aggregator</div>
-                                    </div>
-                                )
-                            }
-                        ]}
-                        value={dataSourceType}
-                        onChange={dataSourceType => onChange({ ...record, dataSourceType })}
-                    />
-                    {/* <LoadableSelect onChange={() => {}} load={async () => {
-                        // const res = await request("/api/aggregator/subscriptions")
-                        const res = await request("/api/aggregator/metadata/general_hospital/core")
-                        // console.log(res)
-                        const json = JSON.parse(res)
-                        return Object.keys(json).map((x: any, i: number) => ({
-                            label: x,
-                            value: i
-                        }))
-                    }}/> */}
-                </div>
-
-                {
-                    dataSourceType === "file" ?
-                        id ?
-                            <>
-                                <div className="col col-0">
-                                    <Link to={`/requests/${id}/import`} className="btn color-blue">Upload Data</Link>
-                                </div>
-                                <div className="col"/>
-                            </> :
-                            <div className="col">
-                                You can upload data once this subscription is saved 
-                            </div> :
-                        null
-                }
-
-                { dataSourceType === "url" && <div className="col col-4">
-                    <input type="url" placeholder="Data URL" required value={dataURL || ""} onChange={e => {
-                        onChange({ ...record, dataURL: e.target.value })
-                    }} />
-                </div> }
-                
-                { dataSourceType === "url" && 
-                    <div className="col">
+            { !id && <div className="mt-2 mb-1">
+                <div className="row gap wrap">
+                    <div className="col col-3 responsive middle mb-1">
+                        <label className="nowrap pt-0">Data Source</label>
                         <Select
-                            right
-                            placeholder="Please select"
-                            value={ refresh }
                             options={[
                                 {
-                                    value: "manually",
-                                    label: <div>
-                                        Refresh Manually
-                                        <div className="color-muted small">
-                                            Refresh on demand by clicking on dedicated
-                                            button in the subscription page
+                                    value: "file",
+                                    icon: "fa-regular fa-file color-blue",
+                                    label: (
+                                        <div>
+                                            <div>File</div>
+                                            <div className="color-muted small">Data is inserted by manually uploading a CSV or TSV file</div>
                                         </div>
-                                    </div>,
-                                    icon : "fa-solid fa-user-gear color-blue"
+                                    )
                                 },
                                 {
-                                    value: "yearly",
-                                    label: <div>Refresh Yearly<div className="color-muted small">1 year after the last refresh</div></div>,
-                                    icon: "/icons/date_3.png"
-                                },
-                                {
-                                    value: "monthly",
-                                    label: <div>Refresh Monthly<div className="color-muted small">1 month after the last refresh</div></div>,
-                                    icon : "/icons/date_3.png"
-                                },
-                                {
-                                    value: "weekly",
-                                    label: <div>Refresh Weekly<div className="color-muted small">7 days after the last refresh</div></div>,
-                                    icon : "/icons/date_3.png"
-                                },
-                                {
-                                    value: "daily",
-                                    label: <div>Refresh Daily<div className="color-muted small">24 hours after the last refresh</div></div>,
-                                    icon : "/icons/date_3.png"
+                                    value: "aggregator",
+                                    icon: "fa-solid fa-network-wired color-blue",
+                                    label: (
+                                        <div>
+                                            <div>Aggregator</div>
+                                            <div className="color-muted small">The application pulls the data from the Cumulus Aggregator</div>
+                                        </div>
+                                    )
                                 }
                             ]}
-                            onChange={value => {
-                                onChange({ ...record, refresh: value })
-                            }}
+
+                            disabled={ !!record.id }
+                            value={dataSourceType}
+                            onChange={dataSourceType => onChange({
+                                ...record,
+                                dataSourceType,
+                                dataURL: dataSourceType === "file" ? undefined : record.dataSourceType,
+                                dataPackage: dataSourceType === "file" ? undefined : record.dataPackage
+                            })}
                         />
                     </div>
-                }
-            </div>
-
-            <div className="row gap-2 mt-2 wrap">
-                <div className="col col-6 mb-2 responsive">
-                    <h4>Data Elements</h4>
-                    <hr/>
-                    <FieldsEditor fields={requestedData.fields} onChange={ fields => onChange({
-                        ...record,
-                        requestedData: {
-                            ...requestedData,
-                            fields
-                        }
-                    }) }/>
-                </div>
-                <div className="col col-4 mb-2 responsive">
-                    <Panel title="Included Healthcare Sites" menu={[
-                        <Link to="/sites">Manage Healthcare Sites</Link>
-                    ]}>
-                        <CheckboxList
-                            items={ sites }
-                            toggle={ item => toggleDataSite(item as app.DataSite) }
-                            isSelected={ item => !!requestedData.dataSites.find(x => x.id === item.id) }
-                        />
-                    </Panel>
-
-                    <br />
-                    <EditorList
-                        label="Transmission History"
-                        list={ record.transmissions || [] }
-                        onAdd={() => ({})}
-                        onChange={ transmissions => onChange({ ...record, transmissions }) }
-                        editor={ (data, onChange) => (
-                            <TransmissionEditor
-                                data={ data }
-                                onChange={ onChange }
-                                sites={ sites }
-                            />
-                        )}
-                    />
-                </div>
-            </div>
-
-            <hr/>
-
-            <div className="row gap">
-                { id && canDelete && <>
-                    <div className="col">
-                        <div className="row gap">
-                            { deleteRequest &&
-                                <div className="col mt-1 mb-1">
-                                    <button className="btn color-red" type="button" onClick={deleteRequest}>
-                                        { working === "deleting" && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
-                                        Delete Subscription
-                                    </button>
-                                </div>
-                            }
+                    { dataSourceType === "file" && <div className="col col-7 responsive middle mb-1">
+                        <label className="nowrap pt-0">&nbsp;</label>
+                        <div>
+                            <i className="fas fa-info-circle" />&nbsp;You can upload a CSV or TSV file once this subscription is saved
                         </div>
-                    </div>
-                    <div className="col"/>
-                </> }
+                    </div> }
+                    { dataSourceType === "aggregator" && <DataSourceSelector onChange={onChange} subscription={record} /> }
+                </div>
+            </div> }
 
-                { !id && <div className="col"/> }
-                { canUpdate && <div className="col mt-1 mb-1">
-                    <button className="btn btn-green" type="submit">
+            { id && dataURL && <div className="mb-1 mt-2">
+                <div className="row gap wrap">
+                    <DataSourceSelector onChange={onChange} subscription={record} />
+                </div>
+            </div> }
+
+            { dataPackage && <DataPackageViewer {...dataPackage} /> }
+
+            <hr className="mt-1"/>
+
+            <div className="center">
+                { id && canDelete && deleteRequest &&
+                    <button className="btn color-red pl-1 pr-1 m-1" style={{ minWidth: "11em" }} type="button" onClick={deleteRequest}>
+                        { working === "deleting" && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
+                        Delete Subscription
+                    </button>
+                }
+                { canUpdate && 
+                    <button className="btn btn-green pl-1 pr-1 m-1" style={{ minWidth: "11em" }} type="submit">
                         { working === "saving" && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
                         { id ? "Save Changes" : "Create Subscription" }
                     </button>
-                </div> }
-                { !id && <div className="col"/> }
+                }
             </div>
             
         </form>
+    )
+}
+
+function DataSourceSelector({
+    subscription,
+    onChange
+}: {
+    onChange: (data: Partial<app.Subscription>) => void
+    subscription: Partial<app.Subscription>
+}) {
+    const dataUrl = subscription.dataURL || ""
+    const [_study, _pkg, _version] = dataUrl.split("__")
+
+    const { loading, error, result } = useBackend<{ dataPackages: DataPackage[], studies: Study[] }>(
+        useCallback(async () => {
+            return Promise.all([
+                aggregator.getPackages(),
+                aggregator.getStudies()
+            ]).then(([dataPackages, studies]) => ({ dataPackages, studies }))
+        }, []),
+        true
+    );
+
+    if (loading) {
+        return <div className="col col-7 responsive middle mb-1">
+            <label className="nowrap pt-0">&nbsp;</label>
+            <Loader msg="Loading aggregator data..." />
+        </div>
+    }
+
+    if (error) {
+        return <div className="col col-7 responsive middle mb-1 color-red">
+            <label className="nowrap pt-0">&nbsp;</label>
+            <div><i className="fa-regular fa-circle-xmark" />&nbsp;{ error + "" }</div>
+        </div>
+    }
+
+    if (!result) {
+        return <AlertError className="form-control pl-2" style={{ margin: 0 }}>Failed getting aggregator data</AlertError>
+    }
+
+    const packages = result.dataPackages.filter(p => p.study === _study).reduce((prev, cur) => {
+        if (!prev.find(p => p.name === cur.name)) {
+            prev.push(cur)
+        }
+        return prev
+    }, [] as DataPackage[])
+
+    const versions = packages.filter(p => p.name === _pkg).map(p => p.version).sort((a, b) => b.localeCompare(a))
+
+    function getLatestVersion(pkgName: string) {
+        return packages.filter(p => p.name === pkgName).map(p => p.version).sort((a, b) => b.localeCompare(a)).shift()
+    }
+
+    function update({
+        study,
+        pkg,
+        version
+    }: {
+        study  ?: string
+        pkg    ?: string
+        version?: string
+    }) {
+        study   = study ?? _study
+        pkg     = pkg   ?? _pkg
+
+        const payload: Partial<app.SubscriptionWithPackage> = {
+            ...subscription,
+            dataURL: `${study}__${pkg}__${version ?? ""}`
+        }
+
+        // const selectedPackage = result?.dataPackages.find(p => p.id === payload.dataURL)
+        const selectedPackage = result?.dataPackages.find(p => p.study === study && p.name === pkg && p.version === version)
+        if (selectedPackage) {
+            payload.metadata = {
+                total: +selectedPackage.total,
+                type : "cube",
+                cols : Object.keys(selectedPackage.columns).map(name => {
+                    let type = String(selectedPackage.columns[name])
+                        .replace("year" , "date:YYYY")
+                        .replace("month", "date:YYYY-MM")
+                        .replace("week" , "date:YYYY-MM-DD")
+                        .replace("day"  , "date:YYYY-MM-DD") as app.supportedDataType;
+    
+                    return {
+                        name,
+                        label      : humanizeColumnName(name),
+                        description: humanizeColumnName(name),
+                        dataType   : type
+                    }
+                })
+            }
+            payload.dataPackage = selectedPackage
+            payload.completed = selectedPackage.last_data_update
+        } else {
+            payload.metadata = null
+            payload.dataPackage = null
+            payload.completed = null
+        }
+        onChange(payload)
+    }
+
+
+    return (
+        <>
+            <div className="col col-2 responsive middle mb-1">
+                <label className="nowrap pt-0">Study</label>
+                <select value={_study} onChange={e => {
+                    update({ study: e.target.value, pkg: "", version: "" })
+                }}>
+                    <option value="">Please Select</option>
+                    { result.studies.map((s, i) => (
+                        <option key={i} value={s.id}>📦 {s.label}</option>
+                    )) }
+                </select>
+            </div>
+            <div className="col col-3 responsive middle mb-1">
+                <label className="nowrap pt-0">Data Package</label>
+                <select disabled={!_study} value={_pkg} onChange={e => {
+                    update({ pkg: e.target.value, version: getLatestVersion(e.target.value) })
+                }}>
+                    <option value="">Please Select</option>
+                    { packages.map((p, i) => (
+                        <option key={i} value={p.name}>📔 {humanizeColumnName(p.name)}</option>
+                    )) }
+                </select>
+            </div>
+            <div className="col col-2 responsive middle mb-1">
+                <label className="nowrap pt-0">Version</label>
+                <select disabled={!_pkg} value={_version} onChange={e => update({ version: e.target.value })} placeholder="test">
+                    { _pkg ? versions.map((v, i) => (
+                        <option key={i} value={v}>📑 {v}</option>
+                    )) : <option value="">Please Select</option> }
+                </select>
+            </div>
+        </>
     )
 }
