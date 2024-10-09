@@ -20,7 +20,7 @@ export async function request<T=any>(path: string, options: RequestInit = {}): P
 
     if (!res.ok) {
         // @ts-ignore
-        throw new HttpError(res.status, body.message || body || res.statusText)
+        throw new HttpError(res.status, body?.message || body || res.statusText)
         // throw new Error(body || res.statusText)
     }
 
