@@ -1,6 +1,7 @@
 import React, { useCallback } from "react"
 import { Link }               from "react-router-dom"
 import DataPackageViewer      from "./DataPackageViewer"
+import PackageVersionCheck    from "./PackageVersionCheck"
 import { Format }             from "../Format"
 import Select                 from "../generic/Select"
 import TagSelector            from "../Tags/TagSelector"
@@ -183,6 +184,8 @@ export default function SubscriptionForm({
                 </div>
             </div> }
 
+            { dataPackage && <div><PackageVersionCheck pkgId={dataPackage.id} /></div> }
+
             { dataPackage && <DataPackageViewer {...dataPackage} /> }
 
             <hr className="mt-1"/>
@@ -244,7 +247,9 @@ function DataSourceSelector({
         return <AlertError className="form-control pl-2" style={{ margin: 0 }}>Failed getting aggregator data</AlertError>
     }
 
-    const packages = result.dataPackages.filter(p => p.study === _study).reduce((prev, cur) => {
+    const packages = result.dataPackages.filter(p => p.study === _study)
+
+    const uniquePackages = packages.reduce((prev, cur) => {
         if (!prev.find(p => p.name === cur.name)) {
             prev.push(cur)
         }
@@ -325,7 +330,7 @@ function DataSourceSelector({
                     update({ pkg: e.target.value, version: getLatestVersion(e.target.value) })
                 }}>
                     <option value="">Please Select</option>
-                    { packages.map((p, i) => (
+                    { uniquePackages.map((p, i) => (
                         <option key={i} value={p.name}>📔 {humanizeColumnName(p.name)}</option>
                     )) }
                 </select>

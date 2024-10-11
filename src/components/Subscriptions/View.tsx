@@ -17,6 +17,7 @@ import { request }                 from "../../backend"
 import { useBackend }              from "../../hooks"
 import { app }                     from "../../types"
 import aggregator, { DataPackage } from "../../Aggregator"
+import PackageVersionCheck         from "./PackageVersionCheck"
 
 
 export default function SubscriptionView(): JSX.Element
@@ -53,6 +54,8 @@ export default function SubscriptionView(): JSX.Element
     }
 
     const isFlatData = model.metadata?.type === "flat"
+
+    const canHaveCharts = !isFlatData && (model.dataURL || model.completed)
 
     return (
         <div className="container">
@@ -131,6 +134,8 @@ export default function SubscriptionView(): JSX.Element
 
                         <br />
 
+                        { model.dataURL && <PackageVersionCheck pkgId={model.dataURL} /> }
+
                         { dataPackage ?
                             <DataPackageViewer { ...dataPackage } /> :
                             model.metadata?.cols ?
@@ -146,7 +151,7 @@ export default function SubscriptionView(): JSX.Element
                         { model.metadata?.type === "flat" && <div className="mt-2"><DataViewer subscription={model} /></div> }
                     </div>
                 </div>
-                { !isFlatData && 
+                { canHaveCharts && 
                     <div className="col col-4 responsive" style={{ minWidth: "20rem" }}>
                         { (model.completed || model.dataURL) && <>
                             <h5 className="color-blue-dark">Dependent Graphs</h5>

@@ -1,10 +1,47 @@
-import { Link }      from "react-router-dom"
-import { highlight } from "../../utils"
-import { Format }    from "../Format"
-import { app }       from "../../types"
-import { ToggleFavorite } from "../../commands/ToggleFavorite"
-import { useCommand } from "../../hooks"
+import { useEffect, useState }           from "react"
+import { Link }                          from "react-router-dom"
+import { Format }                        from "../Format"
+import { highlight }                     from "../../utils"
+import { app }                           from "../../types"
+import { useCommand }                    from "../../hooks"
+import aggregator, { humanizePackageId } from "../../Aggregator"
+import { ToggleFavorite }                from "../../commands/ToggleFavorite"
 
+
+function Icon({ subscription }: { subscription: app.Subscription }) {
+
+    const { dataURL } = subscription
+
+    const [version, setVersion] = useState<string | null>(null)
+    
+    useEffect(() => {
+        if (dataURL) {
+            aggregator.getLatestPackageId(dataURL).then(setVersion)
+        }
+    }, [dataURL])
+
+    if (dataURL && version !== null && version !== dataURL) {
+        if (version === "") {
+            return <span className="material-symbols-outlined color-red" data-tooltip="Remote data package no longer exists!">database_off</span>
+        }
+        return <span className="material-symbols-outlined color-orange"
+            data-tooltip={ `<div class="center">Subscription can be upgraded to package <b>${humanizePackageId(version)}</b></div>` }>database_upload</span>
+    }
+
+    if (subscription.metadata?.type === "flat") {
+        return <span className="material-symbols-outlined color-blue">table</span>
+    }
+
+    if (dataURL) {
+        return <span className="material-symbols-outlined color-blue">database</span>
+    }
+
+    if (subscription.completed) {
+        return <span className="material-symbols-outlined color-blue">news</span>
+    }
+    
+    return <span className="material-symbols-outlined">overview</span>
+}
 
 export default function SubscriptionLink({
     request,
@@ -27,13 +64,7 @@ export default function SubscriptionLink({
             e.nativeEvent.menuItems = [toggleFavorite]
         }}>
             <div className="icon">
-                { request.metadata?.type === "flat" ?
-                    <span className="material-symbols-outlined color-blue">table</span> :
-                    !!request.dataURL ?
-                        <span className="material-symbols-outlined color-blue">database</span> :
-                        request.completed ?
-                            <span className="material-symbols-outlined color-blue">news</span> :
-                            <span className="material-symbols-outlined">overview</span> }
+                <Icon subscription={request} />
                 { on && <i className="fa-solid fa-star star"/> }
             </div>
             <b className="nowrap">
