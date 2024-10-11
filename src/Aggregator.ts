@@ -58,6 +58,28 @@ export class AggregatorError extends Error {
     }
 }
 
+function filter<T>(data: T[], props: Partial<T>): T[] {
+    return data.filter(x => {
+        for (const propName in props) {
+            if (props[propName] !== x[propName]) return false
+        }
+        return true
+    })
+}
+
+function packageColumnsChanged(pkg1: DataPackage, pkg2: DataPackage) {
+    if (pkg1.column_types_format_version !== pkg2.column_types_format_version) return true
+    if (Object.keys(pkg1.columns).length !== Object.keys(pkg2.columns).length) return true
+    const a = Object.keys(pkg1.columns).map(x => `${x}:${pkg1.columns[x]}`).sort()
+    const b = Object.keys(pkg2.columns).map(x => `${x}:${pkg1.columns[x]}`).sort()
+    return JSON.stringify(a) !== JSON.stringify(b)
+}
+
+export function humanizePackageId(id: string) {
+    const [study, name, version] = id.trim().split("__")
+    return `${humanizeColumnName(study)}/${humanizeColumnName(name)}/${version}`
+}
+
 class Aggregator
 {
     private cache: Record<string, any> = {}
@@ -130,8 +152,40 @@ class Aggregator
         // return this.fetch(`/api/aggregator/data_packages/${id}`)
     }
 
-    public synchronize() {
-        // 1. Know when we updated last
+    public async filterPackages(props: Partial<DataPackage>): Promise<DataPackage[]> {
+        let out = await this.getPackages()
+        return filter(out, props)
+    }
+
+    public async getLatestPackageId(pkgId: string) {
+        const pkg = await this.getPackage(pkgId)
+
+        if (!pkg) {
+            return "" // PACKAGE_NO_LONGER_AVAILABLE
+        }
+
+        const allPackages = await this.getPackages()
+        const allVersions = filter(allPackages, { study: pkg.study, name: pkg.name })
+
+        if (!allVersions.some(x => x.version === pkg.version)) {
+            return "" // PACKAGE_NO_LONGER_AVAILABLE
+        }
+
+        allVersions.sort((a, b) => b.version.localeCompare(a.version))
+        
+        for (let i = 0; i < allVersions.length; i++) {
+            let current = allVersions[i];
+            if (current.version <= pkg.version) {
+                return pkg.id; // "PACKAGE_UP_TO_DATE"
+            }
+
+            // if we are here, we have a newer version. Check the structure now
+            if (!packageColumnsChanged(current, pkg)) {
+                return current.id // UPDATE POSSIBLE
+            }
+        }
+
+        return pkg.id; // "PACKAGE_UP_TO_DATE"
     }
 }
 

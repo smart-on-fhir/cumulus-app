@@ -61,6 +61,14 @@
         }
     }
 
+    .sync-notes {
+        grid-column: 1 / 6;
+        background: #FFEFCF;
+        padding: 1em 1.5em;
+        border-color: #9002;
+        font-weight: bold;
+    }
+
     .study-areas {
         display: grid;
         grid-row: 1;
@@ -113,12 +121,10 @@
     }
 
     .subscriptions {
-        grid-row: 3;
         grid-column: 1 / 4;
     }
 
     .sites {
-        grid-row: 3;
         grid-column: 4 / 6;
     }    
 }
@@ -157,13 +163,15 @@
             }
         }
 
+        .sync-notes {
+            grid-column: 1 / 1;
+        }
+
         .subscriptions {
-            grid-row: 3;
             grid-column: 1 / 1;
         }
 
         .sites {
-            grid-row: 4;
             grid-column: 1 / 1;
         } 
     }
