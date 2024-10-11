@@ -32,7 +32,7 @@ export default class Tooltip extends Component<any> {
             }
 
             // @ts-ignore
-            this.tooltip.current.firstChild!.innerText = el.getAttribute("data-tooltip") ?? ""
+            this.tooltip.current.firstChild!.innerHTML = el.getAttribute("data-tooltip") ?? ""
 
             this.positionTooltip(el)
             this.tooltip.current.style.opacity = "1"
