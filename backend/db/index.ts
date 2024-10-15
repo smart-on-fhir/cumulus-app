@@ -6,7 +6,6 @@ import { getDockerContainer }              from "./Docker"
 import * as logger                         from "../services/logger"
 import { attachHooks, init as initModels } from "./models"
 import { seedTable }                       from "./seeds/lib"
-import { runScheduler }                    from "../services/Scheduler"
 
 
 let connection: Sequelize;
@@ -158,8 +157,6 @@ export default async function setupDB(options: Config): Promise<Sequelize>
     await applySeeds(options, connection)
 
     attachHooks(connection)
-
-    runScheduler();
     
     return connection;
 }
