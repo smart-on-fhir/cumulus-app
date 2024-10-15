@@ -1,3 +1,4 @@
+import { Fragment }       from "react"
 import { Link }           from "react-router-dom"
 import Alert              from "../generic/Alert"
 import { createListPage } from "../generic/EndpointListWrapper"
@@ -7,6 +8,13 @@ import { useAuth }        from "../../auth"
 import { app }            from "../../types"
 import { ellipsis }       from "../../utils"
 import "../generic/EndpointListTable.scss"
+
+function MarkdownPreview({ markdown, maxLen=70 }: { markdown: string, maxLen?: number }) {
+    let i = 0;
+    return <Markdown options={{
+        createElement: (tag, props, ...children) => <Fragment key={ i++ }>{children} </Fragment>
+    }}>{ ellipsis(markdown || "", maxLen) }</Markdown>
+}
 
 export default function SubscriptionGroupList()
 {
@@ -47,7 +55,7 @@ export default function SubscriptionGroupList()
                                     <tr key={i}>
                                         <td>{row.id}</td>
                                         <td><Link title={row.name} to={"./" + row.id} className="link">{row.name}</Link></td>
-                                        <td className="color-muted"><Markdown options={{createElement: (tag, props, ...children) => <>{children} </>}}>{ ellipsis(row.description || "", 70) }</Markdown></td>
+                                        <td className="color-muted"><MarkdownPreview markdown={row.description || ""} maxLen={70} /></td>
                                         <IfAllowed showError={false} permissions="SubscriptionGroups.update" element={ <td className="right nowrap">
                                             <Link title="Edit" className="btn small color-brand-2 btn-virtual" to={ row.id + "/edit" }>
                                                 <i className="fa-solid fa-pen-to-square" />

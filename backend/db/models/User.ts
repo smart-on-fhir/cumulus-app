@@ -43,7 +43,7 @@ export default class User extends BaseModel<InferAttributes<User>, InferCreation
     declare name          : CreationOptional<string | null>;
     declare password      : CreationOptional<string | null>;
     declare sid           : CreationOptional<string | null>;
-    declare lastLogin     : CreationOptional<Date>;
+    declare lastLogin     : CreationOptional<Date   | null>;
     declare activationCode: CreationOptional<string | null>;
     declare invitedBy     : CreationOptional<string | null>;
     declare status        : CreationOptional<string | null>;
@@ -161,7 +161,8 @@ export default class User extends BaseModel<InferAttributes<User>, InferCreation
             
             // Last login datetime (automatically updated on login)
             lastLogin: {
-                type: DataTypes.DATE
+                type: DataTypes.DATE,
+                allowNull: true
             },
 
             status: {

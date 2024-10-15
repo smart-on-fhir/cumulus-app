@@ -781,28 +781,22 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                             shareCommand={shareCommand}
                         />
 
-                        { viewType === "data" && <>
-                            <div className="tab-panel mt-1">
-                                <span onClick={() => dispatch({ type: "UPDATE", payload: { dataTabIndex: 0 }})} className={"tab" + (dataTabIndex === 0 ? " active" : "")}>Primary Data</span>
-                                <span onClick={() => dispatch({ type: "UPDATE", payload: { dataTabIndex: 1 }})} className={"tab" + (dataTabIndex === 1 ? " active" : "")}>Secondary Data</span>
-                            </div>
-                            { viewType === "data" && dataTabIndex === 0 && <div className="data-view">{ Json(data ) }</div> }
-                            { viewType === "data" && dataTabIndex === 1 && <div className="data-view">{ Json(data2) }</div> }
-                        </> }
-
                         { !viewColumn && viewType === "overview" && (
                             <AlertError>
                                 It looks like the data source has been updated and this view is no longer compatible
                                 with the new data. Please edit this view or delete it and create new one.
                             </AlertError>
                         ) }
+                        
                         { viewType === "overview" && turbo && (
                             <Alert color="orange" className="mb-1" icon="fa-solid fa-circle-exclamation">
                                 The data is too big to render properly in the chart view. We did our best but there might be some issues.
                                 Please change your settings and perhaps add some filters to reduce the data size.
                             </Alert>
                         ) }
-                        { loadingDataError && <AlertError><b>Error loading data:</b> { loadingDataError + "" }</AlertError> }
+                        
+                        { loadingDataError && <AlertError style={{ marginTop: 0 }}><b>Error loading data:</b> { loadingDataError + "" }</AlertError> }
+                        
                         { viewGroupBy?.name && state.denominator === "count" && filters.some(f => f.left === viewGroupBy.name) && (
                             <Alert color="orange" className="mb-1" icon="fa-solid fa-circle-exclamation">
                                 <div style={{ fontFamily: "sans-serif" }}>
@@ -815,6 +809,16 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                                 </div>
                             </Alert>
                         )}
+
+                        { viewType === "data" && <>
+                            <div className="tab-panel">
+                                <span onClick={() => dispatch({ type: "UPDATE", payload: { dataTabIndex: 0 }})} className={"tab" + (dataTabIndex === 0 ? " active" : "")}>Primary Data</span>
+                                <span onClick={() => dispatch({ type: "UPDATE", payload: { dataTabIndex: 1 }})} className={"tab" + (dataTabIndex === 1 ? " active" : "")}>Secondary Data</span>
+                            </div>
+                            { viewType === "data" && dataTabIndex === 0 && <div className="data-view">{ Json(data ) }</div> }
+                            { viewType === "data" && dataTabIndex === 1 && <div className="data-view">{ Json(data2) }</div> }
+                        </> }
+
                         { viewColumn && viewType === "overview" && <BaseChart
                             loading={ loadingData }
                             options={ state.chartOptions }
