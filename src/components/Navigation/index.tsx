@@ -84,6 +84,7 @@ export default function Navigation()
                         { canReadUsers && <NavLink to="/users" end><i className="icon fa-solid fa-users" /> Users</NavLink> }
                         { canReadUserGroups && <NavLink to="/user-groups" end><i className="icon fa-solid fa-user-friends" /> User Groups</NavLink> }
                         { canManagePermissions && <NavLink to="/permissions" end><i className="icon fa-solid fa-shield" /> Permissions</NavLink> }
+                        <NavLink to="/health-check" end><i className="icon fa-solid fa-stethoscope" /> Health Check</NavLink>
                     </NavGroup>
                 )}
 

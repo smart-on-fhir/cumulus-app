@@ -5,7 +5,8 @@ import {
     Op,
     Order,
     Sequelize,
-    IncludeOptions
+    IncludeOptions,
+    QueryTypes
 } from "sequelize"
 
 
@@ -360,4 +361,22 @@ export function parseDbUrl(url: string) {
         out.query[key] = value
     });
     return out
+}
+
+export async function tableExists(connection: Sequelize, tableName: string) {
+    const result = await connection.query(
+        `SELECT EXISTS (
+          SELECT 1
+          FROM information_schema.tables 
+          WHERE table_schema = 'public' 
+          AND table_name = :tableName
+        )`,
+        {
+          replacements: { tableName },
+          type: QueryTypes.SELECT,
+        }
+    );
+  
+    // @ts-ignore
+    return result[0].exists;
 }
