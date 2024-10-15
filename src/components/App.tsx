@@ -23,6 +23,7 @@ import Tooltip                          from "./generic/Tooltip";
 import PermissionsManager               from "./Permissions";
 import UserGroups                       from "./UserGroups";
 import StudyBuilder                     from "./Study";
+import HealthCheck                      from "./HealthCheck";
 import "../styles/main.scss";
 
 
@@ -72,6 +73,7 @@ export default function App()
                                 <Route path="permissions"    element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
                                 <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
                                 <Route path="study"          element={ <RequireAuth><StudyBuilder /></RequireAuth>} />
+                                <Route path="health-check"   element={ <RequireAuth><HealthCheck /></RequireAuth> } />
                                 
                                 <Route path="*" element="Page Not Found" />
                             </Route>
