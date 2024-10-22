@@ -1,5 +1,6 @@
-import { request } from "./backend"
-import { assert, humanizeColumnName } from "./utils"
+import React                  from "react"
+import { request }            from "./backend"
+import { humanizeColumnName } from "./utils"
 
 
 interface Metadata {
@@ -54,6 +55,7 @@ export class AggregatorError extends Error {
     constructor(message: string) {
         super(message)
         this.name = "AggregatorError"
+        this.message = message
         Error.captureStackTrace(this, this.constructor)
     }
 }
@@ -84,10 +86,43 @@ class Aggregator
 {
     private cache: Record<string, any> = {}
 
+    public baseUrl = ""
+
+    private _packages: DataPackage[] | undefined
+
+    public async initialize() {
+        if (!this._packages) {
+            const result: DataPackage[] = await this.fetch("/api/aggregator/data-packages")
+            
+            if (!Array.isArray(result)) {
+                throw new AggregatorError(`Expected array of data packages but got ${typeof result}`)
+            }
+            // assert(Array.isArray(result), `Expected array of data packages but got ${typeof result}`, AggregatorError)
+
+            this._packages = result
+        }
+
+        return this
+    }
+
+    get packages() {
+        if (!this._packages) {
+            throw new AggregatorError("Aggregator not initialized")
+        }
+        return this._packages
+    }
+
     private async fetch(uri: string) {
         try {
             if (!this.cache[uri]) {
-                this.cache[uri] = request(uri)
+                this.cache[uri] = request(uri, { includeResponse: true })
+                    .then(({ response, body }) => {
+                        this.baseUrl = String(response.headers.get("X-Upstream-Host") || "")
+                        if (!response.ok) {
+                            throw new AggregatorError(body.message || body)
+                        }
+                        return body
+                    })
             }
             return await this.cache[uri]
         } catch (ex) {
@@ -141,8 +176,15 @@ class Aggregator
     }
 
     public async getPackages(): Promise<DataPackage[]> {
-        const result: DataPackage[] = await this.fetch("/api/aggregator/data_packages")
-        assert(Array.isArray(result), `Expected array of data packages but got ${typeof result}`, AggregatorError)
+        const result: DataPackage[] = await this.fetch("/api/aggregator/data-packages")
+        
+        // if (typeof result === "string") {
+        //     throw new Error("Not connected")
+        // }
+        if (!Array.isArray(result)) {
+            throw new AggregatorError(`Expected array of data packages but got ${typeof result}`)
+        }
+        // assert(Array.isArray(result), `Expected array of data packages but got ${typeof result}`, AggregatorError)
         return result
     }
 
@@ -189,4 +231,41 @@ class Aggregator
     }
 }
 
-export default new Aggregator()
+const aggregator = new Aggregator()
+
+export default aggregator
+
+interface AggregatorContextType {
+    aggregator: Aggregator
+    status    : "connected" | "failed" | "offline" | "loading"
+    error     : string | null
+}
+
+const AggregatorContext = React.createContext<AggregatorContextType>(null!);
+
+export function AggregatorProvider({ children }: { children: React.ReactNode }) {
+    const [status , setStatus ] = React.useState<AggregatorContextType["status"]>("loading");
+    const [error  , setError  ] = React.useState<string | null>(null);
+    
+    React.useEffect(() => {
+        aggregator.initialize().then(
+            () => {
+                setStatus("connected")
+            },
+            e => {
+                setStatus(e.message === "The aggregator API is not enabled" ? "offline" : "failed")
+                setError(String(e))
+            }
+        );
+    }, []);
+
+    return (
+        <AggregatorContext.Provider value={{ aggregator, status, error }}>
+            {children}
+        </AggregatorContext.Provider>
+    );
+}
+
+export function useAggregator() {
+    return React.useContext(AggregatorContext);
+}
