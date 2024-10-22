@@ -53,7 +53,7 @@ export default function HealthCheck() {
                 await wait(30)
             }
         }
-    }, [loading, checks])
+    }, [checks])
 
     if (loading) {
         return <Loader msg="Loading checks..." />
@@ -75,7 +75,7 @@ export default function HealthCheck() {
             </Grid>
             <hr className="mt-1 mb-1"/>
             <div>
-                { checks.map(c => <Check name={c.name} description={c.description} result={results[c.path]} key={c.path} />) }
+                { checks.map(c => <CheckComponent name={c.name} description={c.description} result={results[c.path]} key={c.path} />) }
             </div>
         </>
     )
@@ -126,7 +126,7 @@ function CheckIcon({ status }: CheckResult) {
     return <i className="far fa-pause-circle color-blue" />
 }
 
-function Check({
+function CheckComponent({
     name,
     description,
     result = {}
