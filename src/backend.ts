@@ -1,8 +1,11 @@
 import HttpError from "./HttpError";
 import { app }   from "./types"
 
+interface RequestOptions extends RequestInit {
+    includeResponse?: boolean
+}
 
-export async function request<T=any>(path: string, options: RequestInit = {}): Promise<T> {
+export async function request<T=any>(path: string, options: RequestOptions = {}): Promise<T> {
     path = path.replace(/^\//, (process.env.REACT_APP_BACKEND_HOST || "") + "/");
     const res = await fetch(path, {
         mode: "cors",
@@ -18,14 +21,17 @@ export async function request<T=any>(path: string, options: RequestInit = {}): P
         body = JSON.parse(body);
     }
 
+    if (options.includeResponse) {
+        return { body, response: res } as T;
+    }
+
     if (!res.ok) {
         // @ts-ignore
         throw new HttpError(res.status, body?.message || body || res.statusText)
         // throw new Error(body || res.statusText)
     }
 
-    // @ts-ignore
-    return body;
+    return body as T;
 }
 
 export async function createOne<T=Record<string, any>>(table: string, payload: Partial<T>) {

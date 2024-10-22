@@ -1,7 +1,6 @@
-import { ReactNode, useState } from "react"
+import { ReactNode, useState }                          from "react"
 import { NavLink, useLocation, matchPath, useNavigate } from "react-router-dom"
-import { useAuth } from "../../auth"
-import aggregator from "../../Aggregator"
+import { useAuth }                                      from "../../auth"
 import "./Navigation.scss"
 
 
@@ -64,8 +63,6 @@ export default function Navigation()
     const canManagePermissions = user.permissions.includes("Permissions.read")
     const canReadUserGroups    = user.permissions.includes("UserGroups.read")
     const canAdminister        = canReadUsers || canReadUserGroups || canManagePermissions;
-
-    aggregator.getPackages() // PRE-LOAD!
 
     return (
         <div className="navigation">
