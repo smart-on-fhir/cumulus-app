@@ -292,6 +292,71 @@ function hasRanges(data: app.ServerResponses.DataResponse | null, data2: app.Ser
     );
 }
 
+function validateData(data: any, { column, stratifier }: { column: string, stratifier?: string, filters?: string[] }) {
+
+    type Point = [string, number] | [string, number, number, number];
+
+    // response data type
+    assert(data && typeof data === "object", `Invalid data response received: type "${typeof data}"`)
+    
+    // column
+    assert(data.column === column, `Invalid data response received: Expected the "column" property to equal "${column}".`)
+
+    // stratifier
+    if (stratifier) {
+        assert(data.stratifier === stratifier, `Invalid data response received: Expected the "stratifier" property to equal "${stratifier}".`)
+    }
+    
+    // totalCount
+    assert(typeof data.totalCount === "number", `Invalid data response received: Expected numeric "totalCount" property.`)
+    
+    // rowCount
+    assert(typeof data.rowCount === "number", `Invalid data response received: Expected numeric "rowCount" property.`)
+
+    // filters
+    assert(Array.isArray(data.filters), `Invalid data response received: Expected "filters" to be array.`)
+
+    // data
+    assert(Array.isArray(data.data), `Invalid data response received: Expected "data" to be array.`)
+
+    // Singular response
+    if (!stratifier) {
+        assert(data.data.length === 1, `Invalid data response received: Expected the "data" array to contain one entry.`)
+        assert(typeof data.data[0] === "object", `Invalid data response received: Expected the "data" array to contain one object.`)
+        assert(Array.isArray(data.data[0].rows), `Invalid data response received: Expected data[0].rows to be array.`)
+        assert(data.data[0].rows.length === data.rowCount, `Invalid data response received: Expected data[0].rows to have length equal to "rowCount".`)
+
+        data.data[0].rows.forEach((row: Point, i: number) => {
+            assert(typeof row[0] === "string", `Invalid data response received: data[0].rows[${i}][0] must be a string`)
+            assert(typeof row[1] === "number", `Invalid data response received: data[0].rows[${i}][1] must be a number`)
+            assert(row.length === 2 || typeof row[2] === "number", `Invalid data response received: data[0].rows[${i}][2] must be a number`)
+            assert(row.length === 2 || typeof row[3] === "number", `Invalid data response received: data[0].rows[${i}][3] must be a number`)
+            assert(i === 0 || row[0].localeCompare(data.data[0].rows[i-1][0]) >= 0, "Invalid data response received: Data is not sorted")
+        })
+    }
+
+    // Stratified response
+    else {
+        const stratifiers: Record<string, boolean> = {}
+
+        data.data.forEach((group: any, g: number) => {
+            assert(group && typeof group === "object", `Invalid data response received: data[${g}] is not an object.`)
+            assert(typeof group.stratifier === "string", `Invalid data response received: data[${g}].stratifier is not a string.`)
+            assert(Array.isArray(group.rows), `Invalid data response received: data[${g}].rows is not an array.`)
+            assert(!stratifiers[group.stratifier], `Invalid data response received: Duplicate stratifier "${group.stratifier}".`)
+            stratifiers[group.stratifier] = true;
+
+            group.rows.forEach((row: Point, i: number) => {
+                assert(typeof row[0] === "string", `Invalid data response received: data[${g}].rows[${i}][0] must be a string`)
+                assert(typeof row[1] === "number", `Invalid data response received: data[${g}].rows[${i}][1] must be a number`)
+                assert(row.length === 2 || typeof row[2] === "number", `Invalid data response received: data[${g}].rows[${i}][2] must be a number`)
+                assert(row.length === 2 || typeof row[3] === "number", `Invalid data response received: data[${g}].rows[${i}][3] must be a number`)
+                assert(i === 0 || row[0].localeCompare(group.rows[i-1][0]) >= 0, "Invalid data response received: data[${g}].rows is not sorted")
+            })
+        })
+    }
+}
+
 export interface DashboardProps {
     /**
      * The view object that we are editing. If this is an empty object
@@ -606,24 +671,30 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
         return Promise.all([
             fetchPrimaryData(),
             fetchSecondaryData()
-        ]).then(
-            ([
-                primaryData,
-                secondaryData
-            ]) => {
-                dispatch({ type: "UPDATE", payload: {
-                    data : primaryData,
-                    data2: secondaryData,
-                    loadingData: false
-                }})
-            },
-            error => {
-                dispatch({ type: "UPDATE", payload: {
-                    loadingDataError: error,
-                    loadingData: false
-                }})
+        ]).then(([
+            primaryData,
+            secondaryData
+        ]) => {
+            try {
+                validateData(primaryData, { column: viewColumnName, stratifier: stratifierName, filters: filterParams })
+                if (secColumnName) {
+                    validateData(secondaryData, { column: viewColumnName, stratifier: secColumnName, filters: filterParams })
+                }
+            } catch (ex) {
+                dispatch({ type: "UPDATE", payload: { loadingDataError: ex }})
             }
-        )
+
+            dispatch({ type: "UPDATE", payload: {
+                data : primaryData,
+                data2: secondaryData,
+                loadingData: false
+            }})
+        }).catch(error => {
+            dispatch({ type: "UPDATE", payload: {
+                loadingDataError: error,
+                loadingData: false
+            }})
+        })
     }, [requestId, stratifierName, viewColumnName, filter, secColumnName]);
 
     useEffect(() => { loadData() }, [loadData])
