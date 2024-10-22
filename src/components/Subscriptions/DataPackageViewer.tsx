@@ -2,17 +2,42 @@ import { useEffect, useState }      from "react"
 import ColumnsTable                 from "./ColumnsTable"
 import TransmissionView             from "./TransmissionView"
 import Loader                       from "../generic/Loader"
-import Alert                        from "../generic/Alert"
+import Alert, { AlertError }        from "../generic/Alert"
 import aggregator                   from "../../Aggregator"
 import { DataPackage, StudyPeriod } from "../../Aggregator"
 import { humanizeColumnName }       from "../../utils"
 import { app }                      from "../../types"
 
 
-export default function DataPackageViewer({ study, columns, last_data_update, total }: DataPackage) {
-    
-    const cols = Object.keys(columns).map(name => {
-        let type = String(columns[name])
+export default function DataPackageViewer({ packageId }: { packageId: string }) {
+
+    const [pkg    , setPkg    ] = useState<DataPackage>()
+    const [periods, setPeriods] = useState<StudyPeriod[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        aggregator.getPackage(packageId).then(pkg => {
+            if (!pkg) {
+                return null
+            }
+            return aggregator.getStudyPeriods(pkg!.study).then(
+                p => {
+                    setPeriods(p)
+                    setPkg(pkg)
+                })
+        }).finally(() => setLoading(false))
+    }, [ packageId ])
+
+    if (loading) {
+        return <Loader msg="Loading package..." />
+    }
+
+    if (!pkg) {
+        return <AlertError>Package not found</AlertError>
+    }
+
+    const cols = Object.keys(pkg.columns).map(name => {
+        let type = String(pkg.columns[name])
             .replace("year" , "date:YYYY")
             .replace("month", "date:YYYY-MM")
             .replace("week" , "date:YYYY-MM-DD")
@@ -24,13 +49,6 @@ export default function DataPackageViewer({ study, columns, last_data_update, to
             dataType   : type
         }
     });
-
-    const [periods, setPeriods] = useState<StudyPeriod[]>([])
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        aggregator.getStudyPeriods(study).then(p => setPeriods(p)).finally(() => setLoading(false))
-    }, [ study ])
 
     const sites = periods.map(p => ({ id: p.site, name: humanizeColumnName(p.site) }))
     // .reduce((prev, cur) => {
@@ -57,14 +75,14 @@ export default function DataPackageViewer({ study, columns, last_data_update, to
                 <div className="col col-0">
                     <p className="nowrap">
                         <b>Last data update: </b>
-                        <span className="color-blue-dark">{ new Date(last_data_update).toLocaleString() }</span>
+                        <span className="color-blue-dark">{ new Date(pkg.last_data_update).toLocaleString() }</span>
                     </p>
                 </div>
                 <div className="col col-auto"></div>
                 <div className="col col-0">
                     <p>
                         <b>Total Rows: </b>
-                        <span className="color-blue-dark">{ Number(total).toLocaleString() }</span>
+                        <span className="color-blue-dark">{ Number(pkg.total).toLocaleString() }</span>
                     </p>
                 </div>
             </div>
