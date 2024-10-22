@@ -4,7 +4,7 @@ import "./MenuButton.scss"
 
 
 interface MenuButtonProps {
-    items: (JSX.Element|"separator"|null)[]
+    items: (JSX.Element|"separator"|null)[] | JSX.Element
     right?: boolean
     title?: string
     children?: JSX.Element | string | (JSX.Element | string)[]
@@ -43,12 +43,12 @@ export default class MenuButton extends Component<MenuButtonProps>
                     { children || <i className="fa-solid fa-ellipsis-vertical default-icon"/> }
                 </div>
                 <div className="menu" onClick={this.onMenuClick}>
-                    { items.filter(Boolean).map((item, i) => {
+                    { Array.isArray(items) ? items.filter(Boolean).map((item, i) => {
                         if (item === "separator") {
                             return <hr key={i} />
                         }
                         return <div key={i} className="menu-item">{ item }</div>
-                    }) }
+                    }) : items }
                 </div>
             </span>
         )
