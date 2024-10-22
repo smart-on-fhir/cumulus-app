@@ -9,12 +9,10 @@ export default function PackageVersionCheck({ pkgId }: { pkgId: string }) {
         aggregator.getLatestPackageId(pkgId).then(setVersion)
     })
     if (version === null) {
-        return null; // <Loader msg="Checking for updates..." />
+        return null;
     }
     if (version === "") {
-        return <Alert color="red" icon="fas fa-times-circle">
-            Remote data package no longer exists!
-        </Alert>
+        return null;
     }
     if (version === pkgId) {
         return null; // <Alert color="green">Subscription is up to date</Alert>
