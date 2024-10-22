@@ -12,12 +12,12 @@ import { GraphDescription }                      from "./GraphDescription"
 import { GraphToolbar }                          from "./GraphToolbar"
 import Tag                                       from "../Tags/Tag"
 import Alert, { AlertError }                     from "../generic/Alert"
+import Loader                                    from "../generic/Loader"
 import Grid                                      from "../generic/Grid"
 import { app }                                   from "../../types"
 import { createOne, updateOne, request }         from "../../backend"
 import { useBackend, useCommand }                from "../../hooks"
 import Highcharts, { Chart }                     from "../../highcharts"
-import { defer, Json, requestPermission, strip } from "../../utils"
 import { useAuth }                               from "../../auth"
 import { getScreenShot }                         from "../../commands/lib"
 import CommandButton                             from "../../commands/CommandButton"
@@ -32,6 +32,13 @@ import { GenerateCaption }                       from "../../commands/Graphs/Gen
 import { ShareGraph }                            from "../../commands/Graphs/Share/ShareGraph"
 import { ManagePermissions }                     from "../../commands/Graphs/Share/ManagePermissions"
 import { OpenInAnalyticEnvironment }             from "../../commands/Subscriptions/OpenInAnalyticEnvironment"
+import {
+    assert,
+    defer,
+    Json,
+    requestPermission,
+    strip
+} from "../../utils"
 import {
     ReadOnlyPaths,
     SupportedChartTypes,
@@ -815,8 +822,12 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                                 <span onClick={() => dispatch({ type: "UPDATE", payload: { dataTabIndex: 0 }})} className={"tab" + (dataTabIndex === 0 ? " active" : "")}>Primary Data</span>
                                 <span onClick={() => dispatch({ type: "UPDATE", payload: { dataTabIndex: 1 }})} className={"tab" + (dataTabIndex === 1 ? " active" : "")}>Secondary Data</span>
                             </div>
-                            { viewType === "data" && dataTabIndex === 0 && <div className="data-view">{ Json(data ) }</div> }
-                            { viewType === "data" && dataTabIndex === 1 && <div className="data-view">{ Json(data2) }</div> }
+                            { viewType === "data" && dataTabIndex === 0 && <div className="data-view">
+                                { loadingData ? <div className="p-1"><Loader msg="Loading chart data..." /></div> : Json(data ) }
+                            </div> }
+                            { viewType === "data" && dataTabIndex === 1 && <div className="data-view">
+                                { loadingData ? <div className="p-1"><Loader msg="Loading chart data..." /></div> : Json(data2) }
+                            </div> }
                         </> }
 
                         { viewColumn && viewType === "overview" && <BaseChart
