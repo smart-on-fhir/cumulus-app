@@ -64,11 +64,7 @@ export default function ViewsBrowser({
             query.set("order", "name:desc");
         break;
         default:
-            if (requestId) {
-                query.set("order", "createdAt:asc")
-            } else {
-                query.set("order", "name:asc,createdAt:asc")
-            }
+            query.set("order", "createdAt:desc,name:asc")
         break;
     }
 
