@@ -955,7 +955,7 @@ function AllSeriesEditor({
         })
     }
 
-    const allShowInLegendN = state.chartOptions.series?.every(s => !!s.showInLegend === false)
+    const allShowInLegendN = state.chartOptions.series?.every(s => s.showInLegend === false)
     const allShowInLegendY = state.chartOptions.series?.every(s => s.showInLegend !== false )
     props.push({
         name : "Show in Legend",
