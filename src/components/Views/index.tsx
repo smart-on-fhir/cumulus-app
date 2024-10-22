@@ -105,7 +105,7 @@ export default function Views({ drafts }: { drafts?: boolean })
                                 <Checkbox onChange={() => onSetSort("mod-desc"   )} checked={ sort === "mod-desc"   } name="sort" type="radio" label={<>Sort by Date <span className="color-muted">(newest first)</span></>} />,
                                 <Checkbox onChange={() => onSetSort("mod-asc"    )} checked={ sort === "mod-asc"    } name="sort" type="radio" label={<>Sort by Date <span className="color-muted">(oldest first)</span></>} />,
                                 "separator",
-                                <Checkbox onChange={() => onSetSort("")} checked={ !sort } name="sort" type="radio" label={ <><b>Default Sort</b> <span className="color-muted">(name, date)</span></> } />
+                                <Checkbox onChange={() => onSetSort("")} checked={ !sort } name="sort" type="radio" label={ <><b>Default Sort</b> <span className="color-muted">(date, name)</span></> } />
                             ]}>
                                 <i className={ classList({
                                     "material-symbols-rounded": true,
