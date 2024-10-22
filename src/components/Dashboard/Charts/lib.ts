@@ -151,7 +151,7 @@ function getSeriesAndExceptions({
                     return false
                 }
             }
-            else if (xType === "datetime" && !moment(row[0], false).isValid()) {
+            else if (xType === "datetime" && !moment(row[0], true).isValid()) {
                 pushException()
                 return false
             }
