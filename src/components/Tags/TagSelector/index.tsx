@@ -1,8 +1,8 @@
-import { classList }       from "../../../utils"
-import Checkbox            from "../../generic/Checkbox"
-import EndpointListWrapper from "../../generic/EndpointListWrapper"
-import Tag                 from "../Tag"
-import { app }             from "../../../types"
+import { classList } from "../../../utils"
+import Checkbox      from "../../generic/Checkbox"
+import Tag           from "../Tag"
+import { app }       from "../../../types"
+import Prefetch      from "../../generic/Prefetch"
 import "../../generic/Select/Select.scss"
 import "./TagSelector.scss"
 
@@ -43,7 +43,7 @@ export default function TagSelector({
             })}
             >{ value }</div>
             <div className="select-component-menu">
-                <EndpointListWrapper endpoint="/api/tags">
+                <Prefetch path="/api/tags">
                     {(data: PartialTag[]) => (
                         <>
                         { data.map((tag, i) => (
@@ -59,7 +59,7 @@ export default function TagSelector({
                         ))}
                         </>
                     )}
-                </EndpointListWrapper>
+                </Prefetch>
             </div>
         </div>
     )

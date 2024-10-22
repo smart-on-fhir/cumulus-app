@@ -1,15 +1,11 @@
-import { useCallback, useState }  from "react"
-import { HelmetProvider, Helmet } from "react-helmet-async"
-import { Link }                   from "react-router-dom"
-import EndpointListWrapper        from "../generic/EndpointListWrapper"
-import Loader                     from "../generic/Loader"
-import { AlertError }             from "../generic/Alert"
-import StudyAreaCard              from "../StudyAreas/Card"
-import { useAuth }                from "../../auth"
-import { app }                    from "../../types"
-import { useBackend }             from "../../hooks"
-import { request }                from "../../backend"
-import Aggregator                 from "../../Aggregator"
+import { useEffect, useState }       from "react"
+import { HelmetProvider, Helmet }    from "react-helmet-async"
+import { Link }                      from "react-router-dom"
+import StudyAreaCard                 from "../StudyAreas/Card"
+import Prefetch                      from "../generic/Prefetch"
+import { useAuth }                   from "../../auth"
+import { app }                       from "../../types"
+import Aggregator, { useAggregator } from "../../Aggregator"
 import "./home.scss"
 
 
@@ -34,7 +30,7 @@ function StudyAreas() {
     const { user } = useAuth();
     const canCreate = user?.permissions.includes("StudyAreas.create")
     return (
-        <EndpointListWrapper endpoint="/api/study-areas?order=updatedAt:desc">
+        <Prefetch path="/api/study-areas?order=updatedAt:desc">
             { (data: app.StudyArea[]) => {
                 if (!data.length) {
                     return <div className="study-areas center card">
@@ -56,7 +52,7 @@ function StudyAreas() {
                     </div>
                 )
             }}
-        </EndpointListWrapper>
+        </Prefetch>
     )
 }
 
@@ -65,7 +61,7 @@ function Graphs() {
     const [selected, setSelected] = useState(0)
 
     return (
-        <EndpointListWrapper endpoint="/api/views?order=updatedAt:desc&limit=7&attributes=id,name,description,updatedAt">
+        <Prefetch path="/api/views?order=updatedAt:desc&limit=7&attributes=id,name,description,updatedAt">
             { (data: app.StudyArea[]) => {
 
                 if (!selected && data.length) {
@@ -110,69 +106,52 @@ function Graphs() {
                     </div>
                 )
             }}
-        </EndpointListWrapper>
+        </Prefetch>
     )
 }
 
 function SubscriptionsAndSites() {
+    return <Prefetch path="/api/requests?order=updatedAt:desc&attributes=id,name,description,dataURL">{subscriptions => (
+        <>
+            <UpdateCheck subscriptions={subscriptions} />
+            <Subscriptions data={subscriptions.slice(0, 5)} />
+            <Sites />
+        </>
+    )}</Prefetch>
+}
 
-    const fetchData = useCallback(async () => {
-        return Promise.all([
-            request("/api/requests?order=updatedAt:desc&attributes=id,name,description,dataURL"),
-            request("/api/data-sites?order=updatedAt:desc&limit=5&attributes=id,name,description"),
-            Aggregator.getPackages()
-        ]).then(async ([subscriptions, sites]) => {
-            let toUpdate = 0
-            let toDelete = 0
+function UpdateCheck({ subscriptions }: { subscriptions: app.Subscription[] }) {
+
+    const { aggregator } = useAggregator()
+
+    const [toUpdate, setToUpdate] = useState(0)
+    const [toDelete, setToDelete] = useState(0)
+
+    useEffect(() => {
+        
+        aggregator.initialize().then(async () => {
+            let _toUpdate = 0
+            let _toDelete = 0
             for (const sub of subscriptions) {
                 if (sub.dataURL) {
                     const id = await Aggregator.getLatestPackageId(sub.dataURL)
                     if (id === "") {
-                        toDelete++
+                        _toDelete++
                     }
                     if (id && id !== sub.dataURL) {
-                        toUpdate++
+                        _toUpdate++
                     }
                 }
             }
-            return { subscriptions, sites, toDelete, toUpdate }
-        })
+            setToUpdate(_toUpdate)
+            setToDelete(_toDelete)
+        }).catch(() => {})
     }, [])
 
-    const { error, loading, result } = useBackend<{
-        subscriptions: app.Subscription[]
-        sites        : app.DataSite[]
-        toDelete     : number
-        toUpdate     : number
-    }>(fetchData, true);
-
-    if (loading) {
-        return <Loader />
-    }
-
-    if (error) {
-        return <AlertError>{ error }</AlertError>
-    }
-
-    if (!result) {
-        return <AlertError>Failed fetching data</AlertError>
-    }
-
-    const { subscriptions, sites, toDelete, toUpdate } = result
-
-    return (
-        <>
-            <UpdateCheck toDelete={toDelete} toUpdate={toUpdate} />
-            <Subscriptions data={subscriptions.slice(0, 5)} />
-            <Sites data={sites} />
-        </>
-    )
-}
-
-function UpdateCheck({ toDelete, toUpdate }: { toDelete: number, toUpdate: number }) {
     if (!toDelete && !toUpdate) {
         return null
     }
+
     return (
         <div className="sync-notes card">
             <table>
@@ -228,44 +207,43 @@ function Subscriptions({ data }: { data: app.Subscription[] }) {
     )
 }
 
-function Sites({ data }: { data: app.DataSite[] }) {
-    
+function Sites() {    
     const { user } = useAuth();
     const canCreate = user?.permissions.includes("DataSites.create")
 
-    return (
+    return <Prefetch<app.DataSite[]> path="/api/data-sites?order=updatedAt:desc&limit=5&attributes=id,name,description">{result => (
         <div className="card sites">
             <h4><i className="icon fa-solid fa-location-dot" /> Healthcare Sites</h4>
             <hr/>
             
-            { data.length ?
+            { result.length ?
                 <>
-                { data.map((item, i) => (
-                    <li key={i}>
-                        <Link
-                            to={`/sites/${ item.id }`}
-                            className="link"
-                            title={ item.description || undefined }
-                        >
-                            { item.name }
-                        </Link>
-                    </li>
-                ))}
-                <li>
-                    <Link to="/sites/" className="link"><b className="color-brand-2">Browse All...</b></Link>
-                </li>
-                </> : 
-                    <div>
-                        <p>No Healthcare Sites found in the database.</p>
-                        { canCreate && <div className="center mt-1 mb-1">
-                            <Link to="/sites/new" className="link bold color-green">
-                                <i className="fa-solid fa-circle-plus" /> Create Healthcare Site
+                    { result.map((item, i) => (
+                        <li key={i}>
+                            <Link
+                                to={`/sites/${ item.id }`}
+                                className="link"
+                                title={ item.description || undefined }
+                            >
+                                { item.name }
                             </Link>
-                        </div> }
-                    </div>
+                        </li>
+                    ))}
+                    <li>
+                        <Link to="/sites/" className="link"><b className="color-brand-2">Browse All...</b></Link>
+                    </li>
+                </> : 
+                <div>
+                    <p>No Healthcare Sites found in the database.</p>
+                    { canCreate && <div className="center mt-1 mb-1">
+                        <Link to="/sites/new" className="link bold color-green">
+                            <i className="fa-solid fa-circle-plus" /> Create Healthcare Site
+                        </Link>
+                    </div> }
+                </div>
             }
         </div>
-    )
+    )}</Prefetch>
 }
 
 

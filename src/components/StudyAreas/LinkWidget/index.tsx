@@ -1,16 +1,15 @@
 import { classList } from "../../../utils"
-import Wrapper       from "../../generic/EndpointListWrapper"
 import { app }       from "../../../types"
+import Prefetch      from "../../generic/Prefetch"
 import "./LinkWidget.scss"
-
 
 
 export default function LinkWidget({ onChange, value }: { onChange: (selection: string) => void, value?: string })
 {
     return (
-        <Wrapper endpoint="/api/request-groups?subscriptions=true">{
+        <Prefetch path="/api/request-groups?subscriptions=true">{
             (data: app.SubscriptionGroup[]) => <Root data={data} onChange={onChange} value={value} />
-        }</Wrapper>
+        }</Prefetch>
     )
 }
 
