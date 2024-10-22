@@ -8,7 +8,8 @@ export default function BooleanEditor({ prop }: { prop: EditableProperty }) {
             <CheckBox
                 type="checkbox"
                 disabled={ !!prop.disabled }
-                checked={ prop.indeterminate ? undefined : prop.value }
+                // checked={ prop.indeterminate ? undefined : prop.value }
+                checked={ !!prop.value }
                 onChange={ () => prop.onChange(!prop.value) }
                 indeterminate={ prop.indeterminate }
             />{ prop.indeterminate ? "mixed" : prop.value + "" }
