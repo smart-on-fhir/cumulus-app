@@ -51,8 +51,7 @@ export default function SubscriptionForm({
         name = "",
         description = "",
         groupId,
-        dataURL = "",
-        dataPackage
+        dataURL = ""
     } = record
 
     const dataSourceType = record.dataSourceType || (dataURL ? "aggregator" : "file");
@@ -184,9 +183,10 @@ export default function SubscriptionForm({
                 </div>
             </div> }
 
-            { dataPackage && <div><PackageVersionCheck pkgId={dataPackage.id} /></div> }
-
-            { dataPackage && <DataPackageViewer {...dataPackage} /> }
+            { dataURL?.match(/.+?__.+?__.+?/) && <>
+                <div><PackageVersionCheck pkgId={dataURL} /></div>
+                <DataPackageViewer packageId={dataURL} />
+            </> }
 
             <hr className="mt-1"/>
 
@@ -221,10 +221,9 @@ function DataSourceSelector({
 
     const { loading, error, result } = useBackend<{ dataPackages: DataPackage[], studies: Study[] }>(
         useCallback(async () => {
-            return Promise.all([
-                aggregator.getPackages(),
-                aggregator.getStudies()
-            ]).then(([dataPackages, studies]) => ({ dataPackages, studies }))
+            await aggregator.initialize()
+            return aggregator.getStudies()
+                .then(studies => ({ dataPackages: aggregator.packages, studies }))
         }, []),
         true
     );
