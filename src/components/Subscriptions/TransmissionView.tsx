@@ -252,15 +252,15 @@ export default class Chart extends React.Component<ChartProps>
                         `<table>` +
                         `<tr>` +
                             `<th style="text-align: right">Data from:</th>` +
-                            `<td>${new Date(this.options.low!).toLocaleString()}</td>` +
+                            `<td>${new Date(this.options.low!).toLocaleDateString()}</td>` +
                         `</tr>` +
                         `<tr>` +
                             `<th style="text-align: right">Data to:</th>` +
-                            `<td>${new Date(this.options.high!).toLocaleString()}</td>` +
+                            `<td>${new Date(this.options.high!).toLocaleDateString()}</td>` +
                         `</tr>` +
                         (this.options.custom!.lastUpdate ? `<tr>` +
                             `<th style="text-align: right">Last Update:</th>` +
-                            `<td>${new Date(this.options.custom!.lastUpdate).toLocaleString()}</td>` +
+                            `<td>${new Date(this.options.custom!.lastUpdate).toLocaleDateString()}</td>` +
                         `</tr>` : "") +
                         (this.options.custom!.failed ? `<tr>` +
                             `<th class="color-red center" colspan="2"><hr/><h6>Latest data fetch failed!</h6></th>` +

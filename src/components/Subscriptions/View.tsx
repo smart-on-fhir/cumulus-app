@@ -1,43 +1,31 @@
-import { useCallback, useState }   from "react"
-import { useParams }               from "react-router"
-import { Link }                    from "react-router-dom"
-import { HelmetProvider, Helmet }  from "react-helmet-async"
-import DataViewer                  from "./DataViewer"
-import ColumnsTable                from "./ColumnsTable"
-import DataPackageViewer           from "./DataPackageViewer"
-import Markdown                    from "../generic/Markdown"
-import Breadcrumbs                 from "../generic/Breadcrumbs"
-import Loader                      from "../generic/Loader"
-import { AlertError }              from "../generic/Alert"
-import { Format }                  from "../Format"
-import Tag                         from "../Tags/Tag"
-import ViewsBrowser                from "../Views/ViewsBrowser"
-import { useAuth }                 from "../../auth"
-import { request }                 from "../../backend"
-import { useBackend }              from "../../hooks"
-import { app }                     from "../../types"
-import aggregator, { DataPackage } from "../../Aggregator"
-import PackageVersionCheck         from "./PackageVersionCheck"
+import { useCallback }            from "react"
+import { useParams }              from "react-router"
+import { Link }                   from "react-router-dom"
+import { HelmetProvider, Helmet } from "react-helmet-async"
+import DataViewer                 from "./DataViewer"
+import ColumnsTable               from "./ColumnsTable"
+import DataPackageViewer          from "./DataPackageViewer"
+import Markdown                   from "../generic/Markdown"
+import Breadcrumbs                from "../generic/Breadcrumbs"
+import Loader                     from "../generic/Loader"
+import { AlertError }             from "../generic/Alert"
+import { Format }                 from "../Format"
+import Tag                        from "../Tags/Tag"
+import ViewsBrowser               from "../Views/ViewsBrowser"
+import { useAuth }                from "../../auth"
+import { request }                from "../../backend"
+import { useBackend }             from "../../hooks"
+import { app }                    from "../../types"
+import PackageVersionCheck        from "./PackageVersionCheck"
 
 
 export default function SubscriptionView(): JSX.Element
 {
     const { id } = useParams()
     const { user } = useAuth()
-    const [dataPackage, setDataPackage] = useState<DataPackage | null>(null)
 
     const { loading, error, result: model } = useBackend<app.Subscription>(
-        useCallback(async () => {
-            const subscription = await request("/api/requests/" + id + "?group=true&graphs=true&tags=true")
-
-            // If package ID is set fetch the dataPackage for further info
-            if (subscription.dataURL) {
-                const pkg = await aggregator.getPackage(subscription.dataURL)
-                setDataPackage(pkg || null)
-            }
-
-            return subscription;
-        }, [id]),
+        useCallback(() => request("/api/requests/" + id + "?group=true&graphs=true&tags=true"), [id]),
         true
     )
 
@@ -136,8 +124,8 @@ export default function SubscriptionView(): JSX.Element
 
                         { model.dataURL && <PackageVersionCheck pkgId={model.dataURL} /> }
 
-                        { dataPackage ?
-                            <DataPackageViewer { ...dataPackage } /> :
+                        { model.dataURL ?
+                            <DataPackageViewer packageId={ model.dataURL } /> :
                             model.metadata?.cols ?
                             <>
                                 <h5 className="color-blue-dark">Data Elements</h5>

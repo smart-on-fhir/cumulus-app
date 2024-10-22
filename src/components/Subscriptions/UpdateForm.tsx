@@ -1,14 +1,13 @@
-import { useCallback, useState }  from "react"
-import { Navigate, useParams }    from "react-router"
-import { HelmetProvider, Helmet } from "react-helmet-async"
+import { useCallback, useState }         from "react"
+import { Navigate, useParams }           from "react-router"
+import { HelmetProvider, Helmet }        from "react-helmet-async"
 import { request, updateOne, deleteOne } from "../../backend"
-import { useBackend }             from "../../hooks"
-import Breadcrumbs                from "../generic/Breadcrumbs"
-import Loader                     from "../generic/Loader"
-import { AlertError }             from "../generic/Alert"
-import SubscriptionForm           from "./form"
-import { app }                    from "../../types"
-import aggregator                 from "../../Aggregator"
+import { useBackend }                    from "../../hooks"
+import Breadcrumbs                       from "../generic/Breadcrumbs"
+import Loader                            from "../generic/Loader"
+import { AlertError }                    from "../generic/Alert"
+import SubscriptionForm                  from "./form"
+import { app }                           from "../../types"
 
 import "./form.scss";
 
@@ -38,13 +37,6 @@ export default function EditSubscriptionForm()
         useCallback(
             async () => {
                 const subscription: app.SubscriptionWithPackage = await request(`/api/requests/${id}?tags=true`)
-                
-                // If package ID is set fetch the dataPackage for further info
-                if (subscription.dataURL) {
-                    const dataPackage = await aggregator.getPackage(subscription.dataURL)
-                    subscription.dataPackage = dataPackage
-                }
-
                 setState(subscription);
                 return subscription;
             },
@@ -119,7 +111,7 @@ export default function EditSubscriptionForm()
                 </div>
             </div>
             <hr/>
-            <div className="row gap color-muted small">
+            <div className="row gap">
                 <div className="col">
                     { error && <AlertError><b>Error loading subscription:</b> { error + "" }</AlertError> }
                     { savingError && <AlertError><b>Error saving subscription:</b> { savingError + "" }</AlertError> }
