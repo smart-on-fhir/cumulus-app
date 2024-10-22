@@ -1,8 +1,8 @@
-import { Link }           from "react-router-dom"
-import { createListPage } from "../generic/EndpointListWrapper"
-import IfAllowed          from "../generic/IfAllowed"
-import { useAuth }        from "../../auth"
-import { app }            from "../../types"
+import { Link }       from "react-router-dom"
+import createListPage from "../generic/EndpointListWrapper"
+import IfAllowed      from "../generic/IfAllowed"
+import { useAuth }    from "../../auth"
+import { app }        from "../../types"
 import "../generic/EndpointListTable.scss"
 
 export default function ListPage()

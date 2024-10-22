@@ -1,9 +1,9 @@
-import { Link }           from "react-router-dom"
-import StudyAreaCard      from "./Card"
-import { createListPage } from "../generic/EndpointListWrapper"
-import Grid               from "../generic/Grid"
-import { useAuth }        from "../../auth"
-import { app }            from "../../types"
+import { Link }       from "react-router-dom"
+import StudyAreaCard  from "./Card"
+import createListPage from "../generic/EndpointListWrapper"
+import Grid           from "../generic/Grid"
+import { useAuth }    from "../../auth"
+import { app }        from "../../types"
 import "./StudyAreas.scss"
 
 

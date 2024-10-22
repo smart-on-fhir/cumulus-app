@@ -9,10 +9,10 @@ import { app }                    from "../../types"
 import { buildPermissionLabel }   from "../../utils"
 import Alert, { AlertError }      from "../generic/Alert"
 import Collapse                   from "../generic/Collapse"
-import EndpointListWrapper        from "../generic/EndpointListWrapper"
 import Grid                       from "../generic/Grid"
 import StaticGrid                 from "../generic/StaticGrid"
 import { Tabs }                   from "../generic/Tabs"
+import Prefetch                   from "../generic/Prefetch"
 import "./Permissions.scss"
 
 
@@ -66,7 +66,7 @@ export default function PermissionsManager() {
                     {
                         name: "Role-based Permissions",
                         children: (
-                            <EndpointListWrapper key={key + "-role-based"} endpoint="/api/permissions?order=resource:asc&where=role:not:null&where=resource_id:eq:null&where=user_group_id:eq:null">
+                            <Prefetch key={key + "-role-based"} path="/api/permissions?order=resource:asc&where=role:not:null&where=resource_id:eq:null&where=user_group_id:eq:null">
                             { (data: app.Permission[]) => {
                                 let lastObject = "", buffer: app.Permission[] = [], children: JSX.Element[] = [];
                                 data.forEach((row: app.Permission, i) => {
@@ -98,7 +98,7 @@ export default function PermissionsManager() {
                                     </div>
                                 )
                             } }
-                            </EndpointListWrapper>
+                            </Prefetch>
                         )
                     },
                     {
@@ -190,7 +190,7 @@ function UserPermissionsUI() {
             revoke access permissions.
         </div>
         <div className="p-1">
-            <EndpointListWrapper endpoint="/api/permissions?order=resource:asc&where=user_id:not:null&include=User:email" key={key}>
+            <Prefetch path="/api/permissions?order=resource:asc&where=user_id:not:null&include=User:email" key={key}>
                 { (data: app.Permission[]) => {
                     if (!data.length) {
                         return <Alert color="orange" icon="fas fa-exclamation-circle"><b>No records found</b></Alert>
@@ -263,7 +263,7 @@ function UserPermissionsUI() {
                         </div>
                     </div>
                 }}
-            </EndpointListWrapper>
+            </Prefetch>
         </div>
     </>
 }
@@ -296,7 +296,7 @@ function GroupPermissionsUI() {
             which will effectively revoke access permissions.
         </div>
         <div className="p-1">
-            <EndpointListWrapper endpoint="/api/permissions?order=resource:asc&where=user_group_id:not:null&include=UserGroup:name" key={key}>
+            <Prefetch path="/api/permissions?order=resource:asc&where=user_group_id:not:null&include=UserGroup:name" key={key}>
                 { (data: app.Permission[]) => {
                     if (!data.length) {
                         return <Alert color="orange" icon="fas fa-exclamation-circle"><b>No records found</b></Alert>
@@ -367,7 +367,7 @@ function GroupPermissionsUI() {
                         </div>
                     </div>
                 }}
-            </EndpointListWrapper>
+            </Prefetch>
         </div>
     </>
 }

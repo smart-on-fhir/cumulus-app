@@ -1,9 +1,9 @@
-import { Link }           from "react-router-dom"
-import { createListPage } from "../generic/EndpointListWrapper"
-import Alert              from "../generic/Alert"
-import { useAuth }        from "../../auth"
-import IfAllowed          from "../generic/IfAllowed"
-import { app }            from "../../types"
+import { Link }       from "react-router-dom"
+import createListPage from "../generic/EndpointListWrapper"
+import Alert          from "../generic/Alert"
+import IfAllowed      from "../generic/IfAllowed"
+import { useAuth }    from "../../auth"
+import { app }        from "../../types"
 import "../generic/EndpointListTable.scss"
 
 

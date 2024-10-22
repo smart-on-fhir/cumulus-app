@@ -1,42 +1,10 @@
-import { useCallback }            from "react"
 import { Helmet, HelmetProvider } from "react-helmet-async"
 import { Link }                   from "react-router-dom"
-import { request }                from "../../backend"
-import { useBackend }             from "../../hooks"
-import { AlertError }             from "./Alert"
 import Breadcrumbs                from "./Breadcrumbs"
-import Loader                     from "./Loader"
+import Prefetch                   from "./Prefetch"
 
 
-export default function EndpointListWrapper({
-    endpoint,
-    children
-}: {
-    endpoint: string
-    children: (data: any) => JSX.Element
-})
-{
-    let { result: data, loading, error } = useBackend(
-        useCallback(signal => request(endpoint, { signal }), [endpoint]),
-        true
-    )
-
-    if (loading) {
-        return <Loader msg="Loading data..." />
-    }
-
-    if (error) {
-        return <AlertError>{ error }</AlertError>
-    }
-
-    if (!data) {
-        return <AlertError>Failed fetching data from the server</AlertError>
-    }
-
-    return children(data)
-}
-
-export function createListPage<T = unknown>({
+export default function createListPage<T = unknown>({
     namePlural,
     endpoint,
     renderList,
@@ -54,7 +22,7 @@ export function createListPage<T = unknown>({
 {
     return (
         <div className="container">
-            <EndpointListWrapper endpoint={ endpoint }>
+            <Prefetch path={ endpoint }>
                 {(data: T) => (
                     <>
                         <HelmetProvider>
@@ -87,7 +55,7 @@ export function createListPage<T = unknown>({
                         { renderList(data) }
                     </>
                 )}
-            </EndpointListWrapper>
+            </Prefetch>
         </div>
     )
 }
