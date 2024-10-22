@@ -1,5 +1,71 @@
-import { Link }       from "react-router-dom"
+import { Link }          from "react-router-dom"
+import MenuButton        from "../generic/MenuButton"
+import Grid              from "../generic/Grid"
+import Loader            from "../generic/Loader"
+import { useAggregator } from "../../Aggregator"
 import "./Header.scss"
+
+
+function CloudIcon() {
+    const { status } = useAggregator()
+
+    if (status === "loading") {
+        return <Loader msg="" />
+    }
+    if (status === "offline") {
+        return <span className="material-symbols-outlined" style={{ fontSize: "2rem" }}>cloud_off</span>
+    }
+    if (status === "connected") {
+        return <span className="material-symbols-outlined" style={{ fontSize: "2rem" }}>cloud_done</span>
+    }
+    if (status === "failed") {
+        return <i className="fas fa-exclamation-circle" style={{ fontSize: "1.2rem" }} />
+    }
+    return null
+}
+
+function CloudMenu() {
+    const { aggregator, status, error } = useAggregator()
+    if (status === "loading") {
+        return <Loader msg="Connecting to aggregator..." />
+    }
+    if (status === "offline") {
+        return <Grid cols="3rem 1fr" style={{ alignItems: "center" }}>
+            <i className="fas fa-minus-circle color-grey" style={{ fontSize: "2rem" }} />
+            <div>
+                <b>Not connected to data aggregator</b>
+                <p className="color-muted small">
+                    Data aggregator is not configured or is turned off. You will <br />
+                    not be able to use subscriptions with remote data source.
+                </p>
+            </div>
+        </Grid>
+    }
+    if (status === "connected") {
+        return <Grid cols="3rem 1fr" style={{ alignItems: "center" }}>
+            <i className="fas fa-check-circle color-green" style={{ fontSize: "2rem" }} />
+            <div>
+                <b>Connected to data aggregator</b>
+                <div className="color-blue-dark small">{ aggregator.baseUrl }</div>
+                <p className="color-muted small">You will be able to use subscriptions with data<br />from this data source</p>
+            </div>
+        </Grid>
+    }
+    if (status === "failed") {
+        return <Grid cols="3rem 1fr" style={{ alignItems: "center" }}>
+            <i className="fas fa-exclamation-circle color-red" style={{ fontSize: "2rem" }} />
+            <div>
+                <b>Not connected to data aggregator</b>
+                <div className="color-blue-dark small">{ aggregator.baseUrl }</div>
+                <p className="color-muted small">
+                    Connecting to the data aggregator failed! It is probably<br />offline, or not properly configured.
+                </p>
+                <p className="color-red small">{ error + "" }</p>
+            </div>
+        </Grid>
+    }
+    return null
+}
 
 export default function Header() {
     return (
@@ -12,7 +78,9 @@ export default function Header() {
                 </div>
                 <div className="col middle center"/>
                 <div className="col pl-1 middle right">
-                    <div className="nowrap">Boston Children's Hospital</div>
+                    <MenuButton right items={ <div className="p-1"><CloudMenu /></div> }>
+                        <CloudIcon />
+                    </MenuButton>
                 </div>
             </div>
         </header>
