@@ -24,6 +24,7 @@ import PermissionsManager               from "./Permissions";
 import UserGroups                       from "./UserGroups";
 import StudyBuilder                     from "./Study";
 import HealthCheck                      from "./HealthCheck";
+import { AggregatorProvider }           from "../Aggregator";
 import "../styles/main.scss";
 
 
@@ -31,56 +32,58 @@ export default function App()
 {
     return (
         <AuthProvider>
-            <ContextMenu />
-            <Tooltip />
-            <BrowserRouter>
-                <Header/>
-                <div className="container container-fluid row p-1">
-                    <Navigation />
-                    <div id="main" className="col">
-                        <Routes>
-                            <Route path="/">
-                                <Route index element={ <RequireAuth><Home /></RequireAuth> } />
+            <AggregatorProvider>
+                <ContextMenu />
+                <Tooltip />
+                <BrowserRouter>
+                    <Header/>
+                    <div className="container container-fluid row p-1">
+                        <Navigation />
+                        <div id="main" className="col">
+                            <Routes>
+                                <Route path="/">
+                                    <Route index element={ <RequireAuth><Home /></RequireAuth> } />
 
-                                <Route path="views">
-                                    <Route index element={ <RequireAuth><Views /></RequireAuth> } />
-                                    <Route path=":id">
-                                        <Route index               element={ <RequireAuth><EditView /></RequireAuth> } />
-                                        <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />
-                                        <Route path="copy"         element={ <RequireAuth><CopyView /></RequireAuth> } />
+                                    <Route path="views">
+                                        <Route index element={ <RequireAuth><Views /></RequireAuth> } />
+                                        <Route path=":id">
+                                            <Route index               element={ <RequireAuth><EditView /></RequireAuth> } />
+                                            <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />
+                                            <Route path="copy"         element={ <RequireAuth><CopyView /></RequireAuth> } />
+                                        </Route>
                                     </Route>
-                                </Route>
-                                <Route path="drafts">
-                                    <Route index element={ <RequireAuth><Views drafts /></RequireAuth> } />
-                                    <Route path=":id">
-                                        <Route index               element={ <RequireAuth><EditView /></RequireAuth> } />
-                                        <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />
-                                        <Route path="copy"         element={ <RequireAuth><CopyView /></RequireAuth> } />
+                                    <Route path="drafts">
+                                        <Route index element={ <RequireAuth><Views drafts /></RequireAuth> } />
+                                        <Route path=":id">
+                                            <Route index               element={ <RequireAuth><EditView /></RequireAuth> } />
+                                            <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />
+                                            <Route path="copy"         element={ <RequireAuth><CopyView /></RequireAuth> } />
+                                        </Route>
                                     </Route>
-                                </Route>
 
-                                <Route path="requests/*"     element={ <RequireAuth><Subscriptions /></RequireAuth> } />
-                                <Route path="sites/*"        element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
-                                <Route path="groups/*"       element={ <RequireAuth><SubscriptionGroups /></RequireAuth> } />
-                                <Route path="study-areas/*"  element={ <RequireAuth><StudyAreas /></RequireAuth> } />
-                                <Route path="tags/*"         element={ <RequireAuth><Tags /></RequireAuth> } />
-                                <Route path="login"          element={ <LoginPage /> } />
-                                <Route path="activate"       element={ <Activate /> } />
-                                <Route path="password-reset" element={ <PasswordReset /> } />
-                                <Route path="user"           element={ <RequireAuth><Account /></RequireAuth> } />
-                                <Route path="users/invite"   element={ <RequireAuth><Invite /></RequireAuth> } />
-                                <Route path="users"          element={ <RequireAuth><Users /></RequireAuth> } />
-                                <Route path="permissions"    element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
-                                <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
-                                <Route path="study"          element={ <RequireAuth><StudyBuilder /></RequireAuth>} />
-                                <Route path="health-check"   element={ <RequireAuth><HealthCheck /></RequireAuth> } />
-                                
-                                <Route path="*" element="Page Not Found" />
-                            </Route>
-                        </Routes>
+                                    <Route path="requests/*"     element={ <RequireAuth><Subscriptions /></RequireAuth> } />
+                                    <Route path="sites/*"        element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
+                                    <Route path="groups/*"       element={ <RequireAuth><SubscriptionGroups /></RequireAuth> } />
+                                    <Route path="study-areas/*"  element={ <RequireAuth><StudyAreas /></RequireAuth> } />
+                                    <Route path="tags/*"         element={ <RequireAuth><Tags /></RequireAuth> } />
+                                    <Route path="login"          element={ <LoginPage /> } />
+                                    <Route path="activate"       element={ <Activate /> } />
+                                    <Route path="password-reset" element={ <PasswordReset /> } />
+                                    <Route path="user"           element={ <RequireAuth><Account /></RequireAuth> } />
+                                    <Route path="users/invite"   element={ <RequireAuth><Invite /></RequireAuth> } />
+                                    <Route path="users"          element={ <RequireAuth><Users /></RequireAuth> } />
+                                    <Route path="permissions"    element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
+                                    <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
+                                    <Route path="study"          element={ <RequireAuth><StudyBuilder /></RequireAuth>} />
+                                    <Route path="health-check"   element={ <RequireAuth><HealthCheck /></RequireAuth> } />
+                                    
+                                    <Route path="*" element="Page Not Found" />
+                                </Route>
+                            </Routes>
+                        </div>
                     </div>
-                </div>
-            </BrowserRouter>
+                </BrowserRouter>
+            </AggregatorProvider>
         </AuthProvider>
     )
 }
