@@ -62,6 +62,12 @@ export default function SubscriptionLink({
     const toggleFavorite    = useCommand(ToggleFavoriteCmd)
     const on = ToggleFavoriteCmd.on()
 
+    const graphCount = request.graphCount !== undefined ?
+        request.graphCount :
+        request.Views ?
+            request.Views.length :
+            undefined;
+
     return (
         <Link
             to={ href.replace(":id", id) }
@@ -79,7 +85,8 @@ export default function SubscriptionLink({
                 <span className="wrap">{ search ? highlight(request.name, search) : request.name }</span>
             </b>
             <div className="color-muted small">
-                { request.completed ? <>Data updated: <Format value={request.completed} format="date" /></> : "No data yet" }
+                { graphCount !== undefined && <><span className="color-brand-2">{ graphCount } Graph{ graphCount === 1 ? "" : "s" }</span>, </> }
+                { request.completed ? <>Data Updated: <Format value={request.completed} format="date" /></> : "No data yet" }
             </div>
         </Link>
     )

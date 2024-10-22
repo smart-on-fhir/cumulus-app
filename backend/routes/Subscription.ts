@@ -232,8 +232,26 @@ route(router, {
             attributes: ["id", "name", "description", "createdAt"],
             include: {
                 association: "requests",
-                attributes : ["id", "name", "description", "refresh", "completed", "dataURL", "metadata"],
-                right      : true
+                attributes : [
+                    "id",
+                    "name",
+                    "description",
+                    "refresh",
+                    "completed",
+                    "dataURL",
+                    "metadata",
+                    
+                    // Subquery to count graphs for each request
+                    [
+                        GroupModel.sequelize!.literal(`(
+                            SELECT COUNT(*)::int
+                            FROM "Views" AS "graphs"
+                            WHERE "graphs"."subscriptionId" = "requests"."id"
+                        )`),
+                        "graphCount"
+                    ]
+                ],
+                right: true
             },
             order: [["name", "asc"]],
             limit: groupLimit ? Math.max(groupLimit, 2) : undefined,

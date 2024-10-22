@@ -190,6 +190,8 @@ export declare module app {
         transmissions: Transmission[] | null
 
         StudyAreas?: StudyArea[]
+
+        graphCount?: number
     }
 
     interface SubscriptionWithPackage extends app.Subscription {
