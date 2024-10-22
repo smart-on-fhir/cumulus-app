@@ -103,7 +103,16 @@ route(router, {
                     "name",
                     "completed",
                     "metadata",
-                    "dataURL"
+                    "dataURL",
+                    // Subquery to count graphs for each request
+                    [
+                        Model.sequelize!.literal(`(
+                            SELECT COUNT(*)::int
+                            FROM "Views" AS "graphs"
+                            WHERE "graphs"."subscriptionId" = "requests"."id"
+                        )`),
+                        "graphCount"
+                    ]
                 ]
             })
         }
