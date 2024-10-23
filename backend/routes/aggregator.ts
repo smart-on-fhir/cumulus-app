@@ -1,13 +1,11 @@
-import crypto                         from "crypto"
 import express, { Request, Response } from "express"
 import https, { RequestOptions }      from "https"
-import { rw }                         from "../lib"
+import { cached, rw }                 from "../lib"
 import config                         from "../config"
 
 
 export const router = express.Router({ mergeParams: true })
 
-const startTime = Date.now()
 
 // These are the only paths we recognize and proxy to the aggregator
 const AGGREGATOR_PATHS = [
@@ -19,11 +17,11 @@ const AGGREGATOR_PATHS = [
     "/metadata",
 
     // subscriptions
-    "/data_packages",
-    "/data_packages/:id",
+    "/data-packages",
+    "/data-packages/:id",
 
     // chart-data
-    "/chart-data/:subscription_name",
+    // "/chart-data/:subscription_name",
 
     // study-periods
     "/study-periods/:site/:study",
@@ -41,21 +39,12 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
         return res.status(400).type("text").end("The aggregator API is not enabled")
     }
 
-    const { port, hostname, href } = new URL(baseUrl + req.url);
+    const { port, hostname } = new URL(baseUrl + req.url);
 
-    // Cache -------------------------------------------------------------------
-    const cacheKey = crypto.createHash("sha1").update([href, startTime].join("-")).digest("hex");
-
-    res.setHeader('Cache-Control', `max-age=31536000, no-cache`)
-    res.setHeader('Vary', 'Origin, ETag')
-    res.setHeader('ETag', cacheKey)
-
-    let ifNoneMatchValue = req.headers['if-none-match']
-    if (ifNoneMatchValue && ifNoneMatchValue === cacheKey) {
-        res.statusCode = 304
-        return res.end()
+    // Cache for 2 days --------------------------------------------------------
+    if (cached(req, res, 7_200, [baseUrl])) {
+        return;
     }
-    // -------------------------------------------------------------------------
 
     const requestOptions: RequestOptions = {
         host: hostname,
@@ -86,11 +75,11 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
                 const jsonResponse = JSON.parse(data);
 
                 // Send the JSON response to the client
-                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'application/json' });
+                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'application/json', "X-Upstream-Host": baseUrl });
                 res.end(JSON.stringify(jsonResponse));
             } catch (error) {
                 // If the response is not JSON, return it as a plain string
-                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'text/plain' });
+                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'text/plain', "X-Upstream-Host": baseUrl });
                 res.end(data);
             }
         });
@@ -99,7 +88,10 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
     // Handle any error during the proxy request
     proxy.on('error', (err) => {
         console.error('Error with proxy request:', err);
-        res.writeHead(500);
+        res.writeHead(500, {
+            "X-Upstream-Host": baseUrl,
+            "Cache-Control"  : "no-cache"
+        });
         res.end('Internal Server Error');
     });
 

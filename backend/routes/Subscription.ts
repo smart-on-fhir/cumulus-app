@@ -1,21 +1,22 @@
-import crypto                                                     from "crypto"
-import express, { Response }                                      from "express"
-import slug                                                       from "slug"
-import { Includeable, QueryTypes, Op }                            from "sequelize"
-import { NotFound, InternalServerError, HttpError, BadRequest }   from "../errors"
-import Model                                                      from "../db/models/Subscription"
-import { AppRequest }                                             from "../types"
-import { route }                                                  from "../lib/route"
-import GroupModel                                                 from "../db/models/SubscriptionGroup"
-import { requestPermission }                                      from "../services/acl"
-import ViewModel                                                  from "../db/models/View"
-import ColumnsMetadata                                            from "../cumulus_library_columns.json"
-import { sql as logSql }                                          from "../services/logger"
-import ImportJob                                                  from "../DataManager/ImportJob"
-import { getFindOptions, assert, rw, uInt, bool }                 from "../lib"
-import { version as pkgVersion }                                  from "../../package.json"
-import { DATA_TYPES }                                             from "../DataManager/dataTypes"
-import { fetchSubscriptionData }                                  from "../DataManager/CsvDownloader"
+import crypto                                                   from "crypto"
+import express, { Response }                                    from "express"
+import slug                                                     from "slug"
+import { Includeable, QueryTypes }                              from "sequelize"
+import { NotFound, InternalServerError, HttpError, BadRequest } from "../errors"
+import Model                                                    from "../db/models/Subscription"
+import { AppRequest }                                           from "../types"
+import { route }                                                from "../lib/route"
+import GroupModel                                               from "../db/models/SubscriptionGroup"
+import { requestPermission }                                    from "../services/acl"
+import ViewModel                                                from "../db/models/View"
+import ColumnsMetadata                                          from "../cumulus_library_columns.json"
+import { sql as logSql }                                        from "../services/logger"
+import ImportJob                                                from "../DataManager/ImportJob"
+import { getFindOptions, assert, rw, uInt, bool, cached }       from "../lib"
+import { version as pkgVersion }                                from "../../package.json"
+import { DATA_TYPES }                                           from "../DataManager/dataTypes"
+import { fetchSubscriptionData }                                from "../DataManager/CsvDownloader"
+import config                                                   from "../config"
 
 
 export const router = express.Router({ mergeParams: true });
@@ -311,6 +312,58 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
     assert(subscription, "Subscription not found", NotFound)
     assert(subscription.metadata, "Subscription data not found", NotFound)
 
+    // Aggregator --------------------------------------------------------------
+    const packageId = subscription.dataURL
+    if (packageId) {
+        const { enabled, apiKey, baseUrl } = config.aggregator
+
+        if (!enabled || !apiKey || !baseUrl) {
+            throw new BadRequest("The aggregator API is not enabled")
+        }
+
+        // Cached for 2 hours
+        if (cached(req, res, 7_200)) {
+            return;
+        }
+
+        const url = new URL(`/data-packages/${packageId}/chart`, baseUrl);
+        for (const [name, value] of Object.entries(req.query)) {
+            url.searchParams.set(name, value + "")
+        }
+        // console.log("url ====>", url)
+
+        try {
+            var response = await fetch(url, {
+                headers: {
+                    "x-api-key": apiKey,
+                    "accept"   : "application/json"
+                },
+
+            })
+        } catch (ex) {
+            console.error("====>", ex)
+            throw ex
+        }
+
+        let type = response.headers.get("Content-Type") + "";
+
+        let body = await response.text();
+
+        if (body.length && type.match(/\bjson\b/i)) {
+            body = JSON.parse(body);
+        }
+
+        if (!response.ok) {
+            // @ts-ignore
+            throw new HttpError(response.status, "Aggregator: " + (body?.message || body || response.statusText))
+        }
+
+        // console.log("%s ====> %s", url, body)
+        
+        return res.json(body)
+    }
+    // -------------------------------------------------------------------------
+
     const table = "subscription_data_" + req.params.id
 
     const column = String(req.query.column || "")
@@ -321,23 +374,9 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         req.query.filter :
         [req.query.filter || ""]).map(String).filter(Boolean)
 
-    const cacheKey = crypto.createHash("sha1").update([
-        table,
-        column,
-        stratifier,
-        filtersParams.join("+"),
-        subscription.completed + "",
-        pkgVersion
-    ].join("-")).digest("hex");
-
-    res.setHeader('Cache-Control', `max-age=31536000, no-cache`)
-    res.setHeader('Vary', 'Origin, ETag')
-    res.setHeader('ETag', cacheKey)
-
-    let ifNoneMatchValue = req.headers['if-none-match']
-    if (ifNoneMatchValue && ifNoneMatchValue === cacheKey) {
-        res.statusCode = 304
-        return res.end()
+    // Cached for 1 year unless subscription.completed changes
+    if (cached(req, res, 31_536_000, [subscription.completed + ""])) {
+        return;
     }
 
     const allColumns = subscription.metadata.cols;
