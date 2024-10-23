@@ -294,7 +294,7 @@ function hasRanges(data: app.ServerResponses.DataResponse | null, data2: app.Ser
 
 function validateData(data: any, { column, stratifier }: { column: string, stratifier?: string, filters?: string[] }) {
 
-    type Point = [string, number] | [string, number, number, number];
+    type Point = [string | number, number] | [string | number, number, number, number];
 
     // response data type
     assert(data && typeof data === "object", `Invalid data response received: type "${typeof data}"`)
@@ -327,11 +327,11 @@ function validateData(data: any, { column, stratifier }: { column: string, strat
         assert(data.data[0].rows.length === data.rowCount, `Invalid data response received: Expected data[0].rows to have length equal to "rowCount".`)
 
         data.data[0].rows.forEach((row: Point, i: number) => {
-            assert(typeof row[0] === "string", `Invalid data response received: data[0].rows[${i}][0] must be a string`)
+            assert(typeof row[0] === "string" || typeof row[0] === "number", `Invalid data response received: data[0].rows[${i}][0] must be a string or number`)
             assert(typeof row[1] === "number", `Invalid data response received: data[0].rows[${i}][1] must be a number`)
             assert(row.length === 2 || typeof row[2] === "number", `Invalid data response received: data[0].rows[${i}][2] must be a number`)
             assert(row.length === 2 || typeof row[3] === "number", `Invalid data response received: data[0].rows[${i}][3] must be a number`)
-            assert(i === 0 || row[0].localeCompare(data.data[0].rows[i-1][0]) >= 0, "Invalid data response received: Data is not sorted")
+            assert(i === 0 || row[0] >= data.data[0].rows[i-1][0], "Invalid data response received: Data is not sorted")
         })
     }
 
@@ -351,7 +351,7 @@ function validateData(data: any, { column, stratifier }: { column: string, strat
                 assert(typeof row[1] === "number", `Invalid data response received: data[${g}].rows[${i}][1] must be a number`)
                 assert(row.length === 2 || typeof row[2] === "number", `Invalid data response received: data[${g}].rows[${i}][2] must be a number`)
                 assert(row.length === 2 || typeof row[3] === "number", `Invalid data response received: data[${g}].rows[${i}][3] must be a number`)
-                assert(i === 0 || row[0].localeCompare(group.rows[i-1][0]) >= 0, "Invalid data response received: data[${g}].rows is not sorted")
+                assert(i === 0 || row[0] >= group.rows[i-1][0], "Invalid data response received: data[${g}].rows is not sorted")
             })
         })
     }
