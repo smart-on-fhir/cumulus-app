@@ -1,4 +1,5 @@
-import { Request, RequestHandler } from "express"
+import crypto                                from "crypto"
+import { Request, RequestHandler, Response } from "express"
 import {
     FindAttributeOptions,
     FindOptions,
@@ -9,6 +10,8 @@ import {
     QueryTypes
 } from "sequelize"
 
+// When the server was started
+const START_TIME = Date.now()
 
 const RE_FALSE = /^(0|no|false|off|null|undefined|NaN|none|)$/i;
 
@@ -379,4 +382,31 @@ export async function tableExists(connection: Sequelize, tableName: string) {
   
     // @ts-ignore
     return result[0].exists;
+}
+
+export function cached(req: Request, res: Response, seconds: number = 60*60*24, vars: (string|number)[] = []) {
+        
+    // if (!vars?.length) {
+    //     res.setHeader('Cache-Control', `max-age=${seconds}, must-revalidate`)
+    //     return false
+    // }
+    
+    const key = crypto.createHash("sha1").update([
+        req.originalUrl,
+        START_TIME,
+        ...vars
+    ].join("-")).digest("hex");
+    
+    res.setHeader('Cache-Control', `max-age=${seconds}, no-cache`)
+    res.setHeader('Vary', 'Origin, ETag')
+    res.setHeader('ETag', key)
+
+    let ifNoneMatchValue = req.headers['if-none-match']
+    if (ifNoneMatchValue && ifNoneMatchValue === key) {
+        res.statusCode = 304
+        res.end()
+        return true
+    }
+
+    return false
 }
