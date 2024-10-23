@@ -13,10 +13,10 @@ function CloudIcon() {
         return <Loader msg="" />
     }
     if (status === "offline") {
-        return <span className="material-symbols-outlined" style={{ fontSize: "2rem" }}>cloud_off</span>
+        return <i className="material-symbols-outlined" style={{ fontSize: "2rem" }}>cloud_off</i>
     }
     if (status === "connected") {
-        return <span className="material-symbols-outlined" style={{ fontSize: "2rem" }}>cloud_done</span>
+        return <i className="material-symbols-outlined" style={{ fontSize: "2rem" }}>cloud_done</i>
     }
     if (status === "failed") {
         return <i className="fas fa-exclamation-circle" style={{ fontSize: "1.2rem" }} />
