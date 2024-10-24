@@ -67,6 +67,7 @@ route(router, {
                     ]
                 }
             ],
+            order: [[Model.sequelize!.literal('"Subscriptions.name"'), "asc"]],
             user: req.user
         });
         assert(model, NotFound);
