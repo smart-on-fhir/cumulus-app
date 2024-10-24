@@ -254,7 +254,7 @@ route(router, {
                 ],
                 right: true
             },
-            order: [["name", "asc"]],
+            order: [["name", "asc"], [GroupModel.sequelize!.literal('"requests.name"'), "asc"]],
             limit: groupLimit ? Math.max(groupLimit, 2) : undefined,
             user: req.user
         });

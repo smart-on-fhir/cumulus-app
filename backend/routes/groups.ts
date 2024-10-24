@@ -94,9 +94,14 @@ route(router, {
         }
     },
     handler: async (req, res) => {
-        const include: Includeable[] = [];
+        const options: any = {
+            include: [],
+            order  : [],
+            user   : req.user
+        }
+
         if (req.query.subscriptions) {
-            include.push({
+            options.include.push({
                 association: "requests",
                 attributes: [
                     "id",
@@ -115,8 +120,9 @@ route(router, {
                     ]
                 ]
             })
+            options.order.push([Model.sequelize!.literal('"requests.name"'), "asc"])
         }
-        const model = await Model.findByPk(+req.params.id, { include, user: req.user });
+        const model = await Model.findByPk(+req.params.id, options);
         assert(model, HttpError.NotFound);
         res.json(model)
     }
