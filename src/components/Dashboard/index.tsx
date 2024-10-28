@@ -331,7 +331,12 @@ function validateData(data: any, { column, stratifier }: { column: string, strat
             assert(typeof row[1] === "number", `Invalid data response received: data[0].rows[${i}][1] must be a number`)
             assert(row.length === 2 || typeof row[2] === "number", `Invalid data response received: data[0].rows[${i}][2] must be a number`)
             assert(row.length === 2 || typeof row[3] === "number", `Invalid data response received: data[0].rows[${i}][3] must be a number`)
-            assert(i === 0 || row[0] >= data.data[0].rows[i-1][0], "Invalid data response received: Data is not sorted")
+            if (i > 0 && typeof row[0] === "number") {
+                assert(
+                    row[0] > data.data[0].rows[i-1][0],
+                    `Invalid data response received: Data is not sorted: ${row[0]} > ${data.data[0].rows[i-1][0]}`
+                )
+            }
         })
     }
 
@@ -351,7 +356,9 @@ function validateData(data: any, { column, stratifier }: { column: string, strat
                 assert(typeof row[1] === "number", `Invalid data response received: data[${g}].rows[${i}][1] must be a number`)
                 assert(row.length === 2 || typeof row[2] === "number", `Invalid data response received: data[${g}].rows[${i}][2] must be a number`)
                 assert(row.length === 2 || typeof row[3] === "number", `Invalid data response received: data[${g}].rows[${i}][3] must be a number`)
-                assert(i === 0 || row[0] >= group.rows[i-1][0], "Invalid data response received: data[${g}].rows is not sorted")
+                if (i > 0 && typeof row[0] === "number") {
+                    assert(row[0] >= group.rows[i-1][0], "Invalid data response received: data[${g}].rows is not sorted")
+                }
             })
         })
     }
