@@ -69,12 +69,34 @@ function filter<T>(data: T[], props: Partial<T>): T[] {
     })
 }
 
-function packageColumnsChanged(pkg1: DataPackage, pkg2: DataPackage) {
-    if (pkg1.column_types_format_version !== pkg2.column_types_format_version) return true
-    if (Object.keys(pkg1.columns).length !== Object.keys(pkg2.columns).length) return true
-    const a = Object.keys(pkg1.columns).map(x => `${x}:${pkg1.columns[x]}`).sort()
-    const b = Object.keys(pkg2.columns).map(x => `${x}:${pkg1.columns[x]}`).sort()
-    return JSON.stringify(a) !== JSON.stringify(b)
+/**
+ * Used to check if a local subscription can be upgraded to newer data package.
+ * Compares the local package with a remote one and returns true if they are
+ * compatible. The be considered compatible:
+ * - Both packages should have the same `column_types_format_version`
+ * - All local columns should exist in the remote package
+ * - All local columns should have the same data type as in the remote package
+ */
+function packageColumnsChanged(local: DataPackage, remote: DataPackage): boolean {
+    if (local.column_types_format_version !== remote.column_types_format_version) return true
+
+    for (const name in local.columns) {
+        const remoteColumn = remote.columns[name]
+        
+        // Remote columns does not exist
+        if (!remoteColumn) {
+            return true
+        }
+        
+        const localColumn = local.columns[name]
+        
+        // Remote columns has different data type
+        if (localColumn !== remoteColumn) {
+            return true
+        }
+    }
+
+    return false
 }
 
 export function humanizePackageId(id: string) {
@@ -163,7 +185,6 @@ class Aggregator
 
     public async getStudies(): Promise<Study[]> {
         const data = await this.getPackages()
-        // console.log("packages ===> ", typeof data, data)
         return data.reduce((prev, cur) => {
             if (!prev.find(s => s.id === cur.study)) {
                 prev.push({
@@ -177,21 +198,15 @@ class Aggregator
 
     public async getPackages(): Promise<DataPackage[]> {
         const result: DataPackage[] = await this.fetch("/api/aggregator/data-packages")
-        
-        // if (typeof result === "string") {
-        //     throw new Error("Not connected")
-        // }
         if (!Array.isArray(result)) {
             throw new AggregatorError(`Expected array of data packages but got ${typeof result}`)
         }
-        // assert(Array.isArray(result), `Expected array of data packages but got ${typeof result}`, AggregatorError)
         return result
     }
 
     public async getPackage(id: string): Promise<DataPackage|undefined> {
         const all = await this.getPackages();
         return all.find(p => p.id === id)
-        // return this.fetch(`/api/aggregator/data_packages/${id}`)
     }
 
     public async filterPackages(props: Partial<DataPackage>): Promise<DataPackage[]> {
@@ -202,15 +217,17 @@ class Aggregator
     public async getLatestPackageId(pkgId: string) {
         const pkg = await this.getPackage(pkgId)
 
+        // PACKAGE NOT FOUND
         if (!pkg) {
-            return "" // PACKAGE_NO_LONGER_AVAILABLE
+            return "" 
         }
 
         const allPackages = await this.getPackages()
         const allVersions = filter(allPackages, { study: pkg.study, name: pkg.name })
 
+        // PACKAGE VERSION NOT FOUND
         if (!allVersions.some(x => x.version === pkg.version)) {
-            return "" // PACKAGE_NO_LONGER_AVAILABLE
+            return ""
         }
 
         allVersions.sort((a, b) => b.version.localeCompare(a.version))
@@ -218,7 +235,7 @@ class Aggregator
         for (let i = 0; i < allVersions.length; i++) {
             let current = allVersions[i];
             if (current.version <= pkg.version) {
-                return pkg.id; // "PACKAGE_UP_TO_DATE"
+                return pkg.id; // PACKAGE UP TO DATE
             }
 
             // if we are here, we have a newer version. Check the structure now
@@ -227,7 +244,8 @@ class Aggregator
             }
         }
 
-        return pkg.id; // "PACKAGE_UP_TO_DATE"
+        // PACKAGE UP TO DATE
+        return pkg.id;
     }
 }
 
