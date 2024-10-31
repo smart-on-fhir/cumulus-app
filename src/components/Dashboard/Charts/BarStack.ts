@@ -13,7 +13,8 @@ const options: Options = {
     },
     plotOptions: {
         bar: {
-            stacking: "normal"
+            stacking: "normal",
+            animation: false
         }
     },
     yAxis: {
