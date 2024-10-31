@@ -20,15 +20,6 @@ type SeriesOptions = (
     Highcharts.SeriesBarOptions
 );
 
-
-/**
- * Function from https://github.com/danro/easing-js/blob/master/easing.js
- */
-function easing(pos: number) {
-    if ((pos/=0.5) < 1) return 0.5*Math.pow(pos,2);
-    return -0.5 * ((pos-=2)*pos - 2);
-}
-
 function emToPx(em: number) {
     return Math.round(DEFAULT_FONT_SIZE * em) + "px"
 }
@@ -483,9 +474,7 @@ export function buildChartOptions({
             //     depth: options.chart?.options3d?.depth ?? Math.min(series.length * 10, 100),
             // },
             // plotBorderWidth: is3d ? 0 : options.chart?.plotBorderWidth,
-            animation: {
-                easing
-            },
+            animation: false
         },
         colors: computeColors(type, series, options),
         title: {
@@ -511,9 +500,7 @@ export function buildChartOptions({
         },
         plotOptions: {
             series: {
-                animation: {
-                    easing
-                },
+                animation: false,
                 events: {
                     click: inspection.enabled ? function(e) {
                         onInspectionChange(["series"], { selectedSeriesId: e.point.series.options.id })

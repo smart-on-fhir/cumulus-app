@@ -13,7 +13,8 @@ const options: Options = {
     },
     plotOptions: {
         bar: {
-            stacking: undefined
+            stacking: undefined,
+            animation: false
         }
     }
 }
