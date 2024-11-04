@@ -26,7 +26,7 @@ import {
 
 
 const marker: PointMarkerOptionsObject = {
-    enabled  : false,
+    enabledThreshold: 1000,
     radius   : 4,
     lineWidth: 0.5,
     states: {
