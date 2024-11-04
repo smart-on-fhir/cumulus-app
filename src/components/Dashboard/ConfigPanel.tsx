@@ -154,17 +154,17 @@ export default function ConfigPanel({
 
     const { chartOptions, chartType } = state;
 
-    const isBar    = chartType.startsWith("bar")
-    const isColumn = chartType.startsWith("column")
-    const isPie    = chartType.startsWith("pie") || chartType.startsWith("donut")
-    const isStack  = chartType.endsWith("Stack")
+    const isBar         = chartType.startsWith("bar")
+    const isColumn      = chartType.startsWith("column")
+    const isPie         = chartType.startsWith("pie") || chartType.startsWith("donut")
+    const isStack       = chartType.endsWith("Stack")
     const isBarOrColumn = isBar || isColumn
 
     return (
         <div style={{
-            color: "#666",
-            padding: "0 0.5rem 0 3px",
-            width: 330,
+            color      : "#666",
+            padding    : "0 0.5rem 0 3px",
+            width      : 330,
             marginRight: "0.5rem"
         }}>
 
