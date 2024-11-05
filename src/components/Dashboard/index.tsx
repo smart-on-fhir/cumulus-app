@@ -76,6 +76,9 @@ export interface ViewState
     inspection       : app.Inspection
     isDraft          : boolean
     loadingDataError?: Error | string | null 
+    sortBy           : string
+    limit            : number
+    offset           : number
 }
 
 interface ViewAction
@@ -110,6 +113,9 @@ export function getViewReducer({
                     column2type     : currentState.column2type,
                     ranges          : currentState.ranges,
                     inspection      : currentState.inspection,
+                    sortBy          : currentState.sortBy,
+                    limit           : currentState.limit,
+                    offset          : currentState.limit,
                     onSeriesToggle,
                     onInspectionChange,
                 })
@@ -145,6 +151,9 @@ export function getViewReducer({
                         column2type     : state.column2type,
                         ranges          : state.ranges,
                         inspection      : state.inspection,
+                        sortBy          : state.sortBy,
+                        limit           : state.limit,
+                        offset          : state.offset,
                         onSeriesToggle,
                         onInspectionChange,
                     })
@@ -193,6 +202,9 @@ export function getViewReducer({
                     column2type     : nextState.column2type,
                     ranges          : nextState.ranges,
                     inspection      : nextState.inspection,
+                    sortBy          : nextState.sortBy,
+                    limit           : nextState.limit,
+                    offset          : nextState.offset,
                     onSeriesToggle,
                     onInspectionChange,
                 })
@@ -228,7 +240,10 @@ export function getViewReducer({
                 "data",
                 "data2",
                 // "column"
-                "inspection"
+                "inspection",
+                "sortBy",
+                "limit",
+                "offset"
             ];
 
             // @ts-ignore
@@ -250,6 +265,9 @@ export function getViewReducer({
                     column2type     : nextState.column2type,
                     ranges          : nextState.ranges,
                     inspection      : nextState.inspection,
+                    sortBy          : nextState.sortBy,
+                    limit           : nextState.limit,
+                    offset          : nextState.offset,
                     onSeriesToggle,
                     onInspectionChange,
                 })
@@ -346,7 +364,7 @@ function validateData(data: any, { column, stratifier }: { column: string, strat
 
         data.data.forEach((group: any, g: number) => {
             assert(group && typeof group === "object", `Invalid data response received: data[${g}] is not an object.`)
-            assert(typeof group.stratifier === "string", `Invalid data response received: data[${g}].stratifier is not a string.`)
+            // assert(typeof group.stratifier === "string" || typeof group.stratifier === "number", `Invalid data response received: data[${g}].stratifier is not a string or number.`)
             assert(Array.isArray(group.rows), `Invalid data response received: data[${g}].rows is not an array.`)
             assert(!stratifiers[group.stratifier], `Invalid data response received: Duplicate stratifier "${group.stratifier}".`)
             stratifiers[group.stratifier] = true;
@@ -476,7 +494,13 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
             }
         },
 
-        isDraft: !!view.isDraft
+        isDraft: !!view.isDraft,
+
+        sortBy: viewSettings.sortBy || "x:asc",
+
+        limit: viewSettings.limit || 0,
+
+        offset: viewSettings.offset || 0
 
     } as ViewState);
 
@@ -502,7 +526,10 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
         tags,
         ranges,
         isDraft,
-        loadingDataError
+        loadingDataError,
+        sortBy,
+        limit,
+        offset
     } = state;
 
     const stratifierName = viewGroupBy?.name
@@ -528,7 +555,10 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
             column2: secColumnName,
             column2type,
             caption,
-            ranges
+            ranges,
+            sortBy,
+            limit,
+            offset
         }
     }
 
@@ -832,7 +862,10 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                                 tags,
                                 ranges: hasRanges(data, data2) ? ranges : null,
                                 visualOverrides: state.visualOverrides,
-                                inspection: state.inspection
+                                inspection: state.inspection,
+                                sortBy,
+                                limit,
+                                offset,
                             }}
                             onChange={state => {
                                 dispatch({ type: "UPDATE", payload: {
@@ -843,7 +876,10 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                                     filters        : [...state.filters],
                                     denominator    : state.denominator,
                                     tags           : state.tags,
-                                    visualOverrides: state.visualOverrides
+                                    visualOverrides: state.visualOverrides,
+                                    sortBy         : state.sortBy,
+                                    limit          : state.limit,
+                                    offset         : state.offset
                                 }});
                             }}
                         />

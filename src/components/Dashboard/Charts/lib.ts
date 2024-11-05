@@ -100,7 +100,10 @@ function getSeriesAndExceptions({
     column2type,
     serverOptions,
     xType,
-    ranges = {}
+    ranges = {},
+    sortBy,
+    limit,
+    offset
 }: {
     data            : app.ServerResponses.DataResponse
     data2           : app.ServerResponses.StratifiedDataResponse | null
@@ -111,6 +114,9 @@ function getSeriesAndExceptions({
     xType           : "category" | "linear" | "datetime"
     serverOptions   : Highcharts.Options
     ranges          : app.RangeOptions
+    sortBy          : string
+    limit           : number
+    offset          : number
 }): { series: SeriesOptions[], exceptions: [any, any, any?, any?][] }
 {
     let series: SeriesOptions[] = []
@@ -156,13 +162,13 @@ function getSeriesAndExceptions({
         denominator,
         isErrorRange
     }: {
-        row: [string, number, number?, number?]
+        row: [string, number | null, number?, number?]
         xType: "category" | "linear" | "datetime"
         denominator?: number
         isErrorRange?: boolean
     }): Highcharts.XrangePointOptionsObject | number | number[] | null {
     
-        if (isNaN(row[1]) || !isFinite(row[1])) {
+        if (row[1] !== null && (isNaN(row[1]) || !isFinite(row[1]))) {
             const msg = "Some invalid values detected. See console for details."
             if (!exceptions.includes(msg)) {
                 exceptions.push(msg)
@@ -172,7 +178,7 @@ function getSeriesAndExceptions({
         }
     
         const point: any = {
-            y: pct(row[1], denominator),
+            y: row[1] === null ? null : pct(row[1], denominator),
     
             // The name of the point as shown in the legend, tooltip, dataLabels, etc.
             name: String(row[0]),
@@ -321,16 +327,17 @@ function getSeriesAndExceptions({
         data.data.forEach(group => {
             const id  = (secondary ? "secondary-" : "primary-") + group.stratifier
             const old = serverOptions.series?.find(s => s.id === id)
+            const rows = sortY(group.rows)
             addSeries({
                 type: _type,
                 id,
                 name: String(old?.name ?? group.stratifier),
                 data: keys.map(key => {
-                    const row = group.rows.find(row => row[0] === key)
+                    const row = rows.find(row => row[0] === key)
                     return row ?
                         getPoint({ row, xType, denominator: getDenominator(data, denominator, row, denominatorCache) }) :
-                        null
-                }).filter(Boolean)
+                        getPoint({ row: [key, null], xType, denominator: getDenominator(data, denominator, [key, 0], denominatorCache) })//null
+                })
             }, secondary)
 
             if (ranges?.enabled) {
@@ -341,14 +348,28 @@ function getSeriesAndExceptions({
                     name: old?.name ?? group.stratifier + " (range)",
                     id  : (secondary ? "secondary-" : "primary-") + group.stratifier + " (range)",
                     data: keys.map(key => {
-                        const row = group.rows.find(row => row[0] === key)
+                        const row = rows.find(row => row[0] === key)
                         return row ?
                             getPoint({ row, xType, denominator: getDenominator(data, denominator, row, denominatorCache), isErrorRange: true,  }) :
-                            null
-                    }).filter(Boolean)
+                            getPoint({ row: [key, null, 0, 0], xType, denominator: getDenominator(data, denominator, [key, 0, 0, 0], denominatorCache) })//null
+                    })
                 });
             }
         })
+    }
+
+    function sortY(rows: any[]) {
+        const [col, dir] = sortBy.split(":")
+        if (col === "y" && xType === "category") {
+            rows.sort((a, b) => {
+                let _a = +a[1]
+                let _b = +b[1]    
+                if (isNaN(_a) || !isFinite(_a)) return 0
+                if (isNaN(_b) || !isFinite(_b)) return 0
+                return dir === "desc" ? _a - _b : _b - _a
+            })
+        }
+        return rows
     }
 
     if (data.rowCount) {
@@ -357,15 +378,18 @@ function getSeriesAndExceptions({
             const name = String(column.label || column.name)
             const id  = "primary-" + name
             const old = serverOptions.series?.find(s => s.id === id)
+
+            const rows = sortY(filterOutExceptions(data.data[0].rows, name))
+
             addSeries({
                 type,
                 id,
                 name: old?.name ?? name,
-                data: filterOutExceptions(data.data[0].rows, name).map(row => getPoint({
+                data: rows.map(row => getPoint({
                     row,
                     xType,
                     denominator: getDenominator(data, denominator, row, denominatorCache)
-                })).filter(Boolean)
+                }))
             });
 
             if (ranges?.enabled) {
@@ -375,12 +399,12 @@ function getSeriesAndExceptions({
                     type: ranges.type ?? "errorbar",
                     id,
                     name: old?.name ?? name + " (range)",
-                    data: data.data[0].rows.map(row => getPoint({
+                    data: rows.map(row => getPoint({
                         row,
                         xType,
                         denominator: getDenominator(data, denominator, row, denominatorCache),
                         isErrorRange: true
-                    })).filter(Boolean)
+                    }))
                 });
             }
         }
@@ -389,8 +413,25 @@ function getSeriesAndExceptions({
         }
     }
 
-    if (data2 && data2.rowCount) {
+    if (data2?.rowCount) {
         stratify(data2, true)
+    }
+
+    if (limit || offset) {
+        
+        // Collect all the unique X coordinates so that we can limit & offset
+        const xAxis = new Set<string>()
+        
+        series.forEach(s => s.data?.forEach((p: any) => xAxis.add(p.name)))
+
+        const from = Math.max(offset || 0, 0)
+        const ticks = sortBy === "x:asc" ?
+            Array.from(xAxis).slice(from, limit ? limit + from : undefined) :
+            Array.from(xAxis).reverse().slice(from, limit ? limit + from : undefined)
+
+        series.forEach(s => {
+            s.data = s.data!.filter((p: any) => p && ticks.includes(p.name))
+        })
     }
 
     return { series, exceptions }
@@ -434,7 +475,10 @@ export function buildChartOptions({
     onSeriesToggle,
     ranges = {},
     onInspectionChange,
-    inspection
+    inspection,
+    sortBy,
+    limit,
+    offset
 }: {
     data              : app.ServerResponses.DataResponse
     data2             : app.ServerResponses.StratifiedDataResponse | null
@@ -447,6 +491,9 @@ export function buildChartOptions({
     onSeriesToggle    : (s: Record<string, boolean>) => void
     ranges            : app.RangeOptions
     inspection        : app.Inspection
+    sortBy            : string
+    limit             : number
+    offset            : number
     onInspectionChange: (inspection: string[], context: Partial<app.InspectionContext>) => void
 }): Highcharts.Options
 {
@@ -463,8 +510,13 @@ export function buildChartOptions({
         column2type,
         xType,
         serverOptions: options,
-        ranges
+        ranges,
+        sortBy,
+        limit,
+        offset
     });
+
+    const [col, dir] = (sortBy || "").split(":")
 
     const dynamicOptions: Highcharts.Options = {
         chart: {
@@ -649,7 +701,25 @@ export function buildChartOptions({
         xAxis: {
             type: xType,
             crosshair: !inspection.enabled && type.includes("line"),
+            reversed: (() => {
+                if (col === "x") {
+                    if (xType === "category") {
+                        return type === "bar" ? dir === "desc" : dir === "asc"
+                    }
+                    if (xType === "datetime") {
+                        return type === "bar" ? dir === "asc" : dir === "desc"
+                    }
+                    if (xType === "linear") {
+                        return type === "bar" ? dir === "asc" : dir === "desc"
+                    }
+                }
+                return false
+            })(),
             labels: {
+                autoRotation: [-45, -90],
+                // formatter() {
+                //     return ellipsis(this.value + "", 20)
+                // },
                 style: {
                     // @ts-ignore
                     fontSize: lengthToEm(options.xAxis?.labels?.style?.fontSize ?? "0.85em") + "em"
