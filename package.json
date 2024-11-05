@@ -97,6 +97,7 @@
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "commander": "^11.1.0",
+    "fork-ts-checker-webpack-plugin": "^6.5.3",
     "mocha": "^10.7.3",
     "nodemon": "^2.0.20",
     "nyc": "^15.1.0",
