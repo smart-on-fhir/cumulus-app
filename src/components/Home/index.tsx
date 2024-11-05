@@ -146,7 +146,7 @@ function UpdateCheck({ subscriptions }: { subscriptions: app.Subscription[] }) {
             setToUpdate(_toUpdate)
             setToDelete(_toDelete)
         }).catch(() => {})
-    }, [])
+    }, [ aggregator, subscriptions ])
 
     if (!toDelete && !toUpdate) {
         return null
