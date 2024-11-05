@@ -732,6 +732,8 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                 loadingData: false
             }})
         })
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [requestId, stratifierName, viewColumnName, filter, secColumnName]);
 
     useEffect(() => { loadData() }, [loadData])
