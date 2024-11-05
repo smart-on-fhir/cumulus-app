@@ -20,7 +20,7 @@ function Icon({ subscription }: { subscription: app.Subscription }) {
         if (dataURL) {
             aggregator.getLatestPackageId(dataURL).catch(() => "").then(setVersion)
         }
-    }, [dataURL])
+    }, [dataURL, aggregator])
 
     if (dataURL && status === "connected" && version !== null && version !== dataURL) {
         if (version === "") {

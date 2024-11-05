@@ -7,7 +7,7 @@ export default function PackageVersionCheck({ pkgId }: { pkgId: string }) {
     const [version, setVersion] = useState<string | null>(null)
     useEffect(() => {
         aggregator.getLatestPackageId(pkgId).then(setVersion)
-    })
+    }, [pkgId])
     if (version === null) {
         return null;
     }
