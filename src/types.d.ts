@@ -113,6 +113,9 @@ export declare module app {
         caption?: string // HTML chart caption
         seriesVisibility?: Record<string, boolean>
         ranges?: RangeOptions
+        sortBy?: string
+        limit ?: number
+        offset?: number
     }
 
     interface VisualOverridesState {

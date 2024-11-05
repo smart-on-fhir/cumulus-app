@@ -109,12 +109,29 @@ function SecondaryDataEditor({
     )
 }
 
+function getXType(column: app.SubscriptionDataColumn): "category" | "linear" | "datetime" {
+    
+    let xType: "category" | "linear" | "datetime" = "category";
+
+    if (column.dataType === "integer" || column.dataType === "float") {
+        xType = "linear"
+    }
+
+    else if (column.dataType.startsWith("date")) {
+        xType = "datetime"
+    }
+
+    return xType;
+}
+
 // ----------------------------------------------------------------------------
 
 interface ChartConfigPanelState {
     groupBy        : string
     stratifyBy     : string
     sortBy         : string
+    limit          : number
+    offset         : number
     filters        : any[]
     chartType      : SupportedChartType
     viewName       : string
@@ -159,6 +176,10 @@ export default function ConfigPanel({
     const isPie         = chartType.startsWith("pie") || chartType.startsWith("donut")
     const isStack       = chartType.endsWith("Stack")
     const isBarOrColumn = isBar || isColumn
+    const xType         = getXType(cols.find(c => c.name === state.groupBy)!)
+    const isCategory    = xType === "category"
+    const xLabel        = isPie ? "Label" : isBar ? "Y" : "X"
+    const yLabel        = isPie ? "Value" : isBar ? "X" : "Y"
 
     return (
         <div style={{
@@ -404,6 +425,8 @@ export default function ConfigPanel({
                                     onChange={ (stratifyBy: string) => onChange({
                                         ...state,
                                         stratifyBy,
+                                        offset: 0,
+                                        limit: 0,
                                         denominator: (state.denominator === "local" || state.denominator === "count") && !stratifyBy ? "" : state.denominator
                                     }) }
                                 />
@@ -503,6 +526,52 @@ export default function ConfigPanel({
                         </> }
 
                         { isPie && <SliceEditor state={state} onChange={onChange} /> }
+
+                        <div className="row half-gap">
+                                <div className="col col-5">
+                                    <label>Sort {!!state.stratifyBy && <i className="fa fa-info-circle color-muted" data-tooltip="Sorting data may produce unexpected results in stratified charts because every group is sorted separately." />}</label>
+                                    <Select
+                                        right
+                                        options={[
+                                            {
+                                                label: xLabel + ": asc",
+                                                icon : "fas fa-sort-amount-down-alt color-blue",
+                                                value: "x:asc",
+                                            },
+                                            {
+                                                label: xLabel + ": desc",
+                                                icon : "fas fa-sort-amount-down color-blue",
+                                                value: "x:desc",
+                                            },
+                                            {
+                                                label: yLabel + ": asc",
+                                                icon : "fas fa-sort-amount-down-alt color-blue",
+                                                value: "y:asc",
+                                                disabled: !isCategory
+                                            },
+                                            {
+                                                label: yLabel + ": desc",
+                                                icon : "fas fa-sort-amount-down color-blue",
+                                                value: "y:desc",
+                                                disabled: !isCategory
+                                            }
+                                        ]}
+                                        value={ state.sortBy }
+                                        onChange={ sortBy => onChange({ ...state, sortBy })}>
+                                    </Select>
+                                </div>
+                                <div className="col">
+                                    <label>Offset</label>
+                                    <input type="number" min={0} value={state.offset} onChange={e => onChange({ ...state, offset: e.target.valueAsNumber })} />
+                                </div>
+                                <div className="col">
+                                    <label>Limit</label>
+                                    <input type="number" min={ 0 } value={ state.limit } onChange={e => onChange({ ...state, limit: e.target.valueAsNumber })} />
+                                </div>
+                            </div>
+                            <p className="small color-muted">
+                                Use offset and limit to slice the available data
+                            </p>
                         <br />
                     </div>
                 </Collapse>
