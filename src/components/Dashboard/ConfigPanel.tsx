@@ -563,11 +563,11 @@ export default function ConfigPanel({
                                 </div>
                                 <div className="col">
                                     <label>Offset</label>
-                                    <input type="number" min={0} value={state.offset} onChange={e => onChange({ ...state, offset: e.target.valueAsNumber })} />
+                                    <input type="number" min={0} value={ state.offset || 0 } onChange={e => onChange({ ...state, offset: e.target.valueAsNumber })} />
                                 </div>
                                 <div className="col">
                                     <label>Limit</label>
-                                    <input type="number" min={ 0 } value={ state.limit } onChange={e => onChange({ ...state, limit: e.target.valueAsNumber })} />
+                                    <input type="number" min={ 0 } value={ state.limit || 0 } onChange={e => onChange({ ...state, limit: e.target.valueAsNumber })} />
                                 </div>
                             </div>
                             <p className="small color-muted">

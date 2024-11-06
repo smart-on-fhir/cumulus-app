@@ -115,7 +115,7 @@ export function getViewReducer({
                     inspection      : currentState.inspection,
                     sortBy          : currentState.sortBy,
                     limit           : currentState.limit,
-                    offset          : currentState.limit,
+                    offset          : currentState.offset,
                     onSeriesToggle,
                     onInspectionChange,
                 })
