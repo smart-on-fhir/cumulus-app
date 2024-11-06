@@ -358,6 +358,9 @@ function getSeriesAndExceptions({
         })
     }
 
+    // Sort data by Y if so requested by the user. Note that we do not sort in 
+    // case of X because it only works for category charts. For linear and date
+    // axises we need to use axis.reversed instead.
     function sortY(rows: any[]) {
         const [col, dir] = sortBy.split(":")
         if (col === "y" && xType === "category") {
@@ -366,7 +369,7 @@ function getSeriesAndExceptions({
                 let _b = +b[1]    
                 if (isNaN(_a) || !isFinite(_a)) return 0
                 if (isNaN(_b) || !isFinite(_b)) return 0
-                return dir === "desc" ? _a - _b : _b - _a
+                return dir === "desc" ? _b - _a : _a - _b
             })
         }
         return rows
@@ -425,9 +428,16 @@ function getSeriesAndExceptions({
         series.forEach(s => s.data?.forEach((p: any) => xAxis.add(p.name)))
 
         const from = Math.max(offset || 0, 0)
-        const ticks = sortBy === "x:asc" ?
-            Array.from(xAxis).slice(from, limit ? limit + from : undefined) :
-            Array.from(xAxis).reverse().slice(from, limit ? limit + from : undefined)
+        let ticks = Array.from(xAxis)
+        if (sortBy === "x:desc") { // reversed!
+            const end = Math.max(ticks.length - from, 0)
+            ticks = ticks.slice(0, end)
+            if (limit) {
+                ticks = ticks.slice(Math.max(ticks.length - limit, 0));
+            }
+        } else {
+            ticks = ticks.slice(from, limit ? limit + from : undefined);
+        }
 
         series.forEach(s => {
             s.data = s.data!.filter((p: any) => p && ticks.includes(p.name))
@@ -701,17 +711,24 @@ export function buildChartOptions({
         xAxis: {
             type: xType,
             crosshair: !inspection.enabled && type.includes("line"),
+            // reversed: false,//dir === "desc",//type === "bar" || sortBy === "x:desc",
+            // reversed: col === "x" ? (type === "bar" ? true : dir === "asc") : false,
+            // reversed: type === "bar" && dir !== "desc",
             reversed: (() => {
+                if (type === "bar") {
+                    return col === "y" || (col === "x" && dir === "asc")
+                }
                 if (col === "x") {
-                    if (xType === "category") {
-                        return type === "bar" ? dir === "desc" : dir === "asc"
-                    }
-                    if (xType === "datetime") {
-                        return type === "bar" ? dir === "asc" : dir === "desc"
-                    }
-                    if (xType === "linear") {
-                        return type === "bar" ? dir === "asc" : dir === "desc"
-                    }
+                    return dir === "desc"
+            //         if (xType === "category") {
+            //             return type === "bar" ? dir === "asc" : dir === "desc"
+            //         }
+            //         if (xType === "datetime") {
+            //             return type === "bar" ? dir === "asc" : dir === "desc"
+            //         }
+            //         if (xType === "linear") {
+            //             return type === "bar" ? dir === "asc" : dir === "desc"
+            //         }
                 }
                 return false
             })(),
