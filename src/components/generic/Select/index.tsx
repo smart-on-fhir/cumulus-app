@@ -47,6 +47,19 @@ export default function Select({
     const [ menuOpen, setMenuOpen ] = useState(false)
     const wrapper = useRef<HTMLDivElement>(null)
 
+    function nextEnabledOptionIndex(fromIndex = -1) {
+        return options.findIndex((opt, i) => i > fromIndex && !opt.disabled)
+    }
+
+    function prevEnabledOptionIndex(fromIndex = -1) {
+        while (--fromIndex > 0) {
+            if (!options[fromIndex].disabled) {
+                return fromIndex
+            }
+        }
+        return fromIndex
+    }
+
     useEffect(() => {
         wrapper?.current?.querySelector(".select-component-option.highlighted")?.scrollIntoView?.({ block: "nearest", inline: "nearest", behavior: "instant" })
     })
@@ -57,21 +70,26 @@ export default function Select({
             case "ArrowDown":
                 if (!menuOpen) {
                     e.preventDefault()
+                    setHighlightedIndex(selectedIndex)
                     openMenu()
                 } else if (highlightedIndex < options.length - 1) {
                     e.preventDefault()
-                    setHighlightedIndex(highlightedIndex + 1);
+                    // setHighlightedIndex(highlightedIndex + 1);
+                    setHighlightedIndex(nextEnabledOptionIndex(highlightedIndex))
                 }
                 break;
             case "ArrowUp":
                 if (highlightedIndex > 0) {
                     e.preventDefault()
                     if (menuOpen) {
-                        setHighlightedIndex(highlightedIndex - 1);
+                        // setHighlightedIndex(highlightedIndex - 1);
+                        setHighlightedIndex(prevEnabledOptionIndex(highlightedIndex))
                     } else {
+                        setHighlightedIndex(selectedIndex)
                         openMenu()
                     }
                 } else {
+                    setHighlightedIndex(selectedIndex)
                     closeMenu()
                 }
                 break;
