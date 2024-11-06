@@ -399,7 +399,7 @@ export default function ConfigPanel({
                                 cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max") }
                                 value={ state.groupBy }
                                 disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
-                                onChange={ (groupBy: string) => onChange({ ...state, groupBy }) }
+                                onChange={ (groupBy: string) => onChange({ ...state, groupBy, offset: 0, limit: 0, sortBy: "x:asc" }) }
                             />
                             <p className="small color-muted"> {
                                 isPie ?
@@ -427,6 +427,7 @@ export default function ConfigPanel({
                                         stratifyBy,
                                         offset: 0,
                                         limit: 0,
+                                        sortBy: "x:asc",
                                         denominator: (state.denominator === "local" || state.denominator === "count") && !stratifyBy ? "" : state.denominator
                                     }) }
                                 />
