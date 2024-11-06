@@ -331,6 +331,7 @@ function getSeriesAndExceptions({
             addSeries({
                 type: _type,
                 id,
+                zIndex: secondary ? 0 : 1,
                 name: String(old?.name ?? group.stratifier),
                 data: keys.map(key => {
                     const row = rows.find(row => row[0] === key)
@@ -347,6 +348,7 @@ function getSeriesAndExceptions({
                     type: ranges.type ?? "errorbar",
                     name: old?.name ?? group.stratifier + " (range)",
                     id  : (secondary ? "secondary-" : "primary-") + group.stratifier + " (range)",
+                    zIndex: secondary ? 0 : 1,
                     data: keys.map(key => {
                         const row = rows.find(row => row[0] === key)
                         return row ?
