@@ -10,6 +10,7 @@ import {
     COLOR_THEMES,
     DEFAULT_COLOR_THEME
 } from "../config"
+import { zIndex } from "html2canvas/dist/types/css/property-descriptors/z-index"
 
 
 type SeriesOptions = (
@@ -578,6 +579,7 @@ export function buildChartOptions({
                         }
                     }
                 },
+                dataSorting: { enabled: false },
                 states: {
                     hover: {
                         opacity: 1
