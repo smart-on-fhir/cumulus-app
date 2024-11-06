@@ -345,7 +345,7 @@ function validateData(data: any, { column, stratifier }: { column: string, strat
         assert(data.data[0].rows.length === data.rowCount, `Invalid data response received: Expected data[0].rows to have length equal to "rowCount".`)
 
         data.data[0].rows.forEach((row: Point, i: number) => {
-            assert(typeof row[0] === "string" || typeof row[0] === "number", `Invalid data response received: data[0].rows[${i}][0] must be a string or number`)
+            // assert(typeof row[0] === "string" || typeof row[0] === "number", `Invalid data response received: data[0].rows[${i}][0] must be a string or number`)
             assert(typeof row[1] === "number", `Invalid data response received: data[0].rows[${i}][1] must be a number`)
             assert(row.length === 2 || typeof row[2] === "number", `Invalid data response received: data[0].rows[${i}][2] must be a number`)
             assert(row.length === 2 || typeof row[3] === "number", `Invalid data response received: data[0].rows[${i}][3] must be a number`)
@@ -370,7 +370,7 @@ function validateData(data: any, { column, stratifier }: { column: string, strat
             stratifiers[group.stratifier] = true;
 
             group.rows.forEach((row: Point, i: number) => {
-                assert(typeof row[0] === "string", `Invalid data response received: data[${g}].rows[${i}][0] must be a string`)
+                // assert(typeof row[0] === "string", `Invalid data response received: data[${g}].rows[${i}][0] must be a string`)
                 assert(typeof row[1] === "number", `Invalid data response received: data[${g}].rows[${i}][1] must be a number`)
                 assert(row.length === 2 || typeof row[2] === "number", `Invalid data response received: data[${g}].rows[${i}][2] must be a number`)
                 assert(row.length === 2 || typeof row[3] === "number", `Invalid data response received: data[${g}].rows[${i}][3] must be a number`)
