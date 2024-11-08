@@ -530,7 +530,7 @@ export default function ConfigPanel({
 
                         <div className="row half-gap">
                                 <div className="col col-5">
-                                    <label>Sort {!!state.stratifyBy && <i className="fa fa-info-circle color-muted" data-tooltip="Sorting data may produce unexpected results in stratified charts because every group is sorted separately." />}</label>
+                                    <label>Sort {!!state.stratifyBy && state.sortBy.startsWith("y:") && <i className="fa fa-info-circle color-muted" data-tooltip="Sorting by count may produce unexpected results in stratified charts because every group is sorted separately." />}</label>
                                     <Select
                                         right
                                         options={[
@@ -571,7 +571,7 @@ export default function ConfigPanel({
                                 </div>
                             </div>
                             <p className="small color-muted">
-                                Use offset and limit to slice the available data
+                                Use offset, limit, and sort to slice the available data
                             </p>
                         <br />
                     </div>
