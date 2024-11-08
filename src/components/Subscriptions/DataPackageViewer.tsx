@@ -68,10 +68,10 @@ export default function DataPackageViewer({ packageId }: { packageId: string }) 
     return (
         <>
             <h5 className="mt-2 color-blue-dark">
-                <i className="fa-solid fa-database"/> Available Data
+                <i className="fas fa-table"/> Package Data
             </h5>
             <hr />
-            <div className="row wrap gap mb-2">
+            <div className="row wrap gap mb-1">
                 <div className="col col-0">
                     <p className="nowrap">
                         <b>Last data update: </b>
@@ -86,6 +86,11 @@ export default function DataPackageViewer({ packageId }: { packageId: string }) 
                     </p>
                 </div>
             </div>
+            <ColumnsTable cols={cols} />
+            <h5 className="mt-2 color-blue-dark">
+                <i className="fa-solid fa-database"/> Study Data
+            </h5>
+            <hr className="mb-05" />
             { loading ?
                 <p><Loader msg="Loading study periods" /></p> :
                 transmissions.length > 0 ?
@@ -98,9 +103,6 @@ export default function DataPackageViewer({ packageId }: { packageId: string }) 
                         <b><i className="fa-regular fa-circle-xmark" />&nbsp;Study periods data not available</b>
                     </Alert>
                 }
-            <br />
-            <ColumnsTable cols={cols} />
-            <br />
         </>
     )
 }
