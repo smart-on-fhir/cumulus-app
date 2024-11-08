@@ -91,6 +91,68 @@ function getLocalDenominator(data: app.ServerResponses.StratifiedDataResponse, p
     return out
 }
 
+function filterOutExceptions({
+    rows,
+    seriesName,
+    exceptions,
+    column,
+    xType
+}: {
+    rows       : [any, any, any?, any?][]
+    seriesName?: string
+    xType      : "datetime" | "linear" | "category"
+    exceptions : string[]
+    column     : app.SubscriptionDataColumn
+}) {
+    return rows.filter(row => {
+
+        function pushException() {
+            const x   = row[0]
+            const y   = +row[1]
+            let msg = y === 1 ? 
+                `There is <b>1</b> record ` :
+                `There are <b>${y.toLocaleString()}</b> records `;
+            if (seriesName) {
+                msg += `in the <b>${seriesName}</b> series `
+            }
+            msg += `where <b>${column.label}</b> equals <b>${x}</b>`
+            if (!exceptions.includes(msg)) {
+                exceptions.push(msg)
+            }
+        }
+
+        if (xType === "linear") {
+            const n = +row[0]
+            if (isNaN(n) || !isFinite(n)) {
+                pushException()
+                return false
+            }
+        }
+        else if (xType === "datetime" && !moment(row[0], true).isValid()) {
+            pushException()
+            return false
+        }
+        return true
+    })
+}
+
+// Sort data by Y if so requested by the user. Note that we do not sort in 
+// case of X because it only works for category charts. For linear and date
+// axises we need to use axis.reversed instead.
+function sortY(rows: any[], sortBy: string, xType: "datetime" | "linear" | "category") {
+    const [col, dir] = sortBy.split(":")
+    if (col === "y" && xType === "category") {
+        rows.sort((a, b) => {
+            let _a = +a[1]
+            let _b = +b[1]    
+            if (isNaN(_a) || !isFinite(_a)) return 0
+            if (isNaN(_b) || !isFinite(_b)) return 0
+            return dir === "desc" ? _b - _a : _a - _b
+        })
+    }
+    return rows
+}
+
 function getSeriesAndExceptions({
     column,
     data,
@@ -123,38 +185,10 @@ function getSeriesAndExceptions({
 
     const exceptions: any[] = [];
 
-    function filterOutExceptions(rows: [any, any, any?, any?][], seriesName?: string) {
-        return rows.filter(row => {
+    // Collect all the unique X coordinates so that we can limit & offset
+    const xAxis = new Set<string>()
 
-            function pushException() {
-                const x   = row[0]
-                const y   = +row[1]
-                let msg = y === 1 ? 
-                    `There is <b>1</b> record ` :
-                    `There are <b>${y.toLocaleString()}</b> records `;
-                if (seriesName) {
-                    msg += `in the <b>${seriesName}</b> series `
-                }
-                msg += `where <b>${column.label}</b> equals <b>${x}</b>`
-                if (!exceptions.includes(msg)) {
-                    exceptions.push(msg)
-                }
-            }
-
-            if (xType === "linear") {
-                const n = +row[0]
-                if (isNaN(n) || !isFinite(n)) {
-                    pushException()
-                    return false
-                }
-            }
-            else if (xType === "datetime" && !moment(row[0], true).isValid()) {
-                pushException()
-                return false
-            }
-            return true
-        })
-    }
+    let xTicks: string[] = [];
 
     function getPoint({
         row,
@@ -173,7 +207,7 @@ function getSeriesAndExceptions({
             if (!exceptions.includes(msg)) {
                 exceptions.push(msg)
             }
-            console.warn('Invalid point value "%s". Row: %o', row[1], row)
+            console.info('Invalid point value "%s". Row: %o', row[1], row)
             return null
         }
     
@@ -305,97 +339,106 @@ function getSeriesAndExceptions({
 
         const denominatorCache = {}
 
-        let keys: any[] = [];
         data.data.forEach(group => {
-            filterOutExceptions(group.rows, group.stratifier).forEach(row => {
-                if (!keys.includes(row[0])) {
-                    keys.push(row[0])
+            filterOutExceptions({ rows: group.rows, seriesName: group.stratifier, column, exceptions, xType })
+            .forEach(row => {
+                if (!secondary) {
+                    xAxis.add(row[0] + "")
                 }
             })
         })
 
+        xTicks = Array.from(xAxis)
+
+        // For category charts we don't allow highcharts to sort the data.
+        // However, for other types we need to sort it ourselves
         if (xType === "linear") {
-            keys.sort((a, b) => a - b);
+            // @ts-ignore
+            xTicks.sort((a, b) => a - b);
         }
         else if (xType === "datetime") {
-            keys.sort((a, b) => +new Date(a) - +new Date(b));
+            // @ts-ignore
+            xTicks.sort((a, b) => +new Date(a) - +new Date(b));
         }
         else {
-            // keys.sort((a, b) => String(a).localeCompare(b + ""));
+            xTicks.sort((a, b) => a.localeCompare(b));
         }
         
         data.data.forEach(group => {
-            const id  = (secondary ? "secondary-" : "primary-") + group.stratifier
-            const old = serverOptions.series?.find(s => s.id === id)
-            const rows = sortY(group.rows)
+            const id   = (secondary ? "secondary-" : "primary-") + group.stratifier
+            const old  = serverOptions.series?.find(s => s.id === id)
+            const rows = sortY(group.rows, sortBy, xType)
+
             addSeries({
-                type: _type,
                 id,
-                zIndex: secondary ? 0 : 1,
-                name: String(old?.name ?? group.stratifier),
-                data: keys.map(key => {
-                    const row = rows.find(row => row[0] === key)
-                    return row ?
-                        getPoint({ row, xType, denominator: getDenominator(data, denominator, row, denominatorCache) }) :
-                        getPoint({ row: [key, null], xType, denominator: getDenominator(data, denominator, [key, 0], denominatorCache) })//null
+                name       : String(old?.name ?? group.stratifier),
+                type       : _type,
+                linkedTo   : secondary ? "primary-" + group.stratifier : undefined,
+                zIndex     : secondary ? 0 : 1,
+                data       : xTicks.map(key => {
+                    const row = rows.find(row => row[0] + "" === key)
+                    return getPoint({
+                        row: row || [key + "", null, 0, 0],
+                        xType,
+                        denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache)
+                    })
                 })
             }, secondary)
 
             if (ranges?.enabled) {
-                const id  = (secondary ? "secondary-" : "primary-") + group.stratifier + " (range)"
-                const old = serverOptions.series?.find(s => s.id === id)
+                const _id  = (secondary ? "secondary-" : "primary-") + group.stratifier + " (range)"
+                const old = serverOptions.series?.find(s => s.id === _id)
                 addSeries({
-                    type: ranges.type ?? "errorbar",
-                    name: old?.name ?? group.stratifier + " (range)",
-                    id  : (secondary ? "secondary-" : "primary-") + group.stratifier + " (range)",
-                    zIndex: secondary ? 0 : 1,
-                    data: keys.map(key => {
-                        const row = rows.find(row => row[0] === key)
-                        return row ?
-                            getPoint({ row, xType, denominator: getDenominator(data, denominator, row, denominatorCache), isErrorRange: true,  }) :
-                            getPoint({ row: [key, null, 0, 0], xType, denominator: getDenominator(data, denominator, [key, 0, 0, 0], denominatorCache) })//null
+                    type    : ranges.type ?? "errorbar",
+                    name    : old?.name ?? group.stratifier + " (range)",
+                    id      : _id,
+                    linkedTo: id,
+                    zIndex  : secondary ? 0 : 1,
+                    data    : xTicks.map(key => {
+                        const row = rows.find(row => row[0] + "" === key)
+                        return getPoint({
+                            row: row || [key + "", null, 0, 0],
+                            xType,
+                            denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache),
+                            isErrorRange: true
+                        })
                     })
                 });
             }
         })
     }
 
-    // Sort data by Y if so requested by the user. Note that we do not sort in 
-    // case of X because it only works for category charts. For linear and date
-    // axises we need to use axis.reversed instead.
-    function sortY(rows: any[]) {
-        const [col, dir] = sortBy.split(":")
-        if (col === "y" && xType === "category") {
-            rows.sort((a, b) => {
-                let _a = +a[1]
-                let _b = +b[1]    
-                if (isNaN(_a) || !isFinite(_a)) return 0
-                if (isNaN(_b) || !isFinite(_b)) return 0
-                return dir === "desc" ? _b - _a : _a - _b
-            })
-        }
-        return rows
-    }
-
     if (data.rowCount) {
         if (!data.stratifier) {
             const denominatorCache = {}
             const name = String(column.label || column.name)
-            const id  = "primary-" + name
-            const old = serverOptions.series?.find(s => s.id === id)
+            const id   = "primary-" + name
+            const old  = serverOptions.series?.find(s => s.id === id)
+            const rows = sortY(filterOutExceptions({ rows: data.data[0].rows, seriesName: name, column, exceptions, xType }), sortBy, xType)
 
-            const rows = sortY(filterOutExceptions(data.data[0].rows, name))
+            const seriesData = rows.map(row => {
+                xAxis.add(row[0] + "")
+                return getPoint({
+                    row,
+                    xType,
+                    denominator: getDenominator(data, denominator, row, denominatorCache),
+                })
+            })
+
+            if (type === "pie" && sortBy.startsWith("x:")) {
+                // @ts-ignore
+                seriesData.sort((a, b) => sortBy === "x:asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name))
+            }
 
             addSeries({
                 type,
                 id,
                 name: old?.name ?? name,
-                data: rows.map(row => getPoint({
-                    row,
-                    xType,
-                    denominator: getDenominator(data, denominator, row, denominatorCache)
-                }))
+                data: seriesData,
+                dataSorting: { enabled: false },
             });
+
+            xTicks = Array.from(xAxis)
 
             if (ranges?.enabled) {
                 const id  = "primary-" + name + " (range)"
@@ -404,6 +447,8 @@ function getSeriesAndExceptions({
                     type: ranges.type ?? "errorbar",
                     id,
                     name: old?.name ?? name + " (range)",
+                    linkedTo: "primary-" + name,
+                    dataSorting: { enabled: false },
                     data: rows.map(row => getPoint({
                         row,
                         xType,
@@ -416,34 +461,28 @@ function getSeriesAndExceptions({
         else {
             stratify(data as app.ServerResponses.StratifiedDataResponse)
         }
-    }
 
-    if (data2?.rowCount) {
-        stratify(data2, true)
-    }
-
-    if (limit || offset) {
-        
-        // Collect all the unique X coordinates so that we can limit & offset
-        const xAxis = new Set<string>()
-        
-        series.forEach(s => s.data?.forEach((p: any) => xAxis.add(p.name)))
-
-        const from = Math.max(offset || 0, 0)
-        let ticks = Array.from(xAxis)
-        if (sortBy === "x:desc") { // reversed!
-            const end = Math.max(ticks.length - from, 0)
-            ticks = ticks.slice(0, end)
-            if (limit) {
-                ticks = ticks.slice(Math.max(ticks.length - limit, 0));
-            }
-        } else {
-            ticks = ticks.slice(from, limit ? limit + from : undefined);
+        if (data2?.rowCount) {
+            stratify(data2, true)
         }
 
-        series.forEach(s => {
-            s.data = s.data!.filter((p: any) => p && ticks.includes(p.name))
-        })
+        if (limit || offset) {
+
+            const from = Math.max(offset || 0, 0)
+            if (sortBy === "x:desc") { // reversed!
+                const end = Math.max(xTicks.length - from, 0)
+                xTicks = xTicks.slice(0, end)
+                if (limit) {
+                    xTicks = xTicks.slice(Math.max(xTicks.length - limit, 0));
+                }
+            } else {
+                xTicks = xTicks.slice(from, limit ? limit + from : undefined);
+            }
+
+            series.forEach(s => {
+                s.data = s.data!.filter((p: any) => xTicks.includes(p.name))
+            })
+        }
     }
 
     return { series, exceptions }
@@ -453,9 +492,11 @@ function computeColors(chartType: string, series: any[], options: any)
 {
     // @ts-ignore What theme is currently being used
     const themeId = options.custom?.theme || DEFAULT_COLOR_THEME
+
+    const themeColors = COLOR_THEMES.find(t => t.id === themeId)!.colors
     
     // @ts-ignore Start with the initial colors - from DB or from the theme
-    const orig = options.colors || COLOR_THEMES.find(t => t.id === themeId)!.colors
+    const orig = options.colors || themeColors
 
     // The colors to be used in the current chart
     let colors = [...orig]
@@ -468,7 +509,7 @@ function computeColors(chartType: string, series: any[], options: any)
     } else if (newLength > oldLength) {
         colors = []
         for (let i = 0; i < newLength; i++) {
-            colors.push(orig[i % orig.length])
+            colors.push(options.colors?.[i] || themeColors[i % themeColors.length])
         }
     }
 
@@ -601,7 +642,6 @@ export function buildChartOptions({
                 }
             },
             areasplinerange: {
-                linkedTo: ':previous',
                 marker: {
                     enabled: false,
                     states: {
@@ -615,9 +655,6 @@ export function buildChartOptions({
                         enabled: !!inspection.enabled // No hover on ranges normally
                     }
                 }
-            },
-            errorbar: {
-                linkedTo: ':previous'
             }
         },
         tooltip: {
