@@ -13,7 +13,7 @@ describe("Data Types", () => {
         expect(DATA_TYPES.integer.get("2"   )).to.equal(2)
         expect(DATA_TYPES.integer.get("2g"  )).to.equal(2)
         expect(DATA_TYPES.integer.get("2.3g")).to.equal(2)
-        expect(DATA_TYPES.integer.get(NAMESPACE_PREFIX + "x")).to.equal("x")
+        expect(DATA_TYPES.integer.get(NAMESPACE_PREFIX + "x")).to.equal(NAMESPACE_PREFIX + "x")
     
         expect(() => DATA_TYPES.integer.set("a"        )).to.throw("Value a is not an integer")
         expect(() => DATA_TYPES.integer.set("Infinity" )).to.throw("Value Infinity is infinite")
@@ -31,7 +31,7 @@ describe("Data Types", () => {
         expect(DATA_TYPES.float.get("2"   )).to.equal(2)
         expect(DATA_TYPES.float.get("2g"  )).to.equal(2)
         expect(DATA_TYPES.float.get("2.3g")).to.equal(2.3)
-        expect(DATA_TYPES.float.get(NAMESPACE_PREFIX + "x")).to.equal("x")
+        expect(DATA_TYPES.float.get(NAMESPACE_PREFIX + "x")).to.equal(NAMESPACE_PREFIX + "x")
 
         expect(() => DATA_TYPES.float.set("a"        )).to.throw("Value a is not a number")
         expect(() => DATA_TYPES.float.set("Infinity" )).to.throw("Value Infinity is infinite")
@@ -67,7 +67,7 @@ describe("Data Types", () => {
         expect(DATA_TYPES.boolean.get("1"        )).to.equal(true)
         expect(DATA_TYPES.boolean.get("true"     )).to.equal(true)
         expect(DATA_TYPES.boolean.get("yes"      )).to.equal(true)
-        expect(DATA_TYPES.boolean.get(NAMESPACE_PREFIX + "x")).to.equal("x")
+        expect(DATA_TYPES.boolean.get(NAMESPACE_PREFIX + "x")).to.equal(NAMESPACE_PREFIX + "x")
     })
 
     it ("day", () => {
