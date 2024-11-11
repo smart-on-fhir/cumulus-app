@@ -1,31 +1,10 @@
-import { useEffect, useReducer, useState } from "react"
-import Checkbox                 from "../generic/Checkbox"
-import Grid                     from "../generic/Grid"
-import { TemplateEditor }       from "./editors"
-import { schema }               from "./Schema"
+import { useEffect, useState } from "react"
+import Checkbox                from "../generic/Checkbox"
+import Grid                    from "../generic/Grid"
+import { TemplateEditor }      from "./editors"
+import { schema }              from "./Schema"
 import "./Study.scss"
 
-
-interface State {
-    visitStartDate       ?: string
-    visitEndDate         ?: string
-    includePatientHistory?: boolean
-    dataSites            ?: string[]
-    patientAgeMin        ?: number
-    patientAgeMinUnits   ?: "years" | "months" | "weeks"
-    patientAgeMax        ?: number
-    patientAgeMaxUnits   ?: "years" | "months" | "weeks"
-    clinicalSex          ?: string[]
-    encounterClass       ?: string
-    encounterType        ?: string
-    noteType             ?: string
-    minCountVisits       ?: number
-    maxCountVisits       ?: number
-}
-
-function reducer(state: State, payload: Partial<State>): State {
-    return { ...state, ...payload }
-}
 
 export default function StudyBuilder() {
 

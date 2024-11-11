@@ -13,6 +13,7 @@ import {
 } from "./Schema"
 
 function ifTrue(state: Record<string, any>, expr: string, y:any = true, n:any = false) {
+    // eslint-disable-next-line no-new-func
     return Function(
         Object.keys(state).join(","), `if (${expr}) { return ${y}; } return ${n};`
     )(...Object.values(state))
