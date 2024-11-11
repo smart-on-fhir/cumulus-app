@@ -25,7 +25,7 @@ function createGetter(fn: (x: string) => any) {
             return x
         } 
         if (isPrivateValue(x)) {
-            return x.slice(NAMESPACE_PREFIX.length)
+            return x//.slice(NAMESPACE_PREFIX.length)
         }
         else {
             return fn(x)
