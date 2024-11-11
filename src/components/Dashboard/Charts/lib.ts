@@ -115,7 +115,14 @@ function filterOutExceptions({
             if (seriesName) {
                 msg += `in the <b>${seriesName}</b> series `
             }
-            msg += `where <b>${column.label}</b> equals <b>${x}</b>`
+            msg += `where <b>${column.label}</b> `
+            
+            if (x === "cumulus__none") {
+                msg += `is empty in the source data`
+            } else {
+                msg += `equals <b>${x}</b>`
+            }
+
             if (!exceptions.includes(msg)) {
                 exceptions.push(msg)
             }
