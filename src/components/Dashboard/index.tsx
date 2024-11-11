@@ -692,7 +692,7 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
             if (stratifierName) params.set("stratifier", stratifierName)
             let url = base + params
             if (filter) url += "&filter=" + filter
-            return request(url)
+            return request(url, { label: "Char Primary Data" })
         };
 
         const fetchSecondaryData = async () => {
@@ -702,7 +702,7 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
             params.set("stratifier", secColumnName )
             let url = base + params
             if (filter) url += "&filter=" + filter
-            return request(url)
+            return request(url, { label: "Char Secondary Data" })
         };
 
         return Promise.all([
