@@ -1,16 +1,25 @@
+@import "../../styles/variables.scss";
+
+
 .study-builder {
 
     label {
         margin-bottom: 0.25rem;
         display      : block;
+        color        : #369;
 
         + p {
             margin-top: 0;
+        }
+
+        .checkbox-label-description {
+            color: #444;
         }
     }
 
     .study-builder-main {
         background   : #FFF;
+        background   : #FFF linear-gradient(#1b5dab11, #1b5dab22 8rem, #CCC 8rem, #CCC 8.05rem, #FFF 7rem);
         border       : 1px solid #CCC;
         padding      : 3rem;
         border-radius: 1rem;
@@ -18,17 +27,15 @@
         margin       : auto;
         
 
-        > h4 {
-            letter-spacing: 3px;
+        h4 {
+            margin-top    : 6rem;
+            letter-spacing: 2px;
             font-variant  : small-caps;
             font-weight   : 600;
             text-transform: uppercase;
             font-size     : 16px;
-            text-shadow   : 2px 2px 2px #0002;
-
-            ~ h4 {
-                margin-top: 6rem;
-            }
+            color         : #393;
+            // text-shadow   : 2px 2px 2px #0002;
         }
     }
 }
