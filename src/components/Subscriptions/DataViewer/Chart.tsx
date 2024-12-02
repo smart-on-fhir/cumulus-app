@@ -9,10 +9,17 @@ export default function Chart({ options }: { options: Highcharts.Options })
 
     useLayoutEffect(() => {
         if (containerRef.current) {
-            if (chartRef.current) {
-                chartRef.current.update(options, true, true, false)
-            } else {
-                chartRef.current = Highcharts.chart(containerRef.current, options);
+            try {
+                if (chartRef.current) {
+                    chartRef.current.update(options, true, true, false)
+                } else {
+                    chartRef.current = Highcharts.chart(containerRef.current, options);
+                }
+            } catch (ex) {
+                console.error(ex)
+                document.getElementById("flat-chart")!.innerHTML = '<div><br/><p><b class="color-red">Error rendering chart. See console for details.</b></p><pre>'
+                    + (ex as Error).message + 
+                '</pre></div>'
             }
         }
         return () => {
@@ -23,6 +30,6 @@ export default function Chart({ options }: { options: Highcharts.Options })
         };
     }, [options])
 
-    return <div className="chart" ref={ containerRef } />
+    return <div id="flat-chart" className="chart" ref={ containerRef } />
 }
 

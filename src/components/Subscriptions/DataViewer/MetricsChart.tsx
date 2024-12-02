@@ -24,9 +24,9 @@ export default function MetricsChart({
 }) {
 
     for (const row of data) {
-        row.average = +row.average
-        row.max     = +row.max
-        row.std_dev = +row.std_dev
+        if ("average" in row) row.average = +row.average
+        if ("max"     in row) row.max     = +row.max
+        if ("std_dev" in row) row.std_dev = +row.std_dev
     }
 
     const groups = groupData(data, groupBy)
