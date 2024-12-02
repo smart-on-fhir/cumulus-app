@@ -23,6 +23,12 @@ export default function MetricsChart({
     valueColumn: string
 }) {
 
+    for (const row of data) {
+        row.average = +row.average
+        row.max     = +row.max
+        row.std_dev = +row.std_dev
+    }
+
     const groups = groupData(data, groupBy)
 
     const isPctChart = valueColumn === "numerator" || valueColumn === "percentage"
