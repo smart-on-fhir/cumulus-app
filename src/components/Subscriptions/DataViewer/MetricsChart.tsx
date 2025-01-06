@@ -27,6 +27,7 @@ export default function MetricsChart({
         if ("average" in row) row.average = +row.average
         if ("max"     in row) row.max     = +row.max
         if ("std_dev" in row) row.std_dev = +row.std_dev
+        if ("median"  in row) row.median  = +row.median
     }
 
     const groups = groupData(data, groupBy)
@@ -55,6 +56,7 @@ export default function MetricsChart({
             custom: {
                 data: {
                     Average: r.average,
+                    Median: r.median,
                     Max: r.max,
                     "Standard Deviation": r.std_dev
                 }
@@ -135,6 +137,7 @@ export default function MetricsChart({
                 custom: {
                     data: {
                         Average: r.average,
+                        Median: r.median,
                         Max: r.max,
                         "Standard Deviation": r.std_dev
                     }
@@ -318,7 +321,9 @@ export default function MetricsChart({
                 for (let name in this.point.custom?.data) {
                     // @ts-ignore
                     const value = this.point.custom.data[name]
-                    out += `<tr><td style="text-align:right;font-weight:600;color:#888">${humanizeColumnName(name)}:</td><td>${value.toLocaleString()}</td></tr>`
+                    if (value !== undefined) {
+                        out += `<tr><td style="text-align:right;font-weight:600;color:#888">${humanizeColumnName(name)}:</td><td>${value.toLocaleString()}</td></tr>`
+                    }
                 }
 
                 return out + `</tbody></table>`
