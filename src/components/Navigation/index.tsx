@@ -52,7 +52,9 @@ export default function Navigation()
 
     if (!user || user.status !== "Logged in" || !Array.isArray(user.permissions)) {
         // return null
-        logout().then(() => navigate("/"));
+        if (user && (user.status !== "Logged in" || !Array.isArray(user.permissions))) {
+            logout().then(() => navigate("/"));
+        }
         return null
     }
 
