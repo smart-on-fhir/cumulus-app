@@ -425,7 +425,7 @@ route(router, {
             return res.json({
                 status : STATUS_MIXED,
                 message: `${rows.length} Users have expired invitations`,
-                payload: rows.map(u => ({ test: u.email }))
+                payload: rows.map(u => ({ text: u.email }))
             })
         }
 
