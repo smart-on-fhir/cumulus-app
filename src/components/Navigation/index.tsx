@@ -51,6 +51,8 @@ export default function Navigation()
     let navigate = useNavigate();
 
     if (!user || user.status !== "Logged in" || !Array.isArray(user.permissions)) {
+        // return null
+        logout().then(() => navigate("/"));
         return null
     }
 
