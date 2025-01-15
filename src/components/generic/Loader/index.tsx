@@ -1,5 +1,5 @@
-export default function Loader({ msg = "Loading..." }: { msg?: string }) {
+export default function Loader({ msg = "Loading...", style }: { msg?: string, style?: React.CSSProperties }) {
     return (
-        <span><i className="fas fa-circle-notch fa-spin"/> {msg}</span>
+        <span style={style}><i className="fas fa-circle-notch fa-spin"/> {msg}</span>
     )
 }

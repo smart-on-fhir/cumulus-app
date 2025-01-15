@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { useParams }   from "react-router"
+import { useLocation, useParams }   from "react-router"
 import Dashboard       from "."
 import { request }     from "../../backend"
 import { useBackend }  from "../../hooks"
@@ -15,6 +15,10 @@ export default function CreateView()
     const { id } = useParams();
 
     const { user } = useAuth()
+
+    const location = useLocation()
+
+    const state: any = location.state
 
     // Fetch the subscription by ID
     const { loading, error, result } = useBackend<app.Subscription>(
@@ -38,5 +42,28 @@ export default function CreateView()
     }
 
     // Eventually render a Breadcrumbs and the dashboard
-    return <Dashboard view={{ creatorId: user!.id, isDraft: true }} subscription={result as app.Subscription} />
+    return <Dashboard
+        view={{
+            creatorId: user!.id,
+            isDraft: true,
+            name: state?.name || "",
+            description: state?.description || "",
+            settings: {
+                column: state?.column || "",
+                viewType: state?.chartType || "spline",
+                filters: [],
+                groupBy: "",
+                // sortBy: state?.chartType === "bar" ? "y:desc" : "x:asc",
+                chartOptions: {
+                    title: {
+                        text: state?.description || state?.name || "",                        
+                    },
+                    // subtitle: {
+                    //     text: state?.description || "",
+                    // }
+                }
+            }
+        }}
+        subscription={result as app.Subscription}
+    />
 }
