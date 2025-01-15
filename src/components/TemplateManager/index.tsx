@@ -1,12 +1,12 @@
-import { useEffect, useState }    from "react"
-import { Link }                   from "react-router-dom"
-import html2canvas                from "html2canvas"
-import Loader                     from "../generic/Loader"
-import { buildChartOptions }      from "../Dashboard/Charts/lib"
-import { getDefaultChartOptions } from "../Dashboard/Charts/DefaultChartOptions"
-import Highcharts                 from "../../highcharts"
-import { request }                from "../../backend"
-import { app }                    from "../../types"
+import { useEffect, useMemo, useState } from "react"
+import { Link }                         from "react-router-dom"
+import html2canvas                      from "html2canvas"
+import Loader                           from "../generic/Loader"
+import { buildChartOptions }            from "../Dashboard/Charts/lib"
+import { getDefaultChartOptions }       from "../Dashboard/Charts/DefaultChartOptions"
+import Highcharts                       from "../../highcharts"
+import { request }                      from "../../backend"
+import { app }                          from "../../types"
 import "./TemplateManager.scss"
 
 
@@ -59,8 +59,9 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         col.dataType === "integer" ||
         col.dataType.startsWith("date")
      ? "spline" : "column");
+    const isCountColumn = col.name.startsWith("cnt");
 
-    async function load() {
+    const load = useMemo(() => async function () {
         setLoading(true)
         setError(null)
         try {
@@ -104,15 +105,15 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         } finally {
             setLoading(false)
         }
-    }
+    }, [chartType, col, sub.id])
     
     useEffect(() => { 
-        if (!col.name.startsWith("cnt")) {
+        if (!isCountColumn) {
             load()
         }
-    }, [])
+    }, [load, isCountColumn])
 
-    if (col.name.startsWith("cnt")) {
+    if (isCountColumn) {
         return null
     }
 
@@ -122,7 +123,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
                 { loading && <Loader msg="" style={{ zIndex: 2 }} /> }
                 { error && <small className="color-red" style={{ wordBreak: "break-all" }}>{ error + "" }</small> }
                 { !loading && imgUrl && <>
-                    <img src={imgUrl} />
+                    <img src={imgUrl} alt="Thumbnail Preview" />
                     <div className="thumbnail-buttons-overlay">
                         <b className="btn"><i className="fa fa-pencil"/></b>
                         <b className="btn"><i className="fa fa-plus"/></b>
