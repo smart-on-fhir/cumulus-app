@@ -17,6 +17,7 @@ import { request }                from "../../backend"
 import { useBackend }             from "../../hooks"
 import { app }                    from "../../types"
 import PackageVersionCheck        from "./PackageVersionCheck"
+import TemplateManager            from "../TemplateManager"
 
 
 export default function SubscriptionView(): JSX.Element
@@ -137,6 +138,8 @@ export default function SubscriptionView(): JSX.Element
                         }
 
                         { model.metadata?.type === "flat" && <div className="mt-2"><DataViewer subscription={model} /></div> }
+
+                        { model.metadata?.type !== "flat" && <TemplateManager subscription={model} /> }
                     </div>
                 </div>
                 { canHaveCharts && 
