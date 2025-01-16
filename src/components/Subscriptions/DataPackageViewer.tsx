@@ -1,12 +1,12 @@
-import { useEffect, useState }      from "react"
-import ColumnsTable                 from "./ColumnsTable"
-import TransmissionView             from "./TransmissionView"
-import Loader                       from "../generic/Loader"
-import Alert, { AlertError }        from "../generic/Alert"
-import aggregator                   from "../../Aggregator"
-import { DataPackage, StudyPeriod } from "../../Aggregator"
-import { humanizeColumnName }       from "../../utils"
-import { app }                      from "../../types"
+import { useEffect, useMemo, useState } from "react"
+import ColumnsTable                     from "./ColumnsTable"
+import TransmissionView                 from "./TransmissionView"
+import Loader                           from "../generic/Loader"
+import Alert, { AlertError }            from "../generic/Alert"
+import aggregator                       from "../../Aggregator"
+import { DataPackage, StudyPeriod }     from "../../Aggregator"
+import { humanizeColumnName }           from "../../utils"
+import { app }                          from "../../types"
 
 
 export default function DataPackageViewer({ packageId }: { packageId: string }) {
@@ -14,6 +14,8 @@ export default function DataPackageViewer({ packageId }: { packageId: string }) 
     const [pkg    , setPkg    ] = useState<DataPackage>()
     const [periods, setPeriods] = useState<StudyPeriod[]>([])
     const [loading, setLoading] = useState(true)
+
+    const abortController = useMemo(() => new AbortController(), [])
 
     useEffect(() => {
         aggregator.getPackage(packageId).then(pkg => {
@@ -26,7 +28,19 @@ export default function DataPackageViewer({ packageId }: { packageId: string }) 
                     setPkg(pkg)
                 })
         }).finally(() => setLoading(false))
-    }, [ packageId ])
+
+        return () => {
+            // Note that aggregator requests are global and are meant to be
+            // cached, therefore we don't abort them. We just need to prevent
+            // the unmounted component from trying to render when those requests
+            // are completed 
+            abortController.abort()
+        }
+    }, [ packageId, abortController ])
+
+    if (abortController.signal.aborted) {
+        return null
+    }
 
     if (loading) {
         return <Loader msg="Loading package..." />

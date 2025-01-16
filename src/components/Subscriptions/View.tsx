@@ -139,16 +139,19 @@ export default function SubscriptionView(): JSX.Element
 
                         { model.metadata?.type === "flat" && <div className="mt-2"><DataViewer subscription={model} /></div> }
 
-                        { model.metadata?.type !== "flat" && <TemplateManager subscription={model} /> }
                     </div>
                 </div>
                 { canHaveCharts && 
                     <div className="col col-4 responsive" style={{ minWidth: "20rem" }}>
                         { (model.completed || model.dataURL) && <>
-                            <h5 className="color-blue-dark">Dependent Graphs</h5>
+                            <h5 className="color-blue-dark">Custom Graphs</h5>
                             <hr/>
                             <ViewsBrowser layout="column" requestId={ model.id } />
                         </> }
+                        <br/>
+                        <h5 className="color-blue-dark">Generic Data Views</h5>
+                        <hr/>
+                        { model.metadata?.type !== "flat" && <TemplateManager subscription={model} /> }
                         <br/>
                     </div>
                 }
