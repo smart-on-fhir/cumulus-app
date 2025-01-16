@@ -128,6 +128,10 @@ function filterOutExceptions({
             }
         }
 
+        if (row[0] === "cumulus__none") {
+            pushException()
+            return false
+        }
         if (xType === "linear") {
             const n = +row[0]
             if (isNaN(n) || !isFinite(n)) {
