@@ -125,7 +125,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         } finally {
             setLoading(false)
         }
-    }, [chartType, col, sub.id, abortController.signal, countLabel])
+    }, [chartType, col, sub.id, abortController.signal, countLabel, limit])
     
     useEffect(() => { 
         if (!isCountColumn) {
