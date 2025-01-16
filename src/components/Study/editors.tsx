@@ -111,7 +111,7 @@ export function DateEditor({
                 onChange={ e => onChange(e.target.value) }
                 disabled={disabled}
             />
-            { !!description && <p className="color-muted mb-05 small">{ description }</p> }
+            { !!description && <p className="color-muted mb-05">{ description }</p> }
         </div>
     )
 }
@@ -135,7 +135,7 @@ export function BooleanEditor({
                     checked={ !!value }
                     onChange={ onChange }
                     label={ <b>{ name }</b> }
-                    description={ description }
+                    description={ <span style={{ fontSize: "1rem" }}>{ description }</span> }
                 />
             </label>
         </div>
@@ -166,7 +166,7 @@ export function NumberEditor({
                 min={ min }
                 onChange={ e => onChange(e.target.valueAsNumber) }
             />
-            { !!description && <p className="color-muted mb-05 small">{ description }</p> }
+            { !!description && <p className="color-muted mb-05">{ description }</p> }
         </div>
     )
 }
@@ -187,7 +187,7 @@ export function EnumEditor({
             <select value={ value } onChange={ e => onChange(e.target.value) }>
                 { descriptor.values.map((v, i) => (<option key={i} value={v}>{v}</option>)) }
             </select>
-            { !!description && <p className="color-muted mb-05 small">{ description }</p> }
+            { !!description && <p className="color-muted mb-05">{ description }</p> }
         </div>
     )
 }
