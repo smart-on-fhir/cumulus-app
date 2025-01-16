@@ -571,7 +571,7 @@ export default function ConfigPanel({
                                 </div>
                             </div>
                             <p className="small color-muted">
-                                Use offset, limit, and sort to slice the available data
+                                Use offset, limit, and sort to slice the dataset retrieved from the backend
                             </p>
                         <br />
                     </div>
