@@ -53,14 +53,15 @@ export default function CreateView()
                 viewType: state?.chartType || "spline",
                 filters: [],
                 groupBy: "",
-                // sortBy: state?.chartType === "bar" ? "y:desc" : "x:asc",
                 chartOptions: {
                     title: {
-                        text: state?.description || state?.name || "",                        
+                        text: state?.name || "",                        
                     },
-                    // subtitle: {
-                    //     text: state?.description || "",
-                    // }
+                    yAxis: {
+                        title: {
+                            text: state?.countLabel || ""
+                        }
+                    }
                 }
             }
         }}

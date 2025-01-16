@@ -7,20 +7,26 @@ import { getDefaultChartOptions }       from "../Dashboard/Charts/DefaultChartOp
 import Highcharts                       from "../../highcharts"
 import { request }                      from "../../backend"
 import { app }                          from "../../types"
-import "./TemplateManager.scss"
+import { humanizeColumnName }           from "../../utils"
 
 
-async function getChartData(subscriptionId: number, column: string) {
+async function getChartData(subscriptionId: number, column: string, signal: AbortSignal) {
     const base = process.env.REACT_APP_BACKEND_HOST || window.location.origin
     const url = new URL(`/api/requests/${subscriptionId}/api`, base)
     url.searchParams.set("column", column)
-    return request(url.href)
+    return request(url.href, { signal })
 }
 
-async function renderChartAsPng(options: Highcharts.Options): Promise<string> {
+async function renderChartAsPng(options: Highcharts.Options, signal: AbortSignal): Promise<string> {
+    if (signal.aborted) {
+        return Promise.reject(signal.reason)
+    }
     return new Promise((resolve, reject) => {
         const container = document.createElement("div")
         Highcharts.chart(container, options, chart => {
+            if (signal.aborted) {
+                return reject(signal.reason)
+            }
             html2canvas(chart.container, {
                 scale: 1,
                 logging: false,
@@ -28,10 +34,11 @@ async function renderChartAsPng(options: Highcharts.Options): Promise<string> {
             }).then(canvas => {
                 const url = canvas.toDataURL("image/png");
                 URL.revokeObjectURL(url);
+                resolve(url);
+            }, reject).finally(() => {
                 chart.destroy()
                 container.remove()
-                resolve(url);
-            }, reject)
+            })
         });
     })
 }
@@ -39,9 +46,7 @@ async function renderChartAsPng(options: Highcharts.Options): Promise<string> {
 export default function TemplateManager({ subscription }: { subscription: app.Subscription }) {
     return (
         <div className="template-manager">
-            <h5 className="color-blue-dark">Templates</h5>
-            <hr />
-            <div className="view-browser view-browser-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(12rem, 1fr))"}}>
+            <div className="view-browser view-browser-column nested">
                 { subscription.metadata?.cols.map((col, i) => {
                     return <Thumbnail key={i} col={col} sub={subscription} />
                 }) }
@@ -60,12 +65,14 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         col.dataType.startsWith("date")
      ? "spline" : "column");
     const isCountColumn = col.name.startsWith("cnt");
+    const countLabel = sub.metadata?.cols.find(c => c.name === "cnt")?.label || "Counts"
+    const abortController = useMemo(() => new AbortController(), [])
 
     const load = useMemo(() => async function () {
         setLoading(true)
         setError(null)
         try {
-            const data = await getChartData(sub.id, col.name)
+            const data = await getChartData(sub.id, col.name, abortController.signal)
             
             let _chartType = chartType
             if (chartType === "column" && data.rowCount > 20) {
@@ -80,6 +87,11 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
                 },
                 title: {
                     text: col.label
+                },
+                yAxis: {
+                    title: {
+                        text: countLabel
+                    }
                 }
             })
 
@@ -98,42 +110,62 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
                 onInspectionChange: () => {}
             })
 
-            const url = await renderChartAsPng(options)
+            const url = await renderChartAsPng(options, abortController.signal)
             setImgUrl(url)
         } catch (ex) {
             setError(ex as Error)
         } finally {
             setLoading(false)
         }
-    }, [chartType, col, sub.id])
+    }, [chartType, col, sub.id, abortController.signal, countLabel])
     
     useEffect(() => { 
         if (!isCountColumn) {
             load()
         }
-    }, [load, isCountColumn])
+    }, [load, isCountColumn, abortController])
+
+    useEffect(() => { 
+        return () => {
+            abortController.abort("Operation aborted because the component is unmounting")
+        }
+    }, [abortController])
 
     if (isCountColumn) {
         return null
     }
 
+    
+    let counted = countLabel
+
+    if (sub.dataURL) {
+        const pkgName = sub.dataURL.split("__")[1];
+        if (pkgName) {
+            counted = humanizeColumnName(pkgName)
+        }
+    } else if (sub.name.includes("__")) {
+        const pkgName = sub.name.replace(/(core__)+/, "core__").split("__")[1];
+        if (pkgName) {
+            counted = humanizeColumnName(pkgName)
+        }
+    }
+
+    const label = counted + " by " + col.label
+    const description = sub.name + ": " + label
+
     return (
-        <Link className="view-thumbnail" to="create-view" state={{ column: col.name, chartType, name: col.label, description: `Counts by ${ col.label }` }}>
+        <Link className="view-thumbnail" to="create-view" state={{ column: col.name, chartType, name: label, description, countLabel }}>
             <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }}>
                 { loading && <Loader msg="" style={{ zIndex: 2 }} /> }
                 { error && <small className="color-red" style={{ wordBreak: "break-all" }}>{ error + "" }</small> }
                 { !loading && imgUrl && <>
                     <img src={imgUrl} alt="Thumbnail Preview" />
-                    <div className="thumbnail-buttons-overlay">
-                        <b className="btn"><i className="fa fa-pencil"/></b>
-                        <b className="btn"><i className="fa fa-plus"/></b>
-                    </div>
                 </> }
             </div>
-            <div className="view-thumbnail-title">
-                <b>{ col.label }</b>
+            <div className="view-thumbnail-title" title={label}>
+                <b>{ label }</b>
                 <div className="view-thumbnail-description color-muted">
-                    Counts by { col.label }
+                    { description }
                 </div>
             </div>
         </Link>

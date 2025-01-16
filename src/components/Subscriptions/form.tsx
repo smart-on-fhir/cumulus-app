@@ -129,7 +129,7 @@ export default function SubscriptionForm({
                 </div>
             </div>
 
-            <div className="mt-2 mb-1">
+            { !id && <div className="mt-2 mb-1">
                 <div className="row gap wrap">
                     <div className="col col-3 responsive middle mb-1">
                         <label className="nowrap pt-0">Data Source</label>
@@ -178,7 +178,7 @@ export default function SubscriptionForm({
                     </div> }
                     { dataSourceType === "aggregator" && <DataSourceSelector onChange={onChange} subscription={record} /> }
                 </div>
-            </div>
+            </div> }
 
             { id && dataURL && <div className="mb-1 mt-2">
                 <div className="row gap wrap">

@@ -19,6 +19,12 @@ export async function request<T=any>(path: string, options: RequestOptions = {})
 
     const abortController = new AbortController()
 
+    if (options.signal) {
+        options.signal.addEventListener("abort", (e) => {
+            abortController.abort()
+        })
+    }
+
     const job = fetch(path, {
         mode       : "cors",
         credentials: "same-origin",
