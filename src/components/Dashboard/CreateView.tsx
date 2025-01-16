@@ -53,6 +53,7 @@ export default function CreateView()
                 viewType: state?.chartType || "spline",
                 filters: [],
                 groupBy: "",
+                limit: state?.limit || 0,
                 chartOptions: {
                     title: {
                         text: state?.name || "",                        

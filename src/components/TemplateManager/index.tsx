@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { Link }                         from "react-router-dom"
-import html2canvas                      from "html2canvas"
+// import html2canvas                      from "html2canvas"
 import Loader                           from "../generic/Loader"
 import { buildChartOptions }            from "../Dashboard/Charts/lib"
 import { getDefaultChartOptions }       from "../Dashboard/Charts/DefaultChartOptions"
@@ -27,18 +27,22 @@ async function renderChartAsPng(options: Highcharts.Options, signal: AbortSignal
             if (signal.aborted) {
                 return reject(signal.reason)
             }
-            html2canvas(chart.container, {
-                scale: 1,
-                logging: false,
-                ignoreElements: el => el.classList.contains("highcharts-exporting-group")
-            }).then(canvas => {
-                const url = canvas.toDataURL("image/png");
-                URL.revokeObjectURL(url);
-                resolve(url);
-            }, reject).finally(() => {
-                chart.destroy()
-                container.remove()
-            })
+            const svg = chart.container.querySelector("svg")?.outerHTML!
+            chart.destroy()
+            container.remove()
+            resolve("data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg))
+            // html2canvas(chart.container, {
+            //     scale: 1,
+            //     logging: false,
+            //     ignoreElements: el => el.classList.contains("highcharts-exporting-group")
+            // }).then(canvas => {
+            //     const url = canvas.toDataURL("image/png");
+            //     URL.revokeObjectURL(url);
+            //     resolve(url);
+            // }, reject).finally(() => {
+            //     chart.destroy()
+            //     container.remove()
+            // })
         });
     })
 }
@@ -59,6 +63,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     const [loading, setLoading] = useState(true)
     const [imgUrl , setImgUrl ] = useState("")
     const [error  , setError  ] = useState<Error | string | null>(null)
+    const [limit  , setLimit  ] = useState(0)
     const [chartType, setChartType] = useState<"spline" | "column" | "bar">(
         col.dataType === "float" ||
         col.dataType === "integer" ||
@@ -79,6 +84,9 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
                 _chartType = "bar"
                 setChartType(_chartType)
             }
+            
+            // No limit for lines and up to 30 bars/columns
+            setLimit(chartType === "spline" ? 0 : 30)
                 
             const defaults = getDefaultChartOptions(_chartType, {
                 chart: {
@@ -104,7 +112,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
                 ranges          : { enabled: false },
                 inspection      : { enabled: false, context: {selectedAnnotationIndex: -1, selectedPlotLineAxis: "", selectedPlotLineId: "", selectedSeriesId: ""}, match: [] },
                 sortBy          : "x:asc",
-                limit           : 0,
+                limit,
                 offset          : 0,
                 onSeriesToggle  : () => {},
                 onInspectionChange: () => {}
@@ -154,12 +162,12 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     const description = sub.name + ": " + label
 
     return (
-        <Link className="view-thumbnail" to="create-view" state={{ column: col.name, chartType, name: label, description, countLabel }}>
+        <Link className="view-thumbnail" to="create-view" state={{ column: col.name, chartType, name: label, description, countLabel, limit }}>
             <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }}>
                 { loading && <Loader msg="" style={{ zIndex: 2 }} /> }
                 { error && <small className="color-red" style={{ wordBreak: "break-all" }}>{ error + "" }</small> }
                 { !loading && imgUrl && <>
-                    <img src={imgUrl} alt="Thumbnail Preview" />
+                    <img src={imgUrl || "about:blank"} alt="Thumbnail Preview" loading="lazy" />
                 </> }
             </div>
             <div className="view-thumbnail-title" title={label}>
