@@ -53,6 +53,8 @@ const dictionaryMap = new Map([
     [/\bnlp\b/gi               , "NLP"      ],
     [/\bdx\b/gi                , "Diagnosis"],
     [/\bed\b/gi                , "ED"       ],
+    [/\bpt\b/gi                , "Patient"  ],
+    [/\bpat\b/gi               , "Patient"  ],
     [/\bstd\s+dev\b/gi         , "Standard Deviation"]
 ]);
 
