@@ -70,7 +70,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         col.dataType.startsWith("date")
      ? "spline" : "column");
     const isCountColumn = col.name.startsWith("cnt");
-    const countLabel = sub.metadata?.cols.find(c => c.name === "cnt")?.label || "Counts"
+    const countLabel = humanizeColumnName(sub.metadata?.cols.find(c => c.name === "cnt")?.label || "Counts")
     const abortController = useMemo(() => new AbortController(), [])
 
     const load = useMemo(() => async function () {
@@ -147,15 +147,17 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     let counted = countLabel
 
     if (sub.dataURL) {
-        const pkgName = sub.dataURL.split("__")[1];
-        if (pkgName) {
-            counted = humanizeColumnName(pkgName)
-        }
+        // const pkgName = sub.dataURL.split("__")[1];
+        // if (pkgName) {
+            // counted = humanizeColumnName(pkgName)
+            counted = parsePackageName(sub.dataURL)
+        // }
     } else if (sub.name.includes("__")) {
-        const pkgName = sub.name.replace(/(core__)+/, "core__").split("__")[1];
-        if (pkgName) {
-            counted = humanizeColumnName(pkgName)
-        }
+        counted = parsePackageName(sub.name)
+        // const pkgName = sub.name.replace(/(core__)+/, "core__").split("__")[1];
+        // if (pkgName) {
+        //     counted = humanizeColumnName(pkgName)
+        // }
     }
 
     const label = counted + " by " + col.label
@@ -178,4 +180,13 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
             </div>
         </Link>
     )
+}
+
+function parsePackageName(name: string) {
+    const pkgName = name.replace(/(core__)+/, "core__");
+    const match = pkgName.match(/^(\w+)__count_([^_]+)./)
+    if (match && match[2]) {
+        return "Count " + humanizeColumnName(match[2])
+    }
+    return humanizeColumnName(pkgName)
 }
