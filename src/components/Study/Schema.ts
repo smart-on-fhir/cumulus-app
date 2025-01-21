@@ -47,7 +47,7 @@ export interface EnumParameterDescriptor extends BaseParameterDescriptor {
     type: "enum"
     values: { value: string|number, label?: string }[]
 }
-}
+
 
 export interface Template {
     id: string
@@ -132,24 +132,28 @@ export const schema: Schema = {
                     section: "Demographics",
                     group: "clinicalSex",
                     defaultValue: false,
+                    set: "Patient Administrative Gender"
                 },
                 {
                     id: "gender_male",
                     section: "Demographics",
                     group: "clinicalSex",
                     defaultValue: false,
+                    set: "Patient Administrative Gender"
                 },
                 {
                     id: "gender_other",
                     section: "Demographics",
                     group: "clinicalSex",
                     defaultValue: false,
+                    set: "Patient Administrative Gender"
                 },
                 {
                     id: "gender_unknown",
                     section: "Demographics",
                     group: "clinicalSex",
                     defaultValue: false,
+                    set: "Patient Administrative Gender"
                 },
                 {
                     id: "enc_class_list",

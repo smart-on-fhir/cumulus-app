@@ -127,9 +127,9 @@ export function BooleanEditor({
 }) {
     const { name, description } = descriptor
     return (
-        <div>
-            <label>&nbsp;</label>
-            <label style={{ padding: "0.2em 0 0.2em 0" }}>
+        <div className="boolean-editor">
+            <label className="empty-label">&nbsp;</label>
+            <label className="wrap-label">
                 <Checkbox
                     name=""
                     checked={ !!value }
@@ -246,18 +246,40 @@ export function TemplateEditor({
                 if (!groups[group].length) {
                     return null
                 }
-                // return <Grid cols={ groups[group].map(x => "minmax(16rem, 1fr)").join(" ") } gap="2rem" className="mt-1 mb-4" key={group}>
-                return <Grid cols="15rem" gap="1rem 2rem" key={group} style={{ flex: "1 0 10rem" }}>
-                    { groups[group].map(item => {
-                        return <Editor
-                            key={item.id}
-                            descriptor={ item }
-                            value={ state[item.id] }
-                            runtimeParams={ parseRuntimeParams(item, state) }
-                            onChange={value => onChange({ [item.id]: value })}
-                        />
-                    })}
-                </Grid>
+
+                const sets = groupBy(groups[group], "set")
+
+                return Object.keys(sets).map(((name, i) => {
+                    if (name === "undefined") {
+                        return <Grid cols="15rem" gap="1rem 2rem" key={group} style={{ flex: "1 0 10rem" }}>
+                        { sets[name].map((item: any) => {
+                            return <Editor
+                                key={item.id}
+                                descriptor={ item }
+                                value={ state[item.id] }
+                                runtimeParams={ parseRuntimeParams(item, state) }
+                                onChange={value => onChange({ [item.id]: value })}
+                            />
+                        })}
+                        </Grid>
+                    }
+                    return (
+                        <div key={group} className="editor-set" style={{ flex: "1 0 10rem" }}>
+                            <label>{ name }</label>
+                            <Grid cols="7rem" gap="0rem 1rem">
+                                { sets[name].map((item: any) => {
+                                    return <Editor
+                                        key={item.id}
+                                        descriptor={ item }
+                                        value={ state[item.id] }
+                                        runtimeParams={ parseRuntimeParams(item, state) }
+                                        onChange={value => onChange({ [item.id]: value })}
+                                    />
+                                })}
+                            </Grid>
+                        </div>
+                    )
+                }))
             }) }
             </div>
     }
@@ -288,4 +310,16 @@ export function TemplateEditor({
             }) }
         </>
     )
+}
+
+function groupBy(records: Record<string, any>[], propName: string) {
+    const groups: Record<string, typeof records> = {};
+    for (const item of records) {
+        const group = item[propName] + ""
+        if (!groups[group]) {
+            groups[group] = []
+        }
+        groups[group].push(item)
+    }
+    return groups
 }
