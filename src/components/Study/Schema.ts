@@ -33,9 +33,10 @@ export interface DateParameterDescriptor extends BaseParameterDescriptor {
 }
 
 export interface NumberParameterDescriptor extends BaseParameterDescriptor {
-    type: "number"
-    min?: number
-    max?: number
+    type : "number"
+    min ?: number
+    max ?: number
+    step?: number
 }
 
 export interface BooleanParameterDescriptor extends BaseParameterDescriptor {
@@ -89,50 +90,70 @@ export const schema: Schema = {
             name: "Template 1",
             variables: [
                 {
-                    id: "visitStartDate",
+                    id: "period_start",
                     section: "StudyPeriod",
                     defaultValue: "",
                     required: false
                 },
                 {
-                    id: "visitEndDate",
+                    id: "period_end",
                     section: "StudyPeriod",
                     defaultValue: "",
                     required: false
                 },
                 {
-                    id: "includePatientHistory",
+                    id: "include_history",
                     section: "StudyPeriod",
                     defaultValue: false
                 },
                 {
-                    id: "patientAgeMin",
+                    id: "age_min",
                     section: "Demographics",
                     group: "AgeMin",
                 },
+                // {
+                //     id: "patientAgeMinUnits",
+                //     section: "Demographics",
+                //     group: "AgeMin",
+                // },
                 {
-                    id: "patientAgeMinUnits",
-                    section: "Demographics",
-                    group: "AgeMin",
-                },
-                {
-                    id: "patientAgeMax",
-                    section: "Demographics",
-                    group: "AgeMax",
-                },
-                {
-                    id: "patientAgeMaxUnits",
+                    id: "age_max",
                     section: "Demographics",
                     group: "AgeMax",
                 },
+                // {
+                //     id: "patientAgeMaxUnits",
+                //     section: "Demographics",
+                //     group: "AgeMax",
+                // },
                 {
-                    id: "clinicalSex",
+                    id: "gender_female",
                     section: "Demographics",
                     group: "clinicalSex",
+                    defaultValue: false,
                 },
                 {
-                    id: "encounterClass",
-                    section: "HealthcareSetting"
+                    id: "gender_male",
+                    section: "Demographics",
+                    group: "clinicalSex",
+                    defaultValue: false,
+                },
+                {
+                    id: "gender_other",
+                    section: "Demographics",
+                    group: "clinicalSex",
+                    defaultValue: false,
+                },
+                {
+                    id: "gender_unknown",
+                    section: "Demographics",
+                    group: "clinicalSex",
+                    defaultValue: false,
+                },
+                {
+                    id: "enc_class_list",
+                    section: "HealthcareSetting",
+                    defaultValue: ""
                 },
                 {
                     id: "encounterType",
@@ -143,12 +164,12 @@ export const schema: Schema = {
                     section: "HealthcareSetting"
                 },
                 {
-                    id: "minCountVisits",
+                    id: "enc_min",
                     section: "HealthcareUtilization",
                     max: "$maxCountVisits",
                 },
                 {
-                    id: "maxCountVisits",
+                    id: "enc_max",
                     section: "HealthcareUtilization",
                     min: "$minCountVisits",
                 }
@@ -194,50 +215,65 @@ export const schema: Schema = {
         }
     },
     parameters: {
-        visitStartDate: {
-            name: "Visit Start Date",
-            description: "Select the earliest date of visit to be included in the study",
+        period_start: {
+            name: "Start Date",
+            description: "Study Period Encounter Start Date",
             type: "date"
         },
-        visitEndDate: {
-            name: "Visit End Date",
+        period_end: {
+            name: "Study Period Encounter End Date",
             description: "Select the latest date of visit to be included in the study",
             type: "date"
         },
-        includePatientHistory: {
+        include_history: {
             name: "Include patient history",
             description: "Short description of what this option does and why are we using it...",
             type: "boolean"
         },
-        patientAgeMin: {
+        age_min: {
             name: "Min Patient Age (at visit)",
             description: "The minimal patient age at the time of visit",
             type: "number",
-            min: 0
+            min : 0,
+            max : 130,
+            step: 1
         },
         patientAgeMinUnits: {
             name: "Min Age Units",
             type: "enum",
             values: ["years", "months", "weeks"]
         },
-        patientAgeMax: {
+        age_max: {
             name: "Max Patient Age (at visit)",
             description: "The maximal patient age at the time of visit",
             type: "number",
-            min: 0
+            min: 0,
+            max: 130,
+            step: 1
         },
         patientAgeMaxUnits: {
             name: "Max Age Units",
             type: "enum",
             values: ["years", "months", "weeks"]
         },
-        clinicalSex: {
-            name: "Clinical sex",
-            type: "enum",
-            values: ["male", "female", "other"],
-            description: "This parameter provides guidance on how a recipient should apply settings or reference ranges that are derived from observable information"
+
+        gender_female: {
+            name: "Female",
+            type: "boolean",
         },
-        encounterClass: {
+        gender_male: {
+            name: "Male",
+            type: "boolean",
+        },
+        gender_other: {
+            name: "Other",
+            type: "boolean",
+        },
+        gender_unknown: {
+            name: "Unknown",
+            type: "boolean",
+        },
+        enc_class_list: {
             name: "FHIR Encounter.class",
             type: "enum",
             values: [
@@ -273,13 +309,13 @@ export const schema: Schema = {
             ],
             description: "Select what kind of notes should be used in your study"
         },
-        minCountVisits: {
-            name: "Min count visits",
+        enc_min: {
+            name: "Min number of encounters during study period",
             type: "number",
             description: "Short description of what this option is..."
         },
-        maxCountVisits: {
-            name: "Max count visits",
+        enc_max: {
+            name: "Max number of encounters during study period",
             type: "number",
             description: "Short description of what this option is..."
         }
