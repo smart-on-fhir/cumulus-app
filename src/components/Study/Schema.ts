@@ -45,7 +45,8 @@ export interface BooleanParameterDescriptor extends BaseParameterDescriptor {
 
 export interface EnumParameterDescriptor extends BaseParameterDescriptor {
     type: "enum"
-    values: (string|number)[]
+    values: { value: string|number, label?: string }[]
+}
 }
 
 export interface Template {
@@ -241,7 +242,11 @@ export const schema: Schema = {
         patientAgeMinUnits: {
             name: "Min Age Units",
             type: "enum",
-            values: ["years", "months", "weeks"]
+            values: [
+                { value: "years" },
+                { value: "months" },
+                { value: "weeks" }
+            ]
         },
         age_max: {
             name: "Max Patient Age (at visit)",
@@ -254,7 +259,11 @@ export const schema: Schema = {
         patientAgeMaxUnits: {
             name: "Max Age Units",
             type: "enum",
-            values: ["years", "months", "weeks"]
+            values: [
+                { value: "years" },
+                { value: "months" },
+                { value: "weeks" }
+            ]
         },
 
         gender_female: {
@@ -277,25 +286,30 @@ export const schema: Schema = {
             name: "FHIR Encounter.class",
             type: "enum",
             values: [
-                "",
-                "IMP",
-                "AMB",
-                "OBSENC",
-                "EMER",
-                "VR",
-                "HH",
+                { value: "" },
+                { value: "AMB"   , label: "Ambulatory" },
+                { value: "EMER"  , label: "Emergency" },
+                { value: "FLD"   , label: "Field" },
+                { value: "HH"    , label: "Home health" },
+                { value: "IMP"   , label: "Inpatient encounter" },
+                { value: "ACUTE" , label: "inpatient acute" },
+                { value: "NONAC" , label: "Inpatient non-acute" },
+                { value: "OBSENC", label: "Observation encounter" },
+                { value: "PRENC" , label: "Pre-admission" },
+                { value: "SS"    , label: "Short stay" },
+                { value: "VR"    , label: "Virtual" },
             ],
-            description: "Select what class of encounters should be used in your study"
+            description: "Select what class of encounters should be used in your study. ValueSet: https://terminology.hl7.org/1.0.0/ValueSet-v3-ActEncounterCode.html"
         },
         encounterType: {
             name: "FHIR Encounter.type",
             type: "enum",
             values: [
-                "",
-                "ADMS",
-                "BD/BM-clin",
-                "CCS60",
-                "OKI",
+                { value: "" },
+                { value: "ADMS" },
+                { value: "BD/BM-clin" },
+                { value: "CCS60" },
+                { value: "OKI" },
             ],
             description: "Select what type of encounters should be used in your study"
         },
@@ -303,9 +317,9 @@ export const schema: Schema = {
             name: "FHIR Note Type",
             type: "enum",
             values: [
-                "",
-                "type1",
-                "type2"
+                { value: "" },
+                { value: "type1" },
+                { value: "type2" }
             ],
             description: "Select what kind of notes should be used in your study"
         },
