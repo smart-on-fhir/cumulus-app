@@ -1,6 +1,7 @@
 import { AlertError } from "../generic/Alert"
 import Checkbox from "../generic/Checkbox"
 import Grid from "../generic/Grid"
+import Markdown from "../generic/Markdown"
 
 import {
     EnumParameterDescriptor,
@@ -111,7 +112,7 @@ export function DateEditor({
                 onChange={ e => onChange(e.target.value) }
                 disabled={disabled}
             />
-            { !!description && <p className="color-muted mb-05">{ description }</p> }
+            { !!description && <div className="mb-05 mt-05"><Markdown>{ description }</Markdown></div> }
         </div>
     )
 }
@@ -135,7 +136,7 @@ export function BooleanEditor({
                     checked={ !!value }
                     onChange={ onChange }
                     label={ <b>{ name }</b> }
-                    description={ <span style={{ fontSize: "1rem" }}>{ description }</span> }
+                    description={ <span style={{ fontSize: "1rem", color: "#000" }}>{ description }</span> }
                 />
             </label>
         </div>
@@ -166,7 +167,7 @@ export function NumberEditor({
                 min={ min }
                 onChange={ e => onChange(e.target.valueAsNumber) }
             />
-            { !!description && <p className="color-muted mb-05">{ description }</p> }
+            { !!description && <div className="mb-05 mt-05"><Markdown>{ description }</Markdown></div> }
         </div>
     )
 }
@@ -187,7 +188,7 @@ export function EnumEditor({
             <select value={ value } onChange={ e => onChange(e.target.value) }>
                 { descriptor.values.map(({ value, label }, i) => (<option key={i} value={value}>{ label ?? value }</option>)) }
             </select>
-            { !!description && <p className="color-muted mb-05">{ description }</p> }
+            { !!description && <div className="mb-05 mt-05"><Markdown>{ description }</Markdown></div> }
         </div>
     )
 }

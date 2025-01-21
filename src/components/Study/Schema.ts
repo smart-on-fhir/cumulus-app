@@ -296,14 +296,14 @@ export const schema: Schema = {
                 { value: "FLD"   , label: "Field" },
                 { value: "HH"    , label: "Home health" },
                 { value: "IMP"   , label: "Inpatient encounter" },
-                { value: "ACUTE" , label: "inpatient acute" },
+                { value: "ACUTE" , label: "Inpatient acute" },
                 { value: "NONAC" , label: "Inpatient non-acute" },
                 { value: "OBSENC", label: "Observation encounter" },
                 { value: "PRENC" , label: "Pre-admission" },
                 { value: "SS"    , label: "Short stay" },
                 { value: "VR"    , label: "Virtual" },
             ],
-            description: "Select what class of encounters should be used in your study. ValueSet: https://terminology.hl7.org/1.0.0/ValueSet-v3-ActEncounterCode.html"
+            description: "Select what class of encounters should be used in your study. [ValueSet](https://terminology.hl7.org/1.0.0/ValueSet-v3-ActEncounterCode.html) 🔗"
         },
         encounterType: {
             name: "FHIR Encounter.type",
