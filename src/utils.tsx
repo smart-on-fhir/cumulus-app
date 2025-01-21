@@ -1,14 +1,14 @@
 import { app } from "./types"
 
 
-// downloadBase64File(contentType:any, base64Data:any, fileName:any)
-// {
-//     const linkSource = `data:${contentType};base64,${base64Data}`;
-//     const downloadLink = document.createElement("a");
-//     downloadLink.href = linkSource;
-//     downloadLink.download = fileName;
-//     downloadLink.click();
-// }
+export function downloadBase64File(contentType:any, base64Data:any, fileName:any)
+{
+    const linkSource = `data:${contentType};base64,${base64Data}`;
+    const downloadLink = document.createElement("a");
+    downloadLink.href = linkSource;
+    downloadLink.download = fileName;
+    downloadLink.click();
+}
 
 const deferMap = new WeakMap();
 

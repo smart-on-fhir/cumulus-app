@@ -3,6 +3,7 @@ import Checkbox                from "../generic/Checkbox"
 import Grid                    from "../generic/Grid"
 import { TemplateEditor }      from "./editors"
 import { schema }              from "./Schema"
+import { downloadBase64File }  from "../../utils"
 import "./Study.scss"
 
 
@@ -154,6 +155,7 @@ export default function StudyBuilder() {
                     className="btn btn-green m-05"
                     style={{ width: "8rem", margin: "2rem auto 1rem" }}
                     type="button"
+                    onClick={() => downloadBase64File("application/json", btoa(JSON.stringify(variables, null, 4)), "StudyBuilderConfig.json")}
                 >Submit</button>
             </div>
         </>
