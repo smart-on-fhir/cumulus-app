@@ -2,6 +2,7 @@ import React, { useCallback } from "react"
 import { Link }               from "react-router-dom"
 import DataPackageViewer      from "./DataPackageViewer"
 import PackageVersionCheck    from "./PackageVersionCheck"
+import { ColumnEditor }       from "./ColumnEditor"
 import { Format }             from "../Format"
 import Select                 from "../generic/Select"
 import TagSelector            from "../Tags/TagSelector"
@@ -190,6 +191,23 @@ export default function SubscriptionForm({
                 <div><PackageVersionCheck pkgId={dataURL} /></div>
                 <DataPackageViewer packageId={dataURL} />
             </> }
+
+            { id && <div className="mb-1 mt-2">
+                <label className="nowrap pt-0">Available Columns</label>
+                <hr/>
+                <ColumnEditor
+                    cols={ record.metadata!.cols }
+                    onChange={ cols => {
+                        const metadata = { ...record.metadata, cols }
+                        
+                        // @ts-ignore
+                        metadata.cols.forEach(col => { delete col.meta; })
+
+                        // @ts-ignore
+                        onChange({ ...record, metadata })
+                    }}
+                />
+            </div> }
 
             <hr className="mt-1"/>
 

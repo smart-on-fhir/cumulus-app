@@ -1,0 +1,11 @@
+.data-columns-table {
+    table {
+        border-spacing: 0;
+    }
+    td, th {
+        padding: 2px;
+    }
+    tbody tr:hover {
+        background: rgb(218, 233, 250);
+    }
+}

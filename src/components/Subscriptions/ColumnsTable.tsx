@@ -62,7 +62,7 @@ function ColumnsTableItem({ col }: { col: app.SubscriptionDataColumn })
             </tr>
             { open && <tr>
                 <td colSpan={2} className="col-details">
-                    { col.meta?.datatype && <div>
+                        { col.meta?.datatype && <div>
                             <label>FHIR Type:</label> { col.meta.datatype }
                         </div>}
                         <div>
@@ -102,7 +102,7 @@ function CoddingValuesTable({
     const remainder = Math.max(values.length - limit, 0);
     const rows = remainder ? values.slice(0, limit) : values;
     return (
-        <table className="nowrap">
+        <table className="nowrap" style={{ tableLayout: "fixed"}}>
             <tbody>
                 <tr className="color-muted">
                     <th>Code</th>
@@ -112,7 +112,7 @@ function CoddingValuesTable({
                 { rows.map((x, i) => (
                     <tr key={i}>
                         <td className="color-green nowrap"><b>{ x.code }</b></td>
-                        <td>{ x.display }</td>
+                        <td><div className="ellipsis">{ x.display }</div></td>
                         <td>{ x.system && <a href={x.system} target="_blank" rel="noreferrer noopener" className="link">{x.system.split("/").pop()}</a> }</td>
                     </tr>
                 )) }
