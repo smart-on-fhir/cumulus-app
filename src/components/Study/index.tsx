@@ -54,10 +54,12 @@ export default function StudyBuilder() {
                         </div>
                         <div className="col col-1"/>
                     </div>
-                    <TemplateEditor templateId={templateId} state={variables} onChange={onChange} />                    
-                    <h4 className="color-blue-dark center">Review</h4>
-                    <hr className="small color-blue" />
-                    <pre>{ JSON.stringify(variables, null, 4) }</pre>
+                    <TemplateEditor templateId={templateId} state={variables} onChange={onChange} />
+                    { process.env.NODE_ENV === "development" && <>
+                        <h4 className="color-blue-dark center">Review</h4>
+                        <hr className="small color-blue" />
+                        <pre>{ JSON.stringify(variables, null, 4) }</pre>
+                    </>}
                 </div>
             </div>
             <div className="flex" style={{ width: "calc(min(100%, 47rem))", margin: "1rem auto" }}>
