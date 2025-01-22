@@ -185,7 +185,7 @@ export const schema: Schema = {
             name: "Template 2 having a very long title",
             variables: [
                 {
-                    id: "visitStartDate",
+                    id: "period_start",
                     section: "StudyPeriod",
                     group: "StartDate",
                     required: true,
@@ -193,13 +193,13 @@ export const schema: Schema = {
                     defaultValue: "1990-07-20" // yyyy-MM-dd
                 },
                 {
-                    id: "visitEndDate",
+                    id: "period_end",
                     section: "StudyPeriod",
                     group: "StartDate",
                     defaultValue: "1990-07-24",
                     required: false,
                     min: "$visitStartDate",
-                    disabled: "ifTrue(new Date(visitStartDate).getTime() > Date.now(), true, false)"
+                    disabled: "ifTrue(new Date(period_start).getTime() > Date.now(), true, false)"
                 }
             ]
         }
@@ -269,7 +269,6 @@ export const schema: Schema = {
                 { value: "weeks" }
             ]
         },
-
         gender_female: {
             name: "Female",
             type: "boolean",
