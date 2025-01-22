@@ -146,18 +146,20 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     
     let counted = countLabel
 
-    if (sub.dataURL) {
-        // const pkgName = sub.dataURL.split("__")[1];
-        // if (pkgName) {
-            // counted = humanizeColumnName(pkgName)
-            counted = parsePackageName(sub.dataURL)
-        // }
-    } else if (sub.name.includes("__")) {
-        counted = parsePackageName(sub.name)
-        // const pkgName = sub.name.replace(/(core__)+/, "core__").split("__")[1];
-        // if (pkgName) {
-        //     counted = humanizeColumnName(pkgName)
-        // }
+    if (counted === "Count" || counted === "Counts") {
+        if (sub.dataURL) {
+            // const pkgName = sub.dataURL.split("__")[1];
+            // if (pkgName) {
+                // counted = humanizeColumnName(pkgName)
+                counted = parsePackageName(sub.dataURL)
+            // }
+        } else if (sub.name.includes("__")) {
+            counted = parsePackageName(sub.name)
+            // const pkgName = sub.name.replace(/(core__)+/, "core__").split("__")[1];
+            // if (pkgName) {
+            //     counted = humanizeColumnName(pkgName)
+            // }
+        }
     }
 
     const label = counted + " by " + col.label
