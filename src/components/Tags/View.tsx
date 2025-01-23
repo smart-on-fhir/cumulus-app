@@ -51,11 +51,11 @@ export default function View() {
                     }
                 </div>
                 <div className="col col-4 responsive mb-2">
-                    <h5><i className="fa-solid fa-database color-brand-2" /> Subscriptions</h5>
+                    <h5><i className="fa-solid fa-database color-brand-2" /> Data Sources</h5>
                     <hr/>
                     { data.subscriptions?.length ?
                         <>
-                            <p className="color-muted">This tag is assigned to the following subscriptions:</p>
+                            <p className="color-muted">This tag is assigned to the following Data Sources:</p>
                             <div className="link-list mt-05">
                             { data.subscriptions.map((s, i) => (
                                 // @ts-ignore
@@ -64,9 +64,9 @@ export default function View() {
                             </div>
                         </> :
                         <>
-                            <p className="color-brand-2">This tag is not assigned with any subscriptions</p>
+                            <p className="color-brand-2">This tag is not assigned with any Data Sources</p>
                             <br/>
-                            <Link to="/requests" className="link">Browse all subscriptions</Link>
+                            <Link to="/requests" className="link">Browse all Data Sources</Link>
                         </>
                         
                     }

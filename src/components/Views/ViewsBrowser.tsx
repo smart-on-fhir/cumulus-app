@@ -147,7 +147,7 @@ export default function ViewsBrowser({
                             Create New Graph
                             <div className="view-thumbnail-description grey-out" style={{ whiteSpace: "normal"}}>
                                 Click here to create new view from the data provided
-                                by this subscription
+                                by this Data Source
                             </div>
                         </div>
                     </Link>
@@ -173,7 +173,7 @@ export default function ViewsBrowser({
             let group = groups[label];
             if (!group) {
                 group = groups[label] = {
-                    link: { to: `/requests/${item.Subscription!.id}`, txt: "View Subscription" },
+                    link: { to: `/requests/${item.Subscription!.id}`, txt: "View Data Source" },
                     items: []
                 };
             }

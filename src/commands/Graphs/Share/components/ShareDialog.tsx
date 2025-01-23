@@ -176,9 +176,9 @@ export default function ShareDialog({
                                     setResourceType(e.target.value)
                                 }}>
                                     <option value="" disabled>Please Select</option>
-                                    <option value="SubscriptionGroups">SubscriptionGroups</option>
+                                    <option value="SubscriptionGroups">Data Source Groups</option>
                                     <option value="Graphs">Graphs</option>
-                                    <option value="Subscriptions">Subscriptions</option>
+                                    <option value="Subscriptions">Data Sources</option>
                                     <option value="DataSites">DataSites</option>
                                     <option value="StudyAreas">StudyAreas</option>
                                     <option value="Tags">Tags</option>

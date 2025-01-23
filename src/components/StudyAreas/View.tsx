@@ -37,7 +37,7 @@ export default function View() {
                     <div className="col col-5 mb-2 responsive">
                         <h5>
                             <i className="fa-solid fa-database color-brand-2" />
-                            <span className="color-muted"> Subscriptions</span>
+                            <span className="color-muted"> Data Sources</span>
                         </h5>
                         <hr className="mb-05"/>
                         { data.Subscriptions?.length ? 
@@ -46,7 +46,7 @@ export default function View() {
                                     <SubscriptionLink key={i} request={s} href={"/requests/" + s.id}/>
                                 )) }
                             </div> :
-                            <p className="color-muted">No subscriptions attached yet</p>
+                            <p className="color-muted">No Data Sources attached yet</p>
                         }
                     </div>
                     <div className="col col-10 mb-2 responsive">

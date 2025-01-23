@@ -19,7 +19,7 @@ export default function EditSubscriptionForm()
     const [ deleted, setDeleted ] = useState(false)
 
 
-    // Fetch Subscription Groups -----------------------------------------------
+    // Fetch Data Source Groups -----------------------------------------------
     const {
         loading: loadingData,
         error  : loadingSubscriptionGroupsError,
@@ -29,7 +29,7 @@ export default function EditSubscriptionForm()
         true
     );
 
-    // Fetch Subscription ------------------------------------------------------
+    // Fetch Data Source ------------------------------------------------------
     const {
         loading,
         error
@@ -45,7 +45,7 @@ export default function EditSubscriptionForm()
         true
     );
 
-    // Save (update) Subscription ----------------------------------------------
+    // Save (update) Data Source ----------------------------------------------
     const { execute: save, loading: saving, error: savingError } = useBackend(
         useCallback(
             () => updateOne("requests", id + "", { ...state }).then(s => setState({ ...state, ...s })),
@@ -53,12 +53,12 @@ export default function EditSubscriptionForm()
         )
     );
 
-    // Delete Subscription -----------------------------------------------------
+    // Delete Data Source -----------------------------------------------------
     const { execute: deleteRequest, loading: deleting, error: deletingError } = useBackend(
         useCallback(
             async () => {
                 if (window.confirm(
-                    "Deleting this subscription will also delete all the graphs " +
+                    "Deleting this data source will also delete all the graphs " +
                     "associated with it! Are you sure?")) {
                     deleteOne("requests", id + "").then(() => setDeleted(true))
                 }
@@ -72,40 +72,40 @@ export default function EditSubscriptionForm()
     }
 
     if (loadingData) {
-        return <Loader msg="Loading Subscription Groups..." />
+        return <Loader msg="Loading Data Source Groups..." />
     }
 
     if (loadingSubscriptionGroupsError) {
         return (
             <AlertError>
-                <b>Error loading subscription groups:</b> { loadingSubscriptionGroupsError + "" }
+                <b>Error loading data source groups:</b> { loadingSubscriptionGroupsError + "" }
             </AlertError>
         );
     }
 
     if (!groups) {
-        return <AlertError><b>Error loading subscription groups</b></AlertError>;
+        return <AlertError><b>Error loading data source groups</b></AlertError>;
     }
 
     return (
         <div className="container">
             <HelmetProvider>
                 <Helmet>
-                    <title>Edit Subscription</title>
+                    <title>Edit Data Source</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Subscriptions", href: "/requests" },
+                { name: "Data Sources", href: "/requests" },
                 { name: state.name + "", href: `/requests/${state.id}` },
-                { name: "Edit Subscription" }
+                { name: "Edit Data Source" }
             ]}/>
             <div className="row middle">
                 <div className="col col-0">
-                    <h3>Edit Subscription</h3>
+                    <h3>Edit Data Source</h3>
                 </div>
                 <div className="col right color-muted small">
-                    { loading  && <Loader msg="Loading Subscription..." /> }
+                    { loading  && <Loader msg="Loading Data Source..." /> }
                     { saving   && <Loader msg="Saving..." /> }
                     { deleting && <Loader msg="Deleting..." /> }
                 </div>
@@ -113,13 +113,13 @@ export default function EditSubscriptionForm()
             <hr/>
             <div className="row gap">
                 <div className="col">
-                    { error && <AlertError><b>Error loading subscription:</b> { error + "" }</AlertError> }
-                    { savingError && <AlertError><b>Error saving subscription:</b> { savingError + "" }</AlertError> }
-                    { deletingError && <AlertError><b>Error deleting subscription:</b> { deletingError + "" }</AlertError> }
+                    { error && <AlertError><b>Error loading Data Source:</b> { error + "" }</AlertError> }
+                    { savingError && <AlertError><b>Error saving Data Source:</b> { savingError + "" }</AlertError> }
+                    { deletingError && <AlertError><b>Error deleting Data Source:</b> { deletingError + "" }</AlertError> }
                 </div>
             </div>
             { loading ?
-                <p><Loader msg="Loading Subscription..." /></p> :
+                <p><Loader msg="Loading Data Source..." /></p> :
                 <SubscriptionForm
                     saveRequest={save}
                     deleteRequest={deleteRequest}

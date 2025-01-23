@@ -39,7 +39,7 @@ export default function SubscriptionView(): JSX.Element
     }
 
     if (!model) {
-        return <AlertError>Failed to load Subscription</AlertError>
+        return <AlertError>Failed to load Data Source</AlertError>
     }
 
     const isFlatData = model.metadata?.type === "flat"
@@ -50,12 +50,12 @@ export default function SubscriptionView(): JSX.Element
         <div className="container">
             <HelmetProvider>
                 <Helmet>
-                    <title>Subscription: {model.name}</title>
+                    <title>Data Source: {model.name}</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Subscriptions", href: "/requests" },
+                { name: "Data Sources", href: "/requests" },
                 { name: model.name }
             ]}/>
             <h3><i className="fas fa-database" /> { model.name }</h3>
@@ -173,7 +173,7 @@ export default function SubscriptionView(): JSX.Element
                 { user?.role === "admin" && <Link
                     className="btn btn-blue pl-1 pr-1 m-1"
                     to={`/requests/${model.id}/edit`}
-                    ><b> Edit Subscription </b></Link>
+                    ><b> Edit Data Source </b></Link>
                 }
             </div>
         </div>

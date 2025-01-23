@@ -36,7 +36,7 @@ function CloudMenu() {
                 <b>Not connected to data aggregator</b>
                 <p className="color-muted small">
                     Data aggregator is not configured or is turned off. You will <br />
-                    not be able to use subscriptions with remote data source.
+                    not be able to use data sources with remote data.
                 </p>
             </div>
         </Grid>
@@ -47,7 +47,7 @@ function CloudMenu() {
             <div>
                 <b>Connected to data aggregator</b>
                 <div className="color-blue-dark small">{ aggregator.baseUrl }</div>
-                <p className="color-muted small">You will be able to use subscriptions with data<br />from this data source</p>
+                <p className="color-muted small">You will be able to use Data Sources with data<br />from this aggregator</p>
             </div>
         </Grid>
     }

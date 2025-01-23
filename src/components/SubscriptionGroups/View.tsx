@@ -18,7 +18,7 @@ export default function SubscriptionGroupView()
     return createViewPage<app.SubscriptionGroup>({
         basePath: "/groups",
         endpoint: "/api/request-groups",
-        namePlural: "Request Groups",
+        namePlural: "Data Source Groups",
         icon: <i className="fa-solid fa-folder color-brand-2" />,
         query: "subscriptions=true",
         canDelete,
@@ -30,12 +30,12 @@ export default function SubscriptionGroupView()
                     <div className="row gap mt-2">
                         <div className="col col-0 top responsive">
                             <h6 className="color-brand-2">
-                                <i className="fa-solid fa-link color-brand-2" /> Associated Subscriptions
+                                <i className="fa-solid fa-link color-brand-2" /> Associated Data Sources
                             </h6>
                         </div>
                         { canCreateSub && <div className="col col-0 right nowrap middle">
                             <div>
-                                <Link to={`/requests/new?groupId=${data.id}`} className="btn btn-virtual" title="Create new subscription in this group">
+                                <Link to={`/requests/new?groupId=${data.id}`} className="btn btn-virtual" title="Create new Data Source in this group">
                                     <i className="fa-solid fa-plus-circle color-blue" />
                                 </Link>
                             </div>
@@ -51,7 +51,7 @@ export default function SubscriptionGroupView()
                         <div className="mt-1">
                             <span className="material-icons-round color-blue">
                                 info_outline
-                            </span> No subscriptions are associated with this group.
+                            </span> No Data Sources are associated with this group.
                         </div>
                     }
                 </div>

@@ -98,7 +98,7 @@ function Graphs() {
                                 </> :
                                 <p>
                                     No Graphs found in the database. You can start by selecting one of the
-                                    existing <Link to="requests" className="link">subscriptions</Link> and
+                                    existing <Link to="requests" className="link">Data Sources</Link> and
                                     then you can create new graph from it's data.
                                 </p>
                             }
@@ -158,11 +158,11 @@ function UpdateCheck({ subscriptions }: { subscriptions: app.Subscription[] }) {
                 <tbody>
                     { toUpdate > 0 && <tr>
                         <td style={{ width: "1.5em" }}><i className="fas fa-info-circle color-orange" /></td>
-                        <td>{toUpdate} subscription{toUpdate > 1 ? "s" : ""} can be updated to newer version</td>
+                        <td>{toUpdate} Data Source{toUpdate > 1 ? "s" : ""} can be updated to newer version</td>
                     </tr> }
                     { toDelete > 0 && <tr>
                         <td style={{ width: "1.5em" }}><i className="fas fa-times-circle color-red" /></td>
-                        <td>{toDelete} subscription{toDelete > 1 ? "s are" : " is"} connected to data package{toDelete > 1 ? "s" : ""} that no longer exist</td>
+                        <td>{toDelete} Data Source{toDelete > 1 ? "s are" : " is"} connected to data package{toDelete > 1 ? "s" : ""} that no longer exist</td>
                     </tr> }
                 </tbody>
             </table>
@@ -175,7 +175,7 @@ function Subscriptions({ data }: { data: app.Subscription[] }) {
     const canCreate = user?.permissions.includes("Subscriptions.create")
     return (
         <div className="card subscriptions">
-            <h4><i className="icon fa-solid fa-database" /> Subscriptions</h4>
+            <h4><i className="icon fa-solid fa-database" /> Data Sources</h4>
             <hr/>
             { data.length ? 
                 <>
@@ -195,10 +195,10 @@ function Subscriptions({ data }: { data: app.Subscription[] }) {
                     </li>
                 </> :
                 <div>
-                    <p>No Subscriptions found in the database.</p>
+                    <p>No Data Sources found in the database.</p>
                     { canCreate && <div className="center mt-1 mb-1">
                         <Link to="/sites/new" className="link bold color-green">
-                            <i className="fa-solid fa-circle-plus" /> Create Subscription
+                            <i className="fa-solid fa-circle-plus" /> Create Data Source
                         </Link>
                     </div> }
                 </div>

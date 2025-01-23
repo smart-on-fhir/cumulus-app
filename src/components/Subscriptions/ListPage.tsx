@@ -41,11 +41,11 @@ export default function SubscriptionsListPage()
     );
 
     if (loading) {
-        return <Loader msg="Loading Subscriptions..."/>
+        return <Loader msg="Loading Data Sources..."/>
     }
 
     if (error) {
-        return <AlertError><b>Error Loading Subscriptions: </b>{ error + "" }</AlertError>
+        return <AlertError><b>Error Loading Data Sources: </b>{ error + "" }</AlertError>
     }
 
     let groupsData: app.SubscriptionGroup[] = [];
@@ -66,18 +66,18 @@ export default function SubscriptionsListPage()
         <div>
             <HelmetProvider>
                 <Helmet>
-                    <title>Subscriptions</title>
+                    <title>Data Sources</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Subscriptions" }
+                { name: "Data Sources" }
             ]} />
             <header className="requests-header">
                 <div className="row wrap mt-2">
                     <h3 className="col middle center mt-05 mb-05 nowrap" style={{ flex: "1 1 8em" }}>
                         <div>
-                            <i className="icon fa-solid fa-database color-brand-2" /> Subscriptions
+                            <i className="icon fa-solid fa-database color-brand-2" /> Data Sources
                         </div>
                     </h3>
                     <div className="col col-4 middle center mt-05 mb-05 pl-1" style={{ flex: "200 1 10em" }}>
@@ -90,7 +90,7 @@ export default function SubscriptionsListPage()
                                     { starOnly ? <i className="fa-solid fa-star color-brand-2" /> : <i className="fa-regular fa-star color-muted" /> }
                                 </button>
                                 <Link className="btn color-blue-dark btn-virtual" to="/requests/new">
-                                    <b className="color-green"><i className="fa-solid fa-circle-plus" /> New Subscription</b>
+                                    <b className="color-green"><i className="fa-solid fa-circle-plus" /> New Data Source</b>
                                 </Link>
                             </div>
                         </div>
@@ -102,9 +102,9 @@ export default function SubscriptionsListPage()
             { !groupsData?.length ?
                 <div className="center">
                     <br/>
-                    <p>No subscriptions found in the database! You can start by creating new subscription.</p>
+                    <p>No Data Sources found in the database! You can start by creating new Data Source.</p>
                     <br/>
-                    <Link to="./new" className="btn btn-blue-dark pl-2 pr-2">Create Data Subscription</Link>
+                    <Link to="./new" className="btn btn-blue-dark pl-2 pr-2">Create Data Source</Link>
                 </div> :
                 groupsData.map((group, i) => {
                     const links = group.requests.filter(r => {

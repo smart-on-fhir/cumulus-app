@@ -9,8 +9,8 @@ export default function DeleteSubscriptionGroup()
 {
     return createDeletePage<app.SubscriptionGroup>({
         endpoint: "/api/request-groups",
-        namePlural: "Subscription Groups",
-        nameSingular: "Subscription Group",
+        namePlural: "Data Source Groups",
+        nameSingular: "Data Source Group",
         icon: <i className="fa-solid fa-folder color-brand-2" />,
         query: "subscriptions=true",
         renderView: data => <>
@@ -27,7 +27,7 @@ export default function DeleteSubscriptionGroup()
                     { data.requests && data.requests.length ?
                         <>
                             <h6 className="color-brand-2">
-                                <i className="fa-solid fa-link-slash color-brand-2" /> The following subscriptions will be reassigned to the default group:
+                                <i className="fa-solid fa-link-slash color-brand-2" /> The following Data Sources will be reassigned to the default group:
                             </h6>
                             <hr/>
                             <Grid gap="0 1rem" cols="22em" className="link-list mt-05">{
@@ -40,7 +40,7 @@ export default function DeleteSubscriptionGroup()
                             <hr className="mb-1"/>
                             <span className="material-icons-round color-green">
                                 info_outline
-                            </span> No subscriptions are associated with this group.
+                            </span> No Data Sources are associated with this group.
                             It can be safely deleted.
                         </div>
                     }

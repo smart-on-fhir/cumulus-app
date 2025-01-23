@@ -27,7 +27,7 @@ function Icon({ subscription }: { subscription: app.Subscription }) {
             return <span className="material-symbols-outlined color-red" data-tooltip="Remote data package not found!">database_off</span>
         }
         return <span className="material-symbols-outlined color-orange"
-            data-tooltip={ `<div class="center">Subscription can be upgraded to package <b>${humanizePackageId(version)}</b></div>` }>database_upload</span>
+            data-tooltip={ `<div class="center">Data Source can be upgraded to package <b>${humanizePackageId(version)}</b></div>` }>database_upload</span>
     }
 
     if (subscription.metadata?.type === "flat") {

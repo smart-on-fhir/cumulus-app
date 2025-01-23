@@ -76,8 +76,8 @@ export default function Navigation()
                 <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" /> Graphs</NavLink>
                 <NavLink to="/drafts"><i className="icon fa-solid fa-pen-to-square" /> My Draft Graphs</NavLink>
                 { canReadSites && <NavLink to="/sites"><i className="icon fa-solid fa-location-dot" /> Healthcare Sites</NavLink> }
-                { canReadSubscriptions && <NavLink to="/requests"><i className="icon fa-solid fa-database" /> Subscriptions</NavLink> }
-                { canListGroups && <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Subscription Groups</NavLink> }
+                { canReadSubscriptions && <NavLink to="/requests"><i className="icon fa-solid fa-database" /> Data Sources</NavLink> }
+                { canListGroups && <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Data Source Groups</NavLink> }
                 { canReadTags && <NavLink to="/tags"><i className="icon fa-solid fa-tag" /> Tags</NavLink> }
                 
                 { canAdminister && (

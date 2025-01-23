@@ -76,7 +76,7 @@ function SubscriptionGroup({
                 </summary>
                 <summary>
                     <span className="icon icon-3 material-symbols-rounded color-red">block</span>
-                    No subscriptions in this group
+                    No Data Sources in this group
                 </summary>
             </details>
         )
@@ -86,7 +86,7 @@ function SubscriptionGroup({
             <summary className={classList({
                 selected: false
             })}>
-                <label onMouseDown={() => toggle()} title="Click to automatically include/exclude all subscriptions in this group">
+                <label onMouseDown={() => toggle()} title="Click to automatically include/exclude all Data Sources in this group">
                     <span className="icon material-symbols-rounded color-blue">{
                         isIndeterminate ?
                             "indeterminate_check_box" :
@@ -152,7 +152,7 @@ function Subscription({
                 </>
             ) : <summary>
                     <span className="icon icon-3 material-symbols-rounded color-red">block</span>
-                    This subscription has no graphs yet
+                    This Data Source has no graphs yet
                 </summary>
             }
         </details>

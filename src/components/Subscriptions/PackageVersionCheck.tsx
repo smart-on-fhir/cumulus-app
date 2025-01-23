@@ -15,9 +15,9 @@ export default function PackageVersionCheck({ pkgId }: { pkgId: string }) {
         return null;
     }
     if (version === pkgId) {
-        return null; // <Alert color="green">Subscription is up to date</Alert>
+        return null; // <Alert color="green">Data Source is up to date</Alert>
     }
     return <Alert color="orange" icon="fas fa-info-circle">
-        Subscription can be upgraded to package <b>{humanizePackageId(version)}</b>
+        Data Source can be upgraded to package <b>{humanizePackageId(version)}</b>
     </Alert>
 }

@@ -11,7 +11,7 @@ import { useAuth }     from "../../auth"
 
 export default function CreateView()
 {
-    // The subscription ID from the URL params
+    // The Data Source ID from the URL params
     const { id } = useParams();
 
     const { user } = useAuth()
@@ -20,25 +20,25 @@ export default function CreateView()
 
     const state: any = location.state
 
-    // Fetch the subscription by ID
+    // Fetch the Data Source by ID
     const { loading, error, result } = useBackend<app.Subscription>(
         useCallback(() => request("/api/requests/" + id + "?group=true&study_areas=true"), [id]),
         true
     );
 
-    // Show loader whole the subscription is being loaded
+    // Show loader whole the Data Source is being loaded
     if (loading) {
-        return <Loader msg="Loading subscription..." />
+        return <Loader msg="Loading Data Source..." />
     }
 
-    // If the subscription failed to load exit with an error message
+    // If the Data Source failed to load exit with an error message
     if (error) {
-        return <AlertError>{`Error fetching subscription with id "${id}": ${error}`}</AlertError>
+        return <AlertError>{`Error fetching Data Source with id "${id}": ${error}`}</AlertError>
     }
 
-    // If the subscription request was successful but did not return the expected data exit with an error message
+    // If the Data Source request was successful but did not return the expected data exit with an error message
     if (!result) {
-        return <AlertError>{`Fetching subscription with id "${id}" produced empty response`}</AlertError>
+        return <AlertError>{`Fetching Data Source with id "${id}" produced empty response`}</AlertError>
     }
 
     // Eventually render a Breadcrumbs and the dashboard

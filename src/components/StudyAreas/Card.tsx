@@ -32,7 +32,7 @@ export default function StudyAreaCard({ model, footer, short }: {
                             <span className="color-brand-2">{ footer.graphsCount }</span>
                         </i>
                         <i className="nowrap">
-                            <span className="color-muted">Subscriptions: </span>
+                            <span className="color-muted">Data Sources: </span>
                             <span className="color-brand-2">{ model.Subscriptions?.length || 0 }</span>
                         </i>
                         <i className="nowrap">

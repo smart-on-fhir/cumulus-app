@@ -21,7 +21,7 @@ export default function CreateSubscriptionForm()
     })
     const [ savedRecord, setSavedRecord ] = useState<app.SubscriptionWithPackage|null>(null)
 
-    // onSubmit create new Subscription and redirect to its edit page
+    // onSubmit create new Data Source and redirect to its edit page
     const { execute: save, loading: saving, error: savingError } = useBackend(
         useCallback(async () => {
             delete state.dataSourceType
@@ -45,7 +45,7 @@ export default function CreateSubscriptionForm()
     }
 
     if (loadingSubscriptionGroups) {
-        return <Loader msg="Loading Subscription Groups..." />
+        return <Loader msg="Loading Data Source Groups..." />
     }
 
     if (loadingSubscriptionGroupsError) {
@@ -60,15 +60,15 @@ export default function CreateSubscriptionForm()
         <div className="container">
             <HelmetProvider>
                 <Helmet>
-                    <title>Create Subscription</title>
+                    <title>Create Data Source</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Subscriptions", href: "/requests" },
-                { name: "Create Subscription" }
+                { name: "Data Sources", href: "/requests" },
+                { name: "Create Data Source" }
             ]} />
-            <h3>Create Subscription</h3>
+            <h3>Create Data Source</h3>
             <hr/>
             <div className="row gap">
                 <div className="col">

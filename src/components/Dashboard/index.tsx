@@ -1016,7 +1016,7 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                         <Grid cols="24em" gap="2em">
                         
                             <div className="col">
-                                <b>Subscription</b>
+                                <b>Data Source</b>
                                 <hr className="small"/>
                                 <Link className="link mt-05 subscription-link" to={`/requests/${subscription.id}`}>
                                     <i className="fa-solid fa-database color-brand-2" /> <span>{ subscription.name }</span>
@@ -1024,7 +1024,7 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                             </div>
                         
                             <div className="col">
-                                <b>Subscription Group</b>
+                                <b>Data Source Group</b>
                                 <hr className="small"/>
                                 { subscription.group ?
                                     <Link className="link mt-05 ellipsis subscription-group-link" to={`/groups/${subscription.group.id}`} title={ subscription.group.description }>

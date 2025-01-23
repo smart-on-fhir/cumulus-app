@@ -19,7 +19,7 @@ export class OpenInAnalyticEnvironment extends Command
     }
 
     description() {
-        return "Open this subscription data in external analytic environment"
+        return "Open this Data Source in external analytic environment"
     }
 
     icon() {

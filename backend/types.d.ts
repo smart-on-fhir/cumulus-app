@@ -51,12 +51,9 @@ interface Config {
     appEmail: string
 
     // When line-level data is requested, the email is sent to this address.
-    // Typically, this would represent a subscription group that handles for
-    // example "MA DPH Subscriptions to the Massachusetts regional cluster"
     regionalClusterEmail: string
 
-    // When new data requests (and/or subscriptions) are created, notification
-    // emails are sent to this address
+    // When new data sources are created, notification emails are sent to this address
     cumulusAdminEmail: string
 
     userInviteExpireAfterHours: number
