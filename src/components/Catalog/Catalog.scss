@@ -1,0 +1,117 @@
+@import "../../styles/variables.scss";
+
+.catalog {
+    .tabs-content {
+        min-height: calc(100vh - 15rem);
+        // display: flex;
+        // > * {
+        //     max-width: 100%;
+        // }
+        
+    }
+    .static-grid-wrapper {
+        // display: grid;
+        max-height : calc(100vh - 19.7rem);
+    }
+    .catalog-tree {
+        line-height: 1.4;
+        padding    : 1em !important;
+        white-space: nowrap;
+        overflow   : scroll;
+        height     : 100%;
+        user-select: none;
+        max-height : calc(100vh - 15rem);
+
+        > div {
+            min-width: max-content;
+        }
+
+        label {
+            margin     : 0;
+            text-indent: 0;
+            font-weight: normal;
+            padding    : 1px 0;
+
+            span {
+                padding-left: 0.2em;
+                padding-right: 0.2em;
+            }
+        }
+
+        details {
+            summary {
+                padding: 1px 0.2em 1px 0;
+
+                &::marker {
+                    color: transparent;
+                    font-size: 80%;
+                }
+            }
+
+            &.has-children {
+                > summary::marker {
+                    color: #666;
+                }
+            }
+        }
+
+        // Root node(s)
+        > details {
+            display: block;
+            min-width: 100%;
+        }
+
+        .badge {
+            margin: 3px 0.5em 2px;
+            padding: 2px 6px;
+            vertical-align: top;
+            // background: fade-out(#000, .75);
+        }
+
+        .icon {
+            font-size  : 1.4rem !important;
+            line-height: 1 !important;
+            height     : 1em !important;
+            width      : 1em !important;
+            vertical-align: top;
+            margin: 0 0 0 0.1em;
+            color      : #999;
+            overflow   : hidden;
+            text-indent: 0;
+            font-weight: 400;
+            // background-color: orange;
+            padding: 0;
+            &.color-blue { color: $color-blue; }
+        //     &.color-red { color: $color-red; }
+        //     &.color-green { color: $color-green; }
+        //     &.color-red { color: $color-red; opacity: 0.7 }
+            &.color-brand-2 { color: $color-brand-2; }
+        }
+
+        // .icon-2 {
+        //     margin: 0 0.14em 0 -0.12em;
+        // }
+
+        // .icon-3 {
+        //     margin: 0 0.14em 0 2.86em;
+        //     text-indent: 0;
+        // }
+
+        details {
+            // text-indent: 0.4em;
+            
+            // > summary > label { font-weight: 600; color: #000; }
+            
+            details {
+                padding-left: 1.4em;
+                
+                // label { font-weight: 400; }
+
+                // summary:not(:first-of-type) {
+                //     // background: #FFF;
+                //     // color: #888;
+                // }
+            }
+        }
+    }
+}
