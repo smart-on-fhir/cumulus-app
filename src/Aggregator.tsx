@@ -70,7 +70,7 @@ function filter<T>(data: T[], props: Partial<T>): T[] {
 }
 
 /**
- * Used to check if a local subscription can be upgraded to newer data package.
+ * Used to check if a local Data Source can be upgraded to newer data package.
  * Compares the local package with a remote one and returns true if they are
  * compatible. The be considered compatible:
  * - Both packages should have the same `column_types_format_version`

@@ -7,8 +7,8 @@ import "./SubscriptionGroups.scss"
 export default function SubscriptionGroupEdit()
 {
     return createEditPage<app.SubscriptionGroup>({
-        namePlural  : "Subscription Groups",
-        nameSingular: "Subscription Group",
+        namePlural  : "Data Source Groups",
+        nameSingular: "Data Source Group",
         basePath    : "/groups",
         endpoint    : "/api/request-groups",
         renderForm  : ({ loading, data, onSubmit }) => <>

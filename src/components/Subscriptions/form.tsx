@@ -82,7 +82,7 @@ export default function SubscriptionForm({
                         value={ name || "" }
                         onChange={e => onChange({ ...record, name: e.target.value })}
                         name="SubscriptionName"
-                        placeholder="Subscription Name"
+                        placeholder="Data Source Name"
                         required
                     />
                     <div className="row gap mt-1">
@@ -215,13 +215,13 @@ export default function SubscriptionForm({
                 { id && canDelete && deleteRequest &&
                     <button className="btn color-red pl-1 pr-1 m-1" style={{ minWidth: "11em" }} type="button" onClick={deleteRequest}>
                         { working === "deleting" && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
-                        Delete Subscription
+                        Delete Data Source
                     </button>
                 }
                 { canUpdate && 
                     <button className="btn btn-green pl-1 pr-1 m-1" style={{ minWidth: "11em" }} type="submit">
                         { working === "saving" && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
-                        { id ? "Save Changes" : "Create Subscription" }
+                        { id ? "Save Changes" : "Create Data Source" }
                     </button>
                 }
             </div>

@@ -60,7 +60,7 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
                     </div>
                 </div>
                 <div className="col col-6 mb-1 responsive">
-                    <label>Included Subscriptions</label>
+                    <label>Included Data Sources</label>
                     <LinkWidget
                         value={subscriptions}
                         onChange={setSubscriptions}

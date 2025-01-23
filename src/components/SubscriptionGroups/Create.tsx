@@ -7,8 +7,8 @@ import "./SubscriptionGroups.scss"
 export default function SubscriptionGroupCreate()
 {
     return createCreatePage<app.SubscriptionGroup>({
-        nameSingular: "Subscription Group",
-        namePlural  : "Subscription Groups",
+        nameSingular: "Data Source Group",
+        namePlural  : "Data Source Groups",
         basePath    : "/groups",
         endpoint    : "/api/request-groups",
         renderForm  : ({ loading, onSubmit, data }) => (

@@ -41,12 +41,9 @@ const config: Config = {
     appEmail: APP_EMAIL_FROM,
 
     // When line-level data is requested, the email is sent to this address.
-    // Typically, this would represent a subscription group that handles for
-    // example "MA DPH Subscriptions to the Massachusetts regional cluster"
     regionalClusterEmail: REGIONAL_CLUSTER_EMAIL,
 
-    // When new data requests (and/or subscriptions) are created, notification
-    // emails are sent to this address
+    // When new data sources are created, notification emails are sent to this address
     cumulusAdminEmail: CUMULUS_ADMIN_EMAIL,
 
     // Note that moment humanized duration shows 24 * 7 as "168 hours" and not

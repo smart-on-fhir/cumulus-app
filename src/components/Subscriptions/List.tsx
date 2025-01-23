@@ -42,18 +42,18 @@ export default function SubscriptionsList()
     );
 
     if (loading) {
-        return <Loader msg="Loading Subscriptions..." />
+        return <Loader msg="Loading Data Sources..." />
     }
 
     if (error) {
-        return <AlertError><b>Error Loading Subscriptions: </b>{ error + "" }</AlertError>
+        return <AlertError><b>Error Loading Data Sources: </b>{ error + "" }</AlertError>
     }
 
     if (!groups || !groups.length) {
         return <>
-            <p className="color-muted">No Subscriptions found.</p>
+            <p className="color-muted">No Data Sources found.</p>
             <br/>
-            { user?.permissions.includes("Subscriptions.create") && <Link to="/requests/new" className="color-blue underline">Create New Subscription</Link> }
+            { user?.permissions.includes("Subscriptions.create") && <Link to="/requests/new" className="color-blue underline">Create New Data Source</Link> }
         </>
     }
 

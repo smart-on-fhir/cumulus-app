@@ -24,8 +24,8 @@ export default function SubscriptionGroupList()
     const canCreate = user?.permissions.includes("SubscriptionGroups.create")
 
     return createListPage<app.SubscriptionGroup[]>({
-        nameSingular: "Subscription Group",
-        namePlural  : "Subscription Groups",
+        nameSingular: "Data Source Group",
+        namePlural  : "Data Source Groups",
         endpoint    : "/api/request-groups",
         icon        : <i className="fa-solid fa-folder color-brand-2" />,
         canCreate,
@@ -35,7 +35,7 @@ export default function SubscriptionGroupList()
                 <>
                     <div className="mb-2">
                         <Alert color="blue" icon="fa-solid fa-info-circle">
-                            Subscriptions can be assigned to certain group, otherwise
+                            Data Sources can be assigned to certain group, otherwise
                             they are considered part of the <b>GENERAL</b> group.
                         </Alert>
                     </div>
@@ -73,8 +73,8 @@ export default function SubscriptionGroupList()
                         </table> :
                         <div className="center">
                             <br/>
-                            <p>No subscription groups found in the database. { canCreate && <span> You can start by creating new one.<br/><br/></span> }</p>
-                            { canCreate && <Link to="new" className="btn btn-blue-dark pl-2 pr-2">Create Subscription Group</Link> }
+                            <p>No Data Source groups found in the database. { canCreate && <span> You can start by creating new one.<br/><br/></span> }</p>
+                            { canCreate && <Link to="new" className="btn btn-blue-dark pl-2 pr-2">Create Data Source Group</Link> }
                         </div>
                     }   
                 </>

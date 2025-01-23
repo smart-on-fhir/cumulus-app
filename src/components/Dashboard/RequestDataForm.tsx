@@ -177,7 +177,7 @@ export default function Preload() {
     if (error) return <AlertError>{`Error fetching view with id "${id}": ${error}`}</AlertError>
     if (!result) return <AlertError>{`Error fetching data"`}</AlertError>
     if (!result.view) return <AlertError>{`Error fetching view with id "${id}"`}</AlertError>
-    if (!result.subscription) return <AlertError>{`Error fetching subscription with id "${result.view.subscriptionId}"`}</AlertError>
+    if (!result.subscription) return <AlertError>{`Error fetching Data Source with id "${result.view.subscriptionId}"`}</AlertError>
 
     const { view, subscription } = result || {};
 
