@@ -3,17 +3,9 @@ import { Tabs } from "../generic/Tabs";
 import json from "./icd10_hierarchy_count.json"
 import { useState } from "react";
 import StaticGrid from "../generic/StaticGrid";
+import CatalogChart from "./Chart";
 import "./Catalog.scss";
-
-
-
-const MAPPING: DataMapping = {
-    id: "id",
-    pid: "pid",
-    label: "display",
-    count: "cnt",
-    description: "metadata_description"
-}
+import MAPPING, { DataMapping } from "./DataMapping";
 
 
 interface DataRow {
@@ -22,24 +14,16 @@ interface DataRow {
     [key: string]: string | number | boolean | null
 }
 
-interface DataMapping {
-    /** The name of the id property */
-    id: string
-
-    /** The name of the pid property */
-    pid: string
-
-    /** The name of the count property. If provided render counts in a badge */
-    count: string
-
-    /** The name of the label/name property */
-    label: string
-
-    /** The name of the description property */
-    description: string
-}
-
 export default function Catalog() {
+
+    let data = json
+    if (MAPPING.stratifier) {
+        data = data.filter(row => {
+            const value = row[MAPPING.stratifier as keyof typeof row];
+            return value === undefined || value === null || value === "male"
+        })
+    }
+
     return (
         <div className="catalog">
             <h3 className="mt-0 mb-1 color-blue-dark"><i className="icon fa-solid fa-archive" /> Catalog</h3>
@@ -47,7 +31,7 @@ export default function Catalog() {
             {[
                 {
                     name: "Data Tree",
-                    children: <Tree data={json} mapping={MAPPING} />
+                    children: <Tree data={data} mapping={MAPPING} />
                 }, {
                     name: "Data Grid",
                     children: <div className="p-05 pt-1">
@@ -75,7 +59,7 @@ export default function Catalog() {
                                     type      : "string",
                                 }
                             ]}
-                            rows={json}
+                            rows={data}
                             // groupBy={MAPPING.pid}
                             // maxHeight={"calc(100% - 20.22rem)"}
                             // height={"calc(100% - 3.22rem)"} // exclude search-bar height
@@ -83,7 +67,9 @@ export default function Catalog() {
                     </div>
                 }, {
                     name: "Data Graph",
-                    children: <div className="p-05 pt-1">TODO...</div>
+                    children: <div style={{ padding: 1 }}>
+                        <CatalogChart data={data} />
+                    </div>
                 }
             ]}
             </Tabs>
