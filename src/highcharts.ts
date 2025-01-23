@@ -9,6 +9,7 @@ import patternFill      from "highcharts/modules/pattern-fill"
 import annotations      from "highcharts/modules/annotations"
 import accessibility    from "highcharts/modules/accessibility"
 import drilldown        from "highcharts/modules/drilldown"
+import coloraxis        from "highcharts/modules/coloraxis"
 // import cylinder      from "highcharts/modules/cylinder"
 // import funnel        from "highcharts/modules/funnel"
 // import heatmap       from "highcharts/modules/heatmap"
@@ -26,6 +27,7 @@ patternFill(Highcharts)
 annotations(Highcharts)
 accessibility(Highcharts)
 drilldown(Highcharts)
+coloraxis(Highcharts)
 // cylinder(Highcharts)
 // treemap(Highcharts)
 // funnel(Highcharts)
