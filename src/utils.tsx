@@ -201,7 +201,7 @@ export function stripTags(s: string) {
     return s.replace(/<.*?>/g, "")
 }
 
-export function highlight(str: string, stringToFind = "") {
+export function highlight(str: string, stringToFind = "", useHtml = false) {
     if (!stringToFind) {
         return str
     }
@@ -215,7 +215,10 @@ export function highlight(str: string, stringToFind = "") {
     while (index > -1) {
         fragments.push(temp.substring(0, index))
         const endIndex = index + q.length;
-        fragments.push(<span className="search-match" key={i++}>{ temp.substring(index, endIndex) }</span>)
+        fragments.push(useHtml ?
+            `<span class="search-match">${ temp.substring(index, endIndex) }</span>` :
+            <span className="search-match" key={i++}>{ temp.substring(index, endIndex) }</span>
+        )
         temp  = temp.substring(endIndex);
         index = temp.toLowerCase().indexOf(q);
     }

@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import Highcharts                  from "../../highcharts";
 import MAPPING from "./DataMapping";
+import { highlight } from "../../utils";
 
 
 const FONT_SIZE = 15
@@ -37,7 +38,7 @@ function Chart({ options }: { options: Highcharts.Options })
     return <div id="catalog-chart" className="chart" ref={ containerRef } />
 }
 
-export default function CatalogChart({ data }: { data: Record<string, any>[] })
+export default function CatalogChart({ data, search }: { data: Record<string, any>[], search?: string })
 {
     const { id, pid, count, label, description } = MAPPING;
 
@@ -49,7 +50,7 @@ export default function CatalogChart({ data }: { data: Record<string, any>[] })
             group = groups[row[pid]] = {
                 name: row[pid],
                 id  : row[pid],
-                type: "bar",
+                type: "column",
                 colorKey: "y",
                 data: []
             }
@@ -121,10 +122,10 @@ export default function CatalogChart({ data }: { data: Record<string, any>[] })
             labels: {
 
                 style: {
-                    fontSize: FONT_SIZE * 0.75 + "px",
+                    fontSize: FONT_SIZE * 0.9 + "px",
                     textDecoration: "none",
                     // fontWeight: "800",
-                    color: "#777"
+                    color: "#666"
                 }
             },
             lineWidth: 0
@@ -135,7 +136,7 @@ export default function CatalogChart({ data }: { data: Record<string, any>[] })
             startOnTick: false,
             tickWidth: 1,
             tickLength: 6,
-            offset: 8,
+            offset: 1,
             labels: {
                 overflow: "allow",
                 style: {
@@ -145,11 +146,11 @@ export default function CatalogChart({ data }: { data: Record<string, any>[] })
             gridLineColor: "#0002",
             gridLineDashStyle: "ShortDash",
             title: {
-                text: "Count",
-                style: {
-                    fontWeight: "700",
-                    fontSize: FONT_SIZE * 1.1 + "px"
-                }
+                text: "",
+            //     style: {
+            //         fontWeight: "700",
+            //         fontSize: FONT_SIZE * 1.1 + "px"
+            //     }
             },
             gridZIndex: 8
         },
@@ -183,8 +184,10 @@ export default function CatalogChart({ data }: { data: Record<string, any>[] })
                 // @ts-ignore
                 let out = `<b style="color:${this.point.color}">◉</b> <b>${this.point.custom?.name || this.point.name}</b> <b class="badge" style="background-color:${this.point.color}">${Number(this.point.y).toLocaleString()}</b><hr/>`
 
-                // @ts-ignore
-                return out + `<div style="min-width:200px;white-space:normal">${this.point.custom.data.Description}</div>`
+                return out + `<div style="min-width:200px;white-space:normal">${
+                    // @ts-ignore
+                    search ? highlight(this.point.custom.data.Description, search, true).join("") : this.point.custom.data.Description
+                }</div>`
             }
         },
         drilldown: {
