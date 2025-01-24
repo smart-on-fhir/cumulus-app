@@ -16,7 +16,8 @@
 
     .chart {
         // aspect-ratio: 7/3;
-        min-height: calc(100vh - 16.2rem);
+        min-height: calc(16rem);
+        height: calc(100vh - 16.2rem);
     }
 
     .catalog-tree {
