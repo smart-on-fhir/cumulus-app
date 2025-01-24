@@ -85,7 +85,7 @@ export default function SubscriptionLink({
                 <span className="wrap">{ search ? highlight(request.name, search) : request.name }</span>
             </b>
             <div className="color-muted small">
-                { graphCount !== undefined && <><span className="color-brand-2">{ graphCount } Graph{ graphCount === 1 ? "" : "s" }</span>, </> }
+                { graphCount !== undefined && request.metadata?.type !== "flat" && <><span className="color-brand-2">{ graphCount } Graph{ graphCount === 1 ? "" : "s" }</span>, </> }
                 { request.completed ? <>Data Updated: <Format value={request.completed} format="date" /></> : "No data yet" }
             </div>
         </Link>
