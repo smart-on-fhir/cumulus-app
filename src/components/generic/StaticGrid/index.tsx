@@ -71,6 +71,8 @@ interface StaticGridProps<T = JSONObject> {
     comparator?: (a: any, b: typeof a) => number
 
     contains?: (x: any, search: string) => boolean
+
+    q?: string
 }
 
 function defaultComparator(a: any, b: typeof a): number {
@@ -101,7 +103,8 @@ export default function StaticGrid({
     equals = (a, b) => a === b,
     comparator,
     filter = () => true,
-    contains
+    contains,
+    q
 }: StaticGridProps) {
 
     const searchableCols = columns.filter(c => c.searchable === true && c.name !== groupBy)
@@ -110,6 +113,8 @@ export default function StaticGrid({
     const [sortColumn, setSortColumn] = useState("")
     const [sortDir   , setSortDir   ] = useState<"asc"|"desc">("asc")
     const [groupMap  , setGroupMap  ] = useState<Record<string, boolean>>({})
+
+    const _search = q ?? search
 
     function onHeaderClick(colName: string) {
         setSortColumn(colName)
@@ -144,14 +149,15 @@ export default function StaticGrid({
         // ---------------------------------------------------------------------
         // Apply search and exclude empty groups
         // ---------------------------------------------------------------------
-        if (search) {
+        if (_search) {
+            const _q = _search.toLowerCase()
             for (let groupLabel in groups) {
                 groups[groupLabel] = groups[groupLabel].filter(row => {
                     return searchableCols.some(c => {
                         let val = c.value ? c.value(row, c) : row[c.name];
                         return contains ?
-                            contains(val, search) :
-                            String(val).toLowerCase().includes(search.toLowerCase())
+                            contains(val, _search) :
+                            String(val).toLowerCase().includes(_q)
                     })
                 })
 
@@ -252,7 +258,10 @@ export default function StaticGrid({
                     <tr>
                         <td className="no-data" colSpan={colLength}>
                             No data! {
-                                search && <> Try to <b className="link" onClick={() => setSearch("")}>clear search</b>.</>
+                                _search && (q ?
+                                    <> Try clearing the search parameter.</> :
+                                    <> Try to <b className="link" onClick={() => setSearch("")}>clear search</b>.</>
+                                )
                             }
                         </td>
                     </tr>
@@ -271,9 +280,9 @@ export default function StaticGrid({
                             groupLabel(
                                 label,
                                 children,
-                                search
+                                _search
                             ) :
-                            highlight(label + "", search);
+                            highlight(label + "", _search);
 
                         if (Array.isArray(headerValues)) {
                             headerCells.push(
@@ -372,12 +381,12 @@ export default function StaticGrid({
             </td> }
             { columns.filter(c => c.name !== groupBy).map((c, i) => {
                 let value: any = c.render ?
-                    c.render(rec, c, search) :
+                    c.render(rec, c, _search) :
                     c.value ?
                         c.value(rec, c) + "" : 
                         rec[c.name] + "";
-                if (search && c.searchable && (typeof value === "string" || typeof value === "number")) {
-                    value = <div>{ highlight(value + "", search) }</div>
+                if (_search && c.searchable && (typeof value === "string" || typeof value === "number")) {
+                    value = <div>{ highlight(value + "", _search) }</div>
                 }
                 return <td key={"cell-" + i} style={c.style}>{ value }</td>
             }) }
@@ -386,7 +395,7 @@ export default function StaticGrid({
 
     const renderSearch = () => {
         
-        if (!searchableCols.length) {
+        if (q !== undefined || !searchableCols.length) {
             return null
         }
 
