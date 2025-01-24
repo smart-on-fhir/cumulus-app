@@ -2,6 +2,7 @@ import express, { Request, Response } from "express"
 import https, { RequestOptions }      from "https"
 import { cached, rw }                 from "../lib"
 import config                         from "../config"
+import catalog                        from "../icd10_hierarchy_count.json"
 
 
 export const router = express.Router({ mergeParams: true })
@@ -96,6 +97,10 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
     });
 
     req.pipe(proxy);
+}))
+
+router.get("/catalog", rw(async (req: Request, res: Response) => {
+    res.json(catalog)
 }))
 
 export default router
