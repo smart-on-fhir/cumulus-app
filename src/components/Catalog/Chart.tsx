@@ -125,18 +125,22 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
                     fontSize: FONT_SIZE * 0.9 + "px",
                     textDecoration: "none",
                     // fontWeight: "800",
-                    color: "#666"
+                    // color: "#666"
                 }
             },
-            lineWidth: 0
+            lineWidth: 1,
+            // startOnTick: false,
+            // endOnTick: false,
+            zIndex: 10,
+            offset: 2
         },
         yAxis: {
-            lineWidth: 1,
+            lineWidth: 0,
             endOnTick: false,
             startOnTick: false,
-            tickWidth: 1,
-            tickLength: 6,
-            offset: 1,
+            // tickWidth: 1,
+            // tickLength: 6,
+            // offset: 2,
             labels: {
                 overflow: "allow",
                 style: {
@@ -152,16 +156,17 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
             //         fontSize: FONT_SIZE * 1.1 + "px"
             //     }
             },
-            gridZIndex: 8
+            gridZIndex: 8,
+            min: 0.001
         },
         plotOptions: {
             series: {
                 animation: false
             },
-            bar: {
+            column: {
                 // color: "#4a90e2",
                 // minPointLength: isPctChart ? 6 : 0,
-                borderRadius: 3,
+                borderRadius: 4,
                 stacking: "overlap",
                 // crisp: true,
                 // borderWidth: 2,
@@ -170,6 +175,7 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
                 groupPadding: 0.1,
                 pointPadding: 0.0,
                 maxPointWidth: 60,
+                minPointLength: 8
             }
         },
         tooltip: {
@@ -182,7 +188,8 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
             useHTML: true,
             formatter() {
                 // @ts-ignore
-                let out = `<b style="color:${this.point.color}">◉</b> <b>${this.point.custom?.name || this.point.name}</b> <b class="badge" style="background-color:${this.point.color}">${Number(this.point.y).toLocaleString()}</b><hr/>`
+                let out = `<b style="color:${this.point.color}">◉</b> <b>${this.point.custom?.name || this.point.name}</b><br/>` +
+                    `<span style="color:#888">Count: </span><b class="badge" style="background-color:${this.point.color}">${Number(this.point.y).toLocaleString()}</b><hr style="margin: 8px 0" />`
 
                 return out + `<div style="min-width:200px;white-space:normal">${
                     // @ts-ignore
@@ -197,6 +204,10 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
             },
             breadcrumbs: {
                 relativeTo: "spacingBox",
+                buttonSpacing: 5,
+                // style: {
+                //     padding: "0 10px"
+                // },
                 position: {
                     align: "left",
                     verticalAlign: "top",
