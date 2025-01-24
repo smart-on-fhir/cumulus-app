@@ -174,7 +174,7 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
                 // opacity: 0.8,
                 groupPadding: 0.1,
                 pointPadding: 0.0,
-                maxPointWidth: 60,
+                maxPointWidth: 240,
                 minPointLength: 8
             }
         },
