@@ -88,7 +88,7 @@ export const schema: Schema = {
     templates: [
         {
             id: "template_1",
-            name: "Template 1",
+            name: "Adverse Drug Events (ADE)",
             variables: [
                 {
                     id: "period_start",
@@ -177,32 +177,38 @@ export const schema: Schema = {
                     id: "enc_max",
                     section: "HealthcareUtilization",
                     min: "$minCountVisits",
+                },
+                {
+                    id: "enc_days_min",
+                    section: "HealthcareUtilization",
+                    min: 0,
+                    step: 1
                 }
             ]
         },
-        {
-            id: "template_2",
-            name: "Template 2 having a very long title",
-            variables: [
-                {
-                    id: "period_start",
-                    section: "StudyPeriod",
-                    group: "StartDate",
-                    required: true,
-                    max: "$visitEndDate",
-                    defaultValue: "1990-07-20" // yyyy-MM-dd
-                },
-                {
-                    id: "period_end",
-                    section: "StudyPeriod",
-                    group: "StartDate",
-                    defaultValue: "1990-07-24",
-                    required: false,
-                    min: "$visitStartDate",
-                    disabled: "ifTrue(new Date(period_start).getTime() > Date.now(), true, false)"
-                }
-            ]
-        }
+        // {
+        //     id: "template_2",
+        //     name: "Template 2 having a very long title",
+        //     variables: [
+        //         {
+        //             id: "period_start",
+        //             section: "StudyPeriod",
+        //             group: "StartDate",
+        //             required: true,
+        //             max: "$visitEndDate",
+        //             defaultValue: "1990-07-20" // yyyy-MM-dd
+        //         },
+        //         {
+        //             id: "period_end",
+        //             section: "StudyPeriod",
+        //             group: "StartDate",
+        //             defaultValue: "1990-07-24",
+        //             required: false,
+        //             min: "$visitStartDate",
+        //             disabled: "ifTrue(new Date(period_start).getTime() > Date.now(), true, false)"
+        //         }
+        //     ]
+        // }
     ],
     sections: {
         StudyPeriod: {
@@ -226,8 +232,8 @@ export const schema: Schema = {
             type: "date"
         },
         period_end: {
-            name: "Study Period Encounter End Date",
-            description: "Select the latest date of visit to be included in the study",
+            name: "End Date",
+            description: "Study Period Encounter End Date",
             type: "date"
         },
         include_history: {
@@ -237,7 +243,7 @@ export const schema: Schema = {
         },
         age_min: {
             name: "Min Patient Age (at visit)",
-            description: "The minimal patient age at the time of visit",
+            description: "The minimum patient age at the time of visit",
             type: "number",
             min : 0,
             max : 130,
@@ -254,7 +260,7 @@ export const schema: Schema = {
         },
         age_max: {
             name: "Max Patient Age (at visit)",
-            description: "The maximal patient age at the time of visit",
+            description: "The maximum patient age at the time of visit",
             type: "number",
             min: 0,
             max: 130,
@@ -327,14 +333,19 @@ export const schema: Schema = {
             description: "Select what kind of notes should be used in your study"
         },
         enc_min: {
-            name: "Min number of encounters during study period",
+            name: "Min Encounters",
             type: "number",
-            description: "Short description of what this option is..."
+            description: "Min number of encounters during study period"
         },
         enc_max: {
-            name: "Max number of encounters during study period",
+            name: "Max Encounters",
             type: "number",
-            description: "Short description of what this option is..."
+            description: "Max number of encounters during study period"
+        },
+        enc_days_min: {
+            name: "Min Duration",
+            type: "number",
+            description: "Min number of days between first and last encounter"
         }
     }
 }
