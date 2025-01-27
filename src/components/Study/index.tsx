@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import Checkbox                from "../generic/Checkbox"
-import Grid                    from "../generic/Grid"
+// import Checkbox                from "../generic/Checkbox"
+// import Grid                    from "../generic/Grid"
 import { TemplateEditor }      from "./editors"
 import { schema }              from "./Schema"
 import { downloadBase64File }  from "../../utils"
@@ -12,7 +12,7 @@ export default function StudyBuilder() {
     const [templateId, setTemplateId] = useState(schema.templates[0].id)
 
     const [variables, setVariables] = useState<Record<string, any>>({})
-    const [dataSites, setDataSites] = useState<string[]>([])
+    // const [dataSites, setDataSites] = useState<string[]>([])
 
     // const {} = state
 
@@ -62,7 +62,7 @@ export default function StudyBuilder() {
                     </>}
                 </div>
             </div>
-            <div className="flex" style={{ width: "calc(min(100%, 47rem))", margin: "1rem auto" }}>
+            {/* <div className="flex" style={{ width: "calc(min(100%, 47rem))", margin: "1rem auto" }}>
                 <h6 className="center color-blue-dark mt-1">Data Sites</h6>
                 <hr />
                 <Grid cols="15rem" gap="0 1rem" style={{ margin: "0.5rem auto 1rem", maxWidth: "calc(min(100%, 47rem))" }}>
@@ -151,7 +151,7 @@ export default function StudyBuilder() {
                         />
                     </label>
                 </Grid>
-            </div>
+            </div> */}
             <div className="center">
                 <button
                     className="btn btn-green m-05"
