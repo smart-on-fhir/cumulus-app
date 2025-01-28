@@ -64,6 +64,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     const [imgUrl , setImgUrl ] = useState("")
     const [error  , setError  ] = useState<Error | string | null>(null)
     const [limit  , setLimit  ] = useState(0)
+    const [sortBy , setSortBy ] = useState("x:asc")
     const [chartType, setChartType] = useState<"spline" | "column" | "bar">(
         col.dataType === "float" ||
         col.dataType === "integer" ||
@@ -86,7 +87,10 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
             }
             
             // No limit for lines and up to 30 bars/columns
-            setLimit(chartType === "spline" ? 0 : 30)
+            if (chartType !== "spline" && data.rowCount > 30) {
+                setLimit(30)
+                setSortBy("y:desc")
+            }
                 
             const defaults = getDefaultChartOptions(_chartType, {
                 chart: {
@@ -111,7 +115,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
                 column          : col,
                 ranges          : { enabled: false },
                 inspection      : { enabled: false, context: {selectedAnnotationIndex: -1, selectedPlotLineAxis: "", selectedPlotLineId: "", selectedSeriesId: ""}, match: [] },
-                sortBy          : "x:asc",
+                sortBy,
                 limit,
                 offset          : 0,
                 onSeriesToggle  : () => {},
@@ -125,7 +129,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         } finally {
             setLoading(false)
         }
-    }, [chartType, col, sub.id, abortController.signal, countLabel, limit])
+    }, [chartType, col, sub.id, abortController.signal, countLabel, limit, sortBy])
     
     useEffect(() => { 
         if (!isCountColumn) {
@@ -144,29 +148,17 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     }
 
     
-    let counted = countLabel
+    let counted = pluralizeSubject(getSubject(sub))
 
-    if (counted === "Count" || counted === "Counts") {
-        if (sub.dataURL) {
-            // const pkgName = sub.dataURL.split("__")[1];
-            // if (pkgName) {
-                // counted = humanizeColumnName(pkgName)
-                counted = parsePackageName(sub.dataURL)
-            // }
-        } else if (sub.name.includes("__")) {
-            counted = parsePackageName(sub.name)
-            // const pkgName = sub.name.replace(/(core__)+/, "core__").split("__")[1];
-            // if (pkgName) {
-            //     counted = humanizeColumnName(pkgName)
-            // }
-        }
+    if (limit) {
+        counted = `Top ${limit} ${counted.replace(/^counts?\s/i, "")}`
     }
 
     const label = counted + " by " + col.label
-    const description = sub.name + ": " + label
+    const description = `Generated from the "${sub.name}" data source to show ${label.toLowerCase()}.`
 
     return (
-        <Link className="view-thumbnail" to="create-view" state={{ column: col.name, chartType, name: label, description, countLabel, limit }}>
+        <Link className="view-thumbnail" to="create-view" state={{ column: col.name, chartType, name: label, description, countLabel, limit, sortBy }}>
             <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }}>
                 { loading && <Loader msg="" style={{ zIndex: 2 }} /> }
                 { error && <small className="color-red" style={{ wordBreak: "break-all" }}>{ error + "" }</small> }
@@ -184,11 +176,56 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     )
 }
 
+function getSubject(dataSource: app.Subscription) {
+    let subject = getSubjectFromMetadata(dataSource)
+    if (!subject) {
+        subject = getSubjectFromDataUrl(dataSource)
+    }
+    if (!subject) {
+        subject = getSubjectFromDataSourceName(dataSource)
+    }
+    return subject || "Count"
+}
+
+function getSubjectFromMetadata(dataSource: app.Subscription) {
+    return String(dataSource.metadata?.cols.find(c => c.name === "cnt")?.label || "").replace(/^counts?\s*/i, "")
+}
+
+function getSubjectFromDataUrl(dataSource: app.Subscription) {
+    if (dataSource.dataURL) {
+        return parsePackageName(dataSource.dataURL)
+    }
+    return ""
+}
+
+function getSubjectFromDataSourceName(dataSource: app.Subscription) {
+    if (dataSource.name.includes("__")) {
+        return parsePackageName(dataSource.name)
+    }
+    return ""
+}
+
+function pluralizeSubject(subject: string) {
+    const map = {
+        "ICD10"    : "ICD10",
+        "COVID-19" : "COVID-19",
+        "Category" : "Categories",
+        "PCR"      : "PCR",
+        "NLP"      : "NLP",
+        "Diagnosis": "Diagnoses",
+        "ED"       : "ED"
+    }
+    if (subject in map) {
+        return map[subject as keyof typeof map];
+    }
+    return subject + "s";
+}
+
 function parsePackageName(name: string) {
     const pkgName = name.replace(/(core__)+/, "core__");
     const match = pkgName.match(/^(\w+)__count_([^_]+)./)
     if (match && match[2]) {
-        return "Count " + humanizeColumnName(match[2])
+        return humanizeColumnName(match[2])
     }
     return humanizeColumnName(pkgName)
 }
