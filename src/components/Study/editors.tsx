@@ -91,12 +91,17 @@ export function Editor({
 export function CheckListEditor({
     descriptor,
     value = [],
-    onChange
+    onChange,
+    defaultValue
 }: {
     descriptor: CheckListParameterDescriptor
     value: any[]
     onChange: (list: any[]) => void
+    defaultValue?: any[]
 }) {
+
+    value = value || defaultValue || [];
+
     return (
         <div>
             <label>{ descriptor.name } <b className="badge">{value.length}</b></label>
