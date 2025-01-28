@@ -37,7 +37,8 @@
             margin     : 0;
             text-indent: 0;
             font-weight: normal;
-            padding    : 1px 0;
+            padding    : 3px 0;
+            border-radius: 3px;
 
             span {
                 padding-left: 0.2em;
@@ -47,11 +48,17 @@
             .search-match {
                 padding: 0;
             }
+
+            &:hover {
+                background: #0001;
+                box-shadow: 0 0 1px 0 #0004 inset;
+            }
         }
 
         details {
             summary {
                 padding: 1px 0.2em 1px 0;
+                outline: none;
 
                 &::marker {
                     color: transparent;
