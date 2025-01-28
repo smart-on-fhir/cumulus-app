@@ -1,10 +1,7 @@
-import { useLayoutEffect, useRef } from "react";
-import Highcharts                  from "../../highcharts";
-import MAPPING from "./DataMapping";
-import { highlight } from "../../utils";
-
-
-const FONT_SIZE = 15
+import { useLayoutEffect, useRef } from "react"
+import Highcharts                  from "../../highcharts"
+import { highlight }               from "../../utils"
+import MAPPING                     from "./DataMapping"
 
 
 function Chart({ options }: { options: Highcharts.Options })
@@ -40,7 +37,7 @@ function Chart({ options }: { options: Highcharts.Options })
 
 export default function CatalogChart({ data, search }: { data: Record<string, any>[], search?: string })
 {
-    const { id, pid, count, label, description } = MAPPING;
+    const { id, pid, count, label, description, stratifier = "" } = MAPPING;
 
     const groups: Record<string, any> = {}
 
@@ -60,19 +57,9 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
             y        : +row[count],
             name     : row[label],
             drilldown: data.some((r: any) => r[pid] === row[id]) ? row[id] : undefined,
-            dataLabels: {
-                // enabled: true,
-            //     align  : "end",
-            //     inside : false,
-                // style: {
-            //         textDecoration: "none",
-                    // fontWeight: "600",
-            //         fontSize: FONT_SIZE,
-            //         textOutline: "1px #FFF9"
-                // }
-            },
             custom: {
                 data: {
+                    stratifier: stratifier? row[stratifier] : "",
                     // Label: row[label],
                     Count: row[count],
                     Description: row[description]
@@ -84,7 +71,7 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
     const options: Highcharts.Options = {
         chart: {
             style: {
-                fontSize  : FONT_SIZE + "px",
+                fontSize  : "15px",
                 fontFamily: "'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif",
                 color     : "#222"
             },
@@ -122,7 +109,7 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
             labels: {
 
                 style: {
-                    fontSize: FONT_SIZE * 0.9 + "px",
+                    fontSize: "14px",
                     textDecoration: "none",
                     // fontWeight: "800",
                     // color: "#666"
@@ -144,7 +131,7 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
             labels: {
                 overflow: "allow",
                 style: {
-                    fontSize: FONT_SIZE * 0.9 + "px"
+                    fontSize: "14px"
                 }
             },
             gridLineColor: "#0002",
@@ -153,7 +140,7 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
                 text: "",
             //     style: {
             //         fontWeight: "700",
-            //         fontSize: FONT_SIZE * 1.1 + "px"
+            //         fontSize: "16px"
             //     }
             },
             gridZIndex: 8,
@@ -174,22 +161,22 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
                 // opacity: 0.8,
                 groupPadding: 0.1,
                 pointPadding: 0.0,
-                maxPointWidth: 240,
+                maxPointWidth: 230,
                 minPointLength: 8
             }
         },
         tooltip: {
             headerFormat: "",
             style: {
-                fontSize: FONT_SIZE + "px",
+                fontSize: "15px",
                 whiteSpace: "normal"
             },
             backgroundColor: "#FCFCFC",
             useHTML: true,
             formatter() {
                 // @ts-ignore
-                let out = `<b style="color:${this.point.color}">◉</b> <b>${this.point.custom?.name || this.point.name}</b><br/>` +
-                    `<span style="color:#888">Count: </span><b class="badge" style="background-color:${this.point.color}">${Number(this.point.y).toLocaleString()}</b><hr style="margin: 8px 0" />`
+                let out = `<b style="color:${this.point.color}">◉</b> <b>${this.point.custom?.name || this.point.name}</b> <b class="badge" style="background-color:${this.point.color}">${
+                        Number(this.point.y).toLocaleString()}</b><hr style="margin: 8px 0" />`
 
                 return out + `<div style="min-width:200px;white-space:normal">${
                     // @ts-ignore
@@ -205,9 +192,6 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
             breadcrumbs: {
                 relativeTo: "spacingBox",
                 buttonSpacing: 5,
-                // style: {
-                //     padding: "0 10px"
-                // },
                 position: {
                     align: "left",
                     verticalAlign: "top",
