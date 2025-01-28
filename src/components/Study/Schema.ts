@@ -272,7 +272,7 @@ export const schema: Schema = {
             type: "boolean"
         },
         age_min: {
-            name: "Min Patient Age (at visit)",
+            name: "Min Patient Age",
             description: "The minimum patient age at the time of visit",
             type: "number",
             min : 0,
@@ -289,7 +289,7 @@ export const schema: Schema = {
             ]
         },
         age_max: {
-            name: "Max Patient Age (at visit)",
+            name: "Max Patient Age",
             description: "The maximum patient age at the time of visit",
             type: "number",
             min: 0,
