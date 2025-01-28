@@ -7,7 +7,7 @@ export default function LOINC() {
     // return (
     //     <Prefetch path="/api/aggregator/catalog">
     //         {(json) => {
-    //             return <Catalog title="LOINC Catalog" json={json} />
+    //             return <Catalog title="LOINC Laboratories" json={json} />
     //         }}
     //     </Prefetch>
     // )
