@@ -17,6 +17,14 @@
         }
     }
 
+    .check-list label {
+        color: #444;
+        font-size: 90%;
+        &.checkbox-label {
+            margin-bottom: 0;
+        }
+    }
+
     .study-builder-main {
         background   : #FFF;
         background   : #FFF linear-gradient(#1b5dab11, #1b5dab22 8rem, #CCC 8rem, #CCC 8.05rem, #FFF 7rem);

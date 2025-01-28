@@ -1,7 +1,8 @@
 import { AlertError } from "../generic/Alert"
-import Checkbox from "../generic/Checkbox"
-import Grid from "../generic/Grid"
-import Markdown from "../generic/Markdown"
+import Checkbox       from "../generic/Checkbox"
+import CheckboxList   from "../generic/CheckboxList"
+import Grid           from "../generic/Grid"
+import Markdown       from "../generic/Markdown"
 
 import {
     EnumParameterDescriptor,
@@ -10,7 +11,8 @@ import {
     Template,
     type BooleanParameterDescriptor,
     type DateParameterDescriptor,
-    type ParameterDescriptor
+    type ParameterDescriptor,
+    type CheckListParameterDescriptor
 } from "./Schema"
 
 function ifTrue(state: Record<string, any>, expr: string, y:any = true, n:any = false) {
@@ -59,7 +61,7 @@ function parseRuntimeParams(params: Record<string, any>, state: Record<string, a
 
 export function Editor({
     descriptor,
-    value = "",
+    value,
     onChange,
     runtimeParams = {}
 }: {
@@ -80,7 +82,42 @@ export function Editor({
     if (descriptor.type === "enum") {
         return <EnumEditor descriptor={descriptor} {...runtimeParams} value={value} onChange={onChange} />
     }
+    if (descriptor.type === "checklist") {
+        return <CheckListEditor descriptor={descriptor} {...runtimeParams} value={value} onChange={onChange} />
+    }
     return <b>{descriptor.type} editor not implemented</b>
+}
+
+export function CheckListEditor({
+    descriptor,
+    value = [],
+    onChange
+}: {
+    descriptor: CheckListParameterDescriptor
+    value: any[]
+    onChange: (list: any[]) => void
+}) {
+    return (
+        <div>
+            <label>{ descriptor.name } <b className="badge">{value.length}</b></label>
+            <div className="form-control check-list" style={{ maxHeight: "20rem", overflow: "auto", padding: 4 }}>
+                <CheckboxList
+                    items={descriptor.items as any}
+                    toggle={item => {
+                        const list = [...value]
+                        const index = value.findIndex(x => JSON.stringify(x) === JSON.stringify(item.value))
+                        if (index > -1) {
+                            list.splice(index, 1)
+                        } else {
+                            list.push(item.value)
+                        }
+                        onChange(list)
+                    }}
+                    isSelected={item => value.some(x => JSON.stringify(x) === JSON.stringify(item.value))}
+                />
+            </div>
+        </div>
+    )
 }
 
 export function DateEditor({
