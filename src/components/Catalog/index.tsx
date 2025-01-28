@@ -32,7 +32,7 @@ function search(data: DataRow[], q: string, columns: string[]): DataRow[] {
             out.push(row)
             do {
                 // eslint-disable-next-line no-loop-func
-                const idx = input.findIndex(r => r.id === row.pid)
+                const idx = input.findIndex(r => r[MAPPING.id] === row[MAPPING.pid])
                 if (idx > -1) {
                     row = input.splice(idx, 1)[0]
                     out.push(row)
@@ -67,9 +67,7 @@ export default function Catalog() {
         // }
 
         if (q) {
-            // console.time("search")
             data = search(json, q, [label, description]) as any
-            // console.timeEnd("search")
         }
 
         return (
@@ -96,23 +94,28 @@ export default function Catalog() {
                                         type      : "string",
                                     },
                                     {
-                                        name      : MAPPING.count,
-                                        label     : "Count",
-                                        // searchable: true,
-                                        type      : "number",
-                                        value(row, c) {
+                                        name : MAPPING.count,
+                                        label: "Count",
+                                        type : "number",
+                                        value(row: DataRow) {
                                             return Number(row[MAPPING.count]).toLocaleString()
                                         },
                                     },
+                                    MAPPING.stratifier ? {
+                                        name      : MAPPING.stratifier,
+                                        label     : MAPPING.stratifier,
+                                        type      : "string",
+                                    } : false,
                                     {
                                         name      : MAPPING.description,
                                         label     : "Description",
-                                        searchable: true,
                                         type      : "string",
+                                        searchable: true,
                                     }
-                                ]}
+                                ].filter(Boolean) as any}
                                 rows={data}
-                                // groupBy={MAPPING.pid}
+                                groupBy={MAPPING.stratifier}
+                                groupLabel={value => `${MAPPING.stratifier} = ${value}`}
                                 // maxHeight={"calc(100% - 20.22rem)"}
                                 // height={"calc(100% - 3.22rem)"} // exclude search-bar height
                             />
@@ -140,11 +143,17 @@ function Tree({
     search?: string
 })
 {
-    const { id, pid } = mapping
+    const { id, pid, stratifier } = mapping
+    
+    let children = data.filter(row => row[pid] === null)
+    if (stratifier) {
+        children = children.filter(row => row[stratifier] === null)
+    }
+
     return (
         <div className="catalog-tree">
             <div>
-                { data.filter(row => row[pid] === null).map((row, i) => (
+                { children.map((row, i) => (
                     <Row data={data} id={row[id] as  string | number} key={i} mapping={mapping} search={search} open />
                 )) }
             </div>
@@ -166,9 +175,17 @@ function Row({
     search?: string
 }) {
     const [isOpen, setIsOpen] = useState(!!open)
-    const { id: idColumn, pid: pidColumn, label, count, description } = mapping
-    const node     = data.find(row => row[idColumn] === id)!
-    const children = data.filter(row => row[pidColumn] === node[idColumn])
+    const { id: idColumn, pid: pidColumn, label, count, description, stratifier } = mapping
+    const node = data.find(row => row[idColumn] === id)!
+    
+    let children = data.filter(row => row[pidColumn] === node[idColumn])
+    let tooltip: string | undefined;
+    if (stratifier) {
+        const siblings = data.filter(row => row[pidColumn] === node[pidColumn] && row[idColumn] !== node[idColumn] && row[stratifier] !== null && row[label] === node[label]);
+        tooltip = siblings.map(row => `${row[stratifier]}: ${Number(row[count]).toLocaleString()}`).join('<br/>')
+        children = children.filter(row => row[stratifier] === null)
+    }
+
     return (
         <details open={isOpen} onToggle={e => {
             e.stopPropagation()
@@ -178,7 +195,7 @@ function Row({
             "has-children": children.length > 0
         }) }>
             <summary>
-                <label>
+                <label data-tooltip={tooltip}>
                     <span className={ classList({
                         "icon icon-2 material-symbols-rounded": true,
                         "color-blue": children.length === 0,
