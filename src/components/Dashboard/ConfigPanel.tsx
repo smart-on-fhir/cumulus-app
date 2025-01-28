@@ -337,9 +337,9 @@ export default function ConfigPanel({
                                 max={360}
                                 step={1}
                                 // @ts-ignore
-                                value={ chartOptions.series![0]?.startAngle || 0 }
+                                value={ chartOptions.series?.[0]?.startAngle || 0 }
                                 onChange={e => {
-                                    chartOptions.series![0] = merge(chartOptions.series![0], { startAngle: e.target.valueAsNumber })
+                                    chartOptions.series![0] = merge(chartOptions.series?.[0], { startAngle: e.target.valueAsNumber })
                                     onChartOptionsChange(chartOptions)
                                 }}
                                 style={{ width: "100%", margin: 0 }}
