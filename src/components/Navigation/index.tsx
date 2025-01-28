@@ -82,8 +82,8 @@ export default function Navigation()
                 <NavLink to="/study"><i className="icon fa-solid fa-flask" /> Study Builder</NavLink>
 
                 <NavGroup icon="fa-solid fa-archive" label="Catalog">
-                    <NavLink to="/catalog/icd10"><i className="icon fa-solid fa-archive" /> ICD-10</NavLink>
-                    <NavLink to="/catalog/loinc"><i className="icon fa-solid fa-archive" /> LOINC</NavLink>
+                    <NavLink to="/catalog/icd10"><i className="icon fa-solid fa-archive" /> ICD10 Diagnoses</NavLink>
+                    <NavLink to="/catalog/loinc"><i className="icon fa-solid fa-archive" /> LOINC Laboratories</NavLink>
                 </NavGroup>
                 
                 { canAdminister && (
