@@ -12,7 +12,8 @@ import {
     type BooleanParameterDescriptor,
     type DateParameterDescriptor,
     type ParameterDescriptor,
-    type CheckListParameterDescriptor
+    type CheckListParameterDescriptor,
+    StringParameterDescriptor
 } from "./Schema"
 
 function ifTrue(state: Record<string, any>, expr: string, y:any = true, n:any = false) {
@@ -85,6 +86,10 @@ export function Editor({
     if (descriptor.type === "checklist") {
         return <CheckListEditor descriptor={descriptor} {...runtimeParams} value={value} onChange={onChange} />
     }
+    if (descriptor.type === "string") {
+        return <StringEditor descriptor={descriptor} value={value} onChange={onChange} />
+    }
+    // @ts-ignore
     return <b>{descriptor.type} editor not implemented</b>
 }
 
@@ -121,6 +126,32 @@ export function CheckListEditor({
                     isSelected={item => value.some(x => JSON.stringify(x) === JSON.stringify(item.value))}
                 />
             </div>
+        </div>
+    )
+}
+
+export function StringEditor({
+    descriptor,
+    value = "",
+    onChange
+}: {
+    descriptor: StringParameterDescriptor
+    value: string
+    onChange: (date: string) => void
+}) {
+    const { name, description, type, ...rest } = descriptor
+    return (
+        <div>
+            <label>
+                { name }
+            </label>
+            <input
+                type="text"
+                { ...rest }
+                value={ value }
+                onChange={ e => onChange(e.target.value) }
+            />
+            { !!description && <div className="mb-05 mt-05"><Markdown>{ description }</Markdown></div> }
         </div>
     )
 }
