@@ -25,7 +25,7 @@ import UserGroups                       from "./UserGroups";
 import StudyBuilder                     from "./Study";
 import HealthCheck                      from "./HealthCheck";
 import { AggregatorProvider }           from "../Aggregator";
-import Catalog                          from "./Catalog";
+import CatalogRouter                    from "./Catalog";
 import "../styles/main.scss";
 
 
@@ -75,9 +75,9 @@ export default function App()
                                     <Route path="users"          element={ <RequireAuth><Users /></RequireAuth> } />
                                     <Route path="permissions"    element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
                                     <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
-                                    <Route path="study"          element={ <RequireAuth><StudyBuilder /></RequireAuth>} />
-                                    <Route path="catalog"        element={ <RequireAuth><Catalog /></RequireAuth>} />
                                     <Route path="health-check"   element={ <RequireAuth><HealthCheck /></RequireAuth> } />
+                                    <Route path="study"          element={ <RequireAuth><StudyBuilder /></RequireAuth>} />
+                                    <Route path="catalog/*"      element={ <RequireAuth><CatalogRouter /></RequireAuth>} />
                                     
                                     <Route path="*" element="Page Not Found" />
                                 </Route>
