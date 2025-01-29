@@ -1,0 +1,6169 @@
+[
+  {
+    "cnt":7564617,
+    "pid":null,
+    "id":"LP29693-6",
+    "display":"LP29693-6",
+    "metadata_description":"Laboratory"
+  },
+  {
+    "cnt":6343196,
+    "pid":"LP29693-6",
+    "id":"LP343631-0",
+    "display":"LP343631-0",
+    "metadata_description":"Chemistry and Chemistry - challenge"
+  },
+  {
+    "cnt":6293122,
+    "pid":"LP343631-0",
+    "id":"LP7786-9",
+    "display":"LP7786-9",
+    "metadata_description":"CHEM"
+  },
+  {
+    "cnt":719342,
+    "pid":"LP29693-6",
+    "id":"LP343406-7",
+    "display":"LP343406-7",
+    "metadata_description":"Microbiology and Antimicrobial susceptibility"
+  },
+  {
+    "cnt":719217,
+    "pid":"LP343406-7",
+    "id":"LP7819-8",
+    "display":"LP7819-8",
+    "metadata_description":"MICRO"
+  },
+  {
+    "cnt":437240,
+    "pid":"LP29693-6",
+    "id":"LP7846-1",
+    "display":"LP7846-1",
+    "metadata_description":"Specimen information"
+  },
+  {
+    "cnt":412861,
+    "pid":"LP7786-9",
+    "id":"2708-6",
+    "display":"2708-6",
+    "metadata_description":"SaO2 % BldA"
+  },
+  {
+    "cnt":178945,
+    "pid":"LP7786-9",
+    "id":"2160-0",
+    "display":"2160-0",
+    "metadata_description":"Creat SerPl-mCnc"
+  },
+  {
+    "cnt":177670,
+    "pid":"LP7786-9",
+    "id":"3094-0",
+    "display":"3094-0",
+    "metadata_description":"BUN SerPl-mCnc"
+  },
+  {
+    "cnt":174685,
+    "pid":"LP7846-1",
+    "id":"LP7788-5",
+    "display":"LP7788-5",
+    "metadata_description":"COAG"
+  },
+  {
+    "cnt":173574,
+    "pid":"LP7786-9",
+    "id":"2823-3",
+    "display":"2823-3",
+    "metadata_description":"Potassium SerPl-sCnc"
+  },
+  {
+    "cnt":173553,
+    "pid":"LP7786-9",
+    "id":"2951-2",
+    "display":"2951-2",
+    "metadata_description":"Sodium SerPl-sCnc"
+  },
+  {
+    "cnt":173394,
+    "pid":"LP7786-9",
+    "id":"2075-0",
+    "display":"2075-0",
+    "metadata_description":"Chloride SerPl-sCnc"
+  },
+  {
+    "cnt":173340,
+    "pid":"LP7786-9",
+    "id":"2028-9",
+    "display":"2028-9",
+    "metadata_description":"CO2 SerPl-sCnc"
+  },
+  {
+    "cnt":170368,
+    "pid":"LP7786-9",
+    "id":"2345-7",
+    "display":"2345-7",
+    "metadata_description":"Glucose SerPl-mCnc"
+  },
+  {
+    "cnt":162553,
+    "pid":"LP7786-9",
+    "id":"33037-3",
+    "display":"33037-3",
+    "metadata_description":"Anion Gap SerPl-sCnc"
+  },
+  {
+    "cnt":143404,
+    "pid":"LP7786-9",
+    "id":"1742-6",
+    "display":"1742-6",
+    "metadata_description":"ALT SerPl-cCnc"
+  },
+  {
+    "cnt":141160,
+    "pid":"LP7846-1",
+    "id":"LP6186-3",
+    "display":"LP6186-3",
+    "metadata_description":"Coag"
+  },
+  {
+    "cnt":134567,
+    "pid":"LP7786-9",
+    "id":"1920-8",
+    "display":"1920-8",
+    "metadata_description":"AST SerPl-cCnc"
+  },
+  {
+    "cnt":133944,
+    "pid":"LP7786-9",
+    "id":"17861-6",
+    "display":"17861-6",
+    "metadata_description":"Calcium [Mass\/Vol]"
+  },
+  {
+    "cnt":125720,
+    "pid":"LP7786-9",
+    "id":"1751-7",
+    "display":"1751-7",
+    "metadata_description":"Albumin [Mass\/Vol]"
+  },
+  {
+    "cnt":125096,
+    "pid":"LP7786-9",
+    "id":"2777-1",
+    "display":"2777-1",
+    "metadata_description":"Phosphate [Mass\/Vol]"
+  },
+  {
+    "cnt":123899,
+    "pid":"LP7786-9",
+    "id":"1975-2",
+    "display":"1975-2",
+    "metadata_description":"Bilirub SerPl-mCnc"
+  },
+  {
+    "cnt":123180,
+    "pid":"LP7786-9",
+    "id":"19123-9",
+    "display":"19123-9",
+    "metadata_description":"Magnesium [Mass\/Vol]"
+  },
+  {
+    "cnt":122971,
+    "pid":"LP7786-9",
+    "id":"1968-7",
+    "display":"1968-7",
+    "metadata_description":"Bilirub Direct SerPl-mCnc"
+  },
+  {
+    "cnt":121394,
+    "pid":"LP7846-1",
+    "id":"LP6779-5",
+    "display":"LP6779-5",
+    "metadata_description":"Aper"
+  },
+  {
+    "cnt":118246,
+    "pid":"LP7786-9",
+    "id":"6768-6",
+    "display":"6768-6",
+    "metadata_description":"ALP SerPl-cCnc"
+  },
+  {
+    "cnt":117873,
+    "pid":"LP7786-9",
+    "id":"11580-8",
+    "display":"11580-8",
+    "metadata_description":"TSH DL <= 0.005 mIU\/L Qn"
+  },
+  {
+    "cnt":115334,
+    "pid":"LP7786-9",
+    "id":"2885-2",
+    "display":"2885-2",
+    "metadata_description":"Prot SerPl-mCnc"
+  },
+  {
+    "cnt":101056,
+    "pid":"LP7786-9",
+    "id":"2514-8",
+    "display":"2514-8",
+    "metadata_description":"Ketones Ur Ql Strip"
+  },
+  {
+    "cnt":100957,
+    "pid":"LP6779-5",
+    "id":"5767-9",
+    "display":"5767-9",
+    "metadata_description":"Appearance Ur"
+  },
+  {
+    "cnt":100694,
+    "pid":"LP7786-9",
+    "id":"1988-5",
+    "display":"1988-5",
+    "metadata_description":"CRP SerPl-mCnc"
+  },
+  {
+    "cnt":82773,
+    "pid":"LP7786-9",
+    "id":"62292-8",
+    "display":"62292-8",
+    "metadata_description":"25(OH)D3+25(OH)D2 SerPl-mCnc"
+  },
+  {
+    "cnt":80207,
+    "pid":"LP7786-9",
+    "id":"2458-8",
+    "display":"2458-8",
+    "metadata_description":"IgA [Mass\/Vol]"
+  },
+  {
+    "cnt":75967,
+    "pid":"LP7786-9",
+    "id":"3024-7",
+    "display":"3024-7",
+    "metadata_description":"T4 Free SerPl-mCnc"
+  },
+  {
+    "cnt":65509,
+    "pid":"LP7788-5",
+    "id":"5902-2",
+    "display":"5902-2",
+    "metadata_description":"Prothrombin time"
+  },
+  {
+    "cnt":65491,
+    "pid":"LP7788-5",
+    "id":"6301-6",
+    "display":"6301-6",
+    "metadata_description":"INR PPP"
+  },
+  {
+    "cnt":60987,
+    "pid":"LP6186-3",
+    "id":"14979-9",
+    "display":"14979-9",
+    "metadata_description":"aPTT PPP"
+  },
+  {
+    "cnt":58814,
+    "pid":"LP29693-6",
+    "id":"LP7776-0",
+    "display":"LP7776-0",
+    "metadata_description":"Blood bank"
+  },
+  {
+    "cnt":58814,
+    "pid":"LP7776-0",
+    "id":"LP17803-5",
+    "display":"LP17803-5",
+    "metadata_description":"ABO+Rh group"
+  },
+  {
+    "cnt":58714,
+    "pid":"LP17803-5",
+    "id":"882-1",
+    "display":"882-1",
+    "metadata_description":"ABO + Rh Bld"
+  },
+  {
+    "cnt":57588,
+    "pid":"LP7786-9",
+    "id":"2093-3",
+    "display":"2093-3",
+    "metadata_description":"Cholest SerPl-mCnc"
+  },
+  {
+    "cnt":56470,
+    "pid":"LP7786-9",
+    "id":"2276-4",
+    "display":"2276-4",
+    "metadata_description":"Ferritin SerPl-mCnc"
+  },
+  {
+    "cnt":56198,
+    "pid":"LP7786-9",
+    "id":"2106-3",
+    "display":"2106-3",
+    "metadata_description":"HCG Preg Ur Ql"
+  },
+  {
+    "cnt":53539,
+    "pid":"LP7786-9",
+    "id":"2339-0",
+    "display":"2339-0",
+    "metadata_description":"Glucose Bld-mCnc"
+  },
+  {
+    "cnt":51352,
+    "pid":"LP7786-9",
+    "id":"2085-9",
+    "display":"2085-9",
+    "metadata_description":"HDLc SerPl-mCnc"
+  },
+  {
+    "cnt":50872,
+    "pid":"LP7786-9",
+    "id":"2498-4",
+    "display":"2498-4",
+    "metadata_description":"Iron [Mass\/Vol]"
+  },
+  {
+    "cnt":47708,
+    "pid":"LP7786-9",
+    "id":"2500-7",
+    "display":"2500-7",
+    "metadata_description":"TIBC SerPl-mCnc"
+  },
+  {
+    "cnt":45221,
+    "pid":"LP7786-9",
+    "id":"3040-3",
+    "display":"3040-3",
+    "metadata_description":"Lipase SerPl-cCnc"
+  },
+  {
+    "cnt":40342,
+    "pid":"LP7786-9",
+    "id":"19113-0",
+    "display":"19113-0",
+    "metadata_description":"IgE Qn"
+  },
+  {
+    "cnt":39733,
+    "pid":"LP7786-9",
+    "id":"2324-2",
+    "display":"2324-2",
+    "metadata_description":"GGT SerPl-cCnc"
+  },
+  {
+    "cnt":39255,
+    "pid":"LP7786-9",
+    "id":"1798-8",
+    "display":"1798-8",
+    "metadata_description":"Amylase SerPl-cCnc"
+  },
+  {
+    "cnt":37632,
+    "pid":"LP7786-9",
+    "id":"4548-4",
+    "display":"4548-4",
+    "metadata_description":"HbA1c MFr Bld"
+  },
+  {
+    "cnt":37465,
+    "pid":"LP343631-0",
+    "id":"LP7784-4",
+    "display":"LP7784-4",
+    "metadata_description":"CHAL"
+  },
+  {
+    "cnt":36008,
+    "pid":"LP7786-9",
+    "id":"47596-2",
+    "display":"47596-2",
+    "metadata_description":"Ca-I Bld ISE-sCnc"
+  },
+  {
+    "cnt":34983,
+    "pid":"LP7786-9",
+    "id":"6298-4",
+    "display":"6298-4",
+    "metadata_description":"Potassium Bld-sCnc"
+  },
+  {
+    "cnt":34872,
+    "pid":"LP7786-9",
+    "id":"2746-6",
+    "display":"2746-6",
+    "metadata_description":"pH BldV"
+  },
+  {
+    "cnt":34718,
+    "pid":"LP7786-9",
+    "id":"2705-2",
+    "display":"2705-2",
+    "metadata_description":"pO2 BldV"
+  },
+  {
+    "cnt":34452,
+    "pid":"LP7786-9",
+    "id":"27353-2",
+    "display":"27353-2",
+    "metadata_description":"Est. average glucose Bld gHb Est-mCnc"
+  },
+  {
+    "cnt":34350,
+    "pid":"LP7819-8",
+    "id":"18481-2",
+    "display":"18481-2",
+    "metadata_description":"S pyo Ag Throat Ql"
+  },
+  {
+    "cnt":33875,
+    "pid":"LP7786-9",
+    "id":"2947-0",
+    "display":"2947-0",
+    "metadata_description":"Sodium Bld-sCnc"
+  },
+  {
+    "cnt":33736,
+    "pid":"LP7786-9",
+    "id":"2069-3",
+    "display":"2069-3",
+    "metadata_description":"Chloride Bld-sCnc"
+  },
+  {
+    "cnt":32826,
+    "pid":"LP7786-9",
+    "id":"2161-8",
+    "display":"2161-8",
+    "metadata_description":"Creat Ur-mCnc"
+  },
+  {
+    "cnt":32540,
+    "pid":"LP7786-9",
+    "id":"41276-7",
+    "display":"41276-7",
+    "metadata_description":"Anion Gap Bld-sCnc"
+  },
+  {
+    "cnt":32375,
+    "pid":"LP7819-8",
+    "id":"68966-1",
+    "display":"68966-1",
+    "metadata_description":"RSV Ag Nph Ql IA"
+  },
+  {
+    "cnt":31814,
+    "pid":"LP7786-9",
+    "id":"2465-3",
+    "display":"2465-3",
+    "metadata_description":"IgG SerPl-mCnc"
+  },
+  {
+    "cnt":30954,
+    "pid":"LP7786-9",
+    "id":"32693-4",
+    "display":"32693-4",
+    "metadata_description":"Lactate Bld-sCnc"
+  },
+  {
+    "cnt":30587,
+    "pid":"LP7786-9",
+    "id":"3026-2",
+    "display":"3026-2",
+    "metadata_description":"T4 SerPl-mCnc"
+  },
+  {
+    "cnt":30243,
+    "pid":"LP7786-9",
+    "id":"9830-1",
+    "display":"9830-1",
+    "metadata_description":"Cholest\/HDLc SerPl"
+  },
+  {
+    "cnt":30238,
+    "pid":"LP7786-9",
+    "id":"13457-7",
+    "display":"13457-7",
+    "metadata_description":"LDLc SerPl Calc-mCnc"
+  },
+  {
+    "cnt":30238,
+    "pid":"LP7786-9",
+    "id":"2091-7",
+    "display":"2091-7",
+    "metadata_description":"VLDLc SerPl-mCnc"
+  },
+  {
+    "cnt":30230,
+    "pid":"LP7784-4",
+    "id":"3048-6",
+    "display":"3048-6",
+    "metadata_description":"Trigl p fast SerPl-mCnc"
+  },
+  {
+    "cnt":30123,
+    "pid":"LP7786-9",
+    "id":"14804-9",
+    "display":"14804-9",
+    "metadata_description":"LDH SerPl L to P-cCnc"
+  },
+  {
+    "cnt":29754,
+    "pid":"LP7819-8",
+    "id":"94558-4",
+    "display":"94558-4",
+    "metadata_description":"SARS-CoV-2 Ag Resp Ql IA.rapid"
+  },
+  {
+    "cnt":27856,
+    "pid":"LP7786-9",
+    "id":"3034-6",
+    "display":"3034-6",
+    "metadata_description":"Transferrin SerPl-mCnc"
+  },
+  {
+    "cnt":27314,
+    "pid":"LP7786-9",
+    "id":"14627-4",
+    "display":"14627-4",
+    "metadata_description":"HCO3 BldV-sCnc"
+  },
+  {
+    "cnt":27300,
+    "pid":"LP7786-9",
+    "id":"2021-4",
+    "display":"2021-4",
+    "metadata_description":"pCO2 BldV"
+  },
+  {
+    "cnt":24858,
+    "pid":"LP7788-5",
+    "id":"3255-7",
+    "display":"3255-7",
+    "metadata_description":"Fibrinogen PPP-mCnc"
+  },
+  {
+    "cnt":24749,
+    "pid":"LP7786-9",
+    "id":"2744-1",
+    "display":"2744-1",
+    "metadata_description":"pH BldA"
+  },
+  {
+    "cnt":23744,
+    "pid":"LP7786-9",
+    "id":"43396-1",
+    "display":"43396-1",
+    "metadata_description":"NonHDLc SerPl-mCnc"
+  },
+  {
+    "cnt":23128,
+    "pid":"LP7786-9",
+    "id":"2472-9",
+    "display":"2472-9",
+    "metadata_description":"IgM SerPl-mCnc"
+  },
+  {
+    "cnt":22385,
+    "pid":"LP7786-9",
+    "id":"2335-8",
+    "display":"2335-8",
+    "metadata_description":"Hemoccult Stl Ql"
+  },
+  {
+    "cnt":21678,
+    "pid":"LP7786-9",
+    "id":"2157-6",
+    "display":"2157-6",
+    "metadata_description":"CK SerPl-cCnc"
+  },
+  {
+    "cnt":21640,
+    "pid":"LP7786-9",
+    "id":"20433-9",
+    "display":"20433-9",
+    "metadata_description":"FSH SerPl IRP2-aCnc"
+  },
+  {
+    "cnt":21601,
+    "pid":"LP7786-9",
+    "id":"20565-8",
+    "display":"20565-8",
+    "metadata_description":"CO2 Bld-sCnc"
+  },
+  {
+    "cnt":21558,
+    "pid":"LP7786-9",
+    "id":"11555-0",
+    "display":"11555-0",
+    "metadata_description":"Base excess Bld Calc-sCnc"
+  },
+  {
+    "cnt":20725,
+    "pid":"LP7786-9",
+    "id":"10501-5",
+    "display":"10501-5",
+    "metadata_description":"Lutropin Qn"
+  },
+  {
+    "cnt":20694,
+    "pid":"LP7786-9",
+    "id":"2571-8",
+    "display":"2571-8",
+    "metadata_description":"Trigl SerPl-mCnc"
+  },
+  {
+    "cnt":20042,
+    "pid":"LP7786-9",
+    "id":"2118-8",
+    "display":"2118-8",
+    "metadata_description":"HCG Preg SerPl Ql"
+  },
+  {
+    "cnt":18394,
+    "pid":"LP7786-9",
+    "id":"32771-8",
+    "display":"32771-8",
+    "metadata_description":"pCO2 temp adj BldA"
+  },
+  {
+    "cnt":18393,
+    "pid":"LP7786-9",
+    "id":"33254-4",
+    "display":"33254-4",
+    "metadata_description":"pH temp adj BldA"
+  },
+  {
+    "cnt":17952,
+    "pid":"LP7819-8",
+    "id":"5060-9",
+    "display":"5060-9",
+    "metadata_description":"B burgdor Ab Ser IA-aCnc"
+  },
+  {
+    "cnt":17053,
+    "pid":"LP7786-9",
+    "id":"2132-9",
+    "display":"2132-9",
+    "metadata_description":"Vit B12 SerPl-mCnc"
+  },
+  {
+    "cnt":17004,
+    "pid":"LP7786-9",
+    "id":"2191-5",
+    "display":"2191-5",
+    "metadata_description":"DHEA-S [Mass\/Vol]"
+  },
+  {
+    "cnt":16999,
+    "pid":"LP7786-9",
+    "id":"3084-1",
+    "display":"3084-1",
+    "metadata_description":"Urate [Mass\/Vol]"
+  },
+  {
+    "cnt":16923,
+    "pid":"LP7786-9",
+    "id":"2986-8",
+    "display":"2986-8",
+    "metadata_description":"Testost SerPl-mCnc"
+  },
+  {
+    "cnt":16658,
+    "pid":"LP7786-9",
+    "id":"1960-4",
+    "display":"1960-4",
+    "metadata_description":"HCO3 BldA-sCnc"
+  },
+  {
+    "cnt":16652,
+    "pid":"LP7786-9",
+    "id":"2703-7",
+    "display":"2703-7",
+    "metadata_description":"pO2 BldA"
+  },
+  {
+    "cnt":16652,
+    "pid":"LP7786-9",
+    "id":"2019-8",
+    "display":"2019-8",
+    "metadata_description":"pCO2 BldA"
+  },
+  {
+    "cnt":16161,
+    "pid":"LP7819-8",
+    "id":"5157-3",
+    "display":"5157-3",
+    "metadata_description":"EBV VCA IgG Ser IA-aCnc"
+  },
+  {
+    "cnt":15180,
+    "pid":"LP7819-8",
+    "id":"5193-8",
+    "display":"5193-8",
+    "metadata_description":"HBV surface Ab IA Qn"
+  },
+  {
+    "cnt":14909,
+    "pid":"LP7819-8",
+    "id":"5159-9",
+    "display":"5159-9",
+    "metadata_description":"EBV VCA IgM Ser IA-aCnc"
+  },
+  {
+    "cnt":14539,
+    "pid":"LP6186-3",
+    "id":"3243-3",
+    "display":"3243-3",
+    "metadata_description":"Thrombin time"
+  },
+  {
+    "cnt":14460,
+    "pid":"LP7819-8",
+    "id":"5196-1",
+    "display":"5196-1",
+    "metadata_description":"HBV surface Ag IA Ql"
+  },
+  {
+    "cnt":14324,
+    "pid":"LP7786-9",
+    "id":"2842-3",
+    "display":"2842-3",
+    "metadata_description":"Prolactin SerPl-mCnc"
+  },
+  {
+    "cnt":14180,
+    "pid":"LP7786-9",
+    "id":"2731-8",
+    "display":"2731-8",
+    "metadata_description":"PTH-Intact SerPl-mCnc"
+  },
+  {
+    "cnt":13860,
+    "pid":"LP7819-8",
+    "id":"42771-6",
+    "display":"42771-6",
+    "metadata_description":"S pneum serotype IgG Ser-Imp"
+  },
+  {
+    "cnt":13858,
+    "pid":"LP7819-8",
+    "id":"86064-3",
+    "display":"86064-3",
+    "metadata_description":"S pneum Da 23F IgG Ser-mCnc"
+  },
+  {
+    "cnt":13850,
+    "pid":"LP7819-8",
+    "id":"86024-7",
+    "display":"86024-7",
+    "metadata_description":"S pn Da sero 19F IgG Ser-mCnc"
+  },
+  {
+    "cnt":13846,
+    "pid":"LP7819-8",
+    "id":"27395-3",
+    "display":"27395-3",
+    "metadata_description":"S pneum Da 18C IgG Ser-mCnc"
+  },
+  {
+    "cnt":13839,
+    "pid":"LP7819-8",
+    "id":"85992-6",
+    "display":"85992-6",
+    "metadata_description":"S pneum Da 14 IgG Ser IA-mCnc"
+  },
+  {
+    "cnt":13836,
+    "pid":"LP7819-8",
+    "id":"85977-7",
+    "display":"85977-7",
+    "metadata_description":"S pneum Da 12F IgG Ser-mCnc"
+  },
+  {
+    "cnt":13830,
+    "pid":"LP7819-8",
+    "id":"86169-0",
+    "display":"86169-0",
+    "metadata_description":"S pneum Da 9N IgG Ser-mCnc"
+  },
+  {
+    "cnt":13830,
+    "pid":"LP7819-8",
+    "id":"30153-1",
+    "display":"30153-1",
+    "metadata_description":"S pneum Da 9V IgG Ser-mCnc"
+  },
+  {
+    "cnt":13828,
+    "pid":"LP7819-8",
+    "id":"86148-4",
+    "display":"86148-4",
+    "metadata_description":"S pneum Da 8 IgG Ser IA-mCnc"
+  },
+  {
+    "cnt":13827,
+    "pid":"LP7819-8",
+    "id":"25296-5",
+    "display":"25296-5",
+    "metadata_description":"S pneum Da 7F IgG Ser-mCnc"
+  },
+  {
+    "cnt":13826,
+    "pid":"LP7819-8",
+    "id":"27118-9",
+    "display":"27118-9",
+    "metadata_description":"S pneum Da 6B IgG Ser-mCnc"
+  },
+  {
+    "cnt":13825,
+    "pid":"LP7819-8",
+    "id":"86129-4",
+    "display":"86129-4",
+    "metadata_description":"S pneum Da 5 IgG Ser IA-mCnc"
+  },
+  {
+    "cnt":13823,
+    "pid":"LP7819-8",
+    "id":"86108-8",
+    "display":"86108-8",
+    "metadata_description":"S pneum Da 4 IgG Ser IA-mCnc"
+  },
+  {
+    "cnt":13820,
+    "pid":"LP7819-8",
+    "id":"86081-7",
+    "display":"86081-7",
+    "metadata_description":"S pneum Da 3 IgG Ser IA-mCnc"
+  },
+  {
+    "cnt":13813,
+    "pid":"LP7819-8",
+    "id":"85955-3",
+    "display":"85955-3",
+    "metadata_description":"S pneum Da 1 IgG Ser IA-mCnc"
+  },
+  {
+    "cnt":13780,
+    "pid":"LP7786-9",
+    "id":"2484-4",
+    "display":"2484-4",
+    "metadata_description":"IGF-I SerPl-mCnc"
+  },
+  {
+    "cnt":12900,
+    "pid":"LP7819-8",
+    "id":"10900-9",
+    "display":"10900-9",
+    "metadata_description":"HBV surface Ab IA Ql (S)"
+  },
+  {
+    "cnt":12887,
+    "pid":"LP7819-8",
+    "id":"53935-3",
+    "display":"53935-3",
+    "metadata_description":"C. tetani toxoid IgG IA Qn"
+  },
+  {
+    "cnt":12646,
+    "pid":"LP7819-8",
+    "id":"56888-1",
+    "display":"56888-1",
+    "metadata_description":"HIV 1+2 Ab+HIV1 p24 Ag IA Ql"
+  },
+  {
+    "cnt":12609,
+    "pid":"LP343631-0",
+    "id":"LP234174-3",
+    "display":"LP234174-3",
+    "metadata_description":"CHAL.ROUTINE"
+  },
+  {
+    "cnt":12567,
+    "pid":"LP6186-3",
+    "id":"27816-8",
+    "display":"27816-8",
+    "metadata_description":"vWF Ag Act\/Nor PPP IA"
+  },
+  {
+    "cnt":12453,
+    "pid":"LP7786-9",
+    "id":"40619-9",
+    "display":"40619-9",
+    "metadata_description":"pCO2 temp adj BldV"
+  },
+  {
+    "cnt":12166,
+    "pid":"LP6779-5",
+    "id":"10333-3",
+    "display":"10333-3",
+    "metadata_description":"Appearance CSF"
+  },
+  {
+    "cnt":11927,
+    "pid":"LP7819-8",
+    "id":"13955-0",
+    "display":"13955-0",
+    "metadata_description":"HCV Ab IA Ql"
+  },
+  {
+    "cnt":11826,
+    "pid":"LP7786-9",
+    "id":"2357-2",
+    "display":"2357-2",
+    "metadata_description":"G6PD RBC-cCnc"
+  },
+  {
+    "cnt":11814,
+    "pid":"LP7786-9",
+    "id":"2143-6",
+    "display":"2143-6",
+    "metadata_description":"Cortis SerPl-mCnc"
+  },
+  {
+    "cnt":11453,
+    "pid":"LP7786-9",
+    "id":"14338-8",
+    "display":"14338-8",
+    "metadata_description":"Prealb SerPl-mCnc"
+  },
+  {
+    "cnt":11339,
+    "pid":"LP7786-9",
+    "id":"2880-3",
+    "display":"2880-3",
+    "metadata_description":"Prot CSF-mCnc"
+  },
+  {
+    "cnt":11337,
+    "pid":"LP7786-9",
+    "id":"2342-4",
+    "display":"2342-4",
+    "metadata_description":"Glucose CSF-mCnc"
+  },
+  {
+    "cnt":11317,
+    "pid":"LP7786-9",
+    "id":"45194-8",
+    "display":"45194-8",
+    "metadata_description":"HCG Intact+B SerPl-aCnc"
+  },
+  {
+    "cnt":11187,
+    "pid":"LP7786-9",
+    "id":"2243-4",
+    "display":"2243-4",
+    "metadata_description":"E2 [Mass\/Vol]"
+  },
+  {
+    "cnt":11115,
+    "pid":"LP7786-9",
+    "id":"2692-2",
+    "display":"2692-2",
+    "metadata_description":"Osmolality SerPl"
+  },
+  {
+    "cnt":11000,
+    "pid":"LP234174-3",
+    "id":"1558-6",
+    "display":"1558-6",
+    "metadata_description":"Glucose p fast SerPl-mCnc"
+  },
+  {
+    "cnt":10757,
+    "pid":"LP7819-8",
+    "id":"74281-7",
+    "display":"74281-7",
+    "metadata_description":"M TB IFN-g+spot Pnl Bld"
+  },
+  {
+    "cnt":10443,
+    "pid":"LP7819-8",
+    "id":"31418-7",
+    "display":"31418-7",
+    "metadata_description":"Heteroph Ab Ser Ql"
+  },
+  {
+    "cnt":10419,
+    "pid":"LP7786-9",
+    "id":"2284-8",
+    "display":"2284-8",
+    "metadata_description":"Folate SerPl-mCnc"
+  },
+  {
+    "cnt":10002,
+    "pid":"LP7786-9",
+    "id":"2469-5",
+    "display":"2469-5",
+    "metadata_description":"IgG4 Ser-mCnc"
+  },
+  {
+    "cnt":9999,
+    "pid":"LP7786-9",
+    "id":"2468-7",
+    "display":"2468-7",
+    "metadata_description":"IgG3 Ser-mCnc"
+  },
+  {
+    "cnt":9995,
+    "pid":"LP7786-9",
+    "id":"2467-9",
+    "display":"2467-9",
+    "metadata_description":"IgG2 Ser-mCnc"
+  },
+  {
+    "cnt":9993,
+    "pid":"LP7786-9",
+    "id":"2466-1",
+    "display":"2466-1",
+    "metadata_description":"IgG1 Ser-mCnc"
+  },
+  {
+    "cnt":9775,
+    "pid":"LP7786-9",
+    "id":"2483-6",
+    "display":"2483-6",
+    "metadata_description":"IGF BP3 SerPl-mCnc"
+  },
+  {
+    "cnt":9745,
+    "pid":"LP7786-9",
+    "id":"17862-4",
+    "display":"17862-4",
+    "metadata_description":"Calcium Ur-mCnc"
+  },
+  {
+    "cnt":9563,
+    "pid":"LP7786-9",
+    "id":"1825-9",
+    "display":"1825-9",
+    "metadata_description":"A1AT SerPl-mCnc"
+  },
+  {
+    "cnt":9438,
+    "pid":"LP7819-8",
+    "id":"20507-0",
+    "display":"20507-0",
+    "metadata_description":"RPR Ser Ql"
+  },
+  {
+    "cnt":9335,
+    "pid":"LP7786-9",
+    "id":"20640-9",
+    "display":"20640-9",
+    "metadata_description":"Citrulline SerPl-sCnc"
+  },
+  {
+    "cnt":9186,
+    "pid":"LP7819-8",
+    "id":"5403-1",
+    "display":"5403-1",
+    "metadata_description":"VZV IgG IA Qn (S)"
+  },
+  {
+    "cnt":9035,
+    "pid":"LP7786-9",
+    "id":"33959-8",
+    "display":"33959-8",
+    "metadata_description":"Procalcitonin SerPl-mCnc"
+  },
+  {
+    "cnt":9019,
+    "pid":"LP7786-9",
+    "id":"2991-8",
+    "display":"2991-8",
+    "metadata_description":"Testost Free SerPl-mCnc"
+  },
+  {
+    "cnt":8977,
+    "pid":"LP7786-9",
+    "id":"20637-5",
+    "display":"20637-5",
+    "metadata_description":"Arginine SerPl-sCnc"
+  },
+  {
+    "cnt":8884,
+    "pid":"LP7786-9",
+    "id":"14875-9",
+    "display":"14875-9",
+    "metadata_description":"Phe SerPl-sCnc"
+  },
+  {
+    "cnt":8877,
+    "pid":"LP7786-9",
+    "id":"20660-7",
+    "display":"20660-7",
+    "metadata_description":"Tyrosine SerPl-sCnc"
+  },
+  {
+    "cnt":8876,
+    "pid":"LP7786-9",
+    "id":"20645-8",
+    "display":"20645-8",
+    "metadata_description":"Histidine SerPl-sCnc"
+  },
+  {
+    "cnt":8875,
+    "pid":"LP7786-9",
+    "id":"20650-8",
+    "display":"20650-8",
+    "metadata_description":"Lysine SerPl-sCnc"
+  },
+  {
+    "cnt":8874,
+    "pid":"LP7786-9",
+    "id":"20659-9",
+    "display":"20659-9",
+    "metadata_description":"Tryptophan SerPl-sCnc"
+  },
+  {
+    "cnt":8873,
+    "pid":"LP7786-9",
+    "id":"20652-4",
+    "display":"20652-4",
+    "metadata_description":"Ornithine SerPl-sCnc"
+  },
+  {
+    "cnt":8867,
+    "pid":"LP7819-8",
+    "id":"40969-8",
+    "display":"40969-8",
+    "metadata_description":"S pneum Da 33F IgG Ser-mCnc"
+  },
+  {
+    "cnt":8864,
+    "pid":"LP7819-8",
+    "id":"86053-6",
+    "display":"86053-6",
+    "metadata_description":"S pneum Da 22F IgG Ser IA-mCnc"
+  },
+  {
+    "cnt":8863,
+    "pid":"LP7786-9",
+    "id":"20649-0",
+    "display":"20649-0",
+    "metadata_description":"Leucine SerPl-sCnc"
+  },
+  {
+    "cnt":8861,
+    "pid":"LP7819-8",
+    "id":"86045-2",
+    "display":"86045-2",
+    "metadata_description":"S pneum Da 20A IgG Ser-mCnc"
+  },
+  {
+    "cnt":8861,
+    "pid":"LP7786-9",
+    "id":"20651-6",
+    "display":"20651-6",
+    "metadata_description":"Methionine SerPl-sCnc"
+  },
+  {
+    "cnt":8858,
+    "pid":"LP7819-8",
+    "id":"40974-8",
+    "display":"40974-8",
+    "metadata_description":"S pneum Da 19A IgG Ser-mCnc"
+  },
+  {
+    "cnt":8857,
+    "pid":"LP7786-9",
+    "id":"22672-0",
+    "display":"22672-0",
+    "metadata_description":"Cystine SerPl-sCnc"
+  },
+  {
+    "cnt":8856,
+    "pid":"LP7786-9",
+    "id":"20648-2",
+    "display":"20648-2",
+    "metadata_description":"Isoleucine SerPl-sCnc"
+  },
+  {
+    "cnt":8853,
+    "pid":"LP7819-8",
+    "id":"86010-6",
+    "display":"86010-6",
+    "metadata_description":"S pneum Da 17F IgG Ser IA-mCnc"
+  },
+  {
+    "cnt":8850,
+    "pid":"LP7786-9",
+    "id":"20661-5",
+    "display":"20661-5",
+    "metadata_description":"Valine SerPl-sCnc"
+  },
+  {
+    "cnt":8849,
+    "pid":"LP7819-8",
+    "id":"40973-0",
+    "display":"40973-0",
+    "metadata_description":"S pneum Da 15B IgG Ser-mCnc"
+  },
+  {
+    "cnt":8845,
+    "pid":"LP7786-9",
+    "id":"20655-7",
+    "display":"20655-7",
+    "metadata_description":"Proline SerPl-sCnc"
+  },
+  {
+    "cnt":8845,
+    "pid":"LP7786-9",
+    "id":"20644-1",
+    "display":"20644-1",
+    "metadata_description":"Glycine SerPl-sCnc"
+  },
+  {
+    "cnt":8844,
+    "pid":"LP7786-9",
+    "id":"20636-7",
+    "display":"20636-7",
+    "metadata_description":"Alanine SerPl-sCnc"
+  },
+  {
+    "cnt":8843,
+    "pid":"LP7819-8",
+    "id":"86122-9",
+    "display":"86122-9",
+    "metadata_description":"S pneum Da 11A IgG Ser-mCnc"
+  },
+  {
+    "cnt":8840,
+    "pid":"LP7786-9",
+    "id":"20643-3",
+    "display":"20643-3",
+    "metadata_description":"Glutamine SerPl-sCnc"
+  },
+  {
+    "cnt":8840,
+    "pid":"LP7786-9",
+    "id":"20642-5",
+    "display":"20642-5",
+    "metadata_description":"Glutamate SerPl-sCnc"
+  },
+  {
+    "cnt":8838,
+    "pid":"LP7819-8",
+    "id":"86098-1",
+    "display":"86098-1",
+    "metadata_description":"S pneum Da 10A IgG Ser-mCnc"
+  },
+  {
+    "cnt":8836,
+    "pid":"LP7786-9",
+    "id":"20638-3",
+    "display":"20638-3",
+    "metadata_description":"Asparagine SerPl-sCnc"
+  },
+  {
+    "cnt":8830,
+    "pid":"LP7786-9",
+    "id":"20656-5",
+    "display":"20656-5",
+    "metadata_description":"Serine SerPl-sCnc"
+  },
+  {
+    "cnt":8827,
+    "pid":"LP7819-8",
+    "id":"86039-5",
+    "display":"86039-5",
+    "metadata_description":"S pneum Da 2 IgG Ser-mCnc"
+  },
+  {
+    "cnt":8826,
+    "pid":"LP7786-9",
+    "id":"20658-1",
+    "display":"20658-1",
+    "metadata_description":"Threonine SerPl-sCnc"
+  },
+  {
+    "cnt":8824,
+    "pid":"LP7786-9",
+    "id":"20647-4",
+    "display":"20647-4",
+    "metadata_description":"OH-Proline SerPl-sCnc"
+  },
+  {
+    "cnt":8817,
+    "pid":"LP7786-9",
+    "id":"20639-1",
+    "display":"20639-1",
+    "metadata_description":"Aspartate SerPl-sCnc"
+  },
+  {
+    "cnt":8817,
+    "pid":"LP7786-9",
+    "id":"20657-3",
+    "display":"20657-3",
+    "metadata_description":"Taurine SerPl-sCnc"
+  },
+  {
+    "cnt":8578,
+    "pid":"LP7786-9",
+    "id":"38445-3",
+    "display":"38445-3",
+    "metadata_description":"Calprotectin Stl-mCnt"
+  },
+  {
+    "cnt":8535,
+    "pid":"LP7786-9",
+    "id":"13967-5",
+    "display":"13967-5",
+    "metadata_description":"SHBG SerPl-sCnc"
+  },
+  {
+    "cnt":8473,
+    "pid":"LP7786-9",
+    "id":"4549-2",
+    "display":"4549-2",
+    "metadata_description":"HbA1c MFr Bld Elph"
+  },
+  {
+    "cnt":8442,
+    "pid":"LP6186-3",
+    "id":"48065-7",
+    "display":"48065-7",
+    "metadata_description":"D dimer FEU PPP-mCnc"
+  },
+  {
+    "cnt":8268,
+    "pid":"LP7786-9",
+    "id":"18262-6",
+    "display":"18262-6",
+    "metadata_description":"LDLc SerPl Direct Assay-mCnc"
+  },
+  {
+    "cnt":8225,
+    "pid":"LP7786-9",
+    "id":"14288-5",
+    "display":"14288-5",
+    "metadata_description":"Carnitine SerPl-sCnc"
+  },
+  {
+    "cnt":8225,
+    "pid":"LP7786-9",
+    "id":"14286-9",
+    "display":"14286-9",
+    "metadata_description":"C0 [Moles\/Vol]"
+  },
+  {
+    "cnt":8105,
+    "pid":"LP7786-9",
+    "id":"2524-7",
+    "display":"2524-7",
+    "metadata_description":"Lactate SerPl-sCnc"
+  },
+  {
+    "cnt":8035,
+    "pid":"LP7786-9",
+    "id":"62290-2",
+    "display":"62290-2",
+    "metadata_description":"1,25(OH)2D SerPl-mCnc"
+  },
+  {
+    "cnt":8017,
+    "pid":"LP7786-9",
+    "id":"14569-8",
+    "display":"14569-8",
+    "metadata_description":"17OHP SerPl-sCnc"
+  },
+  {
+    "cnt":8010,
+    "pid":"LP6186-3",
+    "id":"6014-5",
+    "display":"6014-5",
+    "metadata_description":"vWf:RCo Act\/Nor PPP Pl Agg"
+  },
+  {
+    "cnt":7745,
+    "pid":"LP7786-9",
+    "id":"3053-6",
+    "display":"3053-6",
+    "metadata_description":"T3 SerPl-mCnc"
+  },
+  {
+    "cnt":7705,
+    "pid":"LP7819-8",
+    "id":"5124-3",
+    "display":"5124-3",
+    "metadata_description":"CMV IgG IA Qn"
+  },
+  {
+    "cnt":7368,
+    "pid":"LP7786-9",
+    "id":"2955-3",
+    "display":"2955-3",
+    "metadata_description":"Sodium Ur-sCnc"
+  },
+  {
+    "cnt":7364,
+    "pid":"LP7786-9",
+    "id":"2026-3",
+    "display":"2026-3",
+    "metadata_description":"CO2 BldA-sCnc"
+  },
+  {
+    "cnt":7361,
+    "pid":"LP7786-9",
+    "id":"1925-7",
+    "display":"1925-7",
+    "metadata_description":"Base excess BldA Calc-sCnc"
+  },
+  {
+    "cnt":7226,
+    "pid":"LP7784-4",
+    "id":"27873-9",
+    "display":"27873-9",
+    "metadata_description":"Insulin post fast Qn"
+  },
+  {
+    "cnt":7126,
+    "pid":"LP7786-9",
+    "id":"6598-7",
+    "display":"6598-7",
+    "metadata_description":"Troponin T SerPl-mCnc"
+  },
+  {
+    "cnt":6844,
+    "pid":"LP7819-8",
+    "id":"7883-2",
+    "display":"7883-2",
+    "metadata_description":"EBV NA IgG Ser Ql"
+  },
+  {
+    "cnt":6739,
+    "pid":"LP7786-9",
+    "id":"2923-1",
+    "display":"2923-1",
+    "metadata_description":"Vit A SerPl-mCnc"
+  },
+  {
+    "cnt":6229,
+    "pid":"LP7786-9",
+    "id":"14959-1",
+    "display":"14959-1",
+    "metadata_description":"Microalbumin\/Creat Ur"
+  },
+  {
+    "cnt":6121,
+    "pid":"LP7786-9",
+    "id":"30534-2",
+    "display":"30534-2",
+    "metadata_description":"C18:2 [Moles\/Vol]"
+  },
+  {
+    "cnt":6119,
+    "pid":"LP7786-9",
+    "id":"30312-3",
+    "display":"30312-3",
+    "metadata_description":"C18:1-OH [Moles\/Vol]"
+  },
+  {
+    "cnt":6117,
+    "pid":"LP7786-9",
+    "id":"30234-9",
+    "display":"30234-9",
+    "metadata_description":"C16-OH [Moles\/Vol]"
+  },
+  {
+    "cnt":6117,
+    "pid":"LP7786-9",
+    "id":"30542-5",
+    "display":"30542-5",
+    "metadata_description":"C18:1 [Moles\/Vol]"
+  },
+  {
+    "cnt":6116,
+    "pid":"LP7786-9",
+    "id":"30357-8",
+    "display":"30357-8",
+    "metadata_description":"C16:1 [Moles\/Vol]"
+  },
+  {
+    "cnt":6114,
+    "pid":"LP7786-9",
+    "id":"30238-0",
+    "display":"30238-0",
+    "metadata_description":"C14-OH [Moles\/Vol]"
+  },
+  {
+    "cnt":6107,
+    "pid":"LP7786-9",
+    "id":"30560-7",
+    "display":"30560-7",
+    "metadata_description":"C18 [Moles\/Vol]"
+  },
+  {
+    "cnt":6106,
+    "pid":"LP7786-9",
+    "id":"30564-9",
+    "display":"30564-9",
+    "metadata_description":"C14:2 [Moles\/Vol]"
+  },
+  {
+    "cnt":6104,
+    "pid":"LP7786-9",
+    "id":"30566-4",
+    "display":"30566-4",
+    "metadata_description":"C14:1 [Moles\/Vol]"
+  },
+  {
+    "cnt":6101,
+    "pid":"LP7786-9",
+    "id":"30233-1",
+    "display":"30233-1",
+    "metadata_description":"C12-OH [Moles\/Vol]"
+  },
+  {
+    "cnt":6097,
+    "pid":"LP7786-9",
+    "id":"30332-1",
+    "display":"30332-1",
+    "metadata_description":"C12:1 [Moles\/Vol]"
+  },
+  {
+    "cnt":6092,
+    "pid":"LP7786-9",
+    "id":"30328-9",
+    "display":"30328-9",
+    "metadata_description":"C10:1 [Moles\/Vol]"
+  },
+  {
+    "cnt":6089,
+    "pid":"LP7786-9",
+    "id":"30541-7",
+    "display":"30541-7",
+    "metadata_description":"C8:1 [Moles\/Vol]"
+  },
+  {
+    "cnt":6086,
+    "pid":"LP7786-9",
+    "id":"39001-3",
+    "display":"39001-3",
+    "metadata_description":"3OH-Isovalerylcarn SerPl-sCnc"
+  },
+  {
+    "cnt":6083,
+    "pid":"LP7786-9",
+    "id":"30349-5",
+    "display":"30349-5",
+    "metadata_description":"C5-DC [Moles\/Vol]"
+  },
+  {
+    "cnt":6078,
+    "pid":"LP7786-9",
+    "id":"30356-0",
+    "display":"30356-0",
+    "metadata_description":"C16 [Moles\/Vol]"
+  },
+  {
+    "cnt":6075,
+    "pid":"LP7786-9",
+    "id":"30565-6",
+    "display":"30565-6",
+    "metadata_description":"C14 [Moles\/Vol]"
+  },
+  {
+    "cnt":6074,
+    "pid":"LP7786-9",
+    "id":"30331-3",
+    "display":"30331-3",
+    "metadata_description":"C12 [Moles\/Vol]"
+  },
+  {
+    "cnt":6071,
+    "pid":"LP7786-9",
+    "id":"30327-1",
+    "display":"30327-1",
+    "metadata_description":"C10 [Moles\/Vol]"
+  },
+  {
+    "cnt":6069,
+    "pid":"LP7786-9",
+    "id":"30540-9",
+    "display":"30540-9",
+    "metadata_description":"C8 [Moles\/Vol]"
+  },
+  {
+    "cnt":6068,
+    "pid":"LP7786-9",
+    "id":"30358-6",
+    "display":"30358-6",
+    "metadata_description":"C6 [Moles\/Vol]"
+  },
+  {
+    "cnt":6059,
+    "pid":"LP7786-9",
+    "id":"35655-0",
+    "display":"35655-0",
+    "metadata_description":"Butyrylcarn SerPl-sCnc"
+  },
+  {
+    "cnt":6057,
+    "pid":"LP7786-9",
+    "id":"30551-6",
+    "display":"30551-6",
+    "metadata_description":"C3 [Moles\/Vol]"
+  },
+  {
+    "cnt":6054,
+    "pid":"LP7786-9",
+    "id":"30191-1",
+    "display":"30191-1",
+    "metadata_description":"C2 [Moles\/Vol]"
+  },
+  {
+    "cnt":6025,
+    "pid":"LP29693-6",
+    "id":"LP7822-2",
+    "display":"LP7822-2",
+    "metadata_description":"Molecular pathology"
+  },
+  {
+    "cnt":5826,
+    "pid":"LP7819-8",
+    "id":"13952-7",
+    "display":"13952-7",
+    "metadata_description":"HBV core Ab IA Ql"
+  },
+  {
+    "cnt":5822,
+    "pid":"LP7786-9",
+    "id":"30934-4",
+    "display":"30934-4",
+    "metadata_description":"BNP SerPl-mCnc"
+  },
+  {
+    "cnt":5689,
+    "pid":"LP7819-8",
+    "id":"50969-5",
+    "display":"50969-5",
+    "metadata_description":"EBV EA-D IgG Ser-aCnc"
+  },
+  {
+    "cnt":5685,
+    "pid":"LP7819-8",
+    "id":"5126-8",
+    "display":"5126-8",
+    "metadata_description":"CMV IgM IA Qn"
+  },
+  {
+    "cnt":5617,
+    "pid":"LP7786-9",
+    "id":"2162-6",
+    "display":"2162-6",
+    "metadata_description":"Creat 24h Ur-mRate"
+  },
+  {
+    "cnt":5586,
+    "pid":"LP7786-9",
+    "id":"2695-5",
+    "display":"2695-5",
+    "metadata_description":"Osmolality Ur"
+  },
+  {
+    "cnt":5556,
+    "pid":"LP7786-9",
+    "id":"42924-1",
+    "display":"42924-1",
+    "metadata_description":"Lactoferrin Stl-mCnc"
+  },
+  {
+    "cnt":5489,
+    "pid":"LP6186-3",
+    "id":"27811-9",
+    "display":"27811-9",
+    "metadata_description":"AT III Act\/Nor PPP Chro"
+  },
+  {
+    "cnt":5381,
+    "pid":"LP7786-9",
+    "id":"20448-7",
+    "display":"20448-7",
+    "metadata_description":"Insulin Qn"
+  },
+  {
+    "cnt":5290,
+    "pid":"LP7786-9",
+    "id":"2828-2",
+    "display":"2828-2",
+    "metadata_description":"Potassium Ur-sCnc"
+  },
+  {
+    "cnt":5111,
+    "pid":"LP7786-9",
+    "id":"29512-1",
+    "display":"29512-1",
+    "metadata_description":"B-OH-Butyr SerPl-mCnc"
+  },
+  {
+    "cnt":5107,
+    "pid":"LP7786-9",
+    "id":"2748-2",
+    "display":"2748-2",
+    "metadata_description":"pH Fld"
+  },
+  {
+    "cnt":5017,
+    "pid":"LP6779-5",
+    "id":"11135-1",
+    "display":"11135-1",
+    "metadata_description":"Appearance spun CSF"
+  },
+  {
+    "cnt":5015,
+    "pid":"LP7786-9",
+    "id":"14121-8",
+    "display":"14121-8",
+    "metadata_description":"Pyruvate Bld-sCnc"
+  },
+  {
+    "cnt":5004,
+    "pid":"LP7822-2",
+    "id":"LP62072-1",
+    "display":"LP62072-1",
+    "metadata_description":"PANEL.MOLPATH"
+  },
+  {
+    "cnt":5004,
+    "pid":"LP62072-1",
+    "id":"62343-9",
+    "display":"62343-9",
+    "metadata_description":"CMA # change pnl Microarray"
+  },
+  {
+    "cnt":4926,
+    "pid":"LP7786-9",
+    "id":"2064-4",
+    "display":"2064-4",
+    "metadata_description":"Ceruloplasmin [Mass\/Vol]"
+  },
+  {
+    "cnt":4852,
+    "pid":"LP7786-9",
+    "id":"2078-4",
+    "display":"2078-4",
+    "metadata_description":"Chloride Ur-sCnc"
+  },
+  {
+    "cnt":4838,
+    "pid":"LP7786-9",
+    "id":"53962-7",
+    "display":"53962-7",
+    "metadata_description":"AFP-TM SerPl-mCnc"
+  },
+  {
+    "cnt":4774,
+    "pid":"LP6186-3",
+    "id":"66483-9",
+    "display":"66483-9",
+    "metadata_description":"UFH PPP-aCnc"
+  },
+  {
+    "cnt":4325,
+    "pid":"LP7786-9",
+    "id":"1961-2",
+    "display":"1961-2",
+    "metadata_description":"HCO3 BldC-sCnc"
+  },
+  {
+    "cnt":4322,
+    "pid":"LP7786-9",
+    "id":"2704-5",
+    "display":"2704-5",
+    "metadata_description":"pO2 BldC"
+  },
+  {
+    "cnt":4319,
+    "pid":"LP7786-9",
+    "id":"2020-6",
+    "display":"2020-6",
+    "metadata_description":"pCO2 BldC"
+  },
+  {
+    "cnt":4316,
+    "pid":"LP7786-9",
+    "id":"2745-8",
+    "display":"2745-8",
+    "metadata_description":"pH BldC"
+  },
+  {
+    "cnt":4285,
+    "pid":"LP7786-9",
+    "id":"22763-7",
+    "display":"22763-7",
+    "metadata_description":"Ammonia Plas-mCnc"
+  },
+  {
+    "cnt":4176,
+    "pid":"LP7819-8",
+    "id":"6320-6",
+    "display":"6320-6",
+    "metadata_description":"B burgdor IgG Ser Ql IB"
+  },
+  {
+    "cnt":4169,
+    "pid":"LP7786-9",
+    "id":"2141-0",
+    "display":"2141-0",
+    "metadata_description":"ACTH Plas-mCnc"
+  },
+  {
+    "cnt":4164,
+    "pid":"LP7819-8",
+    "id":"6321-4",
+    "display":"6321-4",
+    "metadata_description":"B burgdor IgM Ser Ql IB"
+  },
+  {
+    "cnt":4156,
+    "pid":"LP7819-8",
+    "id":"5244-9",
+    "display":"5244-9",
+    "metadata_description":"MeV IgG IA Qn (S)"
+  },
+  {
+    "cnt":4145,
+    "pid":"LP7819-8",
+    "id":"13950-1",
+    "display":"13950-1",
+    "metadata_description":"HAV IgM IA Ql"
+  },
+  {
+    "cnt":4089,
+    "pid":"LP7786-9",
+    "id":"2749-0",
+    "display":"2749-0",
+    "metadata_description":"pH Gast"
+  },
+  {
+    "cnt":3957,
+    "pid":"LP7786-9",
+    "id":"30059-0",
+    "display":"30059-0",
+    "metadata_description":"Glutamate\/Creat Ur-Rto"
+  },
+  {
+    "cnt":3948,
+    "pid":"LP7786-9",
+    "id":"11060-1",
+    "display":"11060-1",
+    "metadata_description":"Reducing Subs Stl Ql"
+  },
+  {
+    "cnt":3861,
+    "pid":"LP7819-8",
+    "id":"5370-2",
+    "display":"5370-2",
+    "metadata_description":"ASO Ab SerPl-aCnc"
+  },
+  {
+    "cnt":3799,
+    "pid":"LP7786-9",
+    "id":"25907-7",
+    "display":"25907-7",
+    "metadata_description":"Elastase Panc Stl-mCnt"
+  },
+  {
+    "cnt":3505,
+    "pid":"LP7786-9",
+    "id":"12598-9",
+    "display":"12598-9",
+    "metadata_description":"Neutral Fat Stl Ql"
+  },
+  {
+    "cnt":3422,
+    "pid":"LP7788-5",
+    "id":"66748-5",
+    "display":"66748-5",
+    "metadata_description":"Clot angle Bld TEG"
+  },
+  {
+    "cnt":3419,
+    "pid":"LP6186-3",
+    "id":"52789-5",
+    "display":"52789-5",
+    "metadata_description":"Clot init Bld TEG"
+  },
+  {
+    "cnt":3405,
+    "pid":"LP7786-9",
+    "id":"2193-1",
+    "display":"2193-1",
+    "metadata_description":"DHEA SerPl-mCnc"
+  },
+  {
+    "cnt":3376,
+    "pid":"LP7786-9",
+    "id":"1761-6",
+    "display":"1761-6",
+    "metadata_description":"Aldolase SerPl-cCnc"
+  },
+  {
+    "cnt":3353,
+    "pid":"LP6186-3",
+    "id":"5076-5",
+    "display":"5076-5",
+    "metadata_description":"Cardiolipin IgA IA Qn (S)"
+  },
+  {
+    "cnt":3352,
+    "pid":"LP6186-3",
+    "id":"3182-3",
+    "display":"3182-3",
+    "metadata_description":"Cardiolipin IgM IA Qn (S)"
+  },
+  {
+    "cnt":3350,
+    "pid":"LP6186-3",
+    "id":"3181-5",
+    "display":"3181-5",
+    "metadata_description":"Cardiolipin IgG IA Qn (S)"
+  },
+  {
+    "cnt":3344,
+    "pid":"LP7819-8",
+    "id":"8039-0",
+    "display":"8039-0",
+    "metadata_description":"T. gondii IgG Qn (S)"
+  },
+  {
+    "cnt":3309,
+    "pid":"LP7786-9",
+    "id":"2270-7",
+    "display":"2270-7",
+    "metadata_description":"Fat Stl Ql"
+  },
+  {
+    "cnt":3232,
+    "pid":"LP6186-3",
+    "id":"3271-4",
+    "display":"3271-4",
+    "metadata_description":"LMWH PPP Chro-aCnc"
+  },
+  {
+    "cnt":3162,
+    "pid":"LP6779-5",
+    "id":"9335-1",
+    "display":"9335-1",
+    "metadata_description":"Appearance Fld"
+  },
+  {
+    "cnt":3160,
+    "pid":"LP7786-9",
+    "id":"2963-7",
+    "display":"2963-7",
+    "metadata_description":"GH SerPl-mCnc"
+  },
+  {
+    "cnt":3157,
+    "pid":"LP7786-9",
+    "id":"2428-1",
+    "display":"2428-1",
+    "metadata_description":"Hcys SerPl-mCnc"
+  },
+  {
+    "cnt":3146,
+    "pid":"LP7786-9",
+    "id":"16362-6",
+    "display":"16362-6",
+    "metadata_description":"Ammonia Plas-sCnc"
+  },
+  {
+    "cnt":2976,
+    "pid":"LP7786-9",
+    "id":"32287-5",
+    "display":"32287-5",
+    "metadata_description":"Methylmalonate Ur-sCnc"
+  },
+  {
+    "cnt":2957,
+    "pid":"LP7819-8",
+    "id":"27948-9",
+    "display":"27948-9",
+    "metadata_description":"HSV 1+2 IgG IA Qn (S)"
+  },
+  {
+    "cnt":2927,
+    "pid":"LP7819-8",
+    "id":"43304-5",
+    "display":"43304-5",
+    "metadata_description":"C trach rRNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":2901,
+    "pid":"LP7819-8",
+    "id":"94500-6",
+    "display":"94500-6",
+    "metadata_description":"SARS-CoV-2 RNA Resp Ql NAA+probe"
+  },
+  {
+    "cnt":2895,
+    "pid":"LP7786-9",
+    "id":"29874-5",
+    "display":"29874-5",
+    "metadata_description":"Isovalerylgly Ur Ql"
+  },
+  {
+    "cnt":2895,
+    "pid":"LP7786-9",
+    "id":"13753-9",
+    "display":"13753-9",
+    "metadata_description":"Hexanoylgly\/Creat Ur"
+  },
+  {
+    "cnt":2869,
+    "pid":"LP6186-3",
+    "id":"18720-3",
+    "display":"18720-3",
+    "metadata_description":"Coagulation studies (set)"
+  },
+  {
+    "cnt":2834,
+    "pid":"LP7819-8",
+    "id":"80382-5",
+    "display":"80382-5",
+    "metadata_description":"FLUAV Ag Upper resp Ql IA.rapid"
+  },
+  {
+    "cnt":2828,
+    "pid":"LP7819-8",
+    "id":"5176-3",
+    "display":"5176-3",
+    "metadata_description":"H. pylori IgG IA Qn (S)"
+  },
+  {
+    "cnt":2828,
+    "pid":"LP7819-8",
+    "id":"80383-3",
+    "display":"80383-3",
+    "metadata_description":"FLUBV Ag Upper resp Ql IA.rapid"
+  },
+  {
+    "cnt":2823,
+    "pid":"LP7819-8",
+    "id":"34487-9",
+    "display":"34487-9",
+    "metadata_description":"FLUAV RNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":2818,
+    "pid":"LP7819-8",
+    "id":"8014-3",
+    "display":"8014-3",
+    "metadata_description":"RUBV IgG Ser-aCnc"
+  },
+  {
+    "cnt":2785,
+    "pid":"LP7786-9",
+    "id":"1836-6",
+    "display":"1836-6",
+    "metadata_description":"Retinol Bind Prot SerPl-mCnc"
+  },
+  {
+    "cnt":2779,
+    "pid":"LP7786-9",
+    "id":"1854-9",
+    "display":"1854-9",
+    "metadata_description":"Androst SerPl-mCnc"
+  },
+  {
+    "cnt":2745,
+    "pid":"LP7786-9",
+    "id":"2755-7",
+    "display":"2755-7",
+    "metadata_description":"pH Stl"
+  },
+  {
+    "cnt":2689,
+    "pid":"LP7786-9",
+    "id":"3095-7",
+    "display":"3095-7",
+    "metadata_description":"UUN Ur-mCnc"
+  },
+  {
+    "cnt":2683,
+    "pid":"LP7788-5",
+    "id":"66745-1",
+    "display":"66745-1",
+    "metadata_description":"Clot Lysis 30M p MA LenFr Bld TEG"
+  },
+  {
+    "cnt":2663,
+    "pid":"LP7819-8",
+    "id":"25418-5",
+    "display":"25418-5",
+    "metadata_description":"MuV IgG IA Qn (S)"
+  },
+  {
+    "cnt":2609,
+    "pid":"LP7819-8",
+    "id":"53776-1",
+    "display":"53776-1",
+    "metadata_description":"HAV Ab Ser-Imp"
+  },
+  {
+    "cnt":2605,
+    "pid":"LP7819-8",
+    "id":"13951-9",
+    "display":"13951-9",
+    "metadata_description":"HAV Ab IA Ql (S)"
+  },
+  {
+    "cnt":2405,
+    "pid":"LP7819-8",
+    "id":"43305-2",
+    "display":"43305-2",
+    "metadata_description":"N gonorrhoea rRNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":2388,
+    "pid":"LP7786-9",
+    "id":"2778-9",
+    "display":"2778-9",
+    "metadata_description":"Phosphate Ur-mCnc"
+  },
+  {
+    "cnt":2330,
+    "pid":"LP7786-9",
+    "id":"21582-2",
+    "display":"21582-2",
+    "metadata_description":"Tryptase [Mass\/Vol]"
+  },
+  {
+    "cnt":2319,
+    "pid":"LP7819-8",
+    "id":"29257-3",
+    "display":"29257-3",
+    "metadata_description":"M pneumo DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":2314,
+    "pid":"LP7788-5",
+    "id":"16136-4",
+    "display":"16136-4",
+    "metadata_description":"B2 Glycoprot1 IgM Ser-aCnc"
+  },
+  {
+    "cnt":2309,
+    "pid":"LP6186-3",
+    "id":"16135-6",
+    "display":"16135-6",
+    "metadata_description":"B2 Glycoprot1 IgG Ser-aCnc"
+  },
+  {
+    "cnt":2302,
+    "pid":"LP7786-9",
+    "id":"29763-0",
+    "display":"29763-0",
+    "metadata_description":"ZPP RBC-sRto"
+  },
+  {
+    "cnt":2285,
+    "pid":"LP7786-9",
+    "id":"25303-9",
+    "display":"25303-9",
+    "metadata_description":"A1AT Stl-mCnt"
+  },
+  {
+    "cnt":2251,
+    "pid":"LP7786-9",
+    "id":"6687-8",
+    "display":"6687-8",
+    "metadata_description":"Citrate 24h Ur-mRate"
+  },
+  {
+    "cnt":2250,
+    "pid":"LP7786-9",
+    "id":"2128-7",
+    "display":"2128-7",
+    "metadata_description":"Citrate Ur-mCnc"
+  },
+  {
+    "cnt":2226,
+    "pid":"LP7786-9",
+    "id":"32769-2",
+    "display":"32769-2",
+    "metadata_description":"A1AT Phenotyp SerPl-Imp"
+  },
+  {
+    "cnt":2188,
+    "pid":"LP7786-9",
+    "id":"13722-4",
+    "display":"13722-4",
+    "metadata_description":"Citrate\/Creat Ur"
+  },
+  {
+    "cnt":2164,
+    "pid":"LP7786-9",
+    "id":"2964-5",
+    "display":"2964-5",
+    "metadata_description":"Sp Gr Fld"
+  },
+  {
+    "cnt":2096,
+    "pid":"LP6186-3",
+    "id":"3209-4",
+    "display":"3209-4",
+    "metadata_description":"Fact VIII Act\/Nor PPP"
+  },
+  {
+    "cnt":2045,
+    "pid":"LP7788-5",
+    "id":"27819-2",
+    "display":"27819-2",
+    "metadata_description":"Prot C Act\/Nor PPP"
+  },
+  {
+    "cnt":2041,
+    "pid":"LP7819-8",
+    "id":"42176-8",
+    "display":"42176-8",
+    "metadata_description":"1,3 beta glucan Ser-mCnc"
+  },
+  {
+    "cnt":2031,
+    "pid":"LP7786-9",
+    "id":"33863-2",
+    "display":"33863-2",
+    "metadata_description":"Cystatin C [Mass\/Vol]"
+  },
+  {
+    "cnt":2012,
+    "pid":"LP7788-5",
+    "id":"27822-6",
+    "display":"27822-6",
+    "metadata_description":"Prot S Act\/Nor PPP"
+  },
+  {
+    "cnt":1986,
+    "pid":"LP7786-9",
+    "id":"2915-7",
+    "display":"2915-7",
+    "metadata_description":"Renin Plas-cCnc"
+  },
+  {
+    "cnt":1951,
+    "pid":"LP7819-8",
+    "id":"5256-3",
+    "display":"5256-3",
+    "metadata_description":"M pneumo IgM Ser IA-aCnc"
+  },
+  {
+    "cnt":1926,
+    "pid":"LP7786-9",
+    "id":"30062-4",
+    "display":"30062-4",
+    "metadata_description":"Arginine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1925,
+    "pid":"LP7786-9",
+    "id":"28594-0",
+    "display":"28594-0",
+    "metadata_description":"3Me-histidine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1924,
+    "pid":"LP7786-9",
+    "id":"30048-3",
+    "display":"30048-3",
+    "metadata_description":"Lysine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1924,
+    "pid":"LP7786-9",
+    "id":"28606-2",
+    "display":"28606-2",
+    "metadata_description":"1Me-hist\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1924,
+    "pid":"LP7786-9",
+    "id":"30047-5",
+    "display":"30047-5",
+    "metadata_description":"Histidine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1921,
+    "pid":"LP7786-9",
+    "id":"30055-8",
+    "display":"30055-8",
+    "metadata_description":"Phe\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1921,
+    "pid":"LP7786-9",
+    "id":"30049-1",
+    "display":"30049-1",
+    "metadata_description":"Ornithine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1919,
+    "pid":"LP7786-9",
+    "id":"30054-1",
+    "display":"30054-1",
+    "metadata_description":"Tyrosine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1918,
+    "pid":"LP7786-9",
+    "id":"30052-5",
+    "display":"30052-5",
+    "metadata_description":"Isoleucine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1918,
+    "pid":"LP7786-9",
+    "id":"30053-3",
+    "display":"30053-3",
+    "metadata_description":"Leucine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1916,
+    "pid":"LP7786-9",
+    "id":"26963-9",
+    "display":"26963-9",
+    "metadata_description":"Methionine Ur-sCnc"
+  },
+  {
+    "cnt":1914,
+    "pid":"LP7786-9",
+    "id":"30065-7",
+    "display":"30065-7",
+    "metadata_description":"Cystine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1914,
+    "pid":"LP7786-9",
+    "id":"30064-0",
+    "display":"30064-0",
+    "metadata_description":"Valine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1914,
+    "pid":"LP7786-9",
+    "id":"30161-4",
+    "display":"30161-4",
+    "metadata_description":"Citrulline\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1911,
+    "pid":"LP7786-9",
+    "id":"30068-1",
+    "display":"30068-1",
+    "metadata_description":"Alanine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1907,
+    "pid":"LP7786-9",
+    "id":"30066-5",
+    "display":"30066-5",
+    "metadata_description":"Glycine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1905,
+    "pid":"LP7786-9",
+    "id":"30056-6",
+    "display":"30056-6",
+    "metadata_description":"Glutamine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1905,
+    "pid":"LP7786-9",
+    "id":"30067-3",
+    "display":"30067-3",
+    "metadata_description":"Proline\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1904,
+    "pid":"LP7786-9",
+    "id":"28603-9",
+    "display":"28603-9",
+    "metadata_description":"Asparagine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1903,
+    "pid":"LP7786-9",
+    "id":"30058-2",
+    "display":"30058-2",
+    "metadata_description":"Serine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1903,
+    "pid":"LP7786-9",
+    "id":"30057-4",
+    "display":"30057-4",
+    "metadata_description":"Threonine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1901,
+    "pid":"LP7786-9",
+    "id":"28601-3",
+    "display":"28601-3",
+    "metadata_description":"OH-Proline\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1901,
+    "pid":"LP7786-9",
+    "id":"30061-6",
+    "display":"30061-6",
+    "metadata_description":"Aspartate\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1900,
+    "pid":"LP7786-9",
+    "id":"28595-7",
+    "display":"28595-7",
+    "metadata_description":"Taurine\/Creat Ur-Rto"
+  },
+  {
+    "cnt":1878,
+    "pid":"LP7819-8",
+    "id":"6558-1",
+    "display":"6558-1",
+    "metadata_description":"S pyo Ag Spec Ql IA"
+  },
+  {
+    "cnt":1876,
+    "pid":"LP7819-8",
+    "id":"5273-8",
+    "display":"5273-8",
+    "metadata_description":"B19V IgG Ser IA-aCnc"
+  },
+  {
+    "cnt":1874,
+    "pid":"LP7819-8",
+    "id":"5274-6",
+    "display":"5274-6",
+    "metadata_description":"B19V IgM Ser IA-aCnc"
+  },
+  {
+    "cnt":1854,
+    "pid":"LP7786-9",
+    "id":"2895-1",
+    "display":"2895-1",
+    "metadata_description":"ZPP RBC-mCnc"
+  },
+  {
+    "cnt":1798,
+    "pid":"LP7819-8",
+    "id":"5255-5",
+    "display":"5255-5",
+    "metadata_description":"M pneumo IgG Ser IA-aCnc"
+  },
+  {
+    "cnt":1797,
+    "pid":"LP7786-9",
+    "id":"19124-7",
+    "display":"19124-7",
+    "metadata_description":"Magnesium Ur-mCnc"
+  },
+  {
+    "cnt":1765,
+    "pid":"LP7786-9",
+    "id":"1903-4",
+    "display":"1903-4",
+    "metadata_description":"Vit C SerPl-mCnc"
+  },
+  {
+    "cnt":1759,
+    "pid":"LP7786-9",
+    "id":"3051-0",
+    "display":"3051-0",
+    "metadata_description":"T3Free SerPl-mCnc"
+  },
+  {
+    "cnt":1747,
+    "pid":"LP7819-8",
+    "id":"24113-3",
+    "display":"24113-3",
+    "metadata_description":"HBV core IgM IA Ql"
+  },
+  {
+    "cnt":1725,
+    "pid":"LP7819-8",
+    "id":"5133-4",
+    "display":"5133-4",
+    "metadata_description":"Strep DNAse B Ser-aCnc"
+  },
+  {
+    "cnt":1708,
+    "pid":"LP7786-9",
+    "id":"10835-7",
+    "display":"10835-7",
+    "metadata_description":"LPa SerPl-mCnc"
+  },
+  {
+    "cnt":1659,
+    "pid":"LP7786-9",
+    "id":"21198-7",
+    "display":"21198-7",
+    "metadata_description":"B-HCG SerPl-aCnc"
+  },
+  {
+    "cnt":1657,
+    "pid":"LP7819-8",
+    "id":"38180-6",
+    "display":"38180-6",
+    "metadata_description":"HCV RNA SerPl NAA+probe-Log IU"
+  },
+  {
+    "cnt":1657,
+    "pid":"LP7819-8",
+    "id":"23826-1",
+    "display":"23826-1",
+    "metadata_description":"B pert DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":1651,
+    "pid":"LP7786-9",
+    "id":"2881-1",
+    "display":"2881-1",
+    "metadata_description":"Prot Fld-mCnc"
+  },
+  {
+    "cnt":1646,
+    "pid":"LP7819-8",
+    "id":"31147-2",
+    "display":"31147-2",
+    "metadata_description":"RPR Ser-Titr"
+  },
+  {
+    "cnt":1639,
+    "pid":"LP7786-9",
+    "id":"2460-4",
+    "display":"2460-4",
+    "metadata_description":"IgD Ser-mCnc"
+  },
+  {
+    "cnt":1583,
+    "pid":"LP7819-8",
+    "id":"29723-4",
+    "display":"29723-4",
+    "metadata_description":"B parapert DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":1555,
+    "pid":"LP7819-8",
+    "id":"44871-2",
+    "display":"44871-2",
+    "metadata_description":"HIV 1 pro DNA Bld Ql NAA+probe"
+  },
+  {
+    "cnt":1544,
+    "pid":"LP7819-8",
+    "id":"11011-4",
+    "display":"11011-4",
+    "metadata_description":"HCV RNA NAA+probe Qn"
+  },
+  {
+    "cnt":1534,
+    "pid":"LP7786-9",
+    "id":"2283-0",
+    "display":"2283-0",
+    "metadata_description":"Folate RBC-mCnc"
+  },
+  {
+    "cnt":1450,
+    "pid":"LP7819-8",
+    "id":"5221-7",
+    "display":"5221-7",
+    "metadata_description":"HIV 1 Ab IB Ql"
+  },
+  {
+    "cnt":1445,
+    "pid":"LP7819-8",
+    "id":"29591-5",
+    "display":"29591-5",
+    "metadata_description":"EV RNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":1444,
+    "pid":"LP7786-9",
+    "id":"1763-2",
+    "display":"1763-2",
+    "metadata_description":"Aldost SerPl-mCnc"
+  },
+  {
+    "cnt":1423,
+    "pid":"LP7819-8",
+    "id":"549-6",
+    "display":"549-6",
+    "metadata_description":"B pert Spec Ql Cult"
+  },
+  {
+    "cnt":1420,
+    "pid":"LP7786-9",
+    "id":"2334-1",
+    "display":"2334-1",
+    "metadata_description":"Gastrocult Gast Ql"
+  },
+  {
+    "cnt":1406,
+    "pid":"LP7786-9",
+    "id":"2900-9",
+    "display":"2900-9",
+    "metadata_description":"Vit B6 SerPl-mCnc"
+  },
+  {
+    "cnt":1394,
+    "pid":"LP7819-8",
+    "id":"31204-1",
+    "display":"31204-1",
+    "metadata_description":"HBV core IgM Ql (S)"
+  },
+  {
+    "cnt":1376,
+    "pid":"LP7786-9",
+    "id":"2999-1",
+    "display":"2999-1",
+    "metadata_description":"Vit B1 SerPl-mCnc"
+  },
+  {
+    "cnt":1361,
+    "pid":"LP7786-9",
+    "id":"2148-5",
+    "display":"2148-5",
+    "metadata_description":"Creatine [Mass\/Vol]"
+  },
+  {
+    "cnt":1360,
+    "pid":"LP7786-9",
+    "id":"15045-8",
+    "display":"15045-8",
+    "metadata_description":"Creatine SerPl-sCnc"
+  },
+  {
+    "cnt":1334,
+    "pid":"LP7786-9",
+    "id":"2617-9",
+    "display":"2617-9",
+    "metadata_description":"MetHgb MFr BldV"
+  },
+  {
+    "cnt":1328,
+    "pid":"LP7786-9",
+    "id":"12228-3",
+    "display":"12228-3",
+    "metadata_description":"Trigl Fld-mCnc"
+  },
+  {
+    "cnt":1319,
+    "pid":"LP7786-9",
+    "id":"2615-3",
+    "display":"2615-3",
+    "metadata_description":"MetHgb MFr BldA"
+  },
+  {
+    "cnt":1295,
+    "pid":"LP7786-9",
+    "id":"2344-0",
+    "display":"2344-0",
+    "metadata_description":"Glucose Fld-mCnc"
+  },
+  {
+    "cnt":1287,
+    "pid":"LP7786-9",
+    "id":"76651-9",
+    "display":"76651-9",
+    "metadata_description":"ZnT8 Ab SerPl IA-aCnc"
+  },
+  {
+    "cnt":1279,
+    "pid":"LP7819-8",
+    "id":"5390-0",
+    "display":"5390-0",
+    "metadata_description":"T. gondii IgM IA Qn (S)"
+  },
+  {
+    "cnt":1228,
+    "pid":"LP234174-3",
+    "id":"20436-2",
+    "display":"20436-2",
+    "metadata_description":"Glucose 2h p Glc SerPl-mCnc"
+  },
+  {
+    "cnt":1210,
+    "pid":"LP7819-8",
+    "id":"11259-9",
+    "display":"11259-9",
+    "metadata_description":"HCV RNA NAA+probe Ql"
+  },
+  {
+    "cnt":1206,
+    "pid":"LP7786-9",
+    "id":"24461-6",
+    "display":"24461-6",
+    "metadata_description":"FA SerPl-sCnc"
+  },
+  {
+    "cnt":1205,
+    "pid":"LP7786-9",
+    "id":"35178-3",
+    "display":"35178-3",
+    "metadata_description":"w3 FA SerPl-sCnc"
+  },
+  {
+    "cnt":1205,
+    "pid":"LP7786-9",
+    "id":"35177-5",
+    "display":"35177-5",
+    "metadata_description":"Polyunsat FA SerPl-sCnc"
+  },
+  {
+    "cnt":1205,
+    "pid":"LP7786-9",
+    "id":"35179-1",
+    "display":"35179-1",
+    "metadata_description":"w6 FA SerPl-sCnc"
+  },
+  {
+    "cnt":1204,
+    "pid":"LP7786-9",
+    "id":"35176-7",
+    "display":"35176-7",
+    "metadata_description":"Monounsat FA SerPl-sCnc"
+  },
+  {
+    "cnt":1204,
+    "pid":"LP7786-9",
+    "id":"35175-9",
+    "display":"35175-9",
+    "metadata_description":"Sat FA SerPl-sCnc"
+  },
+  {
+    "cnt":1203,
+    "pid":"LP7786-9",
+    "id":"35411-8",
+    "display":"35411-8",
+    "metadata_description":"Trienoate\/AA SerPl-sRto"
+  },
+  {
+    "cnt":1203,
+    "pid":"LP7786-9",
+    "id":"35173-4",
+    "display":"35173-4",
+    "metadata_description":"EPA SerPl-sCnc"
+  },
+  {
+    "cnt":1203,
+    "pid":"LP7786-9",
+    "id":"35174-2",
+    "display":"35174-2",
+    "metadata_description":"DHA SerPl-sCnc"
+  },
+  {
+    "cnt":1202,
+    "pid":"LP7786-9",
+    "id":"35171-8",
+    "display":"35171-8",
+    "metadata_description":"Homo-G Linolenate SerPl-sCnc"
+  },
+  {
+    "cnt":1202,
+    "pid":"LP7786-9",
+    "id":"35168-4",
+    "display":"35168-4",
+    "metadata_description":"AA SerPl-sCnc"
+  },
+  {
+    "cnt":1201,
+    "pid":"LP7786-9",
+    "id":"35149-4",
+    "display":"35149-4",
+    "metadata_description":"Octadecanoate SerPl-sCnc"
+  },
+  {
+    "cnt":1201,
+    "pid":"LP7786-9",
+    "id":"35165-0",
+    "display":"35165-0",
+    "metadata_description":"Linoleate SerPl-sCnc"
+  },
+  {
+    "cnt":1201,
+    "pid":"LP7786-9",
+    "id":"35163-5",
+    "display":"35163-5",
+    "metadata_description":"G-Linolenate SerPl-sCnc"
+  },
+  {
+    "cnt":1201,
+    "pid":"LP7786-9",
+    "id":"35164-3",
+    "display":"35164-3",
+    "metadata_description":"A-Linolenate SerPl-sCnc"
+  },
+  {
+    "cnt":1201,
+    "pid":"LP7786-9",
+    "id":"35166-8",
+    "display":"35166-8",
+    "metadata_description":"Oleate SerPl-sCnc"
+  },
+  {
+    "cnt":1201,
+    "pid":"LP7786-9",
+    "id":"35172-6",
+    "display":"35172-6",
+    "metadata_description":"Mead acid SerPl-sCnc"
+  },
+  {
+    "cnt":1200,
+    "pid":"LP7786-9",
+    "id":"35162-7",
+    "display":"35162-7",
+    "metadata_description":"Palmitoleate SerPl-sCnc"
+  },
+  {
+    "cnt":1200,
+    "pid":"LP7786-9",
+    "id":"35161-9",
+    "display":"35161-9",
+    "metadata_description":"Palmitate SerPl-sCnc"
+  },
+  {
+    "cnt":1174,
+    "pid":"LP7786-9",
+    "id":"3087-4",
+    "display":"3087-4",
+    "metadata_description":"Urate 24h Ur-mRate"
+  },
+  {
+    "cnt":1173,
+    "pid":"LP7786-9",
+    "id":"3086-6",
+    "display":"3086-6",
+    "metadata_description":"Urate Ur-mCnc"
+  },
+  {
+    "cnt":1101,
+    "pid":"LP7786-9",
+    "id":"3021-3",
+    "display":"3021-3",
+    "metadata_description":"TBG [Mass\/Vol]"
+  },
+  {
+    "cnt":1090,
+    "pid":"LP7819-8",
+    "id":"5404-9",
+    "display":"5404-9",
+    "metadata_description":"VZV IgM IA Qn (S)"
+  },
+  {
+    "cnt":1062,
+    "pid":"LP7819-8",
+    "id":"51730-0",
+    "display":"51730-0",
+    "metadata_description":"HHV6 IgG+IgM Ser-Imp"
+  },
+  {
+    "cnt":1061,
+    "pid":"LP7819-8",
+    "id":"38348-9",
+    "display":"38348-9",
+    "metadata_description":"HHV6 DNA Spec NAA+probe"
+  },
+  {
+    "cnt":1061,
+    "pid":"LP7819-8",
+    "id":"38350-5",
+    "display":"38350-5",
+    "metadata_description":"HHV6 DNA Spec NAA+probe-Log#"
+  },
+  {
+    "cnt":1061,
+    "pid":"LP7819-8",
+    "id":"38349-7",
+    "display":"38349-7",
+    "metadata_description":"HHV6 DNA # Spec NAA+probe"
+  },
+  {
+    "cnt":1058,
+    "pid":"LP7786-9",
+    "id":"3122-9",
+    "display":"3122-9",
+    "metadata_description":"VMA 24h Ur-mRate"
+  },
+  {
+    "cnt":1034,
+    "pid":"LP7786-9",
+    "id":"2700-3",
+    "display":"2700-3",
+    "metadata_description":"Oxalate Ur-mCnc"
+  },
+  {
+    "cnt":1034,
+    "pid":"LP7786-9",
+    "id":"2701-1",
+    "display":"2701-1",
+    "metadata_description":"Oxalate 24h Ur-mRate"
+  },
+  {
+    "cnt":1031,
+    "pid":"LP6186-3",
+    "id":"3187-2",
+    "display":"3187-2",
+    "metadata_description":"Fact IX Act\/Nor PPP"
+  },
+  {
+    "cnt":1031,
+    "pid":"LP7786-9",
+    "id":"1953-9",
+    "display":"1953-9",
+    "metadata_description":"B2 Microglob Ur-mCnc"
+  },
+  {
+    "cnt":1027,
+    "pid":"LP7786-9",
+    "id":"2436-4",
+    "display":"2436-4",
+    "metadata_description":"HVA 24h Ur-mRate"
+  },
+  {
+    "cnt":1021,
+    "pid":"LP202929-8",
+    "id":"36922-3",
+    "display":"36922-3",
+    "metadata_description":"TPMT gene Mut Anl Bld\/T"
+  },
+  {
+    "cnt":1021,
+    "pid":"LP7822-2",
+    "id":"LP202929-8",
+    "display":"LP202929-8",
+    "metadata_description":"MOLPATH.PHARMG"
+  },
+  {
+    "cnt":1005,
+    "pid":"LP7819-8",
+    "id":"5198-7",
+    "display":"5198-7",
+    "metadata_description":"HCV Ab IA Qn (S)"
+  },
+  {
+    "cnt":1004,
+    "pid":"LP7786-9",
+    "id":"2520-5",
+    "display":"2520-5",
+    "metadata_description":"Lactate CSF-sCnc"
+  },
+  {
+    "cnt":1002,
+    "pid":"LP7786-9",
+    "id":"1746-7",
+    "display":"1746-7",
+    "metadata_description":"Albumin CSF-mCnc"
+  },
+  {
+    "cnt":997,
+    "pid":"LP7786-9",
+    "id":"2464-6",
+    "display":"2464-6",
+    "metadata_description":"IgG CSF-mCnc"
+  },
+  {
+    "cnt":997,
+    "pid":"LP7786-9",
+    "id":"34275-8",
+    "display":"34275-8",
+    "metadata_description":"Creatine\/Creat Ur-sRto"
+  },
+  {
+    "cnt":992,
+    "pid":"LP7786-9",
+    "id":"2470-3",
+    "display":"2470-3",
+    "metadata_description":"IgG\/Alb CSF"
+  },
+  {
+    "cnt":992,
+    "pid":"LP7786-9",
+    "id":"14116-8",
+    "display":"14116-8",
+    "metadata_description":"IgG Synth Rate Ser+CSF Calc-mRate"
+  },
+  {
+    "cnt":992,
+    "pid":"LP7786-9",
+    "id":"14117-6",
+    "display":"14117-6",
+    "metadata_description":"IgG\/Alb clear Ser+CSF-Rto"
+  },
+  {
+    "cnt":992,
+    "pid":"LP7786-9",
+    "id":"1756-6",
+    "display":"1756-6",
+    "metadata_description":"Alb CSF\/SerPl"
+  },
+  {
+    "cnt":992,
+    "pid":"LP7786-9",
+    "id":"13964-2",
+    "display":"13964-2",
+    "metadata_description":"Methylmalonate SerPl-sCnc"
+  },
+  {
+    "cnt":987,
+    "pid":"LP7786-9",
+    "id":"29141-9",
+    "display":"29141-9",
+    "metadata_description":"Metaneph SerPl-mCnc"
+  },
+  {
+    "cnt":986,
+    "pid":"LP7786-9",
+    "id":"49282-7",
+    "display":"49282-7",
+    "metadata_description":"Metaneph+Normetaneph SerPl-Imp"
+  },
+  {
+    "cnt":986,
+    "pid":"LP7786-9",
+    "id":"2669-0",
+    "display":"2669-0",
+    "metadata_description":"Normetanephrine SerPl-mCnc"
+  },
+  {
+    "cnt":984,
+    "pid":"LP7786-9",
+    "id":"57800-5",
+    "display":"57800-5",
+    "metadata_description":"O2 Ct VFr Bld Calc"
+  },
+  {
+    "cnt":984,
+    "pid":"LP7786-9",
+    "id":"2027-1",
+    "display":"2027-1",
+    "metadata_description":"CO2 BldV-sCnc"
+  },
+  {
+    "cnt":982,
+    "pid":"LP7786-9",
+    "id":"12782-9",
+    "display":"12782-9",
+    "metadata_description":"Oligoclonal Bands CSF Elph-Imp"
+  },
+  {
+    "cnt":982,
+    "pid":"LP7786-9",
+    "id":"48668-8",
+    "display":"48668-8",
+    "metadata_description":"Oligoclonal Bands.IT Ser+CSF Ql"
+  },
+  {
+    "cnt":978,
+    "pid":"LP7786-9",
+    "id":"1927-3",
+    "display":"1927-3",
+    "metadata_description":"Base excess BldV Calc-sCnc"
+  },
+  {
+    "cnt":971,
+    "pid":"LP7819-8",
+    "id":"54905-5",
+    "display":"54905-5",
+    "metadata_description":"Norovirus GI RNA Stl Ql NAA+probe"
+  },
+  {
+    "cnt":971,
+    "pid":"LP7819-8",
+    "id":"54906-3",
+    "display":"54906-3",
+    "metadata_description":"Norovirus GII RNA Stl Ql NAA+probe"
+  },
+  {
+    "cnt":960,
+    "pid":"LP7786-9",
+    "id":"2150-1",
+    "display":"2150-1",
+    "metadata_description":"Creatine 24h Ur-mRate"
+  },
+  {
+    "cnt":957,
+    "pid":"LP7786-9",
+    "id":"30571-4",
+    "display":"30571-4",
+    "metadata_description":"VMA\/Creat 24h Ur"
+  },
+  {
+    "cnt":957,
+    "pid":"LP7786-9",
+    "id":"2742-5",
+    "display":"2742-5",
+    "metadata_description":"ACE SerPl-cCnc"
+  },
+  {
+    "cnt":935,
+    "pid":"LP7786-9",
+    "id":"13760-4",
+    "display":"13760-4",
+    "metadata_description":"HVA\/Creat 24h Ur"
+  },
+  {
+    "cnt":918,
+    "pid":"LP7786-9",
+    "id":"1986-9",
+    "display":"1986-9",
+    "metadata_description":"C peptide [Mass\/Vol]"
+  },
+  {
+    "cnt":913,
+    "pid":"LP7786-9",
+    "id":"26881-3",
+    "display":"26881-3",
+    "metadata_description":"Il6 SerPl-mCnc"
+  },
+  {
+    "cnt":911,
+    "pid":"LP7786-9",
+    "id":"35469-6",
+    "display":"35469-6",
+    "metadata_description":"CDT Disialo\/CDT Tetrasialo SerPl"
+  },
+  {
+    "cnt":885,
+    "pid":"LP7819-8",
+    "id":"29541-0",
+    "display":"29541-0",
+    "metadata_description":"HIV1 RNA SerPl NAA+probe-Log#"
+  },
+  {
+    "cnt":884,
+    "pid":"LP7819-8",
+    "id":"11258-1",
+    "display":"11258-1",
+    "metadata_description":"HBV DNA Qn (S)"
+  },
+  {
+    "cnt":884,
+    "pid":"LP7786-9",
+    "id":"3074-2",
+    "display":"3074-2",
+    "metadata_description":"A-Tumor Necrosis Fact SerPl-mCnc"
+  },
+  {
+    "cnt":881,
+    "pid":"LP7788-5",
+    "id":"3198-9",
+    "display":"3198-9",
+    "metadata_description":"Fact VII Act\/Nor PPP"
+  },
+  {
+    "cnt":879,
+    "pid":"LP7786-9",
+    "id":"30166-3",
+    "display":"30166-3",
+    "metadata_description":"TSI Act\/Nor Ser"
+  },
+  {
+    "cnt":877,
+    "pid":"LP7786-9",
+    "id":"13629-1",
+    "display":"13629-1",
+    "metadata_description":"Il1Beta SerPl-mCnc"
+  },
+  {
+    "cnt":871,
+    "pid":"LP7786-9",
+    "id":"49852-7",
+    "display":"49852-7",
+    "metadata_description":"Oligoclonal Bands CSF IEF"
+  },
+  {
+    "cnt":869,
+    "pid":"LP7786-9",
+    "id":"9624-8",
+    "display":"9624-8",
+    "metadata_description":"VMA Ur-mCnc"
+  },
+  {
+    "cnt":861,
+    "pid":"LP7786-9",
+    "id":"15061-5",
+    "display":"15061-5",
+    "metadata_description":"EPO SerPl-aCnc"
+  },
+  {
+    "cnt":858,
+    "pid":"LP7786-9",
+    "id":"14803-1",
+    "display":"14803-1",
+    "metadata_description":"LDH Fld L to P-cCnc"
+  },
+  {
+    "cnt":858,
+    "pid":"LP7786-9",
+    "id":"33939-0",
+    "display":"33939-0",
+    "metadata_description":"Il2 SerPl-mCnc"
+  },
+  {
+    "cnt":855,
+    "pid":"LP7786-9",
+    "id":"11144-3",
+    "display":"11144-3",
+    "metadata_description":"HVA Ur-mCnc"
+  },
+  {
+    "cnt":854,
+    "pid":"LP7786-9",
+    "id":"38476-8",
+    "display":"38476-8",
+    "metadata_description":"MIS SerPl-mCnc"
+  },
+  {
+    "cnt":851,
+    "pid":"LP7819-8",
+    "id":"53560-9",
+    "display":"53560-9",
+    "metadata_description":"HSV IgM IA Qn (S)"
+  },
+  {
+    "cnt":847,
+    "pid":"LP7819-8",
+    "id":"29610-3",
+    "display":"29610-3",
+    "metadata_description":"HBV DNA NAA+probe Ql"
+  },
+  {
+    "cnt":845,
+    "pid":"LP7819-8",
+    "id":"42595-9",
+    "display":"42595-9",
+    "metadata_description":"HBV DNA NAA+probe Qn"
+  },
+  {
+    "cnt":841,
+    "pid":"LP7819-8",
+    "id":"24013-5",
+    "display":"24013-5",
+    "metadata_description":"HIV1 RNA Ser-Imp"
+  },
+  {
+    "cnt":835,
+    "pid":"LP7819-8",
+    "id":"17780-8",
+    "display":"17780-8",
+    "metadata_description":"H pylori Ag Stl Ql IA"
+  },
+  {
+    "cnt":834,
+    "pid":"LP7786-9",
+    "id":"34319-4",
+    "display":"34319-4",
+    "metadata_description":"Inhibin B [Mass\/Vol]"
+  },
+  {
+    "cnt":818,
+    "pid":"LP7819-8",
+    "id":"25836-8",
+    "display":"25836-8",
+    "metadata_description":"HIV1 RNA # Spec NAA+probe"
+  },
+  {
+    "cnt":776,
+    "pid":"LP7788-5",
+    "id":"3226-8",
+    "display":"3226-8",
+    "metadata_description":"Fact XI Act\/Nor PPP"
+  },
+  {
+    "cnt":755,
+    "pid":"LP7819-8",
+    "id":"4991-6",
+    "display":"4991-6",
+    "metadata_description":"B burgdor DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":745,
+    "pid":"LP7786-9",
+    "id":"9622-2",
+    "display":"9622-2",
+    "metadata_description":"Phytonadione SerPl-mCnc"
+  },
+  {
+    "cnt":726,
+    "pid":"LP7786-9",
+    "id":"1747-5",
+    "display":"1747-5",
+    "metadata_description":"Albumin Fld-mCnc"
+  },
+  {
+    "cnt":722,
+    "pid":"LP7819-8",
+    "id":"5005-4",
+    "display":"5005-4",
+    "metadata_description":"EBV DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":698,
+    "pid":"LP7788-5",
+    "id":"6009-5",
+    "display":"6009-5",
+    "metadata_description":"Prot C Ag PPP IA-aCnc"
+  },
+  {
+    "cnt":697,
+    "pid":"LP7786-9",
+    "id":"1805-1",
+    "display":"1805-1",
+    "metadata_description":"Amylase P SerPl-cCnc"
+  },
+  {
+    "cnt":678,
+    "pid":"LP7788-5",
+    "id":"29860-4",
+    "display":"29860-4",
+    "metadata_description":"Cardiolipin Ab Ql (S)"
+  },
+  {
+    "cnt":655,
+    "pid":"LP7819-8",
+    "id":"77028-9",
+    "display":"77028-9",
+    "metadata_description":"FLUAV H1 2009 pand RNA Nph Ql NAA+probe"
+  },
+  {
+    "cnt":651,
+    "pid":"LP7786-9",
+    "id":"17838-4",
+    "display":"17838-4",
+    "metadata_description":"ALP Bone [Mass\/Vol]"
+  },
+  {
+    "cnt":651,
+    "pid":"LP7819-8",
+    "id":"34376-4",
+    "display":"34376-4",
+    "metadata_description":"Strongyloides IgG Ser IA-aCnc"
+  },
+  {
+    "cnt":647,
+    "pid":"LP7819-8",
+    "id":"49339-5",
+    "display":"49339-5",
+    "metadata_description":"HAdV DNA # Stl NAA+probe"
+  },
+  {
+    "cnt":644,
+    "pid":"LP7819-8",
+    "id":"16117-4",
+    "display":"16117-4",
+    "metadata_description":"B microti IgG Titr Ser"
+  },
+  {
+    "cnt":641,
+    "pid":"LP7786-9",
+    "id":"49256-1",
+    "display":"49256-1",
+    "metadata_description":"Catechols Ur-Imp"
+  },
+  {
+    "cnt":640,
+    "pid":"LP7786-9",
+    "id":"2218-6",
+    "display":"2218-6",
+    "metadata_description":"DOPamine 24h Ur-mRate"
+  },
+  {
+    "cnt":640,
+    "pid":"LP7786-9",
+    "id":"2668-2",
+    "display":"2668-2",
+    "metadata_description":"Norepineph 24h Ur-mRate"
+  },
+  {
+    "cnt":639,
+    "pid":"LP7819-8",
+    "id":"5000-5",
+    "display":"5000-5",
+    "metadata_description":"CMV DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":639,
+    "pid":"LP7786-9",
+    "id":"2232-7",
+    "display":"2232-7",
+    "metadata_description":"Epineph 24h Ur-mRate"
+  },
+  {
+    "cnt":638,
+    "pid":"LP7786-9",
+    "id":"12722-5",
+    "display":"12722-5",
+    "metadata_description":"IGF BP1 SerPl-mCnc"
+  },
+  {
+    "cnt":634,
+    "pid":"LP7786-9",
+    "id":"3013-0",
+    "display":"3013-0",
+    "metadata_description":"Thyroglob SerPl-mCnc"
+  },
+  {
+    "cnt":632,
+    "pid":"LP7819-8",
+    "id":"16118-2",
+    "display":"16118-2",
+    "metadata_description":"B microti IgM Titr Ser"
+  },
+  {
+    "cnt":611,
+    "pid":"LP7819-8",
+    "id":"9572-9",
+    "display":"9572-9",
+    "metadata_description":"B19V DNA Ser Ql NAA+probe"
+  },
+  {
+    "cnt":596,
+    "pid":"LP7786-9",
+    "id":"22656-3",
+    "display":"22656-3",
+    "metadata_description":"Arginine CSF-sCnc"
+  },
+  {
+    "cnt":595,
+    "pid":"LP7786-9",
+    "id":"22647-2",
+    "display":"22647-2",
+    "metadata_description":"Ornithine CSF-sCnc"
+  },
+  {
+    "cnt":595,
+    "pid":"LP7786-9",
+    "id":"13375-1",
+    "display":"13375-1",
+    "metadata_description":"Lysine CSF-mCnc"
+  },
+  {
+    "cnt":595,
+    "pid":"LP7819-8",
+    "id":"11483-5",
+    "display":"11483-5",
+    "metadata_description":"VZV DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":595,
+    "pid":"LP7786-9",
+    "id":"26602-3",
+    "display":"26602-3",
+    "metadata_description":"Tryptophan CSF-sCnc"
+  },
+  {
+    "cnt":595,
+    "pid":"LP7786-9",
+    "id":"9453-2",
+    "display":"9453-2",
+    "metadata_description":"Histidine CSF-sCnc"
+  },
+  {
+    "cnt":595,
+    "pid":"LP7786-9",
+    "id":"22642-3",
+    "display":"22642-3",
+    "metadata_description":"Tyrosine CSF-sCnc"
+  },
+  {
+    "cnt":595,
+    "pid":"LP7786-9",
+    "id":"22646-4",
+    "display":"22646-4",
+    "metadata_description":"Phe CSF-sCnc"
+  },
+  {
+    "cnt":594,
+    "pid":"LP7786-9",
+    "id":"9412-8",
+    "display":"9412-8",
+    "metadata_description":"Leucine CSF-sCnc"
+  },
+  {
+    "cnt":593,
+    "pid":"LP7786-9",
+    "id":"22649-8",
+    "display":"22649-8",
+    "metadata_description":"Valine CSF-sCnc"
+  },
+  {
+    "cnt":593,
+    "pid":"LP7786-9",
+    "id":"22648-0",
+    "display":"22648-0",
+    "metadata_description":"Methionine CSF-sCnc"
+  },
+  {
+    "cnt":593,
+    "pid":"LP7786-9",
+    "id":"22653-0",
+    "display":"22653-0",
+    "metadata_description":"Cystine CSF-sCnc"
+  },
+  {
+    "cnt":593,
+    "pid":"LP7786-9",
+    "id":"22659-7",
+    "display":"22659-7",
+    "metadata_description":"Isoleucine CSF-sCnc"
+  },
+  {
+    "cnt":591,
+    "pid":"LP7786-9",
+    "id":"22657-1",
+    "display":"22657-1",
+    "metadata_description":"Alanine CSF-sCnc"
+  },
+  {
+    "cnt":591,
+    "pid":"LP7786-9",
+    "id":"22645-6",
+    "display":"22645-6",
+    "metadata_description":"Proline CSF-sCnc"
+  },
+  {
+    "cnt":591,
+    "pid":"LP7786-9",
+    "id":"22641-5",
+    "display":"22641-5",
+    "metadata_description":"Glutamine CSF-sCnc"
+  },
+  {
+    "cnt":591,
+    "pid":"LP7786-9",
+    "id":"22652-2",
+    "display":"22652-2",
+    "metadata_description":"Glutamate CSF-sCnc"
+  },
+  {
+    "cnt":591,
+    "pid":"LP7786-9",
+    "id":"22650-6",
+    "display":"22650-6",
+    "metadata_description":"Glycine CSF-sCnc"
+  },
+  {
+    "cnt":591,
+    "pid":"LP7786-9",
+    "id":"22654-8",
+    "display":"22654-8",
+    "metadata_description":"Citrulline CSF-sCnc"
+  },
+  {
+    "cnt":590,
+    "pid":"LP7786-9",
+    "id":"22643-1",
+    "display":"22643-1",
+    "metadata_description":"Threonine CSF-sCnc"
+  },
+  {
+    "cnt":590,
+    "pid":"LP7786-9",
+    "id":"22644-9",
+    "display":"22644-9",
+    "metadata_description":"Serine CSF-sCnc"
+  },
+  {
+    "cnt":590,
+    "pid":"LP7786-9",
+    "id":"22655-5",
+    "display":"22655-5",
+    "metadata_description":"Aspartate CSF-sCnc"
+  },
+  {
+    "cnt":590,
+    "pid":"LP7786-9",
+    "id":"26596-7",
+    "display":"26596-7",
+    "metadata_description":"OH-Proline CSF-sCnc"
+  },
+  {
+    "cnt":590,
+    "pid":"LP7786-9",
+    "id":"26603-1",
+    "display":"26603-1",
+    "metadata_description":"Asparagine CSF-sCnc"
+  },
+  {
+    "cnt":589,
+    "pid":"LP7786-9",
+    "id":"26614-8",
+    "display":"26614-8",
+    "metadata_description":"Taurine CSF-sCnc"
+  },
+  {
+    "cnt":559,
+    "pid":"LP7786-9",
+    "id":"13733-1",
+    "display":"13733-1",
+    "metadata_description":"DOPamine\/Creat Ur"
+  },
+  {
+    "cnt":558,
+    "pid":"LP7786-9",
+    "id":"13734-9",
+    "display":"13734-9",
+    "metadata_description":"Epineph\/Creat Ur"
+  },
+  {
+    "cnt":558,
+    "pid":"LP7786-9",
+    "id":"13782-8",
+    "display":"13782-8",
+    "metadata_description":"Norepineph\/Creat Ur"
+  },
+  {
+    "cnt":555,
+    "pid":"LP7788-5",
+    "id":"27823-4",
+    "display":"27823-4",
+    "metadata_description":"Prot S Ag Act\/Nor PPP IA"
+  },
+  {
+    "cnt":532,
+    "pid":"LP7819-8",
+    "id":"23877-4",
+    "display":"23877-4",
+    "metadata_description":"A phagocytoph IgG Titr Ser IF"
+  },
+  {
+    "cnt":523,
+    "pid":"LP6186-3",
+    "id":"3193-0",
+    "display":"3193-0",
+    "metadata_description":"Fact V Act\/Nor PPP"
+  },
+  {
+    "cnt":517,
+    "pid":"LP7788-5",
+    "id":"3232-6",
+    "display":"3232-6",
+    "metadata_description":"Fact XII Act\/Nor PPP"
+  },
+  {
+    "cnt":516,
+    "pid":"LP7819-8",
+    "id":"46154-1",
+    "display":"46154-1",
+    "metadata_description":"T vaginalis rRNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":493,
+    "pid":"LP7819-8",
+    "id":"23878-2",
+    "display":"23878-2",
+    "metadata_description":"A phagocytoph IgM Titr Ser IF"
+  },
+  {
+    "cnt":489,
+    "pid":"LP7786-9",
+    "id":"1809-3",
+    "display":"1809-3",
+    "metadata_description":"Amylase S SerPl-cCnc"
+  },
+  {
+    "cnt":484,
+    "pid":"LP7786-9",
+    "id":"15066-4",
+    "display":"15066-4",
+    "metadata_description":"NEFA SerPl-sCnc"
+  },
+  {
+    "cnt":479,
+    "pid":"LP7788-5",
+    "id":"3241-7",
+    "display":"3241-7",
+    "metadata_description":"Fact XIII Clot Dis 24h PPP Ql"
+  },
+  {
+    "cnt":472,
+    "pid":"LP7786-9",
+    "id":"2667-4",
+    "display":"2667-4",
+    "metadata_description":"Norepineph Ur-mCnc"
+  },
+  {
+    "cnt":472,
+    "pid":"LP7786-9",
+    "id":"2217-8",
+    "display":"2217-8",
+    "metadata_description":"DOPamine Ur-mCnc"
+  },
+  {
+    "cnt":471,
+    "pid":"LP7786-9",
+    "id":"11046-0",
+    "display":"11046-0",
+    "metadata_description":"Epineph Ur-mCnc"
+  },
+  {
+    "cnt":467,
+    "pid":"LP7786-9",
+    "id":"2839-9",
+    "display":"2839-9",
+    "metadata_description":"Progest SerPl-mCnc"
+  },
+  {
+    "cnt":453,
+    "pid":"LP7786-9",
+    "id":"23883-2",
+    "display":"23883-2",
+    "metadata_description":"Inhibin A [Mass\/Vol]"
+  },
+  {
+    "cnt":452,
+    "pid":"LP7819-8",
+    "id":"5285-2",
+    "display":"5285-2",
+    "metadata_description":"PV3 NAb Titr Ser Nt"
+  },
+  {
+    "cnt":452,
+    "pid":"LP7786-9",
+    "id":"10334-1",
+    "display":"10334-1",
+    "metadata_description":"Cancer Ag 125 Qn"
+  },
+  {
+    "cnt":452,
+    "pid":"LP7819-8",
+    "id":"5281-1",
+    "display":"5281-1",
+    "metadata_description":"PV1 NAb Titr Ser Nt"
+  },
+  {
+    "cnt":451,
+    "pid":"LP7819-8",
+    "id":"32781-7",
+    "display":"32781-7",
+    "metadata_description":"Legionella Ag Ur Ql"
+  },
+  {
+    "cnt":446,
+    "pid":"LP7819-8",
+    "id":"6954-2",
+    "display":"6954-2",
+    "metadata_description":"B henselae IgG Titr Ser IF"
+  },
+  {
+    "cnt":444,
+    "pid":"LP7819-8",
+    "id":"6955-9",
+    "display":"6955-9",
+    "metadata_description":"B henselae IgM Titr Ser IF"
+  },
+  {
+    "cnt":443,
+    "pid":"LP7786-9",
+    "id":"2950-4",
+    "display":"2950-4",
+    "metadata_description":"Sodium Fld-sCnc"
+  },
+  {
+    "cnt":438,
+    "pid":"LP7786-9",
+    "id":"14115-0",
+    "display":"14115-0",
+    "metadata_description":"Collagen NTx\/Creat Ur-sRto"
+  },
+  {
+    "cnt":438,
+    "pid":"LP7786-9",
+    "id":"1982-8",
+    "display":"1982-8",
+    "metadata_description":"Biotinidase SerPl-cCnc"
+  },
+  {
+    "cnt":438,
+    "pid":"LP7819-8",
+    "id":"51822-5",
+    "display":"51822-5",
+    "metadata_description":"HAdV IgG Ser IA-aCnc"
+  },
+  {
+    "cnt":431,
+    "pid":"LP7786-9",
+    "id":"5117-7",
+    "display":"5117-7",
+    "metadata_description":"Cryoglob Ser Ql"
+  },
+  {
+    "cnt":430,
+    "pid":"LP7786-9",
+    "id":"6892-4",
+    "display":"6892-4",
+    "metadata_description":"T4 Free SerPl Dialy-mCnc"
+  },
+  {
+    "cnt":423,
+    "pid":"LP7786-9",
+    "id":"6765-2",
+    "display":"6765-2",
+    "metadata_description":"17OH-Preg SerPl-mCnc"
+  },
+  {
+    "cnt":423,
+    "pid":"LP7819-8",
+    "id":"51823-3",
+    "display":"51823-3",
+    "metadata_description":"HAdV IgM Ser IA-aCnc"
+  },
+  {
+    "cnt":421,
+    "pid":"LP7819-8",
+    "id":"9783-2",
+    "display":"9783-2",
+    "metadata_description":"E chaffeensis IgG Titr Ser"
+  },
+  {
+    "cnt":418,
+    "pid":"LP7786-9",
+    "id":"2821-7",
+    "display":"2821-7",
+    "metadata_description":"Potassium Fld-sCnc"
+  },
+  {
+    "cnt":415,
+    "pid":"LP7786-9",
+    "id":"14045-9",
+    "display":"14045-9",
+    "metadata_description":"D-Lactate SerPl-sCnc"
+  },
+  {
+    "cnt":410,
+    "pid":"LP7819-8",
+    "id":"81655-3",
+    "display":"81655-3",
+    "metadata_description":"Resp bact + virus DNA + RNA Resp NAA+pr"
+  },
+  {
+    "cnt":400,
+    "pid":"LP7786-9",
+    "id":"2145-1",
+    "display":"2145-1",
+    "metadata_description":"Cortis F SerPl-mCnc"
+  },
+  {
+    "cnt":397,
+    "pid":"LP7819-8",
+    "id":"48952-6",
+    "display":"48952-6",
+    "metadata_description":"H capsul Ag Ur-mCnc"
+  },
+  {
+    "cnt":395,
+    "pid":"LP7786-9",
+    "id":"2072-7",
+    "display":"2072-7",
+    "metadata_description":"Chloride Fld-sCnc"
+  },
+  {
+    "cnt":393,
+    "pid":"LP7788-5",
+    "id":"5995-6",
+    "display":"5995-6",
+    "metadata_description":"PA Coll PRP"
+  },
+  {
+    "cnt":393,
+    "pid":"LP7786-9",
+    "id":"11040-3",
+    "display":"11040-3",
+    "metadata_description":"Cortis F Ur-mCnc"
+  },
+  {
+    "cnt":383,
+    "pid":"LP7819-8",
+    "id":"13227-4",
+    "display":"13227-4",
+    "metadata_description":"C. diphtheriae IgG Qn (S)"
+  },
+  {
+    "cnt":382,
+    "pid":"LP7819-8",
+    "id":"13954-3",
+    "display":"13954-3",
+    "metadata_description":"HBV e Ag IA Ql"
+  },
+  {
+    "cnt":378,
+    "pid":"LP7786-9",
+    "id":"41653-7",
+    "display":"41653-7",
+    "metadata_description":"Glucose BldC Glucomtr-mCnc"
+  },
+  {
+    "cnt":377,
+    "pid":"LP7786-9",
+    "id":"2258-2",
+    "display":"2258-2",
+    "metadata_description":"E1 [Mass\/Vol]"
+  },
+  {
+    "cnt":376,
+    "pid":"LP7786-9",
+    "id":"14628-2",
+    "display":"14628-2",
+    "metadata_description":"Bile Ac SerPl-sCnc"
+  },
+  {
+    "cnt":365,
+    "pid":"LP7819-8",
+    "id":"13953-5",
+    "display":"13953-5",
+    "metadata_description":"HBV e Ab IA Ql"
+  },
+  {
+    "cnt":365,
+    "pid":"LP7786-9",
+    "id":"2868-8",
+    "display":"2868-8",
+    "metadata_description":"Alpha2 Glob SerPl Elph-mCnc"
+  },
+  {
+    "cnt":365,
+    "pid":"LP7786-9",
+    "id":"2871-2",
+    "display":"2871-2",
+    "metadata_description":"B-Globulin SerPl Elph-mCnc"
+  },
+  {
+    "cnt":365,
+    "pid":"LP7786-9",
+    "id":"2874-6",
+    "display":"2874-6",
+    "metadata_description":"Gamma glob SerPl Elph-mCnc"
+  },
+  {
+    "cnt":364,
+    "pid":"LP7786-9",
+    "id":"2862-1",
+    "display":"2862-1",
+    "metadata_description":"Albumin SerPl Elph-mCnc"
+  },
+  {
+    "cnt":364,
+    "pid":"LP7819-8",
+    "id":"27994-3",
+    "display":"27994-3",
+    "metadata_description":"E chaffeensis DNA Bld Ql NAA+probe"
+  },
+  {
+    "cnt":364,
+    "pid":"LP7819-8",
+    "id":"48865-0",
+    "display":"48865-0",
+    "metadata_description":"E ewingii DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":364,
+    "pid":"LP7819-8",
+    "id":"30039-2",
+    "display":"30039-2",
+    "metadata_description":"A phagocytoph DNA Bld Ql NAA+probe"
+  },
+  {
+    "cnt":364,
+    "pid":"LP7819-8",
+    "id":"48866-8",
+    "display":"48866-8",
+    "metadata_description":"Ehrlichia DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":364,
+    "pid":"LP7786-9",
+    "id":"12851-2",
+    "display":"12851-2",
+    "metadata_description":"Prot Pattern SerPl Elph-Imp"
+  },
+  {
+    "cnt":364,
+    "pid":"LP7786-9",
+    "id":"2865-4",
+    "display":"2865-4",
+    "metadata_description":"Alpha1 Glob SerPl Elph-mCnc"
+  },
+  {
+    "cnt":364,
+    "pid":"LP7786-9",
+    "id":"48796-7",
+    "display":"48796-7",
+    "metadata_description":"HCV FibroSURE panel"
+  },
+  {
+    "cnt":362,
+    "pid":"LP7788-5",
+    "id":"32217-2",
+    "display":"32217-2",
+    "metadata_description":"vWF multimers PPP Ql"
+  },
+  {
+    "cnt":357,
+    "pid":"LP6186-3",
+    "id":"3289-6",
+    "display":"3289-6",
+    "metadata_description":"Prothrom Act\/Nor PPP"
+  },
+  {
+    "cnt":352,
+    "pid":"LP7786-9",
+    "id":"2147-7",
+    "display":"2147-7",
+    "metadata_description":"Cortis F 24h Ur-mRate"
+  },
+  {
+    "cnt":348,
+    "pid":"LP7788-5",
+    "id":"3218-5",
+    "display":"3218-5",
+    "metadata_description":"Fact X Act\/Nor PPP"
+  },
+  {
+    "cnt":340,
+    "pid":"LP7786-9",
+    "id":"2589-0",
+    "display":"2589-0",
+    "metadata_description":"Lysozyme [Mass\/Vol]"
+  },
+  {
+    "cnt":334,
+    "pid":"LP7819-8",
+    "id":"5111-0",
+    "display":"5111-0",
+    "metadata_description":"CV B5 NAb Titr Ser Nt"
+  },
+  {
+    "cnt":334,
+    "pid":"LP7819-8",
+    "id":"5113-6",
+    "display":"5113-6",
+    "metadata_description":"CV B6 NAb Titr Ser Nt"
+  },
+  {
+    "cnt":333,
+    "pid":"LP7819-8",
+    "id":"5103-7",
+    "display":"5103-7",
+    "metadata_description":"CV B1 NAb Titr Ser Nt"
+  },
+  {
+    "cnt":333,
+    "pid":"LP7819-8",
+    "id":"5109-4",
+    "display":"5109-4",
+    "metadata_description":"CV B4 NAb Titr Ser Nt"
+  },
+  {
+    "cnt":333,
+    "pid":"LP7819-8",
+    "id":"5107-8",
+    "display":"5107-8",
+    "metadata_description":"CV B3 NAb Titr Ser Nt"
+  },
+  {
+    "cnt":333,
+    "pid":"LP7819-8",
+    "id":"5105-2",
+    "display":"5105-2",
+    "metadata_description":"CV B2 NAb Titr Ser Nt"
+  },
+  {
+    "cnt":330,
+    "pid":"LP7819-8",
+    "id":"49451-8",
+    "display":"49451-8",
+    "metadata_description":"VZV DNA # Spec NAA+probe"
+  },
+  {
+    "cnt":327,
+    "pid":"LP7786-9",
+    "id":"1959-6",
+    "display":"1959-6",
+    "metadata_description":"HCO3 Bld-sCnc"
+  },
+  {
+    "cnt":326,
+    "pid":"LP234174-3",
+    "id":"20438-8",
+    "display":"20438-8",
+    "metadata_description":"Glucose 1h p Glc SerPl-mCnc"
+  },
+  {
+    "cnt":325,
+    "pid":"LP7786-9",
+    "id":"15155-5",
+    "display":"15155-5",
+    "metadata_description":"Calcium Fld-mCnc"
+  },
+  {
+    "cnt":324,
+    "pid":"LP7819-8",
+    "id":"5014-6",
+    "display":"5014-6",
+    "metadata_description":"HSV DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":323,
+    "pid":"LP7819-8",
+    "id":"587-6",
+    "display":"587-6",
+    "metadata_description":"H pylori Spec Ql Cult"
+  },
+  {
+    "cnt":319,
+    "pid":"LP7819-8",
+    "id":"30167-1",
+    "display":"30167-1",
+    "metadata_description":"HPV I\/H Risk 1 DNA Cvx Ql Probe+sig amp"
+  },
+  {
+    "cnt":319,
+    "pid":"LP7819-8",
+    "id":"17726-1",
+    "display":"17726-1",
+    "metadata_description":"T pallidum IgG Ser Ql IF"
+  },
+  {
+    "cnt":312,
+    "pid":"LP7786-9",
+    "id":"49038-3",
+    "display":"49038-3",
+    "metadata_description":"Vit B2 SerPl-sCnc"
+  },
+  {
+    "cnt":310,
+    "pid":"LP7786-9",
+    "id":"2164-2",
+    "display":"2164-2",
+    "metadata_description":"Creat Cl 24h Ur+SerPl-vRate"
+  },
+  {
+    "cnt":303,
+    "pid":"LP7786-9",
+    "id":"21482-5",
+    "display":"21482-5",
+    "metadata_description":"Prot 24h Ur-mCnc"
+  },
+  {
+    "cnt":303,
+    "pid":"LP7819-8",
+    "id":"39528-5",
+    "display":"39528-5",
+    "metadata_description":"HAdV DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":302,
+    "pid":"LP7819-8",
+    "id":"9757-6",
+    "display":"9757-6",
+    "metadata_description":"CV A9 Ab Titr Ser CF"
+  },
+  {
+    "cnt":302,
+    "pid":"LP7786-9",
+    "id":"2641-9",
+    "display":"2641-9",
+    "metadata_description":"Myoglobin Ur-mCnc"
+  },
+  {
+    "cnt":302,
+    "pid":"LP7786-9",
+    "id":"3016-3",
+    "display":"3016-3",
+    "metadata_description":"TSH Qn"
+  },
+  {
+    "cnt":301,
+    "pid":"LP7819-8",
+    "id":"94508-9",
+    "display":"94508-9",
+    "metadata_description":"SARS-CoV-2 IgM SerPlBld Ql IA.rapid"
+  },
+  {
+    "cnt":301,
+    "pid":"LP7819-8",
+    "id":"94563-4",
+    "display":"94563-4",
+    "metadata_description":"SARS-CoV-2 IgG SerPl Ql IA"
+  },
+  {
+    "cnt":298,
+    "pid":"LP7819-8",
+    "id":"34645-2",
+    "display":"34645-2",
+    "metadata_description":"C pneum DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":289,
+    "pid":"LP7819-8",
+    "id":"5283-7",
+    "display":"5283-7",
+    "metadata_description":"PV2 NAb Titr Ser Nt"
+  },
+  {
+    "cnt":288,
+    "pid":"LP7786-9",
+    "id":"22671-2",
+    "display":"22671-2",
+    "metadata_description":"Phytanate SerPl-sCnc"
+  },
+  {
+    "cnt":287,
+    "pid":"LP7786-9",
+    "id":"34316-0",
+    "display":"34316-0",
+    "metadata_description":"Histamine SerPl-sCnc"
+  },
+  {
+    "cnt":284,
+    "pid":"LP7819-8",
+    "id":"22239-8",
+    "display":"22239-8",
+    "metadata_description":"CMV Ab Ql"
+  },
+  {
+    "cnt":276,
+    "pid":"LP7819-8",
+    "id":"49381-7",
+    "display":"49381-7",
+    "metadata_description":"HSV1+2 DNA # Spec NAA+probe"
+  },
+  {
+    "cnt":275,
+    "pid":"LP7786-9",
+    "id":"15069-8",
+    "display":"15069-8",
+    "metadata_description":"Fructosamine SerPl-sCnc"
+  },
+  {
+    "cnt":275,
+    "pid":"LP7786-9",
+    "id":"12190-5",
+    "display":"12190-5",
+    "metadata_description":"Creat Fld-mCnc"
+  },
+  {
+    "cnt":273,
+    "pid":"LP7786-9",
+    "id":"1777-2",
+    "display":"1777-2",
+    "metadata_description":"ALP Bone SerPl-cCnc"
+  },
+  {
+    "cnt":273,
+    "pid":"LP7786-9",
+    "id":"2697-1",
+    "display":"2697-1",
+    "metadata_description":"Osteocalcin SerPl-mCnc"
+  },
+  {
+    "cnt":273,
+    "pid":"LP7786-9",
+    "id":"33421-9",
+    "display":"33421-9",
+    "metadata_description":"ALP Other SerPl-cCnc"
+  },
+  {
+    "cnt":272,
+    "pid":"LP7786-9",
+    "id":"1779-8",
+    "display":"1779-8",
+    "metadata_description":"ALP Liver SerPl-cCnc"
+  },
+  {
+    "cnt":271,
+    "pid":"LP7786-9",
+    "id":"2142-8",
+    "display":"2142-8",
+    "metadata_description":"Cortis Sal-mCnc"
+  },
+  {
+    "cnt":269,
+    "pid":"LP7788-5",
+    "id":"24471-5",
+    "display":"24471-5",
+    "metadata_description":"Closure Tme Coll+Epinep Bld"
+  },
+  {
+    "cnt":258,
+    "pid":"LP7786-9",
+    "id":"21365-2",
+    "display":"21365-2",
+    "metadata_description":"Leptin SerPl-mCnc"
+  },
+  {
+    "cnt":257,
+    "pid":"LP7786-9",
+    "id":"1795-4",
+    "display":"1795-4",
+    "metadata_description":"Amylase Fld-cCnc"
+  },
+  {
+    "cnt":249,
+    "pid":"LP7786-9",
+    "id":"3052-8",
+    "display":"3052-8",
+    "metadata_description":"T3Reverse SerPl-mCnc"
+  },
+  {
+    "cnt":245,
+    "pid":"LP7786-9",
+    "id":"1657-6",
+    "display":"1657-6",
+    "metadata_description":"11DC SerPl-mCnc"
+  },
+  {
+    "cnt":241,
+    "pid":"LP7786-9",
+    "id":"44924-9",
+    "display":"44924-9",
+    "metadata_description":"Normetanephrine\/Creat 24h Ur-sRto"
+  },
+  {
+    "cnt":241,
+    "pid":"LP7786-9",
+    "id":"15083-9",
+    "display":"15083-9",
+    "metadata_description":"Normetanephrine 24h Ur-sRate"
+  },
+  {
+    "cnt":238,
+    "pid":"LP7786-9",
+    "id":"21422-1",
+    "display":"21422-1",
+    "metadata_description":"Normetanephrine 24h Ur-mCnc"
+  },
+  {
+    "cnt":235,
+    "pid":"LP7786-9",
+    "id":"41652-9",
+    "display":"41652-9",
+    "metadata_description":"Glucose BldV-mCnc"
+  },
+  {
+    "cnt":233,
+    "pid":"LP7786-9",
+    "id":"42668-4",
+    "display":"42668-4",
+    "metadata_description":"FA Stl Ql"
+  },
+  {
+    "cnt":232,
+    "pid":"LP7786-9",
+    "id":"49275-1",
+    "display":"49275-1",
+    "metadata_description":"Interpretation SerPl IFE-Imp"
+  },
+  {
+    "cnt":226,
+    "pid":"LP7819-8",
+    "id":"22827-0",
+    "display":"22827-0",
+    "metadata_description":"FLUAV Subtyp Spec NAA+probe"
+  },
+  {
+    "cnt":226,
+    "pid":"LP7819-8",
+    "id":"29904-0",
+    "display":"29904-0",
+    "metadata_description":"T gondii DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":224,
+    "pid":"LP7786-9",
+    "id":"32546-4",
+    "display":"32546-4",
+    "metadata_description":"G6PD RBC-cCnt"
+  },
+  {
+    "cnt":224,
+    "pid":"LP7819-8",
+    "id":"32286-7",
+    "display":"32286-7",
+    "metadata_description":"HCV genotype NAA+probe"
+  },
+  {
+    "cnt":217,
+    "pid":"LP7786-9",
+    "id":"2230-1",
+    "display":"2230-1",
+    "metadata_description":"Epineph Plas-mCnc"
+  },
+  {
+    "cnt":217,
+    "pid":"LP7786-9",
+    "id":"2216-0",
+    "display":"2216-0",
+    "metadata_description":"DOPamine SerPl-mCnc"
+  },
+  {
+    "cnt":217,
+    "pid":"LP7786-9",
+    "id":"2666-6",
+    "display":"2666-6",
+    "metadata_description":"Norepineph Plas-mCnc"
+  },
+  {
+    "cnt":216,
+    "pid":"LP7819-8",
+    "id":"23992-1",
+    "display":"23992-1",
+    "metadata_description":"DENV IgM IA Qn (S)"
+  },
+  {
+    "cnt":212,
+    "pid":"LP7786-9",
+    "id":"13969-1",
+    "display":"13969-1",
+    "metadata_description":"CK.MB [Mass\/Vol]"
+  },
+  {
+    "cnt":211,
+    "pid":"LP7786-9",
+    "id":"18244-4",
+    "display":"18244-4",
+    "metadata_description":"Niacin [Mass\/Vol]"
+  },
+  {
+    "cnt":209,
+    "pid":"LP7786-9",
+    "id":"24108-3",
+    "display":"24108-3",
+    "metadata_description":"Cancer Ag 19-9 Qn"
+  },
+  {
+    "cnt":209,
+    "pid":"LP7819-8",
+    "id":"23991-3",
+    "display":"23991-3",
+    "metadata_description":"DENV IgG IA Qn (S)"
+  },
+  {
+    "cnt":208,
+    "pid":"LP7786-9",
+    "id":"17869-9",
+    "display":"17869-9",
+    "metadata_description":"Orotate\/Creat Ur-sRto"
+  },
+  {
+    "cnt":208,
+    "pid":"LP7786-9",
+    "id":"32016-8",
+    "display":"32016-8",
+    "metadata_description":"Glucose BldC-mCnc"
+  },
+  {
+    "cnt":208,
+    "pid":"LP7819-8",
+    "id":"19053-8",
+    "display":"19053-8",
+    "metadata_description":"Brucella Ab Titr Ser Aggl"
+  },
+  {
+    "cnt":205,
+    "pid":"LP7819-8",
+    "id":"25419-3",
+    "display":"25419-3",
+    "metadata_description":"MuV IgM IA Qn (S)"
+  },
+  {
+    "cnt":199,
+    "pid":"LP7786-9",
+    "id":"2039-6",
+    "display":"2039-6",
+    "metadata_description":"CEA SerPl-mCnc"
+  },
+  {
+    "cnt":197,
+    "pid":"LP7788-5",
+    "id":"27812-7",
+    "display":"27812-7",
+    "metadata_description":"AT III Ag Act\/Nor PPP IA"
+  },
+  {
+    "cnt":193,
+    "pid":"LP7786-9",
+    "id":"1668-3",
+    "display":"1668-3",
+    "metadata_description":"17OHP SerPl-mCnc"
+  },
+  {
+    "cnt":191,
+    "pid":"LP7819-8",
+    "id":"21089-8",
+    "display":"21089-8",
+    "metadata_description":"B microti DNA Bld Ql NAA+probe"
+  },
+  {
+    "cnt":191,
+    "pid":"LP7819-8",
+    "id":"5335-5",
+    "display":"5335-5",
+    "metadata_description":"RUBV IgM Ser IA-aCnc"
+  },
+  {
+    "cnt":190,
+    "pid":"LP7786-9",
+    "id":"9811-1",
+    "display":"9811-1",
+    "metadata_description":"CgA SerPl-mCnc"
+  },
+  {
+    "cnt":189,
+    "pid":"LP7819-8",
+    "id":"44099-0",
+    "display":"44099-0",
+    "metadata_description":"Galactomannan Ag IA Ql"
+  },
+  {
+    "cnt":187,
+    "pid":"LP7786-9",
+    "id":"49136-5",
+    "display":"49136-5",
+    "metadata_description":"CK.MB [Ratio]"
+  },
+  {
+    "cnt":186,
+    "pid":"LP7786-9",
+    "id":"2333-3",
+    "display":"2333-3",
+    "metadata_description":"Gastrin SerPl-mCnc"
+  },
+  {
+    "cnt":183,
+    "pid":"LP7819-8",
+    "id":"36923-1",
+    "display":"36923-1",
+    "metadata_description":"EBV DNA # Bld NAA+probe"
+  },
+  {
+    "cnt":181,
+    "pid":"LP7819-8",
+    "id":"38917-1",
+    "display":"38917-1",
+    "metadata_description":"hMPV RNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":176,
+    "pid":"LP7786-9",
+    "id":"12183-0",
+    "display":"12183-0",
+    "metadata_description":"Cholest Fld-mCnc"
+  },
+  {
+    "cnt":171,
+    "pid":"LP7786-9",
+    "id":"3126-0",
+    "display":"3126-0",
+    "metadata_description":"Vasopressin SerPl-mCnc"
+  },
+  {
+    "cnt":169,
+    "pid":"LP7819-8",
+    "id":"5307-4",
+    "display":"5307-4",
+    "metadata_description":"R rickettsi IgG Titr Ser IF"
+  },
+  {
+    "cnt":169,
+    "pid":"LP7786-9",
+    "id":"14041-8",
+    "display":"14041-8",
+    "metadata_description":"B-HCG CSF-aCnc"
+  },
+  {
+    "cnt":168,
+    "pid":"LP7786-9",
+    "id":"10839-9",
+    "display":"10839-9",
+    "metadata_description":"Troponin I SerPl-mCnc"
+  },
+  {
+    "cnt":167,
+    "pid":"LP7786-9",
+    "id":"1833-3",
+    "display":"1833-3",
+    "metadata_description":"AFP CSF-mCnc"
+  },
+  {
+    "cnt":165,
+    "pid":"LP7819-8",
+    "id":"5308-2",
+    "display":"5308-2",
+    "metadata_description":"R rickettsi IgM Titr Ser IF"
+  },
+  {
+    "cnt":162,
+    "pid":"LP7786-9",
+    "id":"32043-2",
+    "display":"32043-2",
+    "metadata_description":"Uropor\/Creat 24h Ur-sRto"
+  },
+  {
+    "cnt":162,
+    "pid":"LP7786-9",
+    "id":"38175-6",
+    "display":"38175-6",
+    "metadata_description":"Heptacarboxylate\/Creat Ur-sRto"
+  },
+  {
+    "cnt":162,
+    "pid":"LP7786-9",
+    "id":"45313-4",
+    "display":"45313-4",
+    "metadata_description":"Copro1\/Creat Ur-sRto"
+  },
+  {
+    "cnt":161,
+    "pid":"LP7786-9",
+    "id":"40703-1",
+    "display":"40703-1",
+    "metadata_description":"Lactoferrin Stl Ql IA"
+  },
+  {
+    "cnt":161,
+    "pid":"LP7786-9",
+    "id":"44014-9",
+    "display":"44014-9",
+    "metadata_description":"Porphyrins Ur-Imp"
+  },
+  {
+    "cnt":158,
+    "pid":"LP7786-9",
+    "id":"1980-2",
+    "display":"1980-2",
+    "metadata_description":"Biotin [Mass\/Vol]"
+  },
+  {
+    "cnt":158,
+    "pid":"LP7819-8",
+    "id":"43225-2",
+    "display":"43225-2",
+    "metadata_description":"Toxocara Ab Ser IA-aCnc"
+  },
+  {
+    "cnt":156,
+    "pid":"LP7786-9",
+    "id":"15200-9",
+    "display":"15200-9",
+    "metadata_description":"Osmolality Fld"
+  },
+  {
+    "cnt":156,
+    "pid":"LP7819-8",
+    "id":"22567-2",
+    "display":"22567-2",
+    "metadata_description":"S pyog.enz Ab Titr Ser"
+  },
+  {
+    "cnt":155,
+    "pid":"LP7786-9",
+    "id":"50948-9",
+    "display":"50948-9",
+    "metadata_description":"VMA & Creat 24h Ur-Imp"
+  },
+  {
+    "cnt":151,
+    "pid":"LP7786-9",
+    "id":"1848-1",
+    "display":"1848-1",
+    "metadata_description":"Androstanolone SerPl-mCnc"
+  },
+  {
+    "cnt":150,
+    "pid":"LP7786-9",
+    "id":"25137-1",
+    "display":"25137-1",
+    "metadata_description":"Succinylacetone\/Creat Ur-sRto"
+  },
+  {
+    "cnt":148,
+    "pid":"LP7786-9",
+    "id":"45315-9",
+    "display":"45315-9",
+    "metadata_description":"Copro3\/Creat Ur-sRto"
+  },
+  {
+    "cnt":148,
+    "pid":"LP7788-5",
+    "id":"66760-0",
+    "display":"66760-0",
+    "metadata_description":"CI Bld TEG-aCnc"
+  },
+  {
+    "cnt":147,
+    "pid":"LP6186-3",
+    "id":"28660-9",
+    "display":"28660-9",
+    "metadata_description":"PLG Act\/Nor PPP Chro"
+  },
+  {
+    "cnt":146,
+    "pid":"LP7786-9",
+    "id":"14882-5",
+    "display":"14882-5",
+    "metadata_description":"PBG 24h Ur-sRate"
+  },
+  {
+    "cnt":146,
+    "pid":"LP7786-9",
+    "id":"2811-8",
+    "display":"2811-8",
+    "metadata_description":"PBG Ur-sCnc"
+  },
+  {
+    "cnt":144,
+    "pid":"LP7819-8",
+    "id":"593-4",
+    "display":"593-4",
+    "metadata_description":"Legionella Spec Cult"
+  },
+  {
+    "cnt":143,
+    "pid":"LP7786-9",
+    "id":"1992-7",
+    "display":"1992-7",
+    "metadata_description":"Calcit SerPl-mCnc"
+  },
+  {
+    "cnt":142,
+    "pid":"LP7786-9",
+    "id":"30248-9",
+    "display":"30248-9",
+    "metadata_description":"sTfR SerPl-mCnc"
+  },
+  {
+    "cnt":142,
+    "pid":"LP7786-9",
+    "id":"47549-1",
+    "display":"47549-1",
+    "metadata_description":"Adenosine deaminase RBC-cCnt"
+  },
+  {
+    "cnt":140,
+    "pid":"LP7819-8",
+    "id":"25421-9",
+    "display":"25421-9",
+    "metadata_description":"MeV IgM IA Qn (S)"
+  },
+  {
+    "cnt":139,
+    "pid":"LP7819-8",
+    "id":"601-5",
+    "display":"601-5",
+    "metadata_description":"Fungus Bld Cult"
+  },
+  {
+    "cnt":139,
+    "pid":"LP7819-8",
+    "id":"24312-1",
+    "display":"24312-1",
+    "metadata_description":"T pallidum Ab Ser Ql Aggl"
+  },
+  {
+    "cnt":138,
+    "pid":"LP7786-9",
+    "id":"38505-4",
+    "display":"38505-4",
+    "metadata_description":"Thyroglob Recovery MFr SerPl"
+  },
+  {
+    "cnt":135,
+    "pid":"LP7786-9",
+    "id":"16142-2",
+    "display":"16142-2",
+    "metadata_description":"Fat 24h Stl-mRate"
+  },
+  {
+    "cnt":135,
+    "pid":"LP7819-8",
+    "id":"43201-3",
+    "display":"43201-3",
+    "metadata_description":"BKV DNA Spec NAA+probe-Log#"
+  },
+  {
+    "cnt":131,
+    "pid":"LP7786-9",
+    "id":"24082-0",
+    "display":"24082-0",
+    "metadata_description":"Gal1PUT RBC-cCnt"
+  },
+  {
+    "cnt":130,
+    "pid":"LP7786-9",
+    "id":"26746-8",
+    "display":"26746-8",
+    "metadata_description":"Magnesium RBC-mCnc"
+  },
+  {
+    "cnt":129,
+    "pid":"LP7819-8",
+    "id":"49988-9",
+    "display":"49988-9",
+    "metadata_description":"HSV2 DNA # Bld NAA+probe"
+  },
+  {
+    "cnt":125,
+    "pid":"LP343406-7",
+    "id":"LP7755-4",
+    "display":"LP7755-4",
+    "metadata_description":"ABXBACT"
+  },
+  {
+    "cnt":124,
+    "pid":"LP7819-8",
+    "id":"38173-1",
+    "display":"38173-1",
+    "metadata_description":"B burgdor C6 Ab Ser IA-aCnc"
+  },
+  {
+    "cnt":123,
+    "pid":"LP7786-9",
+    "id":"12480-0",
+    "display":"12480-0",
+    "metadata_description":"ACE CSF-cCnc"
+  },
+  {
+    "cnt":122,
+    "pid":"LP7786-9",
+    "id":"49269-4",
+    "display":"49269-4",
+    "metadata_description":"HVA & Creat Ur-Imp"
+  },
+  {
+    "cnt":122,
+    "pid":"LP7786-9",
+    "id":"3066-8",
+    "display":"3066-8",
+    "metadata_description":"Trypsinogen SerPl-mCnc"
+  },
+  {
+    "cnt":110,
+    "pid":"LP7819-8",
+    "id":"5177-1",
+    "display":"5177-1",
+    "metadata_description":"H. pylori IgM IA Qn (S)"
+  },
+  {
+    "cnt":108,
+    "pid":"LP7786-9",
+    "id":"31203-3",
+    "display":"31203-3",
+    "metadata_description":"5OH-indoleacetate 24h Ur-mCnc"
+  },
+  {
+    "cnt":108,
+    "pid":"LP7786-9",
+    "id":"44909-0",
+    "display":"44909-0",
+    "metadata_description":"5HIAA & Creatinine Ur-Imp"
+  },
+  {
+    "cnt":108,
+    "pid":"LP7786-9",
+    "id":"1695-6",
+    "display":"1695-6",
+    "metadata_description":"5OH-indoleacetate 24h Ur-mRate"
+  },
+  {
+    "cnt":107,
+    "pid":"LP7819-8",
+    "id":"49399-9",
+    "display":"49399-9",
+    "metadata_description":"HHV7 DNA # Spec NAA+probe"
+  },
+  {
+    "cnt":107,
+    "pid":"LP7786-9",
+    "id":"9537-2",
+    "display":"9537-2",
+    "metadata_description":"IF Block Ab Ser Ql RIA"
+  },
+  {
+    "cnt":106,
+    "pid":"LP7786-9",
+    "id":"2638-5",
+    "display":"2638-5",
+    "metadata_description":"MBP CSF-mCnc"
+  },
+  {
+    "cnt":106,
+    "pid":"LP7819-8",
+    "id":"29901-6",
+    "display":"29901-6",
+    "metadata_description":"HTLV I+II Ab Ser Ql IA"
+  },
+  {
+    "cnt":106,
+    "pid":"LP6186-3",
+    "id":"27821-8",
+    "display":"27821-8",
+    "metadata_description":"Prot S Free Ag Act\/Nor PPP IA"
+  },
+  {
+    "cnt":105,
+    "pid":"LP7786-9",
+    "id":"2857-1",
+    "display":"2857-1",
+    "metadata_description":"PSA SerPl-mCnc"
+  },
+  {
+    "cnt":105,
+    "pid":"LP7786-9",
+    "id":"3093-2",
+    "display":"3093-2",
+    "metadata_description":"Urea nit Fld-mCnc"
+  },
+  {
+    "cnt":105,
+    "pid":"LP7786-9",
+    "id":"2639-3",
+    "display":"2639-3",
+    "metadata_description":"Myoglobin [Mass\/Vol]"
+  },
+  {
+    "cnt":105,
+    "pid":"LP7786-9",
+    "id":"2837-3",
+    "display":"2837-3",
+    "metadata_description":"Preg SerPl-mCnc"
+  },
+  {
+    "cnt":103,
+    "pid":"LP7786-9",
+    "id":"39791-9",
+    "display":"39791-9",
+    "metadata_description":"Sodium BldV-sCnc"
+  },
+  {
+    "cnt":103,
+    "pid":"LP7786-9",
+    "id":"41645-3",
+    "display":"41645-3",
+    "metadata_description":"Ca-I BldV-sCnc"
+  },
+  {
+    "cnt":103,
+    "pid":"LP7786-9",
+    "id":"39789-3",
+    "display":"39789-3",
+    "metadata_description":"Potassium BldV-sCnc"
+  },
+  {
+    "cnt":100,
+    "pid":"LP7786-9",
+    "id":"1952-1",
+    "display":"1952-1",
+    "metadata_description":"B2 Microglob SerPl-mCnc"
+  },
+  {
+    "cnt":100,
+    "pid":"LP7786-9",
+    "id":"15212-4",
+    "display":"15212-4",
+    "metadata_description":"Lipase Fld-cCnc"
+  },
+  {
+    "cnt":99,
+    "pid":"LP7786-9",
+    "id":"44288-9",
+    "display":"44288-9",
+    "metadata_description":"5OH-indoleacetate\/Creat 24h Ur"
+  },
+  {
+    "cnt":98,
+    "pid":"LP7819-8",
+    "id":"6420-4",
+    "display":"6420-4",
+    "metadata_description":"H. pylori IgA IA Qn (S)"
+  },
+  {
+    "cnt":96,
+    "pid":"LP7819-8",
+    "id":"47003-9",
+    "display":"47003-9",
+    "metadata_description":"VZV DNA NAA+probe [#\/Vol]"
+  },
+  {
+    "cnt":95,
+    "pid":"LP7786-9",
+    "id":"1869-7",
+    "display":"1869-7",
+    "metadata_description":"Apo A-I SerPl-mCnc"
+  },
+  {
+    "cnt":95,
+    "pid":"LP7786-9",
+    "id":"15087-0",
+    "display":"15087-0",
+    "metadata_description":"PTH Related Prot SerPl-sCnc"
+  },
+  {
+    "cnt":95,
+    "pid":"LP7786-9",
+    "id":"1874-7",
+    "display":"1874-7",
+    "metadata_description":"Apo B\/Apo A-I SerPl"
+  },
+  {
+    "cnt":95,
+    "pid":"LP7786-9",
+    "id":"1884-6",
+    "display":"1884-6",
+    "metadata_description":"Apo B SerPl-mCnc"
+  },
+  {
+    "cnt":94,
+    "pid":"LP7786-9",
+    "id":"1974-5",
+    "display":"1974-5",
+    "metadata_description":"Bilirub Fld-mCnc"
+  },
+  {
+    "cnt":92,
+    "pid":"LP6779-5",
+    "id":"11158-3",
+    "display":"11158-3",
+    "metadata_description":"Appearance (S)"
+  },
+  {
+    "cnt":88,
+    "pid":"LP6186-3",
+    "id":"3256-5",
+    "display":"3256-5",
+    "metadata_description":"Fibrinogen Ag PPP IA-mCnc"
+  },
+  {
+    "cnt":87,
+    "pid":"LP7819-8",
+    "id":"13956-8",
+    "display":"13956-8",
+    "metadata_description":"M tb DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":86,
+    "pid":"LP7786-9",
+    "id":"2053-7",
+    "display":"2053-7",
+    "metadata_description":"Carotene [Mass\/Vol]"
+  },
+  {
+    "cnt":84,
+    "pid":"LP7786-9",
+    "id":"73958-1",
+    "display":"73958-1",
+    "metadata_description":"Cholest Est DBS-cCnc"
+  },
+  {
+    "cnt":83,
+    "pid":"LP7786-9",
+    "id":"12723-3",
+    "display":"12723-3",
+    "metadata_description":"IGF BP2 SerPl-mCnc"
+  },
+  {
+    "cnt":83,
+    "pid":"LP7786-9",
+    "id":"14883-3",
+    "display":"14883-3",
+    "metadata_description":"Porphyrins [Interp]"
+  },
+  {
+    "cnt":82,
+    "pid":"LP7786-9",
+    "id":"33311-2",
+    "display":"33311-2",
+    "metadata_description":"Porphyrins SerPl-sCnc"
+  },
+  {
+    "cnt":82,
+    "pid":"LP7786-9",
+    "id":"34284-0",
+    "display":"34284-0",
+    "metadata_description":"D-ALA Ur-sCnc"
+  },
+  {
+    "cnt":82,
+    "pid":"LP7786-9",
+    "id":"14689-4",
+    "display":"14689-4",
+    "metadata_description":"D-ALA 24h Ur-sRate"
+  },
+  {
+    "cnt":76,
+    "pid":"LP7786-9",
+    "id":"33559-6",
+    "display":"33559-6",
+    "metadata_description":"Kappa LC\/Lambda Ur"
+  },
+  {
+    "cnt":76,
+    "pid":"LP7786-9",
+    "id":"25682-6",
+    "display":"25682-6",
+    "metadata_description":"Kappa LC 24h Ur-mRate"
+  },
+  {
+    "cnt":76,
+    "pid":"LP7786-9",
+    "id":"25684-2",
+    "display":"25684-2",
+    "metadata_description":"Lambda LC 24h Ur-mRate"
+  },
+  {
+    "cnt":76,
+    "pid":"LP7786-9",
+    "id":"38178-0",
+    "display":"38178-0",
+    "metadata_description":"Lambda LC Free Ur-mCnc"
+  },
+  {
+    "cnt":75,
+    "pid":"LP7786-9",
+    "id":"9745-1",
+    "display":"9745-1",
+    "metadata_description":"Gamma glob Ur Elph-mCnc"
+  },
+  {
+    "cnt":75,
+    "pid":"LP7786-9",
+    "id":"1754-1",
+    "display":"1754-1",
+    "metadata_description":"Albumin Ur-mCnc"
+  },
+  {
+    "cnt":75,
+    "pid":"LP7786-9",
+    "id":"38176-4",
+    "display":"38176-4",
+    "metadata_description":"Kappa LC Free Ur-mCnc"
+  },
+  {
+    "cnt":75,
+    "pid":"LP7786-9",
+    "id":"2889-4",
+    "display":"2889-4",
+    "metadata_description":"Prot 24h Ur-mRate"
+  },
+  {
+    "cnt":75,
+    "pid":"LP7786-9",
+    "id":"9744-4",
+    "display":"9744-4",
+    "metadata_description":"B-Globulin Ur Elph-mCnc"
+  },
+  {
+    "cnt":75,
+    "pid":"LP7786-9",
+    "id":"9734-5",
+    "display":"9734-5",
+    "metadata_description":"Alpha1 Glob Ur Elph-mCnc"
+  },
+  {
+    "cnt":75,
+    "pid":"LP7786-9",
+    "id":"38190-5",
+    "display":"38190-5",
+    "metadata_description":"Alpha2 Glob Ur Elph-mCnc"
+  },
+  {
+    "cnt":74,
+    "pid":"LP7786-9",
+    "id":"25700-6",
+    "display":"25700-6",
+    "metadata_description":"Interpretation SerPl IFE-Imp"
+  },
+  {
+    "cnt":74,
+    "pid":"LP7786-9",
+    "id":"41171-0",
+    "display":"41171-0",
+    "metadata_description":"Collagen CTx SerPl-mCnc"
+  },
+  {
+    "cnt":70,
+    "pid":"LP7819-8",
+    "id":"14212-5",
+    "display":"14212-5",
+    "metadata_description":"HEV IgM Ser Ql"
+  },
+  {
+    "cnt":68,
+    "pid":"LP7819-8",
+    "id":"41479-7",
+    "display":"41479-7",
+    "metadata_description":"BKV DNA # SerPl NAA+probe"
+  },
+  {
+    "cnt":66,
+    "pid":"LP7755-4",
+    "id":"49659-6",
+    "display":"49659-6",
+    "metadata_description":"HIV RT Susc Pnl Islt Genotyp"
+  },
+  {
+    "cnt":65,
+    "pid":"LP7819-8",
+    "id":"32700-7",
+    "display":"32700-7",
+    "metadata_description":"Malaria Smear Bld"
+  },
+  {
+    "cnt":64,
+    "pid":"LP7786-9",
+    "id":"13876-8",
+    "display":"13876-8",
+    "metadata_description":"B2 Transferrin Fld Ql"
+  },
+  {
+    "cnt":60,
+    "pid":"LP7786-9",
+    "id":"2077-6",
+    "display":"2077-6",
+    "metadata_description":"Chloride Sweat-sCnc"
+  },
+  {
+    "cnt":60,
+    "pid":"LP7819-8",
+    "id":"77400-0",
+    "display":"77400-0",
+    "metadata_description":"HPV18 DNA Cvx Ql NAA+probe"
+  },
+  {
+    "cnt":60,
+    "pid":"LP17803-5",
+    "id":"14577-1",
+    "display":"14577-1",
+    "metadata_description":"ABO + Rh Bld Donr"
+  },
+  {
+    "cnt":60,
+    "pid":"LP7819-8",
+    "id":"77399-4",
+    "display":"77399-4",
+    "metadata_description":"HPV16 DNA Cvx Ql NAA+probe"
+  },
+  {
+    "cnt":60,
+    "pid":"LP7819-8",
+    "id":"82675-0",
+    "display":"82675-0",
+    "metadata_description":"HPV I\/H Risk 4 DNA Cvx Ql NAA+probe"
+  },
+  {
+    "cnt":59,
+    "pid":"LP7786-9",
+    "id":"2671-6",
+    "display":"2671-6",
+    "metadata_description":"Normetanephrine 24h Ur-mRate"
+  },
+  {
+    "cnt":58,
+    "pid":"LP7819-8",
+    "id":"14211-7",
+    "display":"14211-7",
+    "metadata_description":"HEV IgG Ql (S)"
+  },
+  {
+    "cnt":58,
+    "pid":"LP7819-8",
+    "id":"58755-0",
+    "display":"58755-0",
+    "metadata_description":"VZV IgG CSF IA-aCnc"
+  },
+  {
+    "cnt":57,
+    "pid":"LP7819-8",
+    "id":"6916-1",
+    "display":"6916-1",
+    "metadata_description":"C psittaci IgG Titr Ser IF"
+  },
+  {
+    "cnt":56,
+    "pid":"LP7819-8",
+    "id":"6920-3",
+    "display":"6920-3",
+    "metadata_description":"C trach IgM Titr Ser IF"
+  },
+  {
+    "cnt":56,
+    "pid":"LP7819-8",
+    "id":"700-5",
+    "display":"700-5",
+    "metadata_description":"P jiroveci Ag Spec Ql IF"
+  },
+  {
+    "cnt":56,
+    "pid":"LP7819-8",
+    "id":"40727-0",
+    "display":"40727-0",
+    "metadata_description":"HDV Ab IA Ql (S)"
+  },
+  {
+    "cnt":56,
+    "pid":"LP7819-8",
+    "id":"6913-8",
+    "display":"6913-8",
+    "metadata_description":"C pneum IgG Titr Ser IF"
+  },
+  {
+    "cnt":56,
+    "pid":"LP7819-8",
+    "id":"6914-6",
+    "display":"6914-6",
+    "metadata_description":"C pneum IgM Titr Ser IF"
+  },
+  {
+    "cnt":56,
+    "pid":"LP7819-8",
+    "id":"6917-9",
+    "display":"6917-9",
+    "metadata_description":"C psittaci IgM Titr Ser IF"
+  },
+  {
+    "cnt":56,
+    "pid":"LP7819-8",
+    "id":"31695-0",
+    "display":"31695-0",
+    "metadata_description":"VZV IgM CSF-aCnc"
+  },
+  {
+    "cnt":55,
+    "pid":"LP7786-9",
+    "id":"2548-6",
+    "display":"2548-6",
+    "metadata_description":"LDH5 CFr SerPl Elph"
+  },
+  {
+    "cnt":55,
+    "pid":"LP234174-3",
+    "id":"20437-0",
+    "display":"20437-0",
+    "metadata_description":"Glucose 3h p Glc SerPl-mCnc"
+  },
+  {
+    "cnt":55,
+    "pid":"LP7819-8",
+    "id":"48719-9",
+    "display":"48719-9",
+    "metadata_description":"C burnet Ph2 IgG Ser Ql IF"
+  },
+  {
+    "cnt":55,
+    "pid":"LP7786-9",
+    "id":"2536-1",
+    "display":"2536-1",
+    "metadata_description":"LDH1 CFr SerPl Elph"
+  },
+  {
+    "cnt":55,
+    "pid":"LP7819-8",
+    "id":"48720-7",
+    "display":"48720-7",
+    "metadata_description":"C burnet Ph1 IgG Ser Ql IF"
+  },
+  {
+    "cnt":55,
+    "pid":"LP7819-8",
+    "id":"49616-6",
+    "display":"49616-6",
+    "metadata_description":"Legionella DNA Spec NAA+probe"
+  },
+  {
+    "cnt":55,
+    "pid":"LP7786-9",
+    "id":"2545-2",
+    "display":"2545-2",
+    "metadata_description":"LDH4 CFr SerPl Elph"
+  },
+  {
+    "cnt":55,
+    "pid":"LP7786-9",
+    "id":"2542-9",
+    "display":"2542-9",
+    "metadata_description":"LDH3 CFr SerPl Elph"
+  },
+  {
+    "cnt":55,
+    "pid":"LP7786-9",
+    "id":"2539-5",
+    "display":"2539-5",
+    "metadata_description":"LDH2 CFr SerPl Elph"
+  },
+  {
+    "cnt":54,
+    "pid":"LP7786-9",
+    "id":"14956-7",
+    "display":"14956-7",
+    "metadata_description":"Microalbumin 24h Ur-mRate"
+  },
+  {
+    "cnt":51,
+    "pid":"LP7786-9",
+    "id":"3125-2",
+    "display":"3125-2",
+    "metadata_description":"VIP SerPl-mCnc"
+  },
+  {
+    "cnt":51,
+    "pid":"LP7819-8",
+    "id":"30247-1",
+    "display":"30247-1",
+    "metadata_description":"CMV DNA # SerPl NAA+probe"
+  },
+  {
+    "cnt":51,
+    "pid":"LP6186-3",
+    "id":"30226-5",
+    "display":"30226-5",
+    "metadata_description":"FSP PPP-mCnc"
+  },
+  {
+    "cnt":48,
+    "pid":"LP7786-9",
+    "id":"27057-9",
+    "display":"27057-9",
+    "metadata_description":"Serotonin Ser-mCnc"
+  },
+  {
+    "cnt":46,
+    "pid":"LP7819-8",
+    "id":"49990-5",
+    "display":"49990-5",
+    "metadata_description":"HSV2 DNA # CSF NAA+probe"
+  },
+  {
+    "cnt":46,
+    "pid":"LP7819-8",
+    "id":"49987-1",
+    "display":"49987-1",
+    "metadata_description":"HSV1 DNA # CSF NAA+probe"
+  },
+  {
+    "cnt":45,
+    "pid":"LP7786-9",
+    "id":"39354-6",
+    "display":"39354-6",
+    "metadata_description":"Cholinesterase dibucaine\/CHe CFr SerPl"
+  },
+  {
+    "cnt":45,
+    "pid":"LP7786-9",
+    "id":"2098-2",
+    "display":"2098-2",
+    "metadata_description":"Cholinesterase SerPl-cCnc"
+  },
+  {
+    "cnt":42,
+    "pid":"LP7819-8",
+    "id":"9522-4",
+    "display":"9522-4",
+    "metadata_description":"E histolyt IgG Ser IA-aCnc"
+  },
+  {
+    "cnt":41,
+    "pid":"LP7819-8",
+    "id":"42921-7",
+    "display":"42921-7",
+    "metadata_description":"JCPyV DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":41,
+    "pid":"LP7819-8",
+    "id":"7959-0",
+    "display":"7959-0",
+    "metadata_description":"Leptospira Ab Titr Ser"
+  },
+  {
+    "cnt":41,
+    "pid":"LP7786-9",
+    "id":"1799-6",
+    "display":"1799-6",
+    "metadata_description":"Amylase Ur-cCnc"
+  },
+  {
+    "cnt":41,
+    "pid":"LP7819-8",
+    "id":"25389-8",
+    "display":"25389-8",
+    "metadata_description":"T sol lar IgG Ser IA-aCnc"
+  },
+  {
+    "cnt":40,
+    "pid":"LP17803-5",
+    "id":"90905-1",
+    "display":"90905-1",
+    "metadata_description":"ABO + Rh Bld Mother"
+  },
+  {
+    "cnt":38,
+    "pid":"LP7819-8",
+    "id":"6584-7",
+    "display":"6584-7",
+    "metadata_description":"Virus Spec Cult"
+  },
+  {
+    "cnt":38,
+    "pid":"LP7819-8",
+    "id":"45161-7",
+    "display":"45161-7",
+    "metadata_description":"HBV DNA SerPl NAA+probe-Log#"
+  },
+  {
+    "cnt":37,
+    "pid":"LP7786-9",
+    "id":"27923-2",
+    "display":"27923-2",
+    "metadata_description":"Coenzyme Q10 [Mass\/Vol]"
+  },
+  {
+    "cnt":34,
+    "pid":"LP7819-8",
+    "id":"29539-4",
+    "display":"29539-4",
+    "metadata_description":"HIV1 RNA Plas Probe+sig amp-Log#"
+  },
+  {
+    "cnt":34,
+    "pid":"LP7786-9",
+    "id":"2494-3",
+    "display":"2494-3",
+    "metadata_description":"Iodine SerPl-mCnc"
+  },
+  {
+    "cnt":34,
+    "pid":"LP7755-4",
+    "id":"40444-2",
+    "display":"40444-2",
+    "metadata_description":"CMV gene Mut Det Islt"
+  },
+  {
+    "cnt":33,
+    "pid":"LP7819-8",
+    "id":"21363-7",
+    "display":"21363-7",
+    "metadata_description":"L pneumo DNA Spec Ql NAA+probe"
+  },
+  {
+    "cnt":32,
+    "pid":"LP7819-8",
+    "id":"32368-3",
+    "display":"32368-3",
+    "metadata_description":"Ureaplasma Spec Cult"
+  },
+  {
+    "cnt":31,
+    "pid":"LP6186-3",
+    "id":"6683-7",
+    "display":"6683-7",
+    "metadata_description":"Reptilase time"
+  },
+  {
+    "cnt":31,
+    "pid":"LP7786-9",
+    "id":"15085-4",
+    "display":"15085-4",
+    "metadata_description":"Oxalate SerPl-sCnc"
+  },
+  {
+    "cnt":29,
+    "pid":"LP7786-9",
+    "id":"6766-0",
+    "display":"6766-0",
+    "metadata_description":"17KS 24h Ur-mRate"
+  },
+  {
+    "cnt":29,
+    "pid":"LP7786-9",
+    "id":"21038-5",
+    "display":"21038-5",
+    "metadata_description":"17KS 24h Ur-mCnc"
+  },
+  {
+    "cnt":28,
+    "pid":"LP7819-8",
+    "id":"23876-6",
+    "display":"23876-6",
+    "metadata_description":"HIV 1 RNA Probe+sig amp Qn (P)"
+  },
+  {
+    "cnt":27,
+    "pid":"LP7819-8",
+    "id":"47313-2",
+    "display":"47313-2",
+    "metadata_description":"FLUAV IgG IA Qn (S)"
+  },
+  {
+    "cnt":27,
+    "pid":"LP7786-9",
+    "id":"55920-3",
+    "display":"55920-3",
+    "metadata_description":"C peptide 24h Ur-mCnc"
+  },
+  {
+    "cnt":27,
+    "pid":"LP7819-8",
+    "id":"49345-2",
+    "display":"49345-2",
+    "metadata_description":"BKV DNA # Bld NAA+probe"
+  },
+  {
+    "cnt":27,
+    "pid":"LP7786-9",
+    "id":"27944-8",
+    "display":"27944-8",
+    "metadata_description":"C peptide 24h Ur-mRate"
+  },
+  {
+    "cnt":27,
+    "pid":"LP7819-8",
+    "id":"5290-2",
+    "display":"5290-2",
+    "metadata_description":"VDRL CSF Ql"
+  },
+  {
+    "cnt":27,
+    "pid":"LP7786-9",
+    "id":"2338-2",
+    "display":"2338-2",
+    "metadata_description":"Glucagon SerPl-mCnc"
+  },
+  {
+    "cnt":27,
+    "pid":"LP7819-8",
+    "id":"5199-5",
+    "display":"5199-5",
+    "metadata_description":"HCV Ab IB Ql (S)"
+  },
+  {
+    "cnt":27,
+    "pid":"LP7786-9",
+    "id":"2179-0",
+    "display":"2179-0",
+    "metadata_description":"Cystine 24h Ur-mRate"
+  },
+  {
+    "cnt":26,
+    "pid":"LP7819-8",
+    "id":"9765-9",
+    "display":"9765-9",
+    "metadata_description":"LCMV IgG Titr Ser IF"
+  },
+  {
+    "cnt":26,
+    "pid":"LP7786-9",
+    "id":"16258-6",
+    "display":"16258-6",
+    "metadata_description":"Amm Urate Cry Stone Ql IR"
+  },
+  {
+    "cnt":25,
+    "pid":"LP7786-9",
+    "id":"29365-4",
+    "display":"29365-4",
+    "metadata_description":"Magnesium Fld-mCnc"
+  },
+  {
+    "cnt":25,
+    "pid":"LP7786-9",
+    "id":"27882-0",
+    "display":"27882-0",
+    "metadata_description":"Proinsulin SerPl-sCnc"
+  },
+  {
+    "cnt":25,
+    "pid":"LP7788-5",
+    "id":"50410-0",
+    "display":"50410-0",
+    "metadata_description":"dRVVT screen to confirm ratio"
+  },
+  {
+    "cnt":25,
+    "pid":"LP6186-3",
+    "id":"6303-2",
+    "display":"6303-2",
+    "metadata_description":"Screen dRVVT"
+  },
+  {
+    "cnt":25,
+    "pid":"LP7788-5",
+    "id":"75513-2",
+    "display":"75513-2",
+    "metadata_description":"Mixing dRVVT"
+  },
+  {
+    "cnt":24,
+    "pid":"LP7819-8",
+    "id":"49412-0",
+    "display":"49412-0",
+    "metadata_description":"JCPyV DNA # Spec NAA+probe"
+  },
+  {
+    "cnt":23,
+    "pid":"LP7819-8",
+    "id":"31950-9",
+    "display":"31950-9",
+    "metadata_description":"RSV Ag Spec Ql"
+  },
+  {
+    "cnt":23,
+    "pid":"LP7786-9",
+    "id":"41649-5",
+    "display":"41649-5",
+    "metadata_description":"Chloride BldV-sCnc"
+  },
+  {
+    "cnt":22,
+    "pid":"LP7786-9",
+    "id":"44342-4",
+    "display":"44342-4",
+    "metadata_description":"Normetanephrine\/Creat 24h Ur"
+  },
+  {
+    "cnt":22,
+    "pid":"LP7755-4",
+    "id":"45182-3",
+    "display":"45182-3",
+    "metadata_description":"HIV Phenotyp Islt"
+  },
+  {
+    "cnt":22,
+    "pid":"LP7819-8",
+    "id":"47314-0",
+    "display":"47314-0",
+    "metadata_description":"FLUBV IgG IA Qn (S)"
+  },
+  {
+    "cnt":22,
+    "pid":"LP7819-8",
+    "id":"47312-4",
+    "display":"47312-4",
+    "metadata_description":"FLUAV IgM IA Qn (S)"
+  },
+  {
+    "cnt":21,
+    "pid":"LP7786-9",
+    "id":"6884-1",
+    "display":"6884-1",
+    "metadata_description":"(Hcys)2 24h Ur-mRate"
+  },
+  {
+    "cnt":21,
+    "pid":"LP7819-8",
+    "id":"16934-2",
+    "display":"16934-2",
+    "metadata_description":"HBV DNAp Bld Ql NAA+probe"
+  },
+  {
+    "cnt":21,
+    "pid":"LP7786-9",
+    "id":"2431-5",
+    "display":"2431-5",
+    "metadata_description":"(Hcys)2 Ur-mCnc"
+  },
+  {
+    "cnt":21,
+    "pid":"LP7819-8",
+    "id":"32366-7",
+    "display":"32366-7",
+    "metadata_description":"HBV genotype NAA+probe"
+  },
+  {
+    "cnt":20,
+    "pid":"LP7819-8",
+    "id":"6524-3",
+    "display":"6524-3",
+    "metadata_description":"RABV NAb Ser Nt-aCnc"
+  },
+  {
+    "cnt":19,
+    "pid":"LP7819-8",
+    "id":"5876-8",
+    "display":"5876-8",
+    "metadata_description":"RSV Ag Spec Ql IA"
+  },
+  {
+    "cnt":18,
+    "pid":"LP7786-9",
+    "id":"46746-4",
+    "display":"46746-4",
+    "metadata_description":"PKU+Var\/BIOPT Defects DBS-Imp"
+  },
+  {
+    "cnt":18,
+    "pid":"LP7819-8",
+    "id":"16982-1",
+    "display":"16982-1",
+    "metadata_description":"HTLV I+II Ab Ser Ql IB"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25476-3",
+    "display":"25476-3",
+    "metadata_description":"Methionine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25301-3",
+    "display":"25301-3",
+    "metadata_description":"Alanine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7819-8",
+    "id":"47315-7",
+    "display":"47315-7",
+    "metadata_description":"FLUBV IgM IA Qn (S)"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25376-5",
+    "display":"25376-5",
+    "metadata_description":"Citrulline 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25327-8",
+    "display":"25327-8",
+    "metadata_description":"Aspartate 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25510-9",
+    "display":"25510-9",
+    "metadata_description":"Proline 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25533-1",
+    "display":"25533-1",
+    "metadata_description":"Taurine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"14785-0",
+    "display":"14785-0",
+    "metadata_description":"OH-Proline 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25464-9",
+    "display":"25464-9",
+    "metadata_description":"Lysine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25430-0",
+    "display":"25430-0",
+    "metadata_description":"Glutamine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25495-3",
+    "display":"25495-3",
+    "metadata_description":"Phe 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"19255-9",
+    "display":"19255-9",
+    "metadata_description":"pO2 temp adj BldA"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25547-1",
+    "display":"25547-1",
+    "metadata_description":"Tyrosine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25319-5",
+    "display":"25319-5",
+    "metadata_description":"3Me-histidine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25553-9",
+    "display":"25553-9",
+    "metadata_description":"Valine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25440-9",
+    "display":"25440-9",
+    "metadata_description":"Histidine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25450-8",
+    "display":"25450-8",
+    "metadata_description":"Isoleucine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25540-6",
+    "display":"25540-6",
+    "metadata_description":"Threonine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25429-2",
+    "display":"25429-2",
+    "metadata_description":"Glutamate 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25460-7",
+    "display":"25460-7",
+    "metadata_description":"Leucine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25523-2",
+    "display":"25523-2",
+    "metadata_description":"Serine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25491-2",
+    "display":"25491-2",
+    "metadata_description":"Ornithine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"21036-9",
+    "display":"21036-9",
+    "metadata_description":"17OHCS 24h Ur-mRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25431-8",
+    "display":"25431-8",
+    "metadata_description":"Glycine 24h Ur-sRate"
+  },
+  {
+    "cnt":17,
+    "pid":"LP7786-9",
+    "id":"25322-9",
+    "display":"25322-9",
+    "metadata_description":"Arginine 24h Ur-sRate"
+  },
+  {
+    "cnt":16,
+    "pid":"LP7819-8",
+    "id":"19054-6",
+    "display":"19054-6",
+    "metadata_description":"M pneumo Spec Ql Cult"
+  },
+  {
+    "cnt":16,
+    "pid":"LP7819-8",
+    "id":"9766-7",
+    "display":"9766-7",
+    "metadata_description":"LCMV IgG Titr CSF IF"
+  },
+  {
+    "cnt":15,
+    "pid":"LP7786-9",
+    "id":"56677-8",
+    "display":"56677-8",
+    "metadata_description":"Cystine\/Creat 24h Ur-Rto"
+  },
+  {
+    "cnt":15,
+    "pid":"LP7786-9",
+    "id":"49061-5",
+    "display":"49061-5",
+    "metadata_description":"Hepatic iron index"
+  },
+  {
+    "cnt":15,
+    "pid":"LP7786-9",
+    "id":"49228-0",
+    "display":"49228-0",
+    "metadata_description":"PBG Deaminase RBC-cCnt"
+  },
+  {
+    "cnt":15,
+    "pid":"LP7786-9",
+    "id":"2099-0",
+    "display":"2099-0",
+    "metadata_description":"Cholinesterase RBC-cCnc"
+  },
+  {
+    "cnt":14,
+    "pid":"LP7786-9",
+    "id":"12242-4",
+    "display":"12242-4",
+    "metadata_description":"Phosphate Fld-mCnc"
+  },
+  {
+    "cnt":13,
+    "pid":"LP7819-8",
+    "id":"31146-4",
+    "display":"31146-4",
+    "metadata_description":"VDRL CSF-Titr"
+  },
+  {
+    "cnt":13,
+    "pid":"LP7786-9",
+    "id":"26889-6",
+    "display":"26889-6",
+    "metadata_description":"Sulfate 24h Ur-sRate"
+  },
+  {
+    "cnt":13,
+    "pid":"LP7819-8",
+    "id":"9360-9",
+    "display":"9360-9",
+    "metadata_description":"B quintana IgG Titr Ser"
+  },
+  {
+    "cnt":13,
+    "pid":"LP7819-8",
+    "id":"41480-5",
+    "display":"41480-5",
+    "metadata_description":"BKV DNA # Ur NAA+probe"
+  },
+  {
+    "cnt":13,
+    "pid":"LP7786-9",
+    "id":"2743-3",
+    "display":"2743-3",
+    "metadata_description":"pH Amn"
+  },
+  {
+    "cnt":12,
+    "pid":"LP7786-9",
+    "id":"2351-5",
+    "display":"2351-5",
+    "metadata_description":"Glucose 24h Ur-mRate"
+  },
+  {
+    "cnt":12,
+    "pid":"LP7786-9",
+    "id":"2350-7",
+    "display":"2350-7",
+    "metadata_description":"Glucose Ur-mCnc"
+  },
+  {
+    "cnt":12,
+    "pid":"LP7786-9",
+    "id":"57028-3",
+    "display":"57028-3",
+    "metadata_description":"Iron Liver-mCnt"
+  },
+  {
+    "cnt":12,
+    "pid":"LP7819-8",
+    "id":"18396-2",
+    "display":"18396-2",
+    "metadata_description":"HIV 1 p24 Ag IA Ql"
+  },
+  {
+    "cnt":12,
+    "pid":"LP7786-9",
+    "id":"29266-4",
+    "display":"29266-4",
+    "metadata_description":"Copro Stl-sCnt"
+  },
+  {
+    "cnt":12,
+    "pid":"LP7786-9",
+    "id":"14884-1",
+    "display":"14884-1",
+    "metadata_description":"Porphyrins Stl-Imp"
+  },
+  {
+    "cnt":12,
+    "pid":"LP7786-9",
+    "id":"1690-7",
+    "display":"1690-7",
+    "metadata_description":"5NT SerPl-cCnc"
+  },
+  {
+    "cnt":12,
+    "pid":"LP7786-9",
+    "id":"29267-2",
+    "display":"29267-2",
+    "metadata_description":"Protopor Stl-sCnt"
+  },
+  {
+    "cnt":12,
+    "pid":"LP7819-8",
+    "id":"9361-7",
+    "display":"9361-7",
+    "metadata_description":"B quintana IgM Titr Ser"
+  },
+  {
+    "cnt":12,
+    "pid":"LP6186-3",
+    "id":"34444-0",
+    "display":"34444-0",
+    "metadata_description":"Acarboxyprothrombin [Mass\/Vol]"
+  },
+  {
+    "cnt":11,
+    "pid":"LP7786-9",
+    "id":"48996-3",
+    "display":"48996-3",
+    "metadata_description":"Amylase P Fld-cCnc"
+  },
+  {
+    "cnt":10,
+    "pid":"LP7786-9",
+    "id":"15357-7",
+    "display":"15357-7",
+    "metadata_description":"Iron Tiss-mCnt"
+  },
+  {
+    "cnt":10,
+    "pid":"LP7786-9",
+    "id":"26962-1",
+    "display":"26962-1",
+    "metadata_description":"Cystine Ur-sCnc"
+  },
+  {
+    "cnt":10,
+    "pid":"LP7786-9",
+    "id":"32338-6",
+    "display":"32338-6",
+    "metadata_description":"Pyruvate SerPl-sCnc"
+  },
+  {
+    "cnt":10,
+    "pid":"LP7819-8",
+    "id":"30361-0",
+    "display":"30361-0",
+    "metadata_description":"HIV 2 Ab IA Ql"
+  }
+]
