@@ -19,6 +19,12 @@ export default function Tree({
         children = children.filter(row => row[stratifier] === null)
     }
 
+    if (!data.length) {
+        return search ? 
+            <div className="color-brand-2 p-1">No results found matching your search</div> :
+            <div className="color-brand-2 p-1">No data found</div>
+    }
+
     return (
         <div className="catalog-tree">
             <div key={search}>
