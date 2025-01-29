@@ -73,6 +73,8 @@ interface StaticGridProps<T = JSONObject> {
     contains?: (x: any, search: string) => boolean
 
     q?: string
+
+    defaultLimit?: number
 }
 
 function defaultComparator(a: any, b: typeof a): number {
@@ -104,11 +106,13 @@ export default function StaticGrid({
     comparator,
     filter = () => true,
     contains,
-    q
+    q,
+    defaultLimit = 500
 }: StaticGridProps) {
 
     const searchableCols = columns.filter(c => c.searchable === true && c.name !== groupBy)
 
+    const [limit     , setLimit     ] = useState(defaultLimit)
     const [search    , setSearch    ] = useState("")
     const [sortColumn, setSortColumn] = useState("")
     const [sortDir   , setSortDir   ] = useState<"asc"|"desc">("asc")
@@ -119,6 +123,7 @@ export default function StaticGrid({
     function onHeaderClick(colName: string) {
         setSortColumn(colName)
         setSortDir(sortDir === "desc" ? "asc" : "desc")
+        setLimit(defaultLimit)
     }
 
     const prepareData = () => {
@@ -260,7 +265,7 @@ export default function StaticGrid({
                             No data! {
                                 _search && (q ?
                                     <> Try clearing the search parameter.</> :
-                                    <> Try to <b className="link" onClick={() => setSearch("")}>clear search</b>.</>
+                                    <> Try to <b className="link" onClick={() => { setSearch(""); setLimit(defaultLimit); }}>clear search</b>.</>
                                 )
                             }
                         </td>
@@ -348,9 +353,22 @@ export default function StaticGrid({
             )
         }
 
+        let rows = groups.get("__ALL__")!.filter(filter)
+        let remaining = 0
+        if (limit && limit < rows.length) {
+            remaining = rows.length - limit
+            rows = rows.slice(0, limit)
+        }
+
         return (
             <tbody>
-                { groups.get("__ALL__")!.filter(filter).map((u, i) => renderRow(u, "row--" + i)) }
+                { rows.map((u, i) => renderRow(u, "row--" + i)) }
+                { remaining > 0 && <tr>
+                    <td colSpan={columns.filter(c => c.name !== groupBy).length} className="center color-red" style={{ padding: 10 }}>
+                        { remaining.toLocaleString() } rows not rendered to improve performance.<br/>
+                        <b className="link" onClick={() => setLimit(0)}>Load All</b>
+                    </td>
+                </tr> }
             </tbody>
         )
     }
