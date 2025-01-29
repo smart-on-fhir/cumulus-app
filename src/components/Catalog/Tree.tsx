@@ -21,9 +21,9 @@ export default function Tree({
 
     return (
         <div className="catalog-tree">
-            <div>
+            <div key={search}>
                 { children.map((row, i) => (
-                    <Row data={data} id={row[id] as  string | number} key={i} search={search} open />
+                    <Row data={data} id={row[id] as  string | number} key={i} search={search} open expandOnSearch={data.length < 1000} />
                 )) }
             </div>
         </div>
@@ -34,12 +34,14 @@ function Row({
     id,
     data,
     open,
-    search
+    search,
+    expandOnSearch
 }: {
     data: DataRow[]
     id: string | number
     open?: boolean
     search?: string
+    expandOnSearch?: boolean
 }) {
     const [isOpen, setIsOpen] = useState(!!open)
     const { id: idColumn, pid: pidColumn, label, count, description, stratifier } = MAPPING
@@ -54,7 +56,7 @@ function Row({
     }
 
     return (
-        <details open={isOpen} onToggle={e => {
+        <details open={(expandOnSearch && !!search) || isOpen} onToggle={e => {
             e.stopPropagation()
             // @ts-ignore
             setIsOpen(!!e.target.open)
@@ -77,8 +79,8 @@ function Row({
                     { count && <span className="badge">{Number(node[count]).toLocaleString()}</span> }
                 </label>
             </summary>
-            { isOpen && children.map((row, i) => (
-                <Row data={data} id={row[idColumn] as string | number} key={i} search={search} />
+            { ((expandOnSearch && !!search) || isOpen) && children.map((row, i) => (
+                <Row data={data} id={row[idColumn] as string | number} key={i} search={search} expandOnSearch={expandOnSearch} />
             ))}
         </details>
     )
