@@ -192,11 +192,11 @@ export default function SubscriptionForm({
                 <DataPackageViewer packageId={dataURL} />
             </> }
 
-            { id && <div className="mb-1 mt-2">
+            { id && Array.isArray(record.metadata?.cols) && <div className="mb-1 mt-2">
                 <label className="nowrap pt-0">Available Columns</label>
                 <hr/>
                 <ColumnEditor
-                    cols={ record.metadata!.cols }
+                    cols={ record.metadata.cols }
                     onChange={ cols => {
                         const metadata = { ...record.metadata, cols }
                         
