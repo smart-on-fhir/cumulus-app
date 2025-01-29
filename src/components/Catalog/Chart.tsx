@@ -37,6 +37,12 @@ function Chart({ options }: { options: Highcharts.Options })
 
 export default function CatalogChart({ data, search }: { data: Record<string, any>[], search?: string })
 {
+    if (!data.length) {
+        return search ? 
+            <div className="color-brand-2 p-1">No results found matching your search</div> :
+            <div className="color-brand-2 p-1">No data found</div>
+    }
+
     const { id, pid, count, label, description, stratifier = "" } = MAPPING;
 
     const groups: Record<string, any> = {}
