@@ -80,6 +80,13 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
             spacingBottom: 20,
             spacingLeft  : 20,
             spacingRight : 20,
+            panning: {
+                enabled: true,
+                type: "x"
+            },
+            zooming: {
+                type: "x"
+            }
             // width: 600,
             // height: 510,
             // height: null,
@@ -113,13 +120,14 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
                     textDecoration: "none",
                     // fontWeight: "800",
                     // color: "#666"
-                }
+                },
+                autoRotation: [0, -45, -90]
             },
             lineWidth: 1,
-            // startOnTick: false,
-            // endOnTick: false,
+            startOnTick: false,
+            endOnTick: false,
             zIndex: 10,
-            offset: 2
+            offset: 2,
         },
         yAxis: {
             lineWidth: 0,
@@ -153,16 +161,16 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
             column: {
                 // color: "#4a90e2",
                 // minPointLength: isPctChart ? 6 : 0,
-                borderRadius: 4,
+                borderRadius: 3,
                 stacking: "overlap",
-                // crisp: true,
+                crisp: false,
                 // borderWidth: 2,
                 // clip: false,
                 // opacity: 0.8,
                 groupPadding: 0.1,
-                pointPadding: 0.0,
-                maxPointWidth: 230,
-                minPointLength: 8
+                pointPadding: 0,
+                maxPointWidth: 160,
+                minPointLength: 8,
             }
         },
         tooltip: {
