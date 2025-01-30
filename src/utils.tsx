@@ -73,6 +73,42 @@ export function toTitleCase(str: string) {
         .trim();
 }
 
+export function pluralize(str: string) {
+
+    // Skip empty or space-only strings
+    if (!str.trim()) {
+        return str
+    }
+
+    // Leave abbreviations non-pluralized
+    if (str.match(/^[A-Z0-9\W]+$/)) {
+        return str
+    }
+
+    // For weird cases like "Diagnosis" -> "Diagnoses"
+    if (str.match(/sis$/i)) {
+        return str.replace(/sis$/i, "ses")
+    }
+
+    // Already plural
+    if (str.match(/[BCDFGHJKLMNPQRSTVWXYZ]s$/i)) {
+        return str
+    }
+
+    // for words ending in "s", "x", "z", "ch", or "sh", add "es"
+    if (str.match(/(s|x|z|ch|sh)$/i)) {
+        return str + "es"
+    }
+
+    // if a word ends in "y" preceded by a consonant "y" to "ies"
+    if (str.match(/[BCDFGHJKLMNPQRSTVWXYZ]y$/i)) {
+        return str.substring(0, str.length - 1) + "ies"
+    }
+
+    // Standard - just add "s"
+    return str + "s"
+}
+
 export function ellipsis(str: string, maxLength: number) {
     let out = str.substring(0, maxLength).trim();
     if (out.length < str.length) {
