@@ -65,7 +65,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     const [error  , setError  ] = useState<Error | string | null>(null)
     const [limit  , setLimit  ] = useState(0)
     const [sortBy , setSortBy ] = useState("x:asc")
-    const [colors , setColors ] = useState(COLOR_THEMES.find(t => t.id === "sas_light")!.colors)
+    const [theme  , setTheme  ] = useState("sas_light")
     const [chartType, setChartType] = useState<"spline" | "column" | "bar">(
         col.dataType === "float" ||
         col.dataType === "integer" ||
@@ -94,8 +94,10 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
             }
 
             if (chartType === "spline") {
-                setColors(COLOR_THEMES.find(t => t.id === "sas_dark")!.colors)
+                setTheme("sas_dark")
             }
+
+            const colors = COLOR_THEMES.find(t => t.id === "sas_light")!.colors
                 
             const defaults = getDefaultChartOptions(_chartType, {
                 chart: {
@@ -110,7 +112,10 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
                         text: countLabel
                     }
                 },
-                colors
+                colors,
+
+                // @ts-ignore
+                custom: { theme }
             })
 
             // @ts-ignore
@@ -135,7 +140,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         } finally {
             setLoading(false)
         }
-    }, [chartType, col, sub.id, abortController.signal, countLabel, limit, sortBy, colors])
+    }, [chartType, col, sub.id, abortController.signal, countLabel, limit, sortBy, theme])
     
     useEffect(() => { 
         if (!isCountColumn) {
@@ -164,7 +169,16 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     const description = `Generated from the "${sub.name}" data source to show ${label.toLowerCase()}.`
 
     return (
-        <Link className="view-thumbnail" to="create-view" state={{ column: col.name, chartType, name: label, description, countLabel, limit, sortBy, colors }}>
+        <Link className="view-thumbnail" to="create-view" state={{
+            column: col.name,
+            chartType,
+            name: label,
+            description, countLabel,
+            limit,
+            sortBy,
+            theme,
+            colors: COLOR_THEMES.find(t => t.id === theme)!.colors
+        }}>
             <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }} data-tooltip={`<img src=${imgUrl || "about:blank"} alt="Chart Preview" style="display:block" />`}>
                 { loading && <Loader msg="" style={{ zIndex: 2 }} /> }
                 { error && <small className="color-red" style={{ wordBreak: "break-all" }}>{ error + "" }</small> }
