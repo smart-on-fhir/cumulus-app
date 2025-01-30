@@ -3,6 +3,7 @@ import { Link }                          from "react-router-dom"
 import Loader                            from "../generic/Loader"
 import { buildChartOptions }             from "../Dashboard/Charts/lib"
 import { getDefaultChartOptions }        from "../Dashboard/Charts/DefaultChartOptions"
+import { COLOR_THEMES }                  from "../Dashboard/config"
 import Highcharts                        from "../../highcharts"
 import { request }                       from "../../backend"
 import { app }                           from "../../types"
@@ -64,6 +65,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     const [error  , setError  ] = useState<Error | string | null>(null)
     const [limit  , setLimit  ] = useState(0)
     const [sortBy , setSortBy ] = useState("x:asc")
+    const [colors , setColors ] = useState(COLOR_THEMES.find(t => t.id === "sas_light")!.colors)
     const [chartType, setChartType] = useState<"spline" | "column" | "bar">(
         col.dataType === "float" ||
         col.dataType === "integer" ||
@@ -90,6 +92,10 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
                 setLimit(30)
                 setSortBy("y:desc")
             }
+
+            if (chartType === "spline") {
+                setColors(COLOR_THEMES.find(t => t.id === "sas_dark")!.colors)
+            }
                 
             const defaults = getDefaultChartOptions(_chartType, {
                 chart: {
@@ -103,7 +109,8 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
                     title: {
                         text: countLabel
                     }
-                }
+                },
+                colors
             })
 
             // @ts-ignore
@@ -118,7 +125,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
                 limit,
                 offset          : 0,
                 onSeriesToggle  : () => {},
-                onInspectionChange: () => {}
+                onInspectionChange: () => {},
             })
 
             const url = await renderChartAsPng(options, abortController.signal)
@@ -128,7 +135,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         } finally {
             setLoading(false)
         }
-    }, [chartType, col, sub.id, abortController.signal, countLabel, limit, sortBy])
+    }, [chartType, col, sub.id, abortController.signal, countLabel, limit, sortBy, colors])
     
     useEffect(() => { 
         if (!isCountColumn) {
@@ -157,7 +164,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     const description = `Generated from the "${sub.name}" data source to show ${label.toLowerCase()}.`
 
     return (
-        <Link className="view-thumbnail" to="create-view" state={{ column: col.name, chartType, name: label, description, countLabel, limit, sortBy }}>
+        <Link className="view-thumbnail" to="create-view" state={{ column: col.name, chartType, name: label, description, countLabel, limit, sortBy, colors }}>
             <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }} data-tooltip={`<img src=${imgUrl || "about:blank"} alt="Chart Preview" style="display:block" />`}>
                 { loading && <Loader msg="" style={{ zIndex: 2 }} /> }
                 { error && <small className="color-red" style={{ wordBreak: "break-all" }}>{ error + "" }</small> }
