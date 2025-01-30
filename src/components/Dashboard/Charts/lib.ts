@@ -8,7 +8,9 @@ import {
     DEFAULT_FONT_FAMILY,
     DEFAULT_FONT_SIZE,
     COLOR_THEMES,
-    DEFAULT_COLOR_THEME
+    DEFAULT_COLOR_THEME,
+    COLOR_DANGER,
+    COLOR_SUCCESS
 } from "../config"
 
 
@@ -227,6 +229,14 @@ function getSeriesAndExceptions({
     
             // The name of the point as shown in the legend, tooltip, dataLabels, etc.
             name: String(row[0]),
+
+            color: xType === "category" ?
+                row[0] + "" === "false" ?
+                    COLOR_DANGER :
+                    row[0] + "" === "true" ?
+                        COLOR_SUCCESS :
+                        undefined :
+                undefined,
     
             custom: {
                 data: {
