@@ -293,7 +293,8 @@ function getSeriesAndExceptions({
         // @ts-ignore
         const prev = serverOptions.plotOptions?.[options.type || "series"] ?? {}
 
-        const themeId = options.custom?.theme || DEFAULT_COLOR_THEME
+        // @ts-ignore
+        const themeId = serverOptions.custom?.theme || DEFAULT_COLOR_THEME
 
         const colors: string[] = serverOptions.colors as string[] || COLOR_THEMES.find(t => t.id === themeId)!.colors
 
@@ -457,6 +458,7 @@ function getSeriesAndExceptions({
                 name: old?.name ?? name,
                 data: seriesData,
                 dataSorting: { enabled: false },
+                colorByPoint: data.data.length === 1 && xType === "category" && seriesData.length <= 12,
             });
 
             xTicks = Array.from(xAxis)
