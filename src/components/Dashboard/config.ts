@@ -66,6 +66,10 @@ export const DASH_STYLES: DashStyleValue[] = [
     'LongDashDot', 'LongDashDotDot'
 ];
 
+export const COLOR_DANGER  = "#DD4433"
+export const COLOR_WARNING = "#EE8833"
+export const COLOR_SUCCESS = "#44BB33"
+
 export const COLOR_THEMES = [
     { id: "cumulus"      , name: "Cumulus Default", colors: generateColors(12, 70, 55, 0.46, 220) },
     { id: "cumulus_muted", name: "Cumulus Muted"  , colors: generateColors(12, 40, 70, 0.46, 220) },
