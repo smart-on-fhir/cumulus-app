@@ -63,7 +63,10 @@ export default function CreateView()
                         title: {
                             text: state?.countLabel || ""
                         }
-                    }
+                    },
+                    colors: state?.colors,
+                    // @ts-ignore
+                    custom: { theme: state?.theme }
                 }
             }
         }}
