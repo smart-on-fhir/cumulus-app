@@ -158,15 +158,16 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         return null
     }
 
-    
-    let counted = pluralize(getSubject(sub))
+    let counted = pluralize(getSubject(sub));
+    let description: string, label: string; 
 
     if (limit) {
-        counted = `Top ${limit} ${counted.replace(/^counts?\s/i, "")}`
+        label = `Top ${limit} ${counted.replace(/^counts?\s/i, "")} by ${col.label}`
+        description = `Generated from the "${sub.name}" data source to show ${label.toLowerCase()}.`
+    } else {
+        label = `Count ${counted.replace(/^counts?\s/i, "")} by ${col.label}`
+        description = `Generated from the "${sub.name}" data source to ${label.toLowerCase()}.`
     }
-
-    const label = counted + " by " + col.label
-    const description = `Generated from the "${sub.name}" data source to show ${label.toLowerCase()}.`
 
     return (
         <Link className="view-thumbnail" to="create-view" state={{
