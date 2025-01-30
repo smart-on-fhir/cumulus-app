@@ -259,7 +259,7 @@ export function EnumEditor({
         <div>
             <label>{ name }</label>
             <select value={ value } onChange={ e => onChange(e.target.value) }>
-                { descriptor.values.map(({ value, label }, i) => (<option key={i} value={value}>{ label ?? value }</option>)) }
+                { descriptor.values.map(({ value, label, title }, i) => (<option key={i} value={value} title={title}>{ label ?? value }</option>)) }
             </select>
             { !!description && <div className="mb-05 mt-05"><Markdown>{ description }</Markdown></div> }
         </div>
