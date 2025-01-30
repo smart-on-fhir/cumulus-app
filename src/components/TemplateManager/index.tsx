@@ -1,13 +1,12 @@
-import { useEffect, useMemo, useState } from "react"
-import { Link }                         from "react-router-dom"
-// import html2canvas                      from "html2canvas"
-import Loader                           from "../generic/Loader"
-import { buildChartOptions }            from "../Dashboard/Charts/lib"
-import { getDefaultChartOptions }       from "../Dashboard/Charts/DefaultChartOptions"
-import Highcharts                       from "../../highcharts"
-import { request }                      from "../../backend"
-import { app }                          from "../../types"
-import { humanizeColumnName }           from "../../utils"
+import { useEffect, useMemo, useState }  from "react"
+import { Link }                          from "react-router-dom"
+import Loader                            from "../generic/Loader"
+import { buildChartOptions }             from "../Dashboard/Charts/lib"
+import { getDefaultChartOptions }        from "../Dashboard/Charts/DefaultChartOptions"
+import Highcharts                        from "../../highcharts"
+import { request }                       from "../../backend"
+import { app }                           from "../../types"
+import { humanizeColumnName, pluralize } from "../../utils"
 
 
 async function getChartData(subscriptionId: number, column: string, signal: AbortSignal) {
@@ -148,7 +147,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     }
 
     
-    let counted = pluralizeSubject(getSubject(sub))
+    let counted = pluralize(getSubject(sub))
 
     if (limit) {
         counted = `Top ${limit} ${counted.replace(/^counts?\s/i, "")}`
@@ -203,22 +202,6 @@ function getSubjectFromDataSourceName(dataSource: app.Subscription) {
         return parsePackageName(dataSource.name)
     }
     return ""
-}
-
-function pluralizeSubject(subject: string) {
-    const map = {
-        "ICD10"    : "ICD10",
-        "COVID-19" : "COVID-19",
-        "Category" : "Categories",
-        "PCR"      : "PCR",
-        "NLP"      : "NLP",
-        "Diagnosis": "Diagnoses",
-        "ED"       : "ED"
-    }
-    if (subject in map) {
-        return map[subject as keyof typeof map];
-    }
-    return subject + "s";
 }
 
 function parsePackageName(name: string) {
