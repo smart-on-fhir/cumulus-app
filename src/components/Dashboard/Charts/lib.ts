@@ -458,7 +458,8 @@ function getSeriesAndExceptions({
                 name: old?.name ?? name,
                 data: seriesData,
                 dataSorting: { enabled: false },
-                colorByPoint: data.data.length === 1 && xType === "category" && seriesData.length <= 12,
+                // @ts-ignore
+                colorByPoint: data.data.length === 1 && xType === "category" && seriesData.length <= 12 && serverOptions.custom?.theme,
             });
 
             xTicks = Array.from(xAxis)
