@@ -158,7 +158,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
 
     return (
         <Link className="view-thumbnail" to="create-view" state={{ column: col.name, chartType, name: label, description, countLabel, limit, sortBy }}>
-            <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }}>
+            <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }} data-tooltip={`<img src=${imgUrl || "about:blank"} alt="Chart Preview" style="display:block" />`}>
                 { loading && <Loader msg="" style={{ zIndex: 2 }} /> }
                 { error && <small className="color-red" style={{ wordBreak: "break-all" }}>{ error + "" }</small> }
                 { !loading && imgUrl && <>
