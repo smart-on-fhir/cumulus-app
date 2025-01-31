@@ -332,12 +332,12 @@ export const schema: Schema = {
     parameters: {
         period_start: {
             name: "Start Date",
-            description: "FHIR Encounter Period start date",
+            description: "[FHIR Encounter Period](https://hl7.org/fhir/us/core/STU4/StructureDefinition-us-core-encounter-definitions.html#Encounter.period) start date",
             type: "date"
         },
         period_end: {
             name: "End Date",
-            description: "FHIR Encounter Period end date",
+            description: "[FHIR Encounter Period](https://hl7.org/fhir/us/core/STU4/StructureDefinition-us-core-encounter-definitions.html#Encounter.period) end date",
             type: "date"
         },
         include_history: {
@@ -1023,17 +1023,17 @@ export const schema: Schema = {
         note_type: {
             name: "FHIR Document Type",
             type: "string",
-            description: "Require patients to have specific clinical notes of type ValueSet"
+            description: "Require patients to have specific clinical notes of type [ValueSet](https://build.fhir.org/valueset-doc-typecodes.html)"
         },
         enc_min: {
             name: "Min FHIR Encounters",
             type: "number",
-            description: "Min number of FHIR Encounters during study period"
+            description: "Min number of [FHIR Encounters](https://hl7.org/fhir/us/core/STU4/StructureDefinition-us-core-encounter.html) during study period"
         },
         enc_max: {
             name: "Max FHIR Encounters",
             type: "number",
-            description: "Max number of FHIR Encounters during study period"
+            description: "Max number of [FHIR Encounters](https://hl7.org/fhir/us/core/STU4/StructureDefinition-us-core-encounter.html) during study period"
         },
         enc_days_min: {
             name: "Min Duration",
