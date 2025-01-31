@@ -27,6 +27,7 @@ import { getOptions as getPieOptions       } from "./Pie"
 import { getOptions as getAreaRangeOptions } from "./AreaRange"
 import { getOptions as getErrorBarOptions  } from "./ErrorBar"
 import { getOptions as getDataLabelsOptions} from "../DataLabels"
+import { COLOR_THEMES, DEFAULT_COLOR_THEME } from "../../config"
 
 
 type SupportedSeriesOptions =
@@ -51,7 +52,42 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
     const color          = getColorForSeries(options, seriesId)
     const seriesType     = series.type ?? options.chart?.type
 
+    function isBool() {
+        if (!series.data) {
+            return false
+        }
+        // return !series.color
+        if (series.name === "true" || series.name === "false") {
+            return true
+        }
+        return series.data.every(point => {
+            if (!point || typeof point === "number") {
+                return false
+            }
+            if (Array.isArray(point)) {
+                return point[0] === "true" || point[0] === "false"
+            }
+            return point.name === "true" || point.name === "false"
+        })
+    }
+
     const props = [
+        {
+            name: "Color by Point",
+            type: "boolean",
+            description: "Automatically assign a color from the current color theme to every data point.",
+            // @ts-ignore
+            value: !!series.colorByPoint,
+            disabled: isBool(),
+            // @ts-ignore
+            onChange: (colorByPoint: boolean) => {
+                onSeriesChange({ colorByPoint })
+                if (colorByPoint) {
+                    // @ts-ignore
+                    onChange({ colors: COLOR_THEMES.find(t => t.id === (options.custom?.theme || DEFAULT_COLOR_THEME))!.colors })
+                }
+            }
+        },
         {
             name: "Visible",
             type: "boolean",
@@ -90,11 +126,14 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
         }
     ] as any[]
 
+    // @ts-ignore
     if (seriesType !== "pie") {
         props.unshift({
             name: "Color",
             type: "color",
             value: color,
+            // @ts-ignore
+            disabled: !!series.colorByPoint || isBool(),
             onChange: (color: string) => {
                 const colors = [...options.colors!]
                 colors[seriesIndex % colors.length] = color

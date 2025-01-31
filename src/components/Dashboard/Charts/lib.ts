@@ -296,13 +296,16 @@ function getSeriesAndExceptions({
         // @ts-ignore
         const themeId = serverOptions.custom?.theme || DEFAULT_COLOR_THEME
 
-        const colors: string[] = serverOptions.colors as string[] || COLOR_THEMES.find(t => t.id === themeId)!.colors
+        const themeColors = COLOR_THEMES.find(t => t.id === themeId)!.colors
+
+        // @ts-ignore
+        const colors: string[] = S?.colorByPoint ? themeColors : serverOptions.colors as string[] || themeColors
 
         const color = colors[series.length % colors.length]
 
         const cfg: any = {
-            // index: series.length,
-            color,
+            // @ts-ignore,
+            color: S?.colorByPoint ? undefined : color,
             id: options.id
         }
 
@@ -459,7 +462,11 @@ function getSeriesAndExceptions({
                 data: seriesData,
                 dataSorting: { enabled: false },
                 // @ts-ignore
-                colorByPoint: data.data.length === 1 && xType === "category" && seriesData.length <= 12 && serverOptions.custom?.theme,
+                colorByPoint: old?.colorByPoint === undefined ?
+                    // @ts-ignore    
+                    data.data.length === 1 && xType === "category" && seriesData.length <= 12 && serverOptions.custom?.theme :
+                    // @ts-ignore
+                    !!old.colorByPoint,
             });
 
             xTicks = Array.from(xAxis)
