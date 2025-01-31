@@ -142,28 +142,28 @@ export const schema: Schema = {
                     section: "Demographics",
                     group: "clinicalSex",
                     defaultValue: false,
-                    set: "Patient Administrative Gender"
+                    set: "FHIR Patient Gender"
                 },
                 {
                     id: "gender_male",
                     section: "Demographics",
                     group: "clinicalSex",
                     defaultValue: false,
-                    set: "Patient Administrative Gender"
+                    set: "FHIR Patient Gender"
                 },
                 {
                     id: "gender_other",
                     section: "Demographics",
                     group: "clinicalSex",
                     defaultValue: false,
-                    set: "Patient Administrative Gender"
+                    set: "FHIR Patient Gender"
                 },
                 {
                     id: "gender_unknown",
                     section: "Demographics",
                     group: "clinicalSex",
                     defaultValue: false,
-                    set: "Patient Administrative Gender"
+                    set: "FHIR Patient Gender"
                 },
                 {
                     id: "enc_class_list",
@@ -332,12 +332,12 @@ export const schema: Schema = {
     parameters: {
         period_start: {
             name: "Start Date",
-            description: "Study Period Encounter Start Date",
+            description: "FHIR Encounter Period start date",
             type: "date"
         },
         period_end: {
             name: "End Date",
-            description: "Study Period Encounter End Date",
+            description: "FHIR Encounter Period end date",
             type: "date"
         },
         include_history: {
@@ -347,7 +347,7 @@ export const schema: Schema = {
         },
         age_min: {
             name: "Min Patient Age",
-            description: "The minimum patient age at the time of visit",
+            description: "Minimum FHIR Patient age at the time of visit",
             type: "number",
             min : 0,
             max : 130,
@@ -364,7 +364,7 @@ export const schema: Schema = {
         },
         age_max: {
             name: "Max Patient Age",
-            description: "The maximum patient age at the time of visit",
+            description: "Maximum FHIR Patient age at the time of visit",
             type: "number",
             min: 0,
             max: 130,
@@ -1018,22 +1018,22 @@ export const schema: Schema = {
                       { value: "629", label: "Vision Equipment" }
                 ].sort((a, b) => a.label.localeCompare(b.label))
             ],
-            description: "Select the encounter service type"
+            description: "Select encounter service type. [ValueSet](http://hl7.org/fhir/R4/valueset-service-type.html) 🔗"
         },
         note_type: {
             name: "FHIR Document Type",
             type: "string",
-            description: "Select what kind of notes should be used in your study"
+            description: "Require patients to have specific clinical notes of type ValueSet"
         },
         enc_min: {
-            name: "Min Encounters",
+            name: "Min FHIR Encounters",
             type: "number",
-            description: "Min number of encounters during study period"
+            description: "Min number of FHIR Encounters during study period"
         },
         enc_max: {
-            name: "Max Encounters",
+            name: "Max FHIR Encounters",
             type: "number",
-            description: "Max number of encounters during study period"
+            description: "Max number of FHIR Encounters during study period"
         },
         enc_days_min: {
             name: "Min Duration",
