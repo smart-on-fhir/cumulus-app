@@ -386,7 +386,7 @@ function getSeriesAndExceptions({
             xTicks.sort((a, b) => +new Date(a) - +new Date(b));
         }
         else {
-            xTicks.sort((a, b) => a.localeCompare(b));
+            xTicks.sort((a, b) => a.localeCompare(b, "en-US", { numeric: true }));
         }
         
         data.data.forEach(group => {
