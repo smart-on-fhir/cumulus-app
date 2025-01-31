@@ -72,7 +72,9 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         col.dataType.startsWith("date")
      ? "spline" : "column");
     const isCountColumn = col.name.startsWith("cnt");
-    const countLabel = humanizeColumnName(sub.metadata?.cols.find(c => c.name === "cnt")?.label || "Counts")
+    let counted = pluralize(getSubject(sub));
+    let description: string, label: string; 
+    const countLabel = `Count ${counted.replace(/^counts?\s/i, "")}`
     const abortController = useMemo(() => new AbortController(), [])
 
     const load = useMemo(() => async function () {
@@ -158,8 +160,6 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         return null
     }
 
-    let counted = pluralize(getSubject(sub));
-    let description: string, label: string; 
 
     if (limit) {
         label = `Top ${limit} ${counted.replace(/^counts?\s/i, "")} by ${col.label}`
@@ -174,7 +174,8 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
             column: col.name,
             chartType,
             name: label,
-            description, countLabel,
+            description,
+            countLabel,
             limit,
             sortBy,
             theme,
