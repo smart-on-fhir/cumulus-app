@@ -34,7 +34,7 @@ export async function downloadScreenshot({
     const screenShot = await getScreenShot({ scale: 4 }, { type, quality });
     const a = document.createElement("a");
     a.href = screenShot;
-    a.download = fileName?.trim() || "chart." + type.split("/").pop();
+    a.download = (fileName?.trim() || "chart") + "." + type.split("/").pop();
     a.click();
 }
 
