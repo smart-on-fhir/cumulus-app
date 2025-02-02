@@ -467,12 +467,14 @@ function getSeriesAndExceptions({
                 name: old?.name ?? name,
                 data: seriesData,
                 dataSorting: { enabled: false },
-                // @ts-ignore
-                colorByPoint: old?.colorByPoint === undefined ?
-                    // @ts-ignore    
-                    data.data.length === 1 && xType === "category" && seriesData.length <= 12 && serverOptions.custom?.theme :
+                colorByPoint: (type === "column" || type === "bar") ?
                     // @ts-ignore
-                    !!old.colorByPoint,
+                    old?.colorByPoint === undefined ?
+                        // @ts-ignore    
+                        data.data.length === 1 && xType === "category" && seriesData.length <= 12 && serverOptions.custom?.theme :
+                        // @ts-ignore
+                        !!old.colorByPoint :
+                    type === "pie",
             });
 
             xTicks = Array.from(xAxis)
