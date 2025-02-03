@@ -102,7 +102,7 @@ function CoddingValuesTable({
     const remainder = Math.max(values.length - limit, 0);
     const rows = remainder ? values.slice(0, limit) : values;
     return (
-        <table className="nowrap" style={{ tableLayout: "fixed"}}>
+        <table className="nowrap" style={{ tableLayout: "fixed", maxWidth: "-webkit-fill-available" }}>
             <tbody>
                 <tr className="color-muted">
                     <th>Code</th>
