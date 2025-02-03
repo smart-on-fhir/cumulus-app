@@ -43,6 +43,13 @@ type SupportedSeriesOptions =
     SeriesSplineOptions |
     SeriesPieOptions;
 
+function isTrue(x: any) {
+    return String(x).toLowerCase() === "true"
+}
+
+function isFalse(x: any) {
+    return String(x).toLowerCase() === "false"
+}
 
 export function getOptions(options : Options, onChange: (o: Partial<Options>) => void, seriesId: string) {
 
@@ -57,7 +64,7 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
             return false
         }
         // return !series.color
-        if (series.name === "true" || series.name === "false") {
+        if (isTrue(series.name) || isFalse(series.name)) {
             return true
         }
         return series.data.every(point => {
@@ -65,9 +72,9 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
                 return false
             }
             if (Array.isArray(point)) {
-                return point[0] === "true" || point[0] === "false"
+                return isTrue(point[0]) || isFalse(point[0])
             }
-            return point.name === "true" || point.name === "false"
+            return isTrue(point.name) || isFalse(point.name)
         })
     }
 
