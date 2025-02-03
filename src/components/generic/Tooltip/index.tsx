@@ -133,6 +133,7 @@ export default class Tooltip extends Component<any> {
         document.documentElement.addEventListener("mouseleave", this.onMouseLeave, { capture: true })
         document.addEventListener("scroll", this.hideTooltip, { passive: true })
         document.addEventListener("blur", this.hideTooltip)
+        document.addEventListener("focusout", this.hideTooltip)
     }
 
     componentWillUnmount() {
@@ -141,6 +142,7 @@ export default class Tooltip extends Component<any> {
         document.documentElement.removeEventListener("mouseleave", this.onMouseLeave, { capture: true })
         document.removeEventListener("scroll", this.hideTooltip)
         document.removeEventListener("blur", this.hideTooltip)
+        document.removeEventListener("focusout", this.hideTooltip)
     }
 
     shouldComponentUpdate() {
