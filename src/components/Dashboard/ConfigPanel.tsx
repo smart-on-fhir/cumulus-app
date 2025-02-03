@@ -548,13 +548,13 @@ export default function ConfigPanel({
                                                 label: yLabel + ": asc",
                                                 icon : "fas fa-sort-amount-down-alt color-blue",
                                                 value: "y:asc",
-                                                disabled: !isCategory
+                                                disabled: !isCategory || !!state.stratifyBy
                                             },
                                             {
                                                 label: yLabel + ": desc",
                                                 icon : "fas fa-sort-amount-down color-blue",
                                                 value: "y:desc",
-                                                disabled: !isCategory
+                                                disabled: !isCategory || !!state.stratifyBy
                                             }
                                         ]}
                                         value={ state.sortBy }
