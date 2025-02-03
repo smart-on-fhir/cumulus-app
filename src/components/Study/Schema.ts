@@ -197,7 +197,7 @@ export const schema: Schema = {
                 },
                 {
                     id: "dx_variables",
-                    section: "HealthcareUtilization",
+                    section: "StudyVariables",
                     defaultValue: [
                         { name: "skin", value: "2.16.840.1.113883.3.526.3.1010" },
                         { name: "melanoma", value: "2.16.840.1.113883.3.526.3.1010" },
@@ -245,7 +245,7 @@ export const schema: Schema = {
                 },
                 {
                     id: "rx_variables",
-                    section: "HealthcareUtilization",
+                    section: "StudyVariables",
                     defaultValue: [
                         { name: "everolimus", value: "2.16.840.1.113762.1.4.1260.499" },
                         { name: "drugs", value: "2.16.840.1.113762.1.4.1219.192" },
@@ -268,7 +268,7 @@ export const schema: Schema = {
                 },
                 {
                     id: "lab_variables",
-                    section: "HealthcareUtilization",
+                    section: "StudyVariables",
                     defaultValue: [
                         { name: "with_diff", value: "1.3.6.1.4.1.6997.4.1.2.271.13.38167.1.1.999.594" },
                         { name: "comprehensive", value: "2.16.840.1.113762.1.4.1078.867" },
@@ -294,7 +294,7 @@ export const schema: Schema = {
                 },
                 // {
                 //     id: "doc_variables",
-                //     section: "HealthcareUtilization",
+                //     section: "StudyVariables",
                 //     defaultValue: [
                 //         { name: "kidney", value: "2.16.840.1.113762.1.4.1222.864" },
                 //         { name: "skin", value: "2.16.840.1.113762.1.4.1222.867" },
@@ -305,7 +305,7 @@ export const schema: Schema = {
                 // },
                 {
                     id: "proc_variables",
-                    section: "HealthcareUtilization",
+                    section: "StudyVariables",
                     defaultValue: [
                         { name: "services"   , value: "2.16.840.1.113883.3.464.1003.109.12.1013" },
                         { name: "other_major", value: "2.16.840.1.113883.3.464.1003.198.12.1075" }
@@ -327,6 +327,9 @@ export const schema: Schema = {
         },
         HealthcareUtilization: {
             name: "Healthcare Utilization"
+        },
+        StudyVariables: {
+            name: "STUDY VARIABLES"
         }
     },
     parameters: {
