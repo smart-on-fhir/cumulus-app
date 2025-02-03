@@ -231,9 +231,9 @@ function getSeriesAndExceptions({
             name: String(row[0]),
 
             color: xType === "category" ?
-                row[0] + "" === "false" ?
+                String(row[0]).toLowerCase() === "false" ?
                     COLOR_DANGER :
-                    row[0] + "" === "true" ?
+                    String(row[0]).toLowerCase() === "true" ?
                         COLOR_SUCCESS :
                         undefined :
                 undefined,
