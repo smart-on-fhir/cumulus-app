@@ -610,6 +610,8 @@ export function buildChartOptions({
 
     const [col, dir] = (sortBy || "").split(":")
 
+    const maxPointLength = Math.max(...series.map(s => s.data!.length))
+
     const dynamicOptions: Highcharts.Options = {
         chart: {
             // @ts-ignore
@@ -663,6 +665,11 @@ export function buildChartOptions({
                     hover: {
                         opacity: 1
                     }
+                },
+                dataLabels: {
+                    // @ts-ignore
+                    // enabled: options.plotOptions?.series?.dataLabels?.enabled ?? (!groupBy && maxPointLength <= 30)
+                    enabled: (!groupBy && !denominator && maxPointLength <= 30 && ["bar", "column", "pie"].includes(type))
                 }
             },
             pie: {
