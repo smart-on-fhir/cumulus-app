@@ -277,7 +277,7 @@ export declare module app {
 
     }
 
-    type supportedDataType = "string" | "integer" | "float" | "boolean" | "date:YYYY-MM-DD" | "date:YYYY-MM" | "date:YYYY"
+    type supportedDataType = "string" | "integer" | "float" | "boolean" | "date:YYYY-MM-DD" | "date:YYYY-MM" | "date:YYYY" | "hidden"
 
     interface SubscriptionGroup {
         id         : number
