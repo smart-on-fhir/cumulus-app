@@ -51,7 +51,7 @@ export default function TemplateManager({ subscription }: { subscription: app.Su
     return (
         <div className="template-manager">
             <div className="view-browser view-browser-column nested">
-                { subscription.metadata?.cols.map((col, i) => {
+                { subscription.metadata?.cols.filter(col => col.dataType !== "hidden").map((col, i) => {
                     return <Thumbnail key={i} col={col} sub={subscription} />
                 }) }
             </div>

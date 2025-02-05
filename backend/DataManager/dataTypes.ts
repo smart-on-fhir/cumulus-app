@@ -50,6 +50,10 @@ export const DATA_TYPES = {
         set: createSetter(String),
         get: createGetter(String),
     },
+    "hidden": {
+        set: createSetter(String),
+        get: createGetter(String),
+    },
     "day": {
         set: createSetter((x: string) => date(x).startOf("day").format()),
         get: createGetter((x: string) => date(x).startOf("day").format("YYYY-MM-DD")),

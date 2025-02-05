@@ -53,7 +53,7 @@ function SecondaryDataEditor({
                 <label>Secondary Data</label>
                 <ColumnSelector
                     addEmptyOption="start"
-                    cols={ cols }
+                    cols={ cols.filter(c => c.dataType !== "hidden") }
                     value={ state.column2 || null }
                     disabled={[ "cnt", state.stratifyBy, state.groupBy ].filter(Boolean)}
                     onChange={ (column: string) => onChange({ column, type: state.column2type }) }
@@ -396,7 +396,7 @@ export default function ConfigPanel({
                         <div className="pt-1">
                             <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
                             <ColumnSelector
-                                cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max") }
+                                cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max" && c.dataType !== "hidden") }
                                 value={ state.groupBy }
                                 disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
                                 onChange={ (groupBy: string) => onChange({ ...state, groupBy, offset: 0, limit: 0, sortBy: "x:asc" }) }
@@ -411,7 +411,7 @@ export default function ConfigPanel({
                             <div className="pt-1 pb-1">
                                 <label>Stratifier</label>
                                 <ColumnSelector
-                                    cols={ cols }
+                                    cols={ cols.filter(c => c.dataType !== "hidden") }
                                     placeholder="Select Column"
                                     addEmptyOption="start"
                                     value={ state.stratifyBy }

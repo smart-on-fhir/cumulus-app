@@ -429,7 +429,7 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
 
         // If column is not set pick the firs one other than "cnt"
         viewColumn: cols.find(c => c.name === viewSettings.column || "") ||
-                    cols.find(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max")!,
+                    cols.find(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max" && c.dataType !== "hidden")!,
 
         // The stratifier if any (groupBy is its legacy name)
         viewGroupBy: cols.find(c => c.name === viewSettings.groupBy),

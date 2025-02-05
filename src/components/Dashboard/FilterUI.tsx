@@ -58,7 +58,7 @@ function Filter({
             <div className="row">
                 <div className="col">
                     <ColumnSelector
-                        cols={cols}
+                        cols={cols.filter(c => c.dataType !== "hidden")}
                         value={filter.left}
                         onChange={(value: string) => onChange({ ...emptyFilter, left: value })}
                         disabled={ filter.right.type === "column" ? [filter.right.value + ""] : undefined }

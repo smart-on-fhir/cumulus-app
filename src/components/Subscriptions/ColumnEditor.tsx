@@ -54,7 +54,7 @@ export function ColumnEditor({
                                     <option value="date:YYYY-MM">Month</option>
                                     <option value="date:YYYY">Year</option>
                                     <option value="boolean">Boolean</option>
-                                    {/* <option value="hidden">Hidden</option>  */}
+                                    <option value="hidden">Hidden</option> 
                                 </select>
                             </td>
                             <td className="small">

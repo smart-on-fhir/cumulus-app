@@ -228,7 +228,7 @@ function Preview({
                 <thead>
                     <tr>
                         { payload.cols.map((col, i) => {
-                            if (col.dataType === "hidden") return null;
+                            // if (col.dataType === "hidden") return null;
                             return (
                                 <th key={i} title={ col.description || undefined } onClick={() => onSelectionChange(i)}>
                                     { col.label }
@@ -242,15 +242,14 @@ function Preview({
                         <tr key={i} tabIndex={0}>
                             {row.map((r, y) => {
                                 let value: any = r, type = payload.cols[y]?.dataType || ""
-                                if (type === "hidden") {
-                                    return null
-                                }
                                 value = format(value, type, trimSpaces)
 
                                 if (value === null) {
                                     value = <div className="center color-muted"><b>&lt;null&gt;</b></div>
                                 }
-
+                                else if (type === "hidden") {
+                                    value = <span style={{ color: "#CCC" }}>{value}</span>
+                                }
                                 else if (type === "string") {
                                     value = <span style={{ color: "#373" }}>{value}</span>
                                 }
@@ -413,7 +412,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
         
         this.setState({ uploading: true })
 
-        let _cols = cols.filter(col => col.dataType !== "hidden");
+        let _cols = cols//.filter(col => col.dataType !== "hidden");
         
         let params = new URLSearchParams();
         params.set("types", _cols.map(c => encodeURIComponent(c.dataType)).join(","))
