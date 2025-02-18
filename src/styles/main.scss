@@ -39,12 +39,12 @@ body {
 .pull-right { float: right; }
 .pull-left { float: left; }
 
-h1 { font-size: 2rem;   margin: 1ex 0 0.5ex 0; }
-h2 { font-size: 1.8rem; margin: 1ex 0 0.5ex 0; }
-h3 { font-size: 1.6rem; margin: 1ex 0 0.5ex 0; }
-h4 { font-size: 1.4rem; margin: 1ex 0 0.5ex 0; }
-h5 { font-size: 1.2rem; margin: 1ex 0 0.5ex 0; }
-h6 { font-size: 1rem;   margin: 1ex 0 0.5ex 0; }
+h1 { font-size: 2rem;   margin: 1ex 0 0.5ex 0; line-break: anywhere; }
+h2 { font-size: 1.8rem; margin: 1ex 0 0.5ex 0; line-break: anywhere; }
+h3 { font-size: 1.6rem; margin: 1ex 0 0.5ex 0; line-break: anywhere; }
+h4 { font-size: 1.4rem; margin: 1ex 0 0.5ex 0; line-break: anywhere; }
+h5 { font-size: 1.2rem; margin: 1ex 0 0.5ex 0; line-break: anywhere; }
+h6 { font-size: 1rem;   margin: 1ex 0 0.5ex 0; line-break: anywhere; }
 
 p {
   margin: 0.5em 0 0;
@@ -97,6 +97,7 @@ b, .bold {
   margin: initial;
   padding: initial;
   border: 0;
+  line-break: anywhere;
 
   &:hover {
     text-decoration: underline 1px solid;

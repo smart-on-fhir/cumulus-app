@@ -252,6 +252,8 @@
 
 .view-browser.view-browser-column .view-thumbnail .view-thumbnail-title .view-thumbnail-description {
     -webkit-line-clamp: 3;
+    word-break: break-word;
+    line-break: anywhere;
 }
 
 @media (min-width: 50em) {
