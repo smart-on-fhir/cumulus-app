@@ -8,6 +8,7 @@ import Highcharts                        from "../../highcharts"
 import { request }                       from "../../backend"
 import { app }                           from "../../types"
 import { humanizeColumnName, pluralize } from "../../utils"
+import { FhirResourceTypes }             from "../../config"
 
 
 async function getChartData(subscriptionId: number, column: string, signal: AbortSignal) {
@@ -72,9 +73,14 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         col.dataType.startsWith("date")
      ? "spline" : "column");
     const isCountColumn = col.name.startsWith("cnt");
+    
+    // Can be a word like "Patients", but can also be "Count" or "Counts"
     let counted = pluralize(getSubject(sub));
-    let description: string, label: string; 
-    const countLabel = `Count ${counted.replace(/^counts?\s/i, "")}`
+    
+    let description = "", label = "";
+
+    const countLabel = counted.match(/^counts?/i) ? counted : `Count ${counted}`;
+
     const abortController = useMemo(() => new AbortController(), [])
 
     const load = useMemo(() => async function () {
@@ -160,13 +166,18 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         return null
     }
 
-
-    if (limit) {
-        label = `Top ${limit} ${counted.replace(/^counts?\s/i, "")} by ${col.label}`
-        description = `Generated from the "${sub.name}" data source to show ${label.toLowerCase()}.`
+    if (counted.match(/^counts?$/i)) {
+        label = limit ?
+            `Top ${limit} Counts by ${col.label}` :
+            `Counts by ${col.label}`;
+        description = `Generated from the "${sub.name
+            }" data source to show ${label.toLowerCase()}.`
     } else {
-        label = `Count ${counted.replace(/^counts?\s/i, "")} by ${col.label}`
-        description = `Generated from the "${sub.name}" data source to ${label.toLowerCase()}.`
+        label = limit ?
+            `Top ${limit} ${counted} by ${col.label}`:
+            `Count ${counted} by ${col.label}`;
+        description = `Generated from the "${sub.name
+            }" data source to ${limit ? "show" : ""} ${label.toLowerCase()}.`
     }
 
     return (
@@ -229,9 +240,20 @@ function getSubjectFromDataSourceName(dataSource: app.Subscription) {
 
 function parsePackageName(name: string) {
     const pkgName = name.replace(/(core__)+/, "core__");
-    const match = pkgName.match(/^(\w+)__count_([^_]+)./)
+
+    // Look for the first FHIR resource
+    const re = new RegExp("(" + FhirResourceTypes.join("|") + ")", "i")
+    let match = pkgName.match(re);
+    if (match && match[1]) {
+        return humanizeColumnName(match[1])
+    }
+
+    // For standard pkg names take the first token after "count"
+    match = pkgName.match(/^(\w+)__count_([^_]+)./)
     if (match && match[2]) {
         return humanizeColumnName(match[2])
     }
+
+    // Use the package name as is
     return humanizeColumnName(pkgName)
 }
