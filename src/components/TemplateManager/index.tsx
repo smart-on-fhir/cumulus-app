@@ -181,7 +181,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     }
 
     return (
-        <Link className="view-thumbnail" to="create-view" state={{
+        <Link className="view-thumbnail" to={`/requests/${sub.id}/create-view`} state={{
             column: col.name,
             chartType,
             name: label,
