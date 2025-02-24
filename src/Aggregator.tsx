@@ -50,6 +50,12 @@ export interface DataPackage {
     s3_path                   ?: string
 }
 
+export interface Site {
+    id: string
+    name: string
+    studies: Record<string, Record<string, StudyPeriod>>
+}
+
 export type DataPackageColumnDataType = "string" | "integer" | "float" | "boolean" | "year" | "month" | "week" | "day"
 
 export class AggregatorError extends Error {
@@ -177,6 +183,18 @@ class Aggregator
         }
         // console.log("getStudyPeriods:", out)
         return out
+    }
+
+    public async getSites(): Promise<Site[]> {
+        const data = await this.fetch("/api/aggregator/study-periods")
+        return Object.keys(data).map(k => {
+            const studies = data[k]
+            return {
+                id: k,
+                name: humanizeColumnName(k),
+                studies
+            }
+        })
     }
 
     public async getStudyPeriods(studyId: string): Promise<StudyPeriod[]> {
