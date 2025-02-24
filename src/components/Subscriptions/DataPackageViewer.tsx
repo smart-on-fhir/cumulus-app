@@ -73,10 +73,10 @@ export default function DataPackageViewer({ packageId }: { packageId: string }) 
                         <th className="right pr-1 pl-1 nowrap">Study: </th>
                         <td>{ pkg.study }</td>
                     </tr>
-                    <tr>
+                    {/* <tr>
                         <th className="right pr-1 pl-1 nowrap">S3 Path: </th>
                         <td><span className="color-muted" style={{ wordBreak: "break-all" }}>{ pkg.s3_path || "" }</span></td>
-                    </tr>
+                    </tr> */}
                 </tbody>
             </table>
             <br />

@@ -49,10 +49,10 @@ export default function DataPackageView({ pkg }: { pkg: DataPackage }) {
                         <th className="right nowrap pr-1">Study:</th>
                         <td>{ pkg.study }</td>
                     </tr>
-                    <tr>
+                    {/* <tr>
                         <th className="right nowrap pr-1">S3 Path:</th>
                         <td><span className="color-muted" style={{ wordBreak: "break-all" }}>{ pkg.s3_path || "" }</span></td>
-                    </tr>
+                    </tr> */}
                 </tbody>
             </table>
 
