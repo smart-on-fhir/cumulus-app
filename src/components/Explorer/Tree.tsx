@@ -37,6 +37,12 @@ export default function Tree({
     )
 }
 
+function isIdInPath(id: string, path: string) {
+    const a = path.split("/")
+    const b = id.split("/")
+    return b.every((segment, i) => a[i] === segment)
+}
+
 function Row({
     node,
     onSelect,
@@ -56,7 +62,8 @@ function Row({
 
     // if the user closed the node manually, but then load a subpath, we must
     // ignore that choice and force open
-    const _open = isOpen ?? (path !== node.id && !!node.loader && path.startsWith(node.id))
+    // const _open = isOpen ?? (path !== node.id && !!node.loader && path.match(node.id))
+    const _open = isOpen ?? (path !== node.id && !!node.loader && isIdInPath(node.id, path))
 
     useEffect(() => {
         if (_open && !!node.loader && length === 0) {
