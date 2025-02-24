@@ -80,6 +80,7 @@ export default function Navigation()
                 { canListGroups && <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Data Source Groups</NavLink> }
                 { canReadTags && <NavLink to="/tags"><i className="icon fa-solid fa-tag" /> Tags</NavLink> }
                 <NavLink to="/study"><i className="icon fa-solid fa-flask" /> Study Builder</NavLink>
+                <NavLink to="/explorer"><i className="icon fa-solid fa-folder" /> Explore</NavLink>
 
                 <NavGroup icon="fa-solid fa-archive" label="Catalog">
                     <NavLink to="/catalog/icd10"><i className="icon fa-solid fa-archive" /> ICD10 Diagnoses</NavLink>

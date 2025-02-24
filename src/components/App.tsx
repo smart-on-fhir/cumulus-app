@@ -26,6 +26,7 @@ import StudyBuilder                     from "./Study";
 import HealthCheck                      from "./HealthCheck";
 import { AggregatorProvider }           from "../Aggregator";
 import CatalogRouter                    from "./Catalog";
+import Explorer                         from "./Explorer";
 import "../styles/main.scss";
 
 
@@ -78,6 +79,7 @@ export default function App()
                                     <Route path="health-check"   element={ <RequireAuth><HealthCheck /></RequireAuth> } />
                                     <Route path="study"          element={ <RequireAuth><StudyBuilder /></RequireAuth>} />
                                     <Route path="catalog/*"      element={ <RequireAuth><CatalogRouter /></RequireAuth>} />
+                                    <Route path="explorer"       element={ <RequireAuth><Explorer /></RequireAuth>} />
                                     
                                     <Route path="*" element="Page Not Found" />
                                 </Route>

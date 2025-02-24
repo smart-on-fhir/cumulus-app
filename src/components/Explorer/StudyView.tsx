@@ -6,7 +6,6 @@ import TransmissionView                 from "../Subscriptions/TransmissionView"
 import { humanizeColumnName }           from "../../utils"
 import aggregator, {
     DataPackage,
-    humanizePackageId,
     Study,
     // StudyPeriod
 } from "../../Aggregator"
@@ -128,6 +127,7 @@ export default function StudyView({ study }: { study: Study }) {
             <h6 className="mt-2">Packages <b className="badge">{ packages.length }</b></h6>
             <hr className="mb-1" />
             { packages.map((p, i) => {
+                const [, name, version] = p.id.trim().split("__")
                 return (
                     <div key={i}>
                         <i className="material-symbols-outlined color-brand-2" style={{ fontSize: 18, verticalAlign: "middle" }}>
@@ -137,9 +137,9 @@ export default function StudyView({ study }: { study: Study }) {
                             // reloadDocument
                             className="link"
                         >
-                            {humanizePackageId(p.id)}
+                            {humanizeColumnName(name)}
                         </Link>
-                        <small className="color-grey-dark color-muted"> - { Number(p.total).toLocaleString() }</small>
+                        <small className="color-muted"> v{version} - { Number(p.total).toLocaleString() }</small>
                     </div>
                 )
             })}
