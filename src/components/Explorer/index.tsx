@@ -193,13 +193,18 @@ async function loadSites() {
 }
 
 // =============================================================================
+function isIdInPath(id: string, path: string) {
+    const a = path.split("/")
+    const b = id.split("/")
+    return b.every((segment, i) => a[i] === segment)
+}
 
 async function find(path: string, branch: DataRow[]) {
     for (const node of branch) {
         if (node.id === path) {
             return node
         }
-        if (path.startsWith(node.id) && node.loader) {
+        if (!!node.loader && isIdInPath(node.id, path)) {
             return find(path, await node.loader())
         }
     }
