@@ -109,28 +109,28 @@ export function pluralize(str: string) {
     return str + "s"
 }
 
-export function ellipsis(str: string, maxLength: number) {
-    let out = str.substring(0, maxLength).trim();
-    if (out.length < str.length) {
-        return out + "..."
-    }
-    return out
-}
-// export function ellipsis(txt: string, maxLength: number, position: "start"|"end"|"middle" = "end") {
-//     const l = txt.length;
-//     if (l <= maxLength) {
-//         return txt
+// export function ellipsis(str: string, maxLength: number) {
+//     let out = str.substring(0, maxLength).trim();
+//     if (out.length < str.length) {
+//         return out + "..."
 //     }
-//     if (position === "end") {
-//         return txt.substring(0, maxLength) + "…"
-//     }
-//     if (position === "start") {
-//         return "…" + txt.substring(l - maxLength)
-//     }
-//     const left  = txt.substring(0, Math.ceil(maxLength / 2))
-//     const right = txt.substring(l - Math.floor(maxLength / 2))
-//     return left + "\u200B…\u200B" + right
+//     return out
 // }
+export function ellipsis(txt: string, maxLength: number, position: "start"|"end"|"middle" = "end") {
+    const l = txt.length;
+    if (l <= maxLength) {
+        return txt
+    }
+    if (position === "end") {
+        return txt.substring(0, maxLength) + "…"
+    }
+    if (position === "start") {
+        return "…" + txt.substring(l - maxLength)
+    }
+    const left  = txt.substring(0, Math.ceil(maxLength / 2))
+    const right = txt.substring(l - Math.floor(maxLength / 2))
+    return left + "\u200B…\u200B" + right
+}
 
 export function hslToHex(h: number, s: number, l: number) {
     l /= 100;
