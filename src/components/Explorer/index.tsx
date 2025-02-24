@@ -51,7 +51,7 @@ async function loadStudies() {
                     title : p.id,
                     icon  : "deployed_code",
                     id    : `/studies/${s.id}/${p.id}`,
-                    render: () => <>{ellipsis(humanizeColumnName(name), 27, "start")}<span className="color-muted"> {version}</span></>,
+                    render: () => <>{ellipsis(humanizeColumnName(name), 24, "start")}<span className="color-muted"> {version}</span></>,
                     view  : () => <DataPackageView pkg={p} key={p.id} />,
                     // loader: async () => {
                     //     const versions = packages.filter(x => x.name === p.name).map(p => p.version)
