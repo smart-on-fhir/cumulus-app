@@ -20,10 +20,12 @@ import PackageVersionCheck        from "./PackageVersionCheck"
 import TemplateManager            from "../TemplateManager"
 
 
-export default function SubscriptionView(): JSX.Element
+export default function SubscriptionView({ id }: { id?: number }): JSX.Element
 {
-    const { id } = useParams()
+    const params = useParams()
     const { user } = useAuth()
+
+    id = id || +params.id!
 
     const { loading, error, result: model } = useBackend<app.Subscription>(
         useCallback(() => request("/api/requests/" + id + "?group=true&graphs=true&tags=true"), [id]),

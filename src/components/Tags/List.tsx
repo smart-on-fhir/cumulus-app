@@ -7,17 +7,20 @@ import { app }        from "../../types"
 import "../generic/EndpointListTable.scss"
 
 
-export default function List()
+export default function TagsList()
 {
     const { user } = useAuth();
 
     const canCreate = user?.permissions.includes("Tags.create")
+
+    const baseUrl = "/tags"
 
     return createListPage<app.Tag[]>({
         namePlural: "Tags",
         endpoint  : "/api/tags",
         icon      : <i className="fa-solid fa-tag color-brand-2" />,
         canCreate,
+        baseUrl,
         renderList: data => {
             
             if (!data.length) {
@@ -51,17 +54,17 @@ export default function List()
                     { data.map((record, i) => (
                         <tr key={i}>
                             <td className="color-muted">{ record.id }</td>
-                            <td><Link className="link" to={"./" + record.id}>{ record.name }</Link></td>
+                            <td><Link className="link" to={`${baseUrl}/${record.id}`}>{ record.name }</Link></td>
                             <td>{ record.description }</td>
                             <td className="color-muted">{ new Date(record.createdAt).toLocaleDateString() }</td>
                             <td className="color-muted">{ new Date(record.updatedAt).toLocaleDateString() }</td>
                             <IfAllowed showError={false} permissions="Tags.update" element={ <td className="right nowrap">
-                                <Link className="btn small btn-virtual" to={ `./${record.id}/edit` }>
+                                <Link className="btn small btn-virtual" to={ `${baseUrl}/${record.id}/edit` }>
                                     <i className="fa-solid fa-pen-to-square color-blue-dark" />
                                 </Link>
                             </td> } />
                             <IfAllowed showError={false} permissions="Tags.delete" element={ <td className="right nowrap">
-                                <Link className="btn small btn-virtual" to={ `./${record.id}/delete` }>
+                                <Link className="btn small btn-virtual" to={ `${baseUrl}/${record.id}/delete` }>
                                     <i className="fa-solid fa-trash-can color-red" />
                                 </Link>
                             </td> } />

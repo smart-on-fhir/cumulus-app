@@ -9,7 +9,8 @@ export default function createListPage<T = unknown>({
     endpoint,
     renderList,
     icon = null,
-    canCreate = true
+    canCreate = true,
+    baseUrl = ""
 }: {
     namePlural   : string
     /** @deprecated */
@@ -18,6 +19,7 @@ export default function createListPage<T = unknown>({
     icon        ?: JSX.Element | null
     renderList   : (data: T) => JSX.Element
     canCreate   ?: boolean
+    baseUrl     ?: string
 })
 {
     return (
@@ -43,7 +45,7 @@ export default function createListPage<T = unknown>({
                             </div>
                             { canCreate && <div className="col col-0 right nowrap bottom">
                                 <div>
-                                    <Link to="new" className="btn btn-virtual">
+                                    <Link to={ baseUrl + "/new" } className="btn btn-virtual">
                                         <b className="color-green">
                                             <i className="fa-solid fa-circle-plus" /> Add Record
                                         </b>

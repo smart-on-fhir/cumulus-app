@@ -7,7 +7,7 @@ import { useAuth }        from "../../auth"
 import { app }            from "../../types"
 
 
-export default function SubscriptionGroupView()
+export default function SubscriptionGroupView({ id }: { id?: number })
 {
     const { user } = useAuth();
 
@@ -23,6 +23,7 @@ export default function SubscriptionGroupView()
         query: "subscriptions=true",
         canDelete,
         canUpdate,
+        id,
         renderView : data => <>
             { data.description ? <Markdown>{ data.description }</Markdown> : <span className="color-muted">No description provided</span> }
             <div className="mt-2 row gap wrap">

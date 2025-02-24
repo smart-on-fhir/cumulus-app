@@ -6,7 +6,7 @@ import ViewThumbnail      from "../Views/ViewThumbnail"
 import { app }            from "../../types"
 
 
-export default function View() {
+export default function TagView({ id }: { id?: number }) {
 
     const { user } = useAuth();
 
@@ -21,6 +21,7 @@ export default function View() {
         basePath    : "/tags",
         canUpdate,
         canDelete,
+        id,
         renderView  : data => <>
             <div className="mt-05">
                 <span className="color-muted">Created by: </span>

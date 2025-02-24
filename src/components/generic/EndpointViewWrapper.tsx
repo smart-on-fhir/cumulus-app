@@ -2,25 +2,29 @@
 import { useCallback } from "react"
 import { Helmet, HelmetProvider } from "react-helmet-async"
 import { useParams }   from "react-router"
-import { Link } from "react-router-dom"
+import { Link }        from "react-router-dom"
 import { request }     from "../../backend"
 import { useBackend }  from "../../hooks"
 import { AlertError }  from "./Alert"
-import Breadcrumbs from "./Breadcrumbs"
+import Breadcrumbs     from "./Breadcrumbs"
 import Loader          from "./Loader"
 
 
 export default function EndpointViewWrapper({
     endpoint,
     query,
-    children
+    children,
+    id
 }: {
     endpoint: string
-    query?: string
+    query  ?: string
     children: (data: any) => JSX.Element
+    id     ?: number
 })
 {
-    const { id } = useParams()
+    const params = useParams()
+
+    id = id || +params.id!
 
     let url = `${endpoint}/${id}`
 
@@ -48,7 +52,7 @@ export default function EndpointViewWrapper({
     return children(data)
 }
 
-export function createViewPage<T extends { createdAt: string, updatedAt: string }>({
+export function createViewPage<T extends { createdAt: string, updatedAt: string, id: number }>({
     namePlural,
     endpoint,
     basePath,
@@ -57,7 +61,8 @@ export function createViewPage<T extends { createdAt: string, updatedAt: string 
     icon = null,
     canUpdate = true,
     canDelete = true,
-    query
+    query,
+    id
 }: {
     namePlural  : string
     endpoint    : string
@@ -68,11 +73,12 @@ export function createViewPage<T extends { createdAt: string, updatedAt: string 
     renderView  : (data: T) => JSX.Element
     canUpdate  ?: boolean
     canDelete  ?: boolean
+    id         ?: number
 })
 {
     return (
         <div className="container">
-            <EndpointViewWrapper endpoint={ endpoint } query={ query }>
+            <EndpointViewWrapper endpoint={ endpoint } query={ query } id={id}>
                 {(data: T) => {
                     const name = data[nameField as keyof T] + ""
                     return (
@@ -96,10 +102,10 @@ export function createViewPage<T extends { createdAt: string, updatedAt: string 
                                 </div>
                                 { (canUpdate || canDelete) && <div className="col col-0 right nowrap middle">
                                     <div>
-                                        { canUpdate && <Link to="./edit" className="btn btn-virtual">
+                                        { canUpdate && <Link to={ basePath + "/" + data.id + "/edit" } className="btn btn-virtual">
                                             <i className="fa-solid fa-pen-to-square color-blue" title="Edit" />
                                         </Link> }
-                                        { canDelete && <Link to="./delete" className="btn btn-virtual" title="Delete">
+                                        { canDelete && <Link to={ basePath + "/" + data.id + "/delete" } className="btn btn-virtual" title="Delete">
                                             <i className="fa-solid fa-trash-can color-blue" />
                                         </Link> }
                                     </div>

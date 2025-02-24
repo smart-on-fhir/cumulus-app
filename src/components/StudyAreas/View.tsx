@@ -7,7 +7,7 @@ import ViewThumbnail      from "../Views/ViewThumbnail"
 import { app }            from "../../types"
 
 
-export default function View() {
+export default function ViewStudyArea({ id }: { id?: number }) {
 
     const { user } = useAuth();
 
@@ -18,6 +18,7 @@ export default function View() {
         icon      : <i className="fa-solid fa-book color-brand-2" />,
         canUpdate : user?.permissions.includes("Tags.update"),
         canDelete : user?.permissions.includes("Tags.delete"),
+        id,
         renderView: data => {
 
             const graphs: app.View[] = [];
