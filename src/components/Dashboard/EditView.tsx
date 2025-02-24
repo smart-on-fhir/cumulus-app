@@ -6,10 +6,12 @@ import { useBackend }  from "../../hooks";
 import { AlertError }  from "../generic/Alert";
 import Loader          from "../generic/Loader";
 
-export default function EditView()
+export default function EditView({ id }: { id?: number })
 {
     // The Data Source ID from the URL params
-    const { id } = useParams()
+    const params = useParams()
+
+    id = id || +params.id!
 
     // Fetch the Data Source by ID
     const { loading, error, result: view } = useBackend(

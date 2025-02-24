@@ -7,16 +7,18 @@ import { app }        from "../../types"
 import "./StudyAreas.scss"
 
 
-export default function List()
+export default function ListStudyAreas()
 {
     const { user } = useAuth();
     const canCreate = user?.permissions.includes("StudyAreas.create")
+    const baseUrl = "/study-areas"
 
     return createListPage<app.StudyArea[]>({
         namePlural: "Study Areas",
         endpoint  : "/api/study-areas",
         icon      : <i className="fa-solid fa-book color-brand-2" />,        
         canCreate,
+        baseUrl,
         renderList: data => {
 
             if (!data.length) {
@@ -24,7 +26,7 @@ export default function List()
                     <br/>
                     <p>No study areas found in the database! You can start by creating a new study area.</p>
                     <br/>
-                    <Link to="./new" className="btn btn-blue-dark pl-2 pr-2">Create Study Area</Link>
+                    <Link to={`${baseUrl}/new`} className="btn btn-blue-dark pl-2 pr-2">Create Study Area</Link>
                 </div>
             }
 

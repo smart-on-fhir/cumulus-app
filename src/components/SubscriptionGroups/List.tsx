@@ -23,11 +23,14 @@ export default function SubscriptionGroupList()
 
     const canCreate = user?.permissions.includes("SubscriptionGroups.create")
 
+    const baseUrl = "/groups"
+
     return createListPage<app.SubscriptionGroup[]>({
         nameSingular: "Data Source Group",
         namePlural  : "Data Source Groups",
         endpoint    : "/api/request-groups",
         icon        : <i className="fa-solid fa-folder color-brand-2" />,
+        baseUrl,
         canCreate,
         renderList  : data => {
             data = data.filter((g: any) => !!g.id)
@@ -55,15 +58,15 @@ export default function SubscriptionGroupList()
                                 { data.map((row, i) => (
                                     <tr key={i}>
                                         <td>{row.id}</td>
-                                        <td><Link title={row.name} to={"./" + row.id} className="link">{row.name}</Link></td>
+                                        <td><Link title={row.name} to={ baseUrl + "/" + row.id} className="link">{row.name}</Link></td>
                                         <td className="color-muted"><MarkdownPreview markdown={row.description || ""} maxLen={70} /></td>
                                         <IfAllowed showError={false} permissions="SubscriptionGroups.update" element={ <td className="right nowrap">
-                                            <Link title="Edit" className="btn small color-brand-2 btn-virtual" to={ row.id + "/edit" }>
+                                            <Link title="Edit" className="btn small color-brand-2 btn-virtual" to={ baseUrl + "/" + row.id + "/edit" }>
                                                 <i className="fa-solid fa-pen-to-square" />
                                             </Link>
                                         </td> } />
                                         <IfAllowed showError={false} permissions="SubscriptionGroups.delete" element={ <td className="right nowrap">
-                                            <Link title="Delete" className="btn small color-red btn-virtual" to={ row.id + "/delete" }>
+                                            <Link title="Delete" className="btn small color-red btn-virtual" to={ baseUrl + "/" + row.id + "/delete" }>
                                                 <i className="fa-solid fa-trash-can" />
                                             </Link>
                                         </td> } />
@@ -74,7 +77,7 @@ export default function SubscriptionGroupList()
                         <div className="center">
                             <br/>
                             <p>No Data Source groups found in the database. { canCreate && <span> You can start by creating new one.<br/><br/></span> }</p>
-                            { canCreate && <Link to="new" className="btn btn-blue-dark pl-2 pr-2">Create Data Source Group</Link> }
+                            { canCreate && <Link to={ baseUrl + "/new" } className="btn btn-blue-dark pl-2 pr-2">Create Data Source Group</Link> }
                         </div>
                     }   
                 </>
