@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from "react"
 import { useSearchParams }              from "react-router-dom"
 import DataPackageView                  from "./DataPackageView"
 import StudyView                        from "./StudyView"
+import SiteView                         from "./SiteView"
+import Tree, { DataRow }                from "./Tree"
 import Dashboard                        from "../Dashboard"
 import EditView                         from "../Dashboard/EditView"
-import Tree, { DataRow }                from "./Tree"
 import SubscriptionView                 from "../Subscriptions/View"
 import SubscriptionGroupView            from "../SubscriptionGroups/View"
 import SubscriptionGroupList            from "../SubscriptionGroups/List"
@@ -180,11 +181,11 @@ async function loadSubscriptionsForTag(tagId: number) {
 }
 
 async function loadSites() {
-    const items = await request<app.DataSite[]>("/api/data-sites")
+    const items = await aggregator.getSites()
     return sortByName(items).filter(x => !!x.id).map(x => ({
         render: () => x.name,
         // loader: () => loadSubscriptionsForGroup(g),
-        // view  : () => <SubscriptionGroupView id={g.id} />,
+        view  : () => <SiteView site={x} />,
         title : x.name,
         id    : "/sites/" + x.id,
         icon  : "apartment"
