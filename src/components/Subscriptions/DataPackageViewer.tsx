@@ -85,8 +85,8 @@ export default function DataPackageViewer({ packageId }: { packageId: string }) 
                 <i className="fas fa-table"/> Package Data
             </h5>
             <hr />
-            <div className="row wrap gap mb-1">
-                <div className="col col-0">
+            <div className="row nowrap gap mb-1">
+                <div className="col col-7">
                     <p className="nowrap">
                         <b>Last data update: </b>
                         <span className="color-blue-dark">{ new Date(pkg.last_data_update).toLocaleString() }</span>
@@ -100,6 +100,15 @@ export default function DataPackageViewer({ packageId }: { packageId: string }) 
                     </p>
                 </div>
             </div>
+            <div>
+                <b>Study: </b>
+                <span className="color-blue-dark">{ pkg.study }</span>
+            </div>
+            <div>
+                <b>S3 Path: </b>
+                <span className="color-muted" style={{ wordBreak: "break-all" }}>{ pkg.s3_path || "" }</span>
+            </div>
+            <br />
             <ColumnsTable cols={cols} />
             <h5 className="mt-2 color-blue-dark">
                 <i className="fa-solid fa-database"/> Study Data
