@@ -80,7 +80,7 @@ export default class Chart extends React.Component<ChartProps>
         return {
             chart: {
                 inverted: true,
-                height: Math.max(series.length * 50 + 20, 180),
+                height: Math.max(series.length * 38 + 20, 180),
                 backgroundColor: "transparent",
                 plotBackgroundColor: "#FFF",
                 plotBorderColor: "#0002",
@@ -92,6 +92,9 @@ export default class Chart extends React.Component<ChartProps>
                 spacingBottom: 50,
                 spacingRight: 3,
                 spacingLeft: 1,
+                zooming: {
+                    type: "y"
+                }
             },
             credits: {
                 enabled: false
@@ -150,6 +153,7 @@ export default class Chart extends React.Component<ChartProps>
                 tickColor: "#0002",
                 tickLength: 10,
                 tickWidth: 1,
+                zoomEnabled: true,
                 labels: {
                     // rotation: 0,
                     padding: 100,
@@ -160,6 +164,7 @@ export default class Chart extends React.Component<ChartProps>
                     // step: 2
                 },
                 // angle: 0,
+                softMax: lastUpdate + 1000 * 60 * 60 * 24 * 80,
                 // max           : Date.now() + 1000*60*60*24*130,
                 dateTimeLabelFormats: {
                     // millisecond: '%H:%M:%S.%L',
@@ -283,8 +288,8 @@ export default class Chart extends React.Component<ChartProps>
                     name: "Data Range",
                     type: "columnrange",
                     data: series.map(s => ({
-                        low: s.dataStart,
-                        high: s.dataEnd,
+                        low  : s.dataStart,
+                        high : s.dataEnd,
                         color: s.failed ? "rgba(255,170,0,0.7)" : "rgba(100,170,250,0.3)",
                         borderColor: s.failed ? "rgb(220,0,0)" : "rgba(0, 0, 0, 0.3)",
                         custom: {
@@ -296,7 +301,7 @@ export default class Chart extends React.Component<ChartProps>
                             enabled : true,
                             align   : 'left' as AlignValue,
                             color   : '#1b5dab',
-                            overflow: "allow",
+                            overflow: "justify",
                             filter : {
                                 property: "y",
                                 operator: "<",
