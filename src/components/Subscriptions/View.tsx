@@ -68,7 +68,7 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
             <div className="row gap-2 wrap">
                 <div className="col col-6 responsive">
                     <div style={{ position: "sticky", top: "4rem" }}>
-                        <h5 className="color-blue-dark">Status</h5>
+                        <h5 className="color-blue-dark">Metadata</h5>
                         <hr/>
                         <div className="left">
                             <table style={{ tableLayout: "fixed" }}>

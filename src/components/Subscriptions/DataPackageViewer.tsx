@@ -1,32 +1,23 @@
 import { useEffect, useMemo, useState } from "react"
 import ColumnsTable                     from "./ColumnsTable"
-import TransmissionView                 from "./TransmissionView"
 import Loader                           from "../generic/Loader"
-import Alert, { AlertError }            from "../generic/Alert"
+import { AlertError }                   from "../generic/Alert"
 import aggregator                       from "../../Aggregator"
-import { DataPackage, StudyPeriod }     from "../../Aggregator"
+import { DataPackage }                  from "../../Aggregator"
 import { humanizeColumnName }           from "../../utils"
 import { app }                          from "../../types"
 
 
 export default function DataPackageViewer({ packageId }: { packageId: string }) {
 
-    const [pkg    , setPkg    ] = useState<DataPackage>()
-    const [periods, setPeriods] = useState<StudyPeriod[]>([])
+    const [pkg    , setPkg    ] = useState<DataPackage | null>(null)
     const [loading, setLoading] = useState(true)
 
     const abortController = useMemo(() => new AbortController(), [])
 
     useEffect(() => {
         aggregator.getPackage(packageId).then(pkg => {
-            if (!pkg) {
-                return null
-            }
-            return aggregator.getStudyPeriods(pkg!.study).then(
-                p => {
-                    setPeriods(p)
-                    setPkg(pkg)
-                })
+            setPkg(pkg || null)
         }).finally(() => setLoading(false))
 
         return () => {
@@ -64,68 +55,34 @@ export default function DataPackageViewer({ packageId }: { packageId: string }) 
         }
     });
 
-    const sites = periods.map(p => ({ id: p.site, name: humanizeColumnName(p.site) }))
-    // .reduce((prev, cur) => {
-    //     if (!prev.find(x => x.id === cur.id)) {
-    //         prev.push(cur)
-    //     }
-    //     return prev
-    // }, [] as any[])
-
-    const transmissions = periods.map(p => ({
-        dataStart: new Date(p.earliest_date),
-        dataEnd  : new Date(p.latest_date),
-        date     : new Date(p.last_data_update),
-        siteId   : p.site as any
-    }))
-
     return (
         <>
-            <h5 className="mt-2 color-blue-dark">
-                <i className="fas fa-table"/> Package Data
-            </h5>
+            <h5 className="mt-2 color-blue-dark">Data Package</h5>
             <hr />
-            <div className="row nowrap gap mb-1">
-                <div className="col col-7">
-                    <p className="nowrap">
-                        <b>Last data update: </b>
-                        <span className="color-blue-dark">{ new Date(pkg.last_data_update).toLocaleString() }</span>
-                    </p>
-                </div>
-                <div className="col col-auto"></div>
-                <div className="col col-0">
-                    <p>
-                        <b>Total Rows: </b>
-                        <span className="color-blue-dark">{ Number(pkg.total).toLocaleString() }</span>
-                    </p>
-                </div>
-            </div>
-            <div>
-                <b>Study: </b>
-                <span className="color-blue-dark">{ pkg.study }</span>
-            </div>
-            <div>
-                <b>S3 Path: </b>
-                <span className="color-muted" style={{ wordBreak: "break-all" }}>{ pkg.s3_path || "" }</span>
-            </div>
+            <table>
+                <tbody>
+                    <tr>
+                        <th className="right pr-1 pl-1 nowrap">Last data update: </th>
+                        <td>{ new Date(pkg.last_data_update).toLocaleString() }</td>
+                    </tr>
+                    <tr>
+                        <th className="right pr-1 pl-1 nowrap">Total Rows: </th>
+                        <td>{ Number(pkg.total).toLocaleString() }</td>
+                    </tr>
+                    <tr>
+                        <th className="right pr-1 pl-1 nowrap">Study: </th>
+                        <td>{ pkg.study }</td>
+                    </tr>
+                    <tr>
+                        <th className="right pr-1 pl-1 nowrap">S3 Path: </th>
+                        <td><span className="color-muted" style={{ wordBreak: "break-all" }}>{ pkg.s3_path || "" }</span></td>
+                    </tr>
+                </tbody>
+            </table>
             <br />
+            <h5 className="mt-2 color-blue-dark">Data Elements</h5>
+            <hr />
             <ColumnsTable cols={cols} />
-            <h5 className="mt-2 color-blue-dark">
-                <i className="fa-solid fa-database"/> Study Data
-            </h5>
-            <hr className="mb-05" />
-            { loading ?
-                <p><Loader msg="Loading study periods" /></p> :
-                transmissions.length > 0 ?
-                    <TransmissionView
-                        // @ts-ignore
-                        sites={ sites }
-                        transmissions={ transmissions }
-                    /> :
-                    <Alert color="orange">
-                        <b><i className="fa-regular fa-circle-xmark" />&nbsp;Study periods data not available</b>
-                    </Alert>
-                }
         </>
     )
 }
