@@ -10,11 +10,12 @@ import { ellipsis }   from "../../utils"
 import "../generic/EndpointListTable.scss"
 
 
-function MarkdownPreview({ markdown, maxLen=70 }: { markdown: string, maxLen?: number }) {
+export function MarkdownPreview({ markdown, maxLen=70 }: { markdown: string, maxLen?: number }) {
     let i = 0;
+    const txt = String(markdown || "").replace(/<.*?>/g, "")
     return <Markdown options={{
-        createElement: (tag, props, ...children) => <Fragment key={ i++ }>{children} </Fragment>
-    }}>{ ellipsis(markdown || "", maxLen) }</Markdown>
+        createElement: (tag, props, ...children) => <Fragment key={ i++ }>{children} </Fragment>,
+    }}>{ maxLen ? ellipsis(txt, maxLen) : txt }</Markdown>
 }
 
 export default function SubscriptionGroupList()

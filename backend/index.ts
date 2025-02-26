@@ -52,6 +52,7 @@ function setupAPI(app: Application)
     app.use("/api/permissions"   , api.permissionsRouter  );
     app.use("/api/user-groups"   , api.userGroupsRouter   );
     app.use("/api/health-check"  , api.healthCheckRouter  );
+    app.use("/api/search"        , api.searchRouter       );
     app.use("/api/sse"           , api.longPollingHandler );
     logger.verbose("✔ REST API set up");
 }
