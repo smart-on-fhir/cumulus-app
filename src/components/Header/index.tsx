@@ -2,6 +2,7 @@ import { Link }          from "react-router-dom"
 import MenuButton        from "../generic/MenuButton"
 import Grid              from "../generic/Grid"
 import Loader            from "../generic/Loader"
+import Search            from "../Search"
 import { useAggregator } from "../../Aggregator"
 import "./Header.scss"
 
@@ -76,8 +77,10 @@ export default function Header() {
                         <img src="/smart-logo-light-text.svg" alt="Cumulus Logo"/>CUMULUS<sup>&#xAE;</sup>
                     </Link>
                 </div>
-                <div className="col middle center"/>
-                <div className="col pl-1 middle right">
+                <div className="col middle center">
+                    <Search />
+                </div>
+                <div className="col col-0 pl-1 middle right">
                     <MenuButton right items={ <div className="p-1"><CloudMenu /></div> }>
                         <CloudIcon />
                     </MenuButton>
