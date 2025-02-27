@@ -71,40 +71,40 @@ export default function Navigation()
     return (
         <div className="navigation">
             <div className="navigation-wrap">
-                <NavLink to="/"><i className="icon fa-solid fa-house-chimney"></i> Home</NavLink>
-                { canReadStudyAreas && <NavLink to="/study-areas"><i className="icon fa-solid fa-book" /> Study Areas</NavLink> }
-                <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" /> Graphs</NavLink>
-                <NavLink to="/drafts"><i className="icon fa-solid fa-pen-to-square" /> My Draft Graphs</NavLink>
-                { canReadSites && <NavLink to="/sites"><i className="icon fa-solid fa-location-dot" /> Healthcare Sites</NavLink> }
-                { canReadSubscriptions && <NavLink to="/requests"><i className="icon fa-solid fa-database" /> Data Sources</NavLink> }
-                { canListGroups && <NavLink to="/groups"><i className="icon fa-solid fa-folder" /> Data Source Groups</NavLink> }
-                { canReadTags && <NavLink to="/tags"><i className="icon fa-solid fa-tag" /> Tags</NavLink> }
-                <NavLink to="/study"><i className="icon fa-solid fa-flask" /> Study Builder</NavLink>
-                <NavLink to="/explorer"><i className="icon fa-solid fa-folder" /> Explore</NavLink>
+                <NavLink to="/"><i className="icon fa-solid fa-house-chimney"></i>Home</NavLink>
+                { canReadStudyAreas && <NavLink to="/study-areas"><i className="icon fa-solid fa-book" />Study Areas</NavLink> }
+                <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" />Graphs</NavLink>
+                <NavLink to="/drafts"><i className="icon fa-solid fa-pen-to-square" />My Draft Graphs</NavLink>
+                { canReadSites && <NavLink to="/sites"><i className="icon fa-solid fa-location-dot" />Healthcare Sites</NavLink> }
+                { canReadSubscriptions && <NavLink to="/requests"><i className="icon fa-solid fa-database" />Data Sources</NavLink> }
+                { canListGroups && <NavLink to="/groups"><i className="icon fa-solid fa-folder" />Data Source Groups</NavLink> }
+                { canReadTags && <NavLink to="/tags"><i className="icon fa-solid fa-tag" />Tags</NavLink> }
+                <NavLink to="/study"><i className="icon fa-solid fa-flask" />Study Builder</NavLink>
+                <NavLink to="/explorer"><i className="icon fa-solid fa-folder-open" />Explore</NavLink>
 
                 <NavGroup icon="fa-solid fa-archive" label="Catalog">
-                    <NavLink to="/catalog/icd10"><i className="icon fa-solid fa-archive" /> ICD10 Diagnoses</NavLink>
-                    <NavLink to="/catalog/loinc"><i className="icon fa-solid fa-archive" /> LOINC Laboratories</NavLink>
+                    <NavLink to="/catalog/icd10"><i className="icon fa-solid fa-archive" />ICD10 Diagnoses</NavLink>
+                    <NavLink to="/catalog/loinc"><i className="icon fa-solid fa-archive" />LOINC Laboratories</NavLink>
                 </NavGroup>
                 
                 { canAdminister && (
                     <NavGroup icon="fa-solid fa-screwdriver-wrench" label="Administration">
-                        { canReadUsers && <NavLink to="/users" end><i className="icon fa-solid fa-users" /> Users</NavLink> }
-                        { canReadUserGroups && <NavLink to="/user-groups" end><i className="icon fa-solid fa-user-friends" /> User Groups</NavLink> }
-                        { canManagePermissions && <NavLink to="/permissions" end><i className="icon fa-solid fa-shield" /> Permissions</NavLink> }
-                        <NavLink to="/health-check" end><i className="icon fa-solid fa-stethoscope" /> Health Check</NavLink>
+                        { canReadUsers && <NavLink to="/users" end><i className="icon fa-solid fa-users" />Users</NavLink> }
+                        { canReadUserGroups && <NavLink to="/user-groups" end><i className="icon fa-solid fa-user-friends" />User Groups</NavLink> }
+                        { canManagePermissions && <NavLink to="/permissions" end><i className="icon fa-solid fa-shield" />Permissions</NavLink> }
+                        <NavLink to="/health-check" end><i className="icon fa-solid fa-stethoscope" />Health Check</NavLink>
                     </NavGroup>
                 )}
 
                 <hr />
 
                 <NavGroup icon="fa-solid fa-user" label={ user?.name || user?.email }>
-                    <NavLink to="/user"><i className="icon fa-solid fa-user-pen" /> My Account</NavLink>
+                    <NavLink to="/user"><i className="icon fa-solid fa-user-pen" />My Account</NavLink>
                     <div className="link" onClick={() => {
                         logout().then(() => navigate("/"));
                     }}>
                         <i className="icon fa-solid fa-right-from-bracket" />
-                        <b className="color-red"> SIGN OUT </b>
+                        <b className="color-red">SIGN OUT</b>
                         { loading && <i className="fas fa-circle-notch fa-spin color-muted" /> }
                     </div>
                 </NavGroup>
