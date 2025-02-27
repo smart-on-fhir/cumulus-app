@@ -40,6 +40,8 @@ export default class Tooltip extends Component<any> {
     }
 
     positionTooltip(el: Element) {
+        // @ts-ignore - Force reflow
+        let tmp = el.offsetHeight + el.offsetWidth + this.tooltip.current!.offsetHeight + this.tooltip.current!.offsetWidth;
         const pos    = el.getAttribute("data-tooltip-position") ?? "50% 0"
         const elRect = el.getBoundingClientRect()
         const ttRect = this.tooltip.current!.getBoundingClientRect()
@@ -70,6 +72,10 @@ export default class Tooltip extends Component<any> {
             yUnit  = "%"
         } else if (vertical === "bottom") {
             yValue = 100
+            yUnit  = "%"
+        } else if (vertical === "auto") {
+            const cY = document.documentElement.clientHeight / 2
+            yValue = elRect.top + elRect.height / 2 >= cY ? 0 : 100
             yUnit  = "%"
         } else {
             yUnit  = vertical.endsWith("%") ? "%" : "px"
