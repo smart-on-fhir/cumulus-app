@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useState } from "react"
-import ColumnsTable                     from "./ColumnsTable"
 import Loader                           from "../generic/Loader"
 import { AlertError }                   from "../generic/Alert"
 import aggregator                       from "../../Aggregator"
 import { DataPackage }                  from "../../Aggregator"
-import { humanizeColumnName }           from "../../utils"
-import { app }                          from "../../types"
 
 
 export default function DataPackageViewer({ packageId }: { packageId: string }) {
@@ -41,48 +38,23 @@ export default function DataPackageViewer({ packageId }: { packageId: string }) 
         return <AlertError>Package not found</AlertError>
     }
 
-    const cols = Object.keys(pkg.columns).map(name => {
-        let type = String(pkg.columns[name])
-            .replace("year" , "date:YYYY")
-            .replace("month", "date:YYYY-MM")
-            .replace("week" , "date:YYYY-MM-DD")
-            .replace("day"  , "date:YYYY-MM-DD") as app.supportedDataType;
-        return {
-            name,
-            label      : humanizeColumnName(name),
-            description: humanizeColumnName(name),
-            dataType   : type
-        }
-    });
-
     return (
         <>
-            <h5 className="mt-2 color-blue-dark">Data Package</h5>
-            <hr />
-            <table>
-                <tbody>
-                    <tr>
-                        <th className="right pr-1 pl-1 nowrap">Last data update: </th>
-                        <td>{ new Date(pkg.last_data_update).toLocaleString() }</td>
-                    </tr>
-                    <tr>
-                        <th className="right pr-1 pl-1 nowrap">Total Rows: </th>
-                        <td>{ Number(pkg.total).toLocaleString() }</td>
-                    </tr>
-                    <tr>
-                        <th className="right pr-1 pl-1 nowrap">Study: </th>
-                        <td>{ pkg.study }</td>
-                    </tr>
-                    {/* <tr>
-                        <th className="right pr-1 pl-1 nowrap">S3 Path: </th>
-                        <td><span className="color-muted" style={{ wordBreak: "break-all" }}>{ pkg.s3_path || "" }</span></td>
-                    </tr> */}
-                </tbody>
-            </table>
-            <br />
-            <h5 className="mt-2 color-blue-dark">Data Elements</h5>
-            <hr />
-            <ColumnsTable cols={cols} />
+            <div className="col">
+                <br />
+                <b>Last Data Update</b>
+                <div className="color-muted">{ new Date(pkg.last_data_update).toLocaleString() }</div>
+            </div>
+            <div className="col">
+                <br />
+                <b>Total Rows</b>
+                <div className="color-muted">{ Number(pkg.total).toLocaleString() }</div>
+            </div>
+            <div className="col">
+                <br />
+                <b>Study</b>
+                <div className="color-muted">{ pkg.study }</div>
+            </div>
         </>
     )
 }
