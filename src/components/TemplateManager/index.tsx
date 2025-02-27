@@ -51,13 +51,17 @@ async function renderChartAsPng(options: Highcharts.Options, signal: AbortSignal
 export default function TemplateManager({ subscription }: { subscription: app.Subscription }) {
     return (
         <div className="template-manager">
-            <div className="view-browser view-browser-column nested">
-                { subscription.metadata?.cols.filter(col => col.dataType !== "hidden").map((col, i) => {
-                    return <Thumbnail key={i} col={col} sub={subscription} />
-                }) }
+            <div className="view-browser view-browser-flex">
+                <Templates subscription={subscription} />
             </div>
         </div>
     )
+}
+
+export function Templates({ subscription }: { subscription: app.Subscription }) {
+    return <>{ subscription.metadata?.cols.filter(col => col.dataType !== "hidden").map((col, i) => {
+        return <Thumbnail key={i} col={col} sub={subscription} />
+    })}</>
 }
 
 function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Subscription }) {
@@ -181,7 +185,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     }
 
     return (
-        <Link className="view-thumbnail" to={`/requests/${sub.id}/create-view`} state={{
+        <Link className="view-thumbnail template" to={`/requests/${sub.id}/create-view`} state={{
             column: col.name,
             chartType,
             name: label,
@@ -192,7 +196,9 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
             theme,
             colors: COLOR_THEMES.find(t => t.id === theme)!.colors
         }}>
-            <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }} data-tooltip={`<img src=${imgUrl || "about:blank"} alt="Chart Preview" style="display:block" />`}>
+            <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }}
+                data-tooltip={`<img src=${imgUrl || "about:blank"} alt="Chart Preview" style="display:block" />`}
+                data-tooltip-position="50% auto">
                 { loading && <Loader msg="" style={{ zIndex: 2 }} /> }
                 { error && <small className="color-red" style={{ wordBreak: "break-all" }}>{ error + "" }</small> }
                 { !loading && imgUrl && <>
@@ -200,10 +206,12 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
                 </> }
             </div>
             <div className="view-thumbnail-title" title={label}>
-                <b>{ label }</b>
-                <div className="view-thumbnail-description color-muted">
+                {/* <b> */}
+                    { label }
+                {/* </b> */}
+                {/* <div className="view-thumbnail-description color-muted">
                     { description }
-                </div>
+                </div> */}
             </div>
         </Link>
     )
