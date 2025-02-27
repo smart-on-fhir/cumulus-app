@@ -16,7 +16,7 @@ import ViewStudyArea                    from "../StudyAreas/View"
 import aggregator                       from "../../Aggregator"
 import { request }                      from "../../backend"
 import { app }                          from "../../types"
-import { ellipsis, humanizeColumnName } from "../../utils"
+import { humanizeColumnName }           from "../../utils"
 import { useAuth }                      from "../../auth"
 import "./Explorer.scss"
 
