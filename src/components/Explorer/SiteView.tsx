@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
-import { Site } from "../../Aggregator";
-import { humanizeColumnName } from "../../utils";
-import moment from "moment";
+import moment                 from "moment"
+import { Link }               from "react-router-dom"
+import { Site }               from "../../Aggregator"
+import { humanizeColumnName } from "../../utils"
+
 
 export default function SiteView({ site }: { site: Site }) {
 
@@ -31,54 +32,52 @@ export default function SiteView({ site }: { site: Site }) {
             <h1>
                 <i className="material-symbols-outlined mr-05" style={{ verticalAlign: "text-bottom", fontSize: "1.2em" }}>apartment</i>{ site.name }
             </h1>
-            <hr />
-            <table>
-                <tbody>
-                    <tr>
-                        <th className="right pr-1 pl-1 nowrap">ID: </th>
-                        <td width={"70%"}>{ site.id }</td>
-                    </tr>
-                    { isFinite(earliest) && <tr>
-                        <th className="right pr-1 pl-1 nowrap">Earliest Data: </th>
-                        <td>{ new Date(earliest).toLocaleString() }</td>
-                    </tr> }
-                    { isFinite(latest) && <tr>
-                        <th className="right pr-1 pl-1 nowrap">Latest Data: </th>
-                        <td>{ new Date(latest).toLocaleString() }</td>
-                    </tr> }
-                    { isFinite(lastUpdate) && <tr>
-                        <th className="right pr-1 pl-1 nowrap">Last Data Update: </th>
-                        <td>{ new Date(lastUpdate).toLocaleString() }</td>
-                    </tr> }
-                </tbody>
-            </table>
+            <p className="color-muted">Description not available</p>
+            <div className="row gap-2 wrap">
+                <div className="col col-8 responsive">
+                    <h5 className="mt-2">Studies</h5>
+                    <hr className="mb-1" />
+                    { numStudies > 0 ?
+                        Object.keys(site.studies).map(id => {
+                            return <div key={id} className="mb-05">
+                                <h6>{humanizeColumnName(id)}</h6>
+                                { Object.keys(site.studies[id]).map((version, i) => {
+                                    return <div key={i}>
+                                        <Link to={`/explorer?path=${encodeURIComponent(`/studies/${id}/${version}`)}`} className="link ml-1">
+                                            <i className="material-symbols-outlined mr-025" style={{ verticalAlign: "top", lineHeight: "1.3rem", fontSize: "1.4em" }}>history</i>v{version}
+                                        </Link>
+                                    </div>
+                                })}
+                            </div>
+                        }) :
+                        <div className="text-muted">This site is not participating in any studies yet</div>
+                    }
+                </div>
+                <div className="col" style={{ wordBreak: "break-all", minWidth: "15rem" }}>
+                    <h5 className="mt-2">Metadata</h5>
+                    <hr className="mb-1" />
+                    <br />
+                    <b>ID</b>
+                    <div className="color-muted">{ site.id }</div>
+
+                    { isFinite(earliest) && <>
+                        <br />
+                        <b>Earliest Data</b>
+                        <div className="color-muted">{ new Date(earliest).toLocaleString() }</div>
+                    </> }
+                    { isFinite(latest) && <>
+                        <br />
+                        <b>Latest Data: </b>
+                        <div className="color-muted">{ new Date(latest).toLocaleString() }</div>
+                    </> }
+                    { isFinite(lastUpdate) && <>
+                        <br />
+                        <b>Last Data Update: </b>
+                        <div className="color-muted">{ new Date(lastUpdate).toLocaleString() }</div>
+                    </> }
+                </div>
+            </div>
             {/* <pre>{ JSON.stringify(site, null, 4) }</pre> */}
-
-            <h5 className="mt-3">Studies <b className="badge">{ numStudies }</b></h5>
-            <hr className="mb-1"/>
-            { numStudies > 0 ?
-                Object.keys(site.studies).map(id => {
-                    const versions = Object.keys(site.studies[id]).length
-                    return <div key={id}>
-                        <i className="material-symbols-outlined mr-05" style={{ verticalAlign: "top", lineHeight: "1.3rem", fontSize: "1.4em" }}>experiment</i>
-                        <Link to={`/explorer?path=%2Fstudies%2F${id}`} className="link">
-                            {humanizeColumnName(id)}
-                        </Link><span className="color-muted" style={{ fontWeight: 400 }}> - { versions } version{ versions === 1 ? "" : "s" }</span>
-                        {/* <ul className="ml-1">
-                            { Object.keys(site.studies[id]).map((version, i) => {
-                                return <li key={i}>
-                                    v{version}
-                                </li>
-                            })}
-                            
-                        </ul> */}
-                    </div>
-                }) :
-                <div className="text-muted">This site is not participating in any studies yet</div>
-            }
-            
-            
-
             {/* <h6 className="mt-3">Data Packages <b className="badge">{ 0 }</b></h6>
             <hr className="mb-1"/>
             <div className="text-muted">Data from this site is not included in any data packages yet</div> */}
