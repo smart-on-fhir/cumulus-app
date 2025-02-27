@@ -1,4 +1,4 @@
-import { useCallback }                    from "react"
+import { ReactNode, useCallback }         from "react"
 import { Link }                           from "react-router-dom"
 import ViewThumbnail                      from "./ViewThumbnail"
 import { AlertError }                     from "../generic/Alert"
@@ -28,7 +28,10 @@ export default function ViewsBrowser({
     sort = "",
     groupBy,
     drafts,
-    starOnly
+    starOnly,
+    minColWidth,
+    header,
+    footer
 }: {
     layout?: "grid" | "column" | "list",
     requestId?: string | number,
@@ -38,6 +41,9 @@ export default function ViewsBrowser({
     groupBy?: "tag" | "subscription" | ""
     drafts?: boolean
     starOnly?: boolean
+    minColWidth?: string
+    header?: ReactNode
+    footer?: ReactNode
 }) {
 
     let { user } = useAuth();
@@ -133,26 +139,17 @@ export default function ViewsBrowser({
         }
         return (
             <div className={ classList({
-                ["view-browser view-browser-" + layout] : true,
-                "nested": !!requestId
-            })}>
-                { requestId && !canCreateGraphs && result?.length === 0 && <div className="color-red small">You cannot see any of the graphs, and you are not allowed to create new graphs!</div> }
-                { requestId && canCreateGraphs && <Link to={`/requests/${requestId}/create-view`} className="view-thumbnail view-thumbnail-add-btn">
-                        <div className="view-thumbnail-image">
-                            <div className="plus-icon-wrapper">
-                                <i className="fas fa-plus"/>
-                            </div>
-                        </div>
-                        <div className="view-thumbnail-title color-blue">
-                            Create New Graph
-                            <div className="view-thumbnail-description grey-out" style={{ whiteSpace: "normal"}}>
-                                Click here to create new view from the data provided
-                                by this Data Source
-                            </div>
-                        </div>
-                    </Link>
+                ["view-browser view-browser-" + layout] : true
+            })}
+                style={
+                    minColWidth ?
+                        { gridTemplateColumns: `repeat(auto-fill, minmax(${minColWidth}, 1fr))` } :
+                        undefined
                 }
-                { !!result?.length && (result || []).map((v, i) => (
+            >
+                { requestId && !canCreateGraphs && result?.length === 0 && <div className="color-red small">You cannot see any of the graphs, and you are not allowed to create new graphs!</div> }
+                { header }
+                { (result || []).map((v, i) => (
                         <ViewThumbnail
                             key={i}
                             view={ v }
@@ -162,6 +159,8 @@ export default function ViewsBrowser({
                         />
                     ))
                 }
+
+                { footer }
             </div>
         )
     }
@@ -231,7 +230,6 @@ export default function ViewsBrowser({
                     }>
                         <div className={ classList({
                             ["view-browser view-browser-" + layout] : true,
-                            "nested": !!requestId,
                             "mb-2": true
                         })}>
                         {
