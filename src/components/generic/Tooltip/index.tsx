@@ -41,6 +41,7 @@ export default class Tooltip extends Component<any> {
 
     positionTooltip(el: Element) {
         // @ts-ignore - Force reflow
+        // eslint-disable-next-line
         let tmp = el.offsetHeight + el.offsetWidth + this.tooltip.current!.offsetHeight + this.tooltip.current!.offsetWidth;
         const pos    = el.getAttribute("data-tooltip-position") ?? "50% 0"
         const elRect = el.getBoundingClientRect()
