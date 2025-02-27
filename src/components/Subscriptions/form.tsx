@@ -189,7 +189,9 @@ export default function SubscriptionForm({
 
             { dataURL?.match(/.+?__.+?__.+?/) && <>
                 <div><PackageVersionCheck pkgId={dataURL} /></div>
-                <DataPackageViewer packageId={dataURL} />
+                <div className="row center">
+                    <DataPackageViewer packageId={dataURL} />
+                </div>
             </> }
 
             { id && Array.isArray(record.metadata?.cols) && <div className="mb-1 mt-2">

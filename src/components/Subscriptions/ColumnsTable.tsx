@@ -36,8 +36,8 @@ export default function ColumnsTable({ cols }: { cols?: app.SubscriptionDataColu
         <table className="columns-table">
             <tbody>
                 <tr>
-                    <th>Variable Name</th>
-                    <th>Description</th>
+                    <th className="color-muted">Variable Name</th>
+                    <th className="color-muted">Description</th>
                 </tr>
                 { cols.map((col, i) => <ColumnsTableItem key={i} col={{
                     meta: library[col.name],
@@ -56,7 +56,7 @@ function ColumnsTableItem({ col }: { col: app.SubscriptionDataColumn })
         <>
             <tr>
                 <td className="col-name" onClick={() => setOpen(!open)}>
-                    <span className="arrow">{ open ? "▿" : "▹" }</span> <img src="/icons/column.png" alt="icon" width="16" style={{ verticalAlign: "middle" }}/> { humanizeColumnName(col.name) }
+                    <span className="arrow">{ open ? "▿" : "▹" }</span>{ humanizeColumnName(col.name) }
                 </td>
                 <td className="col-description">{ col.meta?.display || col.description || "No description provided" }</td>
             </tr>

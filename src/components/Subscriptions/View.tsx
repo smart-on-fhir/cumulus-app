@@ -1,5 +1,5 @@
-import { useCallback }            from "react"
-import { useParams }              from "react-router"
+import { useCallback, useState }  from "react"
+import { Navigate, useParams }    from "react-router"
 import { Link }                   from "react-router-dom"
 import { HelmetProvider, Helmet } from "react-helmet-async"
 import DataViewer                 from "./DataViewer"
@@ -13,17 +13,18 @@ import { Format }                 from "../Format"
 import Tag                        from "../Tags/Tag"
 import ViewsBrowser               from "../Views/ViewsBrowser"
 import { useAuth }                from "../../auth"
-import { request }                from "../../backend"
+import { deleteOne, request }     from "../../backend"
 import { useBackend }             from "../../hooks"
 import { app }                    from "../../types"
 import PackageVersionCheck        from "./PackageVersionCheck"
-import TemplateManager            from "../TemplateManager"
+import { Templates }              from "../TemplateManager"
 
 
 export default function SubscriptionView({ id }: { id?: number }): JSX.Element
 {
-    const params = useParams()
+    const params   = useParams()
     const { user } = useAuth()
+    const [ deleted, setDeleted ] = useState(false)
 
     id = id || +params.id!
 
@@ -31,6 +32,18 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
         useCallback(() => request("/api/requests/" + id + "?group=true&graphs=true&tags=true"), [id]),
         true
     )
+
+    const destroy = useCallback(() => {
+        if (window.confirm(
+            "Deleting this data source will also delete all the graphs " +
+            "associated with it! Are you sure?")) {
+            deleteOne("requests", id + "").then(() => setDeleted(true))
+        }
+    }, [id]);
+
+    if (deleted) {
+        return <Navigate to="/requests" />
+    }
 
     if (loading && !model) {
         return <Loader/>
@@ -44,9 +57,14 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
         return <AlertError>Failed to load Data Source</AlertError>
     }
 
-    const isFlatData = model.metadata?.type === "flat"
-
-    const canHaveCharts = !isFlatData && (model.dataURL || model.completed)
+    const isFlatData      = model.metadata?.type === "flat"
+    const canHaveCharts   = !isFlatData && (model.dataURL || model.completed)
+    const canCreateGraphs = user!.permissions.includes("Graphs.create") && !model.dataURL
+    const canEdit         = user!.permissions.includes("Subscriptions.update")
+    const canDelete       = user!.permissions.includes("Subscriptions.delete")// && !model.dataURL
+    const canExport       = user!.permissions.includes("Subscriptions.export") && !model.dataURL
+    const canImport       = canEdit && !model.dataURL
+    const isPending       = !model.dataURL && !model.completed
 
     return (
         <div className="container">
@@ -60,123 +78,173 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
                 { name: "Data Sources", href: "/requests" },
                 { name: model.name }
             ]}/>
-            <h3><i className="fas fa-database" /> { model.name }</h3>
-            <div className="markdown">
-                <Markdown>{ model.description || "" }</Markdown>
-            </div>
-            <br/>
+            <header className="ml-3">
+                <h2>
+                    <i className="material-symbols-outlined mr-05" style={{ verticalAlign: "middle", fontSize: "1.4em", marginLeft: "-3rem" }}>
+                        { model.metadata?.type === "flat" ? "table" : "deployed_code" }
+                    </i>
+                    { model.name }
+                </h2>
+                { model.description && <div>
+                    <Markdown>{ model.description || "" }</Markdown>
+                    <br/>
+                </div> }
+            </header>
+
+            { model.dataURL && <PackageVersionCheck pkgId={model.dataURL} /> }
+
             <div className="row gap-2 wrap">
-                <div className="col col-6 responsive">
-                    <div style={{ position: "sticky", top: "4rem" }}>
-                        <h5 className="color-blue-dark">Metadata</h5>
+                <div className="col col-8 responsive">
+                    
+                    {/* Empty View ----------------------------------------- */}
+                    { isPending && <>
+                        <h5 className="mt-2">&nbsp;</h5>
                         <hr/>
-                        <div className="left">
-                            <table style={{ tableLayout: "fixed" }}>
-                                <tbody>
-                                    <tr>
-                                        <th className="right pr-1 pl-1" style={{ width: "9em" }}>Group:</th>
-                                        <td>{
-                                            model.group ?
-                                                <Link to={`/groups/${model.group.id}`} className="link" title={model.group.description}>{ model.group.name }</Link> :
-                                                "GENERAL"
-                                            }
-                                        </td>
-                                    </tr>
-                                    { !model.dataURL && 
-                                        <tr>
-                                            <th className="right pr-1 pl-1">Status:</th>
-                                            <td>
-                                                {
-                                                    model.completed ?
-                                                    <>completed <Format value={ model.completed } format="date-time" /></> :
-                                                    <span className="color-red">Pending</span>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                    
-                                    <tr>
-                                        <th className="right pr-1 pl-1">Created:</th>
-                                        <td><Format value={ model.createdAt } format="date-time" /></td>
-                                    </tr>
-                                    { model.dataURL && (
-                                        <tr>
-                                            <th className="right pr-1 pl-1 top nowrap">Data Package:</th>
-                                            <td className="ellipsis" title={ model.dataURL }>{ model.dataURL }</td>
-                                        </tr>
-                                    )}
-                                    { model.Tags && (
-                                        <tr>
-                                            <th className="right pr-1 pl-1">Tags:</th>
-                                            <td>{
-                                                model.Tags.length ?
-                                                    model.Tags.map((t, i) => <Tag tag={t} key={i} />) :
-                                                    <span className="color-muted">no tag assigned</span>
-                                            }</td>
-                                        </tr>
-                                    )}
-                                    { !model.dataURL && model.metadata?.total && <tr>
-                                        <th className="right pr-1 pl-1 nowrap">Total rows:</th>
-                                        <td>{ Number(model.metadata.total).toLocaleString()}</td>
-                                    </tr>}
-                                </tbody>
-                            </table>
+                        <div className="col middle">
+                            <p>This data source is currently empty. Please begin by uploading CSV data.</p>
+                            <p className="center mt-1">
+                                <button className="btn btn-blue">
+                                    <b>Upload CSV Data</b>
+                                </button>
+                            </p>
+                        </div>
+                    </> }
+
+                    {/* Flat Chart View ------------------------------------ */}
+                    { isFlatData && <div className="mt-2"><DataViewer subscription={model} /></div> }
+                    
+                    {/* Charts --------------------------------------------- */}
+                    { canHaveCharts && (model.completed || model.dataURL) && <>
+                        <h5 className="mt-2">Graphs</h5>
+                        <hr/>
+                        <ViewsBrowser requestId={ model.id } minColWidth="10rem" header={
+                            <Templates subscription={model} />
+                        }  />
+                    </> }
+
+                    {/* Columns -------------------------------------------- */}
+                    { model.metadata?.cols && <>
+                        <h5 className="mt-2">Data Elements</h5>
+                        <hr className="mb-0"/>
+                        <ColumnsTable cols={model.metadata?.cols} />
+                    </> }
+                </div>
+
+                <div className="col" style={{ wordBreak: "break-all", minWidth: "16rem" }}>
+                    <div style={{ position: "sticky", top: "3em" }}>
+                        <h5 className="mt-2">Metadata</h5>
+                        <hr className="mb-1"/>
+                        
+                        {/* Group ------------------------------------------ */}
+                        <div>
+                            <b>Group</b>
+                            { model.group ?
+                                <div>
+                                    <Link to={`/groups/${model.group.id}`} className="link" title={model.group.description}>{ model.group.name }</Link>
+                                </div> :
+                                <div className="color-muted">GENERAL</div>
+                            }
                         </div>
 
-                        <br />
+                        {/* Tags ------------------------------------------- */}
+                        { model.Tags && <div>
+                            <br />
+                            <b>Tags</b>
+                            <div>{
+                                model.Tags.length ?
+                                    model.Tags.map((t, i) => <Tag tag={t} key={i} />) :
+                                    <span className="color-muted">No tag assigned</span>
+                            }</div>
+                        </div> }
 
-                        { model.dataURL && <PackageVersionCheck pkgId={model.dataURL} /> }
+                        {/* Last Data Update (local) ----------------------- */}
+                        { !model.dataURL && <div>
+                            <br />
+                            <b>Last Data Update</b>
+                            <div className="color-muted">{
+                                model.completed ?
+                                <Format value={ model.completed } format="date-time" /> :
+                                "Pending"
+                            }</div>
+                        </div> }
 
-                        { model.dataURL ?
-                            <DataPackageViewer packageId={ model.dataURL } /> :
-                            model.metadata?.cols ?
-                            <>
-                                <h5 className="color-blue-dark">Data Elements</h5>
-                                <hr/>
-                                <ColumnsTable cols={model.metadata?.cols} />
-                                <br/>
-                            </> :
-                            null
-                        }
+                        {/* Created ---------------------------------------- */}
+                        <div>
+                            <br />
+                            <b>Created</b>
+                            <div className="color-muted"><Format value={ model.createdAt } format="date-time" /></div>
+                        </div>
 
-                        { model.metadata?.type === "flat" && <div className="mt-2"><DataViewer subscription={model} /></div> }
+                        {/* Updated ---------------------------------------- */}
+                        <div>
+                            <br />
+                            <b>Updated</b>
+                            <div className="color-muted"><Format value={ model.updatedAt } format="date-time" /></div>
+                        </div>
 
+                        {/* Data Package ----------------------------------- */}
+                        { model.dataURL && (
+                            <div>
+                                <br />
+                                <b>Data Package</b>
+                                <div className="color-muted">{ model.dataURL }</div>
+                            </div>
+                        )}
+
+                        {/* Total Rows ------------------------------------- */}
+                        { !model.dataURL && model.metadata?.total && <div>
+                            <br />
+                            <b>Total Rows</b>
+                            <div className="color-muted">{ Number(model.metadata.total).toLocaleString()}</div>
+                        </div>}
+
+                        {/* Data Package Info ------------------------------ */}
+                        { model.dataURL && <DataPackageViewer packageId={ model.dataURL } /> }
+
+                        <h5 className="mt-2">Actions</h5>
+                        <hr className="mb-1"/>
+
+                        {/* Add Graph -------------------------------------- */}
+                        { canCreateGraphs && <p>
+                            <Link className="link" to={`/requests/${model.id}/create-view`} title="Click here to create new view from the data provided from this Data Source">
+                                <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>add_photo_alternate</i>
+                                Add Graph
+                            </Link>
+                        </p> }
+
+                        {/* Edit ------------------------------------------- */}
+                        { canEdit && <p>
+                            <Link className="link" to={`/requests/${model.id}/edit`}>
+                                <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>tune</i>
+                                Edit
+                            </Link>
+                        </p> }
+
+                        {/* Export Data ------------------------------------ */}
+                        { canExport && <p>
+                            <a aria-disabled={!model.metadata} className="link" href={`${process.env.REACT_APP_BACKEND_HOST || ""}/api/requests/${id}/data?format=csv`}>
+                                <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>download</i>
+                                Export Data
+                            </a>
+                        </p> }
+
+                        {/* Import Data ------------------------------------ */}
+                        { canImport && <p>
+                            <Link className="link" to={`/requests/${model.id}/import`}>
+                                <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>upload</i>
+                                Import Data
+                            </Link>
+                        </p> }
+
+                        {/* Delete ----------------------------------------- */}
+                        { canDelete && <p>
+                            <span className="link" onClick={destroy}>
+                                <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>delete</i>
+                                Delete
+                            </span>
+                        </p> }
                     </div>
                 </div>
-                { canHaveCharts && 
-                    <div className="col col-4 responsive" style={{ minWidth: "20rem" }}>
-                        { (model.completed || model.dataURL) && <>
-                            <h5 className="color-blue-dark">Custom Graphs</h5>
-                            <hr/>
-                            <ViewsBrowser layout="column" requestId={ model.id } />
-                        </> }
-                        <br/>
-                        <h5 className="color-blue-dark">Generic Data Views</h5>
-                        <hr/>
-                        { model.metadata?.type !== "flat" && <TemplateManager subscription={model} /> }
-                        <br/>
-                    </div>
-                }
-            </div>
-            <hr className="center mt-1"/>
-            <div className="center mt-1 mb-1">
-                { !model.dataURL && <a
-                    aria-disabled={!model.metadata}
-                    className="btn btn-blue pl-1 pr-1 m-1"
-                    // https://smart-cumulus.herokuapp.com/requests/undefined/api/requests/10/data?format=csv
-                    href={`${process.env.REACT_APP_BACKEND_HOST || ""}/api/requests/${id}/data?format=csv`}>
-                    <b> Export Data </b>
-                </a> }
-                { !model.dataURL && user?.role === "admin" && <Link
-                    className="btn btn-blue pl-1 pr-1 m-1"
-                    to={`/requests/${model.id}/import`}
-                    ><b> Import Data </b></Link>
-                }
-                { user?.role === "admin" && <Link
-                    className="btn btn-blue pl-1 pr-1 m-1"
-                    to={`/requests/${model.id}/edit`}
-                    ><b> Edit Data Source </b></Link>
-                }
             </div>
         </div>
     )
