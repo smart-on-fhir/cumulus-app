@@ -23,9 +23,9 @@ interface Transmission {
     siteId   : string | number
 }
 
-async function load(studyId: string) {
-    const periods  = await aggregator.getStudyPeriods(studyId)
-    const packages = await aggregator.filterPackages({ study: studyId })
+async function load(studyId: string, version: string) {
+    const periods  = (await aggregator.getStudyPeriods(studyId)).filter(p => p.version === version)
+    const packages = await aggregator.filterPackages({ study: studyId, version })
     // const uniquePackages = packages.reduce((prev, cur) => {
     //     if (!prev.find(p => p.name === cur.name)) {
     //         prev.push(cur)
@@ -41,15 +41,15 @@ async function load(studyId: string) {
     // }, [] as StudyPeriod[])
 
     const sites = periods.map(p => ({
-        id: p.site + " v" + p.version,
-        name: humanizeColumnName(p.site) + " v" + p.version
+        id  : p.site,
+        name: humanizeColumnName(p.site)
     }))
 
     const transmissions = periods.map(p => ({
         dataStart: new Date(p.earliest_date),
         dataEnd  : new Date(p.latest_date),
         date     : new Date(p.last_data_update),
-        siteId   : (p.site + " v" + p.version) as any
+        siteId   : p.site as any
     }))
 
     return {
@@ -60,7 +60,7 @@ async function load(studyId: string) {
     }
 }
 
-export default function StudyView({ study }: { study: Study }) {
+export default function StudyView({ study, version }: { study: Study, version: string }) {
     const [loading      , setLoading] = useState(true)
     const [error        , setError  ] = useState<Error | string | null>(null)
     // const [periods      , setPeriods] = useState<StudyPeriod[]>([])
@@ -74,7 +74,7 @@ export default function StudyView({ study }: { study: Study }) {
     useEffect(() => {
         setError(null)
         setLoading(true)
-        load(studyId)
+        load(studyId, version)
             .then(result => {
                 // setPeriods(result.periods)
                 setSites(result.sites)
@@ -95,7 +95,7 @@ export default function StudyView({ study }: { study: Study }) {
             // are completed 
             abortController.abort()
         }
-    }, [ studyId, abortController ])
+    }, [ studyId, abortController, version ])
 
     if (abortController.signal.aborted) {
         return null
@@ -111,40 +111,52 @@ export default function StudyView({ study }: { study: Study }) {
 
     return (
         <>
-            <h1><i className="material-symbols-outlined mr-05" style={{ verticalAlign: "text-bottom", fontSize: "1.2em" }}>experiment</i>{ humanizeColumnName(study.label) }</h1>
-            <hr />
-            <p><b>ID:</b> <code>{ study.id }</code></p>
-            
-            {/* <pre>{ JSON.stringify(periods, null, 4) }</pre> */}
-            <h6 className="mt-2">Study Periods <b className="badge">{ transmissions.length }</b></h6>
-            <hr className="mb-1"/>
-            { transmissions.length ? 
-                // @ts-ignore
-                <TransmissionView sites={ sites } transmissions={ transmissions } /> :
-                <p className="color-muted">Study periods data not available</p>
-            }
-            
-            <h6 className="mt-2">Packages <b className="badge">{ packages.length }</b></h6>
-            <hr className="mb-1" />
-            { packages.map((p, i) => {
-                const [, name, version] = p.id.trim().split("__")
-                return (
-                    <div key={i}>
-                        <i className="material-symbols-outlined color-brand-2" style={{ fontSize: 18, verticalAlign: "middle" }}>
-                            { p.type === "flat" ? "table" : "deployed_code" }
-                        </i> <Link
-                            to={`/explorer?path=${encodeURIComponent(`/studies/${study.id}/${p.id}`)}`}
-                            // reloadDocument
-                            className="link"
-                        >
-                            {humanizeColumnName(name)}
-                        </Link>
-                        <small className="color-muted"> v{version} - { Number(p.total).toLocaleString() }</small>
-                    </div>
-                )
-            })}
-            {/* <pre>{ JSON.stringify(packages, null, 4) }</pre> */}
-            {/* <pre>{ JSON.stringify(study, null, 4) }</pre> */}
+            <h1>
+                <i className="material-symbols-outlined mr-05" style={{ verticalAlign: "text-bottom", fontSize: "1.2em" }}>experiment</i>
+                { humanizeColumnName(study.label) }
+            </h1>
+            <p className="color-muted">Description not available</p>
+            <div className="row gap-2 wrap">
+                <div className="col col-8 responsive">
+                    <h5 className="mt-2">Study Periods</h5>
+                    <hr className="mb-1" />
+                    { transmissions.length ? 
+                        // @ts-ignore
+                        <TransmissionView sites={ sites } transmissions={ transmissions } /> :
+                        <p className="color-muted">Study periods data not available</p>
+                    }
+
+                    <h5 className="mt-2">Packages</h5>
+                    <hr className="mb-1" />
+                    { packages.map((p, i) => {
+                        const [, name] = p.id.trim().split("__")
+                        return (
+                            <div key={i}>
+                                <i className="material-symbols-outlined color-brand-2" style={{ fontSize: 18, verticalAlign: "middle" }}>
+                                    { p.type === "flat" ? "table" : "deployed_code" }
+                                </i> <Link
+                                    to={`/explorer?path=${encodeURIComponent(`/studies/${study.id}/${version}/${p.id}`)}`}
+                                    // reloadDocument
+                                    className="link"
+                                >
+                                    {humanizeColumnName(name)}
+                                </Link>
+                                <small className="color-muted"> - { Number(p.total).toLocaleString() }</small>
+                            </div>
+                        )
+                    })}
+                </div>
+                <div className="col" style={{ wordBreak: "break-all", minWidth: "15rem" }}>
+                    <h5 className="mt-2">Metadata</h5>
+                    <hr className="mb-1" />
+                    <br />
+                    <b>ID</b>
+                    <div className="color-muted">{ study.id }</div>
+                    <br />
+                    <b>Version</b>
+                    <div className="color-muted">{ version }</div>
+                </div>
+            </div>
         </>
     )
 }

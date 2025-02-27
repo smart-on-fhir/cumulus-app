@@ -35,34 +35,61 @@ async function loadStudies() {
     return studies.map(s => ({
         id    : `/studies/${s.id}`,
         icon  : "experiment",
+        title : s.label,
         render: () => s.label,
-        view  : () => <StudyView study={s} key={s.id} />,
+        // view  : () => <StudyView study={s} key={s.id} />,
         loader: async () => {
-            const packages = await aggregator.filterPackages({ study: s.id })
-            // const uniquePackages = packages.reduce((prev, cur) => {
-            //     if (!prev.find(p => p.name === cur.name)) {
-            //         prev.push(cur)
-            //     }
-            //     return prev
-            // }, [] as DataPackage[])
-        
-            return sortByName(packages).map(p => {
-                const [, name, version] = p.id.trim().split("__")
+            const versions = await aggregator.getStudyVersions(s.id)
+            return versions.map(v => {
                 return {
-                    title : p.id,
-                    icon  : "deployed_code",
-                    id    : `/studies/${s.id}/${p.id}`,
-                    render: () => <>{ellipsis(humanizeColumnName(name), 24, "start")}<span className="color-muted"> {version}</span></>,
-                    view  : () => <DataPackageView pkg={p} key={p.id} />,
-                    // loader: async () => {
-                    //     const versions = packages.filter(x => x.name === p.name).map(p => p.version)
-                    //     return sortByName(versions).map(x => ({
-                    //         render: () => x,
-                    //         // value: versions
-                    //     }))
-                    // }
+                    title : s.label + " v" + v,
+                    icon  : "history",
+                    id    : `/studies/${s.id}/${v}`,
+                    render: () => v,
+                    view  : () => <StudyView study={s} key={s.id + ":" + v} version={v} />,
+                    // view  : () => <DataPackageView pkg={p} key={p.id} />,
+                    loader: async () => {
+                        const packages = await aggregator.filterPackages({ study: s.id, version: v })
+                        return sortByName(packages).map(p => {
+                            const [, name] = p.id.trim().split("__")
+                            return {
+                                title : p.id,
+                                icon  : "deployed_code",
+                                id    : `/studies/${s.id}/${v}/${p.id}`,
+                                // render: () => ellipsis(humanizeColumnName(name), 28, "start"),
+                                render: () => humanizeColumnName(name),
+                                view  : () => <DataPackageView pkg={p} key={p.id} />,
+                            }
+                        })
+                    }
                 }
             })
+
+        //     const packages = await aggregator.filterPackages({ study: s.id })
+        //     // const uniquePackages = packages.reduce((prev, cur) => {
+        //     //     if (!prev.find(p => p.name === cur.name)) {
+        //     //         prev.push(cur)
+        //     //     }
+        //     //     return prev
+        //     // }, [] as DataPackage[])
+        
+        //     return sortByName(packages).map(p => {
+        //         const [, name, version] = p.id.trim().split("__")
+        //         return {
+        //             title : p.id,
+        //             icon  : "deployed_code",
+        //             id    : `/studies/${s.id}/${p.id}`,
+        //             render: () => <>{ellipsis(humanizeColumnName(name), 24, "start")}<span className="color-muted"> {version}</span></>,
+        //             view  : () => <DataPackageView pkg={p} key={p.id} />,
+        //             // loader: async () => {
+        //             //     const versions = packages.filter(x => x.name === p.name).map(p => p.version)
+        //             //     return sortByName(versions).map(x => ({
+        //             //         render: () => x,
+        //             //         // value: versions
+        //             //     }))
+        //             // }
+        //         }
+        //     })
         }
     }) as unknown as DataRow)
 }

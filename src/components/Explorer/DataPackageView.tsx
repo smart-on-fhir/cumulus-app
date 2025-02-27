@@ -25,44 +25,52 @@ export default function DataPackageView({ pkg }: { pkg: DataPackage }) {
 
     return (
         <>
-            <h1>{ humanizeColumnName(pkg.name) }</h1>
-            <hr />
-            <table>
-                <tbody>
-                    <tr>
-                        <th className="right nowrap pr-1">Name:</th>
-                        <td>{ pkg.name }</td>
-                    </tr>
-                    <tr>
-                        <th className="right nowrap pr-1">ID:</th>
-                        <td>{ pkg.id }</td>
-                    </tr>
-                    <tr>
-                        <th className="right nowrap pr-1">Last data update:</th>
-                        <td>{ new Date(pkg.last_data_update).toLocaleString() }</td>
-                    </tr>
-                    <tr>
-                        <th className="right nowrap pr-1">Total Rows:</th>
-                        <td>{ Number(pkg.total).toLocaleString() }</td>
-                    </tr>
-                    <tr>
-                        <th className="right nowrap pr-1">Study:</th>
-                        <td>{ pkg.study }</td>
-                    </tr>
-                    {/* <tr>
-                        <th className="right nowrap pr-1">S3 Path:</th>
-                        <td><span className="color-muted" style={{ wordBreak: "break-all" }}>{ pkg.s3_path || "" }</span></td>
-                    </tr> */}
-                </tbody>
-            </table>
-
-            <h5 className="mt-2 color-blue-dark">Columns</h5>
-            <hr className="mb-1" />
-            <ColumnsTable cols={cols} />
-
-            <h5 className="mt-2 color-blue-dark">Data Sources</h5>
-            <hr className="mb-1" />
-            <PackageSubscriptionsList pkg={pkg} />
+            <h1>
+                <i className="material-symbols-outlined mr-05" style={{ verticalAlign: "text-bottom", fontSize: "1.2em" }}>deployed_code</i>
+                { humanizeColumnName(pkg.name) }
+            </h1>
+            <p className="color-muted">Description not available</p>
+            <div className="row gap-2 wrap">
+                <div className="col col-8 responsive">
+                    <h5 className="mt-2">Columns</h5>
+                    <hr className="mb-1" />
+                    <ColumnsTable cols={cols} />
+                    <h5 className="mt-2">Data Sources</h5>
+                    <hr className="mb-1" />
+                    <PackageSubscriptionsList pkg={pkg} />
+                    {/* <h5 className="mt-2 color-blue-dark">Generic Data Views</h5>
+                    <hr className="mb-1" />
+                    TODO... */}
+                </div>
+                <div className="col" style={{ wordBreak: "break-all", minWidth: "16rem" }}>
+                    <h5 className="mt-2">Metadata</h5>
+                    <hr className="mb-1" />
+                    <br />
+                    <b>Name</b>
+                    <div className="color-muted">{ pkg.name }</div>
+                    <br />
+                    <b>ID</b>
+                    <div className="color-muted">{ pkg.id }</div>
+                    <br />
+                    <b>Last Data Update</b>
+                    <div className="color-muted">{ new Date(pkg.last_data_update).toLocaleString() }</div>
+                    <br />
+                    <b>Total Rows</b>
+                    <div className="color-muted">{ Number(pkg.total).toLocaleString() }</div>
+                    <br />
+                    <b>Study</b>
+                    <div className="color-muted">{ pkg.study }</div>
+                    <br />
+                    <b>Version</b>
+                    <div className="color-muted">{ pkg.version }</div>
+                    <br />
+                    <b>Type</b>
+                    <div className="color-muted">{ pkg.type || "cube" }</div>
+                    {/* <br />
+                    <b>S3 Path</b>
+                    <div>{ pkg.s3_path || "" }</div> */}
+                </div>
+            </div>
         </>
     )
 }
@@ -75,7 +83,7 @@ function PackageSubscriptionsList({ pkg }: { pkg: DataPackage }) {
                     return <div className="color-muted mt-05">No Data Sources have been created from this package.</div>
                 }
                 return (
-                    <Grid gap="0 1rem" cols="22em" className="link-list mt-05">
+                    <Grid gap="0 1rem" cols="18em" className="link-list mt-05">
                         { data.map((s, i) => (
                             <SubscriptionLink key={i} request={s} href={"/requests/" + s.id}/>
                         ))}

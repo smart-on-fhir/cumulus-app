@@ -207,12 +207,22 @@ class Aggregator
         return data.reduce((prev, cur) => {
             if (!prev.find(s => s.id === cur.study)) {
                 prev.push({
-                    id: cur.study,
+                    id   : cur.study,
                     label: humanizeColumnName(cur.study)
                 })
             }
             return prev;
         }, [] as Study[])
+    }
+
+    public async getStudyVersions(studyId: string): Promise<string[]> {
+        const data = await this.filterPackages({ study: studyId })
+        return data.reduce((prev, cur) => {
+            if (!prev.find(s => s === cur.version)) {
+                prev.push(cur.version)
+            }
+            return prev;
+        }, [] as string[]).sort()
     }
 
     public async getPackages(): Promise<DataPackage[]> {
