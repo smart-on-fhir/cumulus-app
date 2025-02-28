@@ -104,7 +104,7 @@ export default function Navigation()
                         logout().then(() => navigate("/"));
                     }}>
                         <i className="icon fa-solid fa-right-from-bracket" />
-                        <b className="color-red">SIGN OUT</b>
+                        Sign Out
                         { loading && <i className="fas fa-circle-notch fa-spin color-muted" /> }
                     </div>
                 </NavGroup>

@@ -11,18 +11,25 @@
     z-index: 10000;
 
     .logo-link {
-        line-height   : 1;
-        font-size     : 1.8rem;
-        color         : #FFF9;
+        line-height   : 2.5rem;
+        font-size     : 1.6rem;
+        color         : #FFFB;
         letter-spacing: 0.4rem;
+        margin: 0 0 0 0.25rem;
 
         img {
             height: 1.8rem;
-            margin: 0.2rem 0.5em -0.2rem 20px;
+            margin: 0 0.5em -0.2rem 0;
         }
 
         sup {
             font-size: 50%;
+        }
+
+        .logo-icon {
+            font-size: 3rem;
+            vertical-align: top;
+            margin: 0 0.25rem 0 0;
         }
     }
 
