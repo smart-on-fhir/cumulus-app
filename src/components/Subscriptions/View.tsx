@@ -103,9 +103,9 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
                         <div className="col middle">
                             <p>This data source is currently empty. Please begin by uploading CSV data.</p>
                             <p className="center mt-1">
-                                <button className="btn btn-blue">
+                                <Link className="btn btn-blue" to={`/requests/${model.id}/import`}>
                                     <b>Upload CSV Data</b>
-                                </button>
+                                </Link>
                             </p>
                         </div>
                     </> }
