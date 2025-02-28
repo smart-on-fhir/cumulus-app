@@ -96,13 +96,63 @@ async function loadStudies() {
 
 async function loadGroups() {
     const groups = await request<app.SubscriptionGroup[]>("/api/request-groups")
-    return sortByName(groups).filter(g => !!g.id).map(g => ({
-        render: () => g.name,
-        loader: () => loadSubscriptionsForGroup(g),
-        view  : () => <SubscriptionGroupView id={g.id} />,
-        title : g.name,
-        id    : "/groups/" + g.id,
-    } as unknown as DataRow))
+    
+    return sortByName(groups).map(g => {
+        if (g.id) {
+            return {
+                render: () => g.name,
+                loader: () => loadSubscriptionsForGroup(g),
+                view  : () => <SubscriptionGroupView id={g.id} />,
+                title : g.name,
+                id    : "/groups/" + g.id
+            } as unknown as DataRow
+        }
+
+        return {
+            render: () => g.name,
+            loader: async () => {
+                return g.requests.map((s: any) => {
+                    const id = `/groups/GENERAL/${s.id}`
+                    return {
+                        render: () => s.name,
+                        loader   : s.metadata?.type === "flat" ? undefined : () => loadGraphsForSubscription(s, id),
+                        icon     : s.metadata?.type === "flat" ? "table" : "deployed_code",
+                        iconColor: "#369",
+                        title    : s.name,
+                        view     : () => <SubscriptionView id={s.id} />,
+                        id
+                    } as unknown as DataRow
+                })
+            },
+            // view  : () => <SubscriptionGroupView id={g.id} />,
+            title : "The GENERAL group is a virtual container for items not explicitly assigned to other group",
+            id    : "/groups/GENERAL"
+        } as unknown as DataRow
+    });
+
+    
+    // const children = sortByName(groups).filter(g => !!g.id).map(g => ({
+    //     render: () => g.name,
+    //     loader: () => loadSubscriptionsForGroup(g),
+    //     view  : () => <SubscriptionGroupView id={g.id} />,
+    //     title : g.name,
+    //     id    : "/groups/" + g.id
+    // } as unknown as DataRow));
+
+    // groups.find(g => !g.id)?.requests.forEach(s => {
+    //     const id = `/groups/GENERAL/${s.id}`
+    //     children.push({
+    //         render: () => s.name,
+    //         loader   : s.metadata?.type === "flat" ? undefined : () => loadGraphsForSubscription(s, id),
+    //         icon     : s.metadata?.type === "flat" ? "table" : "deployed_code",
+    //         iconColor: "#369",
+    //         title    : s.name,
+    //         view     : () => <SubscriptionView id={s.id} />,
+    //         id
+    //     } as unknown as DataRow)
+    // })
+
+    // return children
 }
 
 async function loadSubscriptionsForGroup(group: app.SubscriptionGroup) {
@@ -112,7 +162,7 @@ async function loadSubscriptionsForGroup(group: app.SubscriptionGroup) {
         return {
             render   : () => s.name,
             loader   : s.metadata?.type === "flat" ? undefined : () => loadGraphsForSubscription(s, id),
-            icon     : s.metadata?.type === "flat" ? "table" : "database",
+            icon     : s.metadata?.type === "flat" ? "table" : "deployed_code",
             iconColor: "#369",
             title    : s.name,
             view     : () => <SubscriptionView id={s.id} />,
@@ -144,7 +194,7 @@ async function loadStudyAreas() {
         view  : () => <ViewStudyArea id={x.id} />,
         loader: async () => sortByName(x.Subscriptions!).map(s => ({
             id       : `/study-areas/${x.id}/subscriptions/${s.id}`,
-            icon     : "database",
+            icon     : s.metadata?.type === "flat" ? "table" : "deployed_code",
             iconColor: "#369",
             title    : s.name,
             render   : () => s.name,
@@ -200,7 +250,7 @@ async function loadSubscriptionsForTag(tagId: number) {
     // @ts-ignore
     return sortByName(tag.subscriptions).map(s => ({
         render   : () => s.name,
-        icon     : "database",
+        icon     : s.metadata?.type === "flat" ? "table" : "deployed_code",
         iconColor: "#369",
         id       : "/tags/" + tagId + "/subscriptions/" + s.id,
         view     : () => <SubscriptionView id={s.id} />,
@@ -254,7 +304,7 @@ export default function Explorer() {
         if (canListGroups && canReadSubscriptions) {
             DATA.push({
                 id       : "/groups",
-                render   : () => "Groups",
+                render   : () => "Data Sources",
                 view     : () => <SubscriptionGroupList />,
                 loader   : loadGroups,
                 icon     : "folder_open",
@@ -308,7 +358,7 @@ export default function Explorer() {
 
     const [selected, setSelected] = useState<DataRow | null>(null)
     const [params, setParams] = useSearchParams()
-    const path = params.get("path") || "/study-areas"
+    const path = params.get("path") || "/groups"
 
     useEffect(() => {
         find(path, DATA).then(node => {

@@ -44,7 +44,7 @@ export default function SiteView({ site }: { site: Site }) {
                                 { Object.keys(site.studies[id]).map((version, i) => {
                                     return <div key={i}>
                                         <Link to={`/explorer?path=${encodeURIComponent(`/studies/${id}/${version}`)}`} className="link ml-1">
-                                            <i className="material-symbols-outlined mr-025" style={{ verticalAlign: "top", lineHeight: "1.3rem", fontSize: "1.4em" }}>history</i>v{version}
+                                            <i className="material-symbols-outlined mr-025" style={{ verticalAlign: "top", lineHeight: "1.3rem", fontSize: "1.4em" }}>history</i> Version {version}
                                         </Link>
                                     </div>
                                 })}
