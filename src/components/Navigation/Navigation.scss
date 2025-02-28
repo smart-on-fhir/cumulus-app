@@ -2,12 +2,12 @@
 
 .navigation {
     background : #e8e8e8;
-    font-size  : 1.3rem;
+    // font-size  : 1.3rem;
     width      : 16rem;
-    font-weight: 500;
+    // font-weight: 500;
     box-shadow : -1px 0 0 0 rgba(0, 0, 0, 0.1) inset;
     // font-family: Arial, "Open Sans", sans-serif;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    // font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     // font-family: 'Arial Narrow', Arial, sans-serif;
     // font-family: 'Arial Narrow', sans-serif;
     white-space: nowrap;
@@ -18,7 +18,6 @@
     max-height : calc(100vh - 4rem);
     overflow   : auto;
     white-space: nowrap;
-    text-shadow: 0 1px 0 #FFFC;
     padding    : 1rem 0;
 
     label {
@@ -35,26 +34,33 @@
 
     a, .link {
         display        : block;
-        height         : 1.8em;
-        line-height    : 1.8em;
+        height         : 2rem;
+        line-height    : 2rem;
         color          : inherit;
         text-decoration: none;
         overflow       : hidden;
+        padding        : 0 0.1rem;
         
 
         .icon {
-            width      : 3rem;
-            height     : 1.8em;
-            line-height: 1.8em;
+            width      : 1.6rem;
+            height     : 1.6rem;
+            line-height: 1.6rem;
             text-align : center;
             float      : left;
-            margin     : 0;
-            opacity    : 0.6;
+            margin     : 0.2rem 0.3rem 0.2rem 0.2rem;
+            // opacity    : 0.6;
+            font-size  : 14px;
+            // color      : #69C;
+            // background-color: #69C;
+            border-radius: 4px;
+            // text-shadow: 0 0 0.5px #000;
         }
 
         &:hover {
             background     : rgba(0, 0, 0, 0.1);
             text-decoration: none;
+            text-shadow    : 0 1px 0 #e8e8e8;
         }
 
         &.active {
@@ -62,7 +68,7 @@
             color      : #C60;
             opacity    : 1;
             box-shadow : 0 1px 0 0 rgba(0, 0, 0, 0.1), 0 -1px 0 0 rgba(0, 0, 0, 0.1);
-            font-weight: 600;
+            // font-weight: 600;
             .icon {
                 opacity: 1;
             }
@@ -71,18 +77,18 @@
         .chevron {
             color      : rgba(0, 0, 0, 0.3);
             float      : right;
-            line-height: 2.4rem;
+            line-height: 2rem;
             padding    : 0 0.75rem;
             font-size  : 60%;
         }
     }
 
     .group {
-        // padding-left: 2rem;
-        text-indent: 2.5rem;
+        
+        // text-indent: 1.8rem;
         display    : none;
         font-weight: 400;
-        font-size  : 1.1rem;
+        // font-size  : 1.1rem;
         // white-space : nowrap;
         // text-overflow: ellipsis;
         // overflow: hidden;
@@ -90,14 +96,15 @@
         a, .link {
             // color: $color-blue-dark;
             // font-family: "Arial";//$font-family;
+            padding-left: 1.8rem;
             
-            .icon {
+            // .icon {
                 // color      : $color-blue-dark;
                 // opacity    : 1;
-                text-shadow: 0 0 1px #FFF;
-                margin     : 0 0.5rem;
-                width      : 1.5rem;
-            }
+                // text-shadow: 0 0 1px #FFF;
+                // margin     : 0;
+                // width      : 1.5rem;
+            // }
 
             &.active {
                 background: #f8f8f7;
@@ -126,25 +133,19 @@
 
     .navigation {
         position: fixed;
-        top: 5rem;
-        bottom: 1rem;
-        left: 1rem;
-        z-index: 10000;
-        width: 2.4rem;
+        top     : 5rem;
+        bottom  : 1rem;
+        left    : 1rem;
+        z-index : 10000;
+        width   : 2.2rem;
         padding-bottom: 1rem;
         
         .group, .group.active, .chevron {
             display: none;
         }
 
-        a, .link {
-            .icon {
-                width: 2.4rem;
-            }
-        }
-
         &:hover {
-            width: 18em;
+            width: 16rem;
             .group.active {
                 display: block;
             }

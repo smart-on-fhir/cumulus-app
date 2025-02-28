@@ -71,10 +71,11 @@ function CloudMenu() {
 export default function Header() {
     return (
         <header id="app-header">
-            <div className="container container-fluid row pl-1 pr-1">
+            <div className="container container-fluid row pr-1">
                 <div className="col col-0 pr-1 middle left">
                     <Link className="logo-link" to="/">
-                        <img src="/smart-logo-light-text.svg" alt="Cumulus Logo"/>CUMULUS<sup>&#xAE;</sup>
+                        <span className="material-symbols-outlined logo-icon">nest_farsight_weather</span>
+                        CUMULUS<sup>&#xAE;</sup>
                     </Link>
                 </div>
                 <div className="col middle center">
