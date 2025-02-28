@@ -110,13 +110,13 @@
                     height: 18px;
                     line-height: 16px;
                     text-align: center;
-                    margin-right: 1px;
+                    // margin-right: 1px;
                     cursor: default;
                     // float: left;
                     // display: inline;
                     &:hover {
                         background: #FFF;
-                        box-shadow: 0 0 0 1px #0003 inset;
+                        box-shadow: 0 0 0 1px #0002 inset;
                     }
                 }
             }
