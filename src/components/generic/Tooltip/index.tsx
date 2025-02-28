@@ -33,16 +33,17 @@ export default class Tooltip extends Component<any> {
 
             // @ts-ignore
             this.tooltip.current.firstChild!.innerHTML = el.getAttribute("data-tooltip") ?? ""
-
-            this.positionTooltip(el)
-            this.tooltip.current.style.opacity = "1"
+            this.tooltip.current.style.opacity = "0.001"
+            requestAnimationFrame(() => {
+                if (el && this.tooltip.current) {
+                    this.positionTooltip(el)
+                    this.tooltip.current.style.opacity = "1"
+                }
+            })
         }, 300)
     }
 
     positionTooltip(el: Element) {
-        // @ts-ignore - Force reflow
-        // eslint-disable-next-line
-        let tmp = el.offsetHeight + el.offsetWidth + this.tooltip.current!.offsetHeight + this.tooltip.current!.offsetWidth;
         const pos    = el.getAttribute("data-tooltip-position") ?? "50% 0"
         const elRect = el.getBoundingClientRect()
         const ttRect = this.tooltip.current!.getBoundingClientRect()
