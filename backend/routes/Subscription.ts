@@ -15,7 +15,6 @@ import ImportJob                                                from "../DataMan
 import { getFindOptions, assert, rw, uInt, bool, cached }       from "../lib"
 import { version as pkgVersion }                                from "../../package.json"
 import { DATA_TYPES }                                           from "../DataManager/dataTypes"
-import { fetchSubscriptionData }                                from "../DataManager/CsvDownloader"
 import config                                                   from "../config"
 
 
@@ -182,18 +181,6 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
     }
     loop()
 
-}));
-
-// Refresh Data endpoint ------------------------------------------------------
-router.get("/:id/refresh", rw(async (req: AppRequest, res: Response) => {
-    requestPermission({ user: req.user, resource: "Subscriptions", action: "refresh" })
-    requestPermission({ user: req.user, resource: "Subscriptions", action: "update"  })
-    requestPermission({ user: req.user, resource: "Subscriptions", action: "read"    })
-    const model = await Model.findByPk(req.params.id, { user: req.user })
-    assert(model, "Model not found", NotFound)
-    await fetchSubscriptionData(model)
-    await model.reload({ user: req.user })
-    res.json(model)
 }));
 
 // By Group --------------------------------------------------------------------

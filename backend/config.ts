@@ -27,8 +27,7 @@ const {
     REGIONAL_CLUSTER_EMAIL = "",
     AGGREGATOR_URL         = "",
     AGGREGATOR_API_KEY     = "",
-    AGGREGATOR_ENABLED     = "false",
-    API_KEYS               = "{}"
+    AGGREGATOR_ENABLED     = "false"
 } = process.env;
 
 
@@ -80,8 +79,6 @@ const config: Config = {
         apiKey : AGGREGATOR_API_KEY,
         enabled: bool(AGGREGATOR_ENABLED)
     },
-
-    apiKeys: JSON.parse(API_KEYS),
 
     mailGun: {
         // Your Mailgun API KEY

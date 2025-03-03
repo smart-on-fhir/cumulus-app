@@ -81,9 +81,6 @@ interface Config {
         apiKey : string
         enabled: boolean
     }
-
-    /** Keys are hosts and values are api keys */
-    apiKeys: Record<string, string>
 }
 
 interface CurrentUser {
