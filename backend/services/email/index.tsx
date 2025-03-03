@@ -1,4 +1,3 @@
-import { readFileSync }      from "fs"
 import ReactDOMServer        from "react-dom/server"
 import sendEmail             from "./sendMail"
 import config                from "../../config"
@@ -14,16 +13,13 @@ import {
 } from "./components"
 
 
-const headerImage = readFileSync(__dirname + "/email-header.png");
-const base64Image = headerImage.toString("base64");
-
 function generateHtml(component: JSX.Element): string {
     return `<!DOCTYPE html>
     <html>
         <body style="font:18px sans-serif;margin:0;padding:8px">
             <header>
                 <div style="max-width:720px;margin: 0 auto">
-                    <img src="data:image/png;base64,${base64Image}" style="width:100%;display:block;" />
+                    CUMULUS<sup>®</sub>
                 </div>
             </header>
             <div style="margin:0 auto; padding:18px 0;max-width:720px">
