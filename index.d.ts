@@ -35,7 +35,8 @@ declare module app {
         "date:YYYY wk W" |
         "date:YYYY-MM-DD" |
         "date:YYYY-MM" |
-        "date:YYYY"
+        "date:YYYY" | 
+        "hidden"
 
     interface ColumnDescriptor {
         name: string

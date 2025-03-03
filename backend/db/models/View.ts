@@ -150,7 +150,7 @@ export default class View extends BaseModel<InferAttributes<View>, InferCreation
 
                                         // Graphs shared with groups I'm a member of
                                         { id: {
-                                            [Op.in]: this.sequelize.literal(`(
+                                            [Op.in]: sequelize.literal(`(
                                                 SELECT "resource_id"
                                                 FROM "Permissions"
                                                 WHERE "user_group_id" IN (SELECT "UserGroupId" FROM "UserGroupUsers" WHERE "UserId" = ${+user.id})
