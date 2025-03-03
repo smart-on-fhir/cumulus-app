@@ -22,7 +22,7 @@ export async function getDockerContainer(options: Config)
         // "/cumulus" is already in use by container "...". You have to remove
         // (or rename) that container to be able to reuse that name. 
         // Happens after unexpected exit!
-        if (error.statusCode === 409) {
+        if ((error as any).statusCode === 409) {
             const docker = new Docker({ socketPath: '/var/run/docker.sock' })
             container = docker.getContainer(options.docker.containerName)
             await container.restart()

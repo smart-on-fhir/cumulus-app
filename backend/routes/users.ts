@@ -200,7 +200,7 @@ route(router, {
             });
         } catch (e) {
             const error = new BadRequest("Error updating account")
-            error.cause = e.stack
+            error.cause = (e as Error).stack
             throw error
         }
     }
@@ -320,11 +320,11 @@ route(router, {
                 });
             }
         } catch (e) {
-            debug(e)
+            debug(e + "")
 
             await transaction.rollback()
 
-            if (e.name === "SequelizeUniqueConstraintError") {
+            if ((e as Error).name === "SequelizeUniqueConstraintError") {
                 throw new BadRequest("User already invited")
             }
 
@@ -339,7 +339,7 @@ route(router, {
                 message
             })
         } catch (e) {
-            debug(e)
+            debug(e + "")
             await transaction.rollback()
             throw new InternalServerError("Error sending invitation email")
         }
@@ -482,7 +482,7 @@ route(router, {
             res.end("Password updated")
         } catch (e) {
             const error = new BadRequest("Error updating account")
-            error.cause = e.stack
+            error.cause = (e as Error).stack
             throw error
         }
     }

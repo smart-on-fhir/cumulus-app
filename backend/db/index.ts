@@ -16,9 +16,9 @@ async function waitForDatabaseServer(options: Config)
         try {
             await getDockerContainer(options)
         } catch (ex) {
-            if (ex.failed && !ex.isCanceled && !ex.killed) {
-                logger.error(ex)
-                process.exit(ex.exitCode)
+            if ((ex as any).failed && !(ex as any).isCanceled && !(ex as any).killed) {
+                logger.error(ex + "")
+                process.exit((ex as any).exitCode)
             }
             throw ex
         }
@@ -34,7 +34,7 @@ async function connectToDatabase(options: Config)
         logger.verbose("✔ Connected to the database");
         return connection
     } catch (ex) {
-        logger.error("✘ Failed to connected to the database", { ...ex });
+        logger.error("✘ Failed to connected to the database", { ...(ex as any) });
         throw ex;
     }
 }

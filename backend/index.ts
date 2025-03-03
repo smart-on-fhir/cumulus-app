@@ -94,7 +94,7 @@ function setUpErrorHandlers(app: Application)
 
         // Sequelize Validation Errors
         else if (error.name === "SequelizeValidationError" || error.name === "SequelizeUniqueConstraintError") {
-            const msg = error.errors.map(e => `${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => ${e.type || "Error"} while validating ${e.path || "data"}: ${e.message}`).join("\n")
+            const msg = error.errors.map((e: any) => `${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => ${e.type || "Error"} while validating ${e.path || "data"}: ${e.message}`).join("\n")
             logger.error("Sequelize Validation Error " + JSON.stringify(error, null, 4))
             res.status(400).send(msg);
         }

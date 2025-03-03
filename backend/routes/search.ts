@@ -70,7 +70,7 @@ route(router, {
         // Also search through package names from the aggregator
         if (aggregatorIsEnabled()) {
             const packages = await aggregatorRequest(req, "/data-packages")
-            results = results.concat(packages.filter(p => p.name.toLowerCase().includes(q)).map(p => ({
+            results = results.concat(packages.filter((p: any) => p.name.toLowerCase().includes(q)).map((p: any) => ({
                 name: p.name,
                 description: null,
                 id: p.id,

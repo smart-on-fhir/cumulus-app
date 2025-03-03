@@ -201,7 +201,7 @@ route(router, {
         try {
             const model = await Model.create({ ...req.body }, { transaction, user: req.user })
             if (Array.isArray(req.body.users)) {
-                await model.setUsers(req.body.users.map(u => u.id), { transaction, user: req.user })
+                await model.setUsers(req.body.users.map((u: any) => u.id), { transaction, user: req.user })
                 await model.reload({ include: [{ association: "users" }], transaction, user: req.user })
             }
             await transaction.commit()

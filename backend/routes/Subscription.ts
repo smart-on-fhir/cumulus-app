@@ -544,7 +544,7 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
             type: QueryTypes.SELECT
         });
     } catch (ex) {
-        throw new BadRequest(ex)
+        throw new BadRequest(ex as Error)
     }
 
     // Do some post-processing
@@ -759,7 +759,7 @@ route(router, {
         const json: any = model!.toJSON()
 
         if (json.metadata?.cols?.length) {
-            json.metadata.cols = json.metadata.cols.map(col => {
+            json.metadata.cols = json.metadata.cols.map((col: any) => {
 
                 if (col.name === "cnt") {
                     col.meta = {
@@ -770,7 +770,7 @@ route(router, {
 
                 else {
                     // const meta = ColumnsMetadata.find(item => item.hasOwnProperty(col.name));
-                    const meta = ColumnsMetadata[col.name];
+                    const meta = ColumnsMetadata[col.name as keyof typeof ColumnsMetadata];
                     if (meta) {
                         col.meta = meta//[col.name];
                     }

@@ -326,7 +326,7 @@ route(router, {
         assert(req.user?.id, "Guest cannot create graphs", Unauthorized)
         const model = await Model.create({ ...req.body, creatorId: req.user.id }, { user: req.user })
         if (Array.isArray(req.body.Tags)) {
-            await model.setTags(req.body.Tags.map(t => t.id), { user: req.user })
+            await model.setTags(req.body.Tags.map((t: any) => t.id), { user: req.user })
             await model.reload({ include: [{ association: "Tags" }], user: req.user })
         }
         res.json(model)
@@ -428,7 +428,7 @@ route(router, {
 
         const file = Buffer.from(match[2], "base64");
 
-        const cacheKey = crypto.createHash("sha1").update(file).digest("hex");
+        const cacheKey = crypto.createHash("sha1").update(match[2]).digest("hex");
 
         res.setHeader('Cache-Control', `max-age=31536000, no-cache`)
         res.setHeader('Vary', 'Origin, ETag')
