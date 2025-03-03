@@ -4,7 +4,6 @@ import { cached, rw }                 from "../lib"
 import config                         from "../config"
 import icd10Catalog                   from "../icd10_hierarchy_count.json"
 import loincCatalog                   from "../loinc_tree.json"
-// import catalog                        from "../icd10_hierarchy_stratifiers_count.json"
 
 
 export const router = express.Router({ mergeParams: true })
