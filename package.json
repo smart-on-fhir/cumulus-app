@@ -74,7 +74,8 @@
     "openapi:build": "redocly build-docs backend/api.yaml --output=docs/api.html",
     "openapi:watch": "nodemon -w backend/api.yaml -x 'npm run openapi:lint && npm run openapi:build'",
 
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "heroku-postbuild": "npm run build"
   },
   "eslintConfig": {
     "extends": [
