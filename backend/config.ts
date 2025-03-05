@@ -82,7 +82,7 @@ const config: Config = {
 
     mailGun: {
         // Your Mailgun API KEY
-        apiKey: MAILGUN_API_KEY,
+        apiKey: MAILGUN_API_KEY || "Missing Mailgun API Key",
 
         // Your public Mailgun API KEY
         publicApiKey: "",
