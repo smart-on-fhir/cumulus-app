@@ -59,7 +59,7 @@
 
     "start"         : "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
     "start:prod"    : "node dist/backend/index.js",
-    "start:prod:old": "ts-node -P backend/tsconfig.json backend",
+    "start:prod:ts" : "ts-node -P backend/tsconfig.json backend",
     "start:dev"     : "cd docker && docker compose --env-file='../.env.development.local' up",
     "start:hmr"     : "PORT=3000 react-scripts start",
     
