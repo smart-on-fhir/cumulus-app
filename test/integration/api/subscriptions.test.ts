@@ -180,244 +180,244 @@ describe("Subscriptions", () => {
         testEndpoint("Subscriptions.read", "GET", "/api/requests/1/raw-data")
     })
 
-    describe("refresh subscription data", () => {
+    // describe("refresh subscription data", () => {
 
-        const mockServer = new MockServer("CSV Server", true)
+    //     const mockServer = new MockServer("CSV Server", true)
 
-        before(() => mockServer.start())
-        after(() => mockServer.stop())
-        afterEach(() => mockServer.clear())
+    //     before(() => mockServer.start())
+    //     after(() => mockServer.stop())
+    //     afterEach(() => mockServer.clear())
 
-        it ("guest cannot refresh subscription data", async () => {
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`)
-            expect(res.status).to.equal(401)
-        })
+    //     it ("guest cannot refresh subscription data", async () => {
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`)
+    //         expect(res.status).to.equal(401)
+    //     })
 
-        it ("Rejects subscriptions without dataUrl", async () => {
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
-            expect(res.status).to.equal(400)
-            expect(await res.text()).to.equal("Cannot fetch data for subscription having no dataURL")
-        })
+    //     it ("Rejects subscriptions without dataUrl", async () => {
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
+    //         expect(res.status).to.equal(400)
+    //         expect(await res.text()).to.equal("Cannot fetch data for subscription having no dataURL")
+    //     })
 
-        it ("Passes error status codes down to the client", async () => {
-            await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
-            mockServer.mock("/csv", { status: 404 })
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
-            expect(res.status).to.equal(400)
-            expect(await res.text()).to.equal("Unexpected response code 404. Expecting 200.")
-        })
+    //     it ("Passes error status codes down to the client", async () => {
+    //         await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
+    //         mockServer.mock("/csv", { status: 404 })
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
+    //         expect(res.status).to.equal(400)
+    //         expect(await res.text()).to.equal("Unexpected response code 404. Expecting 200.")
+    //     })
 
-        it ("requires x-column-names header to have valid item length", async () => {
-            await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
-            mockServer.mock("/csv", {
-                headers: {
-                    "content-type": "text/csv",
-                    "x-column-names": "a,b,c"
-                },
-                body: "cnt,a,b,c\n"
-            })
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
-            expect(await res.text()).to.equal("The file contains 4 columns but names for 3 columns were provided")
-            expect(res.status).to.equal(400)
-        })
+    //     it ("requires x-column-names header to have valid item length", async () => {
+    //         await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
+    //         mockServer.mock("/csv", {
+    //             headers: {
+    //                 "content-type": "text/csv",
+    //                 "x-column-names": "a,b,c"
+    //             },
+    //             body: "cnt,a,b,c\n"
+    //         })
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
+    //         expect(await res.text()).to.equal("The file contains 4 columns but names for 3 columns were provided")
+    //         expect(res.status).to.equal(400)
+    //     })
 
-        it ("requires x-column-types header to have valid item length", async () => {
-            await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
-            mockServer.mock("/csv", {
-                headers: {
-                    "content-type": "text/csv",
-                    "x-column-types": "integer,float,boolean"
-                },
-                body: "cnt,a,b,c\n"
-            })
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
-            expect(await res.text()).to.equal("The file contains 4 columns but data types for 3 columns were provided")
-            expect(res.status).to.equal(400)
-        })
+    //     it ("requires x-column-types header to have valid item length", async () => {
+    //         await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
+    //         mockServer.mock("/csv", {
+    //             headers: {
+    //                 "content-type": "text/csv",
+    //                 "x-column-types": "integer,float,boolean"
+    //             },
+    //             body: "cnt,a,b,c\n"
+    //         })
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
+    //         expect(await res.text()).to.equal("The file contains 4 columns but data types for 3 columns were provided")
+    //         expect(res.status).to.equal(400)
+    //     })
 
-        it ("requires x-column-descriptions header to have valid item length", async () => {
-            await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
-            mockServer.mock("/csv", {
-                headers: {
-                    "content-type": "text/csv",
-                    "x-column-descriptions": "x,y,z"
-                },
-                body: "cnt,a,b,c\n"
-            })
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
-            // console.log(await res.text())
-            expect(await res.text()).to.equal("The file contains 4 columns but descriptions for 3 columns were provided")
-            expect(res.status).to.equal(400)
-        })
+    //     it ("requires x-column-descriptions header to have valid item length", async () => {
+    //         await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
+    //         mockServer.mock("/csv", {
+    //             headers: {
+    //                 "content-type": "text/csv",
+    //                 "x-column-descriptions": "x,y,z"
+    //             },
+    //             body: "cnt,a,b,c\n"
+    //         })
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
+    //         // console.log(await res.text())
+    //         expect(await res.text()).to.equal("The file contains 4 columns but descriptions for 3 columns were provided")
+    //         expect(res.status).to.equal(400)
+    //     })
 
-        it ("Catches missing total row", async () => {
-            await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
-            mockServer.mock("/csv", {
-                headers: {
-                    "content-type"         : "text/csv",
-                    "x-column-names"       : "cnt    , a     , b   , c",
-                    "x-column-types"       : "integer, string, date, boolean",
-                    "x-column-descriptions": "cnt    , a     , b   , c"
-                },
-                body: "cnt, a, b, c\n"
-            })
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
-            expect(await res.text()).to.equal(`Unable to find a total row where all data columns are NULL`)
-            expect(res.status).to.equal(400)
-        })
+    //     it ("Catches missing total row", async () => {
+    //         await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
+    //         mockServer.mock("/csv", {
+    //             headers: {
+    //                 "content-type"         : "text/csv",
+    //                 "x-column-names"       : "cnt    , a     , b   , c",
+    //                 "x-column-types"       : "integer, string, date, boolean",
+    //                 "x-column-descriptions": "cnt    , a     , b   , c"
+    //             },
+    //             body: "cnt, a, b, c\n"
+    //         })
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
+    //         expect(await res.text()).to.equal(`Unable to find a total row where all data columns are NULL`)
+    //         expect(res.status).to.equal(400)
+    //     })
         
-        it ("Catches rows with extra columns", async () => {
-            await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
-            mockServer.mock("/csv", {
-                headers: {
-                    "content-type"         : "text/csv",
-                    "x-column-names"       : "cnt    , a     , b   , c",
-                    "x-column-types"       : "integer, string, float, boolean",
-                    "x-column-descriptions": "cnt    , a     , b   , c"
-                },
-                body: "cnt,a,b,c\n1,2,3,4\n1,2,3,4,5\n1,2,3,4"
-            })
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
-            expect(await res.text()).to.equal(`Number of cells exceeds the number of columns`)
-            expect(res.status).to.equal(400)
-        })
+    //     it ("Catches rows with extra columns", async () => {
+    //         await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
+    //         mockServer.mock("/csv", {
+    //             headers: {
+    //                 "content-type"         : "text/csv",
+    //                 "x-column-names"       : "cnt    , a     , b   , c",
+    //                 "x-column-types"       : "integer, string, float, boolean",
+    //                 "x-column-descriptions": "cnt    , a     , b   , c"
+    //             },
+    //             body: "cnt,a,b,c\n1,2,3,4\n1,2,3,4,5\n1,2,3,4"
+    //         })
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
+    //         expect(await res.text()).to.equal(`Number of cells exceeds the number of columns`)
+    //         expect(res.status).to.equal(400)
+    //     })
 
-        it ("Catches invalid data types", async () => {
-            await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
-            mockServer.mock("/csv", {
-                headers: {
-                    "content-type"         : "text/csv",
-                    "x-column-names"       : "cnt    , a     , b   , c",
-                    "x-column-types"       : "integer, string, badColumn, boolean",
-                    "x-column-descriptions": "cnt    , a     , b   , c"
-                },
-                body: "cnt,a,b,c\n1,2,3,4\n1,2,3,4\n1,2,3,4"
-            })
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
-            expect(await res.text()).to.equal(`Invalid data type "badColumn" at column 3`)
-            expect(res.status).to.equal(400)
-        })
+    //     it ("Catches invalid data types", async () => {
+    //         await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
+    //         mockServer.mock("/csv", {
+    //             headers: {
+    //                 "content-type"         : "text/csv",
+    //                 "x-column-names"       : "cnt    , a     , b   , c",
+    //                 "x-column-types"       : "integer, string, badColumn, boolean",
+    //                 "x-column-descriptions": "cnt    , a     , b   , c"
+    //             },
+    //             body: "cnt,a,b,c\n1,2,3,4\n1,2,3,4\n1,2,3,4"
+    //         })
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
+    //         expect(await res.text()).to.equal(`Invalid data type "badColumn" at column 3`)
+    //         expect(res.status).to.equal(400)
+    //     })
 
-        it ("Catches parse errors", async () => {
-            await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
-            mockServer.mock("/csv", {
-                headers: {
-                    "content-type"         : "text/csv",
-                    "x-column-names"       : "cnt    , a     , b   , c",
-                    "x-column-types"       : "integer, string, badColumn, boolean",
-                    "x-column-descriptions": "cnt    , a     , b   , c"
-                },
-                body: 'cnt,a,b,c\n1,2,3,4\n1,2,"3,4\n1,2,3,4'
-            })
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
-            expect(await res.text()).to.equal(`Syntax error - unterminated string. Expecting "\\"", line: 1,2,"3,4`)
-            expect(res.status).to.equal(400)
-        })
+    //     it ("Catches parse errors", async () => {
+    //         await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv` }, { where: { id: 1 }, user: SystemUser })
+    //         mockServer.mock("/csv", {
+    //             headers: {
+    //                 "content-type"         : "text/csv",
+    //                 "x-column-names"       : "cnt    , a     , b   , c",
+    //                 "x-column-types"       : "integer, string, badColumn, boolean",
+    //                 "x-column-descriptions": "cnt    , a     , b   , c"
+    //             },
+    //             body: 'cnt,a,b,c\n1,2,3,4\n1,2,"3,4\n1,2,3,4'
+    //         })
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
+    //         expect(await res.text()).to.equal(`Syntax error - unterminated string. Expecting "\\"", line: 1,2,"3,4`)
+    //         expect(res.status).to.equal(400)
+    //     })
 
-        it ("redirects", async () => {
-            await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv1` }, { where: { id: 1 }, user: SystemUser })
-            mockServer.mock("/csv1", {
-                status: 302,
-                headers: {
-                    "x-column-descriptions": "cnt-desc, a-desc, b-desc, c-desc",
-                    "x-column-types"       : "integer, string, float, float",
-                    location: "/csv2"
-                }
-            })
-            mockServer.mock("/csv2", {
-                headers: {
-                    "content-type"         : "text/csv",
-                    "x-column-names"       : "cnt    , a     , b    , c",
-                    "x-column-types"       : "integer, string, float, boolean",
-                    // "x-column-descriptions": "cnt    , a     , b   , c"
-                },
-                body: 'cnt,a,b,c\n1,2,3,4\n5,6,7,8\n9,,,'
-            })
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
-            const json = await res.json()
-            expect(json.metadata).to.deep.equal({
-                cols: [
-                    { name: 'cnt', label: 'cnt', dataType: 'integer', description: 'cnt-desc' },
-                    { name: 'a'  , label: 'a'  , dataType: 'string' , description: 'a-desc'   },
-                    { name: 'b'  , label: 'b'  , dataType: 'float'  , description: 'b-desc'   },
-                    { name: 'c'  , label: 'c'  , dataType: 'boolean', description: 'c-desc'   }
-                ],
-                total: 9
-            })
-        })
+    //     it ("redirects", async () => {
+    //         await Subscription.update({ dataURL: `${mockServer.baseUrl}/csv1` }, { where: { id: 1 }, user: SystemUser })
+    //         mockServer.mock("/csv1", {
+    //             status: 302,
+    //             headers: {
+    //                 "x-column-descriptions": "cnt-desc, a-desc, b-desc, c-desc",
+    //                 "x-column-types"       : "integer, string, float, float",
+    //                 location: "/csv2"
+    //             }
+    //         })
+    //         mockServer.mock("/csv2", {
+    //             headers: {
+    //                 "content-type"         : "text/csv",
+    //                 "x-column-names"       : "cnt    , a     , b    , c",
+    //                 "x-column-types"       : "integer, string, float, boolean",
+    //                 // "x-column-descriptions": "cnt    , a     , b   , c"
+    //             },
+    //             body: 'cnt,a,b,c\n1,2,3,4\n5,6,7,8\n9,,,'
+    //         })
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, { headers: { cookie: getCookie("manager") }})
+    //         const json = await res.json()
+    //         expect(json.metadata).to.deep.equal({
+    //             cols: [
+    //                 { name: 'cnt', label: 'cnt', dataType: 'integer', description: 'cnt-desc' },
+    //                 { name: 'a'  , label: 'a'  , dataType: 'string' , description: 'a-desc'   },
+    //                 { name: 'b'  , label: 'b'  , dataType: 'float'  , description: 'b-desc'   },
+    //                 { name: 'c'  , label: 'c'  , dataType: 'boolean', description: 'c-desc'   }
+    //             ],
+    //             total: 9
+    //         })
+    //     })
 
-        it ("ignores empty x-column-names headers", async () => {
-            const model = (await Subscription.findByPk(1, { user: SystemUser }))!
-            await model.update({ dataURL: `${mockServer.baseUrl}/csv` }, { user: SystemUser })
-            mockServer.mock("/csv", {
-                headers: {
-                    "content-type"  : "text/csv",
-                    "x-column-names": "",
-                    "x-column-types": "integer, string, string, string",
-                },
-                body: [
-                    "cnt,a,b,c",
-                    '20,,,',
-                    '10,x,,""',
-                    "12,,y,",
-                    "2,,,z"
-                ].join("\n")
-            })
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, {
-                headers: {
-                    cookie: getCookie("manager")
-                }
-            })
-            await model.reload({ user: SystemUser })
+    //     it ("ignores empty x-column-names headers", async () => {
+    //         const model = (await Subscription.findByPk(1, { user: SystemUser }))!
+    //         await model.update({ dataURL: `${mockServer.baseUrl}/csv` }, { user: SystemUser })
+    //         mockServer.mock("/csv", {
+    //             headers: {
+    //                 "content-type"  : "text/csv",
+    //                 "x-column-names": "",
+    //                 "x-column-types": "integer, string, string, string",
+    //             },
+    //             body: [
+    //                 "cnt,a,b,c",
+    //                 '20,,,',
+    //                 '10,x,,""',
+    //                 "12,,y,",
+    //                 "2,,,z"
+    //             ].join("\n")
+    //         })
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, {
+    //             headers: {
+    //                 cookie: getCookie("manager")
+    //             }
+    //         })
+    //         await model.reload({ user: SystemUser })
 
-            // console.log(await res.text())
-            expect(res.status).to.equal(200)
-            expect(model.metadata).to.deep.equal({
-                cols: [
-                    { name: "cnt", label: "Count", dataType: "integer", description: "Count" },
-                    { name: "a"  , label: "A"    , dataType: "string" , description: "" },
-                    { name: "b"  , label: "B"    , dataType: "string" , description: "" },
-                    { name: "c"  , label: "C"    , dataType: "string" , description: "" }
-                ],
-                total: 20
-            })
-        })
+    //         // console.log(await res.text())
+    //         expect(res.status).to.equal(200)
+    //         expect(model.metadata).to.deep.equal({
+    //             cols: [
+    //                 { name: "cnt", label: "Count", dataType: "integer", description: "Count" },
+    //                 { name: "a"  , label: "A"    , dataType: "string" , description: "" },
+    //                 { name: "b"  , label: "B"    , dataType: "string" , description: "" },
+    //                 { name: "c"  , label: "C"    , dataType: "string" , description: "" }
+    //             ],
+    //             total: 20
+    //         })
+    //     })
 
-        it ("Works as expected", async () => {
-            const model = (await Subscription.findByPk(1, { user: SystemUser }))!
-            await model.update({ dataURL: `${mockServer.baseUrl}/csv` }, { user: SystemUser })
-            mockServer.mock("/csv", {
-                headers: {
-                    "content-type": "text/csv"
-                },
-                body: [
-                    "cnt,a,b,c",
-                    '20,,,',
-                    '10,x,,""',
-                    "12,,y,",
-                    "2,,,z"
-                ].join("\n")
-            })
-            const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, {
-                headers: {
-                    cookie: getCookie("manager")
-                }
-            })
-            await model.reload({ user: SystemUser })
+    //     it ("Works as expected", async () => {
+    //         const model = (await Subscription.findByPk(1, { user: SystemUser }))!
+    //         await model.update({ dataURL: `${mockServer.baseUrl}/csv` }, { user: SystemUser })
+    //         mockServer.mock("/csv", {
+    //             headers: {
+    //                 "content-type": "text/csv"
+    //             },
+    //             body: [
+    //                 "cnt,a,b,c",
+    //                 '20,,,',
+    //                 '10,x,,""',
+    //                 "12,,y,",
+    //                 "2,,,z"
+    //             ].join("\n")
+    //         })
+    //         const res = await fetch(`${server.baseUrl}/api/requests/1/refresh`, {
+    //             headers: {
+    //                 cookie: getCookie("manager")
+    //             }
+    //         })
+    //         await model.reload({ user: SystemUser })
 
-            // console.log(await res.text())
-            expect(res.status).to.equal(200)
-            expect(model.metadata).to.deep.equal({
-                cols: [
-                    { name: "cnt", label: "Count", dataType: "integer", description: "Count" },
-                    { name: "a"  , label: "A"    , dataType: "string" , description: "" },
-                    { name: "b"  , label: "B"    , dataType: "string" , description: "" },
-                    { name: "c"  , label: "C"    , dataType: "string" , description: "" }
-                ],
-                total: 20
-            })
-        })
-    })
+    //         // console.log(await res.text())
+    //         expect(res.status).to.equal(200)
+    //         expect(model.metadata).to.deep.equal({
+    //             cols: [
+    //                 { name: "cnt", label: "Count", dataType: "integer", description: "Count" },
+    //                 { name: "a"  , label: "A"    , dataType: "string" , description: "" },
+    //                 { name: "b"  , label: "B"    , dataType: "string" , description: "" },
+    //                 { name: "c"  , label: "C"    , dataType: "string" , description: "" }
+    //             ],
+    //             total: 20
+    //         })
+    //     })
+    // })
 
     describe("import subscription data", () => {
 

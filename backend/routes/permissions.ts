@@ -81,7 +81,7 @@ function makeArray(x: any) {
     return [x]
 }
 
-export async function emailsToUserIDs(emails: string[]) {
+export async function emailsToUserIDs(emails: string[]): Promise<number[]> {
     const list = await User.findAll({
         attributes: ["id"],
         where: {

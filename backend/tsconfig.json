@@ -18,7 +18,4 @@
   "ts-node": {
     "transpileOnly": true
   },
-  "include": [
-    "backend"
-  ]
 }
