@@ -10,15 +10,7 @@ const dbSettings = parseDbUrl(process.env.DATABASE_URL || "")
 const {
     HOST                   = "0.0.0.0",
     PORT                   = "4000",
-    DB_SEED                = "db/seeds",
-    DB_SYNC                = "none", // normal|force|alter|none
-    DB_HOST                = dbSettings.host || "localhost",
-    DB_PORT                = dbSettings.port || "5432",
-    DB_USER                = dbSettings.username || "",
-    DB_PASS                = dbSettings.password || "",
-    DB_DATABASE            = dbSettings.database || "cumulus",
     THROTTLE               = 0,
-    DB_SSL                 = "true",
     DB_DOCKER_CONTAINER    = "",
     MAILGUN_API_KEY        = "missing mailgun api key",
     MAILGUN_DOMAIN         = "smarthealthit.org",
@@ -56,22 +48,22 @@ const config: Config = {
         containerName: DB_DOCKER_CONTAINER
     },
     db: {
-        sync: DB_SYNC as Config["db"]["sync"],
-        seed: bool(DB_SEED) ? Path.join(__dirname, DB_SEED) : "",
+        sync: String(dbSettings.query.sync || "none") as Config["db"]["sync"],
+        seed: bool(dbSettings.query.seed) ? Path.join(__dirname, dbSettings.query.seed) : "",
         options: {
             dialectOptions: {
-                ssl: bool(DB_SSL) ? {
+                ssl: bool(dbSettings.query.ssl ?? true) ? {
                     rejectUnauthorized: false
                 } : false
             },
             dialect : "postgres",
             schema  : "public",
-            database: DB_DATABASE,
+            database: dbSettings.database || "cumulus",
             logging : logSql,
-            username: DB_USER,
-            password: DB_PASS,
-            port    : +DB_PORT,
-            host    : DB_HOST
+            username: dbSettings.username || "",
+            password: dbSettings.password || "",
+            port    : +(dbSettings.port   || "5432"),
+            host    : dbSettings.host     || "localhost"
         }
     },
     aggregator: {
