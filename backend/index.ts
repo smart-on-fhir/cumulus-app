@@ -60,7 +60,7 @@ function setupAPI(app: Application)
 function setupStaticContent(app: Application)
 {
     // Get the path to the static content
-    const staticPath = process.env.NODE_ENV === "production" ?
+    const staticPath = process.env.NODE_ENV === "production" && process.env.DOCKER_CONTAINER ?
         Path.join(__dirname, "../frontend"):
         Path.join(__dirname, "../dist/frontend");
     
