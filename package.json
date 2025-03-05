@@ -57,21 +57,24 @@
     "build:frontend": "BUILD_PATH='./dist/frontend' react-scripts build",
     "build:server"  : "tsc -p backend/tsconfig.json",
 
-    "start": "npm run start:manual",
-    "start:docker": "if-env NODE_ENV=production && npm run start:prod:docker || npm run start:dev:docker",
-    "start:manual": "if-env NODE_ENV=production && npm run start:prod:manual || npm run start:dev:manual",
-    "start:prod:docker": "cd docker && docker compose --env-file='../.env.production.local' up",
-    "start:dev:docker": "cd docker && docker compose --env-file='../.env.development.local' up",
-    "start:prod:manual": "ts-node -P backend/tsconfig.json -r dotenv-expand/config backend dotenv_config_path=.env.production.local",
-    "start:dev:manual": "nodemon -e js,ts,tsx,json -w backend -x 'ts-node -P backend/tsconfig.json -r dotenv-expand/config backend dotenv_config_path=.env.development.local'",
-    "start:hmr": "PORT=$HMR_PORT react-scripts start dotenv_config_path=.env.development.local",
-    "eject": "react-scripts eject",
-    "test": "DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov ts-mocha -p test/tsconfig.json",
-    "test:frontend": "react-scripts test --watch --coverage",
-    "test:server:watch": "nodemon -w backend -w test -e ts,tsx,json -x 'npm test'",
-    "openapi:lint": "redocly lint backend/api.yaml",
+    "start"         : "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
+    "start:prod"    : "node backend/index.js",
+    "start:dev"     : "cd docker && docker compose --env-file='../.env.development.local' up",
+    "start:hmr"     : "PORT=3000 react-scripts start",
+    
+    "watch:server"  : "nodemon -e js,ts,tsx,json -w backend -x 'ts-node -P backend/tsconfig.json -r dotenv-expand/config backend dotenv_config_path=.env.development.local'",
+    
+    "test"               : "npm run test:server",
+    "test:frontend"      : "react-scripts test --coverage",
+    "test:frontend:watch": "react-scripts test --watch --coverage",
+    "test:server"        : "DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov ts-mocha -p test/tsconfig.json",
+    "test:server:watch"  : "nodemon -w backend -w test -e ts,tsx,json -x 'npm run test:server'",
+    
+    "openapi:lint" : "redocly lint backend/api.yaml",
     "openapi:build": "redocly build-docs backend/api.yaml --output=docs/api.html",
-    "openapi:watch": "nodemon -w backend/api.yaml -x 'npm run openapi:lint && npm run openapi:build'"
+    "openapi:watch": "nodemon -w backend/api.yaml -x 'npm run openapi:lint && npm run openapi:build'",
+
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
