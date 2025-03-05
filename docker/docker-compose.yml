@@ -14,7 +14,7 @@ services:
     ports:
       - $PORT:80
     volumes:
-      - ../build:/usr/share/nginx/html 
+      - ../dist/frontend:/usr/share/nginx/html 
     depends_on:
       - db
 
@@ -24,19 +24,11 @@ services:
       context: ..
       dockerfile: docker/backend.Dockerfile
     ports:
-      - $INTERNAL_PORT:80
+      - 4001:80
     depends_on:
       - db
     environment:
-      - DB_HOST=db
-      - DB_PORT=$DB_PORT
-      - DB_USER=$DB_USER
-      - DB_PASS=$DB_PASS
-      - DB_DATABASE=$DB_DATABASE
-      - DB_SYNC=$DB_SYNC
-      - DB_SEED=$DB_SEED
-      - DB_SSL=$DB_SSL
-      - DATABASE_URL=postgres://$DB_USER:$DB_PASS@db:$DB_PORT/$DB_DATABASE
+      - DATABASE_URL=$DATABASE_URL
       - NODE_ENV=$NODE_ENV
       - MAILGUN_API_KEY=$MAILGUN_API_KEY
       - MAILGUN_DOMAIN=$MAILGUN_DOMAIN
@@ -50,8 +42,7 @@ services:
       - APP_EMAIL_FROM=$APP_EMAIL_FROM
     volumes:
       - ../backend:/app/backend
-      - ../build:/app/build
-      - ../logs:/app/logs
+      - ../dist/frontend:/app/dist/frontend
 
   db:
     container_name: cumulus-dashboard-db

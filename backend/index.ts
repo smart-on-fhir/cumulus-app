@@ -59,10 +59,24 @@ function setupAPI(app: Application)
 
 function setupStaticContent(app: Application)
 {
+    // Get the path to the static content
+    const staticPath = process.env.NODE_ENV === "production" ?
+        Path.join(__dirname, "../frontend"):
+        Path.join(__dirname, "../dist/frontend");
+    
+    // Don't have a favicon
     app.get("/favicon.ico", (req, res) => res.status(404).end());
-    app.use(express.static(Path.join(__dirname, "../build/")));
+    
+    // Serve the cumulus_library_columns file (temporary)
     app.get("/cumulus_library_columns.json", (req, res) => res.sendFile("cumulus_library_columns.json", { root: __dirname }));
-    app.get("*", (req, res) => res.sendFile("index.html", { root: Path.join(__dirname, "../build/") }));
+    
+    // Serve the static content
+    app.use(express.static(staticPath));
+    
+    // Serve the index.html file for all other requests
+    app.get("*", (req, res) => res.sendFile("index.html", { root: staticPath }));
+    
+    // Declare the static content hosted
     logger.verbose("✔ Static content hosted");
 }
 

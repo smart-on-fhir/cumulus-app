@@ -15,4 +15,4 @@ RUN npm ci
 
 EXPOSE 80
 
-CMD ["npm", "run", "start:manual"]
+CMD ["npm", "run", "watch:server"]
