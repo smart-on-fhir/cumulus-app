@@ -12,10 +12,13 @@ import Subscription                from "../db/models/Subscription"
 import { assert }                  from "../lib"
 import { AppRequest, CurrentUser } from "../types"
 import * as logger                 from "../services/logger"
+import config                      from "../config"
+
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
+    connectionString: process.env.DATABASE_URL?.replace(/\?.*$/, "") || "",
+    ssl: (config.db.options.dialectOptions as any).ssl // === true ? { rejectUnauthorized: false } : false
+    // ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
 });
 
 const JOBS: Record<string, ImportJob> = {};
