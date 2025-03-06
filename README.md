@@ -1,6 +1,16 @@
 # Cumulus Dashboard
 
-## Installation
+## Deploying Docker image
+There is a Dockerfile which builds a production image containing compiled
+version of the dashboard backend and frontend. This can be used to deploy to
+any environment that can work with such images. An additional requirement is to
+setup a Postgres 14 database and make sure a `DATABASE_URL` env variable is
+provided to the dashboard image while running it.
+
+[Read More](./docker/readme.md)
+
+
+## Local Installation
 
 ***Prerequisites***
 1. OS - This app has been only tested on Mac OS and Linux
@@ -27,11 +37,11 @@ to do is:
 ```
 ./bin/cumulus.ts configure
 ```
-The configuration script will generate a local config file for you named `.env.production.local`
-or `.env.development.local`. You can run it twice to generate both files, although 
-you don't typically need use production settings on local machine and vice versa.
+The configuration script will generate a local config file for you named `.env.production.local`,
+or `.env.development.local`, or `.env.test.local`. You can run it multiple times to generate all files,
+although you typically only need the development settings on local machine.
 
-When you run the configure script for the first time it will create configuration files.
+When you run the configure script for the first time it will create the configuration file.
 However, any subsequent runs will NOT override existing config files. Instead, the script
 will just display the proposed file contents and even show a diff of which variables have
 been changed.
@@ -49,59 +59,39 @@ to rebuild on every restart.
 
 Another build that happens once is the docker images build. It happens when you
 start the instance via docker-compose for the first time. If for any reason you
-need to rebuild, `cd docker` and run one of these (depending on what your environment
-is and what .env file you have generated):
-
-**for production**
-```
-docker-compose --env-file='../.env.production.local' up --build
-```
-**for development**
+need to rebuild, `cd docker` and run:
 ```
 docker-compose --env-file='../.env.development.local' up --build 
 ```
 
 ## Run
-There are 4 major ways to start the dashboard. Production instances are those deployed for public use.
+There are multiple ways to start the dashboard. Production instances are those deployed for public use.
 Development instances are started by developers on their local machines in order to test the app or
 contribute in some way.
 
-- Run **production** instance via **docker-compose**
-    1. Prepare (see below)
-    2. Make sure a `NODE_ENV` environment variable is set to `production`
-    3. Run `npm run start:docker`
-- Run **production** instance **manually**
-    1. Prepare (see below)
-    2. Make sure a `NODE_ENV` environment variable is set to `production`
-    3. Run `npm start`
-- Run **development** instance via **docker-compose**
-    1. Make sure a `NODE_ENV` environment variable is set to `development`
-    2. Run `npm run start:docker`
-    3. In separate terminal run `npm run start:hmr`
-- Run **development** instance **manually**
-    1. Make sure a `NODE_ENV` environment variable is set to `development`
-    2. Run `npm run start:manual`
-    3. In separate terminal run `npm run start:hmr`
+- **Heroku** (or other similar environments)
+  1. All the necessary environment variables should be set before deploying
+  2. A Postgres database should be available as a service and the `DATABASE_URL` env variable should point to it
+  3. The `NODE_ENV` environment variable should be set to `production`
+  4. Deploy with Heroku. That should pull the code and run `npm install`, `npm run build`, `npm start`. This should be enough to get a running instance.
 
-Note that in production there is a formal step that we call "prepare".
-This can include various steps like:
-- Initial deployment setup
-- Pulling latest code
-- Installing (`npm install`)
-- Building (`npm run build`)
+- **Using Docker Images**
+  1. All the necessary environment variables should be set before deploying
+  2. A Postgres database should be available as a service and the `DATABASE_URL` env variable should point to it
+  3. The `NODE_ENV` environment variable should be set to `production`
+  4. Build and run a production dashboard image. [Details](./docker/readme.md)
 
-## Using the Dashboard
-Once the dashboard is started you can access it at:
-- http://localhost:4000 by default, or whatever your HOST and PORT have been configured to
-- In development you can also run `npm run start:hmr` and use the live app with hot reloading
-  at http://localhost:3000. If port 3000 is not available the number will be incremented and
-  the updated URL should be printed in the terminal.
-- You can also use DB management tools to connect the database. For example, the default
-  connection string for a development database would be `postgres://postgres:cumulus-db-password@localhost:4002/cumulus`.
+- **Development** (on a local machine)
+  1. Generate a development env file if you don't have one already - `./bin/cumulus.ts configure`
+  2. Run `npm start`
+  3. The dashboard will be available at http://localhost:4000 (or whatever HOST/PORT you have configured). However, for front-end development it might be better to run `npm run start:hmr` in separate terminal. This will start a development server with hot-reloading enabled at http://localhost:3000.
 
+
+## Database Data
 Upon installation the dashboard app will have some data pre-inserted. This includes a
 few default user accounts, as well as some sample data for testing in case of
 development installation. Here are the default user credentials:
+
 |role   |email              |password     |
 |-------|-------------------|-------------|
 |admin  |admin@cumulus.dev  |Admin@12345  |
