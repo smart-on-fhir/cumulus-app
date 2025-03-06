@@ -11,51 +11,67 @@ const STATE: Record<string, string | number | boolean> = {}
 
 function generateEnvFile() {
     const vars: Record<string, string | number | boolean> = {
-        NODE_ENV              : String(STATE.NODE_ENV),
-        PORT                  : String(STATE.PORT),
-        INTERNAL_PORT         : String(STATE.INTERNAL_PORT),
-        DB_PORT               : String(STATE.DB_PORT),
-        DB_USER               : String(STATE.DB_USER),
-        DB_PASS               : String(STATE.DB_PASS),
-        DB_DATABASE           : String(STATE.DB_DATABASE),
-        DB_SSL                : String(STATE.DB_SSL),
-        DB_SEED               : String(STATE.DB_SEED),
-        DB_SYNC               : String(STATE.DB_SYNC),
-        DATABASE_URL          : String(STATE.DATABASE_URL),
-        MAILGUN_API_KEY       : String(STATE.MAILGUN_API_KEY),
-        MAILGUN_DOMAIN        : String(STATE.MAILGUN_DOMAIN),
-        APP_EMAIL_FROM        : String(STATE.APP_EMAIL_FROM),
-        CUMULUS_ADMIN_EMAIL   : String(STATE.CUMULUS_ADMIN_EMAIL),
-        REGIONAL_CLUSTER_EMAIL: String(STATE.REGIONAL_CLUSTER_EMAIL),
-        REACT_APP_NOTEBOOK_URL: String(STATE.REACT_APP_NOTEBOOK_URL),
-        AGGREGATOR_URL        : String(STATE.AGGREGATOR_URL),
-        AGGREGATOR_API_KEY    : String(STATE.AGGREGATOR_API_KEY),
-        AGGREGATOR_ENABLED    : String(STATE.AGGREGATOR_ENABLED),
-        THROTTLE              : String(STATE.THROTTLE || 0),
+        NODE_ENV              : String(STATE.NODE_ENV         || "development"),
+        PORT                  : String(STATE.PORT                             ),
+        DB_PORT               : String(STATE.DB_PORT                          ),
+        DB_USER               : String(STATE.DB_USER                          ),
+        DB_PASS               : String(STATE.DB_PASS                          ),
+        DB_DATABASE           : String(STATE.DB_DATABASE                      ),
+        DATABASE_URL          : String(STATE.DATABASE_URL           || ""     ),
+        MAILGUN_API_KEY       : String(STATE.MAILGUN_API_KEY        || ""     ),
+        MAILGUN_DOMAIN        : String(STATE.MAILGUN_DOMAIN         || ""     ),
+        APP_EMAIL_FROM        : String(STATE.APP_EMAIL_FROM         || ""     ),
+        CUMULUS_ADMIN_EMAIL   : String(STATE.CUMULUS_ADMIN_EMAIL    || ""     ),
+        REGIONAL_CLUSTER_EMAIL: String(STATE.REGIONAL_CLUSTER_EMAIL || ""     ),
+        REACT_APP_NOTEBOOK_URL: String(STATE.REACT_APP_NOTEBOOK_URL || ""     ),
+        AGGREGATOR_URL        : String(STATE.AGGREGATOR_URL         || ""     ),
+        AGGREGATOR_API_KEY    : String(STATE.AGGREGATOR_API_KEY     || ""     ),
+        AGGREGATOR_ENABLED    : String(STATE.AGGREGATOR_ENABLED     || "false"),
     }
 
-    if (STATE.HOST    !== undefined) STATE.HOST    = String(STATE.HOST   )
-    if (STATE.DB_HOST !== undefined) STATE.DB_HOST = String(STATE.DB_HOST)
-
-    vars.THROTTLE = "0"
-
-    if (STATE.NODE_ENV === "development") {
-        vars.NODE_DEBUG = '"app:*"'
-        vars.LOG_LEVEL = "debug" // silly, debug, verbose, http, info, warn, error
-        vars.DB_SEED = "db/seeds/development"
-        // vars.DANGEROUSLY_DISABLE_HOST_CHECK = "true"
-    } else {
-        vars.LOG_LEVEL = "info"
-        vars.DB_SEED = "db/seeds/production"
-    }
-
-    // TODO: # REACT_APP_BACKEND_HOST="http://localhost:$INTERNAL_PORT"
+    if (STATE.HOST    !== undefined) vars.HOST    = String(STATE.HOST   )
+    if (STATE.DB_HOST !== undefined) vars.DB_HOST = String(STATE.DB_HOST)
 
     // @ts-ignore
     dotenvExpand.expand({ parsed: vars })
 
+    let out = `# Database\n`
+    out += `DATABASE_URL=${vars.DATABASE_URL}\n`
+    if (vars.NODE_ENV === "test") {
+        out += `DB_DOCKER_CONTAINER=cumulus_test\n`
+    }
+    if (STATE.DEPLOY === "docker") {
+        out += `\n# The app only uses DATABASE_URL but the following variables\n` +
+               `# are needed for docker compose, to be passed to the database\n`
+        out += `DB_PORT=${vars.DB_PORT}\n`
+        out += `DB_USER=${vars.DB_USER}\n`
+        out += `DB_PASS=${vars.DB_PASS}\n`
+        out += `DB_DATABASE=${vars.DB_DATABASE}\n`
+    }
+    out += `\n`
+    out += `# Emails\n`
+    out += `MAILGUN_API_KEY=${vars.MAILGUN_API_KEY || ""}\n`
+    out += `MAILGUN_DOMAIN=${vars.MAILGUN_DOMAIN || ""}\n`
+    out += `CUMULUS_ADMIN_EMAIL=${vars.CUMULUS_ADMIN_EMAIL || ""}\n`
+    out += `REGIONAL_CLUSTER_EMAIL=${vars.REGIONAL_CLUSTER_EMAIL || ""}\n`
+    out += `APP_EMAIL_FROM=${vars.APP_EMAIL_FROM || ""}\n`
+    out += `\n`
+    out += `# Aggregator\n`
+    out += `AGGREGATOR_URL=${vars.AGGREGATOR_URL || ""}\n`
+    out += `AGGREGATOR_API_KEY=${vars.AGGREGATOR_API_KEY || ""}\n`
+    out += `AGGREGATOR_ENABLED=${vars.AGGREGATOR_ENABLED || ""}\n`
+    out += `\n`
+    out += `# Misc\n`
+    out += `NODE_ENV=${vars.NODE_ENV}\n`
+    out += `PORT=${vars.PORT || ""}\n`
+    out += `REACT_APP_NOTEBOOK_URL=${vars.REACT_APP_NOTEBOOK_URL || ""}\n`
+    out += `NODE_DEBUG=${vars.NODE_ENV === "test" ? "" : "app-verbose,app-error,app-info,app-warn,app-log"}\n`
+    out += `BROWSER=none\n`
+    out += `THROTTLE=0\n`
+    out += `CI=true\n`
+    out += `\n`
 
-    return Object.keys(vars).map(k => `${k}=${vars[k]}`).join("\n")
+    return out
 }
 
 
@@ -63,10 +79,10 @@ export default async function main()
 {
     // Main settings -----------------------------------------------------------
 
-    // NODE_ENV:  'development' | 'production'
+    // NODE_ENV: 'production' | 'development' | 'test'
     STATE.NODE_ENV = await ask(
-        `Please enter the ${clc.bold("environment")} you would like to configure.`,
-        { answers: ['development', 'production'], currentValue: STATE.NODE_ENV }
+        `What environment is this configuration intended for?`,
+        { answers: ['production', 'development', 'test'], defaultValue: "production" }
     )
 
     const FILE = `.env.${STATE.NODE_ENV}.local`
@@ -82,12 +98,7 @@ export default async function main()
     }
 
     // DEPLOY: 'docker' | 'manual'
-    STATE.DEPLOY = await ask(
-        `How would you like to deploy? Type ${clc.bold.cyan("docker")} to use docker-compose ` +
-        `or ${clc.bold.cyan("manual")} for manual configuration.In manual mode you will have ` +
-        `to set up and host the database yourself.`,
-        { answers: ['docker', 'manual'] }
-    )
+    STATE.DEPLOY = STATE.NODE_ENV === "development" ? "docker" : "manual"
 
     // HOST = "0.0.0.0"
     if (STATE.DEPLOY !== "docker") {
@@ -107,35 +118,33 @@ export default async function main()
         { defaultValue: 4000, currentValue: STATE.PORT }
     ))
 
-    // INTERNAL_PORT: 4001 in Docker or same as PORT otherwise
-    if (STATE.DEPLOY === "docker") {
-        STATE.INTERNAL_PORT = +(await ask(
-            `Enter the port number on which the dashboard API will be accessible ` +
-            `within the docker network.`,
-            { defaultValue: 4001, currentValue: STATE.INTERNAL_PORT }
-        ))
-    }
-
     // Database ----------------------------------------------------------------
 
     // DB_HOST: hostname or fixed value "db" in docker-compose
-    if (STATE.DEPLOY !== "docker") {
+    if (STATE.NODE_ENV === "production") {
         STATE.DB_HOST = await ask(
-            "Please enter the database hostname (you have chosen a manual " +
-            "deploy method, thus you will have to setup a Postgres database " +
-            "yourself and enter it's host here).",
+            "Please enter the database hostname (you will have to setup a " +
+            "Postgres database yourself and enter it's host here).",
             {
                 defaultValue: "localhost",
                 required: true,
                 currentValue: STATE.DB_HOST
             }
         );
+    } else if (STATE.NODE_ENV === "test") {
+        STATE.DB_HOST = "localhost"
+    } else {
+        STATE.DB_HOST = "db"
     }
 
     STATE.DB_PORT = +await ask(
         "Please enter the database port.",
         {
-            defaultValue: STATE.DEPLOY === "manual" ? 5432 : 4002,
+            defaultValue: STATE.NODE_ENV === "development" ?
+                4002 :
+                STATE.NODE_ENV === "production" ?
+                    5432 :
+                    5455,
             required: true,
             currentValue: STATE.DB_PORT
         }
@@ -153,7 +162,11 @@ export default async function main()
     STATE.DB_PASS = await ask(
         "Enter database password:",
         {
-            defaultValue: STATE.NODE_ENV === "development" ? "cumulus-db-password" : undefined,
+            defaultValue: STATE.NODE_ENV === "development" ?
+                "cumulus-db-password" :
+                STATE.NODE_ENV === "test" ?
+                    "cumulus_test_db_password" :
+                    undefined,
             required: true,
             currentValue: STATE.DB_PASS
         }
@@ -162,7 +175,11 @@ export default async function main()
     STATE.DB_DATABASE = await ask(
         "Enter database name:",
         {
-            defaultValue: STATE.NODE_ENV === "development" ? "cumulus" : undefined,
+            defaultValue: STATE.NODE_ENV === "development" ?
+                "cumulus" :
+                STATE.NODE_ENV === "test" ?
+                    "cumulus_test" :
+                    undefined,
             required: true,
             currentValue: STATE.DB_DATABASE
         }
@@ -177,69 +194,64 @@ export default async function main()
         }
     )
 
-    if (STATE.NODE_ENV === "production") {
-        STATE.DB_SYNC = "normal"
-    } else {
-        STATE.DB_SYNC = await ask(
-            'How would you like the database to be synchronized with model structure changes? Options are:\n' +
-            clc.bold.cyan("normal") + " - create tables for new models and do nothing for existing models\n" +
-            clc.bold.cyan("force") + "  - drop and recreate all tables\n" +
-            clc.bold.cyan("none") + "   - do not synchronize (I will do that manually)",
-            {
-                answers: ['normal', 'force', 'none'],
-                defaultValue: "normal",
-                currentValue: STATE.DB_SYNC
-            }
-        )
-    }
+    STATE.DB_SYNC = await ask(
+        'How would you like the database to be synchronized with model structure changes? Options are:\n' +
+        clc.bold.cyan("normal") + " - create tables for new models and do nothing for existing models\n" +
+        clc.bold.cyan("force") + "  - drop and recreate all tables\n" +
+        clc.bold.cyan("none") + "   - do not synchronize (I will do that manually)",
+        {
+            answers: ['normal', 'force', 'none'],
+            defaultValue: STATE.NODE_ENV === "test" ? "force" : "normal",
+            currentValue: STATE.DB_SYNC
+        }
+    )
 
-    STATE.DATABASE_URL = `postgres://${STATE.DB_USER}:${STATE.DB_PASS}@${STATE.DB_HOST || "localhost"}:${STATE.DB_PORT}/${STATE.DB_DATABASE}`
+    STATE.DATABASE_URL = `postgres://${STATE.DB_USER}:${STATE.DB_PASS}@${STATE.DB_HOST}:${
+        STATE.DB_PORT}/${STATE.DB_DATABASE}?ssl=${STATE.DB_SSL}&sync=${STATE.DB_SYNC}`
 
     // Email -------------------------------------------------------------------
 
     STATE.MAILGUN_API_KEY = await ask(
-        `Enter your Mailgun API key.`,
-        { required: true, currentValue: STATE.MAILGUN_API_KEY }
+        `Enter your Mailgun API key. Leave empty to disable email sending.`,
+        { currentValue: STATE.MAILGUN_API_KEY, defaultValue: "" }
     )
 
-    STATE.MAILGUN_DOMAIN = await ask(
-        `Enter your Mailgun domain.`,
-        {
-            required: true,
-            defaultValue: "smarthealthit.org",
-            currentValue: STATE.MAILGUN_DOMAIN
-        }
-    )
-    
-    STATE.CUMULUS_ADMIN_EMAIL = await ask(
-        `Enter the administrator email.`,
-        { required: true, currentValue: STATE.CUMULUS_ADMIN_EMAIL }
-    )
+    if (STATE.MAILGUN_API_KEY) {
+        STATE.MAILGUN_DOMAIN = await ask(
+            `Enter your Mailgun domain.`,
+            {
+                required: true,
+                defaultValue: "smarthealthit.org",
+                currentValue: STATE.MAILGUN_DOMAIN || ""
+            }
+        )
+        
+        STATE.CUMULUS_ADMIN_EMAIL = await ask(
+            `Enter the administrator email.`,
+            { required: true, currentValue: STATE.CUMULUS_ADMIN_EMAIL || "" }
+        )
 
-    STATE.REGIONAL_CLUSTER_EMAIL = await ask(
-        `Enter the regional cluster email address. Hit Enter to leave this empty and configure it later.`,
-        {
-            required: true,
-            defaultValue: "cluster@some-dph.org",
-            currentValue: STATE.REGIONAL_CLUSTER_EMAIL
-        }
-    )
-    
-    STATE.APP_EMAIL_FROM = await ask(
-        `Enter the "from" header in emails sent by the app.`,
-        { defaultValue: "admin@cumulus.org", currentValue: STATE.APP_EMAIL_FROM }
-    )
-
-
-
-    
+        STATE.REGIONAL_CLUSTER_EMAIL = await ask(
+            `Enter the regional cluster email address. Hit Enter to leave this empty and configure it later.`,
+            {
+                required: true,
+                defaultValue: "cluster@some-dph.org",
+                currentValue: STATE.REGIONAL_CLUSTER_EMAIL || ""
+            }
+        )
+        
+        STATE.APP_EMAIL_FROM = await ask(
+            `Enter the "from" header in emails sent by the app.`,
+            { defaultValue: "admin@cumulus.org", currentValue: STATE.APP_EMAIL_FROM || "" }
+        )
+    }    
 
     // Aggregator --------------------------------------------------------------
     
     STATE.AGGREGATOR_URL = await ask(
         `Enter the URL for the aggregator service. Leave empty to disable that feature."`,
         {
-            defaultValue: "https://dev.api.smartcumulus.org",
+            defaultValue: "https://api.smartcumulus.org",
             currentValue: STATE.AGGREGATOR_URL
         }
     )
