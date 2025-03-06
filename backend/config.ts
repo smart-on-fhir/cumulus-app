@@ -1,5 +1,4 @@
 import "dotenv/config"
-import Path                       from "path"
 import { bool, parseDbUrl, uInt } from "./lib"
 import { sql as logSql }          from "./services/logger"
 import { Config }                 from "./types"
