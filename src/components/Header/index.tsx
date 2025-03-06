@@ -4,6 +4,7 @@ import Grid              from "../generic/Grid"
 import Loader            from "../generic/Loader"
 import Search            from "../Search"
 import { useAggregator } from "../../Aggregator"
+import { useAuth }       from "../../auth"
 import "./Header.scss"
 
 
@@ -69,6 +70,7 @@ function CloudMenu() {
 }
 
 export default function Header() {
+    const { user } = useAuth()
     return (
         <header id="app-header">
             <div className="container container-fluid row pr-1">
@@ -79,7 +81,7 @@ export default function Header() {
                     </Link>
                 </div>
                 <div className="col middle center">
-                    <Search />
+                    { user && <Search /> }
                 </div>
                 <div className="col col-0 pl-1 middle right">
                     <MenuButton right items={ <div className="p-1"><CloudMenu /></div> }>
