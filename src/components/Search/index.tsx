@@ -13,6 +13,7 @@ interface SearchResult {
     id         : number | string
     type       : "Data Source"|"Graph"|"Data Source Group"|"Tag"|"Study Area"|"Data Package"
     study     ?: string
+    version   ?: string
 }
 
 interface SearchResponse {
@@ -130,7 +131,7 @@ function getHref(result: SearchResult) {
         case "Tag":
             return `/tags/${result.id}`;
         case "Data Package":
-            return `/explorer?path=${encodeURIComponent(`/studies/${result.study}/${result.id}`)}`;
+            return `/explorer?path=${encodeURIComponent(`/studies/${result.study}/${result.version}/${result.id}`)}`;
         default:
             return ""
     }

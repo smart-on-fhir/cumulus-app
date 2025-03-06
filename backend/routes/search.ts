@@ -71,11 +71,12 @@ route(router, {
         if (aggregatorIsEnabled()) {
             const packages = await aggregatorRequest(req, "/data-packages")
             results = results.concat(packages.filter((p: any) => p.name.toLowerCase().includes(q)).map((p: any) => ({
-                name: p.name,
+                name       : p.name,
                 description: null,
-                id: p.id,
-                type: "Data Package",
-                study: p.study
+                id         : p.id,
+                type       : "Data Package",
+                study      : p.study,
+                version    : p.version
             })))
         }
 
