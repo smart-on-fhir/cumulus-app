@@ -1,5 +1,5 @@
 import { expect } from "chai"
-import Users      from "../../fixtures/Users"
+import Users      from "../../../backend/db/seeds/test/Users"
 import {
     server,
     resetTable,

@@ -66,7 +66,6 @@ interface Config {
 
     db: {
         sync: "none" | "normal" | "force" | "alter"
-        seed: string
         options: Options
     }
 
