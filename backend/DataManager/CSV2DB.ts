@@ -69,7 +69,7 @@ export default class CSV2DB extends Transform
         try {
             return await this.client.query(sql, params)
         } catch (e) {
-            logSql(sql, { params })
+            logSql(sql, 0, { params })
             throw e
         }
     }
