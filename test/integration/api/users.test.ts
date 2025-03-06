@@ -1,5 +1,10 @@
-import { expect } from "chai"
-import Users from "../../fixtures/Users"
+import { expect, use }     from "chai"
+import chaiAsPromised      from "chai-as-promised"
+import { ValidationError } from "sequelize"
+import Users               from "../../fixtures/Users"
+import setupDB             from "../../../backend/db"
+import config              from "../../../backend/config"
+import SystemUser          from "../../../backend/SystemUser"
 import {
     server,
     resetTable,
@@ -11,12 +16,8 @@ import {
     expiredUser,
     testEndpoint
 } from "../../test-lib"
-import setupDB from "../../../backend/db";
-import config from "../../../backend/config";
-import SystemUser from "../../../backend/SystemUser";
-import { ValidationError } from "sequelize";
 
-
+use(chaiAsPromised);
 
 describe("Users", () => {
 

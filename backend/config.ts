@@ -49,7 +49,6 @@ const config: Config = {
     },
     db: {
         sync: String(dbSettings.query.sync || "none") as Config["db"]["sync"],
-        seed: bool(dbSettings.query.seed) ? Path.join(__dirname, dbSettings.query.seed) : "",
         options: {
             dialectOptions: {
                 ssl: bool(dbSettings.query.ssl ?? true) ? {

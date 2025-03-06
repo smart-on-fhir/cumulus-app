@@ -94,42 +94,33 @@ async function applyMigrations(options: Config, dbConnection: Sequelize)
     logger.verbose('✔ Successful migrations: %s', migrations.length ? migrations.map(m => m.path): "none")
 }
 
-async function applySeeds(options: Config, dbConnection: Sequelize)
+async function applySeeds(dbConnection: Sequelize)
 {
-    const seedPath = options.db.seed;
-    if (seedPath) {
-        // If we have 0 users then the the entire DB should be empty
-        const count = await dbConnection.models.User.count()
-        if (count > 0) {
-            logger.verbose("- Seeding the database SKIPPED because the users table is not empty");
-
-            // However, even if the DB is not empty the Permissions table might be
-            const permissionCount =  await dbConnection.models.Permission.count()
-            if (permissionCount === 0) {
-                logger.verbose("- Seeding default permissions...");
-                const path = join(seedPath, "permissions.ts")
-                try {
-                    const data = await import(path);
-                    await seedTable(dbConnection, "Permission", data)
-                } catch (error) {
-                    logger.error("Applying seeds failed %o", error)
-                    process.exit(1)
-                }
-                logger.verbose(`✔ Applied seeds from ${path.replace(__dirname, "")}`);
-            }
-        } else {
-            const { seed } = await import(seedPath);
-            try {
-                await seed(dbConnection);
-            } catch (error) {
-                logger.error("Applying seeds failed %o", error)
-                process.exit(1)
-            }
-            logger.verbose(`✔ Applied seeds from ${seedPath.replace(__dirname, "")}`);
-        }
-    } else {
-        logger.verbose("- Seeding the database SKIPPED because config.db.seedPath is not set!");
+    const { NODE_ENV = "development" } = process.env
+    
+    // Only recognize these 3 environments
+    if (!["production", "development", "test"].includes(NODE_ENV)) {
+        return
     }
+
+    const seedPath = join(__dirname, "seeds", NODE_ENV)
+
+    // Seed the database, but only if the users table is empty
+    const count = await dbConnection.models.User.count()
+    if (count > 0) {
+        logger.verbose("- Seeding the database SKIPPED because the users table is not empty");
+        return
+    }
+
+    const { seed } = await import(seedPath);
+    try {
+        await seed(dbConnection);
+    } catch (error) {
+        logger.error("Applying seeds failed %o", error)
+        throw error
+    }
+
+    logger.verbose(`✔ Applied seeds from ${seedPath.replace(__dirname, "")}`);
 }
 
 export default async function setupDB(options: Config): Promise<Sequelize>
@@ -154,7 +145,7 @@ export default async function setupDB(options: Config): Promise<Sequelize>
     await syncModels(options)
 
     // Insert seeds (if enabled)
-    await applySeeds(options, connection)
+    await applySeeds(connection)
 
     attachHooks(connection)
     

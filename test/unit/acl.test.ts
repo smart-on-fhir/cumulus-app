@@ -1,9 +1,14 @@
-import { expect } from "chai"
-import User       from "../../backend/db/models/User"
-import SystemUser from "../../backend/SystemUser"
+import { expect }     from "chai"
+import { resetTable } from "../test-lib"
+import User           from "../../backend/db/models/User"
+import SystemUser     from "../../backend/SystemUser"
+import Permissions    from "../../backend/db/seeds/test/permissions"
 
 
 describe("Permissions", () => {
+    
+    beforeEach(async () => await resetTable("Permission", Permissions))
+
     it ("User.getPermissions", async () => {
         const user = await User.findByPk(5, { user: SystemUser })
         const permissions = await user!.getPermissions()
