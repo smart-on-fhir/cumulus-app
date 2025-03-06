@@ -1,3 +1,10 @@
+### Build
+Assuming that you run this from the dashboard project root, and you are tagging the
+image as `dashboard-prod`, the build command would look like this:
+
+```
+docker build -t dashboard-prod -f docker/backend.prod.Dockerfile .
+```
 
 ### Run
 
