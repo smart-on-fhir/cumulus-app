@@ -58,11 +58,13 @@ const config: Config = {
             dialect : "postgres",
             schema  : "public",
             database: dbSettings.database || "cumulus",
-            logging : logSql,
+            logging : logSql as any,
             username: dbSettings.username || "",
             password: dbSettings.password || "",
             port    : +(dbSettings.port   || "5432"),
-            host    : dbSettings.host     || "localhost"
+            host    : dbSettings.host     || "localhost",
+            benchmark: true,
+            logQueryParameters: true,
         }
     },
     aggregator: {
