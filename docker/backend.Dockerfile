@@ -2,9 +2,9 @@ FROM node:18
 
 WORKDIR /app
 
-ENV PORT 80
-ENV HOST 0.0.0.0
-ENV NODE_ENV $NODE_ENV
+ENV PORT=80
+ENV HOST=0.0.0.0
+ENV NODE_ENV=$NODE_ENV
 
 COPY package.json /app/package.json
 COPY package-lock.json /app/package-lock.json
