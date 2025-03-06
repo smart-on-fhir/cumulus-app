@@ -1,6 +1,8 @@
 import { expect } from "chai"
+import moment from "moment"
 import { DATA_TYPES, NAMESPACE_PREFIX } from "../../backend/DataManager/dataTypes"
 
+moment.suppressDeprecationWarnings = true;
 
 describe("Data Types", () => {
 
