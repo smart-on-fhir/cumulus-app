@@ -1,55 +1,30 @@
-import { ReactNode, useState }                          from "react"
-import { NavLink, useLocation, matchPath, useNavigate } from "react-router-dom"
-import { useAuth }                                      from "../../auth"
-import Terminology                                      from "../../Terminology"
+import { ReactNode, useState }  from "react"
+import { NavLink, useNavigate } from "react-router-dom"
+import { useAuth }              from "../../auth"
+import Terminology              from "../../Terminology"
 import "./Navigation.scss"
 
 
-function NavGroup({ to, label, icon, children, end }: {
-    to?: string
+function NavGroup({ label, icon, children }: {
     icon: string | ReactNode
     label: string
-    end?: RegExp
     children: ReactNode
 }) {
-    const { pathname } = useLocation()
-    // const [ isOpen, setOpen ] = useState(
-    //     to ? !!matchPath({ path: to, end: false }, pathname) : undefined
-    // )
-
     const [ isOpen, setOpen ] = useState<boolean | undefined>()
 
     return (
         <>
-            { to ?
-                <NavLink to={ to } end={ end ? !end.test(pathname) : true }>
-                    { typeof icon === "string" ?
-                        <i className={ "icon " + icon } /> :
-                        icon
-                    }<label>{ label }</label>
-
-                    { children && <i
-                        className={ "fas chevron " + (isOpen ? "fa-chevron-down" : "fa-chevron-right") }
-                        title={ isOpen ? "Collapse Group" : "Expand Group" }
-                        onClick={ e => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            setOpen(!isOpen)
-                        }}
-                    /> }
-                </NavLink> :
-                <div
-                    className={ "link" + (isOpen ? " open" : "") }
-                    title={ isOpen ? "Collapse Group" : "Expand Group" }
-                    onClick={() => setOpen(!isOpen)}
-                >
-                    { typeof icon === "string" ?
-                        <i className={ "icon " + icon } /> :
-                        icon
-                    }<label>{ label }</label>
-                    { children && <i className="fas chevron fa-chevron-down" /> }
-                </div>
-            }
+            <div
+                className={ "link" + (isOpen ? " open" : "") }
+                title={ isOpen ? "Collapse Group" : "Expand Group" }
+                onClick={() => setOpen(!isOpen)}
+            >
+                { typeof icon === "string" ?
+                    <i className={ "icon " + icon } /> :
+                    icon
+                }<label>{ label }</label>
+                { children && <i className="fas chevron fa-chevron-down" /> }
+            </div>
             <div className={"group" + (isOpen === true ? " active" : isOpen === false ? " closed" : "")}>{ children }</div>
         </>
     )
