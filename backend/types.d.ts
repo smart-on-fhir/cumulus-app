@@ -53,7 +53,7 @@ interface Config {
     // When line-level data is requested, the email is sent to this address.
     regionalClusterEmail: string
 
-    // When new data sources are created, notification emails are sent to this address
+    // When new subscriptions are created, notification emails are sent to this address
     cumulusAdminEmail: string
 
     userInviteExpireAfterHours: number

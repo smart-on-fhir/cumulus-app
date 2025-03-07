@@ -10,6 +10,7 @@ import Breadcrumbs                          from "../generic/Breadcrumbs";
 import Checkbox                             from "../generic/Checkbox";
 import Loader                               from "../generic/Loader";
 import { app }                              from "../../types";
+import Terminology                          from "../../Terminology";
 
 type DataElementNeed = "required" | "preferred" | "optional"
 
@@ -177,7 +178,7 @@ export default function Preload() {
     if (error) return <AlertError>{`Error fetching view with id "${id}": ${error}`}</AlertError>
     if (!result) return <AlertError>{`Error fetching data"`}</AlertError>
     if (!result.view) return <AlertError>{`Error fetching view with id "${id}"`}</AlertError>
-    if (!result.subscription) return <AlertError>{`Error fetching Data Source with id "${result.view.subscriptionId}"`}</AlertError>
+    if (!result.subscription) return <AlertError>{`Error fetching ${Terminology.subscription.nameSingular} with id "${result.view.subscriptionId}"`}</AlertError>
 
     const { view, subscription } = result || {};
 

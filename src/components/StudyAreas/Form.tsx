@@ -2,7 +2,8 @@ import { FormEvent, useState } from "react"
 import Loader                  from "../generic/Loader"
 import LinkWidget              from "./LinkWidget"
 import { app }                 from "../../types"
-import MarkdownEditor from "../generic/MarkdownEditor"
+import MarkdownEditor          from "../generic/MarkdownEditor"
+import Terminology             from "../../Terminology"
 
 export default function Form({ data = {}, onSubmit, loading, error }: {
     data?: Record<string, any>
@@ -60,7 +61,7 @@ export default function Form({ data = {}, onSubmit, loading, error }: {
                     </div>
                 </div>
                 <div className="col col-6 mb-1 responsive">
-                    <label>Included Data Sources</label>
+                    <label>Included {Terminology.subscription.namePlural}</label>
                     <LinkWidget
                         value={subscriptions}
                         onChange={setSubscriptions}

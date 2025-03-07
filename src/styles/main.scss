@@ -110,6 +110,15 @@ b, .bold {
   text-decoration: underline;
 }
 
+.icon {
+  &.material-symbols-outlined {
+    font-size: 1.3em;
+    line-height: 0;
+    vertical-align: middle;
+    overflow: visible;
+  }
+}
+
 // Colors ----------------------------------------------------------------------
 .color-blue       { color: $color-blue       }
 .color-blue-dark  { color: $color-blue-dark  }

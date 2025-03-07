@@ -1,6 +1,7 @@
 import { Command }           from "../Command"
 import { app }               from "../../types"
 import { requestPermission } from "../../utils"
+import Terminology           from "../../Terminology"
 
 
 export class OpenInAnalyticEnvironment extends Command
@@ -19,7 +20,7 @@ export class OpenInAnalyticEnvironment extends Command
     }
 
     description() {
-        return "Open this Data Source in external analytic environment"
+        return `Open this ${Terminology.subscription.nameSingular} in external analytic environment`
     }
 
     icon() {

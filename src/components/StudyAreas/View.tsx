@@ -1,10 +1,11 @@
 import { useAuth }        from "../../auth"
-import SubscriptionLink    from "../Subscriptions/SubscriptionLink"
+import SubscriptionLink   from "../Subscriptions/SubscriptionLink"
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import Grid               from "../generic/Grid"
 import Markdown           from "../generic/Markdown"
 import ViewThumbnail      from "../Views/ViewThumbnail"
 import { app }            from "../../types"
+import Terminology        from "../../Terminology"
 
 
 export default function ViewStudyArea({ id }: { id?: number }) {
@@ -14,8 +15,8 @@ export default function ViewStudyArea({ id }: { id?: number }) {
     return createViewPage<app.StudyArea>({
         basePath  : "/study-areas",
         endpoint  : "/api/study-areas",
-        namePlural: "Study Areas",
-        icon      : <i className="fa-solid fa-book color-brand-2" />,
+        namePlural: Terminology.studyArea.namePlural,
+        icon      : <span className="icon material-symbols-outlined color-brand-2">{Terminology.studyArea.icon}</span>,
         canUpdate : user?.permissions.includes("Tags.update"),
         canDelete : user?.permissions.includes("Tags.delete"),
         id,
@@ -37,8 +38,8 @@ export default function ViewStudyArea({ id }: { id?: number }) {
                 <div className="row gap-2 mt-2 wrap">
                     <div className="col col-5 mb-2 responsive">
                         <h5>
-                            <i className="fa-solid fa-database color-brand-2" />
-                            <span className="color-muted"> Data Sources</span>
+                            <span className="icon material-symbols-outlined color-brand-2">{Terminology.subscription.icon}</span>
+                            <span className="color-muted"> {Terminology.subscription.namePlural}</span>
                         </h5>
                         <hr className="mb-05"/>
                         { data.Subscriptions?.length ? 
@@ -47,7 +48,7 @@ export default function ViewStudyArea({ id }: { id?: number }) {
                                     <SubscriptionLink key={i} request={s} href={"/requests/" + s.id}/>
                                 )) }
                             </div> :
-                            <p className="color-muted">No Data Sources attached yet</p>
+                            <p className="color-muted">No {Terminology.subscription.namePlural} attached yet</p>
                         }
                     </div>
                     <div className="col col-10 mb-2 responsive">

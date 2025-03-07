@@ -1,5 +1,5 @@
 
-import { useCallback } from "react"
+import { ReactNode, useCallback } from "react"
 import { Helmet, HelmetProvider } from "react-helmet-async"
 import { useParams }   from "react-router"
 import { Link }        from "react-router-dom"
@@ -69,8 +69,8 @@ export function createViewPage<T extends { createdAt: string, updatedAt: string,
     basePath    : string
     nameField  ?: string
     query      ?: string
-    icon       ?: JSX.Element | null
-    renderView  : (data: T) => JSX.Element
+    icon       ?: ReactNode
+    renderView  : (data: T) => ReactNode
     canUpdate  ?: boolean
     canDelete  ?: boolean
     id         ?: number

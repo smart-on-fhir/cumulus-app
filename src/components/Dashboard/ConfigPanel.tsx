@@ -8,6 +8,7 @@ import { AllAnnotations } from "./Inspectors/Annotations"
 import TagSelector        from "../Tags/TagSelector"
 import PropertyGrid       from "../generic/PropertyGrid"
 import { app }            from "../../types"
+import Terminology        from "../../Terminology"
 import ColorEditor        from "../generic/PropertyGrid/ColorEditor"
 import DynamicInspector   from "./Inspectors"
 import Legend             from "./Inspectors/Legend"
@@ -444,7 +445,7 @@ export default function ConfigPanel({
                                             <div>None</div>
                                             <div className="small color-muted">
                                                 Render the aggregate counts as found in the<br/>
-                                                data source without further processing
+                                                {Terminology.subscription.nameSingular.toLowerCase()} without further processing
                                             </div>
                                         </div>,
                                         value: "",

@@ -18,6 +18,7 @@ import { request }                      from "../../backend"
 import { app }                          from "../../types"
 import { humanizeColumnName }           from "../../utils"
 import { useAuth }                      from "../../auth"
+import Terminology                      from "../../Terminology"
 import "./Explorer.scss"
 
 
@@ -104,7 +105,8 @@ async function loadGroups() {
                 loader: () => loadSubscriptionsForGroup(g),
                 view  : () => <SubscriptionGroupView id={g.id} />,
                 title : g.name,
-                id    : "/groups/" + g.id
+                id    : "/groups/" + g.id,
+                icon  : Terminology.subscriptionGroup.icon
             } as unknown as DataRow
         }
 
@@ -126,7 +128,8 @@ async function loadGroups() {
             },
             // view  : () => <SubscriptionGroupView id={g.id} />,
             title : "The GENERAL group is a virtual container for items not explicitly assigned to other group",
-            id    : "/groups/GENERAL"
+            id    : "/groups/GENERAL",
+            icon  : Terminology.subscriptionGroup.icon
         } as unknown as DataRow
     });
 
@@ -177,7 +180,7 @@ async function loadGraphsForSubscription(subscription: app.Subscription, pathPre
         render   : () => s.name,
         // view     : () => <ChartViewer model={{ ...s, Subscription: subscription }} />,
         view     : () => <Dashboard subscription={subscription} view={s} key={s.id} />,
-        icon     : "equalizer",
+        icon     : Terminology.graph.icon,
         iconColor: "#369",
         id       : `${pathPrefix}/graphs/${s.id}`,
         title    : s.name,
@@ -189,7 +192,7 @@ async function loadStudyAreas() {
     return sortByName(items).map(x => ({
         id    : `/study-areas/${x.id}`,
         title : x.name,
-        icon  : "book_2",
+        icon  : Terminology.studyArea.icon,
         render: () => x.name,
         view  : () => <ViewStudyArea id={x.id} />,
         loader: async () => sortByName(x.Subscriptions!).map(s => ({
@@ -201,7 +204,7 @@ async function loadStudyAreas() {
             view     : () => <SubscriptionView id={s.id} />,
             loader   : async () => sortByName(s.Views!).map(v => ({
                 render: () => v.name,
-                icon  : "equalizer",
+                icon  : Terminology.graph.icon,
                 id    : `/study-areas/${x.id}/subscriptions/${s.id}/views/${v.id}`,
                 view  : () => <Dashboard subscription={s} view={v} key={v.id} />,
                 title : v.name,
@@ -219,7 +222,7 @@ async function loadTags() {
         view  : () => <TagView id={g.id} />,
         loader: async () => ([
             {
-                render: () => "Data Sources",
+                render: () => Terminology.subscription.namePlural,
                 loader: async () => loadSubscriptionsForTag(g.id),
                 id    : "/tags/" + g.id + "/subscriptions",
             },
@@ -237,7 +240,7 @@ async function loadGraphsForTag(tagId: number) {
     // @ts-ignore
     return sortByName(tag.graphs).map(graph => ({
         render   : () => graph.name,
-        icon     : "equalizer",
+        icon     : Terminology.graph.icon,
         iconColor: "#369",
         id       : "/tags/" + tagId + "/graphs/" + graph.id,
         view     : () => <EditView id={graph.id} />,
@@ -265,7 +268,7 @@ async function loadSites() {
         view  : () => <SiteView site={x} />,
         title : x.name,
         id    : "/sites/" + x.id,
-        icon  : "apartment"
+        icon  : Terminology.site.icon
     } as unknown as DataRow))
 }
 
@@ -304,10 +307,10 @@ export default function Explorer() {
         if (canListGroups && canReadSubscriptions) {
             DATA.push({
                 id       : "/groups",
-                render   : () => "Data Sources",
+                render   : () => Terminology.subscriptionGroup.namePlural,
                 view     : () => <SubscriptionGroupList />,
                 loader   : loadGroups,
-                icon     : "folder_open",
+                icon     : Terminology.subscriptionGroup.icon,
                 iconColor: "#880",
             })
         }
@@ -318,7 +321,7 @@ export default function Explorer() {
                 render   : () => "Study Areas",
                 view     : () => <ListStudyAreas />,
                 loader   : loadStudyAreas,
-                icon     : "book_2",
+                icon     : Terminology.studyArea.icon,
                 iconColor: "#099"
             })
         }
@@ -329,7 +332,7 @@ export default function Explorer() {
                 render   : () => "Tags",
                 view     : () => <TagsList />,
                 loader   : loadTags,
-                icon     : "sell",
+                icon     : Terminology.tag.icon,
                 iconColor: "#C83"
             })
         }
@@ -347,7 +350,7 @@ export default function Explorer() {
                 id       : "/sites",
                 render   : () => "Sites",
                 loader   : loadSites,
-                icon     : "globe",
+                icon     : Terminology.site.icon,
                 iconColor: "#09C"
             })
         }

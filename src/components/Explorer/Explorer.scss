@@ -5,7 +5,7 @@
 
     .tree-column {
         flex: 1 0 16rem;
-        margin-left: -1.5rem;
+        margin: -1rem 0 0 -1.5rem;
     }
 
     .stage-column {
@@ -25,7 +25,7 @@
         overflow   : scroll;
         height     : 100%;
         padding    : 1px 0;
-        max-height : calc(100vh - 7rem);
+        max-height : calc(100vh - 6rem);
         // width      : 18rem;
         // max-width  : 18rem;
         position: sticky;
@@ -47,7 +47,7 @@
             text-overflow: ellipsis;
             max-width    : 100%;
             flex         : 1;
-            -webkit-font-smoothing: subpixel-antialiased;
+            // -webkit-font-smoothing: subpixel-antialiased;
             // font-stretch: condensed;
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
             // font-weight: 300;

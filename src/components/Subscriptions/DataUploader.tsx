@@ -9,6 +9,7 @@ import { request }                       from "../../backend"
 import { classList, defer, humanizeColumnName } from "../../utils"
 import { app }                           from "../../types"
 import { ColumnEditor }                  from "./ColumnEditor"
+import Terminology                       from "../../Terminology"
 import "./DataUploader.scss"
 
 
@@ -560,7 +561,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
         if (requestError) {
             return (
                 <AlertError>
-                    <b>Error Loading Data Source</b> - { requestError + "" }
+                    <b>Error Loading {Terminology.subscription.nameSingular}</b> - { requestError + "" }
                 </AlertError>
             )
         }
@@ -568,7 +569,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
         if (!requestResult) {
             return (
                 <AlertError>
-                    <b>Error Loading Data Source</b> - Failed to fetch data
+                    <b>Error Loading {Terminology.subscription.nameSingular}</b> - Failed to fetch data
                 </AlertError>
             )
         }
@@ -595,9 +596,9 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
                 </HelmetProvider>
                 <Breadcrumbs links={[
                     { name: "Home", href: "/" },
-                    { name: "Data Sources", href: "/requests" },
+                    { name: Terminology.subscription.namePlural, href: "/requests" },
                     { name: requestResult.name, href: `/requests/${requestResult.id}` },
-                    { name: "Edit Data Source", href: `/requests/${requestResult.id}/edit` },
+                    { name: "Edit " + Terminology.subscription.nameSingular, href: `/requests/${requestResult.id}/edit` },
                     { name: "Import Data" }
                 ]}/>
     

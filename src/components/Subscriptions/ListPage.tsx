@@ -1,19 +1,19 @@
-import { useCallback, useState }  from "react"
-import { HelmetProvider, Helmet } from "react-helmet-async"
-import { Link }                   from "react-router-dom"
-import SubscriptionLink            from "./SubscriptionLink"
+import { useCallback, useState }       from "react"
+import { HelmetProvider, Helmet }      from "react-helmet-async"
+import { Link }                        from "react-router-dom"
+import SubscriptionLink                from "./SubscriptionLink"
 import { useBackend, useLocalStorage } from "../../hooks"
-import { request }                from "../../backend"
-import Breadcrumbs                from "../generic/Breadcrumbs"
-import { useAuth }                from "../../auth"
-import Loader                     from "../generic/Loader"
-import { AlertError }             from "../generic/Alert"
-import Grid                       from "../generic/Grid"
-import Collapse                   from "../generic/Collapse"
-import { app }                    from "../../types"
+import { request }                     from "../../backend"
+import Breadcrumbs                     from "../generic/Breadcrumbs"
+import { useAuth }                     from "../../auth"
+import Loader                          from "../generic/Loader"
+import { AlertError }                  from "../generic/Alert"
+import Grid                            from "../generic/Grid"
+import Collapse                        from "../generic/Collapse"
+import { app }                         from "../../types"
+import Terminology                     from "../../Terminology"
 
 import "./ListPage.scss";
-
 
 
 export default function SubscriptionsListPage()
@@ -41,11 +41,11 @@ export default function SubscriptionsListPage()
     );
 
     if (loading) {
-        return <Loader msg="Loading Data Sources..."/>
+        return <Loader msg={`Loading ${Terminology.subscription.namePlural}...`} />
     }
 
     if (error) {
-        return <AlertError><b>Error Loading Data Sources: </b>{ error + "" }</AlertError>
+        return <AlertError><b>Error Loading {Terminology.subscription.namePlural}: </b>{ error + "" }</AlertError>
     }
 
     let groupsData: app.SubscriptionGroup[] = [];
@@ -66,18 +66,20 @@ export default function SubscriptionsListPage()
         <div>
             <HelmetProvider>
                 <Helmet>
-                    <title>Data Sources</title>
+                    <title>{Terminology.subscription.namePlural}</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Data Sources" }
+                { name: Terminology.subscription.namePlural }
             ]} />
             <header className="requests-header">
                 <div className="row wrap mt-2">
                     <h3 className="col middle center mt-05 mb-05 nowrap" style={{ flex: "1 1 8em" }}>
                         <div>
-                            <i className="icon fa-solid fa-database color-brand-2" /> Data Sources
+                            <span className="icon material-symbols-outlined color-brand-2">
+                                {Terminology.subscription.icon}
+                            </span> {Terminology.subscription.namePlural}
                         </div>
                     </h3>
                     <div className="col col-4 middle center mt-05 mb-05 pl-1" style={{ flex: "200 1 10em" }}>
@@ -90,7 +92,7 @@ export default function SubscriptionsListPage()
                                     { starOnly ? <i className="fa-solid fa-star color-brand-2" /> : <i className="fa-regular fa-star color-muted" /> }
                                 </button>
                                 <Link className="btn color-blue-dark btn-virtual" to="/requests/new">
-                                    <b className="color-green"><i className="fa-solid fa-circle-plus" /> New Data Source</b>
+                                    <b className="color-green"><i className="fa-solid fa-circle-plus" /> New {Terminology.subscription.nameSingular}</b>
                                 </Link>
                             </div>
                         </div>
@@ -102,9 +104,9 @@ export default function SubscriptionsListPage()
             { !groupsData?.length ?
                 <div className="center">
                     <br/>
-                    <p>No Data Sources found in the database! You can start by creating new Data Source.</p>
+                    <p>No {Terminology.subscription.namePlural} found in the database! You can start by creating new {Terminology.subscription.nameSingular}.</p>
                     <br/>
-                    <Link to="./new" className="btn btn-blue-dark pl-2 pr-2">Create Data Source</Link>
+                    <Link to="./new" className="btn btn-blue-dark pl-2 pr-2">Create {Terminology.subscription.nameSingular}</Link>
                 </div> :
                 groupsData.map((group, i) => {
                     const links = group.requests.filter(r => {

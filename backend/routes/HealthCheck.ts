@@ -16,6 +16,12 @@ const STATUS_PASSED = "passed"
 const STATUS_FAILED = "failed"
 const STATUS_MIXED  = "mixed"
 
+const Dictionary = {
+    subscriptions     : "Data Slices",
+    subscription      : "Data Slice",
+    subscriptionGroups: "Data Slice Groups"
+}
+
 export const router = express.Router({ mergeParams: true });
 
 
@@ -40,23 +46,23 @@ route(router, {
                 path       : "check-graph-titles"
             },
             {
-                name       : "Graph Subscriptions",
-                description: "Verify that all charts are connected to existing subscriptions",
+                name       : `Graph ${Dictionary.subscriptions}`,
+                description: `Verify that all charts are connected to existing ${Dictionary.subscription.toLowerCase()}`,
                 path       : "check-graph-subscriptions"
             },
             {
-                name       : "Graph Subscription Data",
-                description: "Verify that all charts are connected to existing subscriptions data source",
+                name       : `Graph ${Dictionary.subscriptions} Data`,
+                description: `Verify that all charts are connected to existing ${Dictionary.subscription.toLowerCase()}`,
                 path       : "check-subscriptions-data"
             },
             {
                 name       : "Study Areas",
-                description: "Verify that all Study Areas have associated Subscriptions",
+                description: `Verify that all Study Areas have associated ${Dictionary.subscriptions.toLowerCase()}`,
                 path       : "check-study-areas"
             },
             {
-                name       : "Subscription Groups",
-                description: "Verify that all Subscription Groups have associated Subscriptions",
+                name       : Dictionary.subscriptionGroups,
+                description: `Verify that all Subscription Groups have associated ${Dictionary.subscriptions.toLowerCase()}`,
                 path       : "check-subscription-groups"
             },
             {
@@ -232,7 +238,7 @@ route(router, {
         if (rows.length) {
             return res.json({
                 status : STATUS_MIXED,
-                message: `${rows.length} of ${count} charts are associated with missing subscription`,
+                message: `${rows.length} of ${count} charts are associated with missing ${Dictionary.subscription}`,
                 payload: rows.map(row => ({ text: row.name, to: "/views/" + row.id }))
             })
         }
@@ -263,14 +269,14 @@ route(router, {
         if (bad.length) {
             return res.json({
                 status : STATUS_MIXED,
-                message: `${bad.length} subscriptions have no associated data table`,
+                message: `${bad.length} ${Dictionary.subscriptions.toLowerCase()} have no associated data table`,
                 payload: bad.map(row => ({ text: row.name, to: "/requests/" + row.id }))
             })
         }
 
         res.json({
             status : STATUS_PASSED,
-            message: "All subscriptions are OK"
+            message: `All ${Dictionary.subscriptions.toLowerCase()} are OK`
         })
     }
 })
@@ -331,7 +337,7 @@ route(router, {
         if (!groups.length) {
             return res.json({
                 status : STATUS_MIXED,
-                message: "No Subscription Groups found"
+                message: `No ${Dictionary.subscriptionGroups.toLowerCase()} found`
             })
         }
 
@@ -348,20 +354,20 @@ route(router, {
         if (bad.length === groups.length) {
             return res.json({
                 status : STATUS_FAILED,
-                message: "All Subscription Groups do not have any subscriptions"
+                message: `All ${Dictionary.subscriptionGroups.toLowerCase()} do not have any ${Dictionary.subscriptions.toLowerCase()}`
             })
         }
 
         if (bad.length) {
             return res.json({
                 status : STATUS_MIXED,
-                message: `${bad.length} of ${groups.length} Subscription Groups do not have any subscriptions`
+                message: `${bad.length} of ${groups.length} ${Dictionary.subscriptionGroups.toLowerCase()} do not have any ${Dictionary.subscriptions.toLowerCase()}`
             })
         }
 
         res.json({
             status : STATUS_PASSED,
-            message: "All Subscription Groups have subscriptions"
+            message: `All ${Dictionary.subscriptionGroups.toLowerCase()} have ${Dictionary.subscriptions.toLowerCase()}`
         })
     }
 })

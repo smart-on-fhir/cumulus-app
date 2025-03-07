@@ -11,14 +11,14 @@ import Loader                     from "../generic/Loader"
 
 export default function CopyView()
 {
-    // The Data Source ID from the URL params
+    // The subscription ID from the URL params
     const { id } = useParams()
 
     const { state } = useLocation()
 
     const { user } = useAuth()
 
-    // Fetch the Data Source by ID
+    // Fetch the subscription by ID
     const { loading, error, result: view } = useBackend<app.View>(
         useCallback(() => {
             return request("/api/views/" + id + "?tags=true&subscription=true&group=true&study_areas=true");
@@ -26,17 +26,17 @@ export default function CopyView()
         true
     );
 
-    // Show loader whole the Data Source is being loaded
+    // Show loader whole the subscription is being loaded
     if (loading) {
         return <Loader/>
     }
 
-    // If the Data Source failed to load exit with an error message
+    // If the subscription failed to load exit with an error message
     if (error) {
         return <AlertError>{`Error fetching graph with id "${id}": ${error}`}</AlertError>
     }
 
-     // If the Data Source request was successful but did not return the expected data exit with an error message
+     // If the subscription request was successful but did not return the expected data exit with an error message
     if (!view) {
         return <AlertError>{`Fetching graph with id "${id}" produced empty response`}</AlertError>
     }

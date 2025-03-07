@@ -8,6 +8,7 @@ import Loader                            from "../generic/Loader"
 import { AlertError }                    from "../generic/Alert"
 import SubscriptionForm                  from "./form"
 import { app }                           from "../../types"
+import Terminology                       from "../../Terminology"
 
 import "./form.scss";
 
@@ -19,7 +20,7 @@ export default function EditSubscriptionForm()
     const [ deleted, setDeleted ] = useState(false)
 
 
-    // Fetch Data Source Groups -----------------------------------------------
+    // Fetch Subscription Groups -----------------------------------------------
     const {
         loading: loadingData,
         error  : loadingSubscriptionGroupsError,
@@ -29,7 +30,7 @@ export default function EditSubscriptionForm()
         true
     );
 
-    // Fetch Data Source ------------------------------------------------------
+    // Fetch Subscription ------------------------------------------------------
     const {
         loading,
         error
@@ -45,7 +46,7 @@ export default function EditSubscriptionForm()
         true
     );
 
-    // Save (update) Data Source ----------------------------------------------
+    // Save (update) Subscription ----------------------------------------------
     const { execute: save, loading: saving, error: savingError } = useBackend(
         useCallback(
             () => updateOne("requests", id + "", { ...state }).then(s => setState({ ...state, ...s })),
@@ -53,13 +54,13 @@ export default function EditSubscriptionForm()
         )
     );
 
-    // Delete Data Source -----------------------------------------------------
+    // Delete Subscription -----------------------------------------------------
     const { execute: deleteRequest, loading: deleting, error: deletingError } = useBackend(
         useCallback(
             async () => {
                 if (window.confirm(
-                    "Deleting this data source will also delete all the graphs " +
-                    "associated with it! Are you sure?")) {
+                    `Deleting this ${Terminology.subscription.nameSingular.toLowerCase()} will ` +
+                    `also delete all the graphs associated with it! Are you sure?`)) {
                     deleteOne("requests", id + "").then(() => setDeleted(true))
                 }
             },
@@ -72,40 +73,40 @@ export default function EditSubscriptionForm()
     }
 
     if (loadingData) {
-        return <Loader msg="Loading Data Source Groups..." />
+        return <Loader msg={`Loading ${Terminology.subscriptionGroup.namePlural}...`} />
     }
 
     if (loadingSubscriptionGroupsError) {
         return (
             <AlertError>
-                <b>Error loading data source groups:</b> { loadingSubscriptionGroupsError + "" }
+                <b>Error loading {Terminology.subscriptionGroup.namePlural.toLowerCase()}:</b> { loadingSubscriptionGroupsError + "" }
             </AlertError>
         );
     }
 
     if (!groups) {
-        return <AlertError><b>Error loading data source groups</b></AlertError>;
+        return <AlertError><b>Error loading {Terminology.subscriptionGroup.namePlural.toLowerCase()}</b></AlertError>;
     }
 
     return (
         <div className="container">
             <HelmetProvider>
                 <Helmet>
-                    <title>Edit Data Source</title>
+                    <title>Edit {Terminology.subscription.nameSingular}</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Data Sources", href: "/requests" },
+                { name: Terminology.subscription.namePlural, href: "/requests" },
                 { name: state.name + "", href: `/requests/${state.id}` },
-                { name: "Edit Data Source" }
+                { name: "Edit " + Terminology.subscription.nameSingular }
             ]}/>
             <div className="row middle">
                 <div className="col col-0">
-                    <h3>Edit Data Source</h3>
+                    <h3>Edit {Terminology.subscription.nameSingular}</h3>
                 </div>
                 <div className="col right color-muted small">
-                    { loading  && <Loader msg="Loading Data Source..." /> }
+                    { loading  && <Loader msg="Loading..." /> }
                     { saving   && <Loader msg="Saving..." /> }
                     { deleting && <Loader msg="Deleting..." /> }
                 </div>
@@ -113,13 +114,13 @@ export default function EditSubscriptionForm()
             <hr/>
             <div className="row gap">
                 <div className="col">
-                    { error && <AlertError><b>Error loading Data Source:</b> { error + "" }</AlertError> }
-                    { savingError && <AlertError><b>Error saving Data Source:</b> { savingError + "" }</AlertError> }
-                    { deletingError && <AlertError><b>Error deleting Data Source:</b> { deletingError + "" }</AlertError> }
+                    { error && <AlertError><b>Error loading {Terminology.subscription.nameSingular}:</b> { error + "" }</AlertError> }
+                    { savingError && <AlertError><b>Error saving {Terminology.subscription.nameSingular}:</b> { savingError + "" }</AlertError> }
+                    { deletingError && <AlertError><b>Error deleting {Terminology.subscription.nameSingular}:</b> { deletingError + "" }</AlertError> }
                 </div>
             </div>
             { loading ?
-                <p><Loader msg="Loading Data Source..." /></p> :
+                <p><Loader msg={`Loading ${Terminology.subscription.nameSingular}...`} /></p> :
                 <SubscriptionForm
                     saveRequest={save}
                     deleteRequest={deleteRequest}

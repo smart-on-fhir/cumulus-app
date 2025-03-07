@@ -32,6 +32,7 @@ import { GenerateCaption }                       from "../../commands/Graphs/Gen
 import { ShareGraph }                            from "../../commands/Graphs/Share/ShareGraph"
 import { ManagePermissions }                     from "../../commands/Graphs/Share/ManagePermissions"
 import { OpenInAnalyticEnvironment }             from "../../commands/Subscriptions/OpenInAnalyticEnvironment"
+import Terminology                               from "../../Terminology"
 import {
     assert,
     defer,
@@ -906,7 +907,7 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
 
                         { !viewColumn && viewType === "overview" && (
                             <AlertError>
-                                It looks like the data source has been updated and this view is no longer compatible
+                                It looks like the {Terminology.subscription.nameSingular.toLowerCase()} has been updated and this view is no longer compatible
                                 with the new data. Please edit this view or delete it and create new one.
                             </AlertError>
                         ) }
@@ -1016,32 +1017,32 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                         <Grid cols="24em" gap="2em">
                         
                             <div className="col">
-                                <b>Data Source</b>
+                                <b>{Terminology.subscription.nameSingular}</b>
                                 <hr className="small"/>
                                 <Link className="link mt-05 subscription-link" to={`/requests/${subscription.id}`}>
-                                    <i className="fa-solid fa-database color-brand-2" /> <span>{ subscription.name }</span>
+                                    <span className="icon material-symbols-outlined color-brand-2">{Terminology.subscription.icon}</span> <span>{ subscription.name }</span>
                                 </Link>
                             </div>
                         
                             <div className="col">
-                                <b>Data Source Group</b>
+                                <b>{Terminology.subscriptionGroup.nameSingular}</b>
                                 <hr className="small"/>
                                 { subscription.group ?
                                     <Link className="link mt-05 ellipsis subscription-group-link" to={`/groups/${subscription.group.id}`} title={ subscription.group.description }>
-                                        <i className="fa-solid fa-folder color-brand-2" /> <span>{ subscription.group.name }</span>
+                                        <span className="icon material-symbols-outlined color-brand-2">{Terminology.subscriptionGroup.icon}</span> <span>{ subscription.group.name }</span>
                                     </Link> :
                                     <span className="color-muted">GENERAL</span> }
                             </div>
 
                             <div className="col">
-                                <b>Study Areas</b>
+                                <b>{Terminology.studyArea.namePlural}</b>
                                 <hr className="small"/>
                                 <div className="mt-05 view-study-areas">
                                 { subscription.StudyAreas?.length ?
                                     subscription.StudyAreas.map((p, i) => (
                                         <div key={i} className="ellipsis">
                                             <Link className="link study-area-link" to={`/study-areas/${p.id}`}>
-                                                <i className="fa-solid fa-book color-brand-2" /> { p.name }
+                                                <span className="icon material-symbols-outlined color-brand-2">{Terminology.studyArea.icon}</span> <span>{ p.name }</span>
                                             </Link>
                                         </div>
                                     )) :

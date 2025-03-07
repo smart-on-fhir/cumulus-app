@@ -1,4 +1,5 @@
 import { DataPackage }        from "../../Aggregator"
+import Terminology            from "../../Terminology"
 import { app }                from "../../types"
 import { humanizeColumnName } from "../../utils"
 import Grid                   from "../generic/Grid"
@@ -35,7 +36,7 @@ export default function DataPackageView({ pkg }: { pkg: DataPackage }) {
                     <h5 className="mt-2">Columns</h5>
                     <hr className="mb-1" />
                     <ColumnsTable cols={cols} />
-                    <h5 className="mt-2">Data Sources</h5>
+                    <h5 className="mt-2">{Terminology.subscription.namePlural}</h5>
                     <hr className="mb-1" />
                     <PackageSubscriptionsList pkg={pkg} />
                     {/* <h5 className="mt-2 color-blue-dark">Generic Data Views</h5>
@@ -80,7 +81,7 @@ function PackageSubscriptionsList({ pkg }: { pkg: DataPackage }) {
         <Prefetch path={`/api/requests?where=dataURL:startsWith:${pkg.study}__${pkg.name}`}>
             { (data: app.Subscription[]) => {
                 if (!data.length) {
-                    return <div className="color-muted mt-05">No Data Sources have been created from this package.</div>
+                    return <div className="color-muted mt-05">No {Terminology.subscription.namePlural} have been created from this package.</div>
                 }
                 return (
                     <Grid gap="0 1rem" cols="18em" className="link-list mt-05">

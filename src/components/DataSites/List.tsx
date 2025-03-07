@@ -3,6 +3,7 @@ import createListPage from "../generic/EndpointListWrapper"
 import IfAllowed      from "../generic/IfAllowed"
 import { useAuth }    from "../../auth"
 import { app }        from "../../types"
+import Terminology    from "../../Terminology"
 import "../generic/EndpointListTable.scss"
 
 export default function ListPage()
@@ -12,10 +13,10 @@ export default function ListPage()
     const canCreate = user?.permissions.includes("DataSites.create")
 
     return createListPage<app.DataSite[]>({
-        namePlural  : "Healthcare Sites",
-        nameSingular: "Healthcare Site",
+        namePlural  : Terminology.site.namePlural,
+        nameSingular: Terminology.site.nameSingular,
         endpoint    : "/api/data-sites",
-        icon        : <i className="fa-solid fa-location-dot color-brand-2" />,
+        icon        : <span className="icon material-symbols-outlined color-brand-2">{Terminology.site.icon}</span>,
         canCreate,
         renderList: data => {
             return (

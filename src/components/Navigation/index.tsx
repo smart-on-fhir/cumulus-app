@@ -1,12 +1,13 @@
 import { ReactNode, useState }                          from "react"
 import { NavLink, useLocation, matchPath, useNavigate } from "react-router-dom"
 import { useAuth }                                      from "../../auth"
+import Terminology                                      from "../../Terminology"
 import "./Navigation.scss"
 
 
 function NavGroup({ to, label, icon, children, end }: {
     to?: string
-    icon: string
+    icon: string | ReactNode
     label: string
     end?: RegExp
     children: ReactNode
@@ -20,7 +21,11 @@ function NavGroup({ to, label, icon, children, end }: {
         <>
             { to ?
                 <NavLink to={ to } end={ end ? !end.test(pathname) : true }>
-                    <i className={ "icon " + icon } /><label>{ label }</label>
+                    { typeof icon === "string" ?
+                        <i className={ "icon " + icon } /> :
+                        icon
+                    }<label>{ label }</label>
+
                     { children && <i
                         className={ "fas chevron " + (isOpen ? "fa-chevron-down" : "fa-chevron-right") }
                         title={ isOpen ? "Collapse Group" : "Expand Group" }
@@ -36,7 +41,10 @@ function NavGroup({ to, label, icon, children, end }: {
                     title={ isOpen ? "Collapse Group" : "Expand Group" }
                     onClick={() => setOpen(!isOpen)}
                 >
-                    <i className={ "icon " + icon } /><label>{ label }</label>
+                    { typeof icon === "string" ?
+                        <i className={ "icon " + icon } /> :
+                        icon
+                    }<label>{ label }</label>
                     { children && <i className={ "fas chevron " + (isOpen ? "fa-chevron-down" : "fa-chevron-right") } /> }
                 </div>
             }
@@ -71,39 +79,58 @@ export default function Navigation()
     return (
         <div className="navigation">
             <div className="navigation-wrap">
-                <NavLink to="/"><i className="icon fa-solid fa-house-chimney"></i>Home</NavLink>
-                { canReadStudyAreas && <NavLink to="/study-areas"><i className="icon fa-solid fa-book" />Study Areas</NavLink> }
-                <NavLink to="/views"><i className="icon fa-solid fa-chart-pie" />Graphs</NavLink>
-                <NavLink to="/drafts"><i className="icon fa-solid fa-pen-to-square" />My Draft Graphs</NavLink>
-                { canReadSites && <NavLink to="/sites"><i className="icon fa-solid fa-location-dot" />Healthcare Sites</NavLink> }
-                { canReadSubscriptions && <NavLink to="/requests"><i className="icon fa-solid fa-database" />Data Sources</NavLink> }
-                { canListGroups && <NavLink to="/groups"><i className="icon fa-solid fa-folder" />Data Source Groups</NavLink> }
-                { canReadTags && <NavLink to="/tags"><i className="icon fa-solid fa-tag" />Tags</NavLink> }
-                <NavLink to="/study"><i className="icon fa-solid fa-flask" />Study Builder</NavLink>
-                <NavLink to="/explorer"><i className="icon fa-solid fa-folder-open" />Explore</NavLink>
+                <NavLink to="/">
+                    <span className="icon material-symbols-outlined">home</span>Home
+                </NavLink>
+                { canReadStudyAreas && <NavLink to="/study-areas">
+                    <span className="icon material-symbols-outlined">{Terminology.studyArea.icon}</span>{Terminology.studyArea.namePlural}
+                </NavLink> }
+                <NavLink to="/views">
+                    <span className="icon material-symbols-outlined">{Terminology.graph.icon}</span>{Terminology.graph.namePlural}
+                </NavLink>
+                { canReadSites && <NavLink to="/sites">
+                    <span className="icon material-symbols-outlined">{Terminology.site.icon}</span>{Terminology.site.namePlural}
+                </NavLink> }
+                { canReadSubscriptions && <NavLink to="/requests">
+                    <span className="icon material-symbols-outlined">{Terminology.subscription.icon}</span>{Terminology.subscription.namePlural}
+                </NavLink> }
+                { canListGroups && <NavLink to="/groups">
+                    <span className="icon material-symbols-outlined">{Terminology.subscriptionGroup.icon}</span>{Terminology.subscriptionGroup.namePlural}
+                </NavLink> }
+                { canReadTags && <NavLink to="/tags">
+                    <span className="icon material-symbols-outlined">{Terminology.tag.icon}</span>{Terminology.tag.namePlural}
+                </NavLink> }
+                <NavLink to="/study">
+                    <span className="icon material-symbols-outlined">experiment</span>Study Builder
+                </NavLink>
+                <NavLink to="/explorer">
+                    <span className="icon material-symbols-outlined">folder_open</span>Explore
+                </NavLink>
 
-                <NavGroup icon="fa-solid fa-archive" label="Catalog">
-                    <NavLink to="/catalog/icd10"><i className="icon fa-solid fa-archive" />ICD10 Diagnoses</NavLink>
-                    <NavLink to="/catalog/loinc"><i className="icon fa-solid fa-archive" />LOINC Laboratories</NavLink>
+                <NavGroup icon={<span className="icon material-symbols-outlined">inventory_2</span>} label="Catalog">
+                    <NavLink to="/catalog/icd10"><span className="icon material-symbols-outlined">inventory_2</span>ICD10 Diagnoses</NavLink>
+                    <NavLink to="/catalog/loinc"><span className="icon material-symbols-outlined">inventory_2</span>LOINC Laboratories</NavLink>
                 </NavGroup>
                 
                 { canAdminister && (
-                    <NavGroup icon="fa-solid fa-screwdriver-wrench" label="Administration">
-                        { canReadUsers && <NavLink to="/users" end><i className="icon fa-solid fa-users" />Users</NavLink> }
-                        { canReadUserGroups && <NavLink to="/user-groups" end><i className="icon fa-solid fa-user-friends" />User Groups</NavLink> }
-                        { canManagePermissions && <NavLink to="/permissions" end><i className="icon fa-solid fa-shield" />Permissions</NavLink> }
-                        <NavLink to="/health-check" end><i className="icon fa-solid fa-stethoscope" />Health Check</NavLink>
+                    <NavGroup icon={<span className="icon material-symbols-outlined">build_circle</span>} label="Administration">
+                        { canReadUsers && <NavLink to="/users" end><span className="icon material-symbols-outlined">person</span>Users</NavLink> }
+                        { canReadUserGroups && <NavLink to="/user-groups" end><span className="icon material-symbols-outlined">group</span>User Groups</NavLink> }
+                        { canManagePermissions && <NavLink to="/permissions" end><span className="icon material-symbols-outlined">shield_lock</span>Permissions</NavLink> }
+                        <NavLink to="/health-check" end><span className="icon material-symbols-outlined">stethoscope</span>Health Check</NavLink>
                     </NavGroup>
                 )}
 
-                <hr />
+                {/* <hr /> */}
 
-                <NavGroup icon="fa-solid fa-user" label={ user?.name || user?.email }>
-                    <NavLink to="/user"><i className="icon fa-solid fa-user-pen" />My Account</NavLink>
+                <NavGroup icon={<span className="icon material-symbols-outlined">account_circle</span>} label={ user?.name || user?.email }>
+                    <NavLink to="/drafts"><span className="icon material-symbols-outlined">edit_square</span>My Draft Graphs</NavLink>
+                    <NavLink to="/user"><span className="icon material-symbols-outlined">manage_accounts</span>My Account</NavLink>
                     <div className="link" onClick={() => {
                         logout().then(() => navigate("/"));
                     }}>
-                        <i className="icon fa-solid fa-right-from-bracket" />
+                        <span className="icon material-symbols-outlined color-red">power_settings_new</span>
+                        {/* <i className="icon fa-solid fa-right-from-bracket" /> */}
                         Sign Out
                         { loading && <i className="fas fa-circle-notch fa-spin color-muted" /> }
                     </div>

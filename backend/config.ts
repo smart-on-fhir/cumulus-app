@@ -33,7 +33,7 @@ const config: Config = {
     // When line-level data is requested, the email is sent to this address.
     regionalClusterEmail: REGIONAL_CLUSTER_EMAIL,
 
-    // When new data sources are created, notification emails are sent to this address
+    // When new subscriptions are created, notification emails are sent to this address
     cumulusAdminEmail: CUMULUS_ADMIN_EMAIL,
 
     // Note that moment humanized duration shows 24 * 7 as "168 hours" and not

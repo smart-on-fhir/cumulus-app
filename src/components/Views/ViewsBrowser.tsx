@@ -5,11 +5,12 @@ import { AlertError }                     from "../generic/Alert"
 import Collapse                           from "../generic/Collapse"
 import Loader                             from "../generic/Loader"
 import { CustomSelection, WithSelection } from "../generic/WithSelection"
-import { useBackend, useLocalStorage }  from "../../hooks"
+import { useBackend, useLocalStorage }    from "../../hooks"
 import { request }                        from "../../backend"
 import { classList }                      from "../../utils"
 import { app }                            from "../../types"
 import { useAuth }                        from "../../auth"
+import Terminology                        from "../../Terminology"
 import "./ViewsBrowser.scss"
 
 
@@ -172,7 +173,7 @@ export default function ViewsBrowser({
             let group = groups[label];
             if (!group) {
                 group = groups[label] = {
-                    link: { to: `/requests/${item.Subscription!.id}`, txt: "View Data Source" },
+                    link: { to: `/requests/${item.Subscription!.id}`, txt: "View " + Terminology.subscription.nameSingular },
                     items: []
                 };
             }

@@ -6,6 +6,7 @@ import { app }                              from "../../types"
 import { useCommand }                       from "../../hooks"
 import { humanizePackageId, useAggregator } from "../../Aggregator"
 import { ToggleFavorite }                   from "../../commands/ToggleFavorite"
+import Terminology                          from "../../Terminology"
 
 
 function Icon({ subscription }: { subscription: app.Subscription }) {
@@ -27,7 +28,7 @@ function Icon({ subscription }: { subscription: app.Subscription }) {
             return <span className="material-symbols-outlined color-red" data-tooltip="Remote data package not found!">database_off</span>
         }
         return <span className="material-symbols-outlined color-orange"
-            data-tooltip={ `<div class="center">Data Source can be upgraded to package <b>${humanizePackageId(version)}</b></div>` }>database_upload</span>
+            data-tooltip={ `<div class="center">${Terminology.subscription.nameSingular} can be upgraded to package <b>${humanizePackageId(version)}</b></div>` }>database_upload</span>
     }
 
     if (subscription.metadata?.type === "flat") {

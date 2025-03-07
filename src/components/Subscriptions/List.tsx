@@ -7,6 +7,7 @@ import { request }      from "../../backend"
 import { useBackend }   from "../../hooks"
 import { useAuth }      from "../../auth"
 import { app }          from "../../types"
+import Terminology      from "../../Terminology"
 
 
 function List({
@@ -42,18 +43,18 @@ export default function SubscriptionsList()
     );
 
     if (loading) {
-        return <Loader msg="Loading Data Sources..." />
+        return <Loader msg={`Loading ${Terminology.subscription.namePlural}...`} />
     }
 
     if (error) {
-        return <AlertError><b>Error Loading Data Sources: </b>{ error + "" }</AlertError>
+        return <AlertError><b>Error Loading {Terminology.subscription.namePlural}: </b>{ error + "" }</AlertError>
     }
 
     if (!groups || !groups.length) {
         return <>
-            <p className="color-muted">No Data Sources found.</p>
+            <p className="color-muted">No {Terminology.subscription.namePlural} found.</p>
             <br/>
-            { user?.permissions.includes("Subscriptions.create") && <Link to="/requests/new" className="color-blue underline">Create New Data Source</Link> }
+            { user?.permissions.includes("Subscriptions.create") && <Link to="/requests/new" className="color-blue underline">Create New {Terminology.subscription.nameSingular}</Link> }
         </>
     }
 

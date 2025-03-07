@@ -3,6 +3,7 @@ import { useNavigate } from "react-router"
 import Markdown        from "../generic/Markdown"
 import Grid            from "../generic/Grid"
 import { app }         from "../../types"
+import Terminology     from "../../Terminology"
 import "./StudyAreas.scss"
 
 
@@ -18,7 +19,11 @@ export default function StudyAreaCard({ model, footer, short }: {
 
     return (
         <div className={"col study-area" + (short ? " short" : "") } onClick={() => navigate(`/study-areas/${model.id}`)}>
-            <header><h3><i className="fa-solid fa-book color-muted" /> { model.name }</h3></header>
+            <header>
+                <h3>
+                    <i className="icon material-symbols-outlined color-brand-2">{Terminology.studyArea.icon}</i>{ model.name }
+                </h3>
+            </header>
             <div className="main-wrap small">
                 <main>
                     <Markdown>{ model.description }</Markdown>
@@ -32,7 +37,7 @@ export default function StudyAreaCard({ model, footer, short }: {
                             <span className="color-brand-2">{ footer.graphsCount }</span>
                         </i>
                         <i className="nowrap">
-                            <span className="color-muted">Data Sources: </span>
+                            <span className="color-muted">{Terminology.subscription.namePlural}: </span>
                             <span className="color-brand-2">{ model.Subscriptions?.length || 0 }</span>
                         </i>
                         <i className="nowrap">
