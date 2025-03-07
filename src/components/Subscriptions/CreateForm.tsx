@@ -9,6 +9,7 @@ import Breadcrumbs                from "../generic/Breadcrumbs"
 import Loader                     from "../generic/Loader"
 import SubscriptionForm           from "./form"
 import { app }                    from "../../types"
+import Terminology                from "../../Terminology"
 
 import "./form.scss";
 
@@ -21,7 +22,7 @@ export default function CreateSubscriptionForm()
     })
     const [ savedRecord, setSavedRecord ] = useState<app.SubscriptionWithPackage|null>(null)
 
-    // onSubmit create new Data Source and redirect to its edit page
+    // onSubmit create new Subscription and redirect to its edit page
     const { execute: save, loading: saving, error: savingError } = useBackend(
         useCallback(async () => {
             delete state.dataSourceType
@@ -45,34 +46,34 @@ export default function CreateSubscriptionForm()
     }
 
     if (loadingSubscriptionGroups) {
-        return <Loader msg="Loading Data Source Groups..." />
+        return <Loader msg={`Loading ${Terminology.subscriptionGroup.namePlural}...`} />
     }
 
     if (loadingSubscriptionGroupsError) {
-        return <AlertError><b>Error loading subscription groups:</b> { loadingSubscriptionGroupsError + "" }</AlertError>
+        return <AlertError><b>Error loading {Terminology.subscriptionGroup.namePlural.toLowerCase()}:</b> { loadingSubscriptionGroupsError + "" }</AlertError>
     }
 
     if (!groups) {
-        return <AlertError><b>Failed loading groups data</b></AlertError>
+        return <AlertError><b>Failed loading {Terminology.subscriptionGroup.namePlural.toLowerCase()}</b></AlertError>
     }
 
     return (
         <div className="container">
             <HelmetProvider>
                 <Helmet>
-                    <title>Create Data Source</title>
+                    <title>Create {Terminology.subscription.namePlural}</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Data Sources", href: "/requests" },
-                { name: "Create Data Source" }
+                { name: Terminology.subscription.namePlural, href: "/requests" },
+                { name: "Create " + Terminology.subscription.nameSingular }
             ]} />
-            <h3>Create Data Source</h3>
+            <h3>Create {Terminology.subscription.nameSingular}</h3>
             <hr/>
             <div className="row gap">
                 <div className="col">
-                    { savingError && <AlertError><b>Error saving subscription:</b> { savingError + "" }</AlertError> }
+                    { savingError && <AlertError><b>Error saving {Terminology.subscription.nameSingular}:</b> { savingError + "" }</AlertError> }
                     { saving && <Loader msg="Saving..."/> }
                 </div>
             </div>

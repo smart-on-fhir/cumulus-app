@@ -10,11 +10,11 @@ export const router = express.Router({ mergeParams: true });
 
 async function search(q: string) {
     const sql = `with "data" as (
-              select "name", "description", "id", 'Data Source'       as "type" from "DataRequests"
-        union select "name", "description", "id", 'Graph'             as "type" from "Views"
-        union select "name", "description", "id", 'Data Source Group' as "type" from "SubscriptionGroups"
-        union select "name", "description", "id", 'Tag'               as "type" from "Tags"
-        union select "name", "description", "id", 'Study Area'        as "type" from "Projects"
+              select "name", "description", "id", 'subscription'      as "type" from "DataRequests"
+        union select "name", "description", "id", 'graph'             as "type" from "Views"
+        union select "name", "description", "id", 'subscriptionGroup' as "type" from "SubscriptionGroups"
+        union select "name", "description", "id", 'tag'               as "type" from "Tags"
+        union select "name", "description", "id", 'studyArea'         as "type" from "Projects"
         ORDER BY "type", "name"
     ) SELECT * FROM "data" where "name" ilike :query`;
 
@@ -74,7 +74,7 @@ route(router, {
                 name       : p.name,
                 description: null,
                 id         : p.id,
-                type       : "Data Package",
+                type       : "dataPackage",
                 study      : p.study,
                 version    : p.version
             })))

@@ -15,6 +15,7 @@ import { humanizeColumnName } from "../../utils"
 import { useBackend }         from "../../hooks"
 import aggregator             from "../../Aggregator"
 import { DataPackage, Study } from "../../Aggregator"
+import Terminology            from "../../Terminology"
 import "./form.scss"
 
 
@@ -82,16 +83,16 @@ export default function SubscriptionForm({
                         value={ name || "" }
                         onChange={e => onChange({ ...record, name: e.target.value })}
                         name="SubscriptionName"
-                        placeholder="Data Source Name"
+                        placeholder={`${Terminology.subscription.nameSingular} Name`}
                         required
                     />
                     <div className="row gap mt-1">
                         <div className="col middle">
-                            <label>Group</label>
+                            <label>{Terminology.subscriptionGroup.nameSingular}</label>
                         </div>
                         <div className="col col-0 right middle color-blue small">
                             <Link to="/groups">
-                                Manage Groups <i className="fa-solid fa-up-right-from-square" />
+                                Manage {Terminology.subscriptionGroup.namePlural} <i className="fa-solid fa-up-right-from-square" />
                             </Link>
                         </div>
                     </div>
@@ -104,11 +105,11 @@ export default function SubscriptionForm({
                     <div className="mt-1">
                         <div className="row gap middle">
                             <div className="col middle">
-                                <label className="col">Tags</label>
+                                <label className="col">{Terminology.tag.namePlural}</label>
                             </div>
                             <div className="col col-0 right middle color-blue small">
                                 <Link to="/tags">
-                                    Manage Tags <i className="fa-solid fa-up-right-from-square" />
+                                    Manage {Terminology.tag.namePlural} <i className="fa-solid fa-up-right-from-square" />
                                 </Link>
                             </div>
                         </div>
@@ -173,7 +174,7 @@ export default function SubscriptionForm({
                         <div>
                             { id ?
                                 <Link to="../import" className="link">Import Data</Link> :
-                                <><i className="fas fa-info-circle" />&nbsp;You can upload a CSV or TSV file once this subscription is saved</>
+                                <><i className="fas fa-info-circle" />&nbsp;You can upload a CSV or TSV file once this {Terminology.subscription.nameSingular.toLowerCase()} is saved</>
                             }
                         </div>
                     </div> }
@@ -217,13 +218,13 @@ export default function SubscriptionForm({
                 { id && canDelete && deleteRequest &&
                     <button className="btn color-red pl-1 pr-1 m-1" style={{ minWidth: "11em" }} type="button" onClick={deleteRequest}>
                         { working === "deleting" && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
-                        Delete Data Source
+                        Delete {Terminology.subscription.nameSingular}
                     </button>
                 }
                 { canUpdate && 
                     <button className="btn btn-green pl-1 pr-1 m-1" style={{ minWidth: "11em" }} type="submit">
                         { working === "saving" && <><i className="fas fa-circle-notch fa-spin"/>&nbsp;</> }
-                        { id ? "Save Changes" : "Create Data Source" }
+                        { id ? "Save Changes" : "Create " + Terminology.subscription.nameSingular }
                     </button>
                 }
             </div>

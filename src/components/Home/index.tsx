@@ -6,6 +6,7 @@ import Prefetch                      from "../generic/Prefetch"
 import { useAuth }                   from "../../auth"
 import { app }                       from "../../types"
 import Aggregator, { useAggregator } from "../../Aggregator"
+import Terminology                   from "../../Terminology"
 import "./home.scss"
 
 
@@ -76,7 +77,9 @@ function Graphs() {
                             </Link> : <p className="color-muted center">No preview available</p> }
                         </div>
                         <div className="graphs-list">
-                            <h4>Latest Graphs</h4>
+                            <h4>
+                                <span className="icon material-symbols-outlined">{Terminology.graph.icon}</span>Latest Graphs
+                            </h4>
                             <hr/>
                             { data.length ?
                                 <>
@@ -88,17 +91,16 @@ function Graphs() {
                                             title={ item.description || undefined }
                                             onMouseEnter={() => setSelected(item.id)}
                                         >
-                                            { item.name }
+                                            <span className="icon material-symbols-outlined">{Terminology.graph.icon}</span>{ item.name }
                                         </Link>
                                     </li>
                                 ))}
-                                <li>
-                                    <Link to="/views/?view=column&group=subscription" className="link"><b className="color-brand-2">Browse All...</b></Link>
-                                </li>
+                                <br />
+                                <Link to="/views/?view=column&group=subscription" className="link"><b className="color-brand-2">Browse All...</b></Link>
                                 </> :
                                 <p>
                                     No Graphs found in the database. You can start by selecting one of the
-                                    existing <Link to="requests" className="link">Data Sources</Link> and
+                                    existing <Link to="requests" className="link">{Terminology.subscription.namePlural}</Link> and
                                     then you can create new graph from it's data.
                                 </p>
                             }
@@ -158,11 +160,19 @@ function UpdateCheck({ subscriptions }: { subscriptions: app.Subscription[] }) {
                 <tbody>
                     { toUpdate > 0 && <tr>
                         <td style={{ width: "1.5em" }}><i className="fas fa-info-circle color-orange" /></td>
-                        <td>{toUpdate} Data Source{toUpdate > 1 ? "s" : ""} can be updated to newer version</td>
+                        <td>{toUpdate} {
+                            toUpdate > 1 ?
+                                Terminology.subscription.namePlural :
+                                Terminology.subscription.nameSingular
+                            } can be updated to newer version</td>
                     </tr> }
                     { toDelete > 0 && <tr>
                         <td style={{ width: "1.5em" }}><i className="fas fa-times-circle color-red" /></td>
-                        <td>{toDelete} Data Source{toDelete > 1 ? "s are" : " is"} connected to data package{toDelete > 1 ? "s" : ""} that no longer exist</td>
+                        <td>{toDelete} {
+                            toDelete > 1 ?
+                                Terminology.subscription.namePlural + " are" :
+                                Terminology.subscription.nameSingular + " is"
+                            } connected to data package{toDelete > 1 ? "s" : ""} that no longer exist</td>
                     </tr> }
                 </tbody>
             </table>
@@ -175,7 +185,9 @@ function Subscriptions({ data }: { data: app.Subscription[] }) {
     const canCreate = user?.permissions.includes("Subscriptions.create")
     return (
         <div className="card subscriptions">
-            <h4><i className="icon fa-solid fa-database" /> Data Sources</h4>
+            <h4>
+                <span className="icon material-symbols-outlined">{Terminology.subscription.icon}</span>{Terminology.subscription.namePlural}
+            </h4>
             <hr/>
             { data.length ? 
                 <>
@@ -186,19 +198,18 @@ function Subscriptions({ data }: { data: app.Subscription[] }) {
                                 className="link"
                                 title={ item.description?.replace(/<.*?>/g, "") }
                             >
-                                { item.name }
+                                <span className="icon material-symbols-outlined">{Terminology.subscription.icon}</span>{ item.name }
                             </Link>
                         </li>
                     ))}
-                    <li>
-                        <Link to="/requests/" className="link"><b className="color-brand-2">Browse All...</b></Link>
-                    </li>
+                    <br/>
+                    <Link to="/requests/" className="link"><b className="color-brand-2">Browse All...</b></Link>
                 </> :
                 <div>
-                    <p>No Data Sources found in the database.</p>
+                    <p>No {Terminology.subscription.namePlural} found in the database.</p>
                     { canCreate && <div className="center mt-1 mb-1">
                         <Link to="/sites/new" className="link bold color-green">
-                            <i className="fa-solid fa-circle-plus" /> Create Data Source
+                            <i className="fa-solid fa-circle-plus" /> Create {Terminology.subscription.nameSingular}
                         </Link>
                     </div> }
                 </div>

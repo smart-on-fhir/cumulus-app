@@ -4,6 +4,7 @@ import Alert          from "../generic/Alert"
 import IfAllowed      from "../generic/IfAllowed"
 import { useAuth }    from "../../auth"
 import { app }        from "../../types"
+import Terminology    from "../../Terminology"
 import "../generic/EndpointListTable.scss"
 
 
@@ -16,9 +17,9 @@ export default function TagsList()
     const baseUrl = "/tags"
 
     return createListPage<app.Tag[]>({
-        namePlural: "Tags",
+        namePlural: Terminology.tag.namePlural,
         endpoint  : "/api/tags",
-        icon      : <i className="fa-solid fa-tag color-brand-2" />,
+        icon      : <span className="icon material-symbols-outlined color-brand-2">{Terminology.tag.icon}</span>,
         canCreate,
         baseUrl,
         renderList: data => {
@@ -26,16 +27,16 @@ export default function TagsList()
             if (!data.length) {
                 return <div className="center">
                     <br/>
-                    <p>No tags found in the database! You can start by creating a new tag.</p>
+                    <p>No {Terminology.tag.namePlural} found in the database! You can start by creating a new {Terminology.tag.nameSingular}.</p>
                     <br/>
-                    <Link to="./new" className="btn btn-blue-dark pl-2 pr-2">Create Tag</Link>
+                    <Link to="./new" className="btn btn-blue-dark pl-2 pr-2">Create {Terminology.tag.nameSingular}</Link>
                 </div>
             }
 
             return <>
                 <Alert color="blue" icon="fa-solid fa-info-circle">
-                    Tags can be used to classify things like graphs or data sources.
-                    The Cumulus Dashboard can use the assigned tags for display purposes
+                    {Terminology.tag.namePlural} can be used to classify things like graphs or {Terminology.subscription.namePlural}.
+                    The Cumulus Dashboard can use the assigned {Terminology.tag.namePlural} for display purposes
                     like sorting, grouping, filtering and more.
                 </Alert>
                 <table className="endpoint-list-table mt-2">

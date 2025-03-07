@@ -5,6 +5,7 @@
     border-radius: 1rem;
     cursor       : pointer;
     overflow     : hidden;
+    background   : #FFF;
 
     &:hover {
         box-shadow  : 0 0 0 5px fade-out($color-blue-dark, 0.8);
@@ -16,27 +17,34 @@
         justify-content: center;
         align-items    : center;
         min-height     : 7rem;
-        text-shadow    : 0 1px 0 #FFF;
-        margin         : 0;
-        padding        : 1rem;
-        background     : fade-out($color-blue-dark, 0.9) linear-gradient(#FFF4, #FFF0);
-        box-shadow     : 0 2px 0px -1px #FFF8 inset, 0 -1px 0 0 #0001 inset;
-        border-radius: 1rem 1rem 0 0;
+        // text-shadow    : 0 1px 0 #FFF;
+        margin         : 0 1rem;
+        padding        : 0;
+        // background     : fade-out($color-blue-dark, 0.9) linear-gradient(#FFF4, #FFF0);
+        // background     : #FFF;
+        // box-shadow     : 0 -1.1rem 0 -1rem #0001 inset;
+        // border-radius  : 1rem 1rem 0 0;
+        border-bottom  : 1px solid #0001;
 
         > h3 {
-            text-align        : center;
+            // text-align        : center;
             display           : -webkit-box;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 3;
             overflow          : hidden;
             text-overflow     : ellipsis;
             margin            : 0;
-            padding           : 0;
+            padding           : 1rem 0rem 1rem 2rem;
             line-height       : 1.2;
             font-weight       : 600;
-            color             : $color-blue-dark;
+            // color             : $color-blue-dark;
             font-size         : 1.2rem;
             font-weight       : 500;
+
+            .icon {
+                width: 2rem;
+                margin: 0 0 0 -2rem !important;
+            }
         }
     }
 

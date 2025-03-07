@@ -1,6 +1,7 @@
 import { classList } from "../../../utils"
 import { app }       from "../../../types"
 import Prefetch      from "../../generic/Prefetch"
+import Terminology   from "../../../Terminology"
 import "./LinkWidget.scss"
 
 
@@ -76,7 +77,7 @@ function SubscriptionGroup({
                 </summary>
                 <summary>
                     <span className="icon icon-3 material-symbols-rounded color-red">block</span>
-                    No Data Sources in this group
+                    No {Terminology.subscription.namePlural} in this group
                 </summary>
             </details>
         )
@@ -86,7 +87,9 @@ function SubscriptionGroup({
             <summary className={classList({
                 selected: false
             })}>
-                <label onMouseDown={() => toggle()} title="Click to automatically include/exclude all Data Sources in this group">
+                <label onMouseDown={() => toggle()} title={
+                    `Click to automatically include/exclude all ${Terminology.subscription.namePlural} in this ${Terminology.subscriptionGroup.nameSingular}`
+                }>
                     <span className="icon material-symbols-rounded color-blue">{
                         isIndeterminate ?
                             "indeterminate_check_box" :
@@ -152,7 +155,7 @@ function Subscription({
                 </>
             ) : <summary>
                     <span className="icon icon-3 material-symbols-rounded color-red">block</span>
-                    This Data Source has no graphs yet
+                    This {Terminology.subscription.nameSingular} has no graphs yet
                 </summary>
             }
         </details>

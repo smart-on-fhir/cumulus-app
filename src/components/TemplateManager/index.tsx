@@ -9,6 +9,7 @@ import { request }                       from "../../backend"
 import { app }                           from "../../types"
 import { humanizeColumnName, pluralize } from "../../utils"
 import { FhirResourceTypes }             from "../../config"
+import Terminology                       from "../../Terminology"
 
 
 async function getChartData(subscriptionId: number, column: string, signal: AbortSignal) {
@@ -175,13 +176,13 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
             `Top ${limit} Counts by ${col.label}` :
             `Counts by ${col.label}`;
         description = `Generated from the "${sub.name
-            }" data source to show ${label.toLowerCase()}.`
+            }" ${Terminology.subscription.nameSingular.toLowerCase()} to show ${label.toLowerCase()}.`
     } else {
         label = limit ?
             `Top ${limit} ${counted} by ${col.label}`:
             `Count ${counted} by ${col.label}`;
         description = `Generated from the "${sub.name
-            }" data source to ${limit ? "show" : ""} ${label.toLowerCase()}.`
+            }" ${Terminology.subscription.nameSingular.toLowerCase()} to ${limit ? "show" : ""} ${label.toLowerCase()}.`
     }
 
     return (

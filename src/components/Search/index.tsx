@@ -4,6 +4,7 @@ import Loader                                         from "../generic/Loader"
 import { MarkdownPreview }                            from "../SubscriptionGroups/List"
 import { request }                                    from "../../backend"
 import { highlight }                                  from "../../utils"
+import Terminology                                    from "../../Terminology"
 import "./Search.scss"
 
 
@@ -11,7 +12,7 @@ interface SearchResult {
     name       : string
     description: string | null
     id         : number | string
-    type       : "Data Source"|"Graph"|"Data Source Group"|"Tag"|"Study Area"|"Data Package"
+    type       : "subscription"|"graph"|"subscriptionGroup"|"tag"|"studyArea"|"dataPackage"
     study     ?: string
     version   ?: string
 }
@@ -107,8 +108,8 @@ function Match({ result, search }: { result: SearchResult, search: string }) {
             <span className="name color-blue-dark">{highlight(result.name, search)}</span>
             <div className="small color-muted color-brand-2">
                 {result.study ?
-                    <span><b>{result.type}</b>: {result.study} / {result.id}</span> :
-                    <span><b>{result.type}</b> #{result.id}</span>
+                    <span><b>{Terminology[result.type].nameSingular}</b>: {result.study} / {result.id}</span> :
+                    <span><b>{Terminology[result.type].nameSingular}</b> #{result.id}</span>
                 }
             </div>
             { result.description && <div className="color-muted small description">
@@ -120,17 +121,17 @@ function Match({ result, search }: { result: SearchResult, search: string }) {
 
 function getHref(result: SearchResult) {
     switch (result.type) {
-        case "Data Source":
+        case "subscription":
             return `/requests/${result.id}`;
-        case "Data Source Group":
+        case "subscriptionGroup":
             return `/groups/${result.id}`;
-        case "Graph":
+        case "graph":
             return `/views/${result.id}`;
-        case "Study Area":
+        case "studyArea":
             return `/study-areas/${result.id}`;
-        case "Tag":
+        case "tag":
             return `/tags/${result.id}`;
-        case "Data Package":
+        case "dataPackage":
             return `/explorer?path=${encodeURIComponent(`/studies/${result.study}/${result.version}/${result.id}`)}`;
         default:
             return ""
@@ -138,22 +139,8 @@ function getHref(result: SearchResult) {
 }
 
 function Icon({ type }: { type: SearchResult["type"] }) {
-    switch (type) {
-        case "Graph":
-            return <i className="icon fa-solid fa-chart-pie color-muted" />
-        case "Study Area":
-            return <i className="icon fa-solid fa-book color-muted" />
-        case "Data Source":
-            return <i className="icon fa-solid fa-database color-muted" />
-        case "Data Source Group":
-            return <i className="icon fa-solid fa-folder color-muted" />
-        case "Tag":
-            return <i className="icon fa-solid fa-tag color-muted" />
-        case "Data Package":
-            return <i className="icon fa-solid fa-cube color-muted" />
-        default:
-            return null
-    }
+    const icon = Terminology[type]?.icon
+    return icon ? <span className="icon material-symbols-outlined color-muted">{ icon }</span> : null
 }
 
 export function SearchResultsPage()

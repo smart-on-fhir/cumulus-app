@@ -21,8 +21,10 @@
         }
         
         .icon {
-            font-size: 16px;
-            margin: 0 3px 0 0;
+            font-size: 20px;
+            line-height: 20px;
+            vertical-align: middle;
+            margin: -1px 0.25em 1px 0;
         }
         
         hr {
@@ -40,7 +42,7 @@
             flex: 1;
             font-size: 110%;
             font-weight: 500;
-            color: #666;
+            // color: #666;
             transition: all 0.2s;
             text-transform: uppercase;
             text-shadow: 0px 1px 1px #0001;
@@ -58,6 +60,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            list-style: none;
         }
     }
 
@@ -103,7 +106,7 @@
         grid-row: 2;
         grid-column: 1 / 6;
         gap: 0 2rem;
-        grid-template-columns: 20rem auto;
+        grid-template-columns: 23rem auto;
     }
 
     .graphs {

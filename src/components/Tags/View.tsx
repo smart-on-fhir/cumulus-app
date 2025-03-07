@@ -1,9 +1,10 @@
 import { Link }           from "react-router-dom"
 import { useAuth }        from "../../auth"
-import SubscriptionLink    from "../Subscriptions/SubscriptionLink"
+import SubscriptionLink   from "../Subscriptions/SubscriptionLink"
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import ViewThumbnail      from "../Views/ViewThumbnail"
 import { app }            from "../../types"
+import Terminology        from "../../Terminology"
 
 
 export default function TagView({ id }: { id?: number }) {
@@ -15,8 +16,8 @@ export default function TagView({ id }: { id?: number }) {
 
     return createViewPage<app.Tag>({
         endpoint    : "/api/tags",
-        namePlural  : "Tags",
-        icon        : <i className="fa-solid fa-tag color-brand-2" />,
+        namePlural  : Terminology.tag.namePlural,
+        icon        : <span className="icon material-symbols-outlined color-brand-2">{Terminology.tag.icon}</span>,
         query       : "creator=true&graphs=true&subscriptions=true",
         basePath    : "/tags",
         canUpdate,
@@ -52,11 +53,15 @@ export default function TagView({ id }: { id?: number }) {
                     }
                 </div>
                 <div className="col col-4 responsive mb-2">
-                    <h5><i className="fa-solid fa-database color-brand-2" /> Data Sources</h5>
+                    <h5>
+                        <span className="icon material-symbols-outlined color-brand-2">
+                            {Terminology.subscription.icon}
+                        </span> {Terminology.subscription.namePlural}
+                    </h5>
                     <hr/>
                     { data.subscriptions?.length ?
                         <>
-                            <p className="color-muted">This tag is assigned to the following Data Sources:</p>
+                            <p className="color-muted">This tag is assigned to the following {Terminology.subscription.namePlural}:</p>
                             <div className="link-list mt-05">
                             { data.subscriptions.map((s, i) => (
                                 // @ts-ignore
@@ -65,9 +70,9 @@ export default function TagView({ id }: { id?: number }) {
                             </div>
                         </> :
                         <>
-                            <p className="color-brand-2">This tag is not assigned with any Data Sources</p>
+                            <p className="color-brand-2">This tag is not assigned with any {Terminology.subscription.namePlural}</p>
                             <br/>
-                            <Link to="/requests" className="link">Browse all Data Sources</Link>
+                            <Link to="/requests" className="link">Browse all {Terminology.subscription.namePlural}</Link>
                         </>
                         
                     }

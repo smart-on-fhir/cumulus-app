@@ -28,14 +28,14 @@
         white-space  : nowrap;
         text-overflow: ellipsis;
         overflow     : hidden;
-        font-weight  : 600;
-        color        : #414e5cee;
+        font-weight  : 500;
+        // color        : #414e5c;
     }
 
     a, .link {
         display        : block;
-        height         : 2rem;
-        line-height    : 2rem;
+        height         : 2.2rem;
+        line-height    : 2.2rem;
         color          : inherit;
         text-decoration: none;
         overflow       : hidden;
@@ -48,19 +48,24 @@
             line-height: 1.6rem;
             text-align : center;
             float      : left;
-            margin     : 0.2rem 0.3rem 0.2rem 0.2rem;
+            margin     : 0.3rem 0.3rem 0.3rem 0.2rem;
             // opacity    : 0.6;
             font-size  : 14px;
             // color      : #69C;
             // background-color: #69C;
             border-radius: 4px;
             // text-shadow: 0 0 0.5px #000;
+            opacity: 0.6;
+
+            &.material-symbols-outlined {
+                font-size  : 24px;
+            }
         }
 
         &:hover {
             background     : rgba(0, 0, 0, 0.1);
             text-decoration: none;
-            text-shadow    : 0 1px 0 #e8e8e8;
+            text-shadow    : 0 1px 0 #e8e8e888;
         }
 
         &.active {
@@ -81,6 +86,10 @@
             padding    : 0 0.75rem;
             font-size  : 60%;
         }
+    }
+
+    label {
+        opacity: 0.6;
     }
 
     .group {

@@ -1,9 +1,10 @@
 import { createDeletePage } from "../generic/EndpointDeleteWrapper"
 import Clip                 from "../generic/Clip"
-import SubscriptionLink      from "../Subscriptions/SubscriptionLink"
+import SubscriptionLink     from "../Subscriptions/SubscriptionLink"
 import Grid                 from "../generic/Grid"
 import ViewThumbnail        from "../Views/ViewThumbnail"
 import { app }              from "../../types"
+import Terminology          from "../../Terminology"
 
 
 export default function Delete()
@@ -31,19 +32,19 @@ export default function Delete()
                     <div className="col col-4 mb-2 responsive">
                         <h6>
                             <i className="fa-solid fa-link-slash color-brand-2" />
-                            <span className="color-muted"> Linked Data Sources</span>
+                            <span className="color-muted"> Linked {Terminology.subscription.namePlural}</span>
                         </h6>
                         <hr className="mb-05"/>
                         { data.Subscriptions?.length ?
                             <>
-                                <div className="color-muted mb-05">These Data Sources will no longer be linked to this study area:</div>
+                                <div className="color-muted mb-05">These {Terminology.subscription.namePlural} will no longer be linked to this study area:</div>
                                 <div className="link-list">
                                     { data.Subscriptions?.map((s, i) => (
                                         <SubscriptionLink key={i} request={s} href={"/requests/" + s.id}/>
                                     )) }
                                 </div>
                             </> :
-                            <p className="color-muted">No Data Sources linked</p>
+                            <p className="color-muted">No {Terminology.subscription.namePlural} linked</p>
                         }
                     </div>
                     <div className="col col-6 mb-2 responsive">

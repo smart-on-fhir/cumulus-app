@@ -5,6 +5,7 @@ import Dialog                  from "../../../../components/generic/Dialog"
 import Grid                    from "../../../../components/generic/Grid"
 import Loader                  from "../../../../components/generic/Loader"
 import { app }                 from "../../../../types"
+import Terminology             from "../../../../Terminology"
 import ActionsList             from "./ActionsList"
 import EmailSelector           from "./EmailSelector"
 import ResourceIdSelector      from "./ResourceIdSelector"
@@ -176,12 +177,12 @@ export default function ShareDialog({
                                     setResourceType(e.target.value)
                                 }}>
                                     <option value="" disabled>Please Select</option>
-                                    <option value="SubscriptionGroups">Data Source Groups</option>
+                                    <option value="SubscriptionGroups">{Terminology.subscriptionGroup.namePlural}</option>
                                     <option value="Graphs">Graphs</option>
-                                    <option value="Subscriptions">Data Sources</option>
+                                    <option value="Subscriptions">{Terminology.subscription.namePlural}</option>
                                     <option value="DataSites">DataSites</option>
-                                    <option value="StudyAreas">StudyAreas</option>
-                                    <option value="Tags">Tags</option>
+                                    <option value="StudyAreas">{Terminology.studyArea.namePlural}</option>
+                                    <option value="Tags">{Terminology.tag.namePlural}</option>
                                     <option value="UserGroups">UserGroups</option>
                                 </select>
                             </> }

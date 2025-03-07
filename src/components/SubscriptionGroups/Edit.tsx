@@ -1,14 +1,15 @@
 import { createEditPage } from "../generic/EndpointEditWrapper"
 import Form               from "./Form"
 import { app }            from "../../types"
+import Terminology        from "../../Terminology"
 import "./SubscriptionGroups.scss"
 
 
 export default function SubscriptionGroupEdit()
 {
     return createEditPage<app.SubscriptionGroup>({
-        namePlural  : "Data Source Groups",
-        nameSingular: "Data Source Group",
+        namePlural  : Terminology.subscriptionGroup.namePlural,
+        nameSingular: Terminology.subscriptionGroup.nameSingular,
         basePath    : "/groups",
         endpoint    : "/api/request-groups",
         renderForm  : ({ loading, data, onSubmit }) => <>

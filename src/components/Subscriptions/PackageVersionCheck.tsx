@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import aggregator, { humanizePackageId } from "../../Aggregator";
 import Alert from "../generic/Alert";
+import Terminology from "../../Terminology";
 
 
 export default function PackageVersionCheck({ pkgId }: { pkgId: string }) {
@@ -15,9 +16,9 @@ export default function PackageVersionCheck({ pkgId }: { pkgId: string }) {
         return null;
     }
     if (version === pkgId) {
-        return null; // <Alert color="green">Data Source is up to date</Alert>
+        return null;
     }
     return <Alert color="orange" icon="fas fa-info-circle">
-        Data Source can be upgraded to package <b>{humanizePackageId(version)}</b>
+        {Terminology.subscription.nameSingular} can be upgraded to package <b>{humanizePackageId(version)}</b>
     </Alert>
 }

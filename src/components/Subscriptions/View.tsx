@@ -18,6 +18,7 @@ import { useBackend }             from "../../hooks"
 import { app }                    from "../../types"
 import PackageVersionCheck        from "./PackageVersionCheck"
 import { Templates }              from "../TemplateManager"
+import Terminology                from "../../Terminology"
 
 
 export default function SubscriptionView({ id }: { id?: number }): JSX.Element
@@ -35,8 +36,8 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
 
     const destroy = useCallback(() => {
         if (window.confirm(
-            "Deleting this data source will also delete all the graphs " +
-            "associated with it! Are you sure?")) {
+            `Deleting this ${Terminology.subscription.nameSingular.toLowerCase()} ` +
+            `will also delete all the graphs associated with it! Are you sure?`)) {
             deleteOne("requests", id + "").then(() => setDeleted(true))
         }
     }, [id]);
@@ -54,7 +55,7 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
     }
 
     if (!model) {
-        return <AlertError>Failed to load Data Source</AlertError>
+        return <AlertError>Failed to load {Terminology.subscription.nameSingular}</AlertError>
     }
 
     const isFlatData      = model.metadata?.type === "flat"
@@ -70,12 +71,12 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
         <div className="container">
             <HelmetProvider>
                 <Helmet>
-                    <title>Data Source: {model.name}</title>
+                    <title>{Terminology.subscription.nameSingular}: {model.name}</title>
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: "Data Sources", href: "/requests" },
+                { name: Terminology.subscription.namePlural, href: "/requests" },
                 { name: model.name }
             ]}/>
             <header className="ml-3">
@@ -101,7 +102,7 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
                         <h5 className="mt-2">&nbsp;</h5>
                         <hr/>
                         <div className="col middle">
-                            <p>This data source is currently empty. Please begin by uploading CSV data.</p>
+                            <p>This {Terminology.subscription.nameSingular} is currently empty. Please begin by uploading CSV data.</p>
                             <p className="center mt-1">
                                 <Link className="btn btn-blue" to={`/requests/${model.id}/import`}>
                                     <b>Upload CSV Data</b>
@@ -206,7 +207,7 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
 
                         {/* Add Graph -------------------------------------- */}
                         { canCreateGraphs && <p>
-                            <Link className="link" to={`/requests/${model.id}/create-view`} title="Click here to create new view from the data provided from this Data Source">
+                            <Link className="link" to={`/requests/${model.id}/create-view`} title={`Click here to create new view from the data provided from this ${Terminology.subscription.nameSingular.toLowerCase()}`}>
                                 <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>add_photo_alternate</i>
                                 Add Graph
                             </Link>

@@ -4,6 +4,7 @@ import createListPage from "../generic/EndpointListWrapper"
 import Grid           from "../generic/Grid"
 import { useAuth }    from "../../auth"
 import { app }        from "../../types"
+import Terminology    from "../../Terminology"
 import "./StudyAreas.scss"
 
 
@@ -14,9 +15,9 @@ export default function ListStudyAreas()
     const baseUrl = "/study-areas"
 
     return createListPage<app.StudyArea[]>({
-        namePlural: "Study Areas",
+        namePlural: Terminology.studyArea.namePlural,
         endpoint  : "/api/study-areas",
-        icon      : <i className="fa-solid fa-book color-brand-2" />,        
+        icon      : <span className="icon material-symbols-outlined color-brand-2">{Terminology.studyArea.icon}</span>,
         canCreate,
         baseUrl,
         renderList: data => {
@@ -24,9 +25,9 @@ export default function ListStudyAreas()
             if (!data.length) {
                 return <div className="center">
                     <br/>
-                    <p>No study areas found in the database! You can start by creating a new study area.</p>
+                    <p>No {Terminology.studyArea.namePlural} found in the database! You can start by creating a new {Terminology.studyArea.nameSingular}.</p>
                     <br/>
-                    <Link to={`${baseUrl}/new`} className="btn btn-blue-dark pl-2 pr-2">Create Study Area</Link>
+                    <Link to={`${baseUrl}/new`} className="btn btn-blue-dark pl-2 pr-2">Create {Terminology.studyArea.nameSingular}</Link>
                 </div>
             }
 

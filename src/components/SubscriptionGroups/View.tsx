@@ -5,6 +5,7 @@ import Markdown           from "../generic/Markdown"
 import SubscriptionLink   from "../Subscriptions/SubscriptionLink"
 import { useAuth }        from "../../auth"
 import { app }            from "../../types"
+import Terminology        from "../../Terminology"
 
 
 export default function SubscriptionGroupView({ id }: { id?: number })
@@ -16,11 +17,11 @@ export default function SubscriptionGroupView({ id }: { id?: number })
     const canCreateSub = user?.permissions.includes("Subscriptions.create")
 
     return createViewPage<app.SubscriptionGroup>({
-        basePath: "/groups",
-        endpoint: "/api/request-groups",
-        namePlural: "Data Source Groups",
-        icon: <i className="fa-solid fa-folder color-brand-2" />,
-        query: "subscriptions=true",
+        basePath  : "/groups",
+        endpoint  : "/api/request-groups",
+        namePlural: Terminology.subscriptionGroup.namePlural,
+        icon      : <span className="icon material-symbols-outlined color-brand-2">{Terminology.subscriptionGroup.icon}</span>,
+        query     : "subscriptions=true",
         canDelete,
         canUpdate,
         id,
@@ -31,12 +32,12 @@ export default function SubscriptionGroupView({ id }: { id?: number })
                     <div className="row gap mt-2">
                         <div className="col col-0 top responsive">
                             <h6 className="color-brand-2">
-                                <i className="fa-solid fa-link color-brand-2" /> Associated Data Sources
+                                <i className="fa-solid fa-link color-brand-2" /> Associated {Terminology.subscription.namePlural}
                             </h6>
                         </div>
                         { canCreateSub && <div className="col col-0 right nowrap middle">
                             <div>
-                                <Link to={`/requests/new?groupId=${data.id}`} className="btn btn-virtual" title="Create new Data Source in this group">
+                                <Link to={`/requests/new?groupId=${data.id}`} className="btn btn-virtual" title={`Create new ${Terminology.subscription.nameSingular.toLowerCase()} in this ${Terminology.subscriptionGroup.nameSingular.toLowerCase()}`}>
                                     <i className="fa-solid fa-plus-circle color-blue" />
                                 </Link>
                             </div>
@@ -52,7 +53,7 @@ export default function SubscriptionGroupView({ id }: { id?: number })
                         <div className="mt-1">
                             <span className="material-icons-round color-blue">
                                 info_outline
-                            </span> No Data Sources are associated with this group.
+                            </span> No {Terminology.subscription.namePlural.toLowerCase()} are associated with this {Terminology.subscriptionGroup.nameSingular.toLowerCase()}.
                         </div>
                     }
                 </div>

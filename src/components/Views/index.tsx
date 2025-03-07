@@ -4,6 +4,7 @@ import { classList } from "../../utils";
 import Checkbox from "../generic/Checkbox";
 import MenuButton from "../generic/MenuButton";
 import ViewsBrowser from "./ViewsBrowser";
+import Terminology from "../../Terminology";
 
 
 type SortType = "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | ""
@@ -119,7 +120,7 @@ export default function Views({ drafts }: { drafts?: boolean })
                                     checked={ groupBy === "subscription"}
                                     name="groupBy"
                                     type="radio"
-                                    label="Group by Data Source"
+                                    label={`Group by ${Terminology.subscription.nameSingular}`}
                                 />,
                                 <Checkbox
                                     onChange={() => onSetGroupBy("tag")}
