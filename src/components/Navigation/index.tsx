@@ -13,9 +13,11 @@ function NavGroup({ to, label, icon, children, end }: {
     children: ReactNode
 }) {
     const { pathname } = useLocation()
-    const [ isOpen, setOpen ] = useState(
-        to ? !!matchPath({ path: to, end: false }, pathname) : false
-    )
+    // const [ isOpen, setOpen ] = useState(
+    //     to ? !!matchPath({ path: to, end: false }, pathname) : undefined
+    // )
+
+    const [ isOpen, setOpen ] = useState<boolean | undefined>()
 
     return (
         <>
@@ -45,10 +47,10 @@ function NavGroup({ to, label, icon, children, end }: {
                         <i className={ "icon " + icon } /> :
                         icon
                     }<label>{ label }</label>
-                    { children && <i className={ "fas chevron " + (isOpen ? "fa-chevron-down" : "fa-chevron-right") } /> }
+                    { children && <i className="fas chevron fa-chevron-down" /> }
                 </div>
             }
-            { isOpen && <div className="group active">{ children }</div> }
+            <div className={"group" + (isOpen === true ? " active" : isOpen === false ? " closed" : "")}>{ children }</div>
         </>
     )
 }
@@ -121,16 +123,13 @@ export default function Navigation()
                     </NavGroup>
                 )}
 
-                {/* <hr /> */}
-
-                <NavGroup icon={<span className="icon material-symbols-outlined">account_circle</span>} label={ user?.name || user?.email }>
+                <NavGroup icon={<span className="icon material-symbols-outlined">account_circle</span>} label="User">
                     <NavLink to="/drafts"><span className="icon material-symbols-outlined">edit_square</span>My Draft Graphs</NavLink>
                     <NavLink to="/user"><span className="icon material-symbols-outlined">manage_accounts</span>My Account</NavLink>
                     <div className="link" onClick={() => {
                         logout().then(() => navigate("/"));
                     }}>
                         <span className="icon material-symbols-outlined color-red">power_settings_new</span>
-                        {/* <i className="icon fa-solid fa-right-from-bracket" /> */}
                         Sign Out
                         { loading && <i className="fas fa-circle-notch fa-spin color-muted" /> }
                     </div>

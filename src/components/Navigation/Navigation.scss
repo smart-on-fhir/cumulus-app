@@ -2,14 +2,8 @@
 
 .navigation {
     background : #e8e8e8;
-    // font-size  : 1.3rem;
     width      : 16rem;
-    // font-weight: 500;
     box-shadow : -1px 0 0 0 rgba(0, 0, 0, 0.1) inset;
-    // font-family: Arial, "Open Sans", sans-serif;
-    // font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    // font-family: 'Arial Narrow', Arial, sans-serif;
-    // font-family: 'Arial Narrow', sans-serif;
     white-space: nowrap;
     transition : width 0.2s ease-out;
     margin     : -1rem 1rem -1rem -1rem;
@@ -28,8 +22,7 @@
         white-space  : nowrap;
         text-overflow: ellipsis;
         overflow     : hidden;
-        font-weight  : 500;
-        // color        : #414e5c;
+        font-weight  : 600;
     }
 
     a, .link {
@@ -82,7 +75,7 @@
         .chevron {
             color      : rgba(0, 0, 0, 0.3);
             float      : right;
-            line-height: 2rem;
+            line-height: 2.2rem;
             padding    : 0 0.75rem;
             font-size  : 60%;
         }
@@ -93,28 +86,12 @@
     }
 
     .group {
-        
-        // text-indent: 1.8rem;
         display    : none;
         font-weight: 400;
-        // font-size  : 1.1rem;
-        // white-space : nowrap;
-        // text-overflow: ellipsis;
-        // overflow: hidden;
 
         a, .link {
-            // color: $color-blue-dark;
-            // font-family: "Arial";//$font-family;
             padding-left: 1.8rem;
             
-            // .icon {
-                // color      : $color-blue-dark;
-                // opacity    : 1;
-                // text-shadow: 0 0 1px #FFF;
-                // margin     : 0;
-                // width      : 1.5rem;
-            // }
-
             &.active {
                 background: #f8f8f7;
                 color     : #C60;
@@ -122,18 +99,23 @@
             }
         }
 
-        &.active {
+        &.active, &:has(a.active), &:has(.link.active) {
             display: block;
         }
+
+        &.closed {
+            display: none;
+        }
+
     }
 
-    hr {
-        background: transparent;
-        height    : 0;
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
-        margin    : 0.5em 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    }
+    // hr {
+    //     background: transparent;
+    //     height    : 0;
+    //     border-top: 1px solid rgba(0, 0, 0, 0.1);
+    //     margin    : 0.5em 0;
+    //     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    // }
 
 }
 
