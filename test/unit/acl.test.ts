@@ -31,7 +31,6 @@ describe("Permissions", () => {
         expect(permissions["Subscriptions.read"]).to.equal(true)
         expect(permissions["Subscriptions.refresh"]).to.equal(true)
         expect(permissions["Subscriptions.requestLineLevelData"]).to.equal(true)
-        expect(permissions["DataSites.read"]).to.equal(true)
         expect(permissions["StudyAreas.read"]).to.equal(true)
         expect(permissions["Tags.read"]).to.equal(true)
         expect(permissions["SubscriptionTags.read"]).to.equal(true)

@@ -114,9 +114,11 @@ b, .bold {
 .icon {
   &.material-symbols-outlined {
     font-size: 1.3em;
-    line-height: 0;
+    line-height: 1;
     vertical-align: middle;
     overflow: visible;
+    margin-top: -0.2em;
+    margin-bottom: -0.1em;
   }
 }
 
@@ -415,6 +417,72 @@ table {
     text-align: initial;
     vertical-align: baseline;
   }
+}
+
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  th {
+    font-weight: 500;
+  }  
+  
+  td, th {
+      padding: 0.5em 0.5em;
+  }
+
+
+  &.table-border {
+      td, th {
+          border: 0.5px solid #0001;
+      }
+  }
+
+  // &.table-hover {
+  //     tbody tr:hover {
+  //         background: var(--color-highlight);
+  //     }
+  // }
+}
+
+.table-hover tbody tr:hover {
+  background-color: #9CF3;
+}
+
+.table-border-x {
+  td, th {
+      border-bottom: 0.5px solid #0001;
+      border-top: 0.5px solid #0001;
+  }
+
+  thead:first-of-type {
+    td, th {
+        // border-bottom: 0.5px solid #0001;
+        border-top: 0;
+    }
+  }
+  // tr:last-of-type {
+  //   td, th {
+  //       border-bottom: 0;
+  //   }
+  // }
+}
+
+.table-fixed {
+  table-layout: fixed;
+}
+
+.table-condensed {
+  td, th {
+      padding: 0.25em;
+  }   
+}
+
+.table-responsive {
+  display: grid;
+  overflow: auto;
 }
 
 .search-match {

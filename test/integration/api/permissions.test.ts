@@ -1,7 +1,6 @@
 import { expect, use }               from "chai"
 import chaiAsPromised                from "chai-as-promised"
 import Subscription                  from "../../../backend/db/models/Subscription"
-import DataSite                      from "../../../backend/db/models/DataSite"
 import Permission                    from "../../../backend/db/models/Permission"
 import StudyArea                     from "../../../backend/db/models/StudyArea"
 import SubscriptionGroup             from "../../../backend/db/models/SubscriptionGroup"
@@ -13,7 +12,6 @@ import { explode }                   from "../../../backend/lib"
 import { emailsToUserIDs, validate } from "../../../backend/routes/permissions"
 import SystemUser                    from "../../../backend/SystemUser"
 import Subscriptions                 from "../../fixtures/Subscriptions"
-import DataSites                     from "../../fixtures/DataSites"
 import Permissions                   from "../../fixtures/Permissions"
 import StudyAreas                    from "../../fixtures/StudyAreas"
 import SubscriptionGroups            from "../../fixtures/SubscriptionGroups"
@@ -607,7 +605,6 @@ describe("Permissions", () => {
             await resetTable("Permission"       , Permissions       )
             await resetTable("User"             , Users             )
             await resetTable("Subscription"     , Subscriptions     )
-            await resetTable("DataSite"         , DataSites         )
             await resetTable("UserGroup"        , UserGroups        )
             await resetTable("SubscriptionGroup", SubscriptionGroups)
             await resetTable("Tag"              , Tags              )
@@ -657,21 +654,6 @@ describe("Permissions", () => {
             const sub = await Subscription.findByPk(1, { user: SystemUser,  })
             await sub!.destroy({ user: SystemUser })
             expect(await Permission.count({ where: { resource: "Subscriptions", resource_id: 1 } })).to.equal(0)
-        })
-
-        it ("When a Site is deleted, any associated permissions are also deleted", async () => {
-            await Permission.bulkCreate([
-                { resource: "DataSites", user_id: 3, action: "read"  , permission: true, resource_id: 1 },
-                { resource: "DataSites", user_id: 3, action: "update", permission: true, resource_id: 1 },
-                { resource: "DataSites", user_id: 3, action: "delete", permission: true, resource_id: 1 },
-                // { resource: "DataSites", user_id: 3, action: "search", permission: true, resource_id: 1 },
-                { resource: "DataSites", user_id: 3, action: "share" , permission: true, resource_id: 1 },
-            ])
-
-            expect(await Permission.count({ where: { resource: "DataSites", resource_id: 1 } })).to.be.greaterThan(0)
-            const rec = await DataSite.findByPk(1, { user: SystemUser,  })
-            await rec!.destroy({ user: SystemUser })
-            expect(await Permission.count({ where: { resource: "DataSites", resource_id: 1 } })).to.equal(0)
         })
 
         it ("When a UserGroup is deleted, any associated permissions are also deleted", async () => {

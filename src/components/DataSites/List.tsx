@@ -1,69 +1,90 @@
-import { Link }       from "react-router-dom"
-import createListPage from "../generic/EndpointListWrapper"
-import IfAllowed      from "../generic/IfAllowed"
-import { useAuth }    from "../../auth"
-import { app }        from "../../types"
-import Terminology    from "../../Terminology"
-import "../generic/EndpointListTable.scss"
+import moment                               from "moment"
+import { Link }                             from "react-router-dom"
+import { useCallback, useEffect, useState } from "react"
+import { Helmet, HelmetProvider }           from "react-helmet-async"
+import PageHeader                           from "../generic/PageHeader"
+import Loader                               from "../generic/Loader"
+import { AlertError }                       from "../generic/Alert"
+import Breadcrumbs                          from "../generic/Breadcrumbs"
+import Terminology                          from "../../Terminology"
+import aggregator                           from "../../Aggregator"
+import { sortBy }                           from "../../utils"
 
-export default function ListPage()
-{
-    const { user } = useAuth();
 
-    const canCreate = user?.permissions.includes("DataSites.create")
-
-    return createListPage<app.DataSite[]>({
-        namePlural  : Terminology.site.namePlural,
-        nameSingular: Terminology.site.nameSingular,
-        endpoint    : "/api/data-sites",
-        icon        : <span className="icon material-symbols-outlined color-brand-2">{Terminology.site.icon}</span>,
-        canCreate,
-        renderList: data => {
-            return (
-                <div>
-                    { data.length ?
-                        <table className="endpoint-list-table">
-                            <thead>
-                                <tr>
-                                    <th style={{ width: "2em" }}>ID</th>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th style={{ width: "3em" }}>Lat</th>
-                                    <th style={{ width: "4em" }}>Long</th>
-                                    <IfAllowed showError={false} permissions="DataSites.update" element={ <th style={{ width: "2.5em" }} /> } />
-                                    <IfAllowed showError={false} permissions="DataSites.delete" element={ <th style={{ width: "2.5em" }} /> } />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {data.map((row, i) => (
-                                    <tr key={i}>
-                                        <td>{row.id}</td>
-                                        <td><Link title={row.name} to={"./" + row.id} className="link">{row.name}</Link></td>
-                                        <td>{row.description || ""}</td>
-                                        <td className="center">{row.lat}</td>
-                                        <td className="center">{row.long}</td>
-                                        <IfAllowed showError={false} permissions="DataSites.update" element={ <td>
-                                            <Link title="Edit" className="btn small color-brand-2 btn-virtual" to={ row.id + "/edit" }>
-                                                <i className="fa-solid fa-pen-to-square" />
-                                            </Link>
-                                        </td> } />
-                                        <IfAllowed showError={false} permissions="DataSites.delete" element={ <td>
-                                            <Link title="Delete" className="btn small color-red btn-virtual" to={ row.id + "/delete" }>
-                                                <i className="fa-solid fa-trash-can" />
-                                            </Link>
-                                        </td> } />
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table> :
-                        <div className="center">
-                            <br/>
-                            <p>No Healthcare Sites found in the database. { canCreate && <span> You can start by creating new one.<br/><br/></span> }</p>
-                            { canCreate && <Link to="new" className="btn btn-blue-dark pl-2 pr-2">Create Healthcare Site</Link> }
-                        </div>
-                    }
-                </div>
-            )
+function getSiteDate(site: any) {
+    let date = -Infinity
+    for (const study in site.studies) {
+        for (const version in site.studies[study]) {
+            const d = moment(site.studies[study][version].last_data_update).valueOf()
+            if (d > date) {
+                date = d
+            }
         }
-    })
+    }
+    if (isFinite(date)) {
+        return new Date(date).toDateString()
+    }
+
+    return ""
+}
+
+
+export default function ListSites()
+{
+    const [sites  , setSites  ] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
+    const [error  , setError  ] = useState<Error | string | null>(null)
+
+    const load = useCallback(() => {
+        setLoading(true)
+        setError(null)
+        aggregator.getSites()
+        .then(_sites => sortBy(_sites, "name"))
+        .then(_sites => setSites(_sites))
+        .catch(setError)
+        .finally(() => setLoading(false))
+    }, [])
+
+    useEffect(() => load(), [load])
+
+    return (
+        <div className="container">
+            <HelmetProvider>
+                <Helmet>
+                    <title>List Data Sites</title>
+                </Helmet>
+            </HelmetProvider>
+            <Breadcrumbs links={[
+                { name: "Home"    , href: "/" },
+                { name: Terminology.site.namePlural }
+            ]} />
+            <PageHeader
+                title={Terminology.site.namePlural}
+                icon={Terminology.site.icon}
+                description="List of all the healthcare sites which have contributed data to Cumulus studies" />
+            { loading && <Loader/> }
+            { error && <AlertError>{ error + "" }</AlertError> }
+            <hr className="mb-0"/>
+            <table className="table table-border-x table-hover">
+                <thead>
+                    <tr>
+                        <th style={{ width: "2.5em" }}></th>
+                        <th>Site</th>
+                        <th>Studies</th>
+                        <th>Last Data Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    { sites && sites.map((s, i) => (
+                        <tr key={i}>
+                            <td><i className="icon material-symbols-outlined color-muted">{Terminology.site.icon}</i></td>
+                            <td><Link to={`/sites/${s.id}`} className="link">{s.name}</Link></td>
+                            <td className="color-muted">{ Object.keys(s.studies).length } studies</td>
+                            <td className="color-muted">{ getSiteDate(s) }</td>
+                        </tr>
+                    )) }
+                </tbody>
+            </table>
+        </div>
+    )
 }

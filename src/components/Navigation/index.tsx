@@ -43,7 +43,6 @@ export default function Navigation()
         return null
     }
 
-    const canReadSites         = user.permissions.includes("DataSites.read")
     const canReadSubscriptions = user.permissions.includes("Subscriptions.read")
     const canListGroups        = user.permissions.includes("SubscriptionGroups.read")
     const canReadTags          = user.permissions.includes("Tags.read")
@@ -65,9 +64,9 @@ export default function Navigation()
                 <NavLink to="/views">
                     <span className="icon material-symbols-outlined">{Terminology.graph.icon}</span>{Terminology.graph.namePlural}
                 </NavLink>
-                { canReadSites && <NavLink to="/sites">
+                <NavLink to="/sites">
                     <span className="icon material-symbols-outlined">{Terminology.site.icon}</span>{Terminology.site.namePlural}
-                </NavLink> }
+                </NavLink>
                 { canReadSubscriptions && <NavLink to="/requests">
                     <span className="icon material-symbols-outlined">{Terminology.subscription.icon}</span>{Terminology.subscription.namePlural}
                 </NavLink> }

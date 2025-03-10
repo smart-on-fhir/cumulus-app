@@ -42,10 +42,6 @@ const SHAREABLE_MODELS: Record<string, { Model: any, actions: Action[] }> = {
         Model: SubscriptionGroup as any,
         actions: ["read", "update", "delete", "share"]
     },
-    DataSites: {
-        Model: DataSite as any,
-        actions: ["read", "update", "delete", "share"]
-    },
     StudyAreas: {
         Model: StudyArea as any,
         actions: ["read", "update", "delete", "share"]

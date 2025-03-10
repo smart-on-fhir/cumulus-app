@@ -1,7 +1,6 @@
 import { Sequelize }        from "sequelize"
 import { fixAutoIncrement } from "../backend/lib"
 import Users                from "./fixtures/Users"
-import DataSites            from "./fixtures/DataSites"
 import StudyAreas           from "./fixtures/StudyAreas"
 import SubscriptionGroups   from "./fixtures/SubscriptionGroups"
 import Subscriptions        from "./fixtures/Subscriptions"
@@ -16,9 +15,6 @@ export async function seed(connection: Sequelize) {
 
     await models.User.bulkCreate(Users);
     await fixAutoIncrement(connection, models.User.tableName, "id");
-
-    await models.DataSite.bulkCreate(DataSites);
-    await fixAutoIncrement(connection, models.DataSite.tableName, "id");
 
     await models.StudyArea.bulkCreate(StudyAreas);
     await fixAutoIncrement(connection, models.StudyArea.tableName, "id");
