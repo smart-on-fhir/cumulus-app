@@ -2,7 +2,6 @@ import { Sequelize, Op } from "sequelize"
 import * as logger       from "../../services/logger"
 import BaseModel         from "./BaseModel"
 import Subscription      from "./Subscription"
-import DataSite          from "./DataSite"
 import StudyArea         from "./StudyArea"
 import SubscriptionGroup from "./SubscriptionGroup"
 import Tag               from "./Tag"
@@ -147,7 +146,6 @@ export function attachHooks(connection: Sequelize) {
 export function init(connection: Sequelize) {
     User.initialize(connection);
     Tag.initialize(connection);
-    DataSite.initialize(connection);
     Subscription.initialize(connection);
     StudyArea.initialize(connection);
     SubscriptionGroup.initialize(connection);
