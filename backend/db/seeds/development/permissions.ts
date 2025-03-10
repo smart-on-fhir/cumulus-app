@@ -53,21 +53,7 @@ export default [
     { user_id: null, role: "user"   , user_group_id: null, resource: "Subscriptions", action: "export"               , resource_id: null, permission: 1, comment: "Can export subscriptions data"                  },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Subscriptions", action: "refresh"              , resource_id: null, permission: 0, comment: "Can refresh subscriptions data"                 },
     { user_id: null, role: "user"   , user_group_id: null, resource: "Subscriptions", action: "requestLineLevelData" , resource_id: null, permission: 1, comment: "Can request line-level data from subscriptions" },
-    
-    // DataSites
-    { user_id: null, role: "admin"  , user_group_id: null, resource: "DataSites", action: "read"  , resource_id: null, permission: 1, comment: "Can read sites"   },
-    { user_id: null, role: "admin"  , user_group_id: null, resource: "DataSites", action: "create", resource_id: null, permission: 1, comment: "Can create sites" },
-    { user_id: null, role: "admin"  , user_group_id: null, resource: "DataSites", action: "update", resource_id: null, permission: 1, comment: "Can update sites" },
-    { user_id: null, role: "admin"  , user_group_id: null, resource: "DataSites", action: "delete", resource_id: null, permission: 1, comment: "Can delete sites" },
-    { user_id: null, role: "manager", user_group_id: null, resource: "DataSites", action: "read"  , resource_id: null, permission: 1, comment: "Can read sites"   },
-    { user_id: null, role: "manager", user_group_id: null, resource: "DataSites", action: "create", resource_id: null, permission: 1, comment: "Can create sites" },
-    { user_id: null, role: "manager", user_group_id: null, resource: "DataSites", action: "update", resource_id: null, permission: 1, comment: "Can update sites" },
-    { user_id: null, role: "manager", user_group_id: null, resource: "DataSites", action: "delete", resource_id: null, permission: 0, comment: "Can delete sites" },
-    { user_id: null, role: "user"   , user_group_id: null, resource: "DataSites", action: "read"  , resource_id: null, permission: 1, comment: "Can read sites"   },
-    { user_id: null, role: "user"   , user_group_id: null, resource: "DataSites", action: "create", resource_id: null, permission: 0, comment: "Can create sites" },
-    { user_id: null, role: "user"   , user_group_id: null, resource: "DataSites", action: "update", resource_id: null, permission: 0, comment: "Can update sites" },
-    { user_id: null, role: "user"   , user_group_id: null, resource: "DataSites", action: "delete", resource_id: null, permission: 0, comment: "Can delete sites" },
-          
+
     // StudyAreas
     { user_id: null, role: "admin"  , user_group_id: null, resource: "StudyAreas", action: "read"  , resource_id: null, permission: 1, comment: "Can read study areas"   },
     { user_id: null, role: "admin"  , user_group_id: null, resource: "StudyAreas", action: "create", resource_id: null, permission: 1, comment: "Can create study areas" },

@@ -180,7 +180,6 @@ export default function ShareDialog({
                                     <option value="SubscriptionGroups">{Terminology.subscriptionGroup.namePlural}</option>
                                     <option value="Graphs">Graphs</option>
                                     <option value="Subscriptions">{Terminology.subscription.namePlural}</option>
-                                    <option value="DataSites">DataSites</option>
                                     <option value="StudyAreas">{Terminology.studyArea.namePlural}</option>
                                     <option value="Tags">{Terminology.tag.namePlural}</option>
                                     <option value="UserGroups">UserGroups</option>

@@ -1,12 +1,14 @@
 import { useEffect, useState }       from "react"
 import { HelmetProvider, Helmet }    from "react-helmet-async"
 import { Link }                      from "react-router-dom"
-import StudyAreaCard                 from "../StudyAreas/Card"
-import Prefetch                      from "../generic/Prefetch"
 import { useAuth }                   from "../../auth"
 import { app }                       from "../../types"
 import Aggregator, { useAggregator } from "../../Aggregator"
 import Terminology                   from "../../Terminology"
+import { sortBy }                    from "../../utils"
+import StudyAreaCard                 from "../StudyAreas/Card"
+import Prefetch                      from "../generic/Prefetch"
+import Loader                        from "../generic/Loader"
 import "./home.scss"
 
 
@@ -218,43 +220,66 @@ function Subscriptions({ data }: { data: app.Subscription[] }) {
     )
 }
 
-function Sites() {    
-    const { user } = useAuth();
-    const canCreate = user?.permissions.includes("DataSites.create")
+function Sites() {
 
-    return <Prefetch<app.DataSite[]> path="/api/data-sites?order=updatedAt:desc&limit=5&attributes=id,name,description">{result => (
+    const { aggregator, status, error: aggregatorError } = useAggregator()
+
+    const [sites  , setSites  ] = useState<any[]>([])
+    const [loading, setLoading] = useState(false)
+    const [error  , setError  ] = useState<Error | string | null>(null)
+
+    useEffect(() => {    
+        if (status === "failed") {
+            setError("Failed to connect to the aggregator")
+        }
+        else if (status === "offline") {
+            setError("Aggregator is not enabled")
+        }
+        else if (aggregatorError) {
+            setError(aggregatorError)
+        }
+        else {
+            setLoading(true)
+            aggregator.initialize()
+            .then(() => aggregator.getSites())
+            .then(_sites => sortBy(_sites, "name"))
+            .then(_sites => setSites(_sites))
+            .finally(() => setLoading(false))
+            .catch(setError);
+        }
+    }, [ aggregator, aggregatorError, status ])
+
+
+    return (
         <div className="card sites">
-            <h4><i className="icon fa-solid fa-location-dot" /> Healthcare Sites</h4>
+            <h4><span className="icon material-symbols-outlined">{Terminology.site.icon}</span>{Terminology.site.namePlural}</h4>
             <hr/>
-            
-            { result.length ?
-                <>
-                    { result.map((item, i) => (
-                        <li key={i}>
-                            <Link
-                                to={`/sites/${ item.id }`}
-                                className="link"
-                                title={ item.description || undefined }
-                            >
-                                { item.name }
-                            </Link>
-                        </li>
-                    ))}
-                    <li>
+            { loading ?
+                <Loader /> :
+                error ?
+                    <pre>{ error + "" }</pre> :
+                    sites.length === 0 ?
+                        "No sites found" :
+                        <>
+                        { sites.slice(0, 5).map((s, i) => (
+                            <li key={i}>
+                                <span className="icon material-symbols-outlined">{Terminology.site.icon}</span>
+                                <Link
+                                    to={`/sites/${ s.id }`}
+                                    className="link"
+                                    title={ s.description || undefined }
+                                >
+                                    { s.name }
+                                </Link>
+                            </li>
+                        )) }
+                        <br />
                         <Link to="/sites/" className="link"><b className="color-brand-2">Browse All...</b></Link>
-                    </li>
-                </> : 
-                <div>
-                    <p>No Healthcare Sites found in the database.</p>
-                    { canCreate && <div className="center mt-1 mb-1">
-                        <Link to="/sites/new" className="link bold color-green">
-                            <i className="fa-solid fa-circle-plus" /> Create Healthcare Site
-                        </Link>
-                    </div> }
-                </div>
+                        </>
+
             }
         </div>
-    )}</Prefetch>
+    )
 }
 
 

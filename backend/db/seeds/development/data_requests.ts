@@ -25,11 +25,7 @@ export default [
                     {"name": "COVID-19 #2", "description": "COVID-19 Vaccine - dose 2"},
                     {"name": "COVID-19 #3", "description": "COVID-19 Vaccine - booster"}
                 ]
-            },
-            "dataSites": [
-                {"name": "Boston Children''s Hospital", "description": "Short description of the Boston Children''s Hospital data site"},
-                {"name": "Massachusetts General Hospital", "description": "Short description of the Massachusetts General Hospital data site"}
-            ]
+            }
         },
         metadata: {
             "cols": [

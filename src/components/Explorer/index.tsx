@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react"
 import { useSearchParams }              from "react-router-dom"
 import DataPackageView                  from "./DataPackageView"
 import StudyView                        from "./StudyView"
-import SiteView                         from "./SiteView"
 import Tree, { DataRow }                from "./Tree"
 import Dashboard                        from "../Dashboard"
 import EditView                         from "../Dashboard/EditView"
@@ -16,16 +15,17 @@ import ViewStudyArea                    from "../StudyAreas/View"
 import aggregator                       from "../../Aggregator"
 import { request }                      from "../../backend"
 import { app }                          from "../../types"
-import { humanizeColumnName }           from "../../utils"
+import { humanizeColumnName, sortBy }   from "../../utils"
 import { useAuth }                      from "../../auth"
 import Terminology                      from "../../Terminology"
+import ListSites                        from "../DataSites/List"
+import ViewSite                         from "../DataSites/View"
 import "./Explorer.scss"
 
 
 
 function sortByName(arr: any[]): typeof arr {
-    return arr.sort((a: any, b: any) => String(a.name)
-        .localeCompare(b.name, "en-US", { numeric: true, sensitivity: "base" }))
+    return sortBy(arr, "name")
 }
 
 // Data Loaders ================================================================
@@ -264,8 +264,7 @@ async function loadSites() {
     const items = await aggregator.getSites()
     return sortByName(items).filter(x => !!x.id).map(x => ({
         render: () => x.name,
-        // loader: () => loadSubscriptionsForGroup(g),
-        view  : () => <SiteView site={x} />,
+        view  : () => <ViewSite site={x} />,
         title : x.name,
         id    : "/sites/" + x.id,
         icon  : Terminology.site.icon
@@ -293,8 +292,7 @@ async function find(path: string, branch: DataRow[]) {
 export default function Explorer() {
 
     let { user } = useAuth();
-    
-    const canReadSites         = user!.permissions.includes("DataSites.read")
+
     const canReadSubscriptions = user!.permissions.includes("Subscriptions.read")
     const canListGroups        = user!.permissions.includes("SubscriptionGroups.read")
     const canReadTags          = user!.permissions.includes("Tags.read")
@@ -345,18 +343,17 @@ export default function Explorer() {
             iconColor: "#936"
         })
 
-        if (canReadSites) {
-            DATA.push({
-                id       : "/sites",
-                render   : () => "Sites",
-                loader   : loadSites,
-                icon     : Terminology.site.icon,
-                iconColor: "#09C"
-            })
-        }
+        DATA.push({
+            id       : "/sites",
+            render   : () => "Sites",
+            view     : () => <ListSites />,
+            loader   : loadSites,
+            icon     : Terminology.site.icon,
+            iconColor: "#09C"
+        })
 
         return DATA
-    }, [canReadSites, canReadSubscriptions, canListGroups, canReadTags, canReadStudyAreas])
+    }, [canReadSubscriptions, canListGroups, canReadTags, canReadStudyAreas])
 
 
     const [selected, setSelected] = useState<DataRow | null>(null)
