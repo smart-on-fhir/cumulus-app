@@ -22,8 +22,9 @@ body {
   background-color: $color-grey-light;
   color: $color-grey-dark;
   font-family: $font-family;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  // -webkit-font-smoothing: antialiased;
+  // -moz-osx-font-smoothing: grayscale;
+  // -webkit-font-smoothing: 
 }
 
 .nowrap {
