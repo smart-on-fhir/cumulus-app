@@ -1,4 +1,4 @@
-import { CSSProperties, Fragment, useState } from "react"
+import { CSSProperties, Fragment, ReactNode, useState } from "react"
 import { JSONObject, JSONValue }             from "../../../types"
 import { classList, highlight }              from "../../../utils"
 import "./StaticGrid.scss"
@@ -24,9 +24,11 @@ export interface Column {
 
     style ?: CSSProperties
 
-    render?: (row: any, c: Column, search?: string) => JSX.Element
+    render?: (row: any, c: Column, search?: string) => ReactNode
 
     value?: (row: any, c: Column) => any
+
+    headerStyle ?: CSSProperties
 }
 
 interface StaticGridProps<T = JSONObject> {
@@ -235,8 +237,9 @@ export default function StaticGrid({
                             key={"header-" + i}
                             // style={c.style}
                             onMouseDown={() => onHeaderClick(c.name)}
-                            className={sortColumn === c.name ? "sorted" : ""}
+                            className={ sortColumn === c.name ? "sorted" : "" }
                             title={ c.label && c.label !== c.name ? `Original column name: "${c.name}"` : undefined }
+                            style={ c.headerStyle }
                         >
                             { c.label ?? c.name } {
                             sortColumn === c.name ?
