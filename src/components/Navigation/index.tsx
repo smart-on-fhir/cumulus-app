@@ -58,6 +58,9 @@ export default function Navigation()
                 <NavLink to="/">
                     <span className="icon material-symbols-outlined">home</span>Home
                 </NavLink>
+                <NavLink to="/studies">
+                    <span className="icon material-symbols-outlined">experiment</span>Studies
+                </NavLink>
                 { canReadStudyAreas && <NavLink to="/study-areas">
                     <span className="icon material-symbols-outlined">{Terminology.studyArea.icon}</span>{Terminology.studyArea.namePlural}
                 </NavLink> }
@@ -73,12 +76,12 @@ export default function Navigation()
                 { canListGroups && <NavLink to="/groups">
                     <span className="icon material-symbols-outlined">{Terminology.subscriptionGroup.icon}</span>{Terminology.subscriptionGroup.namePlural}
                 </NavLink> }
+                <NavLink to="/packages">
+                    <span className="icon material-symbols-outlined">{Terminology.dataPackage.icon}</span>{Terminology.dataPackage.namePlural}
+                </NavLink>
                 { canReadTags && <NavLink to="/tags">
                     <span className="icon material-symbols-outlined">{Terminology.tag.icon}</span>{Terminology.tag.namePlural}
                 </NavLink> }
-                <NavLink to="/study">
-                    <span className="icon material-symbols-outlined">experiment</span>Study Builder
-                </NavLink>
                 <NavLink to="/explorer">
                     <span className="icon material-symbols-outlined">folder_open</span>Explore
                 </NavLink>

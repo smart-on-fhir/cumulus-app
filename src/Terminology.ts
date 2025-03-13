@@ -27,12 +27,12 @@ const Terminology = {
     subscription: {
         nameSingular: "Data Slice",
         namePlural  : "Data Slices",
-        icon        : "deployed_code"
+        icon        : "database"
     } as TermOptions,
 
     subscriptionGroup: {
-        nameSingular: "Data Slice Group",
-        namePlural  : "Data Slice Groups",
+        nameSingular: "Slice Group",
+        namePlural  : "Slice Groups",
         icon        : "package_2"
     } as TermOptions,
 

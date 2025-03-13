@@ -22,7 +22,8 @@ import { ContextMenu }                  from "./generic/Menu";
 import Tooltip                          from "./generic/Tooltip";
 import PermissionsManager               from "./Permissions";
 import UserGroups                       from "./UserGroups";
-import StudyBuilder                     from "./Study";
+import Studies                          from "./Studies";
+import Packages                         from "./DataPackages";
 import HealthCheck                      from "./HealthCheck";
 import { AggregatorProvider }           from "../Aggregator";
 import CatalogRouter                    from "./Catalog";
@@ -78,10 +79,11 @@ export default function App()
                                     <Route path="permissions"    element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
                                     <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
                                     <Route path="health-check"   element={ <RequireAuth><HealthCheck /></RequireAuth> } />
-                                    <Route path="study"          element={ <RequireAuth><StudyBuilder /></RequireAuth>} />
                                     <Route path="catalog/*"      element={ <RequireAuth><CatalogRouter /></RequireAuth>} />
                                     <Route path="explorer"       element={ <RequireAuth><Explorer /></RequireAuth>} />
                                     <Route path="search"         element={ <RequireAuth><SearchResultsPage /></RequireAuth>} />
+                                    <Route path="studies/*"      element={ <RequireAuth><Studies /></RequireAuth>} />
+                                    <Route path="packages/*"     element={ <RequireAuth><Packages /></RequireAuth>} />
                                     
                                     <Route path="*" element="Page Not Found" />
                                 </Route>

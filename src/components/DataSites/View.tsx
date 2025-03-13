@@ -103,14 +103,14 @@ export default function ViewSite({ site }: { site?: Site })
                             return <Fragment key={id}>
                                 <div className="mb-05">
                                     <i className="material-symbols-outlined icon color-brand-2 mr-05">{ Terminology.study.icon }</i>
-                                    <Link to={`/explorer?path=${encodeURIComponent(`/studies/${id}`)}`} className="link">
+                                    <Link to={`/studies/${id}`} className="link">
                                         <b>{humanizeColumnName(id)}</b>
                                     </Link>
                                 </div>
                                 { Object.keys(site.studies[id]).map((version, i) => {
                                     return <div key={i} className="mb-05 ml-1">
                                         <i className="material-symbols-outlined icon color-muted mr-05">history</i>
-                                        <Link to={`/explorer?path=${encodeURIComponent(`/studies/${id}/${version}`)}`} className="link">Version {version}</Link>
+                                        <Link to={`/studies/${id}/${version}`} className="link">Version {version}</Link>
                                         <span  className="color-muted"> - { new Date(site.studies[id][version].last_data_update).toDateString() }</span>
                                     </div>
                                 })}
@@ -156,7 +156,7 @@ function Timeline({ site }: { site: Site }) {
         <div>
             { getTimelineEvents(site).map((e, i) => {
                 return (
-                    <div key={i} className="row middle mb-05">
+                    <div key={i} className="row" style={{ padding: "0.4em 0" }} >
                         <div className="col col-0">
                             <span className="material-symbols-outlined color-brand-2 mr-05">calendar_clock</span>
                         </div>
@@ -176,7 +176,7 @@ function getTimelineEvents(site: Site) {
             const info = site.studies[study][version]
             events.push({
                 date: info.last_data_update,
-                msg : <div>Inserted data in the <b>{humanizeColumnName(study)}</b> study - version <Link to={`/explorer?path=${encodeURIComponent(`/studies/${study}/${version}`)}`} className="link">{version}</Link></div>
+                msg : <div>Inserted data in the <b>{humanizeColumnName(study)}</b> study - version {version}</div>
             })
         }
     }
