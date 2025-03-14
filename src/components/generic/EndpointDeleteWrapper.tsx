@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState }  from "react"
 import { Helmet, HelmetProvider } from "react-helmet-async"
 import { useNavigate, useParams } from "react-router"
-import { Link } from "react-router-dom"
+import { Link }                   from "react-router-dom"
 import { request }                from "../../backend"
 import { useBackend }             from "../../hooks"
 import { AlertError }             from "./Alert"
-import Breadcrumbs from "./Breadcrumbs"
+import Breadcrumbs                from "./Breadcrumbs"
 import Loader                     from "./Loader"
 
 

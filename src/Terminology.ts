@@ -53,6 +53,12 @@ const Terminology = {
         nameSingular: "Data Package",
         icon        : "deployed_code"
     } as TermOptions,
+
+    catalog: {
+        namePlural  : "Catalog",
+        nameSingular: "Catalog",
+        icon        : "inventory_2"
+    } as TermOptions,
 };
 
 export default Terminology

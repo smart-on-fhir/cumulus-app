@@ -1,6 +1,6 @@
 import { useCallback, useState }       from "react"
 import { HelmetProvider, Helmet }      from "react-helmet-async"
-import { Link }                        from "react-router-dom"
+import Link                            from "../Link"
 import SubscriptionLink                from "./SubscriptionLink"
 import { useBackend, useLocalStorage } from "../../hooks"
 import { request }                     from "../../backend"

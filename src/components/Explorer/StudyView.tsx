@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { Link }                         from "react-router-dom"
+import Link                             from "../Link"
 import { AlertError }                   from "../generic/Alert"
 import Loader                           from "../generic/Loader"
 import TransmissionView                 from "../Subscriptions/TransmissionView"
@@ -135,7 +135,7 @@ export default function StudyView({ study, version }: { study: Study, version: s
                                 <i className="material-symbols-outlined color-brand-2" style={{ fontSize: 18, verticalAlign: "middle" }}>
                                     { p.type === "flat" ? "table" : "deployed_code" }
                                 </i> <Link
-                                    to={`/explorer?path=${encodeURIComponent(`/studies/${study.id}/${version}/${p.id}`)}`}
+                                    to={`/studies/${study.id}/${version}/${p.id}`}
                                     // reloadDocument
                                     className="link"
                                 >

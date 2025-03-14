@@ -1,5 +1,5 @@
 import { useCallback }  from "react"
-import { Link }         from "react-router-dom"
+import Link             from "../Link"
 import SubscriptionLink from "./SubscriptionLink"
 import { AlertError }   from "../generic/Alert"
 import Loader           from "../generic/Loader"

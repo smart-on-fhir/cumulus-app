@@ -1,4 +1,4 @@
-import { Link }       from "react-router-dom"
+import { Link, useMatch }       from "react-router-dom"
 import StudyAreaCard  from "./Card"
 import createListPage from "../generic/EndpointListWrapper"
 import Grid           from "../generic/Grid"
@@ -12,7 +12,8 @@ export default function ListStudyAreas()
 {
     const { user } = useAuth();
     const canCreate = user?.permissions.includes("StudyAreas.create")
-    const baseUrl = "/study-areas"
+    const isInsideExplorer = useMatch("/explorer/*"); // Matches any route under /explorer
+    const baseUrl = isInsideExplorer ? "/explorer/study-areas" : "/study-areas"
 
     return createListPage<app.StudyArea[]>({
         namePlural: Terminology.studyArea.namePlural,
@@ -27,7 +28,7 @@ export default function ListStudyAreas()
                     <br/>
                     <p>No {Terminology.studyArea.namePlural} found in the database! You can start by creating a new {Terminology.studyArea.nameSingular}.</p>
                     <br/>
-                    <Link to={`${baseUrl}/new`} className="btn btn-blue-dark pl-2 pr-2">Create {Terminology.studyArea.nameSingular}</Link>
+                    <Link to={`./new`} className="btn btn-blue-dark pl-2 pr-2">Create {Terminology.studyArea.nameSingular}</Link>
                 </div>
             }
 

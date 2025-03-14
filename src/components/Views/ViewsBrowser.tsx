@@ -1,5 +1,4 @@
 import { ReactNode, useCallback }         from "react"
-import { Link }                           from "react-router-dom"
 import ViewThumbnail                      from "./ViewThumbnail"
 import { AlertError }                     from "../generic/Alert"
 import Collapse                           from "../generic/Collapse"
@@ -11,6 +10,7 @@ import { classList }                      from "../../utils"
 import { app }                            from "../../types"
 import { useAuth }                        from "../../auth"
 import Terminology                        from "../../Terminology"
+import Link                               from "../Link"
 import "./ViewsBrowser.scss"
 
 

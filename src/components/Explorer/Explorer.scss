@@ -58,11 +58,21 @@
             // font-variant-numeric: tabular-nums;
             // font-family: "Menlo", "Consolas", monospace;
             height: 1.6em;
-            display: block;
+            display: flex;
 
             span {
-                padding-left: 0.2em;
-                padding-right: 0.2em;
+                padding: 0;
+                flex         : 0 0 1.2em;
+                overflow: hidden;
+                text-align   : center;
+
+                font-size  : 23px !important;
+                line-height: 1 !important;
+                height     : 1em !important;
+                width      : 1.2em !important;
+                vertical-align: top;
+                margin     : 0 1.5px;
+                text-indent: 0;
             }
 
             .search-match {
@@ -77,6 +87,12 @@
             &.selected {
                 background: rgb(218, 233, 248);
                 box-shadow: 0 0 1px 0 #0006 inset;
+            }
+
+            a {
+                flex: 1;
+                overflow     : hidden;
+                text-overflow: ellipsis;
             }
         }
 

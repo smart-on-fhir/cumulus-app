@@ -86,10 +86,10 @@ export default function Navigation()
                     <span className="icon material-symbols-outlined">folder_open</span>Explore
                 </NavLink>
 
-                <NavGroup icon={<span className="icon material-symbols-outlined">inventory_2</span>} label="Catalog">
+                {/* <NavGroup icon={<span className="icon material-symbols-outlined">inventory_2</span>} label="Catalog">
                     <NavLink to="/catalog/icd10"><span className="icon material-symbols-outlined">inventory_2</span>ICD10 Diagnoses</NavLink>
                     <NavLink to="/catalog/loinc"><span className="icon material-symbols-outlined">inventory_2</span>LOINC Laboratories</NavLink>
-                </NavGroup>
+                </NavGroup> */}
                 
                 { canAdminister && (
                     <NavGroup icon={<span className="icon material-symbols-outlined">build_circle</span>} label="Administration">

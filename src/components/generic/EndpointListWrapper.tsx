@@ -10,7 +10,7 @@ export default function createListPage<T = unknown>({
     renderList,
     icon = null,
     canCreate = true,
-    baseUrl = ""
+    baseUrl = "."
 }: {
     namePlural   : string
     /** @deprecated */

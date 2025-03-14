@@ -1,5 +1,5 @@
 import { useRef }                         from "react"
-import { Link, useNavigate }              from "react-router-dom"
+import { useNavigate }                    from "react-router-dom"
 import { CustomSelection }                from "../generic/WithSelection"
 import { app }                            from "../../types"
 import { useAuth }                        from "../../auth"
@@ -14,6 +14,7 @@ import { View }                           from "../../commands/Graphs/View"
 import { ShareGraph }                     from "../../commands/Graphs/Share/ShareGraph"
 import { ManagePermissions }              from "../../commands/Graphs/Share/ManagePermissions"
 import { ToggleFavorite }                 from "../../commands/ToggleFavorite"
+import Link                               from "../Link"
 
 
 export default function ViewThumbnail({

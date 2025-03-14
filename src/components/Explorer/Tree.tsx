@@ -1,25 +1,22 @@
 import { ReactNode, useEffect, useState } from "react"
+import { useParams }                      from "react-router"
 import Loader                             from "../generic/Loader"
 import { classList }                      from "../../utils"
-// import "./Tree.scss"
 
 
 export interface DataRow {
     icon     ?: string
     iconColor?: string
-    loader    : () => Promise<DataRow[]>
+    loader   ?: () => Promise<DataRow[]>
     render    : (node: DataRow) => ReactNode
+    href     ?: string
     [key: string]: any
 }
 
 export default function Tree({
-    data,
-    onSelect,
-    path = ""
+    data
 }: {
     data: DataRow[]
-    onSelect?: (selection: any) => void
-    path?: string
 })
 {
     if (!data.length) {
@@ -29,59 +26,37 @@ export default function Tree({
     return (
         <div className="tree">
             <div>
-                { data.map((row, i) => (
-                    <Row node={row} key={i} onSelect={onSelect} path={path} />
-                )) }
+                { data.map((row, i) => <Row node={row} key={i} />) }
             </div>
         </div>
     )
 }
 
-function isIdInPath(id: string, path: string) {
-    const a = path.split("/")
-    const b = id.split("/")
-    return b.every((segment, i) => a[i] === segment)
-}
-
-function Row({
-    node,
-    onSelect,
-    path
-}: {
-    node      : DataRow
-    onSelect ?: (node: DataRow) => void
-    path      : string
-}) {
-    // const shouldOpen = !!node.loader && node.id && path.startsWith(node.id)
-    const [isOpen  , setIsOpen  ] = useState<boolean|undefined>()
+function Row({ node }: { node: DataRow }) {
+    const currentPath = String(useParams()["*"] || "")
     const [loading , setLoading ] = useState(false)
     const [children, setChildren] = useState<DataRow[]>([])
     const [error   , setError   ] = useState<Error | string>("")
+    const [isOpen  , setIsOpen  ] = useState<boolean|undefined>(
+        node.open || (
+            currentPath !== node.id &&
+            !!node.loader &&
+            currentPath.startsWith(node.id)
+        )
+    )
     
     const length = children.length
 
-    // if the user closed the node manually, but then load a subpath, we must
-    // ignore that choice and force open
-    // const _open = isOpen ?? (path !== node.id && !!node.loader && path.match(node.id))
-    const _open = isOpen ?? (path !== node.id && !!node.loader && isIdInPath(node.id, path))
-
     useEffect(() => {
-        if (_open && !!node.loader && length === 0) {
+        if (isOpen && !!node.loader && length === 0) {
             setLoading(true)
             node.loader()
                 .then(setChildren)
-                // .then(() => setIsOpen(true))
                 .catch(setError)
                 .finally(() => setLoading(false))
         }
-        
-        // if (node.id === path) {
-        //     onSelect?.(node)
-        // }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [_open, path, length])
-
-    
+    }, [isOpen, length])
 
     return (
         <div className={ classList({
@@ -91,44 +66,30 @@ function Row({
             <summary>
                 { !!node.loader && <b className="toggle" onClick={e => {
                     e.stopPropagation()
-                    setIsOpen(!_open)
-                }} >{ _open ? "▾" : "▸" }</b> }
+                    setIsOpen(!isOpen)
+                }} >{ isOpen ? "▾" : "▸" }</b> }
                 <label
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onSelect?.(node)
-                    }}
                     data-tooltip={ error ? error + "" : node.title }
-                    className={ node.id && node.id === path ? "selected" : undefined}>
+                    className={ node.id && node.id === currentPath ? "selected" : undefined }>
                     { loading ?
                         <Loader msg="" /> :
-                        <span className={ classList({
-                            "icon icon-2 material-symbols-outlined": true,
-                            "color-blue": !node.icon && !node.loader && children.length === 0,
-                            "color-brand-2": !node.icon && (!!node.loader || children.length > 0)
-                        })} style={{
-                            color: node.iconColor
+                        <span className="icon icon-2 material-symbols-outlined" style={{
+                            color: !!node.loader ? isOpen ? "#C60" : "#888" : "#1b5dab"
                         }}>{ node.icon || (!!node.loader || children.length ? "folder_open" : "draft") }</span>
                     }
                     { error ? error + "" : node.render(node) }
                 </label>
             </summary>
-            { _open ?
+            { isOpen ?
                 children.length > 0 ?
-                    children.map((child, i) => (
-                        <Row
-                            node={{ iconColor: node.iconColor, ...child }}
-                            key={i}
-                            // key={[i, node.id !== path && path.startsWith(node.id) ? path : ""].join(":")}
-                            // key={node.id}
-                            // key={ path === node.id ? "open" : i }
-                            onSelect={onSelect}
-                            path={path}
-                        />
-                    )) :
+                    children.map((child, i) => <Row key={i} node={{ iconColor: node.iconColor, ...child }} />) :
                     loading ?
                         null :
-                        <div className="details"><summary><label className="color-muted">&nbsp; No Items</label></summary></div> :
+                        <div className="details">
+                            <summary>
+                                <label className="color-muted">&nbsp; No Items</label>
+                            </summary>
+                        </div> :
                 null
             }
         </div>
