@@ -29,6 +29,8 @@ const AGGREGATOR_PATHS = [
     "/study-periods/:site/:study",
     "/study-periods/:site",
     "/study-periods",
+
+    "/from-parquet"
 ];
 
 router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {

@@ -276,6 +276,10 @@ class Aggregator
         // PACKAGE UP TO DATE
         return pkg.id;
     }
+
+    public async getPackageJson(s3path: string): Promise<{ schema: any, data: any[] }> {
+        return await this.fetch("/api/aggregator/from-parquet/?s3_path=" + encodeURIComponent(s3path));
+    }
 }
 
 const aggregator = new Aggregator()
