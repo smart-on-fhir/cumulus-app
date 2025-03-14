@@ -59,6 +59,7 @@ export default function ViewStudyVersion() {
     const [transmissions, setTransmissions] = useState<Transmission[]>([])
     const [packages     , setPackages     ] = useState<DataPackage[]>([])
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const abortController = useMemo(() => new AbortController(), [id, version])
 
     useEffect(() => {
