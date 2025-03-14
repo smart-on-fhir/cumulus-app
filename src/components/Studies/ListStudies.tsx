@@ -68,59 +68,6 @@ export default function ListStudies() {
                 <div><br /><Loader /></div> :
                 error ?
                     <AlertError>{ error + "" }</AlertError> :
-                    // <div className="simple-grid">
-                    //     <StaticGrid columns={[
-                    //         {
-                    //             name: "study",
-                    //             type: "string",
-                    //             label: "Study",
-                    //             render: row => (row.study ? <b>
-                    //                     <i className="material-symbols-outlined icon color-brand-2">
-                    //                         { Terminology.study.icon }
-                    //                     </i> <Link to={`./${row.study}`} className="link">{ humanizeColumnName(row.study) }</Link>
-                    //                 </b> : null)
-                    //         },
-                    //         {
-                    //             name: "version",
-                    //             type: "string",
-                    //             label: "Version",
-                    //             render: row => row.version
-                    //         },
-                    //         {
-                    //             name: "site",
-                    //             type: "number",
-                    //             label: "Sites",
-                    //             render: row => row.site
-                    //         },
-                    //         {
-                    //             name: "updated",
-                    //             type: "string",
-                    //             label: "Last Data Update",
-                    //             render: row => row.updated.toLocaleDateString(),
-                    //             headerStyle: { textAlign: "right" },
-                    //             style: { textAlign: "right" }
-                    //         },
-                    //         {
-                    //             name: "packages",
-                    //             type: "number",
-                    //             label: "Packages",
-                    //             headerStyle: { textAlign: "right" },
-                    //             style: { textAlign: "right" }
-                    //             // render: row => row.site
-                    //         },
-                    //         {
-                    //             name: "total",
-                    //             type: "number",
-                    //             label: "Total",
-                    //             headerStyle: { textAlign: "right" },
-                    //             style: { textAlign: "right" },
-                    //             render: row => row.total.toLocaleString()
-                    //         }
-                    //     ]}
-                    //     rows={data}
-                    //     groupBy="study"
-                    //     />
-                    // </div>
                     <table className="table table-border-x table-hover">
                         <thead>
                             <tr>
