@@ -132,7 +132,7 @@ function getHref(result: SearchResult) {
         case "tag":
             return `/tags/${result.id}`;
         case "dataPackage":
-            return `/explorer?path=${encodeURIComponent(`/studies/${result.study}/${result.version}/${result.id}`)}`;
+            return `/packages/${result.id}`;
         default:
             return ""
     }

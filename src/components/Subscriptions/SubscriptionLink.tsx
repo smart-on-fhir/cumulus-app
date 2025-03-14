@@ -1,5 +1,5 @@
 import { useEffect, useState }              from "react"
-import { Link }                             from "react-router-dom"
+import Link                                 from "../Link"
 import { Format }                           from "../Format"
 import { highlight }                        from "../../utils"
 import { app }                              from "../../types"

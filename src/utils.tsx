@@ -490,7 +490,7 @@ export function assert(condition: any, error?: string | ErrorConstructor, ctor: 
     }
 }
 
-export function sortBy(arr: Record<string, any>[], prop: string): typeof arr {
+export function sortBy<T = any>(arr: T[], prop: string): T[] {
     return arr.sort((a: any, b: any) => String(a[prop])
         .localeCompare(b[prop], "en-US", { numeric: true, sensitivity: "base" }))
 }

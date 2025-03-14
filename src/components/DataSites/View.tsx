@@ -1,7 +1,7 @@
 import moment                     from "moment"
 import { HelmetProvider, Helmet } from "react-helmet-async"
-import { Link }                   from "react-router-dom"
 import { useParams }              from "react-router"
+import Link                       from "../Link"
 import { Fragment, useCallback, useEffect, useState } from "react"
 import Breadcrumbs                from "../generic/Breadcrumbs"
 import PageHeader                 from "../generic/PageHeader"

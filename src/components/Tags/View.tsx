@@ -1,4 +1,4 @@
-import { Link }           from "react-router-dom"
+import Link               from "../Link"
 import { useAuth }        from "../../auth"
 import SubscriptionLink   from "../Subscriptions/SubscriptionLink"
 import { createViewPage } from "../generic/EndpointViewWrapper"

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState }  from "react"
-import { Link }                          from "react-router-dom"
 import Loader                            from "../generic/Loader"
 import { buildChartOptions }             from "../Dashboard/Charts/lib"
 import { getDefaultChartOptions }        from "../Dashboard/Charts/DefaultChartOptions"
@@ -10,6 +9,7 @@ import { app }                           from "../../types"
 import { humanizeColumnName, pluralize } from "../../utils"
 import { FhirResourceTypes }             from "../../config"
 import Terminology                       from "../../Terminology"
+import Link                              from "../Link"
 
 
 async function getChartData(subscriptionId: number, column: string, signal: AbortSignal) {

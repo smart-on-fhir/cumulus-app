@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { Link, useParams }              from "react-router-dom"
+import { useParams }                    from "react-router-dom"
 import { HelmetProvider, Helmet }       from "react-helmet-async"
 import TransmissionView                 from "../Subscriptions/TransmissionView"
 import { AlertError }                   from "../generic/Alert"
@@ -9,6 +9,7 @@ import PageHeader                       from "../generic/PageHeader"
 import aggregator, { DataPackage }      from "../../Aggregator"
 import Terminology                      from "../../Terminology"
 import { humanizeColumnName }           from "../../utils"
+import Link                             from "../Link"
 
 
 interface Site {
@@ -58,7 +59,7 @@ export default function ViewStudyVersion() {
     const [transmissions, setTransmissions] = useState<Transmission[]>([])
     const [packages     , setPackages     ] = useState<DataPackage[]>([])
 
-    const abortController = useMemo(() => new AbortController(), [])
+    const abortController = useMemo(() => new AbortController(), [id, version])
 
     useEffect(() => {
         setError(null)
@@ -112,7 +113,7 @@ export default function ViewStudyVersion() {
                 { name: "Version " + version },
             ]} />
             <PageHeader
-                title={humanizeColumnName(id!) + " / " + version}
+                title={ <>{ humanizeColumnName(id!) } <span className="color-muted">/ {version}</span></> }
                 icon={Terminology.study.icon}
                 description={`Description not available`} />
             <div className="row gap-2 wrap">

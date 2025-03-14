@@ -1,6 +1,6 @@
 import { useCallback, useState }  from "react"
 import { Navigate, useParams }    from "react-router"
-import { Link }                   from "react-router-dom"
+import Link                       from "../Link"
 import { HelmetProvider, Helmet } from "react-helmet-async"
 import DataViewer                 from "./DataViewer"
 import ColumnsTable               from "./ColumnsTable"

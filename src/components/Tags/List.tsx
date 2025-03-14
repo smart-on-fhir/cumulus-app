@@ -1,4 +1,4 @@
-import { Link }       from "react-router-dom"
+import { Link, useMatch } from "react-router-dom"
 import createListPage from "../generic/EndpointListWrapper"
 import Alert          from "../generic/Alert"
 import IfAllowed      from "../generic/IfAllowed"
@@ -14,7 +14,9 @@ export default function TagsList()
 
     const canCreate = user?.permissions.includes("Tags.create")
 
-    const baseUrl = "/tags"
+    const isInsideExplorer = useMatch("/explorer/*"); // Matches any route under /explorer
+
+    const baseUrl = isInsideExplorer ? "/explorer/tags" : "/tags"
 
     return createListPage<app.Tag[]>({
         namePlural: Terminology.tag.namePlural,

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { Link }                             from "react-router-dom"
+import Link                                 from "../Link"
 import { HelmetProvider, Helmet }           from "react-helmet-async"
 import Breadcrumbs                          from "../generic/Breadcrumbs"
 import PageHeader                           from "../generic/PageHeader"
@@ -59,7 +59,7 @@ export default function DataPackageList() {
                                         <>
                                             <i className="material-symbols-outlined icon mr-05 ml-1 color-brand-2">
                                                 { row.type === "flat" ? "table" : "deployed_code" }
-                                            </i><Link to={`./${row.id}`} className="link">{
+                                            </i><Link to={`/packages/${row.id}`} className="link">{
                                                 highlight(humanizeColumnName(row.name), search)
                                             }</Link>
                                         </>

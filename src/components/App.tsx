@@ -2,9 +2,6 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { AuthProvider, RequireAuth }    from "../auth";
 import Header                           from "./Header";
 import Home                             from "./Home";
-import EditView                         from "./Dashboard/EditView";
-import CopyView                         from "./Dashboard/CopyView";
-import RequestDataForm                  from "./Dashboard/RequestDataForm";
 import Subscriptions                    from "./Subscriptions";
 import SubscriptionGroups               from "./SubscriptionGroups";
 import DataSiteListPage                 from "./DataSites";
@@ -46,25 +43,9 @@ export default function App()
                         <div id="main" className="col">
                             <Routes>
                                 <Route path="/">
-                                    <Route index element={ <RequireAuth><Home /></RequireAuth> } />
-
-                                    <Route path="views">
-                                        <Route index element={ <RequireAuth><Views /></RequireAuth> } />
-                                        <Route path=":id">
-                                            <Route index               element={ <RequireAuth><EditView /></RequireAuth> } />
-                                            <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />
-                                            <Route path="copy"         element={ <RequireAuth><CopyView /></RequireAuth> } />
-                                        </Route>
-                                    </Route>
-                                    <Route path="drafts">
-                                        <Route index element={ <RequireAuth><Views drafts /></RequireAuth> } />
-                                        <Route path=":id">
-                                            <Route index               element={ <RequireAuth><EditView /></RequireAuth> } />
-                                            <Route path="request-data" element={ <RequireAuth><RequestDataForm /></RequireAuth> } />
-                                            <Route path="copy"         element={ <RequireAuth><CopyView /></RequireAuth> } />
-                                        </Route>
-                                    </Route>
-
+                                    <Route index                 element={ <RequireAuth><Home /></RequireAuth> } />
+                                    <Route path="views/*"        element={ <RequireAuth><Views /></RequireAuth> } />
+                                    <Route path="drafts/*"       element={ <RequireAuth><Views /></RequireAuth> } />
                                     <Route path="requests/*"     element={ <RequireAuth><Subscriptions /></RequireAuth> } />
                                     <Route path="sites/*"        element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
                                     <Route path="groups/*"       element={ <RequireAuth><SubscriptionGroups /></RequireAuth> } />
@@ -77,15 +58,14 @@ export default function App()
                                     <Route path="users/invite"   element={ <RequireAuth><Invite /></RequireAuth> } />
                                     <Route path="users"          element={ <RequireAuth><Users /></RequireAuth> } />
                                     <Route path="permissions"    element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
-                                    <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
                                     <Route path="health-check"   element={ <RequireAuth><HealthCheck /></RequireAuth> } />
-                                    <Route path="catalog/*"      element={ <RequireAuth><CatalogRouter /></RequireAuth>} />
-                                    <Route path="explorer"       element={ <RequireAuth><Explorer /></RequireAuth>} />
                                     <Route path="search"         element={ <RequireAuth><SearchResultsPage /></RequireAuth>} />
+                                    <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
+                                    <Route path="catalog/*"      element={ <RequireAuth><CatalogRouter /></RequireAuth>} />
+                                    <Route path="explorer/*"     element={ <RequireAuth><Explorer /></RequireAuth>} />
                                     <Route path="studies/*"      element={ <RequireAuth><Studies /></RequireAuth>} />
                                     <Route path="packages/*"     element={ <RequireAuth><Packages /></RequireAuth>} />
-                                    
-                                    <Route path="*" element="Page Not Found" />
+                                    <Route path="*"              element="Page Not Found" />
                                 </Route>
                             </Routes>
                         </div>

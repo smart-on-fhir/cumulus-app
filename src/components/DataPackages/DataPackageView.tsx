@@ -108,7 +108,7 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                     <br />
                     <b>Study</b>
                     <div>
-                        <Link to={`../../../studies/${pkg.study}`} className="link">{ pkg.study }</Link>
+                        <Link to={`/studies/${pkg.study}`} className="link">{ pkg.study }</Link>
                     </div>
                     <br />
                     <b>Version</b>

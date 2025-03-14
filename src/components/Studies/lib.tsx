@@ -1,7 +1,7 @@
-import { ReactNode }                from "react"
-import { DataPackage, StudyPeriod } from "../../Aggregator"
+import { ReactNode }                           from "react"
+import { DataPackage, StudyPeriod }            from "../../Aggregator"
 import { groupBy, humanizeColumnName, sortBy } from "../../utils"
-import { Link } from "react-router-dom"
+import Link                                    from "../Link"
 
 
 export interface Data {

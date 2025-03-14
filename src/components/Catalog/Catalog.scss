@@ -2,7 +2,7 @@
 
 .catalog {
     .tabs-content {
-        min-height: calc(100vh - 16rem);
+        min-height: calc(100vh - 17rem);
         // display: flex;
         // > * {
         //     max-width: 100%;
@@ -11,13 +11,13 @@
     }
     .static-grid-wrapper {
         // display: grid;
-        max-height : calc(100vh - 17rem);
+        max-height : calc(100vh - 18rem);
     }
 
     .chart {
         // aspect-ratio: 7/3;
-        min-height: calc(16rem);
-        height: calc(100vh - 16.2rem);
+        min-height: calc(15rem);
+        height: calc(100vh - 17.2rem);
     }
 
     .catalog-tree {
