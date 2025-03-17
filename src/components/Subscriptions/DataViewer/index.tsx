@@ -14,10 +14,8 @@ const aspectRatio = "2/1";
 const chartHeight = "50%";
 
 interface ColumnDefinition {
-    name     : string
-    dataType?: string
-    type    ?: string
-    extDtype?: string
+    name    : string
+    dataType: string
 }
 
 type Data = Record<string, JSONScalar>
@@ -62,10 +60,12 @@ export function FlatPackageDataViewer({ pkg }: { pkg: DataPackage }) {
         return null
     }
 
-    const out = pickColumns(data.schema.fields)
+    
+    const columns = Object.keys(pkg.columns).map(name => ({ name, dataType: pkg.columns[name] }))
+    const out = pickColumns(columns)
 
     return <Viewer
-        columns={data.schema.fields as unknown as ColumnDefinition[]}
+        columns={columns}
         data={data.data}
         groupBy={out.groupBy}
         stratifyBy={out.stratifyBy}
@@ -144,14 +144,13 @@ function Viewer({
                     children: <div className="p-05 pt-1" style={{ aspectRatio }}>
                         <MetricsStaticGrid
                             columns={columns.map(c => {
-                                const type = c.dataType || c.extDtype || c.dataType
                                 return {
                                     name : c.name,
                                     label: humanizeColumnName(c.name),
                                     searchable: true,
-                                    type: type === "boolean" ?
+                                    type: c.dataType === "boolean" ?
                                         "boolean" :
-                                        (type === "float" || type === "integer" || type === "Int64") ?
+                                        (c.dataType === "float" || c.dataType === "integer") ?
                                             "number" :
                                             "string",
                                 }
