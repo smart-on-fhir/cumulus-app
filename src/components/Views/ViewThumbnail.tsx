@@ -1,5 +1,5 @@
 import { useRef }                         from "react"
-import { useNavigate }                    from "react-router-dom"
+import { useMatch, useNavigate, Link }    from "react-router-dom"
 import { CustomSelection }                from "../generic/WithSelection"
 import { app }                            from "../../types"
 import { useAuth }                        from "../../auth"
@@ -14,7 +14,6 @@ import { View }                           from "../../commands/Graphs/View"
 import { ShareGraph }                     from "../../commands/Graphs/Share/ShareGraph"
 import { ManagePermissions }              from "../../commands/Graphs/Share/ManagePermissions"
 import { ToggleFavorite }                 from "../../commands/ToggleFavorite"
-import Link                               from "../Link"
 
 
 export default function ViewThumbnail({
@@ -35,6 +34,8 @@ export default function ViewThumbnail({
     const navigate          = useNavigate()
     const link              = useRef<HTMLAnchorElement>(null)
 
+    const isInsideExplorer  = useMatch("/explorer/*");
+
     const ToggleFavoriteCmd = new ToggleFavorite(view.id, "favoriteGraphs")
 
     
@@ -52,7 +53,7 @@ export default function ViewThumbnail({
     return (
         <Link
             ref={link}
-            to={ view.isDraft ? "/drafts/" + view.id : "/views/" + view.id }
+            to={ (isInsideExplorer ? "/explorer" : "") + (view.isDraft ? "/drafts/" + view.id : "/views/" + view.id) }
             className={ classList({
                 "view-thumbnail": true,
                 "selected": !!selection?.includes(view),
