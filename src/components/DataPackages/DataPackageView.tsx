@@ -15,7 +15,7 @@ import { FlatPackageDataViewer }   from "../Subscriptions/DataViewer"
 import aggregator, { DataPackage } from "../../Aggregator"
 import Terminology                 from "../../Terminology"
 import { app }                     from "../../types"
-import { humanizeColumnName }      from "../../utils"
+import { escapeForFileName, humanizeColumnName } from "../../utils"
 
 
 function Preload() {
@@ -144,7 +144,7 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
 
                     {/* Export Data ------------------------------------ */}
                     { <p>
-                        <a aria-disabled className="link" href={`${process.env.REACT_APP_BACKEND_HOST || ""}/api/requests/${pkg.id}/data?format=csv`}>
+                        <a aria-disabled={!pkg.s3_path} download={escapeForFileName(pkg.name) + ".csv"} className="link" href={`${process.env.REACT_APP_BACKEND_HOST || ""}/api/aggregator/from-parquet/?s3_path=${encodeURIComponent(pkg.s3_path!)}&type=csv`}>
                             <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>download</i>
                             Export Data
                         </a>

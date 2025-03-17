@@ -40,6 +40,7 @@ services:
       - CUMULUS_ADMIN_EMAIL=$CUMULUS_ADMIN_EMAIL
       - REGIONAL_CLUSTER_EMAIL=$REGIONAL_CLUSTER_EMAIL
       - APP_EMAIL_FROM=$APP_EMAIL_FROM
+      - REACT_APP_BACKEND_HOST=$REACT_APP_BACKEND_HOST
     volumes:
       - ../backend:/app/backend
       - ../dist/frontend:/app/dist/frontend
