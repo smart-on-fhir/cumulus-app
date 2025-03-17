@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState }  from "react"
+import { useEffect, useReducer }         from "react"
+import Link                              from "../Link"
 import Loader                            from "../generic/Loader"
 import { buildChartOptions }             from "../Dashboard/Charts/lib"
 import { getDefaultChartOptions }        from "../Dashboard/Charts/DefaultChartOptions"
@@ -9,12 +10,17 @@ import { app }                           from "../../types"
 import { humanizeColumnName, pluralize } from "../../utils"
 import { FhirResourceTypes }             from "../../config"
 import Terminology                       from "../../Terminology"
-import Link                              from "../Link"
+import { DataPackage }                   from "../../Aggregator"
 
 
-async function getChartData(subscriptionId: number, column: string, signal: AbortSignal) {
+async function getChartData(subscriptionId: number | string, column: string, signal: AbortSignal) {
     const base = process.env.REACT_APP_BACKEND_HOST || window.location.origin
-    const url = new URL(`/api/requests/${subscriptionId}/api`, base)
+    const url = new URL(
+        typeof subscriptionId === "number" ?
+            `/api/requests/${subscriptionId}/api` :
+            `/api/requests/pkg-api?pkg=${encodeURIComponent(subscriptionId)}`,
+        base
+    )
     url.searchParams.set("column", column)
     return request(url.href, { signal })
 }
@@ -60,59 +66,102 @@ export default function TemplateManager({ subscription }: { subscription: app.Su
 }
 
 export function Templates({ subscription }: { subscription: app.Subscription }) {
-    return <>{ subscription.metadata?.cols.filter(col => col.dataType !== "hidden").map((col, i) => {
+    return <>{ subscription.metadata?.cols.filter(col => col.dataType !== "hidden" && !col.name.startsWith("cnt")).map((col, i) => {
         return <Thumbnail key={i} col={col} sub={subscription} />
     })}</>
 }
 
-function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Subscription }) {
-    const [loading, setLoading] = useState(true)
-    const [imgUrl , setImgUrl ] = useState("")
-    const [error  , setError  ] = useState<Error | string | null>(null)
-    const [limit  , setLimit  ] = useState(0)
-    const [sortBy , setSortBy ] = useState("x:asc")
-    const [theme  , setTheme  ] = useState("sas_light")
-    const [chartType, setChartType] = useState<"spline" | "column" | "bar">(
-        col.dataType === "float" ||
-        col.dataType === "integer" ||
-        col.dataType.startsWith("date")
-     ? "spline" : "column");
-    const isCountColumn = col.name.startsWith("cnt");
-    
-    // Can be a word like "Patients", but can also be "Count" or "Counts"
-    let counted = pluralize(getSubject(sub));
-    
-    let description = "", label = "";
+export function PackageTemplates({ pkg }: { pkg: DataPackage }) {
+    return (
+        <div className="template-manager">
+            <div className="view-browser view-browser-flex">
+                { Object.keys(pkg.columns).filter(name => !name.startsWith("cnt")).map((col, i) => {
+                    return <Thumbnail key={i} col={{
+                        dataType   : pkg.columns[col] as app.SubscriptionDataColumn["dataType"],
+                        name       : col,
+                        label      : humanizeColumnName(col),
+                        description: humanizeColumnName(col)
+                    }}
+                    sub={{
+                        id  : pkg.id as any,
+                        name: humanizeColumnName(pkg.name)
+                    } as app.Subscription} />
+                }) }
+            </div>
+        </div>
+    )
+}
 
-    const countLabel = counted.match(/^counts?/i) ? counted : `Count ${counted}`;
+interface State {
+    chartType  : "spline" | "column" | "bar"
+    limit      : number
+    sortBy     : "x:asc" | "x:desc" | "y:asc" | "y:desc"
+    theme      : "sas_light" | "sas_dark"
+    countLabel : string
+    counted    : string
+    imgUrl     : string
+    label      : string
+    description: string
+    data       : app.ServerResponses.DataResponse
+    loading    : boolean
+    error      : Error | string | null
+}
 
-    const abortController = useMemo(() => new AbortController(), [])
+function reducer(state: State, payload: Partial<State>): State {
+    return { ...state, ...payload };
+}
 
-    const load = useMemo(() => async function () {
-        setLoading(true)
-        setError(null)
-        try {
-            const data = await getChartData(sub.id, col.name, abortController.signal)
-            
-            let _chartType = chartType
+function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn): State {
+
+    const counted    = pluralize(getSubject(sub))
+    const countLabel = counted.match(/^counts?/i) ? counted : `Count ${counted}`
+
+    const [state, dispatch] = useReducer(reducer, {
+        chartType: (col.dataType === "float" || col.dataType === "integer" || col.dataType.startsWith("date")) ? "spline" : "column",
+        limit      : 0,
+        sortBy     : "x:asc",
+        theme      : "sas_light",
+        data       : {} as any,
+        countLabel,
+        counted,
+        imgUrl     : "",
+        label      : `${countLabel} by ${col.label}`,
+        description: "",
+        loading    : true,
+        error      : null
+    });
+
+    useEffect(() => {
+
+        let abortController = new AbortController()
+
+        const timer = setTimeout(() => abortController.abort("Operation timed out"), 20_000)
+
+        getChartData(sub.id, col.name, abortController.signal)
+        .then(data => {
+
+            let chartType = state.chartType
+            let limit     = state.limit
+            let sortBy    = state.sortBy
+            let theme     = state.theme
+
             if (chartType === "column" && data.rowCount > 20) {
-                _chartType = "bar"
-                setChartType(_chartType)
+                chartType = "bar"
             }
             
             // No limit for lines and up to 30 bars/columns
             if (chartType !== "spline" && data.rowCount > 30) {
-                setLimit(30)
-                setSortBy("y:desc")
+                limit = 30
+                sortBy = "y:desc"
             }
 
             if (chartType === "spline") {
-                setTheme("sas_dark")
+                theme = "sas_dark"
             }
 
             const colors = COLOR_THEMES.find(t => t.id === "sas_light")!.colors
-                
-            const defaults = getDefaultChartOptions(_chartType, {
+            
+            const defaults = getDefaultChartOptions(chartType, {
                 chart: {
                     width: 1500,
                     height: 1000
@@ -135,7 +184,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
             const options = buildChartOptions({
                 data,
                 options         : defaults,
-                type            : _chartType,
+                type            : chartType,
                 column          : col,
                 ranges          : { enabled: false },
                 inspection      : { enabled: false, context: {selectedAnnotationIndex: -1, selectedPlotLineAxis: "", selectedPlotLineId: "", selectedSeriesId: ""}, match: [] },
@@ -146,47 +195,88 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
                 onInspectionChange: () => {},
             })
 
-            const url = await renderChartAsPng(options, abortController.signal)
-            setImgUrl(url)
-        } catch (ex) {
-            setError(ex as Error)
-        } finally {
-            setLoading(false)
-        }
-    }, [chartType, col, sub.id, abortController.signal, countLabel, limit, sortBy, theme])
-    
-    useEffect(() => { 
-        if (!isCountColumn) {
-            load()
-        }
-    }, [load, isCountColumn, abortController])
+            if (counted.match(/^counts?$/i)) {
+                const label = limit ? `Top ${limit} Counts by ${col.label}` : `Counts by ${col.label}`
+                dispatch({
+                    data,
+                    chartType,
+                    limit,
+                    sortBy,
+                    theme,
+                    label,
+                    description: `Generated from the "${sub.name}" ${Terminology.subscription.nameSingular.toLowerCase()} to show ${label.toLowerCase()}.`
+                })
+            } else {
+                const label = limit ? `Top ${limit} ${counted} by ${col.label}`: `Count ${counted} by ${col.label}`
+                dispatch({
+                    data,
+                    chartType,
+                    limit,
+                    sortBy,
+                    theme,
+                    label,
+                    description: `Generated from the "${sub.name}" ${Terminology.subscription.nameSingular.toLowerCase()} to ${limit ? "show" : ""} ${label.toLowerCase()}.`
+                })
+            }
 
-    useEffect(() => { 
+            return renderChartAsPng(options, abortController.signal)
+        })
+        .then(imgUrl => dispatch({ imgUrl }))
+        .catch(error => dispatch({ error }))
+        .finally(() => {
+            if (timer) {
+                clearTimeout(timer)
+            }
+            dispatch({ loading: false })
+        })
+
         return () => {
-            abortController.abort("Operation aborted because the component is unmounting")
+            if (timer) {
+                clearTimeout(timer)
+            }
+            if (state.loading) {
+                abortController.abort("Operation aborted because the component is unmounting")
+            }
         }
-    }, [abortController])
 
-    if (isCountColumn) {
-        return null
-    }
+    // eslint-disable-next-line
+    }, [sub, col])
+    
+    return state
+}
 
-    if (counted.match(/^counts?$/i)) {
-        label = limit ?
-            `Top ${limit} Counts by ${col.label}` :
-            `Counts by ${col.label}`;
-        description = `Generated from the "${sub.name
-            }" ${Terminology.subscription.nameSingular.toLowerCase()} to show ${label.toLowerCase()}.`
-    } else {
-        label = limit ?
-            `Top ${limit} ${counted} by ${col.label}`:
-            `Count ${counted} by ${col.label}`;
-        description = `Generated from the "${sub.name
-            }" ${Terminology.subscription.nameSingular.toLowerCase()} to ${limit ? "show" : ""} ${label.toLowerCase()}.`
+
+function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Subscription }) {
+    
+    const {
+        loading,
+        error,
+        chartType,
+        label,
+        description,
+        countLabel,
+        limit,
+        sortBy,
+        theme,
+        imgUrl
+    } = useDataLoader(sub, col)
+
+    
+    
+    if (loading || error) {
+        return (
+            <div className="view-thumbnail template">
+                <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }}>
+                    { loading && <Loader msg="" style={{ zIndex: 2 }} /> }
+                    { error && <small className="color-red" style={{ wordBreak: "break-all" }}>{ error + "" }</small> }
+                </div>
+                <div className="view-thumbnail-title">{ label }</div>
+            </div>
+        )
     }
 
     return (
-        <Link className="view-thumbnail template" to={`/requests/${sub.id}/create-view`} state={{
+        <Link className="view-thumbnail template" to={ typeof sub.id === "number" ? `/requests/${sub.id}/create-view` : "" } style={typeof sub.id === "number" ? undefined: { cursor: "default" }} state={{
             column: col.name,
             chartType,
             name: label,
@@ -200,20 +290,9 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
             <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }}
                 data-tooltip={`<img src=${imgUrl || "about:blank"} alt="Chart Preview" style="display:block" />`}
                 data-tooltip-position="50% auto">
-                { loading && <Loader msg="" style={{ zIndex: 2 }} /> }
-                { error && <small className="color-red" style={{ wordBreak: "break-all" }}>{ error + "" }</small> }
-                { !loading && imgUrl && <>
-                    <img src={imgUrl || "about:blank"} alt="Thumbnail Preview" loading="lazy" />
-                </> }
+                <img src={imgUrl || "about:blank"} alt="Thumbnail Preview" loading="lazy" />
             </div>
-            <div className="view-thumbnail-title" title={label}>
-                {/* <b> */}
-                    { label }
-                {/* </b> */}
-                {/* <div className="view-thumbnail-description color-muted">
-                    { description }
-                </div> */}
-            </div>
+            <div className="view-thumbnail-title" title={description}>{ label }</div>
         </Link>
     )
 }
