@@ -89,9 +89,6 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                     <h5 className="mt-2">{Terminology.subscription.namePlural}</h5>
                     <hr className="mb-1" />
                     <PackageSubscriptionsList pkg={pkg} />
-                    {/* <h5 className="mt-2 color-blue-dark">Generic Data Views</h5>
-                    <hr className="mb-1" />
-                    TODO... */}
                 </div>
                 <div className="col" style={{ wordBreak: "break-all", minWidth: "16rem" }}>
                     <h5 className="mt-2">Metadata</h5>
