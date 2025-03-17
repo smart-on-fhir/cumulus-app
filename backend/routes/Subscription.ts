@@ -291,17 +291,8 @@ router.put(
     })
 );
 
-// Data API endpoint -----------------------------------------------------------
-router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
-
-    const subscription = await Model.findByPk(req.params.id, { user: req.user })
-
-    assert(subscription, "Subscription not found", NotFound)
-    assert(subscription.metadata, "Subscription data not found", NotFound)
-
-    // Aggregator --------------------------------------------------------------
-    const packageId = subscription.dataURL
-    if (packageId) {
+function getPkgData(packageId: string) {
+    return async (req: AppRequest, res: Response) => {
         const { enabled, apiKey, baseUrl } = config.aggregator
 
         if (!enabled || !apiKey || !baseUrl) {
@@ -347,6 +338,26 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         // console.log("%s ====> %s", url, body)
         
         return res.json(body)
+    }
+}
+
+router.get("/pkg-api", rw(async (req: AppRequest, res: Response) => {
+    const packageId = String(req.query.pkg || "")
+    return getPkgData(packageId)(req, res)
+}))
+
+// Data API endpoint -----------------------------------------------------------
+router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
+
+    const subscription = await Model.findByPk(req.params.id, { user: req.user })
+
+    assert(subscription, "Subscription not found", NotFound)
+    assert(subscription.metadata, "Subscription data not found", NotFound)
+
+    // Aggregator --------------------------------------------------------------
+    const packageId = subscription.dataURL
+    if (packageId) {
+        return getPkgData(packageId)(req, res)
     }
     // -------------------------------------------------------------------------
 

@@ -10,11 +10,12 @@ import Loader                      from "../generic/Loader"
 import { AlertError }              from "../generic/Alert"
 import PageHeader                  from "../generic/PageHeader"
 import Breadcrumbs                 from "../generic/Breadcrumbs"
+import { PackageTemplates }        from "../TemplateManager"
+import { FlatPackageDataViewer }   from "../Subscriptions/DataViewer"
 import aggregator, { DataPackage } from "../../Aggregator"
 import Terminology                 from "../../Terminology"
 import { app }                     from "../../types"
 import { humanizeColumnName }      from "../../utils"
-import { FlatPackageDataViewer }   from "../Subscriptions/DataViewer"
 
 
 function Preload() {
@@ -83,6 +84,11 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
             <div className="row gap-2 wrap">
                 <div className="col col-8 responsive">
                     { pkg.type === "flat" && <div className="mt-2"><FlatPackageDataViewer pkg={pkg} /></div> }
+                    { pkg.type !== "flat" && <>
+                        <h5 className="mt-2">Graphs</h5>
+                        <hr/>
+                        <PackageTemplates pkg={pkg} key={pkg.id} />
+                    </> }
                     <h5 className="mt-2">Columns</h5>
                     <hr className="mb-1" />
                     <ColumnsTable cols={cols} />
@@ -116,6 +122,49 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                     {/* <br />
                     <b>S3 Path</b>
                     <div className="color-muted">{ pkg.s3_path || "" }</div> */}
+
+                    <h5 className="mt-2">Actions</h5>
+                    <hr className="mb-1"/>
+
+                    {/* Add Graph -------------------------------------- */}
+                    {/* { canCreateGraphs && <p>
+                        <Link className="link" to={`/requests/${model.id}/create-view`} title={`Click here to create new view from the data provided from this ${Terminology.subscription.nameSingular.toLowerCase()}`}>
+                            <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>add_photo_alternate</i>
+                            Add Graph
+                        </Link>
+                    </p> } */}
+
+                    {/* Edit ------------------------------------------- */}
+                    {/* { canEdit && <p>
+                        <Link className="link" to={`/requests/${model.id}/edit`}>
+                            <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>tune</i>
+                            Edit
+                        </Link>
+                    </p> } */}
+
+                    {/* Export Data ------------------------------------ */}
+                    { <p>
+                        <a aria-disabled className="link" href={`${process.env.REACT_APP_BACKEND_HOST || ""}/api/requests/${pkg.id}/data?format=csv`}>
+                            <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>download</i>
+                            Export Data
+                        </a>
+                    </p> }
+
+                    {/* Import Data ------------------------------------ */}
+                    {/* { canImport && <p>
+                        <Link className="link" to={`/requests/${model.id}/import`}>
+                            <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>upload</i>
+                            Import Data
+                        </Link>
+                    </p> } */}
+
+                    {/* Delete ----------------------------------------- */}
+                    {/* { canDelete && <p>
+                        <span className="link" onClick={destroy}>
+                            <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>delete</i>
+                            Delete
+                        </span>
+                    </p> } */}
                 </div>
             </div>
         </div>
