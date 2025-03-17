@@ -317,7 +317,6 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         for (const [name, value] of Object.entries(req.query)) {
             url.searchParams.set(name, value + "")
         }
-        // console.log("url ====>", url)
 
         try {
             var response = await fetch(url, {
