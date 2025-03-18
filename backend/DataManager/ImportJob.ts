@@ -16,10 +16,16 @@ import config                      from "../config"
 
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL?.replace(/\?.*$/, "") || "",
-    ssl: (config.db.options.dialectOptions as any).ssl // === true ? { rejectUnauthorized: false } : false
-    // ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
+    database: config.db.options.database,
+    host    : config.db.options.host,
+    password: config.db.options.password,
+    user    : config.db.options.username,
+    port    : config.db.options.port,
+
+    // @ts-ignore
+    ssl: config.db.options.dialectOptions!.ssl,
 });
+
 
 const JOBS: Record<string, ImportJob> = {};
 
