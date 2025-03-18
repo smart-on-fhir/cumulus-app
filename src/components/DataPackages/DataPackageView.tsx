@@ -126,45 +126,21 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                     <h5 className="mt-2">Actions</h5>
                     <hr className="mb-1"/>
 
-                    {/* Add Graph -------------------------------------- */}
-                    {/* { canCreateGraphs && <p>
-                        <Link className="link" to={`/requests/${model.id}/create-view`} title={`Click here to create new view from the data provided from this ${Terminology.subscription.nameSingular.toLowerCase()}`}>
-                            <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>add_photo_alternate</i>
-                            Add Graph
-                        </Link>
-                    </p> } */}
-
-                    {/* Edit ------------------------------------------- */}
-                    {/* { canEdit && <p>
-                        <Link className="link" to={`/requests/${model.id}/edit`}>
-                            <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>tune</i>
-                            Edit
-                        </Link>
-                    </p> } */}
-
-                    {/* Export Data ------------------------------------ */}
-                    { <p>
+                    {/* Export Data ---------------------------------------- */}
+                    { <p className="mb-05">
                         <a aria-disabled={!pkg.s3_path} download={escapeForFileName(pkg.name) + ".csv"} className="link" href={`${process.env.REACT_APP_BACKEND_HOST || ""}/api/aggregator/from-parquet/?s3_path=${encodeURIComponent(pkg.s3_path!)}&type=csv`}>
-                            <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>download</i>
+                            <i className="material-symbols-outlined mr-05 color-brand-2 icon big">download</i>
                             Export Data
                         </a>
                     </p> }
 
-                    {/* Import Data ------------------------------------ */}
-                    {/* { canImport && <p>
-                        <Link className="link" to={`/requests/${model.id}/import`}>
-                            <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>upload</i>
-                            Import Data
+                    {/* Create Subscription -------------------------------- */}
+                    <p className="mb-05">
+                        <Link className="link" to={`/requests/new?packageId=${encodeURIComponent(pkg.id)}`} state={{ dataPackage: pkg }}>
+                            <i className="material-symbols-outlined mr-05 color-brand-2 icon big">add_circle</i>
+                            Create {Terminology.subscription.nameSingular}
                         </Link>
-                    </p> } */}
-
-                    {/* Delete ----------------------------------------- */}
-                    {/* { canDelete && <p>
-                        <span className="link" onClick={destroy}>
-                            <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>delete</i>
-                            Delete
-                        </span>
-                    </p> } */}
+                    </p>
                 </div>
             </div>
         </div>

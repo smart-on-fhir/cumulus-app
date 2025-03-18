@@ -307,7 +307,7 @@ function DataSourceSelector({
         if (selectedPackage) {
             payload.metadata = {
                 total: +selectedPackage.total,
-                type : "cube",
+                type : selectedPackage.type || "cube",
                 cols : Object.keys(selectedPackage.columns).map(name => {
                     let type = String(selectedPackage.columns[name])
                         .replace("year" , "date:YYYY")

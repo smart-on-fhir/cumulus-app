@@ -1,6 +1,6 @@
 import { useCallback, useState }  from "react"
 import { HelmetProvider, Helmet } from "react-helmet-async"
-import { Navigate }               from "react-router"
+import { Navigate, useLocation }  from "react-router"
 import { useSearchParams }        from "react-router-dom"
 import { request, createOne }     from "../../backend"
 import { useBackend }             from "../../hooks"
@@ -10,6 +10,7 @@ import Loader                     from "../generic/Loader"
 import SubscriptionForm           from "./form"
 import { app }                    from "../../types"
 import Terminology                from "../../Terminology"
+import { humanizeColumnName }     from "../../utils"
 
 import "./form.scss";
 
@@ -17,8 +18,42 @@ import "./form.scss";
 export default function CreateSubscriptionForm()
 {
     const [ searchParams ] = useSearchParams()
+
+    const location = useLocation()
+
+    const groupId   = +(searchParams.get("groupId") || 0) || undefined
+
+    const packageId = searchParams.get("packageId") || ""
+    const dataSourceType = packageId ? "aggregator" : "file"
+    const dataURL = packageId || undefined
+    
+    // @ts-ignore
+    const dataPackage = location.state?.dataPackage || undefined
+    
     const [ state, setState ] = useState<Partial<app.SubscriptionWithPackage>>({
-        groupId: +(searchParams.get("groupId") || 0) || undefined
+        groupId,
+        dataSourceType,
+        dataURL,
+        dataPackage,
+        metadata: dataPackage ? {
+            total: +dataPackage.total,
+            type : dataPackage.type || "cube",
+            cols : Object.keys(dataPackage.columns).map(name => {
+                let type = String(dataPackage.columns[name])
+                    .replace("year" , "date:YYYY")
+                    .replace("month", "date:YYYY-MM")
+                    .replace("week" , "date:YYYY-MM-DD")
+                    .replace("day"  , "date:YYYY-MM-DD") as app.supportedDataType;
+
+                return {
+                    name,
+                    label      : humanizeColumnName(name),
+                    description: humanizeColumnName(name),
+                    dataType   : type
+                }
+            })
+        } : null,
+        completed: dataPackage ? dataPackage.last_data_update : null
     })
     const [ savedRecord, setSavedRecord ] = useState<app.SubscriptionWithPackage|null>(null)
 

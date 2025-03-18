@@ -60,7 +60,7 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
 
     const isFlatData      = model.metadata?.type === "flat"
     const canHaveCharts   = !isFlatData && (model.dataURL || model.completed)
-    const canCreateGraphs = user!.permissions.includes("Graphs.create") && !model.dataURL
+    const canCreateGraphs = user!.permissions.includes("Graphs.create") //&& !model.dataURL
     const canEdit         = user!.permissions.includes("Subscriptions.update")
     const canDelete       = user!.permissions.includes("Subscriptions.delete")// && !model.dataURL
     const canExport       = user!.permissions.includes("Subscriptions.export") && !model.dataURL
@@ -132,7 +132,7 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
                 </div>
 
                 <div className="col" style={{ wordBreak: "break-all", minWidth: "16rem" }}>
-                    <div style={{ position: "sticky", top: "3em" }}>
+                    <div style={{ position: "sticky", top: "3em" }} className="col">
                         <h5 className="mt-2">Metadata</h5>
                         <hr className="mb-1"/>
                         
@@ -188,7 +188,10 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
                             <div>
                                 <br />
                                 <b>Data Package</b>
-                                <div className="color-muted">{ model.dataURL }</div>
+                                {/* <div className="color-muted">{ model.dataURL }</div> */}
+                                <div>
+                                    <Link className="link" to={`/packages/${model.dataURL}`}>{ model.dataURL }</Link>
+                                </div>
                             </div>
                         )}
 
@@ -206,41 +209,41 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
                         <hr className="mb-1"/>
 
                         {/* Add Graph -------------------------------------- */}
-                        { canCreateGraphs && <p>
+                        { canCreateGraphs && <p className="mb-05">
                             <Link className="link" to={`/requests/${model.id}/create-view`} title={`Click here to create new view from the data provided from this ${Terminology.subscription.nameSingular.toLowerCase()}`}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>add_photo_alternate</i>
+                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">add_photo_alternate</i>
                                 Add Graph
                             </Link>
                         </p> }
 
                         {/* Edit ------------------------------------------- */}
-                        { canEdit && <p>
+                        { canEdit && <p className="mb-05">
                             <Link className="link" to={`/requests/${model.id}/edit`}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>tune</i>
+                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">tune</i>
                                 Edit
                             </Link>
                         </p> }
 
                         {/* Export Data ------------------------------------ */}
-                        { canExport && <p>
+                        { canExport && <p className="mb-05">
                             <a aria-disabled={!model.metadata} className="link" href={`${process.env.REACT_APP_BACKEND_HOST || ""}/api/requests/${id}/data?format=csv`}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>download</i>
+                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">download</i>
                                 Export Data
                             </a>
                         </p> }
 
                         {/* Import Data ------------------------------------ */}
-                        { canImport && <p>
+                        { canImport && <p className="mb-05">
                             <Link className="link" to={`/requests/${model.id}/import`}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>upload</i>
+                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">upload</i>
                                 Import Data
                             </Link>
                         </p> }
 
                         {/* Delete ----------------------------------------- */}
-                        { canDelete && <p>
+                        { canDelete && <p className="mb-05">
                             <span className="link" onClick={destroy}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2" style={{ verticalAlign: "middle", fontSize: "1.6em" }}>delete</i>
+                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">delete</i>
                                 Delete
                             </span>
                         </p> }
