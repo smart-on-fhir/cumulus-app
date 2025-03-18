@@ -119,6 +119,9 @@ b, .bold {
     overflow: visible;
     margin-top: -0.2em;
     margin-bottom: -0.1em;
+    &.big {
+      font-size: 1.6em;
+    }
   }
 }
 
