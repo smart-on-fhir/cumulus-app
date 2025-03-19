@@ -15,16 +15,16 @@
         // font-family: Arial, 'Helvetica Neue', 'Open Sans',Tahoma, 'Arial', sans-serif;
         font-size  : 15px;
         opacity    : 0;
-        max-width  : min(90vw, 450px);
+        max-width  : min(90vw, 550px);
         pointer-events : none;
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(5px);
         border-radius  : 4px;
-        background: #0009;
+        background: linear-gradient(#0008, #0009);
 
         > .contents {
             position: relative;
             z-index: 2;
-            padding: 5px 7px;
+            padding: 5px;
             line-height: normal;
             white-space: pre-wrap;
             line-break: anywhere;
@@ -38,8 +38,8 @@
             height: 0;
             border-width: 5px 5px 0;
             border-color: #0009 #0000 #0000;
-            border-style: solid;
-            margin: 0 0 -5px -5px
+            border-style: solid solid solid solid;
+            margin: 0 0 -5px -5px;
         }
 
         &.top-pointer {
@@ -50,7 +50,7 @@
                 left: 50%;
                 margin: -5px 0 0 -5px;
                 border-width: 5px;
-                border-color: #0000 #0000 #0009;
+                border-color: #0000 #0000 #0008;
             }
         }
 

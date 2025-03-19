@@ -84,13 +84,18 @@ export default class Tooltip extends Component<any> {
             yValue = parseInt(vertical)
         }
 
-        const x = xUnit === "%" ?
+        let x = xUnit === "%" ?
             Math.max(elRect.left + elRect.width / 100 * xValue - ttRect.width / 2, 2) :
             Math.max(elRect.left - ttRect.width / 2 + xValue, 2);
 
         let y = yUnit === "%" ?
             Math.max(elRect.top + elRect.height / 100 * yValue, 10) :
             Math.max(elRect.top + yValue, 10);
+
+        x = Math.min(x, document.documentElement.clientWidth - ttRect.width - 8)
+
+        // @ts-ignore
+        this.tooltip.current!.querySelector(".pointer")!.style.transform = `translateX(${(elRect.left + elRect.width / 2) - (x + ttRect.width/2)}px)`
 
         if (y > elRect.top + elRect.height / 2) {
             this.tooltip.current!.classList.add("top-pointer")
@@ -100,13 +105,13 @@ export default class Tooltip extends Component<any> {
             y -= ttRect.height
         }
         
-        this.tooltip.current!.classList[
-            x < elRect.left - ttRect.width / 2 ||
-            x > elRect.left + elRect.width - ttRect.width / 2 //||
-            // y < elRect.top - ttRect.height ||
-            // y > elRect.top + elRect.height - ttRect.height
-            ? "add" : "remove"
-        ]("no-pointer")
+        // this.tooltip.current!.classList[
+        //     x < elRect.left - ttRect.width / 2 ||
+        //     x > elRect.left + elRect.width - ttRect.width / 2 //||
+        //     // y < elRect.top - ttRect.height ||
+        //     // y > elRect.top + elRect.height - ttRect.height
+        //     ? "add" : "remove"
+        // ]("no-pointer")
         
         this.tooltip.current!.style.transform = `translate(${x}px, ${y}px)`
     }
