@@ -35,7 +35,10 @@ async function renderChartAsPng(options: Highcharts.Options, signal: AbortSignal
             if (signal.aborted) {
                 return reject(signal.reason)
             }
-            const svg = chart.container.querySelector("svg")?.outerHTML!
+            const svgEl = chart.container.querySelector("svg")!
+            // @ts-ignore
+            // svgEl.style["webkit-font-smoothing"] = "antialiased";
+            const svg = svgEl.outerHTML!
             chart.destroy()
             container.remove()
             resolve("data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg))
@@ -77,7 +80,11 @@ export function PackageTemplates({ pkg }: { pkg: DataPackage }) {
             <div className="view-browser view-browser-flex">
                 { Object.keys(pkg.columns).filter(name => !name.startsWith("cnt")).map((col, i) => {
                     return <Thumbnail key={i} col={{
-                        dataType   : pkg.columns[col] as app.SubscriptionDataColumn["dataType"],
+                        dataType   : pkg.columns[col]
+                            .replace("year" , "date:YYYY")
+                            .replace("month", "date:YYYY-MM")
+                            .replace("week" , "date:YYYY-MM-DD")
+                            .replace("day"  , "date:YYYY-MM-DD") as app.SubscriptionDataColumn["dataType"],
                         name       : col,
                         label      : humanizeColumnName(col),
                         description: humanizeColumnName(col)
@@ -93,7 +100,7 @@ export function PackageTemplates({ pkg }: { pkg: DataPackage }) {
 }
 
 interface State {
-    chartType  : "spline" | "column" | "bar"
+    chartType  : "areaspline" | "spline" | "column" | "bar"
     limit      : number
     sortBy     : "x:asc" | "x:desc" | "y:asc" | "y:desc"
     theme      : "sas_light" | "sas_dark"
@@ -117,7 +124,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn): 
     const countLabel = counted.match(/^counts?/i) ? counted : `Count ${counted}`
 
     const [state, dispatch] = useReducer(reducer, {
-        chartType: (col.dataType === "float" || col.dataType === "integer" || col.dataType.startsWith("date")) ? "spline" : "column",
+        chartType: (col.dataType === "float" || col.dataType === "integer" || col.dataType.startsWith("date")) ? "areaspline" : "column",
         limit      : 0,
         sortBy     : "x:asc",
         theme      : "sas_light",
@@ -150,12 +157,12 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn): 
             }
             
             // No limit for lines and up to 30 bars/columns
-            if (chartType !== "spline" && data.rowCount > 30) {
+            if (!chartType.includes("line") && data.rowCount > 30) {
                 limit = 30
                 sortBy = "y:desc"
             }
 
-            if (chartType === "spline") {
+            if (chartType === "areaspline") {
                 theme = "sas_dark"
             }
 
@@ -163,15 +170,73 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn): 
             
             const defaults = getDefaultChartOptions(chartType, {
                 chart: {
-                    width: 1500,
-                    height: 1000
+                    width        : 1500,
+                    height       : 900,
+                    spacingLeft  : 10,
+                    spacingBottom: 10,
+                    spacingRight : 10,
+                    spacingTop   : 10
+                },
+                exporting: {
+                    enabled: false
+                },
+                credits: {
+                    enabled: false
                 },
                 title: {
-                    text: col.label
+                    text: col.label,
+                    margin: 10,
+                    style: {
+                        fontSize: "36px",
+                        color: "#555"
+                    }
                 },
                 yAxis: {
                     title: {
-                        text: countLabel
+                        text: ""
+                    },
+                    labels: {
+                        style: {
+                            fontSize: "30px"
+                        }
+                    }
+                },
+                xAxis: {
+                    labels: {
+                        padding: 16,
+                        style: {
+                            fontSize: "30px"
+                        }
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    column: {
+                        groupPadding: 0.1,
+                        pointPadding: 0.1,
+                        minPointLength: 4,
+                    },
+                    bar: {
+                        groupPadding: 0.1,
+                        pointPadding: 0.1,
+                        minPointLength: 4,
+                    },
+                    series: {
+                        dataLabels: {
+                            padding: 2,
+                            backgroundColor: "#FFF8",
+                            borderWidth : 3,
+                            borderRadius: 10,
+                            borderColor : "#FFF0",
+                            style: {
+                                fontSize: "26px",
+                                color: "#444",
+                                textOutline: "2px #FFF8",
+                                fontWeight: "300",
+                            }
+                        }
                     }
                 },
                 colors,
