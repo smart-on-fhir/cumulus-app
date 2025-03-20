@@ -18,8 +18,9 @@
         max-width  : min(90vw, 550px);
         pointer-events : none;
         backdrop-filter: blur(5px);
-        border-radius  : 4px;
+        border-radius  : 9px;
         background: linear-gradient(#0008, #0009);
+        filter: drop-shadow(5px 5px 10px #0003);
 
         > .contents {
             position: relative;
@@ -28,6 +29,10 @@
             line-height: normal;
             white-space: pre-wrap;
             line-break: anywhere;
+
+            img {
+                border-radius  : 4px;
+            }
         }
 
         > .pointer {
@@ -40,6 +45,7 @@
             border-color: #0009 #0000 #0000;
             border-style: solid solid solid solid;
             margin: 0 0 -5px -5px;
+            z-index: 20000;
         }
 
         &.top-pointer {

@@ -1,6 +1,7 @@
 import React                  from "react"
 import { request }            from "./backend"
 import { humanizeColumnName } from "./utils"
+import { app }                from "./types"
 
 
 interface Metadata {
@@ -279,6 +280,27 @@ class Aggregator
 
     public async getPackageJson(s3path: string): Promise<{ schema: any, data: any[] }> {
         return await this.fetch("/api/aggregator/from-parquet/?s3_path=" + encodeURIComponent(s3path));
+    }
+
+    public getPackageMetadata(pkg: DataPackage) {
+        return {
+            total: +pkg.total,
+            type : pkg.type || "cube",
+            cols : Object.keys(pkg.columns).map(name => {
+                let type = String(pkg.columns[name])
+                    .replace("year" , "date:YYYY")
+                    .replace("month", "date:YYYY-MM")
+                    .replace("week" , "date:YYYY-MM-DD")
+                    .replace("day"  , "date:YYYY-MM-DD") as app.supportedDataType;
+
+                return {
+                    name,
+                    label      : humanizeColumnName(name),
+                    description: humanizeColumnName(name),
+                    dataType   : type
+                }
+            })
+        }
     }
 }
 

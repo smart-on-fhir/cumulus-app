@@ -158,6 +158,7 @@ export declare module app {
 
         updatedAt: string | null
 
+        /** @deprecated */
         refresh: "none" | "manually" | "daily" | "weekly" | "monthly" | "yearly"
 
         /**
@@ -166,6 +167,7 @@ export declare module app {
          * - `completed` - Created and resolved
          * - `errored`   - Marked as invalid  or otherwise failed
          */
+        /** @deprecated */
         status: "pending" | "completed" | "loading" | "errored"
 
         /**
@@ -174,6 +176,7 @@ export declare module app {
          */
         completed: string | null
 
+        /** @deprecated */
         requestedData: RequestedData | null
 
         dataURL: string | null
@@ -190,6 +193,7 @@ export declare module app {
 
         Views?: View[]
 
+        /** @deprecated */
         transmissions: Transmission[] | null
 
         StudyAreas?: StudyArea[]
