@@ -1,12 +1,13 @@
-import { useCallback }            from "react"
-import { useLocation, useParams } from "react-router"
-import Dashboard                  from "."
-import { useAuth }                from "../../auth"
-import { request }                from "../../backend"
-import { useBackend }             from "../../hooks"
-import { app }                    from "../../types"
-import { AlertError }             from "../generic/Alert"
-import Loader                     from "../generic/Loader"
+import { useCallback }             from "react"
+import { useLocation, useParams }  from "react-router"
+import Dashboard                   from "."
+import { AlertError }              from "../generic/Alert"
+import Loader                      from "../generic/Loader"
+import { useAuth }                 from "../../auth"
+import { request }                 from "../../backend"
+import { useBackend }              from "../../hooks"
+import { app }                     from "../../types"
+import aggregator, { DataPackage } from "../../Aggregator"
 
 
 export default function CopyView()
@@ -18,10 +19,15 @@ export default function CopyView()
 
     const { user } = useAuth()
 
-    // Fetch the subscription by ID
-    const { loading, error, result: view } = useBackend<app.View>(
+    // Fetch the view and it's package (if any)
+    const { loading, error, result } = useBackend<{ view: app.View, pkg?: DataPackage }>(
         useCallback(() => {
-            return request("/api/views/" + id + "?tags=true&subscription=true&group=true&study_areas=true");
+            return request<app.View>("/api/views/" + id + "?tags=true&subscription=true&group=true&study_areas=true").then(view => {
+                if (view.packageId) {
+                    return aggregator.getPackage(view.packageId).then(pkg => ({ view, pkg }))
+                }
+                return { view }
+            });
         }, [id]),
         true
     );
@@ -37,9 +43,11 @@ export default function CopyView()
     }
 
      // If the subscription request was successful but did not return the expected data exit with an error message
-    if (!view) {
+    if (!result?.view) {
         return <AlertError>{`Fetching graph with id "${id}" produced empty response`}</AlertError>
     }
+
+    const { view, pkg } = result
 
     // @ts-ignore
     if (state?.view) {
@@ -48,11 +56,11 @@ export default function CopyView()
     }
 
     view.name = view.name!.replace(/(\s*\(copy\)\s*)?$/, " (copy)")
+    
     // @ts-ignore
     delete view.id
     view.creatorId = user!.id // change ownership
     view.isDraft = true // Start as draft
 
-    // @ts-ignore
-    return <Dashboard copy view={view} subscription={view.Subscription} />
+    return <Dashboard copy view={view} subscription={view.Subscription} dataPackage={pkg} />
 }

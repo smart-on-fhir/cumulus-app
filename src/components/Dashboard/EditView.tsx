@@ -1,10 +1,13 @@
-import { useCallback } from "react";
-import { useParams }   from "react-router";
-import Dashboard       from ".";
-import { request }     from "../../backend";
-import { useBackend }  from "../../hooks";
-import { AlertError }  from "../generic/Alert";
-import Loader          from "../generic/Loader";
+import { useCallback }             from "react"
+import { useParams }               from "react-router"
+import Dashboard                   from "."
+import { AlertError }              from "../generic/Alert"
+import Loader                      from "../generic/Loader"
+import { request }                 from "../../backend"
+import { useBackend }              from "../../hooks"
+import aggregator, { DataPackage } from "../../Aggregator"
+import { app }                     from "../../types"
+
 
 export default function EditView({ id }: { id?: number })
 {
@@ -13,10 +16,15 @@ export default function EditView({ id }: { id?: number })
 
     id = id || +params.id!
 
-    // Fetch the subscription by ID
-    const { loading, error, result: view } = useBackend(
+    // Fetch the view and it's package (if any)
+    const { loading, error, result } = useBackend<{ view: app.View, pkg?: DataPackage }>(
         useCallback(() => {
-            return request("/api/views/" + id + "?tags=true&subscription=true&group=true&study_areas=true");
+            return request<app.View>("/api/views/" + id + "?tags=true&subscription=true&group=true&study_areas=true").then(view => {
+                if (view.packageId) {
+                    return aggregator.getPackage(view.packageId).then(pkg => ({ view, pkg }))
+                }
+                return { view }
+            });
         }, [id]),
         true
     );
@@ -32,9 +40,9 @@ export default function EditView({ id }: { id?: number })
     }
 
      // If the subscription request was successful but did not return the expected data exit with an error message
-    if (!view) {
+    if (!result?.view) {
         return <AlertError>{`Fetching graph with id "${id}" produced empty response`}</AlertError>
     }
 
-    return <Dashboard view={view} subscription={view.Subscription} />
+    return <Dashboard view={result.view} subscription={result.view.Subscription as any} dataPackage={result.pkg} />
 }

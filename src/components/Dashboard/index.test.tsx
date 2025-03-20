@@ -167,6 +167,7 @@ describe("Chart View", () => {
     const baseView: app.View = {
         id           : 1,
         subscriptionId: 1,
+        packageId    : null,
         name         : "Test Chart",
         description  : "Test Chart Description",
         Subscription : baseSubscription,

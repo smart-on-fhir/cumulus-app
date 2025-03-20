@@ -45,7 +45,7 @@ export declare module app {
         updatedAt     : string
         createdAt     : string
         creator      ?: Pick<User, "id" | "email">
-        graphs       ?: Pick<View, "id" | "name" | "description" | "subscriptionId">[]
+        graphs       ?: View[]//Pick<View, "id" | "name" | "description" | "subscriptionId">[]
         subscriptions?: Pick<Subscription, "id" | "name" | "description" | "completed" | "refresh">[]
     }
 
@@ -91,11 +91,12 @@ export declare module app {
         name: string
         description: string
         subscriptionId: number | null
+        packageId: string | null
         screenShot?: string
         settings?: ViewSettings
         creatorId?: number | null
         Tags?: Pick<Tag, "id" | "name" | "description">[]
-        Subscription?: Pick<Subscription, "id" | "name">
+        Subscription?: Subscription// Pick<Subscription, "id" | "name">
         isDraft?: boolean
         createdAt?: Date
         updatedAt?: Date

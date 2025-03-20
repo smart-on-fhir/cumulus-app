@@ -1,5 +1,7 @@
-import HttpError from "./HttpError";
-import { app }   from "./types"
+import { DataPackage } from "./Aggregator"
+import HttpError       from "./HttpError"
+import { app }         from "./types"
+import { assert }      from "./utils"
 
 interface RequestOptions extends RequestInit {
     includeResponse?: boolean
@@ -101,6 +103,48 @@ export async function updateOne<T=Record<string, any>>(table: string, id: string
 
 export async function deleteOne<T=any>(table: string, id: string | number) {
     return request<T>(`/api/${table}/${id}`, { method: "DELETE" });
+}
+
+export async function fetchChartData({
+    column,
+    stratifier,
+    filters = [],
+    label,
+    subscription,
+    dataPackage,
+    signal
+}: {
+    column: string
+    stratifier?: string
+    filters?: string[]
+    label?: string
+    subscription?: app.Subscription
+    dataPackage?: DataPackage
+    signal?: AbortSignal
+}) {
+    assert(subscription || dataPackage, "Either subscription or dataPackage must be provided")
+    
+    const pathName = dataPackage ?
+        `/api/requests/pkg-api` :
+        `/api/requests/${subscription!.id}/api`;
+
+    const params = new URLSearchParams()
+
+    if (dataPackage) {
+        params.set("pkg", dataPackage.id)
+    }
+
+    params.set("column", column)
+
+    if (stratifier) {
+        params.set("stratifier", stratifier)
+    }
+
+    for (const filter of filters) {
+        params.append("filter", filter)
+    }
+
+    return request(`${pathName}?${params.toString()}`, { label, signal })
 }
 
 export const auth = {

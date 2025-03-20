@@ -5,25 +5,13 @@ import { buildChartOptions }             from "../Dashboard/Charts/lib"
 import { getDefaultChartOptions }        from "../Dashboard/Charts/DefaultChartOptions"
 import { COLOR_THEMES }                  from "../Dashboard/config"
 import Highcharts                        from "../../highcharts"
-import { request }                       from "../../backend"
+import { fetchChartData }                from "../../backend"
 import { app }                           from "../../types"
 import { humanizeColumnName, pluralize } from "../../utils"
 import { FhirResourceTypes }             from "../../config"
 import Terminology                       from "../../Terminology"
 import { DataPackage }                   from "../../Aggregator"
 
-
-async function getChartData(subscriptionId: number | string, column: string, signal: AbortSignal) {
-    const base = process.env.REACT_APP_BACKEND_HOST || window.location.origin
-    const url = new URL(
-        typeof subscriptionId === "number" ?
-            `/api/requests/${subscriptionId}/api` :
-            `/api/requests/pkg-api?pkg=${encodeURIComponent(subscriptionId)}`,
-        base
-    )
-    url.searchParams.set("column", column)
-    return request(url.href, { signal })
-}
 
 async function renderChartAsPng(options: Highcharts.Options, signal: AbortSignal): Promise<string> {
     if (signal.aborted) {
@@ -61,7 +49,7 @@ async function renderChartAsPng(options: Highcharts.Options, signal: AbortSignal
 export default function TemplateManager({ subscription }: { subscription: app.Subscription }) {
     return (
         <div className="template-manager">
-            <div className="view-browser view-browser-flex">
+            <div className="view-browser">
                 <Templates subscription={subscription} />
             </div>
         </div>
@@ -76,26 +64,25 @@ export function Templates({ subscription }: { subscription: app.Subscription }) 
 
 export function PackageTemplates({ pkg }: { pkg: DataPackage }) {
     return (
-        <div className="template-manager">
-            <div className="view-browser view-browser-flex">
-                { Object.keys(pkg.columns).filter(name => !name.startsWith("cnt")).map((col, i) => {
-                    return <Thumbnail key={i} col={{
-                        dataType   : pkg.columns[col]
-                            .replace("year" , "date:YYYY")
-                            .replace("month", "date:YYYY-MM")
-                            .replace("week" , "date:YYYY-MM-DD")
-                            .replace("day"  , "date:YYYY-MM-DD") as app.SubscriptionDataColumn["dataType"],
-                        name       : col,
-                        label      : humanizeColumnName(col),
-                        description: humanizeColumnName(col)
-                    }}
-                    sub={{
-                        id  : pkg.id as any,
-                        name: humanizeColumnName(pkg.name)
-                    } as app.Subscription} />
-                }) }
-            </div>
-        </div>
+        <>
+            { Object.keys(pkg.columns).filter(name => !name.startsWith("cnt")).map((col, i) => {
+                return <Thumbnail key={i} col={{
+                    dataType   : pkg.columns[col]
+                        .replace("year" , "date:YYYY")
+                        .replace("month", "date:YYYY-MM")
+                        .replace("week" , "date:YYYY-MM-DD")
+                        .replace("day"  , "date:YYYY-MM-DD") as app.SubscriptionDataColumn["dataType"],
+                    name       : col,
+                    label      : humanizeColumnName(col),
+                    description: humanizeColumnName(col)
+                }}
+                pkg={pkg}
+                sub={{
+                    id  : pkg.id as any,
+                    name: humanizeColumnName(pkg.name)
+                } as app.Subscription} />
+            }) }
+        </>
     )
 }
 
@@ -118,7 +105,7 @@ function reducer(state: State, payload: Partial<State>): State {
     return { ...state, ...payload };
 }
 
-function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn): State {
+function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, pkg?: DataPackage): State {
 
     const counted    = pluralize(getSubject(sub))
     const countLabel = counted.match(/^counts?/i) ? counted : `Count ${counted}`
@@ -144,7 +131,12 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn): 
 
         const timer = setTimeout(() => abortController.abort("Operation timed out"), 20_000)
 
-        getChartData(sub.id, col.name, abortController.signal)
+        fetchChartData({
+            subscription: sub,
+            dataPackage : pkg,
+            column      : col.name,
+            signal      : abortController.signal
+        })
         .then(data => {
 
             let chartType = state.chartType
@@ -311,7 +303,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn): 
 }
 
 
-function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Subscription }) {
+function Thumbnail({ col, sub, pkg }: { col: app.SubscriptionDataColumn, sub: app.Subscription, pkg?: DataPackage }) {
     
     const {
         loading,
@@ -324,7 +316,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
         sortBy,
         theme,
         imgUrl
-    } = useDataLoader(sub, col)
+    } = useDataLoader(sub, col, pkg)
 
     
     

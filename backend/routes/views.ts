@@ -13,7 +13,8 @@ import {
     NotFound,
     InternalServerError,
     HttpError,
-    Unauthorized
+    Unauthorized,
+    BadRequest
 } from "../errors"
 
 
@@ -63,7 +64,11 @@ route(router, {
             attributes: {
                 in: ["query"],
                 optional: true,
-            }
+            },
+            pkg: {
+                in: ["query"],
+                optional: true
+            },
         }
     },
     async handler(req, res) {
@@ -73,7 +78,7 @@ route(router, {
                 { association: "Tags", attributes: ["id", "name", "description"] },
                 { association: "Subscription", attributes: ["id", "name"] }
             ],
-            where: { isDraft: bool(req.query.drafts) },
+            // where: { isDraft: bool(req.query.drafts) },
             user: SystemUser
         };
 
@@ -94,6 +99,12 @@ route(router, {
 
         if (req.query.attributes) {
             options.attributes = String(req.query.attributes).split(",")
+        }
+
+        if (req.query.pkg) {
+            options.where = { packageId: String(req.query.pkg) }
+        } else {
+            options.where = { isDraft: bool(req.query.drafts) }
         }
         
         res.json(await Model.scope({ method: ['visible', req.user] }).findAll(options))
@@ -308,11 +319,17 @@ route(router, {
             },
             subscriptionId: {
                 in: ['body'],
+                optional: true,
                 isInt: {
                     options: {
-                        min: 1
+                        min: 1,
                     }
                 }
+            },
+            packageId: {
+                in: ['body'],
+                optional: true,
+                isString: true
             },
             Tags: {
                 in: ['body'],
@@ -324,7 +341,15 @@ route(router, {
     },
     async handler(req, res) {
         assert(req.user?.id, "Guest cannot create graphs", Unauthorized)
-        const model = await Model.create({ ...req.body, creatorId: req.user.id }, { user: req.user })
+        assert(req.body.subscriptionId || req.body.packageId, "Either subscriptionId or packageId must be provided", BadRequest)
+
+        const model = await Model.create({
+            ...req.body,
+            creatorId     : req.user.id,
+            subscriptionId: req.body.subscriptionId ? +req.body.subscriptionId : null,
+            packageId     : req.body.packageId || null
+        }, { user: req.user })
+        
         if (Array.isArray(req.body.Tags)) {
             await model.setTags(req.body.Tags.map((t: any) => t.id), { user: req.user })
             await model.reload({ include: [{ association: "Tags" }], user: req.user })
