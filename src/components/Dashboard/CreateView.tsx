@@ -22,7 +22,7 @@ export default function CreateView()
 
     const state: any = location.state
 
-    // Fetch the subscription by ID
+    // Fetch the subscription or package
     const { loading, error, result } = useBackend<[DataPackage | null | undefined, app.Subscription | null]>(
         useCallback(() => {
             return Promise.all([

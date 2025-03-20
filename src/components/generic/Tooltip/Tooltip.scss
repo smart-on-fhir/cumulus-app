@@ -25,13 +25,16 @@
         > .contents {
             position: relative;
             z-index: 2;
-            padding: 5px;
+            padding: 5px 10px;
             line-height: normal;
             white-space: pre-wrap;
             line-break: anywhere;
 
             img {
-                border-radius  : 4px;
+                border-radius: 4px;
+                margin: 0 -5px;
+                display: block;
+                max-width: calc(100% + 10px);
             }
         }
 

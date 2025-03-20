@@ -32,7 +32,8 @@ export default function ViewsBrowser({
     starOnly,
     minColWidth,
     header,
-    footer
+    footer,
+    pkgId
 }: {
     layout?: "grid" | "column" | "list",
     requestId?: string | number,
@@ -45,6 +46,7 @@ export default function ViewsBrowser({
     minColWidth?: string
     header?: ReactNode
     footer?: ReactNode
+    pkgId?: string
 }) {
 
     let { user } = useAuth();
@@ -79,6 +81,10 @@ export default function ViewsBrowser({
         query.set("drafts", "true")
     }
 
+    if (pkgId) {
+        query.set("pkg", pkgId)
+    }
+
     const url = requestId ?
         `/api/requests/${requestId}/views?${query.toString()}` :
         `/api/views?${query.toString()}`;
@@ -98,12 +104,8 @@ export default function ViewsBrowser({
 
     result = result || [];
 
-    if (!requestId && !result.length) {
-        return <p className="center">
-            No Graphs found. You can start by selecting one of the
-            existing <Link to="/requests" className="link">subscriptions</Link> and
-            then create new graph from it's data.
-        </p>
+    if (!requestId && !pkgId && !result.length) {
+        return <p className="center">No Graphs found.</p>
     }
 
     if (starOnly) {

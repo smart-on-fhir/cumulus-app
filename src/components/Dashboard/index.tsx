@@ -15,7 +15,7 @@ import Alert, { AlertError }                     from "../generic/Alert"
 import Loader                                    from "../generic/Loader"
 import Grid                                      from "../generic/Grid"
 import { app }                                   from "../../types"
-import { createOne, updateOne, request }         from "../../backend"
+import { createOne, updateOne, fetchChartData }  from "../../backend"
 import { useBackend, useCommand }                from "../../hooks"
 import Highcharts, { Chart }                     from "../../highcharts"
 import { useAuth }                               from "../../auth"
@@ -38,6 +38,7 @@ import aggregator, { DataPackage }               from "../../Aggregator"
 import {
     assert,
     defer,
+    humanizeColumnName,
     Json,
     requestPermission,
     strip
@@ -622,7 +623,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                 return alert("You don't have permission to create graphs")
             }
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
-            await createOne("views", { ...runtimeView, subscriptionId: requestId, screenShot, }).then(
+            await createOne("views", { ...runtimeView, subscriptionId: subscription ? subscription.id : undefined, packageId: dataPackage?.id, screenShot, }).then(
                 v => defer(() => navigate("/views/" + v.id)),
                 e => alert(e.message)
             );
@@ -689,31 +690,26 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             data2: null,
         }})
 
-        const base = process.env.REACT_APP_BACKEND_HOST || window.location.origin
-
-        const pathName = dataPackage ?
-            `/api/requests/pkg-api?pkg=${encodeURIComponent(dataPackage.id)}` :
-            `/api/requests/${subscription!.id}/api`
-
-        const fetchPrimaryData = async () => {
-            const url = new URL(pathName, base)
-            url.searchParams.set("column", viewColumnName)
-            if (stratifierName)
-                url.searchParams.set("stratifier", stratifierName)
-            for (const filter of filterParams)
-                url.searchParams.append("filter", filter)
-            return request(url.href, { label: "Char Primary Data" })
-        };
+        const fetchPrimaryData = async () => fetchChartData({
+            subscription,
+            dataPackage,
+            column    : viewColumnName,
+            stratifier: stratifierName,
+            filters   : filterParams,
+            label     : "Char Primary Data"
+        })
 
         const fetchSecondaryData = async () => {
             if (!secColumnName) return null
-            const url = new URL(pathName, base)
-            url.searchParams.set("column"    , viewColumnName)
-            url.searchParams.set("stratifier", secColumnName )
-            for (const filter of filterParams)
-                url.searchParams.append("filter", filter)
-            return request(url.href, { label: "Char Secondary Data" })
-        };
+            return fetchChartData({
+                subscription,
+                dataPackage,
+                column    : viewColumnName,
+                stratifier: secColumnName,
+                filters   : filterParams,
+                label     : "Char Secondary Data"
+            })
+        }
 
         return Promise.all([
             fetchPrimaryData(),
@@ -825,8 +821,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     const downloadJPG          = useCommand(new DownloadScreenshotAsJPG(runtimeView));
     const toggleFullscreen     = useCommand(new ToggleFullscreen());
     const printChart           = useCommand(new PrintChart());
-    const requestLineData      = useCommand(new RequestLineLevelData(view.id || 0, auth.user, navigate))
-    const openInAE             = useCommand(new OpenInAnalyticEnvironment(view.subscriptionId || 0, auth.user))
     const generateCaption      = useCommand(new GenerateCaption(state.chartOptions, state, c => dispatch({ type: "UPDATE", payload: { caption: c }})))
 
     // console.log(state.chartOptions)
@@ -1023,67 +1017,154 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                         <br/>
                         <CaptionEditor html={caption} onChange={caption => dispatch({ type: "UPDATE", payload: { caption }})}/>
                         <br/>
-                        <Grid cols="24em" gap="2em">
-                        
-                            { subscription && <div className="col">
-                                <b>{Terminology.subscription.nameSingular}</b>
-                                <hr className="small"/>
-                                <Link className="link mt-05 subscription-link" to={`/requests/${subscription.id}`}>
-                                    <span className="icon material-symbols-outlined color-brand-2">{Terminology.subscription.icon}</span> <span>{ subscription.name }</span>
-                                </Link>
-                            </div> }
-                        
-                            { subscription && <div className="col">
-                                <b>{Terminology.subscriptionGroup.nameSingular}</b>
-                                <hr className="small"/>
-                                { subscription.group ?
-                                    <Link className="link mt-05 ellipsis subscription-group-link" to={`/groups/${subscription.group.id}`} title={ subscription.group.description }>
-                                        <span className="icon material-symbols-outlined color-brand-2">{Terminology.subscriptionGroup.icon}</span> <span>{ subscription.group.name }</span>
-                                    </Link> :
-                                    <span className="color-muted">GENERAL</span> }
-                            </div> }
-
-                            { subscription && <div className="col">
-                                <b>{Terminology.studyArea.namePlural}</b>
-                                <hr className="small"/>
-                                <div className="mt-05 view-study-areas">
-                                { subscription.StudyAreas?.length ?
-                                    subscription.StudyAreas.map((p, i) => (
-                                        <div key={i} className="ellipsis">
-                                            <Link className="link study-area-link" to={`/study-areas/${p.id}`}>
-                                                <span className="icon material-symbols-outlined color-brand-2">{Terminology.studyArea.icon}</span> <span>{ p.name }</span>
-                                            </Link>
-                                        </div>
-                                    )) :
-                                    <span className="color-muted">None</span>
-                                }
-                                </div>
-                            </div> }
-
-                            { subscription && <div className="col">
-                                <b>Tags</b>
-                                <hr className="small"/>
-                                <div className="mt-05 view-tags">{ tags.length ? 
-                                    tags.map((t, i) => <Tag tag={t} key={i} />) :
-                                    <span className="color-muted">None</span>
-                                }</div>
-                            </div> }
-
-                            { dataPackage && "TODO: Show package here..." }
-                        </Grid>
+                        <MetaData subscription={subscription} dataPackage={dataPackage} tags={tags} />
                         <br/>
-                        
-                        <div className="row mb-1 mt-2 middle half-gap wrap">
-                            <div className="col col-5 mb-1 ml-2 mr-2 responsive bold">
-                                <CommandButton { ...openInAE } className="btn-blue"/>
-                            </div>
-                            <div className="col col-5 mb-1 ml-2 mr-2 responsive bold">
-                                <CommandButton { ...requestLineData } className="btn-blue"/>
-                            </div>
-                        </div>
+                        <ActionButtons id={view.id} subscription={subscription} />
                     </div>
                 </div>
             </div>
         </div>
     )
+}
+
+function ActionButtons({ subscription, id }: { id?: number, subscription?: app.Subscription }) {
+    const navigate        = useNavigate();
+    const auth            = useAuth();
+    const openInAE        = useCommand(new OpenInAnalyticEnvironment(subscription?.id || 0, auth.user))
+    const requestLineData = useCommand(new RequestLineLevelData(id || 0, auth.user, navigate))
+
+    if (!subscription) {
+        return null
+    }
+
+    return (
+        <div className="row mb-1 mt-2 middle half-gap wrap">
+            <div className="col col-5 mb-1 ml-2 mr-2 responsive bold">
+                <CommandButton { ...openInAE } className="btn-blue"/>
+            </div>
+            <div className="col col-5 mb-1 ml-2 mr-2 responsive bold">
+                <CommandButton { ...requestLineData } className="btn-blue"/>
+            </div>
+        </div>
+    )
+}
+
+function MetaData({ subscription, dataPackage, tags = [] }: { subscription?: app.Subscription, dataPackage?: DataPackage, tags?: Pick<app.Tag, "id" | "name" | "description">[] }) {
+    
+    if (subscription) {
+        return <div className="row wrap">
+            <div className="col col-5 responsive p-1">
+                <Grid cols="auto 1fr" gap="0.5rem">
+                    <div>
+                        <span className="icon material-symbols-outlined color-brand-2">{Terminology.subscription.icon}</span>
+                    </div>
+                    <div>
+                        <b>{Terminology.subscription.nameSingular}</b>
+                        <hr className="small mb-05"/>
+                        <Link className="link mt-05 subscription-link" to={`/requests/${subscription.id}`}>{ subscription.name }</Link>
+                    </div>
+                </Grid>
+            </div>
+
+            <div className="col col-5 responsive p-1">
+                <Grid cols="auto 1fr" gap="0.5rem">
+                    <div>
+                        <span className="icon material-symbols-outlined color-brand-2">{Terminology.subscriptionGroup.icon}</span>
+                    </div>
+                    <div>
+                        <b>{Terminology.subscriptionGroup.nameSingular}</b>
+                        <hr className="small mb-05"/>
+                        { subscription.group ?
+                            <Link className="link mt-05 ellipsis subscription-group-link" to={`/groups/${subscription.group.id}`} title={ subscription.group.description }>
+                                { subscription.group.name }
+                            </Link> :
+                            <span className="color-muted">GENERAL</span>
+                        }
+                    </div>
+                </Grid>
+            </div>
+
+            <div className="col col-5 responsive p-1">
+                <Grid cols="auto 1fr" gap="0.5rem">
+                    <div>
+                        <span className="icon material-symbols-outlined color-brand-2">{Terminology.studyArea.icon}</span>
+                    </div>
+                    <div>
+                        <b className="nowrap">{Terminology.studyArea.namePlural}</b>
+                        <hr className="small mb-05"/>
+                        <div className="view-study-areas">
+                            { subscription.StudyAreas?.length ?
+                                subscription.StudyAreas.map((p, i) => (
+                                    <div key={i} className="ellipsis">
+                                        <Link className="link study-area-link" to={`/study-areas/${p.id}`}>{ p.name }</Link>
+                                    </div>
+                                )) :
+                                <span className="color-muted">None</span>
+                            }
+                        </div>
+                    </div>
+                </Grid>
+            </div>
+
+            { subscription.dataURL && <div className="col col-5 responsive p-1">
+                <Grid cols="auto 1fr" gap="0.5rem">
+                    <div>
+                        <span className="icon material-symbols-outlined color-brand-2">{Terminology.dataPackage.icon}</span>
+                    </div>
+                    <div>
+                        <b>Data Package</b>
+                        <hr className="small mb-05"/>
+                        <Link className="link" to={`/packages/${subscription.dataURL}`}>{ humanizeColumnName(subscription.dataURL) }</Link>
+                    </div>
+                </Grid>
+            </div> }
+
+            <div className="col col-5 responsive p-1">
+                <Grid cols="auto 1fr" gap="0.5rem">
+                    <div>
+                        <span className="icon material-symbols-outlined color-brand-2">{Terminology.tag.icon}</span>
+                    </div>
+                    <div>
+                        <b>Tags</b>
+                        <hr className="small mb-05"/>
+                        <div className="view-tags">{ tags.length ? 
+                            tags.map((t, i) => <Tag tag={t} key={i} />) :
+                            <span className="color-muted">None</span>
+                        }</div>
+                    </div>
+                </Grid>
+            </div>
+        </div>
+    }
+
+    if (dataPackage) {
+        return <div className="row wrap">
+            <div className="col col-5 responsive p-1">
+                <Grid cols="auto 1fr" gap="0.5rem">
+                    <div>
+                        <span className="icon material-symbols-outlined color-brand-2">{Terminology.dataPackage.icon}</span>
+                    </div>
+                    <div>
+                        <b>Data Package</b>
+                        <hr className="small mb-05"/>
+                        <Link className="link" to={`/packages/${dataPackage.id}`}>{ humanizeColumnName(dataPackage.name) }</Link>
+                    </div>
+                </Grid>
+            </div>
+            <div className="col col-5 responsive p-1">
+                <Grid cols="auto 1fr" gap="0.5rem">
+                    <div>
+                        <span className="icon material-symbols-outlined color-brand-2">{Terminology.study.icon}</span>
+                    </div>
+                    <div>
+                        <b>Study</b>
+                        <hr className="small mb-05"/>
+                        <Link to={`/studies/${dataPackage.study}`} className="link">{ humanizeColumnName(dataPackage.study) }</Link>
+                    </div>
+                </Grid>
+            </div>
+        </div>
+    }
+
+    return null
 }
