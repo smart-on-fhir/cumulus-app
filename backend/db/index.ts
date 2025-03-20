@@ -75,7 +75,7 @@ async function applyMigrations(options: Config, dbConnection: Sequelize)
 
     const umzug = new Umzug({
         context: dbConnection.getQueryInterface(),
-        migrations: { glob: ["migrations/*", { cwd: __dirname }] },
+        migrations: { glob: ["migrations/*.{js,ts}", { cwd: __dirname }] },
         storage: new SequelizeStorage({ sequelize: dbConnection, tableName: "SequelizeMeta" }),
         logger: {
             debug: msg => logger.debug(msg.event + " " + msg.name, { ...msg }),
