@@ -341,7 +341,7 @@ function Thumbnail({ col, sub }: { col: app.SubscriptionDataColumn, sub: app.Sub
     }
 
     return (
-        <Link className="view-thumbnail template" to={ typeof sub.id === "number" ? `/requests/${sub.id}/create-view` : "" } style={typeof sub.id === "number" ? undefined: { cursor: "default" }} state={{
+        <Link className="view-thumbnail template" to={`/requests/${sub.id}/create-view`} state={{
             column: col.name,
             chartType,
             name: label,

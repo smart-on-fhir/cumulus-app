@@ -10,7 +10,7 @@ import Loader                     from "../generic/Loader"
 import SubscriptionForm           from "./form"
 import { app }                    from "../../types"
 import Terminology                from "../../Terminology"
-import { humanizeColumnName }     from "../../utils"
+import aggregator                 from "../../Aggregator"
 
 import "./form.scss";
 
@@ -35,24 +35,7 @@ export default function CreateSubscriptionForm()
         dataSourceType,
         dataURL,
         dataPackage,
-        metadata: dataPackage ? {
-            total: +dataPackage.total,
-            type : dataPackage.type || "cube",
-            cols : Object.keys(dataPackage.columns).map(name => {
-                let type = String(dataPackage.columns[name])
-                    .replace("year" , "date:YYYY")
-                    .replace("month", "date:YYYY-MM")
-                    .replace("week" , "date:YYYY-MM-DD")
-                    .replace("day"  , "date:YYYY-MM-DD") as app.supportedDataType;
-
-                return {
-                    name,
-                    label      : humanizeColumnName(name),
-                    description: humanizeColumnName(name),
-                    dataType   : type
-                }
-            })
-        } : null,
+        metadata: dataPackage ? aggregator.getPackageMetadata(dataPackage) : null,
         completed: dataPackage ? dataPackage.last_data_update : null
     })
     const [ savedRecord, setSavedRecord ] = useState<app.SubscriptionWithPackage|null>(null)

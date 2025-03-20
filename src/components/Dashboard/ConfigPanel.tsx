@@ -38,16 +38,13 @@ type SupportedChartType = keyof typeof SupportedChartTypes
 
 function SecondaryDataEditor({
     state,
-    subscription,
+    cols,
     onChange
 }: {
     state: ChartConfigPanelState
-    subscription: app.Subscription
+    cols: app.SubscriptionDataColumn[]
     onChange: (payload: { column?: string, type?: string }) => void
 }) {
-    
-    const { cols } = subscription.metadata || { cols: [] }
-
     return (
         <>
             <div className="pt-1">
@@ -150,7 +147,7 @@ interface ChartConfigPanelState {
 }
 
 export default function ConfigPanel({
-    subscription,
+    cols,
     state,
     onChange,
     onChartTypeChange,
@@ -158,7 +155,7 @@ export default function ConfigPanel({
     onRangeOptionsChange,
     onSecondaryDataOptionsChange
 } : {
-    subscription: app.Subscription
+    cols: app.SubscriptionDataColumn[]
     view?: Partial<app.View>
     state: ChartConfigPanelState
     viewType: "overview" | "data"
@@ -168,7 +165,6 @@ export default function ConfigPanel({
     onRangeOptionsChange: (ranges: app.RangeOptions) => void
     onSecondaryDataOptionsChange: (payload: { column?: string, type?: string }) => void
 }) {
-    const { cols } = subscription.metadata || { cols: [] }
 
     const { chartOptions, chartType } = state;
 
@@ -524,7 +520,7 @@ export default function ConfigPanel({
                                 </p>
                             </div> }
 
-                            <SecondaryDataEditor state={state} subscription={subscription} onChange={onSecondaryDataOptionsChange} />
+                            <SecondaryDataEditor state={state} cols={[ ...cols ]} onChange={onSecondaryDataOptionsChange} />
                         </> }
 
                         { isPie && <SliceEditor state={state} onChange={onChange} /> }

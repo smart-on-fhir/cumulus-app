@@ -34,6 +34,7 @@ import { ShareGraph }                            from "../../commands/Graphs/Sha
 import { ManagePermissions }                     from "../../commands/Graphs/Share/ManagePermissions"
 import { OpenInAnalyticEnvironment }             from "../../commands/Subscriptions/OpenInAnalyticEnvironment"
 import Terminology                               from "../../Terminology"
+import aggregator, { DataPackage }               from "../../Aggregator"
 import {
     assert,
     defer,
@@ -123,10 +124,6 @@ export function getViewReducer({
                 })
             }
             return currentState
-        }
-
-        if (action.type === "SET_DATA") {
-            return updateChartOptions({ ...state, data: action.payload })
         }
 
         if (action.type === "SET_CHART_OPTIONS") {
@@ -396,19 +393,25 @@ export interface DashboardProps {
      * The subscription that this view is (or is going to be)
      * assigned to.
      */
-    subscription: app.Subscription,
+    subscription?: app.Subscription
+
+    dataPackage?: DataPackage
     
     copy?: boolean
 }
 
-export default function Dashboard({ view, subscription, copy }: DashboardProps) {
+export default function Dashboard({ view, subscription, dataPackage, copy }: DashboardProps) {
     const navigate  = useNavigate();
     const auth      = useAuth();
     const isOwner   = auth.user && view.creatorId === auth.user.id;
     const canUpdate = isOwner || requestPermission({ user: auth.user, resource: "Graphs", resource_id: view.id, action: "update" })
     const canCreate = requestPermission({ user: auth.user, resource: "Graphs", action: "create" })
 
-    const { cols = [] } = subscription.metadata ?? {}
+    assert(subscription || dataPackage, "Either subscription or dataPackage prop must be provided");
+
+    const metadata = subscription ? subscription.metadata! : aggregator.getPackageMetadata(dataPackage!)
+
+    const cols = metadata.cols;
 
     const viewSettings = view.settings || {} as Partial<app.ViewSettings>
 
@@ -537,7 +540,7 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
     const stratifierName = viewGroupBy?.name
     const secColumnName  = column2?.name || ""
     const viewColumnName = viewColumn.name
-    const requestId      = subscription.id
+    const requestId      = subscription?.id || dataPackage?.id
 
     const runtimeView: Partial<app.View> = {
         id         : view.id,
@@ -619,7 +622,7 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                 return alert("You don't have permission to create graphs")
             }
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
-            await createOne("views", { ...runtimeView, subscriptionId: subscription.id, screenShot, }).then(
+            await createOne("views", { ...runtimeView, subscriptionId: requestId, screenShot, }).then(
                 v => defer(() => navigate("/views/" + v.id)),
                 e => alert(e.message)
             );
@@ -686,25 +689,30 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
             data2: null,
         }})
 
-        const base = `/api/requests/${requestId}/api?`
+        const base = process.env.REACT_APP_BACKEND_HOST || window.location.origin
+
+        const pathName = dataPackage ?
+            `/api/requests/pkg-api?pkg=${encodeURIComponent(dataPackage.id)}` :
+            `/api/requests/${subscription!.id}/api`
 
         const fetchPrimaryData = async () => {
-            const params = new URLSearchParams()
-            params.set("column", viewColumnName)
-            if (stratifierName) params.set("stratifier", stratifierName)
-            let url = base + params
-            if (filter) url += "&filter=" + filter
-            return request(url, { label: "Char Primary Data" })
+            const url = new URL(pathName, base)
+            url.searchParams.set("column", viewColumnName)
+            if (stratifierName)
+                url.searchParams.set("stratifier", stratifierName)
+            for (const filter of filterParams)
+                url.searchParams.append("filter", filter)
+            return request(url.href, { label: "Char Primary Data" })
         };
 
         const fetchSecondaryData = async () => {
             if (!secColumnName) return null
-            const params = new URLSearchParams()
-            params.set("column"    , viewColumnName)
-            params.set("stratifier", secColumnName )
-            let url = base + params
-            if (filter) url += "&filter=" + filter
-            return request(url, { label: "Char Secondary Data" })
+            const url = new URL(pathName, base)
+            url.searchParams.set("column"    , viewColumnName)
+            url.searchParams.set("stratifier", secColumnName )
+            for (const filter of filterParams)
+                url.searchParams.append("filter", filter)
+            return request(url.href, { label: "Char Secondary Data" })
         };
 
         return Promise.all([
@@ -835,7 +843,7 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                 <div className="col col-0">
                     <div onTransitionEnd={onTransitionEnd} className="dashboard-sidebar">
                         <ConfigPanel
-                            subscription={subscription}
+                            cols={cols}
                             viewType={viewType}
                             view={view}
                             onChartTypeChange={ (type: string) => dispatch({ type: "SET_CHART_TYPE", payload: type }) }
@@ -1017,15 +1025,15 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                         <br/>
                         <Grid cols="24em" gap="2em">
                         
-                            <div className="col">
+                            { subscription && <div className="col">
                                 <b>{Terminology.subscription.nameSingular}</b>
                                 <hr className="small"/>
                                 <Link className="link mt-05 subscription-link" to={`/requests/${subscription.id}`}>
                                     <span className="icon material-symbols-outlined color-brand-2">{Terminology.subscription.icon}</span> <span>{ subscription.name }</span>
                                 </Link>
-                            </div>
+                            </div> }
                         
-                            <div className="col">
+                            { subscription && <div className="col">
                                 <b>{Terminology.subscriptionGroup.nameSingular}</b>
                                 <hr className="small"/>
                                 { subscription.group ?
@@ -1033,9 +1041,9 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                                         <span className="icon material-symbols-outlined color-brand-2">{Terminology.subscriptionGroup.icon}</span> <span>{ subscription.group.name }</span>
                                     </Link> :
                                     <span className="color-muted">GENERAL</span> }
-                            </div>
+                            </div> }
 
-                            <div className="col">
+                            { subscription && <div className="col">
                                 <b>{Terminology.studyArea.namePlural}</b>
                                 <hr className="small"/>
                                 <div className="mt-05 view-study-areas">
@@ -1050,16 +1058,18 @@ export default function Dashboard({ view, subscription, copy }: DashboardProps) 
                                     <span className="color-muted">None</span>
                                 }
                                 </div>
-                            </div>
+                            </div> }
 
-                            <div className="col">
+                            { subscription && <div className="col">
                                 <b>Tags</b>
                                 <hr className="small"/>
                                 <div className="mt-05 view-tags">{ tags.length ? 
                                     tags.map((t, i) => <Tag tag={t} key={i} />) :
                                     <span className="color-muted">None</span>
                                 }</div>
-                            </div>
+                            </div> }
+
+                            { dataPackage && "TODO: Show package here..." }
                         </Grid>
                         <br/>
                         

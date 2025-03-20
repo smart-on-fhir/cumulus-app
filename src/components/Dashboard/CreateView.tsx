@@ -8,12 +8,13 @@ import Loader          from "../generic/Loader"
 import { app }         from "../../types"
 import { useAuth }     from "../../auth"
 import Terminology     from "../../Terminology"
+import aggregator, { DataPackage } from "../../Aggregator"
 
 
 export default function CreateView()
 {
     // The subscription ID from the URL params
-    const { id } = useParams();
+    const { id = "" } = useParams();
 
     const { user } = useAuth()
 
@@ -22,8 +23,13 @@ export default function CreateView()
     const state: any = location.state
 
     // Fetch the subscription by ID
-    const { loading, error, result } = useBackend<app.Subscription>(
-        useCallback(() => request("/api/requests/" + id + "?group=true&study_areas=true"), [id]),
+    const { loading, error, result } = useBackend<[DataPackage | null | undefined, app.Subscription | null]>(
+        useCallback(() => {
+            return Promise.all([
+                isNaN(+id) ? aggregator.getPackage(id) : Promise.resolve(null),
+                isNaN(+id) ? Promise.resolve(null) : request("/api/requests/" + id + "?group=true&study_areas=true"),
+            ])
+        }, [id]),
         true
     );
 
@@ -39,23 +45,23 @@ export default function CreateView()
 
     // If the subscription request was successful but did not return the expected data exit with an error message
     if (!result) {
-        return <AlertError>{`Fetching ${Terminology.subscription.nameSingular} with id "${id}" produced empty response`}</AlertError>
+        return <AlertError>{`Failed fetching data for id=${Terminology.subscription.nameSingular}`}</AlertError>
     }
 
     // Eventually render a Breadcrumbs and the dashboard
     return <Dashboard
         view={{
-            creatorId: user!.id,
-            isDraft: true,
-            name: state?.name || "",
+            creatorId  : user!.id,
+            isDraft    : true,
+            name       : state?.name        || "",
             description: state?.description || "",
             settings: {
-                column: state?.column || "",
+                column  : state?.column    || "",
                 viewType: state?.chartType || "spline",
-                filters: [],
-                groupBy: "",
-                sortBy: state?.sortBy || "x:asc",
-                limit: state?.limit || 0,
+                sortBy  : state?.sortBy    || "x:asc",
+                limit   : state?.limit     || 0,
+                filters : [],
+                groupBy : "",
                 chartOptions: {
                     title: {
                         text: state?.name || "",                        
@@ -71,6 +77,7 @@ export default function CreateView()
                 }
             }
         }}
-        subscription={result as app.Subscription}
+        subscription={result[1] ?? undefined}
+        dataPackage={result[0] ?? undefined}
     />
 }
