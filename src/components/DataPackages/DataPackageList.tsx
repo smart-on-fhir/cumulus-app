@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
-import Link                                 from "../Link"
 import { HelmetProvider, Helmet }           from "react-helmet-async"
+import { Link }                             from "react-router-dom"
 import Breadcrumbs                          from "../generic/Breadcrumbs"
 import PageHeader                           from "../generic/PageHeader"
 import Loader                               from "../generic/Loader"

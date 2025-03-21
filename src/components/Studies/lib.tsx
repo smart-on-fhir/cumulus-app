@@ -1,7 +1,7 @@
 import { ReactNode }                           from "react"
+import { Link }                                from "react-router-dom"
 import { DataPackage, StudyPeriod }            from "../../Aggregator"
 import { groupBy, humanizeColumnName, sortBy } from "../../utils"
-import Link                                    from "../Link"
 
 
 export interface Data {

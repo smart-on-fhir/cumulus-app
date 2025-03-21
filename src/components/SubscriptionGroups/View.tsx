@@ -1,4 +1,4 @@
-import Link               from "../Link"
+import { Link }           from "react-router-dom"
 import { createViewPage } from "../generic/EndpointViewWrapper"
 import Grid               from "../generic/Grid"
 import Markdown           from "../generic/Markdown"
@@ -6,7 +6,6 @@ import SubscriptionLink   from "../Subscriptions/SubscriptionLink"
 import { useAuth }        from "../../auth"
 import { app }            from "../../types"
 import Terminology        from "../../Terminology"
-import { useMatch } from "react-router"
 
 
 export default function SubscriptionGroupView({ id }: { id?: number })
@@ -17,8 +16,7 @@ export default function SubscriptionGroupView({ id }: { id?: number })
     const canDelete    = user?.permissions.includes("SubscriptionGroups.delete")
     const canCreateSub = user?.permissions.includes("Subscriptions.create")
 
-    const isInsideExplorer = useMatch("/explorer/*"); // Matches any route under /explorer
-    const baseUrl = isInsideExplorer ? "/explorer/groups" : "/groups"
+    const baseUrl = "/groups"
 
     return createViewPage<app.SubscriptionGroup>({
         basePath  : baseUrl,

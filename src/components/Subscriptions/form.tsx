@@ -1,5 +1,5 @@
 import React, { useCallback } from "react"
-import Link                   from "../Link"
+import { Link }               from "react-router-dom"
 import DataPackageViewer      from "./DataPackageViewer"
 import PackageVersionCheck    from "./PackageVersionCheck"
 import { ColumnEditor }       from "./ColumnEditor"

@@ -1,4 +1,4 @@
-import { Link, useMatch }       from "react-router-dom"
+import { Link }       from "react-router-dom"
 import StudyAreaCard  from "./Card"
 import createListPage from "../generic/EndpointListWrapper"
 import Grid           from "../generic/Grid"
@@ -12,8 +12,7 @@ export default function ListStudyAreas()
 {
     const { user } = useAuth();
     const canCreate = user?.permissions.includes("StudyAreas.create")
-    const isInsideExplorer = useMatch("/explorer/*"); // Matches any route under /explorer
-    const baseUrl = isInsideExplorer ? "/explorer/study-areas" : "/study-areas"
+    const baseUrl = "/study-areas"
 
     return createListPage<app.StudyArea[]>({
         namePlural: Terminology.studyArea.namePlural,
