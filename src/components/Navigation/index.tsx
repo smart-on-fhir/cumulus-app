@@ -22,9 +22,7 @@ async function loadStudies() {
     await aggregator.initialize()
     const studies = await aggregator.getStudies()
     return studies.map(s => ({
-        id    : `studies/${s.id}`,
         icon  : "experiment",
-        title : s.label,
         render: () => <NavLink to={`/studies/${s.id}`}>{s.label}</NavLink>,
         loader: async () => {
             const versions = await aggregator.getStudyVersions(s.id)
