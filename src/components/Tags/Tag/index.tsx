@@ -1,4 +1,4 @@
-import Link from "../../Link"
+import { Link } from "react-router-dom"
 import { app }  from "../../../types"
 import "./Tag.scss"
 

@@ -1,5 +1,5 @@
 import { useRef }                         from "react"
-import { useMatch, useNavigate, Link }    from "react-router-dom"
+import { useNavigate, Link }              from "react-router-dom"
 import { CustomSelection }                from "../generic/WithSelection"
 import { app }                            from "../../types"
 import { useAuth }                        from "../../auth"
@@ -34,8 +34,6 @@ export default function ViewThumbnail({
     const navigate          = useNavigate()
     const link              = useRef<HTMLAnchorElement>(null)
 
-    const isInsideExplorer  = useMatch("/explorer/*");
-
     const ToggleFavoriteCmd = new ToggleFavorite(view.id, "favoriteGraphs")
 
     
@@ -53,7 +51,7 @@ export default function ViewThumbnail({
     return (
         <Link
             ref={link}
-            to={ (isInsideExplorer ? "/explorer" : "") + (view.isDraft ? "/drafts/" + view.id : "/views/" + view.id) }
+            to={ view.isDraft ? "/drafts/" + view.id : "/views/" + view.id }
             className={ classList({
                 "view-thumbnail": true,
                 "selected": !!selection?.includes(view),

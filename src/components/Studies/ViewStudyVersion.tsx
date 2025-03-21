@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { useParams }                    from "react-router-dom"
+import { useParams, Link }              from "react-router-dom"
 import { HelmetProvider, Helmet }       from "react-helmet-async"
 import TransmissionView                 from "../Subscriptions/TransmissionView"
 import { AlertError }                   from "../generic/Alert"
@@ -9,7 +9,6 @@ import PageHeader                       from "../generic/PageHeader"
 import aggregator, { DataPackage }      from "../../Aggregator"
 import Terminology                      from "../../Terminology"
 import { humanizeColumnName }           from "../../utils"
-import Link                             from "../Link"
 
 
 interface Site {
@@ -136,7 +135,6 @@ export default function ViewStudyVersion() {
                                 <i className="material-symbols-outlined color-brand-2" style={{ fontSize: 18, verticalAlign: "middle" }}>
                                     { p.type === "flat" ? "table" : "deployed_code" }
                                 </i> <Link
-                                    // to={`/explorer?path=${encodeURIComponent(`/studies/${id}/${version}/${p.id}`)}`}
                                     to={`/packages/${p.id}`}
                                     // reloadDocument
                                     className="link"

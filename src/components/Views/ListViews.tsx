@@ -23,9 +23,8 @@ export default function ListViews()
     const [ starOnly, setStarOnly ] = useState<Boolean>(url.searchParams.get("star") === "1")
 
     const isDraft = useMatch("/drafts")
-    const isExplorerDraft = useMatch("/explorer/drafts")
 
-    const draftsMode = !!isDraft || !!isExplorerDraft
+    const draftsMode = !!isDraft
 
     const onSearch = (q: string) => {
         url.searchParams.set("q", q)

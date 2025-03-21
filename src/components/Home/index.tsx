@@ -1,6 +1,6 @@
 import { useEffect, useState }       from "react"
 import { HelmetProvider, Helmet }    from "react-helmet-async"
-import Link                          from "../Link"
+import { Link }                      from "react-router-dom"
 import { useAuth }                   from "../../auth"
 import { app }                       from "../../types"
 import Aggregator, { useAggregator } from "../../Aggregator"

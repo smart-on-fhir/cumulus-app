@@ -1,5 +1,5 @@
 import { useEffect, useReducer }         from "react"
-import Link                              from "../Link"
+import { Link }                          from "react-router-dom"
 import Loader                            from "../generic/Loader"
 import { buildChartOptions }             from "../Dashboard/Charts/lib"
 import { getDefaultChartOptions }        from "../Dashboard/Charts/DefaultChartOptions"
@@ -223,7 +223,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                             borderRadius: 10,
                             borderColor : "#FFF0",
                             style: {
-                                fontSize: "26px",
+                                fontSize: "25px",
                                 color: "#444",
                                 textOutline: "2px #FFF8",
                                 fontWeight: "300",

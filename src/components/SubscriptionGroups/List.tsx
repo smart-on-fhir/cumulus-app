@@ -1,5 +1,5 @@
 import { Fragment }   from "react"
-import { Link, useMatch }       from "react-router-dom"
+import { Link }       from "react-router-dom"
 import Alert          from "../generic/Alert"
 import createListPage from "../generic/EndpointListWrapper"
 import IfAllowed      from "../generic/IfAllowed"
@@ -24,8 +24,8 @@ export default function SubscriptionGroupList()
     const { user } = useAuth();
 
     const canCreate = user?.permissions.includes("SubscriptionGroups.create")
-    const isInsideExplorer = useMatch("/explorer/*"); // Matches any route under /explorer
-    const baseUrl = isInsideExplorer ? "/explorer/groups" : "/groups"
+
+    const baseUrl = "/groups"
 
     return createListPage<app.SubscriptionGroup[]>({
         nameSingular: Terminology.subscriptionGroup.nameSingular,

@@ -1,5 +1,5 @@
 import moment                               from "moment"
-import Link                                 from "../Link"
+import { Link }                             from "react-router-dom"
 import { useCallback, useEffect, useState } from "react"
 import { Helmet, HelmetProvider }           from "react-helmet-async"
 import PageHeader                           from "../generic/PageHeader"

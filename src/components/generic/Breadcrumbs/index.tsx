@@ -1,4 +1,4 @@
-import Link from "../../Link"
+import { Link } from "react-router-dom"
 import "./breadcrumbs.scss"
 
 export default function Breadcrumbs({ links }: { links: { name: string, href?: string }[] })

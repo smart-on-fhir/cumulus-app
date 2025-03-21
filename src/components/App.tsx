@@ -24,7 +24,6 @@ import Packages                         from "./DataPackages";
 import HealthCheck                      from "./HealthCheck";
 import { AggregatorProvider }           from "../Aggregator";
 import CatalogRouter                    from "./Catalog";
-import Explorer                         from "./Explorer";
 import { SearchResultsPage }            from "./Search";
 import "../styles/main.scss";
 
@@ -62,7 +61,6 @@ export default function App()
                                     <Route path="search"         element={ <RequireAuth><SearchResultsPage /></RequireAuth>} />
                                     <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
                                     <Route path="catalog/*"      element={ <RequireAuth><CatalogRouter /></RequireAuth>} />
-                                    <Route path="explorer/*"     element={ <RequireAuth><Explorer /></RequireAuth>} />
                                     <Route path="studies/*"      element={ <RequireAuth><Studies /></RequireAuth>} />
                                     <Route path="packages/*"     element={ <RequireAuth><Packages /></RequireAuth>} />
                                     <Route path="*"              element="Page Not Found" />
