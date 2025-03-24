@@ -110,7 +110,7 @@ export default function ViewStudyVersion() {
                 { name: "Home"    , href: "/" },
                 { name: Terminology.study.namePlural, href: "/studies" },
                 { name: humanizeColumnName(id!), href: "/studies/" + id },
-                { name: "Version " + version },
+                { name: "Version " + version, href: "/studies/" + id + "/" + version },
             ]} />
             <PageHeader
                 title={ <>{ humanizeColumnName(id!) } <span className="color-muted">/ {version}</span></> }

@@ -74,10 +74,10 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
                     <title>{Terminology.subscription.nameSingular}: {model.name}</title>
                 </Helmet>
             </HelmetProvider>
-            <Breadcrumbs links={[
+            <Breadcrumbs historic links={[
                 { name: "Home", href: "/" },
                 { name: Terminology.subscription.namePlural, href: "/requests" },
-                { name: model.name }
+                { name: model.name, href: "/requests/" + model.id }
             ]}/>
             <header className="ml-3">
                 <h2>
