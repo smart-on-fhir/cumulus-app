@@ -63,7 +63,7 @@ export default function ViewStudy({ studyId }: { studyId?: string }) {
             <Breadcrumbs links={[
                 { name: "Home"    , href: "/" },
                 { name: Terminology.study.namePlural, href: "/studies" },
-                { name: humanizeColumnName(study.study) },
+                { name: humanizeColumnName(study.study), href: "/studies/" + study.study },
             ]} />
             <PageHeader
                 title={humanizeColumnName(study.study)}

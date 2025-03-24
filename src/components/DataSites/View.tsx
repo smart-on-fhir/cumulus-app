@@ -87,7 +87,7 @@ export default function ViewSite({ site }: { site?: Site })
             <Breadcrumbs links={[
                 { name: "Home"    , href: "/" },
                 { name: Terminology.site.namePlural, href: "/sites" },
-                { name: site.name }
+                { name: site.name, href: "/sites/" + site.id }
             ]} />
             <PageHeader
                 title={ site.name }

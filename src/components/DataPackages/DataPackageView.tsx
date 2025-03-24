@@ -77,10 +77,10 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                     <title>{humanizeColumnName(pkg.name)}</title>
                 </Helmet>
             </HelmetProvider>
-            <Breadcrumbs links={[
+            <Breadcrumbs historic links={[
                 { name: "Home"    , href: "/" },
                 { name: Terminology.dataPackage.namePlural, href: "/packages" },
-                { name: humanizeColumnName(pkg.name) },
+                { name: humanizeColumnName(pkg.name), href: "/packages/" + pkg.id },
             ]} />
             <PageHeader
                 title={ <>{ humanizeColumnName(pkg.name) }<span className="color-muted"> / { pkg.version }</span></> }

@@ -4,7 +4,7 @@ import Breadcrumbs from "../generic/Breadcrumbs"
 
 export function GraphBreadcrumbs({ graph }: { graph: Partial<app.View> }) {
     return (
-        <Breadcrumbs links={[
+        <Breadcrumbs historic links={[
             { name: "Home"  , href: "/" },
             graph.isDraft ?
                 { name: "Draft Graphs", href: "/drafts" } :

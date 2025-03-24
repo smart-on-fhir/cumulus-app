@@ -320,7 +320,9 @@ export function RequestDataForm({
                 </Helmet>
             </HelmetProvider>
             <Breadcrumbs links={[
-                { name: view!.name, href: `/views/${view!.id}` },
+                { name: "Home"  , href: "/" },
+                view.isDraft ? { name: "Draft Graphs", href: "/drafts" } : { name: "Graphs", href: "/views"  },
+                { name: view!.name, href: (view.isDraft ? "/drafts" : "/views") + `/${view!.id}` },
                 { name: "Request Line-level Data" }
             ]}/>
             <h1>Request Line-level Data</h1>

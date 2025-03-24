@@ -91,7 +91,7 @@ export function createViewPage<T extends { createdAt: string, updatedAt: string,
                             <Breadcrumbs links={[
                                 { name: "Home", href: "/" },
                                 { name: namePlural, href: basePath },
-                                { name }
+                                { name, href: basePath + "/" + data.id }
                             ]} />
                             <div className="row gap mt-2">
                                 { icon && <div className="col col-0 top">
