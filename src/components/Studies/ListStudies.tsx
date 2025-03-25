@@ -46,7 +46,7 @@ export default function ListStudies() {
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home"    , href: "/" },
-                { name: Terminology.study.namePlural }
+                { name: Terminology.study.namePlural, href: "/studies" }
             ]} />
             <div className="row">
                 <div className="col">

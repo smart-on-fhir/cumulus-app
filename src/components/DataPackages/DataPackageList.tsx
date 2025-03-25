@@ -37,7 +37,7 @@ export default function DataPackageList() {
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home"    , href: "/" },
-                { name: Terminology.dataPackage.namePlural }
+                { name: Terminology.dataPackage.namePlural, href: "/packages" }
             ]} />
             <PageHeader
             title={Terminology.dataPackage.namePlural}

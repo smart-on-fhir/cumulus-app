@@ -56,7 +56,7 @@ export default function ListSites()
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home"    , href: "/" },
-                { name: Terminology.site.namePlural }
+                { name: Terminology.site.namePlural, href: "/sites" }
             ]} />
             <PageHeader
                 title={Terminology.site.namePlural}
