@@ -71,7 +71,7 @@ export default function SubscriptionsListPage()
             </HelmetProvider>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
-                { name: Terminology.subscription.namePlural }
+                { name: Terminology.subscription.namePlural, href: "/requests" }
             ]} />
             <header className="requests-header">
                 <div className="row wrap mt-2">
