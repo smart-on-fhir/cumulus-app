@@ -1,18 +1,15 @@
-@use "../../../styles/variables.scss";
-
-
 .select-component {
     position   : relative;
     user-select: none;
     padding    : 0.4em 22px 0.4em 0.6em !important;
-    min-height : variables.$font-size * variables.$line-height + variables.$font-size * 0.8 + 2;
+    min-height : calc(var(--font-size) * var(--line-height) + var(--font-size) * 0.8 + 2);
     text-align : left;
     display    : inline-block;
 
     .select-component-value {
         overflow   : hidden;
         display    : flex;
-        max-height : variables.$font-size * variables.$line-height;
+        max-height : calc(var(--font-size) * var(--line-height));
         flex       : 1 1 0;
         align-items: baseline;
 

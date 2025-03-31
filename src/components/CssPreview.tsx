@@ -57,8 +57,8 @@ export default function CssPreview() {
             <div>
                 <b>links</b>
                 <hr/>
-                <a href="#">This is A link</a><br/>
-                <a href="#" className="link">This is A.link link</a><br/>
+                <a href="/">This is A link</a><br/>
+                <a href="/" className="link">This is A.link link</a><br/>
                 <b className="link">This is B.link</b>
             </div>
 

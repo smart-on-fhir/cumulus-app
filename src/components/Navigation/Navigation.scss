@@ -125,8 +125,8 @@
                     opacity      : 0.6;
                     
                     &:hover {
-                        background: var(--color-highlight);
-                        box-shadow: 0 0 0 1px rgb(from var(--color-blue-dark) r g b / 0.2);
+                       background: var(--color-window-bg);
+                        box-shadow: 0 0 0 1px rgb(from var(--color-blue-dark) r g b / 0.1);
                         opacity   : 1;
                     }
                 }

@@ -1,0 +1,3 @@
+@function contrastForColor($color, $alpha: 1.0) {
+    @return lch(from $color calc(150 - round(l, 150)) 0 h / $alpha);
+}
