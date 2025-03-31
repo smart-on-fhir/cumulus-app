@@ -175,7 +175,7 @@ export function stripValue<T=Record<string, any> | any[]>(o: T, needle: any): T 
                 )
             }
         }
-        return out as T
+        return out as unknown as T
     } else {
         let out = {} as any
         for (let key in o) {
@@ -186,7 +186,7 @@ export function stripValue<T=Record<string, any> | any[]>(o: T, needle: any): T 
                     value
             }
         }
-        return out as T
+        return out as unknown as T
     }
 }
 

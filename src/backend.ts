@@ -42,7 +42,7 @@ export async function request<T=any>(path: string, options: RequestOptions = {})
         }
 
         if (options.includeResponse) {
-            return { body, response: res } as T;
+            return { body, response: res } as unknown as T;
         }
 
         if (!res.ok) {
@@ -51,7 +51,7 @@ export async function request<T=any>(path: string, options: RequestOptions = {})
             // throw new Error(body || res.statusText)
         }
 
-        return body as T;
+        return body as unknown as T;
     })
     .catch(ex => {
         if (abortController.signal.aborted) {

@@ -554,8 +554,7 @@ export default function ConfigPanel({
                                             }
                                         ]}
                                         value={ state.sortBy }
-                                        onChange={ sortBy => onChange({ ...state, sortBy })}>
-                                    </Select>
+                                        onChange={ sortBy => onChange({ ...state, sortBy })} />
                                 </div>
                                 <div className="col">
                                     <label>Offset</label>
