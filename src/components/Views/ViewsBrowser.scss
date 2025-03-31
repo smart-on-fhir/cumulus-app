@@ -1,5 +1,3 @@
-@use "../../styles/variables.scss";
-
 #main > .view-browser {
     max-height: calc(100vh - 310px);
 }
@@ -42,8 +40,8 @@
 }
 
 .view-browser {
-    margin-top: variables.$gap;
-    margin-bottom: variables.$gap;
+    margin-top: var(--gap);
+    margin-bottom: var(--gap);
     display: flex;
     flex-wrap: wrap;
     

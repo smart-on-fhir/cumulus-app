@@ -1,44 +1,32 @@
-@use "sass:math";
-@import "./variables.scss";
+@use "./functions.scss";
 
-@function contrast($color, $threshold: 50%, $light: #FFF, $dark: #000) {
-    @if (lightness($color) < $threshold) {
-        @return $light;
-    }
-    @else {
-        @return $dark;
-    }
-}
 
 @mixin button($color) {
     $bg: $color;
-    $fg: contrastForColor($color);
-    $sh: contrastForColor($fg);
+    $fg: functions.contrastForColor($color);
+    $sh: functions.contrastForColor($fg);
     
 
     background-color: $bg;
     color           : $fg;
     padding         : 0.4em 0.8em;
-
-    border         : 1px solid transparent;//rgb(from $fg r g b / 0.2);
-    line-height    : inherit;
-    font-size      : 1rem;
-    font-weight    : inherit;
-    // color          : var(--color-window-bg); // $color;
-    border-radius  : $border-radius;
-    text-align     : center;
-    text-decoration: none !important;
-    cursor         : pointer;
-    display        : inline-flex;
-    align-items    : center;
-    justify-content: center;
-    outline        : 0;
-    white-space    : pre;
-    user-select    : none;
-    min-width      : 2em;
-    margin         : 0;
-    vertical-align : middle;
-    // text-shadow: 0 -1px 1px contrastForColor($fg, 0.5);
+    border          : 1px solid transparent;
+    line-height     : inherit;
+    font-size       : 1rem;
+    font-weight     : inherit;
+    border-radius   : var(--border-radius);
+    text-align      : center;
+    text-decoration : none !important;
+    cursor          : pointer;
+    display         : inline-flex;
+    align-items     : center;
+    justify-content : center;
+    outline         : 0;
+    white-space     : pre;
+    user-select     : none;
+    min-width       : 2em;
+    margin          : 0;
+    vertical-align  : middle;
 
     * {
         line-height    : inherit;
@@ -46,10 +34,9 @@
     }
     
     &:hover {
-        // $bg: color-mix(in srgb, $color 80%, var(--color-window-fg));
         $bg: hsl(from $color h calc(s * 1.5) l);
         background-color: $bg;
-        color: contrastForColor(lch(from $color l calc(c * 1.01) h));
+        color: functions.contrastForColor(lch(from $color l calc(c * 1.01) h));
     }
 
     &:active {
@@ -58,22 +45,16 @@
 }
 
 @mixin file-selector-button {
-    // line-height       : 1;
     -webkit-appearance: none;
     display           : inline-block;
     border            : none;
-    border-radius     : $border-radius - 1;
-    // padding           : round($font-size * 0.5);
-    // pointer-events    : none;
+    border-radius     : calc(var(--border-radius) - 1);
     background        : var(--color-grey);
     color             : var(--color-window-fg);
     padding           : 0.2rem 0.5rem;
-    // margin: 0;
     margin            : -0.2rem 0.5em -0.2rem -0.5rem;
-    // vertical-align    : middle;
     vertical-align    : top;
-    line-height       : $line-height;
-    // position: absolute;
+    line-height       : var(--line-height);
 }
 
 @mixin disabled-file-selector-button {
@@ -88,16 +69,15 @@
 @mixin form-control() {
     background   : var(--color-window-bg-hard);
     border       : 1px solid var(--color-grey);
-    border-radius: $border-radius;
+    border-radius: var(--border-radius);
     padding      : 0.4em 0.8em;
     outline      : none;
     font         : inherit;
     width        : 100%;
-    line-height  : $line-height;
+    line-height  : var(--line-height);
     color        : inherit;
-    max-height   : (1rem * ($line-height + 0.8)) + 2;
+    max-height   : calc((1rem * (var(--line-height) + 0.8)) + 2);
     margin: 0;
-    // height   : ($font-size * $line-height) + round($font-size * 0.8);
   
     &[readonly], &[aria-readonly] {
         color: rgb(from var(--color-window-fg-hard) r g b / 0.5);
@@ -276,7 +256,7 @@ input[type="color"] {
     text-shadow : 0 1px 0 #FFF;
 }
 fieldset:disabled * {
-    color       : #888;
+    color: #888;
 }
 ::placeholder,
 ::-webkit-input-placeholder {
@@ -404,23 +384,23 @@ input[type="radio"] {
 
 .toolbar {
     background   : var(--color-grey);
-    border-radius: $border-radius + 1px;
+    border-radius: calc(var(--border-radius) + 1px);
     white-space  : nowrap;
     margin       : -1px;
     display      : flex;
     color        : var(--color-window-fg-soft);
 
     .menu-button {
-        display      : flex;
-        align-items  : center;
-        flex         : 1 1 0;
+        display    : flex;
+        align-items: center;
+        flex       : 1 1 0;
 
         .menu-button-btn {
-            border       : 0;
-            margin       : -1px -1px -1px -4px;
-            display      : flex;
-            align-self: stretch;
-            align-items: center;
+            border         : 0;
+            margin         : -1px -1px -1px -4px;
+            display        : flex;
+            align-self     : stretch;
+            align-items    : center;
             justify-content: center;
         }
 
@@ -432,14 +412,14 @@ input[type="radio"] {
         }
 
         &:first-child .menu-button-btn {
-            border-top-left-radius: $border-radius;
-            border-bottom-left-radius: $border-radius;
+            border-top-left-radius: var(--border-radius);
+            border-bottom-left-radius: var(--border-radius);
             margin-left: 1px;
         }
 
         &:last-child .menu-button-btn {
-            border-top-right-radius: $border-radius;
-            border-bottom-right-radius: $border-radius;
+            border-top-right-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
         }
     }
 
@@ -471,14 +451,14 @@ input[type="radio"] {
         }
 
         &:first-child {
-            border-top-left-radius: $border-radius;
-            border-bottom-left-radius: $border-radius;
+            border-top-left-radius: var(--border-radius);
+            border-bottom-left-radius: var(--border-radius);
             margin-left: 1px;
         }
 
         &:last-child {
-            border-top-right-radius: $border-radius;
-            border-bottom-right-radius: $border-radius;
+            border-top-right-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
         }
 
         &.disabled, &[disabled] {
@@ -492,21 +472,21 @@ input[type="radio"] {
     > .btn-blue {
         &.active:not(:disabled, .disabled) {
             background: var(--color-blue);
-            color: contrastForColor(var(--color-blue));
+            color: functions.contrastForColor(var(--color-blue));
             box-shadow: 0 0 0 1px var(--color-blue-dark);
         }
     }
     > .btn-green {
         &.active:not(:disabled, .disabled) {
             background: var(--color-green);
-            color: contrastForColor(var(--color-green));
+            color: functions.contrastForColor(var(--color-green));
             box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-window-fg-hard), var(--color-green) 65%);
         }
     }
     > .btn-brand-2 {
         &.active:not(:disabled, .disabled) {
             background: var(--color-brand-2);
-            color: contrastForColor(var(--color-brand-2));
+            color: functions.contrastForColor(var(--color-brand-2));
             box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-window-fg-hard), var(--color-brand-2) 75%);
         }
     }
@@ -550,7 +530,7 @@ label {
         border-color : transparent;
         border-style : solid;
         border-width : 1px 1px 0 1px;
-        border-radius: $border-radius $border-radius 0 0;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
         padding: 0.2em 1em;
         margin: 0 0 -1px 4px;
         background: transparent;
@@ -581,7 +561,7 @@ label {
 
         .tab {
             border-width : 0 1px 1px 1px;
-            border-radius: 0 0 $border-radius $border-radius;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
             padding: 0.3em 1em 0.2em 1em;
         }
     }
@@ -600,29 +580,29 @@ fieldset {
 }
 
 
-// Sliders - based on https://github.com/darlanrod/input-range-scss
+// Sliders ---------------------------------------------------------------------
 $track-color: #e2e2e2 !default;
 
-$thumb-radius: 10px !default;
-$thumb-height: 20px !default;
-$thumb-width : 20px !default;
+$thumb-radius     : 10px !default;
+$thumb-height     : 20px !default;
+$thumb-width      : 20px !default;
 $thumb-shadow-size: 1px !default;
 $thumb-shadow-blur: 4px !default;
-$thumb-shadow-color: rgba(0, 0, 0, .2) !default;
+$thumb-margin-top : -8px !default;
+// $thumb-shadow-color: rgba(0, 0, 0, .2) !default;
 $thumb-border-width: 1px !default;
 
 $track-width       : 100% !default;
 $track-height      : 6px !default;
-$track-shadow-size : 0px !default;
-$track-shadow-blur : 0px !default;
-$track-shadow-color: rgba(0, 0, 0, .2) !default;
+// $track-shadow-size : 0px !default;
+// $track-shadow-blur : 0px !default;
+// $track-shadow-color: rgba(0, 0, 0, .2) !default;
 $track-border-width: 1px !default;
 $track-border-color: rgb(from var(--color-window-fg-hard) r g b / 0.1) !default;
+$track-radius      : 5px !default;
+$contrast          : 15% !default;
 
-$track-radius: 5px !default;
-$contrast: 15% !default;
-
-$ie-bottom-track-color: darken($track-color, $contrast) !default;
+$ie-bottom-track-color: hsl(from $track-color h s calc(i - $contrast)) !default;
 
 
 @mixin track {
@@ -647,7 +627,7 @@ $ie-bottom-track-color: darken($track-color, $contrast) !default;
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
-  margin: math.div($thumb-height, 2) 0;
+  margin: calc($thumb-height / 2) 0;
   width: $track-width;
   height: $track-height;
 
@@ -665,7 +645,7 @@ $ie-bottom-track-color: darken($track-color, $contrast) !default;
   &::-webkit-slider-thumb {
     @include thumb;
     -webkit-appearance: none;
-    margin-top: math.div(-$track-border-width * 2 + $track-height, 2) - math.div($thumb-height, 2);
+    margin-top: $thumb-margin-top;
   }
 
   &::-moz-range-track {
@@ -673,7 +653,7 @@ $ie-bottom-track-color: darken($track-color, $contrast) !default;
     background: rgb(from var(--color-grey) r g b / 0.5);
     border: $track-border-width solid $track-border-color;
     border-radius: $track-radius;
-    height: math.div($track-height, 2);
+    height: calc($track-height / 2);
   }
 
   &::-moz-range-thumb {
@@ -684,25 +664,25 @@ $ie-bottom-track-color: darken($track-color, $contrast) !default;
     @include track;
     background: transparent;
     border-color: transparent;
-    border-width: math.div($thumb-height, 2) 0;
+    border-width: calc($thumb-height / 2) 0;
     color: transparent;
   }
 
   &::-ms-fill-lower {
     background: $ie-bottom-track-color;
     border: $track-border-width solid $track-border-color;
-    border-radius: ($track-radius * 2);
+    border-radius: calc($track-radius * 2);
   }
 
   &::-ms-fill-upper {
     background: var(--color-window-bg-soft);
     border: $track-border-width solid $track-border-color;
-    border-radius: ($track-radius * 2);
+    border-radius: calc($track-radius * 2);
   }
 
   &::-ms-thumb {
     @include thumb;
-    margin-top: math.div($track-height, 4);
+    margin-top: calc($track-height / 4);
   }
 
   &:focus, &:focus-within, &:focus-visible {
@@ -721,7 +701,7 @@ $ie-bottom-track-color: darken($track-color, $contrast) !default;
     }
 
     &::-ms-fill-upper {
-      background: lighten($track-color, $contrast);
+      background: hsl(from $track-color h s calc(i + $contrast));
     }
   }
 
