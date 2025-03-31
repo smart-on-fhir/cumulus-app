@@ -1,4 +1,4 @@
-@import "../../styles/variables.scss";
+@use "../../styles/variables.scss";
 
 #main > .view-browser {
     max-height: calc(100vh - 310px);
@@ -27,7 +27,7 @@
     &:not(.collapsed) {
 
         .collapse-header {
-            color: $color-brand-2;
+            color: var(--color-brand-2);
         }
     }
 }
@@ -36,14 +36,14 @@
     position: sticky;
     top: 4rem;
     padding-top: 1rem;
-    margin-top: -1rem;
-    background-color: $color-grey-light;
+    margin-top: -2rem;
+    background-color: var(--color-window-bg);
     z-index: 2;
 }
 
 .view-browser {
-    margin-top: $gap;
-    margin-bottom: $gap;
+    margin-top: variables.$gap;
+    margin-bottom: variables.$gap;
     display: flex;
     flex-wrap: wrap;
     
@@ -53,6 +53,7 @@
             border-radius: 10px;
             background-color: #FFF;
             outline: 0 none;
+            color: #333;
 
             .view-thumbnail-image {
                 border-color: transparent;
@@ -61,30 +62,33 @@
         }
 
         &.focus {
-            box-shadow: 0 0 2px 1px $color-blue-dark inset,
-                        0 0 1px 3px #CF0A inset,
-                        0 0 0px 4px $color-blue-dark inset;
+            box-shadow: 0 0 2px 1px var(--color-green) inset,
+                        0 0 1px 3px var(--color-window-bg-soft) inset,
+                        0 0 0px 4px var(--color-green) inset;
         }
 
         &.selected, &.selected.focus {
-            box-shadow: 0 0 2px 1px $color-blue-dark inset,
-                        0 0 1px 3px #FFF8 inset,
-                        0 0 0px 4px $color-blue-dark inset;
+            box-shadow: 0 0 2px 1px var(--color-blue-dark) inset,
+                        0 0 1px 3px var(--color-window-bg) inset,
+                        0 0 0px 4px var(--color-blue-dark) inset;
         }
 
         &:focus-visible {
-            box-shadow: 0 0 2px 1px $color-blue-dark inset,
-                        0 0 1px 3px #CF0A inset,
-                        0 0 0px 4px $color-blue-dark inset;
+            box-shadow: 0 0 2px 1px var(--color-green) inset,
+                        0 0 1px 3px var(--color-window-bg-soft) inset,
+                        0 0 0px 4px var(--color-green) inset;
         }
     }
 
     .view-thumbnail-image {
-        border: 2px solid $color-grey;
+        border: 2px solid var(--color-grey);
         border-radius: 10px;
         background: #FFF;
+        background: var(--color-window-bg-hard);
         overflow: hidden;
-        padding: 4px;
+        padding: 2px;
+        aspect-ratio: 5/3;
+        box-sizing: content-box;
 
         img {
             display: block;
@@ -93,6 +97,7 @@
             object-fit: contain;
             object-position: center;
             width: 100%;
+            border-radius: 6px;
         }
     }
 
@@ -135,15 +140,12 @@
             content: "";
             width: 8px;
             height: 8px;
-            background: $color-grey;
+            background: var(--color-grey);
             border-radius: 50%;
             line-height: 0;
             position: absolute;
             top: 6px;
             right: 6px;
-        }
-        &:hover::after {
-            background: #BBB;
         }
     }
 
@@ -155,7 +157,6 @@
     .view-thumbnail-title {
         text-align: center;
         margin: 5px 0 9px;
-        text-shadow: 0px 0px 0.5px rgba(0, 0, 0, 0.5);
         word-break: break-all;
         word-break: break-word;
         padding: 0 5px;
@@ -169,7 +170,7 @@
 
     a:hover {
         .view-thumbnail-image {
-            border-color: #BBB;
+            border-color: var(--color-soft);
         }
     }
 }
@@ -198,16 +199,20 @@
         align-items: center;
         flex: 1 1 30em;
         overflow: hidden;
+        border-radius: 6px;
     }
     .view-thumbnail-image {
         flex   : 0 0 8em;
-        height : 5.1em;
         display: block;
         max-width: none;
         border-radius: 6px;
         align-self: center;
         align-items: center;
         align-content: center;
+
+        img {
+            border-radius: 3px !important;
+        }
     }
 
     .view-thumbnail-title {

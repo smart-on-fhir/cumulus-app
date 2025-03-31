@@ -1,80 +1,61 @@
-@import "../../../styles/variables.scss";
-
 .collapse {
-
-    $color-2: mix($color-blue, #000, 50%);
-
     display: block;
     
     .collapse-header {
-        // box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.075) inset;
-        // border-radius: 3px;
-        margin: 0;
-        font-weight: bold;
-        color: $color-2;
-        cursor: pointer;
-        padding: 0.2em 0;
-        text-shadow: 0 1px 0 #FFF8;
-        user-select: none;
-        // background: fade-out($color: mix($color-blue, #FFF, 50%), $amount: 0.5);
-        border-bottom: 1px dashed fade-out(#000, 0.7);
-        box-shadow: 0 1px 0 #FFF;
-        // border-bottom: 1px solid fade-out(#000, 0.85);
-        // box-shadow: 0 1px 0 fade-out(#000, 0.9);
-        text-indent: 0;
-        
+        margin       : 0;
+        font-weight  : bold;
+        cursor       : pointer;
+        padding      : 0.2em 0;
+        user-select  : none;
+        border-bottom: 1px dashed rgb(from var(--color-window-fg) r g b / 0.2);
+        text-indent  : 0;
         max-width    : 100%;
         overflow     : hidden;
         text-overflow: ellipsis;
         white-space  : nowrap;
-
-        display    : grid;
-        grid       : auto-flow / auto auto 1fr;
-        align-items: center;
-        gap: 4px;
+        display      : grid;
+        grid         : auto-flow / auto auto 1fr;
+        align-items  : center;
+        gap          : 4px;
 
         > .fa-solid {
-            width: 16px;
-            font-size: 16px;
+            width     : 16px;
+            font-size : 16px;
             text-align: center;
-            color: fade-out(#000, 0.65);
+            color     : rgb(from var(--color-window-fg) r g b / 0.5);
         }
     }
 
     &.selected .collapse-header, .collapse-header:focus-visible {
-        box-shadow: 0 0 0 1px lighten($color: $color-blue, $amount: 15%) inset !important;
-        background-color: lighten($color: $color-blue, $amount: 36%);
-        outline: none;
-        border-radius: 4px;
-        border-color: transparent !important;
-        border-bottom-color: #FFF8 !important;
+        background-color: var(--color-highlight);
+        outline         : 1px solid rgb(from var(--color-blue-dark) r g b / 50%) !important;
+        outline-offset  : -2px;
+        border-radius   : 4px;
+        border-color    : transparent !important;
     }
 
     .collapse-body {
-        opacity: 1;
-        overflow: visible;
-        transform: none;
-        transform-origin: 50% 0;
+        opacity   : 1;
+        overflow  : visible;
+        transform : none;
         transition: all .3s cubic-bezier(0.215, 0.610, 0.355, 1);
         min-height: 0 !important;
-        height: auto;
+        height    : auto;
         visibility: visible;
+        transform-origin: 50% 0;
 
         &.animating {
-            overflow: hidden !important;
+            overflow  : hidden !important;
             visibility: visible !important;
         }
     }
 
     &.collapsed {
         .collapse-header {
-
-            color: fade-out(#000, 0.4);
-            // background: fade-out($color: mix($color-blue, #FFF, 30%), $amount: 0.5);
+            color: var(--color-window-fg);
 
             &:hover {
-                color: $color-brand-2;
-            //     background: fade-out($color: mix($color-blue, #FFF, 45%), $amount: 0.5);
+                color: var(--color-brand-2);
             }
         }
 
@@ -88,7 +69,7 @@
     }
 
     .collapse-body .collapse-header {
-        color: $color-blue !important;
+        color: var(--color-blue) !important;
         border-bottom: none;
         box-shadow: none;
         font-size: 16px;

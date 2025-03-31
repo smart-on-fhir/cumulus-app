@@ -2,7 +2,6 @@ import { createCreatePage } from "../generic/EndpointCreateWrapper"
 import Form                 from "./Form"
 import { app }              from "../../types"
 import Terminology          from "../../Terminology"
-import "./SubscriptionGroups.scss"
 
 
 export default function SubscriptionGroupCreate()

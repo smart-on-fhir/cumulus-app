@@ -141,7 +141,7 @@ function Subscription({
                     </span>
                     <span className="icon icon-2 material-symbols-rounded">database</span>
                     {subscription.name}
-                    <b className="badge">{subscription.Views?.length || 0}</b>
+                    <b className="badge bg-grey">{subscription.Views?.length || 0}</b>
                 </label>
             </summary>
             { subscription.Views && subscription.Views.length ? (

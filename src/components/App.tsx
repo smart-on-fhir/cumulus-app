@@ -25,6 +25,7 @@ import HealthCheck                      from "./HealthCheck";
 import { AggregatorProvider }           from "../Aggregator";
 import CatalogRouter                    from "./Catalog";
 import { SearchResultsPage }            from "./Search";
+import CssPreview                       from "./CssPreview";
 import "../styles/main.scss";
 
 
@@ -63,6 +64,7 @@ export default function App()
                                     <Route path="catalog/*"      element={ <RequireAuth><CatalogRouter /></RequireAuth>} />
                                     <Route path="studies/*"      element={ <RequireAuth><Studies /></RequireAuth>} />
                                     <Route path="packages/*"     element={ <RequireAuth><Packages /></RequireAuth>} />
+                                    <Route path="css"            element={ <CssPreview /> } />
                                     <Route path="*"              element="Page Not Found" />
                                 </Route>
                             </Routes>

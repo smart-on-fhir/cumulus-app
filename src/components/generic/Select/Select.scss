@@ -1,36 +1,36 @@
-@import "../../../styles/variables.scss";
+@use "../../../styles/variables.scss";
 
 
 .select-component {
     position   : relative;
     user-select: none;
     padding    : 0.4em 22px 0.4em 0.6em !important;
-    min-height : $font-size * $line-height + $font-size * 0.8 + 2;
+    min-height : variables.$font-size * variables.$line-height + variables.$font-size * 0.8 + 2;
     text-align : left;
-    display: inline-block;
+    display    : inline-block;
 
     .select-component-value {
-        overflow: hidden;
-        display: flex;
-        max-height: $font-size * $line-height;
-        flex: 1 1 0;
+        overflow   : hidden;
+        display    : flex;
+        max-height : variables.$font-size * variables.$line-height;
+        flex       : 1 1 0;
         align-items: baseline;
 
         .select-component-option-icon {
-            position: relative;
-            width: 1.2em;
-            height: 1.2em;
-            min-width: 1.2em;
-            max-width: 1.2em;
-            margin: 0 0.2em 0 0;
-            overflow: visible;
-            font-size: 1.2em;
+            position   : relative;
+            width      : 1.2em;
+            height     : 1.2em;
+            min-width  : 1.2em;
+            max-width  : 1.2em;
+            margin     : 0 0.2em 0 0;
+            overflow   : visible;
+            font-size  : 1.2em;
             line-height: 1.2em;
-            text-align: center;
+            text-align : center;
+            display    : flex;
+            flex       : 0 0 1.2em;
+            align-self : center;
             vertical-align: middle;
-            display: flex;
-            flex: 0 0 1.2em;
-            align-self: center;
         }
 
         img.select-component-option-icon {
@@ -66,27 +66,27 @@
     }
 
     .select-component-placeholder {
-        color: #999;
-        white-space: nowrap;
+        color        : var(--color-grey);
+        white-space  : nowrap;
         text-overflow: ellipsis;
-        overflow: hidden;
+        overflow     : hidden;
     }
 
     .select-component-menu {
-        position: absolute;
-        z-index: 1000;
-        top: 100%;
-        right: auto;
-        left: 0;
-        min-width: 100%;
-        margin-top: 1px;
-        background: #FFF;
+        position     : absolute;
+        z-index      : 1000;
+        top          : 100%;
+        right        : auto;
+        left         : 0;
+        min-width    : 100%;
+        margin-top   : 1px;
+        background   : var(--color-window-bg-hard);
         border-radius: 3px;
-        padding: 1px;
-        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0px 5px 10px -5px rgba(0, 0, 0, 0.5);
-        display: none;
-        max-height: 50vh;
-        overflow: auto;
+        padding      : 1px;
+        box-shadow   : 0 0 0 1px var(--color-grey), 0px 5px 10px -5px rgba(0, 0, 0, 0.5);
+        display      : none;
+        max-height   : 50vh;
+        overflow     : auto;
 
         &.open {
             display: block;
@@ -97,7 +97,7 @@
         text-align: left;
         .select-component-menu {
             right: 0;
-            left: auto;
+            left : auto;
         }
     }
 
@@ -122,33 +122,19 @@
         }
 
         &.highlighted {
-            background: linear-gradient(90deg, rgba(129, 171, 214, 0.3), rgba(129, 171, 214, 0.32));
-            box-shadow: 0 0 0 0.5px rgb(154, 178, 201) inset;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+            background: var(--color-highlight);
+            box-shadow: 0 0 0 1px var(--color-highlight) inset;
         }
 
         &.selected {
-            background: linear-gradient(90deg, #369, rgb(28, 79, 129));
-            box-shadow: 0 0 0 0.75px #036 inset;
-            color: #FFF;
-            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
-
-            .select-component-option-icon {
-                color: #FFF;
-            }
-
-            .right {
-                color: #FFF;
-            }
+            background: var(--color-selection);
+            box-shadow: 0 0 0 1px var(--color-highlight) inset;
         }
 
         &.disabled {
-            color: #999;
+            filter: grayscale(1);
             pointer-events: none;
-
-            * {
-                color: #999;
-            }
+            opacity: 0.5;
         }
     }
 

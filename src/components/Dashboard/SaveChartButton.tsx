@@ -31,7 +31,7 @@ export function SaveChartButton({
                         }
                     })
                 }}>
-                    <div className="color-grey-dark" style={{ "fontWeight": 500 }}>
+                    <div style={{ "fontWeight": 500 }}>
                         { graph.isDraft ? "Publish" : "Save Changes" }
                     </div>
                     <div className="small color-muted">

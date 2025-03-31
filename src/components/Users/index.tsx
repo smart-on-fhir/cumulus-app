@@ -106,7 +106,7 @@ export default class Users extends Component<any, State>
             <>
                 <hr/>
                 <div className="table-wrap">
-                    <table>
+                    <table className="table-hover table-selectable table-border-x table-condensed">
                         <thead>
                             <tr>
                                 <th>Display Name</th>

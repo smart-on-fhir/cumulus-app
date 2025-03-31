@@ -33,7 +33,7 @@ export default function Toggle({
     return (
         <b
             className={ classList({
-                "toggle": true,
+                "toggle-input": true,
                 [className || ""]: !!className,
                 "grey-out": !!disabled,
                 "on": !!checked

@@ -225,7 +225,7 @@ function Preview({
     }
     return (
         <div className="import-preview-wrap">
-            <table className="import-preview">
+            <table className="import-preview table-border">
                 <thead>
                     <tr>
                         { payload.cols.map((col, i) => {
@@ -238,7 +238,7 @@ function Preview({
                         })}
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="bg-white">
                     { payload.rows.slice(0, 10).map((row, i) => (
                         <tr key={i} tabIndex={0}>
                             {row.map((r, y) => {
@@ -249,24 +249,24 @@ function Preview({
                                     value = <div className="center color-muted"><b>&lt;null&gt;</b></div>
                                 }
                                 else if (type === "hidden") {
-                                    value = <span style={{ color: "#CCC" }}>{value}</span>
+                                    value = <span className="null">{value}</span>
                                 }
                                 else if (type === "string") {
-                                    value = <span style={{ color: "#373" }}>{value}</span>
+                                    value = <span className="string">{value}</span>
                                 }
                                 else if (type === "integer") {
-                                    value = <span style={{ color: "#A00" }}>{value}</span>
+                                    value = <span className="integer">{value}</span>
                                 }
                                 else if (type === "float") {
-                                    value = <span style={{ color: "#D00" }}>{value}</span>
+                                    value = <span className="float">{value}</span>
                                 }
                                 else if (type === "boolean") {
                                     value = value ?
-                                        <span style={{ color: "#0C0" }}>{value + ""}</span> :
-                                        <span style={{ color: "#C00" }}>{value + ""}</span>
+                                        <span className="boolean-true">{value + ""}</span> :
+                                        <span className="boolean-true">{value + ""}</span>
                                 }
                                 else if (type === "year" || type === "month" || type === "day" || type === "week" || type.startsWith("date")) {
-                                    value = <span style={{ color: "#606" }}>{value}</span>
+                                    value = <span className="date">{value}</span>
                                 }
                                 return (
                                     <td
@@ -617,11 +617,13 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
                                 onChange={ this.onFileSelected } />
                             <div className="file-input-value" style={{
                                 position: "absolute",
-                                background: "#FFF",
+                                background: "var(--color-window-bg-hard)",
                                 top: "0.45em",
                                 left: "7em",
                                 right: "0.45em",
-                                pointerEvents: "none"
+                                pointerEvents: "none",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis"
                             }}>{file ? file.name : ""}</div>
                         </div>
                     </div>

@@ -10,7 +10,7 @@ export default function Alert({
     icon,
     style
 }: {
-    color?: "blue"|"red"|"orange"|"grey"|"grey-dark"|"green",
+    color?: "blue"|"red"|"orange"|"grey"|"green",
     className?: string
     icon?: string
     children: JSX.Element | string | (JSX.Element | string)[],

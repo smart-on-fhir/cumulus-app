@@ -2,26 +2,116 @@
 @import "./variables.scss";
 @import "./grid.scss";
 @import "./forms.scss";
+@import "./tables.scss";
+
+@mixin darkTheme {
+  $colors: $colors-dark;
+  body {
+      @each $name, $value in $colors {
+          --color-#{$name}: #{$value};
+      }
+  }
+
+  #catalog-chart, #flat-chart, #transmission-chart {
+      filter: invert(1) hue-rotate(180deg);
+      mix-blend-mode: screen;
+  }
+  .highcharts-tooltip-container {
+      filter: invert(1) hue-rotate(180deg);
+      mix-blend-mode: normal;
+  }
+  img {
+      filter: invert(100%) hue-rotate(180deg);
+      mix-blend-mode: screen;
+  }
+
+  .view-thumbnail-image img,
+  .tooltip img {
+      filter: none;//invert(100%) hue-rotate(180deg);
+      // filter: grayscale(100%);//invert(100%) hue-rotate(180deg);
+      mix-blend-mode: normal;
+      border-radius: 5px;
+  }
+
+  .tooltip img {
+    border: 1px solid #0002;
+  }
+}
+
+@mixin lightTheme {
+  $colors: $colors-light;
+  body {
+      @each $name, $value in $colors {
+          --color-#{$name}: #{$value};
+      }
+  }
+
+  #catalog-chart, #flat-chart, #transmission-chart {
+      filter: none;
+      mix-blend-mode: normal;
+  }
+  .highcharts-tooltip-container {
+      filter: none;
+      mix-blend-mode: normal;
+  }
+  img {
+      filter: none;
+      mix-blend-mode: normal;
+  }
+
+  .markdown {
+    img {
+      mix-blend-mode: multiply;
+    }
+  }
+
+  .view-thumbnail-image img, .tooltip img {
+      filter: none;
+      mix-blend-mode: normal;
+      border-radius: 5px;
+  }
+
+  .tooltip img {
+    border: 1px solid #0002;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  @include darkTheme();
+}
+
+@media (prefers-color-scheme: light) {
+  @include lightTheme();
+}
+
+:root.light {
+  @include lightTheme();
+}
+
+:root.dark {
+  @include darkTheme();
+}
+
 
 * {
   box-sizing: border-box;
 }
 
 :root {
-  display   : block;
-  min-height: 100vh;
-}
-
-html {
-  font-size  : $font-size;
-  line-height: $line-height;
+  display         : block;
+  min-height      : 100vh;
+  font-size       : $font-size;
+  line-height     : $line-height;
+  font-family     : $font-family;
+  background-color: var(--color-window-bg);
+  color           : var(--color-window-fg);
 }
 
 body {
   margin: 0;
-  background-color: $color-grey-light;
-  color: $color-grey-dark;
-  font-family: $font-family;
+  background-color: var(--color-window-bg);
+  color           : var(--color-window-fg);
+  font-family     : $font-family;
   // -webkit-font-smoothing: antialiased;
   // -moz-osx-font-smoothing: grayscale;
   // -webkit-font-smoothing: 
@@ -65,10 +155,10 @@ code, pre {
 }
 
 code:not(pre code) {
-  background: #C001;
-  color: #A00;
+  background: rgb(from color-mix(in srgb, var(--color-brand-2) 50%, var(--color-window-bg)) r g b / 0.2);
+  color: color-mix(in srgb, var(--color-brand-2) 50%, var(--color-window-fg-hard));
   padding: 1px 1px;
-  border: 1px solid #9002;
+  border: 1px solid rgb(from color-mix(in srgb, var(--color-brand-2) 50%, var(--color-window-fg)) r g b / 0.1);
   margin: -1px;
   border-radius: 3px;
   vertical-align: baseline;
@@ -95,7 +185,7 @@ b, .bold {
 }
 
 .link {
-  color: #36C;
+  color: var(--color-blue);
   cursor: pointer;
   appearance: none;
   background: initial;
@@ -106,7 +196,7 @@ b, .bold {
 
   &:hover {
     text-decoration: underline 1px solid;
-    text-decoration-color: fade-out($color-brand-2, 0.25);
+    text-decoration-color: rgb(from var(--color-brand-2) r g b / 0.75);
     text-underline-offset: 2px;
   }
 }
@@ -130,26 +220,23 @@ b, .bold {
 }
 
 // Colors ----------------------------------------------------------------------
-.color-blue       { color: $color-blue       }
-.color-blue-dark  { color: $color-blue-dark  }
-.color-orange     { color: $color-orange     }
-.color-red        { color: $color-red        }
-.color-grey-light { color: $color-grey-light }
-.color-grey       { color: $color-grey       }
-.color-grey-dark  { color: $color-grey-dark  }
-.color-green      { color: $color-green      }
-.color-brand-2    { color: $color-brand-2    }
-.color-muted      { opacity: 0.65 } 
+.color-blue       { color: var(--color-blue)       }
+.color-blue-dark  { color: var(--color-blue-dark)  }
+.color-orange     { color: var(--color-orange)     }
+.color-red        { color: var(--color-red)        }
+.color-grey       { color: var(--color-grey)       }
+.color-green      { color: var(--color-green)      }
+.color-brand-2    { color: var(--color-brand-2)    }
+.color-muted      { color: rgb(from var(--color-window-fg) r g b / 0.5) }
+.color-soft       { color: var(--color-window-fg-soft) } 
 
-.bg-blue       { background-color: fade-out($color: $color-blue      , $amount: 0.9) }
-.bg-orange     { background-color: fade-out($color: $color-orange    , $amount: 0.9) }
-.bg-red        { background-color: fade-out($color: $color-red       , $amount: 0.9) }
-.bg-grey-light { background-color: fade-in( $color: $color-grey-light, $amount: 0.1) }
-.bg-grey       { background-color: fade-in( $color: $color-grey      , $amount: 0.1) }
-.bg-grey-dark  { background-color: fade-out($color: $color-grey-dark , $amount: 0.9) }
-.bg-green      { background-color: fade-out($color: $color-green     , $amount: 0.9) }
-.bg-brand-2    { background-color: fade-out($color: $color-brand-2   , $amount: 0.9) }
-.bg-white      { background-color: #FFF }
+.bg-blue       { background-color: rgb(from var(--color-blue) r g b / 0.1) }
+.bg-orange     { background-color: rgb(from var(--color-orange) r g b / 0.1) }
+.bg-red        { background-color: rgb(from var(--color-red ) r g b / 0.1) }
+.bg-grey       { background-color: rgb(from var(--color-grey) r g b / 0.2) }
+.bg-green      { background-color: rgb(from var(--color-green) r g b / 0.1) }
+.bg-brand-2    { background-color: rgb(from var(--color-brand-2) r g b / 0.1) }
+.bg-white      { background-color: var(--color-window-bg-hard); }
 // .bg-muted      { background-color; 0.65 } 
 
 // Paddings --------------------------------------------------------------------
@@ -222,28 +309,31 @@ b, .bold {
 hr {
   height: 2px;
   border: none;
-  background: $color-grey;
+  background: var(--color-grey);
   margin: 2px 0;
-
-  &.dashed {
-    border-bottom: 1.5px dashed #BBB;
-    box-shadow: 0 1px 0 0 #FFF;
-    height: 0;
-  }
 
   &.small {
     height: 1px;
   }
 
-  &.color-blue       { background: linear-gradient(90deg, transparent, $color-blue      , transparent); }
-  &.color-blue-dark  { background: linear-gradient(90deg, transparent, $color-blue-dark , transparent); }
-  &.color-orange     { background: linear-gradient(90deg, transparent, $color-orange    , transparent); }
-  &.color-red        { background: linear-gradient(90deg, transparent, $color-red       , transparent); }
-  &.color-grey-light { background: linear-gradient(90deg, transparent, $color-grey-light, transparent); }
-  &.color-grey       { background: linear-gradient(90deg, transparent, $color-grey      , transparent); }
-  &.color-grey-dark  { background: linear-gradient(90deg, transparent, $color-grey-dark , transparent); }
-  &.color-green      { background: linear-gradient(90deg, transparent, $color-green     , transparent); }
-  &.color-brand-2    { background: linear-gradient(90deg, transparent, $color-brand-2   , transparent); }
+  &.dashed {
+    background: transparent;
+    border-bottom: 1.5px dashed var(--color-grey);
+    height: 0;
+    &.small {
+      border-bottom-width: 1px;
+    }
+  }
+
+  
+
+  &.color-blue       { background: linear-gradient(90deg, transparent, var(--color-blue      ), transparent); }
+  &.color-blue-dark  { background: linear-gradient(90deg, transparent, var(--color-blue-dark ), transparent); }
+  &.color-orange     { background: linear-gradient(90deg, transparent, var(--color-orange    ), transparent); }
+  &.color-red        { background: linear-gradient(90deg, transparent, var(--color-red       ), transparent); }
+  &.color-grey       { background: linear-gradient(90deg, transparent, var(--color-grey      ), transparent); }
+  &.color-green      { background: linear-gradient(90deg, transparent, var(--color-green     ), transparent); }
+  &.color-brand-2    { background: linear-gradient(90deg, transparent, var(--color-brand-2   ), transparent); }
 }
 
 ul {
@@ -301,16 +391,16 @@ ul {
         }
 
         &.color-green {
-          color: $color-green;
+          color: var(--color-green);
         }
         
         &.color-orange {
-          color: $color-orange;
+          color: var(--color-orange);
         }
 
         .color-blue {
-          color      : rgb(122, 162, 202);
-          text-shadow: 0px 0px 1.5px #FFF;
+          color      : rgb(from var(--color-blue-dark) r g b / 0.75);
+          text-shadow: 0px 0px 1.5px var(--color-window-bg-hard);
         }
 
         .star {
@@ -336,17 +426,18 @@ ul {
     word-wrap: break-word;
 
     &:hover {
-      background: lighten($color: $color-blue, $amount: 36%);
-      box-shadow: 0 0 0 1px lighten($color: $color-blue, $amount: 30%) inset;
+      background: var(--color-highlight);
+      box-shadow: 0 0 0 1px var(--color-highlight) inset;
     }
   }
 }
 
 #chart {
-  border: 2px solid $color-grey;
+  border: 2px solid var(--color-grey);
   border-radius: 5px;
   // width: 100%;
   box-sizing: content-box;
+  outline: 0;
 }
 
 .grey-out, [aria-disabled="true"] {
@@ -358,146 +449,75 @@ ul {
 }
 
 .string {
-  color: #393
+  color: var(--color-string);
 }
 .integer {
-  color: #A00
+  color: var(--color-integer);
 }
 .float, .number {
-  color: #A60
+  color: var(--color-number);
 }
 .boolean {
-  color: #06A
+  color: var(--color-boolean);
 }
 .boolean-true {
-  color: #00b300
+  color: var(--color-boolean-true);
 }
 .boolean-false {
-  color: #C00
+  color: var(--color-boolean-false);
 }
 .date, .date\:YYYY-MM-DD, .date\:YYYY-MM, .date\:YYYY {
-  color: #60A
+  color: var(--color-date);
 }
 .object {
-  color: #A0A
+  color: var(--color-object);
 }
 .array {
-  color: #0AA
+  color: var(--color-array);
 }
 .null {
   font-weight: bold;
-  color: #888;
+  color: var(--color-null);
 }
 
 .badge {
-  background    : rgba(0, 0, 0, 0.4);
-  color         : #FFF;
+  $bg: color-mix(in srgb, var(--color-window-fg), var(--color-window-bg));
+  $fg: contrastForColor($bg);
+  $sh: rgb(from contrastForColor($fg) r g b / 0.3);
+  background    : $bg;
+  color         : $fg;
   border-radius : 100px;
-  padding       : 0.15em 0.4em 0.1em;
+  padding       : 0.2em 0.4em;
   line-height   : 1;
   display       : inline-block;
-  font-weight   : normal;
+  font-weight   : normal !important;
   min-width     : 1.4em;
   text-align    : center;
-  font-size     : 76%;
+  font-size     : 0.8em;
   vertical-align: middle;
-  margin        : -0.2em 0 0 0;
+  margin        : -0.1em 0 0 0;
   font-weight   : bold;
+  text-shadow: 0 0 1px $sh;
 
-  &.bg-blue       { background-color: $color-blue       }
-  &.bg-orange     { background-color: $color-orange     }
-  &.bg-red        { background-color: $color-red        }
-  &.bg-grey-light { background-color: $color-grey-light }
-  &.bg-grey       { background-color: $color-grey       }
-  &.bg-grey-dark  { background-color: $color-grey-dark  }
-  &.bg-green      { background-color: $color-green      }
-  &.bg-brand-2    { background-color: $color-brand-2    }
+  &.bg-blue       { background-color: var(--color-blue); color: contrastForColor(var(--color-blue))}
+  &.bg-orange     { background-color: var(--color-orange); color: contrastForColor(var(--color-orange))}
+  &.bg-red        { background-color: var(--color-red); color: contrastForColor(var(--color-red))}
+  &.bg-grey       { background-color: var(--color-grey); color: contrastForColor(var(--color-grey))}
+  &.bg-green      { background-color: var(--color-green); color: contrastForColor(var(--color-green))}
+  &.bg-brand-2    { background-color: var(--color-brand-2); color: contrastForColor(var(--color-brand-2))}
 }
 
 img {
   max-width: 100%;
 }
 
-table {
-  width: 100%;
-  td, th {
-    text-align: initial;
-    vertical-align: baseline;
-  }
-}
-
-
-.table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-
-  th {
-    font-weight: 500;
-  }  
-  
-  td, th {
-      padding: 0.5em 0.5em;
-  }
-
-
-  &.table-border {
-      td, th {
-          border: 0.5px solid #0001;
-      }
-  }
-
-  // &.table-hover {
-  //     tbody tr:hover {
-  //         background: var(--color-highlight);
-  //     }
-  // }
-}
-
-.table-hover tbody tr:hover {
-  background-color: #9CF3;
-}
-
-.table-border-x {
-  td, th {
-      border-bottom: 0.5px solid #0001;
-      border-top: 0.5px solid #0001;
-  }
-
-  thead:first-of-type {
-    td, th {
-        // border-bottom: 0.5px solid #0001;
-        border-top: 0;
-    }
-  }
-  // tr:last-of-type {
-  //   td, th {
-  //       border-bottom: 0;
-  //   }
-  // }
-}
-
-.table-fixed {
-  table-layout: fixed;
-}
-
-.table-condensed {
-  td, th {
-      padding: 0.25em;
-  }   
-}
-
-.table-responsive {
-  display: grid;
-  overflow: auto;
-}
 
 .search-match {
   background: rgba(255, 222, 0, 0.76);
   box-shadow: 0 0 1px 0 rgb(0, 0, 0, 0.5) inset;
   border-radius: 2px;
   color: #000;
-  text-shadow: 0 1px 0 #fff;
+  text-shadow: 0 1px 0 #fff8;
 }
 
 #root {
@@ -510,14 +530,14 @@ table {
 }
 
 .panel {
-  border: 1px solid #0001;
-  // background: #FFF;
+  border: 1px solid var(--color-window-bg-soft);
+  background: var(--color-window-bg-hard);
   border-radius: 0.5rem;
   padding: 2rem;
 
   &.panel-danger {
-    border-color: fade-out($color-brand-2, 0.5);
-    box-shadow: 0 0 0 0.4em fade-out($color-brand-2, 0.9);
+    border-color: var(--color-brand-2);
+    box-shadow: 0 0 0 0.4em rgb(from var(--color-brand-2) r g b / 0.2);
   }
 
   > h3, > h4 {

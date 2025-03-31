@@ -1,9 +1,7 @@
-@import "../../../styles/variables.scss";
-
 .menu-button {
-    position: relative;
-    display : flex;
-    outline : 0;
+    position   : relative;
+    display    : flex;
+    outline    : 0;
     align-items: center;
 
     > .menu-button-btn {
@@ -34,9 +32,9 @@
         z-index         : 100;
         top             : 100%;
         left            : 0;
-        background      : #FFF;
-        box-shadow      : 0 0 0 1px rgba(0, 0, 0, 0.2), 0 2px 5px -1px rgba(0, 0, 0, 0.3);
-        color           : $color-grey-dark;
+        background      : var(--color-window-bg-hard);
+        box-shadow      : 0 0 0 1px rgb(from var(--color-window-fg-hard) r g b / 0.2), 0 2px 5px -1px rgba(0, 0, 0, 0.5);
+        color           : var(--color-window-fg);
         text-align      : left;
         padding         : 2px;
         border-radius   : 2px;
@@ -47,10 +45,10 @@
         transition      : transform 0.4s ease-out, opacity 0.1s ease-out;
         white-space     : pre-wrap;
         text-shadow     : none;
-        width: max-content;
+        width           : max-content;
 
         > hr {
-            background: #DDD;
+            background: var(--color-grey);
             height: 1px;
             padding: 0;
             margin: 2px 0;
@@ -104,9 +102,11 @@
         }
 
         &:hover, &:focus, &:focus-within {
-            &, * {
-                background: $color-blue !important;
-                color: #FFF !important;
+            background: var(--color-selection) !important;
+            box-shadow: 0 0 0 1px var(--color-highlight) inset;
+            :not(input) {
+                background: transparent;
+                color: var(--color-window-fg);
                 box-shadow: none;
             }
         }
@@ -138,9 +138,6 @@
         border-color: rgba(0, 0, 0, 0.2) rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.2);
         border-width: 1px;
         border-style: solid;
-        // border-left: 0.5px solid rgba(0, 0, 0, 0.2);
-        // border-right: 0.5px solid rgba(255, 255, 255, 0.2);
-        // box-shadow: -1px -1px 0px 0 rgba(255, 255, 255, 0.25) inset, 1px 1px 0px 0 rgba(0, 0, 0, 0.25) inset;
     }
 
     > .menu-button-btn {
@@ -154,7 +151,6 @@
     }
 
     .menu-item  > * {
-        // padding-left: 1.2em;
         text-indent: 0;
     }
 

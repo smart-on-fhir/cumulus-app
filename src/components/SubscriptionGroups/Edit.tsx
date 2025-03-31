@@ -2,7 +2,6 @@ import { createEditPage } from "../generic/EndpointEditWrapper"
 import Form               from "./Form"
 import { app }            from "../../types"
 import Terminology        from "../../Terminology"
-import "./SubscriptionGroups.scss"
 
 
 export default function SubscriptionGroupEdit()

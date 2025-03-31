@@ -29,11 +29,11 @@ function groupBy<T>(data: T[], key: keyof T): Record<string, T[]> {
 }
 
 const roleBgColors = {
-    admin  : "#F99",
-    manager: "#FC6",
-    owner  : "#EAE",
-    user   : "#9D9",
-    guest  : "#0BB"
+    admin  : "#F006",
+    manager: "#E906",
+    owner  : "#E6E6",
+    user   : "#0906",
+    guest  : "#0996"
 }
 
 

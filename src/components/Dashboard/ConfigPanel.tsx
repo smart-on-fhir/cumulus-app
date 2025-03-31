@@ -179,8 +179,7 @@ export default function ConfigPanel({
     const yLabel        = isPie ? "Value" : isBar ? "X" : "Y"
 
     return (
-        <div style={{
-            color      : "#666",
+        <div className="color-soft" style={{
             padding    : "0 0.5rem 0 3px",
             width      : 330,
             marginRight: "0.5rem"
@@ -253,10 +252,10 @@ export default function ConfigPanel({
                                     background: c,
                                     display: "inline-block",
                                     width: "8px",
-                                    height: "1.3em",
-                                    margin: "0 0.5px",
-                                    boxShadow: "0 0 0 0.5px #0008 inset, 0 0 0 0.5px #FFF",
-                                    verticalAlign: "top"
+                                    height: "1em",
+                                    margin: "-2px 1px 0",
+                                    boxShadow: "0 0 0 0.5px #0008 inset, 0 0 0 0.5px #FFF8",
+                                    verticalAlign: "middle"
                                 }} />)}</>,
                                 icon: "fas fa-palette color-muted"
                             }))}
@@ -873,7 +872,7 @@ function SeriesEditor({
             <AllSeries options={state.chartOptions} onChange={onChange} />
             <div
                 className="link pt-1 pb-1"
-                style={{ color: hasInvisible ? "#06D" : "#AAA", userSelect: "none" }}
+                style={{ color: hasInvisible ? "var(--color-blue)" : "#8888", userSelect: "none" }}
                 tabIndex={0}
                 onClick={() => {
                     if (hasInvisible) {

@@ -1,40 +1,82 @@
-@import "../../../styles/variables.scss";
-
-.toggle {
+.toggle-input {
     display       : inline-block;
     vertical-align: text-bottom;
-    max-width     : 1.7em;
-    width         : 1.7em;
-    flex          : 0 0 1.7em;
+    max-width     : 1.8em;
+    width         : 1.8em;
+    flex          : 0 0 1.8em;
     border-radius : 1em;
-    background    : #FFF8;
+    background    : var(--color-grey);
     align-self    : center;
     margin        : 0 0 0;
-    box-shadow    : 0 0 0 1px #8888;
+    box-shadow    : 0 0 0 1px var(--color-grey);
 
     &:after {
         content      : "";
         width        : 1.1em;
         height       : 1.1em;
-        background   : #8888;
+        background   : var(--color-window-bg);
         display      : block;
         border-radius: 1em;
-        border       : 1.5px #FFF solid;
+        margin: 1px;
         transition   : all 0.2s ease-in-out;
         box-sizing   : border-box;
     }
 
     &.on {
-        box-shadow: 0 0 0 1px currentColor;
-        background    : #FFF;
+        box-shadow: 0 0 0 1px var(--color-blue);
+        background    : var(--color-blue);
         &:after {
-            background: currentColor;
             transform: translateX(0.6em);
         }
     }
 
+    &.bg-green {
+        background: var(--color-grey);
+        &.on {
+            box-shadow: 0 0 0 1px var(--color-green);
+            background: var(--color-green);
+        }
+    }
+
+    &.bg-blue-dark {
+        background: var(--color-grey);
+        &.on {
+            box-shadow: 0 0 0 1px var(--color-blue-dark);
+            background: var(--color-blue-dark);
+        }
+    }
+    &.bg-brand-2 {
+        background: var(--color-grey);
+        &.on {
+            box-shadow: 0 0 0 1px var(--color-brand-2);
+            background: var(--color-brand-2);
+        }
+    }
+    &.bg-orange {
+        background: var(--color-grey);
+        &.on {
+            box-shadow: 0 0 0 1px var(--color-orange);
+            background: var(--color-orange);
+        }
+    }
+    &.bg-red {
+        background: var(--color-grey);
+        &.on {
+            box-shadow: 0 0 0 1px var(--color-red);
+            background: var(--color-red);
+        }
+    }
+
+    &.grey-out {
+        background: var(--color-grey) !important;
+        box-shadow: 0 0 0 1px var(--color-grey) !important;
+        user-select: none;
+    }
+
     &:focus, &:focus-visible {
-        box-shadow: 0 0 0 1px $color-blue, 0 0 0 3px fade-out($color-blue, 0.6);
+        &:not(.grey-out) {
+            box-shadow: 0 0 0 1px var(--color-blue-dark), 0 0 0 3px rgb(from var(--color-blue) r g b / 0.5) !important;
+        }
         outline: none;
     }
 }

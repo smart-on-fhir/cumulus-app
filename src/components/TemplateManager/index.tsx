@@ -323,7 +323,7 @@ function Thumbnail({ col, sub, pkg }: { col: app.SubscriptionDataColumn, sub: ap
     if (loading || error) {
         return (
             <div className="view-thumbnail template">
-                <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }}>
+                <div className="view-thumbnail-image center" style={{ position: "relative", placeContent: "center" }}>
                     { loading && <Loader msg="" style={{ zIndex: 2 }} /> }
                     { error && <small className="color-red" style={{ wordBreak: "break-all" }}>{ error + "" }</small> }
                 </div>
@@ -344,7 +344,8 @@ function Thumbnail({ col, sub, pkg }: { col: app.SubscriptionDataColumn, sub: ap
             theme,
             colors: COLOR_THEMES.find(t => t.id === theme)!.colors
         }}>
-            <div className="view-thumbnail-image center" style={{ aspectRatio: "30/19", position: "relative", placeContent: "center" }}
+            <div className="view-thumbnail-image center"
+                style={{ position: "relative", placeContent: "center" }}
                 data-tooltip={`<img src=${imgUrl || "about:blank"} alt="Chart Preview" style="display:block" />`}
                 data-tooltip-position="50% auto">
                 <img src={imgUrl || "about:blank"} alt="Thumbnail Preview" loading="lazy" />

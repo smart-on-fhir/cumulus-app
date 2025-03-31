@@ -1,5 +1,3 @@
-@import "../../../styles/variables.scss";
-
 #modal > .dialog {
     z-index       : 40001;
     position      : fixed;
@@ -9,29 +7,24 @@
     min-height    : 120px;
     max-width     : 90vw;
     max-height    : 90vh;
-    background    : #FFF;
     transform     : translate(-500%, -500%);
     border-radius : 5px;
     display       : flex;
     flex-direction: column;
-    box-shadow    : 0px 5px 20px -4px #0009, 0px 0px 0px 2px $color-blue-dark;
+    box-shadow    : 0px 0px 0px 2px var(--color-blue-dark), 0px 5px 20px -4px #0009;
     
     .dialog-header {
         padding        : 0.25rem 0.5rem;
-        border-bottom  : 1px solid #0004;
         font-size      : 120%;
         font-weight    : 500;
-        color          : lighten($color-blue-dark, 50%);
-        background     : $color-blue linear-gradient(-90deg, #0AE8, fade-out($color-blue-dark, 0.5));
-        // background     : $color-blue-dark radial-gradient(#0AEC, fade-out($color-blue-dark, 0.5) 40em) 0 0.8em;
-        text-shadow    : 0 0px 1px #000F, 0 0px 3px #0008;
+        color          : var(--color-window-bg);
+        background     : var(--color-blue-dark);
         border-radius  : 5px 5px 0 0;
         flex           : 0;
         display        : flex;
         cursor         : grab;
         justify-content: space-between;
         align-items    : center;
-        box-shadow     : 1px 1px 0px 0px #FFF6 inset;
 
         &:active {
             cursor: grabbing;
@@ -42,11 +35,10 @@
             opacity    : 0.6;
             transition : all 0.2s;
             cursor     : pointer;
-            text-shadow: 0 0px 2px #000;
 
             &:hover {
                 opacity: 1;
-                color  : #ff7979;
+                color  : var(--color-orange);
             }
         }
     }
@@ -55,7 +47,7 @@
         padding : 0.5rem;
         overflow: auto;
         flex    : 1;
-        background: #EEE;
+        background: var(--color-window-bg);
         display: flex;
         flex-direction: column;
     }
@@ -63,8 +55,7 @@
     .dialog-footer {
         padding        : 0.5rem 0.5rem;
         border-top     : 1px solid #0003;
-        background     : #EEE;
-        background     : linear-gradient(#0002, #0001 100%);
+        background     : var(--color-window-bg) linear-gradient(#0002, #0001 100%);
         box-shadow     : 0 10px 5px -10px #0002 inset;
         border-radius  : 0 0 5px 5px;
         flex           : 0;
@@ -93,7 +84,7 @@
     right          : 0;
     bottom         : 0;
     left           : 0;
-    background     : #8888;
+    background     : rgb(from var(--color-window-bg) r g b / 0.6);
     backdrop-filter: grayscale(1) contrast(0.75);
 
     &:not(.modal) {

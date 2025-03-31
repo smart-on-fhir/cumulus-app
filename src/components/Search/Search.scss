@@ -4,27 +4,29 @@
     > a {
         display: block;
         padding: 0.5rem 1rem 0.5rem 2rem;
-        color: #000C;
         margin-bottom: 1rem;
         border-radius: 3px;
 
         &:hover {
-            background: #8881;
-            box-shadow: 0 0 0 1px #0001 inset;
+            background: var(--color-highlight);
+            box-shadow: 0 0 0 1px var(--color-highlight) inset;
         }
         &.active {
-            background: #DEF;
+            background: var(--color-selection);
             scroll-margin: 6px;
-            box-shadow: 0 0 0 1px #0001 inset;
+            box-shadow: 0 0 0 1px var(--color-highlight) inset;
         }
+
+        > .name, > .description, .small > span {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            max-width: 99%;
+            display: inline-block;
+        }
+
         .name {
-            font-weight: bold;
-        }
-        .description {
-            overflow     : hidden;
-            -webkit-line-clamp: 3;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
+            font-weight: 600;
         }
     }
 
@@ -45,16 +47,11 @@
 
     input[type="search"] {
         background-color: #FFF0;
-        border-color: #FFF3;
-        color: #FFFC;
-        width: 20rem;
+        width: 7rem;
         transition: all 0.2s ease-in-out;
         max-width: 100%;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='white' fill-opacity='0.4' d='M500.3 443.7l-119.7-119.7c27.22-40.41 40.65-90.9 33.46-144.7C401.8 87.79 326.8 13.32 235.2 1.723C99.01-15.51-15.51 99.01 1.724 235.2c11.6 91.64 86.08 166.7 177.6 178.9c53.8 7.189 104.3-6.236 144.7-33.46l119.7 119.7c15.62 15.62 40.95 15.62 56.57 0C515.9 484.7 515.9 459.3 500.3 443.7zM79.1 208c0-70.58 57.42-128 128-128s128 57.42 128 128c0 70.58-57.42 128-128 128S79.1 278.6 79.1 208z'/%3E%3C/svg%3E");
-
-        &::placeholder {
-            color: #FFF8;
-        }
+        margin: 0 1rem 0 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%238888' d='M500.3 443.7l-119.7-119.7c27.22-40.41 40.65-90.9 33.46-144.7C401.8 87.79 326.8 13.32 235.2 1.723C99.01-15.51-15.51 99.01 1.724 235.2c11.6 91.64 86.08 166.7 177.6 178.9c53.8 7.189 104.3-6.236 144.7-33.46l119.7 119.7c15.62 15.62 40.95 15.62 56.57 0C515.9 484.7 515.9 459.3 500.3 443.7zM79.1 208c0-70.58 57.42-128 128-128s128 57.42 128 128c0 70.58-57.42 128-128 128S79.1 278.6 79.1 208z'/%3E%3C/svg%3E");
     }
 
     .loader {
@@ -74,8 +71,7 @@
     }
 
     .global-search-results {
-        background: #FFF;
-        color     : #000b;
+        background: var(--color-window-bg-hard);
         position  : absolute;
         top       : 100%;
         left      : 50%;
@@ -87,7 +83,7 @@
         margin    : 2px 0 0;
         max-height: calc(100vh - 4.5rem);
         overflow  : auto;
-        box-shadow: 1px 1px 6px #0006, 0 0 0 1px #0003;
+        box-shadow: 1px 1px 6px #0006, 0 0 0 1px rgb(from var(--color-window-fg-hard) r g b / 0.2);
         text-align: left;
         display   : none;
 
@@ -96,19 +92,10 @@
         }
     }
 
-    
-
     &:focus-within {
         input[type="search"] {
-            border-color: #369;
-            color: #000C;
-            background-color: #FFF;
+            background-color: var(--color-window-bg-hard);
             width: 50vw;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='black' fill-opacity='0.4' d='M500.3 443.7l-119.7-119.7c27.22-40.41 40.65-90.9 33.46-144.7C401.8 87.79 326.8 13.32 235.2 1.723C99.01-15.51-15.51 99.01 1.724 235.2c11.6 91.64 86.08 166.7 177.6 178.9c53.8 7.189 104.3-6.236 144.7-33.46l119.7 119.7c15.62 15.62 40.95 15.62 56.57 0C515.9 484.7 515.9 459.3 500.3 443.7zM79.1 208c0-70.58 57.42-128 128-128s128 57.42 128 128c0 70.58-57.42 128-128 128S79.1 278.6 79.1 208z'/%3E%3C/svg%3E");
-            box-shadow: 0 0 0 3px #FFF4;
-        }
-        .loader {
-            color: #000C;
         }
     }
 

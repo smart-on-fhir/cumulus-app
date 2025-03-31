@@ -8,7 +8,6 @@ import { useAuth }    from "../../auth"
 import { app }        from "../../types"
 import { ellipsis }   from "../../utils"
 import Terminology    from "../../Terminology"
-import "../generic/EndpointListTable.scss"
 
 
 export function MarkdownPreview({ markdown, maxLen=70 }: { markdown: string, maxLen?: number }) {
@@ -48,36 +47,38 @@ export default function SubscriptionGroupList()
                     </div>
                     
                     { data.length ?
-                        <table className="endpoint-list-table">
-                            <thead>
-                                <tr>
-                                    <th style={{ width: "2.5em" }}>ID</th>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <IfAllowed showError={false} permissions="SubscriptionGroups.update" element={ <th style={{ width: "2.5em" }} /> } />
-                                    <IfAllowed showError={false} permissions="SubscriptionGroups.delete" element={ <th style={{ width: "2.5em" }} /> } />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                { data.map((row, i) => (
-                                    <tr key={i}>
-                                        <td>{row.id}</td>
-                                        <td><Link title={row.name} to={ baseUrl + "/" + row.id} className="link">{row.name}</Link></td>
-                                        <td className="color-muted"><MarkdownPreview markdown={row.description || ""} maxLen={70} /></td>
-                                        <IfAllowed showError={false} permissions="SubscriptionGroups.update" element={ <td className="right nowrap">
-                                            <Link title="Edit" className="btn small color-brand-2 btn-virtual" to={ baseUrl + "/" + row.id + "/edit" }>
-                                                <i className="fa-solid fa-pen-to-square" />
-                                            </Link>
-                                        </td> } />
-                                        <IfAllowed showError={false} permissions="SubscriptionGroups.delete" element={ <td className="right nowrap">
-                                            <Link title="Delete" className="btn small color-red btn-virtual" to={ baseUrl + "/" + row.id + "/delete" }>
-                                                <i className="fa-solid fa-trash-can" />
-                                            </Link>
-                                        </td> } />
+                        <div className="table-responsive">
+                            <table className="table-border-x table-condensed table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style={{ width: "2.5em" }}>ID</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <IfAllowed showError={false} permissions="SubscriptionGroups.update" element={ <th style={{ width: "2.5em" }} /> } />
+                                        <IfAllowed showError={false} permissions="SubscriptionGroups.delete" element={ <th style={{ width: "2.5em" }} /> } />
                                     </tr>
-                                )) }
-                            </tbody>
-                        </table> :
+                                </thead>
+                                <tbody>
+                                    { data.map((row, i) => (
+                                        <tr key={i}>
+                                            <td>{row.id}</td>
+                                            <td><Link title={row.name} to={ baseUrl + "/" + row.id} className="link">{row.name}</Link></td>
+                                            <td className="color-muted"><MarkdownPreview markdown={row.description || ""} maxLen={70} /></td>
+                                            <IfAllowed showError={false} permissions="SubscriptionGroups.update" element={ <td className="right nowrap">
+                                                <Link title="Edit" className="btn small btn-virtual" to={ baseUrl + "/" + row.id + "/edit" }>
+                                                    <i className="fa-solid fa-pen-to-square color-brand-2" />
+                                                </Link>
+                                            </td> } />
+                                            <IfAllowed showError={false} permissions="SubscriptionGroups.delete" element={ <td className="right nowrap">
+                                                <Link title="Delete" className="btn small btn-virtual" to={ baseUrl + "/" + row.id + "/delete" }>
+                                                    <i className="fa-solid fa-trash-can color-red" />
+                                                </Link>
+                                            </td> } />
+                                        </tr>
+                                    )) }
+                                </tbody>
+                            </table>
+                        </div> :
                         <div className="center">
                             <br/>
                             <p>No {Terminology.subscriptionGroup.namePlural} found in the database. { canCreate && <span> You can start by creating new one.<br/><br/></span> }</p>

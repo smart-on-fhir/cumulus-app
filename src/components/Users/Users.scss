@@ -1,45 +1,7 @@
-@import "../../styles/variables.scss";
-
-
 .users-list {
-
     .table-wrap {
         max-height: calc(100vh - 28rem);
         min-height: 8.6rem;
         overflow: auto;
-    }
-
-    table {
-        border-collapse: collapse;
-    }
-
-    td, th {
-        padding: 2px 8px;
-        line-height: normal;
-        vertical-align: middle;
-    }
-
-    th {
-        color: $color-blue-dark;
-    }
-
-    thead th {
-        border-bottom: 1px solid #CCC;
-    }
-
-    tbody tr {
-
-        cursor: pointer;
-
-        &:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        &.selected {
-            background: $color-blue-dark;
-            * {
-                color: #FFF;
-            }
-        }
     }
 }

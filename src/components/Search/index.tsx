@@ -106,7 +106,7 @@ function Match({ result, search }: { result: SearchResult, search: string }) {
         <Link to={ getHref(result) } className="name color-blue-dark">
             <Icon type={result.type} />
             <span className="name color-blue-dark">{highlight(result.name, search)}</span>
-            <div className="small color-muted color-brand-2">
+            <div className="small color-brand-2">
                 {result.study ?
                     <span><b>{Terminology[result.type].nameSingular}</b>: {result.study} / {result.id}</span> :
                     <span><b>{Terminology[result.type].nameSingular}</b> #{result.id}</span>
@@ -140,7 +140,7 @@ function getHref(result: SearchResult) {
 
 function Icon({ type }: { type: SearchResult["type"] }) {
     const icon = Terminology[type]?.icon
-    return icon ? <span className="icon material-symbols-outlined color-muted">{ icon }</span> : null
+    return icon ? <span className="icon material-symbols-outlined color-soft">{ icon }</span> : null
 }
 
 export function SearchResultsPage()

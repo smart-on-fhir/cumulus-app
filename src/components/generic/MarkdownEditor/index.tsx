@@ -41,15 +41,14 @@ export default function MarkdownEditor({
             <div className="row row-10">
                 <div className="col">
                 { viewType === "markdown" && <textarea { ...textarea } style={{ height, ...textarea.style }}/> }
-                { viewType === "preview" && <div style={{
+                { viewType === "preview" && <div className="form-control" style={{
                     position: "relative",
                     flex: "1 1 " + (height || 0),
-                    border: "1px solid #d1dae2",
                     padding: "0.4em 0.8em",
                     borderRadius: 4,
                     width: "100%",
-                    background: "#FFF",
-                    overflow: "auto"
+                    overflow: "auto",
+                    maxHeight: "none"
                 }}>
                     <Markdown>{ String(textarea.value || "") }</Markdown>
                 </div>

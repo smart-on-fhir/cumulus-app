@@ -171,15 +171,28 @@ export default function ViewsBrowser({
     function renderBySubscription(selection: CustomSelection<app.View>) {
         const groups: Record<string, GroupEntry> = {};
         (result || []).forEach(item => {
-            let label = item.Subscription!.name;
-            let group = groups[label];
-            if (!group) {
-                group = groups[label] = {
-                    link: { to: `/requests/${item.Subscription!.id}`, txt: "View " + Terminology.subscription.nameSingular },
-                    items: []
-                };
+            if (item.Subscription) {
+                let label = item.Subscription.name;
+                let group = groups[label];
+                if (!group) {
+                    group = groups[label] = {
+                        link: { to: `/requests/${item.Subscription.id}`, txt: "View " + Terminology.subscription.nameSingular },
+                        items: []
+                    };
+                }
+                group.items.push(item)
+            } else if (item.packageId) {
+                let label = item.packageId;
+                let group = groups[label];
+                if (!group) {
+                    group = groups[label] = {
+                        link: { to: `/requests/${item.packageId}`, txt: "View " + Terminology.subscription.nameSingular },
+                        items: []
+                    };
+                }
+                group.items.push(item)
             }
-            group.items.push(item)
+            
         });
 
         return renderGroups(groups, "database", selection)

@@ -1,7 +1,4 @@
-@import "../../styles/variables.scss";
-
 .home-page {
-
     display: grid;
     height: 100%;
     width: 100%;
@@ -10,14 +7,14 @@
     gap: 2rem;
 
     .card {
-        background: #FFF;
+        background: var(--color-window-bg-hard);
         padding: 1.5em 2em;
         border-radius: 0.5em;
-        border: 1px solid $color-grey;
+        border: 1px solid var(--color-grey);
         transition: all 0.2s;
 
         li::marker, .icon {
-            color: #AAA;
+            color: var(--color-brand-2);
         }
         
         .icon {
@@ -28,7 +25,6 @@
         }
         
         hr {
-            background: #EEE;
             border: 0;
             height: 1px;
             margin: 0.5em 0;
@@ -42,10 +38,8 @@
             flex: 1;
             font-size: 110%;
             font-weight: 500;
-            // color: #666;
             transition: all 0.2s;
             text-transform: uppercase;
-            text-shadow: 0px 1px 1px #0001;
 
             &:first-child {
                 margin-top: 0;
@@ -53,7 +47,7 @@
         }
 
         p {
-            color: #777;
+            color: var(--color-grey);
         }
 
         li {
@@ -66,9 +60,9 @@
 
     .sync-notes {
         grid-column: 1 / 6;
-        background: #FFEFCF;
+        background: rgb(from var(--color-orange) r g b / 0.2);
         padding: 1em 1.5em;
-        border-color: #9002;
+        border-color: rgb(from var(--color-orange) r g b / 0.2);
         font-weight: bold;
     }
 
@@ -82,18 +76,14 @@
         padding: 5px;
         margin: 0 -5px -5px;
 
-        .card {
-            box-shadow: 0px 10px 0px -6px fade-out($color-blue-dark, 0.9);
-        }
-
         .card:hover {
             cursor: pointer;
-            box-shadow: 0 0 0 5px fade-out($color-blue-dark, 0.8);
-            border-color: $color-blue-dark;
+            box-shadow: 0 0 0 5px rgb(from var(--color-blue-dark) r g b / 0.2);
+            border-color: var(--color-blue-dark);
         }
 
         h4 {
-            color: $color-blue-dark;
+            color: var(--color-blue-dark);
         }
 
         p {

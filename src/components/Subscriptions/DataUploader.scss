@@ -1,6 +1,5 @@
 .import-preview-wrap {
     overflow: auto;
-    border: 1px solid #CCC;
 }
 table.import-preview {
     table-layout: fixed;
@@ -9,21 +8,7 @@ table.import-preview {
     min-width: 100%;
     font-size: 12px;
 
-    tbody {
-        background: #FFF;
-
-        tr:hover td {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-    }
-
-    thead {
-        font-weight: bold;
-    }
-
     td, th {
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        padding: 0.1em 0.4em;
         white-space: pre;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -33,7 +18,7 @@ table.import-preview {
         text-align: left;
 
         &.selected {
-            background: rgb(218, 233, 250);
+            background: var(--color-highlight);
         }
     }
 }
@@ -68,10 +53,6 @@ table.import-preview {
         padding: 2px;
     }
     tr.selected {
-        background: rgb(218, 233, 250);
-
-        input, select {
-            background-color: rgba(255, 255, 255, 0.75);
-        }
+        background: var(--color-highlight);
     }
 }

@@ -2,8 +2,8 @@
     margin: 0.5rem -2px;
 
     .removable-item {
-        border: 1px solid #3696;
-        background: #39C3;
+        border: 1px solid rgb(from var(--color-grey) r g b / 0.4);
+        background: rgb(from var(--color-grey) r g b / 0.4);
         display: inline-block;
         border-radius: 4px;
         padding: 1px 4px;
@@ -17,7 +17,7 @@
             transition: all 0.2s;
 
             &:hover {
-                color: #C00;
+                color: var(--color-red);
                 opacity: 1;
 
             }

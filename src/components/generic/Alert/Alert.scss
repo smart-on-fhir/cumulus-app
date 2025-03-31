@@ -1,13 +1,10 @@
-@import "../../../styles/variables.scss";
-
-
 .alert {
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     padding: 0.5em 1em 0.5em 2em;
     white-space: pre-wrap;
     position: relative;
-    text-shadow: 0 1px 0 #fff;
+    text-shadow: 0 1px 0 var(--color-window-bg);
     word-break: normal;
     font-family: monospace;
     font-size: 85%;
@@ -26,42 +23,32 @@
     }
   
     &.alert-blue {
-        &, * { color: darken($color: $color-blue, $amount: 12%); }
-        border-color: fade-out($color: $color-blue, $amount: 0.9);
-        background: fade-out($color: $color-blue, $amount: 0.9);
-        text-shadow: 0 1px 0 #fff9;
+        &, * { color: var(--color-blue-dark); }
+        border-color: rgb(from var(--color-blue) r g b / 0.2);
+        background: rgb(from var(--color-blue) r g b / 0.2);
     }
 
     &.alert-orange {
-        &, * { color: darken($color: $color-orange, $amount: 10%); }
-        border-color: fade-out($color: $color-orange, $amount: 0.9);
-        background: fade-out($color: $color-orange, $amount: 0.9);
+        &, * { color: color-mix(in srgb, var(--color-orange) 70%, var(--color-window-fg)); }
+        border-color: rgb(from var(--color-orange) r g b / 0.2);
+        background: rgb(from var(--color-orange) r g b / 0.2);
     }
 
     &.alert-red {
-        &, * { color: darken($color: $color-red, $amount: 10%); }
-        border-color: fade-out($color: $color-red, $amount: 0.9);
-        background: fade-out($color: $color-red, $amount: 0.9);
+        &, * { color: color-mix(in srgb, var(--color-red) 80%, var(--color-window-fg)); }
+        border-color: rgb(from var(--color-red) r g b / 0.2);
+        background: rgb(from var(--color-red) r g b / 0.2);
     }
 
     &.alert-grey {
-        &, * { color: darken($color: $color-grey, $amount: 40%); }
-        border-color: fade-out($color: $color-grey, $amount: 0.5);
-        background: fade-out($color: $color-grey, $amount: 0.5);
-        text-shadow: 0 1px 0 #fff9;
+        &, * { color: color-mix(in srgb, var(--color-grey) 40%, var(--color-window-fg)) }
+        border-color: rgb(from var(--color-grey) r g b / 0.4);
+        background: rgb(from var(--color-grey) r g b / 0.3);
     }
     
-    &.alert-grey-dark {
-        &, * { color: darken($color: $color-grey-dark, $amount: 10%); }
-        border-color: fade-out($color: $color-grey-dark, $amount: 0.8);
-        background: fade-out($color: $color-grey-dark, $amount: 0.7);
-        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    }
-
     &.alert-green {
-        &, * { color: darken($color: $color-green, $amount: 15%); }
-        border-color: fade-out($color: $color-green, $amount: 0.8);
-        background: fade-out($color: $color-green, $amount: 0.8);
-        text-shadow: 0 1px 0 #fff9;
+        &, * { color: color-mix(in srgb, var(--color-green) 70%, var(--color-window-fg)); }
+        border-color: rgb(from var(--color-green) r g b / 0.2);
+        background: rgb(from var(--color-green) r g b / 0.2);
     }
 }

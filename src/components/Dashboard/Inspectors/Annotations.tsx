@@ -40,11 +40,11 @@ function Annotation({
 
     return (
         <div className="mb-1" style={{
-            background: "#DDD3 linear-gradient(#F7F7F7, #DDD3)",
+            background: "var(--color-window-bg-soft)",
             padding: 5,
             borderRadius: 7,
-            border: selected ? "1px solid #09F" : "1px solid #D9D9D9",
-            boxShadow: selected ? "0 0 0 3px #09F3" : "none"
+            border: selected ? "1px solid var(--color-blue-dark)" : "1px solid var(--color-grey)",
+            boxShadow: selected ? "0 0 0 3px rgb(from var(--color-blue) r g b / 0.5)" : "none"
         }}>
             <div className="row small">
                 <div className="col">

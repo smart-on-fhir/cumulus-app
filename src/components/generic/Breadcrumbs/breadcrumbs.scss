@@ -1,13 +1,11 @@
-@import "../../../styles/variables.scss";
-
 .breadcrumbs {
     margin-bottom: 1rem;
     a {
-        color: $color-blue;
+        color: var(--color-blue);
         white-space: nowrap;
     }
     .icon {
-        color: $color-grey;
+        color: rgb(from var(--color-window-fg-soft) r g b / 0.5);
         margin: 0 0.5em;
     }
 }

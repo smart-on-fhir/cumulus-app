@@ -249,7 +249,7 @@ export function AllSeries({
                          }}/>
                         <span
                             className={ "ellipsis" + (seriesId === s.id ? " selected" : "") }
-                            style={{ color: s.visible !== false ? "#414e5c" : "#999" }}
+                            style={{ color: s.visible !== false ? "var(--color-window-fg)" : "#8888" }}
                         >{ String(s.name ?? "") || "Series " + (i + 1)}</span>
                     </>
                 }>
