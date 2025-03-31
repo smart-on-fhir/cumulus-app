@@ -444,7 +444,7 @@ export default function StaticGrid({
                 "grouped": !!groupBy,
                 "searchable": searchableCols.length > 0
              })} style={{ maxHeight, minHeight, height }}>
-                <table className="static-grid-table">
+                <table className="static-grid-table table-border">
                     { renderHeader() }
                     { renderBody() }
                 </table>

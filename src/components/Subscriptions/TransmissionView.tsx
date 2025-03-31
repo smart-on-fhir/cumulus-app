@@ -80,14 +80,14 @@ export default class Chart extends React.Component<ChartProps>
         return {
             chart: {
                 inverted: true,
-                height: Math.max(series.length * 38 + 20, 180),
+                height: Math.max(series.length * 40 + 20, 180),
                 backgroundColor: "transparent",
                 plotBackgroundColor: "#FFF",
                 plotBorderColor: "#0002",
                 plotBorderWidth: 1,
-                plotShadow: {
-                    color: "#0003"
-                },
+                // plotShadow: {
+                //     color: "#0003"
+                // },
                 spacingTop: 20,
                 spacingBottom: 50,
                 spacingRight: 3,
@@ -171,9 +171,9 @@ export default class Chart extends React.Component<ChartProps>
                     // second: '%H:%M:%S',
                     // minute: '%H:%M',
                     // hour: '%H:%M',
-                    day: '%m/%d/%Y',
-                    week: '%m/%d/%Y',
-                    month: '%b %Y',
+                    day: '%m/%d/%y',
+                    week: '%m/%d/%y',
+                    month: '%m/%y',
                     year: '%Y'
                 },
                 title: {
@@ -290,7 +290,7 @@ export default class Chart extends React.Component<ChartProps>
                     data: series.map(s => ({
                         low  : s.dataStart,
                         high : s.dataEnd,
-                        color: s.failed ? "rgba(255,170,0,0.7)" : "rgba(100,170,250,0.3)",
+                        color: s.failed ? "rgba(255,170,0,0.7)" : "rgba(100,170,250,0.4)",
                         borderColor: s.failed ? "rgb(220,0,0)" : "rgba(0, 0, 0, 0.3)",
                         custom: {
                             lastUpdate: s.lastUpdate,

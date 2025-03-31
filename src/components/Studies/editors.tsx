@@ -109,7 +109,7 @@ export function CheckListEditor({
 
     return (
         <div>
-            <label>{ descriptor.name } <b className="badge">{value.length}</b></label>
+            <label>{ descriptor.name } <b className="badge bg-blue">{value.length}</b></label>
             <div className="form-control check-list" style={{ maxHeight: "20rem", overflow: "auto", padding: 4 }}>
                 <CheckboxList
                     items={descriptor.items as any}
@@ -209,7 +209,7 @@ export function BooleanEditor({
                     checked={ !!value }
                     onChange={ onChange }
                     label={ <b>{ name }</b> }
-                    description={ <span style={{ fontSize: "1rem", color: "#000" }}>{ description }</span> }
+                    description={ <span style={{ fontSize: "1rem" }}>{ description }</span> }
                 />
             </label>
         </div>

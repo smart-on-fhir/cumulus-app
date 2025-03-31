@@ -32,7 +32,7 @@ export default function StudyBuilder() {
     }
 
     return (
-        <>
+        <div className="container">
             <div className="center mb-2">
                 <h1>Create Study</h1>
             </div>
@@ -6564,6 +6564,6 @@ export default function StudyBuilder() {
                     onClick={() => downloadBase64File("application/json", btoa(JSON.stringify(variables, null, 4)), "StudyBuilderConfig.json")}
                 >Submit</button>
             </div>
-        </>
+        </div>
     )
 }

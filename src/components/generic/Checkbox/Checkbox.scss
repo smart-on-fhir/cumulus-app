@@ -1,6 +1,3 @@
-@import "../../../styles/variables.scss";
-
-
 label.checkbox-label {
     display: block;
     padding: 0 0.5em 0 1.66em;
@@ -20,7 +17,7 @@ label.checkbox-label {
         top: 0.3em;
 
         &:focus-visible + .checkbox-label-focus-highlight {
-            box-shadow: 0 0 0 1px lighten($color: $color-blue, $amount: 10%) inset;
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-blue), var(--color-window-bg-hard) 20%) inset;
             position: absolute;
             top: 0;
             left: 0;
@@ -55,9 +52,8 @@ label.checkbox-label {
     }
 
     &:hover {
-        background: lighten($color: $color-blue, $amount: 36%);
-        background: fade-out($color-blue, 0.74);
-        box-shadow: 0 0 0 1px fade-out($color-blue, 0.7) inset;
+        background: var(--color-highlight);
+        box-shadow: 0 0 0 1px var(--color-highlight) inset;
     }
 
     &.label-left {

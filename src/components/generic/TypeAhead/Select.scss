@@ -1,6 +1,3 @@
-@import "../../../styles/variables.scss";
-
-
 .type-ahead-component {
     position       : relative;
     user-select    : none;
@@ -17,6 +14,8 @@
         width    : 1em;
         padding  : 1px;
         transform: translate(-1px, -50%);
+        font-size: 14px;
+        color    : rgb(from var(--color-window-fg-hard) r g b / 0.3);
     }
 
     .type-ahead-component-value {
@@ -40,8 +39,8 @@
         margin-top   : 1px;
         padding      : 2px;
         border-radius: 3px;
-        background   : #FFF;
-        box-shadow   : 0 0 0 1px rgba(0, 0, 0, 0.2), 0px 5px 10px -5px rgba(0, 0, 0, 0.5);
+        background   : var(--color-window-bg-hard);
+        box-shadow   : 0 0 0 1px rgb(from var(--color-window-fg-hard) r g b / 0.3), 0px 5px 10px -5px rgba(0, 0, 0, 0.5);
         display      : none;
         
         .select-component-menu-wrap {
@@ -64,16 +63,13 @@
         text-overflow: ellipsis;
 
         &:hover {
-            background: linear-gradient(90deg, rgba(129, 171, 214, 0.3), rgba(129, 171, 214, 0.32));
-            box-shadow: 0 0 0 0.5px rgb(154, 178, 201) inset;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+            background: var(--color-highlight);
+            box-shadow: 0 0 0 1px var(--color-highlight) inset;
         }
 
         &.selected {
-            background: linear-gradient(90deg, #369, rgb(28, 79, 129));
-            box-shadow: 0 0 0 0.75px #036 inset;
-            color: #FFF;
-            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+            background: var(--color-selection);
+            box-shadow: 0 0 0 1px var(--color-highlight) inset;
         }
 
         &.disabled {

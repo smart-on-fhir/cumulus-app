@@ -2,7 +2,7 @@
     display: flex;
 
     .tabs-spacer {
-        box-shadow: 0 -1px 0 0 #CCC inset;
+        box-shadow: 0 -1px 0 0 var(--color-grey) inset;
         flex      : 1 1 0;
     }
 
@@ -16,7 +16,7 @@
         overflow     : hidden;
         text-overflow: ellipsis;
         user-select  : none;
-        box-shadow   : 0 -1px 0 0 #CCC inset;
+        box-shadow   : 0 -1px 0 0 var(--color-grey) inset;
         font-weight  : 500;
         box-sizing   : border-box;
 
@@ -26,20 +26,18 @@
         }
 
         &.active {
-            background-color: #FFF;
+            background-color: var(--color-window-bg-hard);
             flex      : 0 0 fit-content;
-            box-shadow: 0 1px 0px 0 #BBB inset,
-                -1px 0 0 0 #CCC inset,
-                1px 0 0 0 #CCC inset,
-                0 13px 3px -10px #FFFC inset,
+            box-shadow: 0 1px 0px 0 #F90 inset,
+                -1px 0 0 0 var(--color-grey) inset,
+                1px 0 0 0 var(--color-grey) inset,
                 0 14px 0px -10px #F90 inset;
         }
     }
 }
 
 .tabs-content {
-    background: linear-gradient(#FFF, #FFF8);
-    box-shadow: 0 -1px 0 0 #CCC inset, -1px 0 0 0 #CCC inset, 1px 0 0 0 #CCC inset;
-    // height: 100%;
+    background: var(--color-window-bg-hard);
+    box-shadow: 0 -1px 0 0 var(--color-grey) inset, -1px 0 0 0 var(--color-grey) inset, 1px 0 0 0 var(--color-grey) inset;
     min-height: -webkit-fill-available;
 }

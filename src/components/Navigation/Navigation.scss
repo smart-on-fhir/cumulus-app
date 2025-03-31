@@ -1,9 +1,7 @@
-@import "../../styles/variables.scss";
-
 .navigation {
-    background : #e8e8e8;
+    background : var(--color-window-bg-soft);
     width      : 16rem;
-    box-shadow : -1px 0 0 0 rgba(0, 0, 0, 0.1) inset;
+    box-shadow : -1px 0 0 0 var(--color-grey) inset;
     white-space: nowrap;
     transition : width 0.2s ease-out;
     margin     : -1rem 1rem -1rem -1rem;
@@ -22,8 +20,7 @@
     }
 
     .resizer {
-        background : #8888;
-        box-shadow : -1px 0 0 #888 inset, 1px 0 0 #888 inset;
+        background : var(--color-grey);
         position   : absolute;
         top        : 0;
         right      : 0;
@@ -80,8 +77,8 @@
             }
 
             &:has(a):hover {
-                background: #f8f8f7;
-                box-shadow: 0 0 0 1px #0001;
+                background: var(--color-window-bg);
+                box-shadow: 0 0 0 1px rgb(from var(--color-blue-dark) r g b / 0.1);
             }
 
             a {
@@ -90,10 +87,8 @@
                 text-overflow: ellipsis;
 
                 &.active {
-                    color      : #C60;
+                    color      : var(--color-brand-2);
                     opacity    : 1;
-                    // box-shadow : 0 1px 0 0 rgba(0, 0, 0, 0.1), 0 -1px 0 0 rgba(0, 0, 0, 0.1);
-                    // font-weight: 600;
                     .icon {
                         opacity: 1;
                     }
@@ -101,16 +96,12 @@
             }
 
             &:has(a.active) > .icon {
-                color  : #C60;
+                color  : var(--color-brand-2);
                 opacity: 1;
             }
         }
 
         .details {
-            // position: sticky;
-            // top: 0;
-            // background: #e8e8e8;
-            
             .details {    
                 margin-left: 2.5rem;
                 &.has-children {
@@ -131,10 +122,12 @@
                     line-height  : 1em;
                     text-align   : center;
                     cursor       : default;
+                    opacity      : 0.6;
                     
                     &:hover {
-                        background: #f8f8f7;
-                        box-shadow: 0 0 0 1px #0001;
+                        background: var(--color-highlight);
+                        box-shadow: 0 0 0 1px rgb(from var(--color-blue-dark) r g b / 0.2);
+                        opacity   : 1;
                     }
                 }
             }
@@ -148,7 +141,7 @@
         }
 
         .icon.active {
-            color  : #C60;
+            color  : var(--color-brand-2);
             opacity: 1;
         }
 
@@ -177,7 +170,6 @@ html:active .navigation {
 
         &:not(:hover) {
             width: 10px !important;
-            background: #8884;
             color: transparent;
         }
 

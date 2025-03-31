@@ -1,14 +1,11 @@
-@import "../../../styles/variables.scss";
-
 .tag {
 
-    $color-bg: #FC3;
-    $color-fg: darken($color-bg, 38);
+    $colorOutline: rgb(from var(--color-window-fg-hard) r g b / 0.4);
 
-    background: linear-gradient(mix($color-bg, #fff, 50), mix($color-bg, #fff, 70));
-    color: $color-fg;
-    box-shadow: 0 0 0 0.5px fade-out($color-fg, 0.6) inset;
-    text-shadow: 0 1px 0 fade-out(#FFF, 0.5);
+    background: linear-gradient(#FD4D, #FB2D);
+    color: #000D;
+    box-shadow: 0 0 0 0.5px $colorOutline inset;
+    text-shadow: 0 1px 0 #FFF6;
     margin: 0 0.5em 0 0;
     padding: 2px 0.5em 2px 1.2em;
     border-top-left-radius: 1.25em 50%;
@@ -27,19 +24,18 @@
     
     &:before {
         content: "";
-        background: $color-grey-light;
+        background: var(--color-window-bg);
         position: absolute;
         width: 0.5em;
         height: 0.5em;
         top: 50%;
         margin: -0.25em 0 0 -0.9em;
         border-radius: 50%;
-        box-shadow: 0 0 0 0.5px fade-out($color-fg, 0.6);
+        box-shadow: 0 0 0 0.5px $colorOutline;
     }
 }
 
 a.tag:hover {
     color: #008;
-    // text-decoration: underline;
     cursor: pointer;
 }

@@ -1,22 +1,13 @@
-@import "../../../styles/variables.scss";
-
 .property-grid {
-    $selection-bg: $color-blue;
-    $selection-bg-dark: mix($selection-bg, #000, 75%);
 
-    // grid: auto-flow / minmax(min-content, 66%) 1fr;
-    // grid: auto-flow / minmax(50%, max-content) auto;// minmax(min-content, 66%) 1fr;
-    // grid: auto-flow / minmax(50%, max-content) 1fr;
     grid: auto-flow / 3fr 2fr;
     display: grid;
     gap: 1px;
-    background: #0001;
+    background: var(--color-window-bg-soft);
     font-size: 15px;
-    // border: 1px solid #0001;
-    // margin: 0.25rem 0;
     
     ::selection {
-        background-color: $color-blue;
+        background-color: var(--color-blue);
         color: #FFF;
     }
 
@@ -28,11 +19,11 @@
         grid-column-start: 1;
         grid-column-end  : 2;
         display          : grid;
-        background       : $color-grey-light;
+        background       : var(--color-window-bg);
         align-content    : center;
         padding          : 0 4px;
         cursor           : default;
-        color            : #888;
+        color            : var(--color-window-fg-soft);
         font-weight      : 500;
 
         .nowrap {
@@ -44,17 +35,17 @@
         }
 
         &.group-heading {
-            background     : $color-grey-light;
+            background     : var(--color-window-bg);
             grid-column-end: 3;
             cursor         : pointer;
             display        : block;
-            color          : $color-blue;
+            color          : var(--color-blue);
             padding        : 2px 4px;
             font-weight    : bold;
 
             .property-description {
                 font-weight: 400;
-                color      : #0008;
+                color      : var(--color-window-fg-soft);
                 padding    : 0 0 0 5px;
                 margin     : 3px 0 3px 2.3em;
                 white-space: pre-wrap;
@@ -69,15 +60,15 @@
             .fa-solid {
                 width: 1em;
                 text-align: left;
-                color: fade-out(#000, 0.65);
+                color: rgb(from var(--color-window-fg) r g b / 0.5);
             }
 
             &:hover .fa-solid {
-                color: fade-out(#000, 0.45);
+                color: rgb(from var(--color-window-fg) r g b / 0.45);
             }
 
             &:focus-visible {
-                outline: 1px solid $selection-bg-dark;
+                outline: 1px solid var(--color-blue-dark);
                 outline-offset: 0px;
                 position: relative;
                 z-index: 2;
@@ -95,18 +86,18 @@
         }
 
         &.disabled {
-            color: #0006;
+            color: #8888;
         }
     }
     
     .prop-editor {
         display        : grid;
-        background     : $color-grey-light;
+        background     : var(--color-window-bg);
         align-content  : stretch;
         align-items    : flex-start;
         justify-content: stretch;
         justify-items  : flex-start;
-        color          : #000;
+        color          : var(--color-window-fg);
 
         > label {
             padding: 0;
@@ -130,7 +121,7 @@
     input[type="checkbox"] {
         margin: 5px;
         &:focus {
-            outline: 1px solid $selection-bg-dark;
+            outline: 1px solid var(--color-blue-dark);
             outline-offset: 4px;
         }
     }
@@ -147,8 +138,8 @@
         text-indent: 2px;
 
         &:focus {
-            box-shadow: 0 0 0 1px $selection-bg-dark;
-            background-color: #FFF;
+            box-shadow: 0 0 0 1px var(--color-blue-dark);
+            background-color: var(--color-window-bg-hard);
             position: relative;
             z-index: 3;
         }

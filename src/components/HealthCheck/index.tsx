@@ -92,7 +92,6 @@ function Progress({ checks, results }: { checks: Check[], results: Record<string
                     data-tooltip-position="25% 0%"
                     style={{
                         height: "1rem",
-                        boxShadow: "0 0 0 1px #0002 inset",
                         borderRadius: 2,
                         background: result.status === "failed" ?
                             "#C00C" :
@@ -102,7 +101,7 @@ function Progress({ checks, results }: { checks: Check[], results: Record<string
                                     "#0C0C" :
                                     result.status === "loading" ?
                                         "#369C" :
-                                        "#0001"
+                                        "#8888"
                     }}
                 />
             }) }

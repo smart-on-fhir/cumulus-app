@@ -304,8 +304,8 @@ export default function MetricsStaticGrid({
                             lineHeight: "1.1em",
                             margin    : "-2px 5px -2px 0",
                             verticalAlign: "top",
-                            color     : "#0002",
-                            userSelect: "none"
+                            userSelect: "none",
+                            opacity: 0.25
                         }}>{ i < all.length - 1 ? "├─" : "└─" }</span>{ cellValue(rec, c.name, true) }
                     </td>
                 }
@@ -344,7 +344,7 @@ export default function MetricsStaticGrid({
                 "grouped": !!groupBy,
                 "searchable": searchableCols.length > 0
              })} style={{ maxHeight, minHeight, height }}>
-                <table className="static-grid-table">
+                <table className="static-grid-table table-border">
                     { renderHeader() }
                     { renderBody() }
                 </table>

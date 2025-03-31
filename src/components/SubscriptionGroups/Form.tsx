@@ -1,7 +1,6 @@
 import { FormEvent, useState } from "react"
 import MarkdownEditor          from "../generic/MarkdownEditor"
 import { app }                 from "../../types"
-import "./SubscriptionGroups.scss"
 
 
 export default function Form({

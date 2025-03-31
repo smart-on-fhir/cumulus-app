@@ -1,31 +1,26 @@
-@import "../../../styles/variables.scss";
-
-
 .static-grid-wrapper {
     overflow  : auto;
-    border    : 1px solid #0003;
+    border    : 1px solid var(--color-grey);
     position  : relative;
     min-height: 6em;
 
     .static-grid-table {
         cursor: default;
         border-spacing: 0;
-        background: #0001;
+        background: var(--color-window-bg-hard);
 
         tr {
-            background: #FFF;
 
             &:hover {
-                background: #F0F0F0;
+                background: var(--color-highlight);
             }
 
             &.summary {
                 td {
-                    background: #FFF8EE !important;
-                    color: #777;
-                    // color: $color-blue;
+                    background: #FD83 !important;
+                    color: var(--window-fg-soft);
                     cursor: default !important;
-                    box-shadow: 0 0.5px 0 0 #0002 inset, 0 -0.5px 0 0 #0003 inset;
+                    box-shadow: 0 0.5px 0 0 var(--window-fg) inset, 0 -0.5px 0 0 var(--window-fg) inset;
                 }
             }
         }
@@ -40,44 +35,38 @@
                 margin: 0 auto;
                 line-height: inherit;
             }
-            // border-top: 0.5px solid #00000013;
-            // border-bottom: 0.5px solid #00000013;
-            border-left: 1px solid #00000013;
-            box-shadow: 0 0.5px 0 0 #00000012 inset, 0 -0.5px 0 0 #00000012 inset;
+
             &:first-child {
                 border-left: 0;
             }
         }
 
         th {
-            padding       : 3px 6px;
-            user-select: none;
-            border-bottom: 1px solid #0003;
-            background: linear-gradient(#F9F9F9, #F0F0F0);
-            text-shadow: 0 1px 0 #FFF;
+            padding      : 3px 6px;
+            user-select  : none;
+            border-bottom: 1px solid rgb(from var(--color-window-fg) r g b / 0.3);
+            background   : var(--color-window-bg);
 
             .icon.fa-angle-up,
             .icon.fa-angle-down {
-                color: #0004;
+                opacity: 0.5;
             }
 
             &.sorted {
-                box-shadow: 0 -2px 0 0 #F906 inset;
-                background: linear-gradient(#FFF, #FFF);
-                border-bottom-color: #C608;
+                box-shadow: 0 -2px 0 0 var(--color-orange) inset, 0 -2px 0 var(--color-window-bg);
+                border-bottom-color: var(--color-orange);
             }
         }
 
         tr.selected td {
-            background: fade-out($color-blue, 0.75);
-            color: #000C;
-            text-shadow: 0 1px 0 #FFF8;
+            background: var(--color-selection);
         }
 
         thead th {
             position: sticky;
-            top: 0;
+            top: 0.5px;
             z-index: 2;
+            box-shadow: 0 -2px 0 var(--color-window-bg);
         }
 
         td.no-data {
@@ -87,30 +76,33 @@
         }
 
         .group-header-row {
-            background: mix($color-blue, #FFFFFF, 5%);
+            background: rgb(from var(--color-blue-dark) r g b / 0.1);
             td {
-                color: $color-blue;
+                color: var(--color-blue-dark);
                 transition: all 0.2s;
 
                 &:first-child {
-                    cursor: pointer;
+                    cursor     : pointer;
                     font-weight: 500;
-                    padding       : 2px 6px 2px 4px;
+                    padding    : 2px 6px 2px 4px;
                 }
 
-                .icon.fa-angle-right,
-                .icon.fa-angle-down {
+                .icon.fa-angle-right, .icon.fa-angle-down {
                     width: 1.2em;
                     text-align: center;
-                    color: #0004;
+                    color: rgb(from var(--color-window-fg) r g b / 0.5);
                 }
             }
 
             &:hover {
-                background: mix($color-blue, #FFFFFF, 10%);
+                background: var(--color-highlight);
                 border-top-color: #00000023;
                 border-bottom-color: #00000023;
             }
+        }
+
+        &.table-border thead th {
+            border-top: 0
         }
     }
 
@@ -121,11 +113,13 @@
 }
 
 .simple-grid {
+    
     .static-grid-wrapper {
         border: 0;
     }
     .static-grid-table {
         background: transparent;
+        border: 0;
 
         tr {
             background: transparent;
@@ -134,38 +128,27 @@
         td {
             padding: 6px;
             border-left-color: #0000;
-            border-width: 1px 0;
+            border-width: 0.5px 0;
         }
 
         th {
-            background: $color-grey-light;
             padding: 6px 6px;
-            border-color: transparent transparent #0002 transparent;
-            border-width: 0 0 3px 0;
-            border-style: none none solid none;
-            // background: linear-gradient(#F9F9F9, #F0F0F0);
-            text-shadow: 0 1px 0 #FFF;
-            box-shadow: none;
+            border-width: 0 0 2px 0;
+            box-shadow: 0 -2px 0 var(--color-window-bg);
             cursor: pointer;
 
             &.sorted {
-                box-shadow: none;//0 -2px 0 0 $color-brand-2 inset;
-                background: $color-grey-light;
-                border-bottom-color: $color-brand-2;
+                box-shadow: 0 -2px 0 var(--color-window-bg);
+                border-bottom-color: var(--color-brand-2);
             }
         }
 
         .group-header-row {
             background: transparent;
+            &:hover { background: transparent; }
             td.group-header {
                 padding: 6px 6px;
-                color: $color-brand-2;
-            }
-        }
-
-        tbody > tr:first-child {
-            td, th {
-                border-top: 0;
+                color: var(--color-brand-2);
             }
         }
     }

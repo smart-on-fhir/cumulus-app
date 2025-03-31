@@ -1,15 +1,11 @@
-@import "../../styles/variables.scss";
-
 .requests-header {
     position: sticky;
     top: 4rem;
-    // padding-top: 1rem;
-    background-color: $color-grey-light !important;
+    background-color: var(--color-window-bg) !important;
     z-index: 20;
 }
 
 .requests-grid {
-    
     grid-template-rows: 1fr auto;
     page-break-inside: avoid;
     break-inside: avoid;
@@ -28,10 +24,12 @@
 .columns-table {
     border-collapse: collapse;
     margin: 0;
+    color: var(--color-window-fg-soft);
 
     > tbody > tr > th {
-        border-bottom: 1px solid $color-grey;
-        padding: 3px 6px;
+        color: var(--color-window-fg);
+        border-bottom: 1px solid rgb(from var(--color-window-fg) r g b / 0.2);
+        padding: 4px 6px;
         &:first-of-type {
             padding-left: 1.25em;
         }
@@ -44,22 +42,21 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            border-bottom: 1px solid #0001;
+            border-bottom: 1px solid rgb(from var(--color-window-fg) r g b / 0.1);
             cursor: pointer;
             padding: 3px 6px 3px 0;
-            color: $color-blue-dark;
+            color: var(--color-blue-dark);
             &:hover {
-                color: $color-brand-2;
+                color: var(--color-brand-2);
             }
         }
         &.col-description {
-            border-bottom: 1px solid #0001;
+            border-bottom: 1px solid rgb(from var(--color-window-fg) r g b / 0.1);
         }
         &.col-details {
             padding: 6px 6px 2em 2.5rem;
             font-size: 85%;
             line-height: 1.4;
-            color: #666;
 
             table {
                 margin-left: 2em;
@@ -72,7 +69,7 @@
 
     > tbody > tr + tr:hover {
         > td, > th {
-            background: #00000008;
+            background: rgb(from var(--color-window-fg-soft) r g b / 0.05);
         }
     }
 
@@ -81,7 +78,7 @@
         width: 1em;
         text-align: center;
         margin-right: 0.25em;
-        color: $color-grey-dark;
+        color: rgb(from var(--color-window-fg) r g b / 0.5);
     }
 }
 

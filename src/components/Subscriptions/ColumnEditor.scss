@@ -6,6 +6,6 @@
         padding: 2px;
     }
     tbody tr:hover {
-        background: rgb(218, 233, 250);
+        background: var(--color-highlight);
     }
 }

@@ -54,7 +54,7 @@ function Filter({
     }
 
     return (
-        <div style={{ background: "#EFEFEF", padding: 3, borderRadius: 7, border: "1px solid #D9D9D9" }}>
+        <div style={{ background: "var(--color-window-bg-soft)", padding: 3, borderRadius: 7, border: "1px solid #8888" }}>
             <div className="row">
                 <div className="col">
                     <ColumnSelector
@@ -215,7 +215,7 @@ export default function FilterUI({
                     { i > 0 &&
                     <div className="row center" style={{ margin: "-1px 0" }}>
                         <div className="col"/>
-                        <div className="col col-0" style={{ background: "#EFEFEF", padding: "0 3px", borderRight: "1px solid #D9D9D9", borderLeft: "1px solid #D9D9D9" }}>
+                        <div className="col col-0" style={{ background: "var(--color-window-bg-soft)", padding: "0 3px", borderRight: "1px solid #8888", borderLeft: "1px solid #8888" }}>
                             <div className="toolbar small">
                                 <button
                                     style={{ width: "3.4em" }}

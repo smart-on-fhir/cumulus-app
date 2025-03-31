@@ -79,7 +79,7 @@ export default function Account()
                     <input type="checkbox" checked={ changePass } onChange={ e => setChangePass(e.target.checked) }/> Change Password
                 </label>
             </div>
-            <fieldset className="p-1 mb-3" style={{ border: "1px solid #DDD", borderRadius: 4, background: "#e8e8e8" }} disabled={ !changePass }>
+            <fieldset className="p-1 mb-3 panel" disabled={ !changePass }>
                 <CreatePassword password1={newPassword1} password2={newPassword2} setPassword1={setNewPassword1} setPassword2={setNewPassword2} hideValidation={!changePass} />
             </fieldset>
             <hr/>
