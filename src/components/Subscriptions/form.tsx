@@ -199,7 +199,7 @@ export default function SubscriptionForm({
                 <label className="nowrap pt-0">Available Columns</label>
                 <hr/>
                 <ColumnEditor
-                    cols={ record.metadata.cols }
+                    cols={ record.metadata!.cols }
                     onChange={ cols => {
                         const metadata = { ...record.metadata, cols }
                         

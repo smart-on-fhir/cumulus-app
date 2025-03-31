@@ -61,7 +61,7 @@ export default function Select({
     }
 
     useEffect(() => {
-        wrapper?.current?.querySelector(".select-component-option.highlighted")?.scrollIntoView?.({ block: "nearest", inline: "nearest", behavior: "instant" })
+        wrapper?.current?.querySelector(".select-component-option.highlighted")?.scrollIntoView?.({ block: "nearest", inline: "nearest", behavior: "instant" as ScrollBehavior })
     })
 
     function onKeyDown(e: KeyboardEvent) 
