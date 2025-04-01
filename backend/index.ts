@@ -142,7 +142,7 @@ function startServer(server: HTTP.Server, config: Config)
     });
 }
 
-async function main(config: Config = settings)
+async function main(config: Config = settings): Promise<any>
 {
     const { app, server } = createServer(config);
     await setupDB(config);

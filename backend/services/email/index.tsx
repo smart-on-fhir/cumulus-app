@@ -1,3 +1,4 @@
+import { ReactNode }         from "react"
 import ReactDOMServer        from "react-dom/server"
 import sendEmail             from "./sendMail"
 import config                from "../../config"
@@ -13,7 +14,7 @@ import {
 } from "./components"
 
 
-function generateHtml(component: JSX.Element): string {
+function generateHtml(component: ReactNode): string {
     return `<!DOCTYPE html>
     <html>
         <body style="font:18px sans-serif;margin:0;padding:8px">

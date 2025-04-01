@@ -109,6 +109,4 @@ const Subscriptions: Subscription[] = [
     }
 ];
 
-const Views = [];
-
 export default Subscriptions;
