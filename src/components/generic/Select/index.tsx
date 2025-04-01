@@ -1,4 +1,4 @@
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { classList } from "../../../utils"
 import "./Select.scss"
 
@@ -23,10 +23,10 @@ export interface SelectProps {
 
 export interface SelectOption {
     value: any
-    label: string | JSX.Element
+    label: ReactNode
     icon?: string
     disabled?: boolean
-    right?: string | JSX.Element
+    right?: ReactNode
 }
 
 export default function Select({

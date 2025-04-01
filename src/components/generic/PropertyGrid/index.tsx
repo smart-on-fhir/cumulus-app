@@ -1,4 +1,4 @@
-import { Fragment, useState }  from "react"
+import { Fragment, ReactNode, useState }  from "react"
 import LengthEditor  from "./LengthEditor"
 import NumberEditor  from "./NumberEditor"
 import StringEditor  from "./StringEditor"
@@ -18,7 +18,7 @@ import DateEditor from "./DateEditor"
 
 
 
-function PropertyEditor({ prop, level = 1 }: { prop: EditableProperty, level?: number }): JSX.Element {
+function PropertyEditor({ prop, level = 1 }: { prop: EditableProperty, level?: number }): ReactNode {
     switch (prop.type) {
         case "boolean":
             return <BooleanEditor prop={ prop as EditableBooleanProperty } />
@@ -61,7 +61,7 @@ export function PropertyEditorGroup({
     description
 }: {
     props: (EditableProperty | EditableGroupProperty)[]
-    name: string | JSX.Element,
+    name: ReactNode,
     level?: number
     open?: boolean
     description?: string
@@ -117,7 +117,7 @@ export function PropertyEditorGroup({
     )
 }
 
-function propertyGridRows(props: (EditableProperty | EditableGroupProperty)[], level = 0): JSX.Element[] {
+function propertyGridRows(props: (EditableProperty | EditableGroupProperty)[], level = 0): ReactNode[] {
     return props.map((prop, i) => {
 
         if (Array.isArray(prop.value)) {

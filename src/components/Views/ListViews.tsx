@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Helmet, HelmetProvider } from "react-helmet-async";
 import { classList } from "../../utils";
 import Checkbox from "../generic/Checkbox";
 import MenuButton from "../generic/MenuButton";
@@ -70,11 +69,7 @@ export default function ListViews()
 
     return (
         <div>
-            <HelmetProvider>
-                <Helmet>
-                    <title>{ draftsMode ? "Draft Graphs" : "Cumulus Graphs" }</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>{ draftsMode ? "Draft Graphs" : "Cumulus Graphs" }</title>
             <header className="view-browser-header">
                 <div className="row half-gap middle wrap">
                     <div className="col col-0 mb-05 nowrap">

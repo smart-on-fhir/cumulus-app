@@ -1,5 +1,4 @@
 import { FormEvent, useCallback, useState } from "react";
-import { Helmet, HelmetProvider }           from "react-helmet-async";
 import { useParams }                        from "react-router";
 import { Link }                             from "react-router-dom";
 import { useAuth }                          from "../../auth";
@@ -314,11 +313,7 @@ export function RequestDataForm({
 
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>Request Line-level Data</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>Request Line-level Data</title>
             <Breadcrumbs links={[
                 { name: "Home"  , href: "/" },
                 view.isDraft ? { name: "Draft Graphs", href: "/drafts" } : { name: "Graphs", href: "/views"  },

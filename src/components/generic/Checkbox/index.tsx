@@ -1,3 +1,4 @@
+import { ReactNode } from "react"
 import { classList } from "../../../utils"
 import "./Checkbox.scss"
 
@@ -16,8 +17,8 @@ export default function Checkbox({
     checked     : boolean
     onChange    : (checked: boolean) => void
     name        : string
-    label      ?: string | JSX.Element
-    description?: string | JSX.Element
+    label      ?: ReactNode
+    description?: ReactNode
     type       ?: "checkbox" | "radio"
     className  ?: string
     disabled   ?: boolean

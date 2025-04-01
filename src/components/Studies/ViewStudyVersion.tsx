@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
 import { useParams, Link }              from "react-router-dom"
-import { HelmetProvider, Helmet }       from "react-helmet-async"
 import TransmissionView                 from "../Subscriptions/TransmissionView"
 import { AlertError }                   from "../generic/Alert"
 import Loader                           from "../generic/Loader"
@@ -101,11 +100,7 @@ export default function ViewStudyVersion() {
 
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>{humanizeColumnName(id!)}</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>{humanizeColumnName(id!)}</title>
             <Breadcrumbs links={[
                 { name: "Home"    , href: "/" },
                 { name: Terminology.study.namePlural, href: "/studies" },

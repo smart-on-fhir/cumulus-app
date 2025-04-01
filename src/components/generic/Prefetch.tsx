@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { ReactNode, useCallback } from "react"
 import { request }     from "../../backend"
 import { useBackend }  from "../../hooks"
 import Loader          from "./Loader"
@@ -10,7 +10,7 @@ export default function Prefetch<T=any>({
     children
 }: {
     path: string
-    children: (data: T) => JSX.Element
+    children: (data: T) => ReactNode
 }) {
     let { result, loading, error } = useBackend(
         useCallback(signal => {

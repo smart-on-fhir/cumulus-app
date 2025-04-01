@@ -1,7 +1,6 @@
 import moment                               from "moment"
 import { Link }                             from "react-router-dom"
 import { useCallback, useEffect, useState } from "react"
-import { Helmet, HelmetProvider }           from "react-helmet-async"
 import PageHeader                           from "../generic/PageHeader"
 import Loader                               from "../generic/Loader"
 import { AlertError }                       from "../generic/Alert"
@@ -49,11 +48,7 @@ export default function ListSites()
 
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>List Data Sites</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>List Data Sites</title>
             <Breadcrumbs links={[
                 { name: "Home"    , href: "/" },
                 { name: Terminology.site.namePlural, href: "/sites" }

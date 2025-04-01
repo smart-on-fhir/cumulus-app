@@ -1,7 +1,6 @@
 import moment                            from "moment"
 import { Component }                     from "react"
 import { useNavigate, useParams }        from "react-router"
-import { HelmetProvider, Helmet }        from "react-helmet-async"
 import Breadcrumbs                       from "../generic/Breadcrumbs"
 import Alert, { AlertError }             from "../generic/Alert"
 import Loader                            from "../generic/Loader"
@@ -589,11 +588,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
                 "grey-out": loading,
                 "data-uploader": true
             })}>
-                <HelmetProvider>
-                    <Helmet>
-                        <title>Import Data</title>
-                    </Helmet>
-                </HelmetProvider>
+                <title>Import Data</title>
                 <Breadcrumbs links={[
                     { name: "Home", href: "/" },
                     { name: Terminology.subscription.namePlural, href: "/requests" },

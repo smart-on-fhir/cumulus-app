@@ -1,5 +1,5 @@
-import { CSSProperties, MouseEvent, useLayoutEffect } from "react"
-import { render }                from "react-dom"
+import { CSSProperties, MouseEvent, ReactNode, useLayoutEffect } from "react"
+import { createRoot }                from "react-dom/client"
 import "./Dialog.scss"
 
 export function centerDialog() {
@@ -23,10 +23,10 @@ export default function Dialog({
     onComplete
 } : {
     modal      ?: boolean
-    header     ?: JSX.Element | string
+    header     ?: ReactNode
     className  ?: string
-    body        : (props: { close: () => void }) => JSX.Element | string
-    footer     ?: (props: { close: () => void }) => JSX.Element | string
+    body        : (props: { close: () => void }) => ReactNode
+    footer     ?: (props: { close: () => void }) => ReactNode
     style      ?: CSSProperties
     onComplete ?: () => void
 })
@@ -34,7 +34,7 @@ export default function Dialog({
     const container = document.getElementById("modal")!
 
     function close() {
-        render(<>{}</>, container)
+        createRoot(container).render(<>{}</>)
         onComplete && onComplete()
     }
 

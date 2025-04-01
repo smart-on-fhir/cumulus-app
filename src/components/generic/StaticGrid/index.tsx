@@ -49,7 +49,7 @@ interface StaticGridProps<T = JSONObject> {
      */
     groupBy?: string | null
 
-    groupLabel?: (value: JSONValue, children: T[], search?: string) => JSX.Element | string
+    groupLabel?: (value: JSONValue, children: T[], search?: string) => ReactNode | string
     
     /**
      * List of selected IDs

@@ -1,4 +1,4 @@
-import { render }            from "react-dom"
+import { createRoot }        from "react-dom/client"
 import ShareDialog           from "./components/ShareDialog"
 import { Command }           from "../../Command"
 import { app }               from "../../../types"
@@ -47,13 +47,12 @@ export class BulkShareGraph extends Command
     }
     
     execute() {
-        render(
+        createRoot(document.getElementById("modal")!).render(
             <ShareDialog 
                 resource="Graphs"
                 selectedResources={ [...this.graphs] }
                 user={ this.user }
-            />,
-            document.getElementById("modal")!
+            />
         )
     }
 }

@@ -1,3 +1,4 @@
+import { ReactNode } from "react"
 import { classList } from "../utils"
 
 export default function CommandButton({
@@ -14,8 +15,8 @@ export default function CommandButton({
     working    ?: boolean,
     error      ?: Error | null,
     execute     : () => void,
-    label       : string | JSX.Element | null,
-    icon       ?: JSX.Element
+    label       : ReactNode,
+    icon       ?: ReactNode
     available  ?: boolean
     enabled    ?: boolean
     active     ?: boolean

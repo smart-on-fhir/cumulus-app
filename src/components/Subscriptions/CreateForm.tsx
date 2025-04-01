@@ -1,5 +1,4 @@
 import { useCallback, useState }  from "react"
-import { HelmetProvider, Helmet } from "react-helmet-async"
 import { Navigate, useLocation }  from "react-router"
 import { useSearchParams }        from "react-router-dom"
 import { request, createOne }     from "../../backend"
@@ -77,11 +76,7 @@ export default function CreateSubscriptionForm()
 
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>Create {Terminology.subscription.namePlural}</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>Create {Terminology.subscription.namePlural}</title>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
                 { name: Terminology.subscription.namePlural, href: "/requests" },

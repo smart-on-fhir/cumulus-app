@@ -1,5 +1,4 @@
 import { useEffect, useState }       from "react"
-import { HelmetProvider, Helmet }    from "react-helmet-async"
 import { Link }                      from "react-router-dom"
 import { useAuth }                   from "../../auth"
 import { app }                       from "../../types"
@@ -15,11 +14,7 @@ import "./home.scss"
 export default function Home() {
     return (
         <>
-            <HelmetProvider>
-                <Helmet>
-                    <title>Cumulus</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>Cumulus</title>
             <div className="home-page container">
                 <StudyAreas />
                 <Graphs />

@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
-import { Helmet, HelmetProvider } from "react-helmet-async"
+import { ReactNode, useEffect, useMemo, useState } from "react"
 import { useNavigate }                  from "react-router"
 import { request }                      from "../../backend"
 import { AlertError } from "./Alert"
@@ -16,7 +15,7 @@ export default function EndpointCreateWrapper({
         data    : any
         onSubmit: (data: any) => void
         error   : Error | string | null
-    }) => JSX.Element
+    }) => ReactNode
 })
 {
     const navigate = useNavigate()
@@ -72,16 +71,12 @@ export function createCreatePage<T = unknown>({
         loading : boolean
         data    : T
         onSubmit: (data: Partial<T>) => void
-    }) => JSX.Element
+    }) => ReactNode
 })
 {
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>Create { nameSingular }</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>Create { nameSingular }</title>
             <EndpointCreateWrapper endpoint={ endpoint }>
                 {({ data, error, loading, onSubmit }) => (
                     <>

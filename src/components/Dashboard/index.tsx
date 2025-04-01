@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useReducer }    from "react"
 import { useNavigate, Link }                     from "react-router-dom"
-import { HelmetProvider, Helmet }                from "react-helmet-async"
 import { buildChartOptions }                     from "./Charts/lib"
 import ConfigPanel                               from "./ConfigPanel"
 import { default as BaseChart }                  from "./Charts/Chart"
@@ -613,7 +612,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
             const result = await updateOne("views", view.id, { ...runtimeView, screenShot }).catch(e => alert(e.message));
 
-            dispatch({ type: "MERGE", payload: { isDraft: result!.isDraft }})
+            dispatch({ type: "MERGE", payload: { isDraft: result ? result.isDraft : false }})
         }
 
         // Create
@@ -826,12 +825,8 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
 
     return (
         <div className={ "dashboard " + (saving || deleteCommand.working ? "grey-out" : "") + (showOptions ? " sidebar-open" : "") }>
-            <HelmetProvider>
-                <Helmet>
-                    <title>{viewName}</title>
-                    {viewDescription && <meta name="description" content="Helmet application" />}
-                </Helmet>
-            </HelmetProvider>
+            <title>{viewName}</title>
+            { viewDescription && <meta name="description" content={viewDescription} />}
             <div className="row">
                 <div className="col col-0">
                     <div onTransitionEnd={onTransitionEnd} className="dashboard-sidebar">

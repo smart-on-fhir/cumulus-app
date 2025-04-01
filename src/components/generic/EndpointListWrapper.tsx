@@ -1,7 +1,7 @@
-import { Helmet, HelmetProvider } from "react-helmet-async"
-import { Link }                   from "react-router-dom"
-import Breadcrumbs                from "./Breadcrumbs"
-import Prefetch                   from "./Prefetch"
+import { Link }      from "react-router-dom"
+import Breadcrumbs   from "./Breadcrumbs"
+import Prefetch      from "./Prefetch"
+import { ReactNode } from "react"
 
 
 export default function createListPage<T = unknown>({
@@ -16,8 +16,8 @@ export default function createListPage<T = unknown>({
     /** @deprecated */
     nameSingular?: string
     endpoint     : string
-    icon        ?: JSX.Element | null
-    renderList   : (data: T) => JSX.Element
+    icon        ?: ReactNode
+    renderList   : (data: T) => ReactNode
     canCreate   ?: boolean
     baseUrl     ?: string
 })
@@ -27,11 +27,7 @@ export default function createListPage<T = unknown>({
             <Prefetch path={ endpoint }>
                 {(data: T) => (
                     <>
-                        <HelmetProvider>
-                            <Helmet>
-                                <title>{ namePlural }</title>
-                            </Helmet>
-                        </HelmetProvider>
+                        <title>{ namePlural }</title>
                         <Breadcrumbs links={[
                             { name: "Home", href: "/" },
                             { name: namePlural }

@@ -1,5 +1,4 @@
 import { useCallback, useState }       from "react"
-import { HelmetProvider, Helmet }      from "react-helmet-async"
 import { Link }                        from "react-router-dom"
 import SubscriptionLink                from "./SubscriptionLink"
 import { useBackend, useLocalStorage } from "../../hooks"
@@ -64,11 +63,7 @@ export default function SubscriptionsListPage()
 
     return (
         <div>
-            <HelmetProvider>
-                <Helmet>
-                    <title>{Terminology.subscription.namePlural}</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>{Terminology.subscription.namePlural}</title>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
                 { name: Terminology.subscription.namePlural, href: "/requests" }

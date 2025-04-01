@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react"
-import { HelmetProvider, Helmet }           from "react-helmet-async"
 import { Link }                             from "react-router-dom"
 import Breadcrumbs                          from "../generic/Breadcrumbs"
 import PageHeader                           from "../generic/PageHeader"
@@ -30,11 +29,7 @@ export default function DataPackageList() {
 
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>List {Terminology.dataPackage.namePlural}</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>List {Terminology.dataPackage.namePlural}</title>
             <Breadcrumbs links={[
                 { name: "Home"    , href: "/" },
                 { name: Terminology.dataPackage.namePlural, href: "/packages" }
