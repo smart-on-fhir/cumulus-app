@@ -355,8 +355,8 @@ input[type="radio"] {
 }
 
 .btn {
+    border-color: rgb(from var(--color-window-fg-hard) r g b / 0.1);
     @include button(var(--color-window-bg-hard));
-    border-color: rgb(from var(--color-window-fg-hard) r g b / 0.1)
 }
 
 .btn-blue {
