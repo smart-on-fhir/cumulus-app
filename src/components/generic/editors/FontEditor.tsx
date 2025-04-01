@@ -81,7 +81,7 @@ function PropertyEditor({
                     <b>{ isArray ? "[" : "{" }</b>
                     { !open && <code>{ JSON.stringify(value).replace(/^.|.$/g, "") }</code> }
                     { open && <span className="add" onClick={() => onChange(
-                            isArray ? [...value, "<New Value>"] : {...value as object, "<New Entry>": "<New Value>"}
+                            isArray ? [...(value as any[]), "<New Value>"] : {...value as object, "<New Entry>": "<New Value>"}
                         )}>Add Property</span>
                      }
                     { !open && <b>{ isArray ? "]" : "}" }</b> }

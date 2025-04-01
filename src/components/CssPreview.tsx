@@ -1,4 +1,4 @@
-import Markdown from "markdown-to-jsx";
+const Markdown = require("markdown-to-jsx");
 import Grid from "./generic/Grid";
 import Alert from "./generic/Alert";
 import Toggle from "./generic/Toggle";
@@ -368,19 +368,19 @@ export default function CssPreview() {
                     <div>
                         <div>
                             <label>select</label>
-                            <select placeholder="placeholder">
+                            <select>
                                 <option>Option 1</option>
                             </select>
                         </div>
                         <div>
                             <label>select:disabled</label>
-                            <select placeholder="placeholder" disabled>
+                            <select disabled>
                                 <option>Option 1</option>
                             </select>
                         </div>
                         <div>
                             <label>select:invalid</label>
-                            <select placeholder="placeholder" defaultValue="2" required>
+                            <select defaultValue="2" required>
                                 <option value="">Option 1</option>
                             </select>
                         </div>

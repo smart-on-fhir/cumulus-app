@@ -1,5 +1,4 @@
-import { useState }               from "react"
-import { Helmet, HelmetProvider } from "react-helmet-async"
+import { ReactNode, useState }               from "react"
 import { useAuth }                from "../../auth"
 import { request, updateOne }     from "../../backend"
 import CommandButton              from "../../commands/CommandButton"
@@ -44,11 +43,7 @@ export default function PermissionsManager() {
 
     return (
         <>
-            <HelmetProvider>
-                <Helmet>
-                    <title>Cumulus Permissions</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>Cumulus Permissions</title>
             <div className="permissions-page container">
                 <div className="pt-1 row gap">
                     <div className="col">
@@ -68,7 +63,7 @@ export default function PermissionsManager() {
                         children: (
                             <Prefetch key={key + "-role-based"} path="/api/permissions?order=resource:asc&where=role:not:null&where=resource_id:eq:null&where=user_group_id:eq:null">
                             { (data: app.Permission[]) => {
-                                let lastObject = "", buffer: app.Permission[] = [], children: JSX.Element[] = [];
+                                let lastObject = "", buffer: app.Permission[] = [], children: ReactNode[] = [];
                                 data.forEach((row: app.Permission, i) => {
                                     if (lastObject !== row.resource) {
                                         if (buffer.length) {

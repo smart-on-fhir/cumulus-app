@@ -83,7 +83,7 @@ export function useAuth() {
     return React.useContext(AuthContext);
 }
 
-export function RequireAuth({ children }: { children: JSX.Element }) {
+export function RequireAuth({ children }: { children: React.ReactNode }) {
     let auth = useAuth();
     let location = useLocation();
 

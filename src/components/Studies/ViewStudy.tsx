@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
 import { useParams }                        from "react-router"
-import { HelmetProvider, Helmet }           from "react-helmet-async"
 import { Data, getStudyData }               from "./lib"
 import PageHeader                           from "../generic/PageHeader"
 import Breadcrumbs                          from "../generic/Breadcrumbs"
@@ -55,11 +54,7 @@ export default function ViewStudy({ studyId }: { studyId?: string }) {
 
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>List {Terminology.study.namePlural}</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>List {Terminology.study.namePlural}</title>
             <Breadcrumbs links={[
                 { name: "Home"    , href: "/" },
                 { name: Terminology.study.namePlural, href: "/studies" },

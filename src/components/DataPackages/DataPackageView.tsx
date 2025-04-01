@@ -1,6 +1,5 @@
 import { useEffect, useState }     from "react"
 import { useParams }               from "react-router"
-import { HelmetProvider, Helmet }  from "react-helmet-async"
 import { Link }                    from "react-router-dom"
 import Grid                        from "../generic/Grid"
 import Prefetch                    from "../generic/Prefetch"
@@ -72,11 +71,7 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
 
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>{humanizeColumnName(pkg.name)}</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>{humanizeColumnName(pkg.name)}</title>
             <Breadcrumbs historic links={[
                 { name: "Home"    , href: "/" },
                 { name: Terminology.dataPackage.namePlural, href: "/packages" },

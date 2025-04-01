@@ -1,4 +1,4 @@
-import { CSSProperties } from "react";
+import { CSSProperties, ReactNode } from "react";
 import { classList } from "../../../utils";
 import "./Alert.scss";
 
@@ -13,7 +13,7 @@ export default function Alert({
     color?: "blue"|"red"|"orange"|"grey"|"green",
     className?: string
     icon?: string
-    children: JSX.Element | string | (JSX.Element | string)[],
+    children: ReactNode,
     style?: CSSProperties
 }) {
     return (
@@ -29,7 +29,7 @@ export default function Alert({
 }
 
 export function AlertError({ className, style, children = "Unknown error" }: {
-    children?: JSX.Element | string | Error | (JSX.Element | string | Error)[],
+    children?: ReactNode | Error | (ReactNode | Error)[],
     className?: string,
     style?: CSSProperties
 }) {

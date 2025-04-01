@@ -1,3 +1,4 @@
+import { ReactNode } from "react"
 import { useAuth }    from "../../auth"
 import { AlertError } from "./Alert"
 
@@ -7,7 +8,7 @@ export default function IfAllowed({
     showError = true
 
 }: {
-    element: JSX.Element
+    element: ReactNode
     permissions: string | string[]
     showError?: boolean
 })

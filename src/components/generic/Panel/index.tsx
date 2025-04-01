@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { classList } from "../../../utils";
 import MenuButton from "../MenuButton";
 
@@ -10,10 +11,10 @@ export default function Panel({
     icon
 }: {
     title: string
-    menu?: (JSX.Element|"separator"|null)[]
-    icon?: JSX.Element | null
+    menu?: (ReactNode|"separator"|null)[]
+    icon?: ReactNode | null
     loading?: boolean
-    children?: JSX.Element | string | (JSX.Element | string)[]
+    children?: ReactNode | string | (ReactNode | string)[]
 })
 {
     return (

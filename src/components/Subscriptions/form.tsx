@@ -360,7 +360,7 @@ function DataSourceSelector({
             </div>
             <div className="col col-2 responsive middle mb-1">
                 <label className="nowrap pt-0">Version</label>
-                <select disabled={!_pkg} value={_version} onChange={e => update({ version: e.target.value })} placeholder="test">
+                <select disabled={!_pkg} value={_version} onChange={e => update({ version: e.target.value })}>
                     { _pkg ? versions.map((v, i) => (
                         <option key={i} value={v}>📑 {v}</option>
                     )) : <option value="">Please Select</option> }

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
 import { Link }                       from "react-router-dom"
-import { HelmetProvider, Helmet }     from "react-helmet-async"
 import { Data, getStudyData }         from "./lib"
 import Breadcrumbs                    from "../generic/Breadcrumbs"
 import PageHeader                     from "../generic/PageHeader"
@@ -39,11 +38,7 @@ export default function ListStudies() {
 
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>List {Terminology.study.namePlural}</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>List {Terminology.study.namePlural}</title>
             <Breadcrumbs links={[
                 { name: "Home"    , href: "/" },
                 { name: Terminology.study.namePlural, href: "/studies" }

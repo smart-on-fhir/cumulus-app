@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useState }  from "react"
-import { Helmet, HelmetProvider } from "react-helmet-async"
+import { ReactNode, useCallback, useEffect, useMemo, useState }  from "react"
 import { useNavigate, useParams } from "react-router"
 import { Link }                   from "react-router-dom"
 import { request }                from "../../backend"
@@ -23,7 +22,7 @@ export default function EndpointDeleteWrapper({
         data    : any
         onSubmit: () => void
         error: Error | string | null
-    }) => JSX.Element
+    }) => ReactNode
 })
 {
     const { id } = useParams()
@@ -97,8 +96,8 @@ export function createDeletePage<T = unknown>({
     endpoint         : string
     nameField       ?: string
     query           ?: string
-    icon            ?: JSX.Element | null
-    renderView       : (data: T) => JSX.Element
+    icon            ?: ReactNode | null
+    renderView       : (data: T) => ReactNode
 })
 {
     return (
@@ -108,11 +107,7 @@ export function createDeletePage<T = unknown>({
                     const name = data[nameField as keyof T] + ""
                     return (
                         <>
-                            <HelmetProvider>
-                                <Helmet>
-                                    <title>Delete { nameSingular }</title>
-                                </Helmet>
-                            </HelmetProvider>
+                            <title>Delete { nameSingular }</title>
                             <Breadcrumbs links={[
                                 { name: "Home"    , href: "/" },
                                 { name: namePlural, href: "./../.." },

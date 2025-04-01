@@ -1,16 +1,16 @@
-import React from "react";
-import { render } from "react-dom"
+import React, { ReactNode } from "react";
+import { createRoot } from "react-dom/client"
 import { classList } from "../../../utils";
 import { Command } from "../../../commands/Command";
 import "./Menu.scss"
 
 export interface MenuItemConfig {
-    label        : string | JSX.Element
+    label        : ReactNode
     execute     ?: (e: MouseEvent) => void
     enabled     ?: boolean | ((e: MouseEvent) => boolean)
     active      ?: boolean | ((e: MouseEvent) => boolean)
     available   ?: boolean | ((e: MouseEvent) => boolean)
-    icon        ?: JSX.Element
+    icon        ?: ReactNode
     children    ?: MenuItemConfig[]
     description ?: string
 }
@@ -96,8 +96,8 @@ export class ContextMenu extends React.Component
 
                     if (!item.execute) {
                         return <div className="menu-header" key={i} title={access(item, "description")}>
-                            <span className="menu-item-icon">{ item.icon || "" }</span>
-                            { item.label }
+                            <span className="menu-item-icon">{ item.icon as any }</span>
+                            { item.label as any }
                         </div>
                     }
 
@@ -116,8 +116,8 @@ export class ContextMenu extends React.Component
                             setTimeout(() => item.execute!(e))
                         }
                     }}>
-                        <span className="menu-item-icon">{ item.icon || "" }</span>
-                        { item.label }
+                        <span className="menu-item-icon">{ item.icon as any }</span>
+                        { item.label as any }
                         {
                             // @ts-ignore
                             item.children && this.renderMenu(e, item.children)
@@ -150,9 +150,8 @@ export class ContextMenu extends React.Component
 
             if (this.target) this.target.classList?.add("focus")
 
-            render(
-                this.renderMenu(e, menuItems),
-                document.getElementById("context-menu")!
+            createRoot(document.getElementById("context-menu")!).render(
+                this.renderMenu(e, menuItems)
             )
 
             this.positionMenu()

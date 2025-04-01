@@ -1,13 +1,13 @@
-import { Component } from "react"
+import { Component, ReactNode } from "react"
 
 
 interface EditorListProps
 {
-    label   : string | JSX.Element
+    label   : ReactNode
     list    : any[]
     onChange: (list: any[]) => void
     onAdd   : () => any
-    editor  : (data: any, onChange: (data: any) => void, ...rest: any[]) => JSX.Element
+    editor  : (data: any, onChange: (data: any) => void, ...rest: any[]) => ReactNode
 }
 
 export default class EditorList extends Component<EditorListProps>

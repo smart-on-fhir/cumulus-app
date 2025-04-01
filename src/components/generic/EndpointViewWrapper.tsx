@@ -1,6 +1,5 @@
 
 import { ReactNode, useCallback } from "react"
-import { Helmet, HelmetProvider } from "react-helmet-async"
 import { useParams }   from "react-router"
 import { Link }        from "react-router-dom"
 import { request }     from "../../backend"
@@ -18,7 +17,7 @@ export default function EndpointViewWrapper({
 }: {
     endpoint: string
     query  ?: string
-    children: (data: any) => JSX.Element
+    children: (data: any) => ReactNode
     id     ?: number
 })
 {
@@ -83,11 +82,7 @@ export function createViewPage<T extends { createdAt: string, updatedAt: string,
                     const name = data[nameField as keyof T] + ""
                     return (
                         <>
-                            <HelmetProvider>
-                                <Helmet>
-                                    <title>{ name }</title>
-                                </Helmet>
-                            </HelmetProvider>
+                            <title>{ name }</title>
                             <Breadcrumbs links={[
                                 { name: "Home", href: "/" },
                                 { name: namePlural, href: basePath },

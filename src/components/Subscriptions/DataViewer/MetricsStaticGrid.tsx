@@ -1,4 +1,4 @@
-import { CSSProperties, Fragment, useState } from "react"
+import { CSSProperties, Fragment, ReactNode, useState } from "react"
 import { JSONObject }                        from "../../../types"
 import { classList, highlight }              from "../../../utils"
 import { CUMULUS_ALL, CUMULUS_NONE }         from "./lib"
@@ -25,7 +25,7 @@ export interface Column {
 
     style ?: CSSProperties
 
-    render?: (row: any, c: Column, search?: string) => JSX.Element
+    render?: (row: any, c: Column, search?: string) => ReactNode
 
     value?: (row: any, c: Column) => any
 }

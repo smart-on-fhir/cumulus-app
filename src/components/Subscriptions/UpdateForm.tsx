@@ -1,6 +1,5 @@
 import { useCallback, useState }         from "react"
 import { Navigate, useParams }           from "react-router"
-import { HelmetProvider, Helmet }        from "react-helmet-async"
 import { request, updateOne, deleteOne } from "../../backend"
 import { useBackend }                    from "../../hooks"
 import Breadcrumbs                       from "../generic/Breadcrumbs"
@@ -90,11 +89,7 @@ export default function EditSubscriptionForm()
 
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>Edit {Terminology.subscription.nameSingular}</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>Edit {Terminology.subscription.nameSingular}</title>
             <Breadcrumbs links={[
                 { name: "Home", href: "/" },
                 { name: Terminology.subscription.namePlural, href: "/requests" },

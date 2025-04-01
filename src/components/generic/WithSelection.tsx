@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 
 
 export interface CustomSelection<T> {
@@ -19,7 +19,7 @@ export function WithSelection<T=number>({
     equals = (a, b) => a === b
 }: {
     equals?: (a: T, b: T) => boolean
-    children: (selection: CustomSelection<T>) => JSX.Element
+    children: (selection: CustomSelection<T>) => ReactNode
 }) {
     const [ selection , setSelection  ] = useState<T[]>([])
 

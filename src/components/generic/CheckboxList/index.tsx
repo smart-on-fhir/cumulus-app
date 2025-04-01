@@ -1,10 +1,11 @@
+import { ReactNode } from "react"
 import Checkbox from "../Checkbox"
 
 
 export interface CheckboxListDataItem {
     id?: number | string
     name: string
-    description?: string | JSX.Element | null
+    description?: ReactNode
     [key: string]: any
 }
 

@@ -1,12 +1,12 @@
 import { merge } from "highcharts";
-import BaseMarkdown, { MarkdownToJSX } from "markdown-to-jsx"
+const BaseMarkdown = require("markdown-to-jsx")
 import { Fragment } from "react";
 import "./Markdown.scss"
 
 
 export default function Markdown({ children, options = {} }: {
     children: string;
-    options?: MarkdownToJSX.Options
+    options?: any//MarkdownToJSX.Options
 }) {
     return (
         <div className="markdown">

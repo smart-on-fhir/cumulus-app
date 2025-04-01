@@ -1,7 +1,6 @@
-import { useCallback, useState }  from "react"
+import { ReactNode, useCallback, useState }  from "react"
 import { Navigate, useParams }    from "react-router"
 import { Link }                   from "react-router-dom"
-import { HelmetProvider, Helmet } from "react-helmet-async"
 import DataViewer                 from "./DataViewer"
 import ColumnsTable               from "./ColumnsTable"
 import DataPackageViewer          from "./DataPackageViewer"
@@ -21,7 +20,7 @@ import { Templates }              from "../TemplateManager"
 import Terminology                from "../../Terminology"
 
 
-export default function SubscriptionView({ id }: { id?: number }): JSX.Element
+export default function SubscriptionView({ id }: { id?: number }): ReactNode
 {
     const params   = useParams()
     const { user } = useAuth()
@@ -69,11 +68,7 @@ export default function SubscriptionView({ id }: { id?: number }): JSX.Element
 
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>{Terminology.subscription.nameSingular}: {model.name}</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>{Terminology.subscription.nameSingular}: {model.name}</title>
             <Breadcrumbs historic links={[
                 { name: "Home", href: "/" },
                 { name: Terminology.subscription.namePlural, href: "/requests" },

@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useState }  from "react"
-import { Helmet, HelmetProvider } from "react-helmet-async"
+import { ReactNode, useCallback, useEffect, useMemo, useState }  from "react"
 import { useNavigate, useParams } from "react-router"
 import { Link } from "react-router-dom"
 import { request }                from "../../backend"
@@ -21,7 +20,7 @@ export default function EndpointEditWrapper({
         data    : any
         onSubmit: (data: any) => void
         error: Error | string | null
-    }) => JSX.Element
+    }) => ReactNode
 })
 {
     const { id } = useParams()
@@ -106,16 +105,12 @@ export function createEditPage<T = unknown>({
         loading : boolean
         data    : T
         onSubmit: (data: Partial<T>) => void
-    }) => JSX.Element
+    }) => ReactNode
 })
 {
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>Edit { nameSingular }</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>Edit { nameSingular }</title>
             <EndpointEditWrapper endpoint={ endpoint } query={ query }>
                 {({ data, error, loading, onSubmit }) => (
                     <>

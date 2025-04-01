@@ -1,6 +1,5 @@
 import { Fragment, useCallback, useEffect, useState } from "react"
 import moment                     from "moment"
-import { HelmetProvider, Helmet } from "react-helmet-async"
 import { useParams }              from "react-router"
 import { Link }                   from "react-router-dom"
 import Breadcrumbs                from "../generic/Breadcrumbs"
@@ -79,11 +78,7 @@ export default function ViewSite({ site }: { site?: Site })
 
     return (
         <div className="container">
-            <HelmetProvider>
-                <Helmet>
-                    <title>{site.name}</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>{site.name}</title>
             <Breadcrumbs links={[
                 { name: "Home"    , href: "/" },
                 { name: Terminology.site.namePlural, href: "/sites" },

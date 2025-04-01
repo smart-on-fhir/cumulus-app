@@ -1,13 +1,13 @@
-import { Component, createRef, RefObject } from "react"
+import { Component, createRef, ReactNode, RefObject } from "react"
 import { classList } from "../../../utils";
 import "./MenuButton.scss"
 
 
 interface MenuButtonProps {
-    items: (JSX.Element|"separator"|null)[] | JSX.Element
+    items: (ReactNode|"separator"|null)[] | ReactNode
     right?: boolean
     title?: string
-    children?: JSX.Element | string | (JSX.Element | string)[]
+    children?: ReactNode
 }
 
 export default class MenuButton extends Component<MenuButtonProps>

@@ -1,4 +1,4 @@
-import { ReactChild, ReactNode, useLayoutEffect, useState } from "react"
+import { ReactNode, useLayoutEffect, useState } from "react"
 import "./Tabs.scss"
 
 export function Tabs({
@@ -7,7 +7,7 @@ export function Tabs({
 }: {
     selectedIndex?: number
     children: {
-        name: ReactChild
+        name: ReactNode
         children: ReactNode
     }[]
 }) {

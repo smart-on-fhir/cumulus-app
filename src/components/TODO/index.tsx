@@ -1,4 +1,3 @@
-import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useLocation } from "react-router";
 
 export default function TODO()
@@ -8,11 +7,7 @@ export default function TODO()
 
     return (
         <div className="row center middle" style={{ flex: 1 }}>
-            <HelmetProvider>
-                <Helmet>
-                    <title>Page Not Implemented</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>Page Not Implemented</title>
             <div className="col center middle">
                 <h2>Not Implemented</h2>
                 <p className="text-muted">
