@@ -23,32 +23,32 @@
     }
   
     &.alert-blue {
-        &, * { color: var(--color-blue-dark); }
         border-color: rgb(from var(--color-blue) r g b / 0.2);
         background: rgb(from var(--color-blue) r g b / 0.2);
+        &, * { color: var(--color-blue-dark); }
     }
 
     &.alert-orange {
-        &, * { color: color-mix(in srgb, var(--color-orange) 70%, var(--color-window-fg)); }
         border-color: rgb(from var(--color-orange) r g b / 0.2);
         background: rgb(from var(--color-orange) r g b / 0.2);
+        &, * { color: color-mix(in srgb, var(--color-orange) 70%, var(--color-window-fg)); }
     }
 
     &.alert-red {
-        &, * { color: color-mix(in srgb, var(--color-red) 80%, var(--color-window-fg)); }
         border-color: rgb(from var(--color-red) r g b / 0.2);
         background: rgb(from var(--color-red) r g b / 0.2);
+        &, * { color: color-mix(in srgb, var(--color-red) 80%, var(--color-window-fg)); }
     }
 
     &.alert-grey {
-        &, * { color: color-mix(in srgb, var(--color-grey) 40%, var(--color-window-fg)) }
         border-color: rgb(from var(--color-grey) r g b / 0.4);
         background: rgb(from var(--color-grey) r g b / 0.3);
+        &, * { color: color-mix(in srgb, var(--color-grey) 40%, var(--color-window-fg)) }
     }
     
     &.alert-green {
-        &, * { color: color-mix(in srgb, var(--color-green) 70%, var(--color-window-fg)); }
         border-color: rgb(from var(--color-green) r g b / 0.2);
         background: rgb(from var(--color-green) r g b / 0.2);
+        &, * { color: color-mix(in srgb, var(--color-green) 70%, var(--color-window-fg)); }
     }
 }
