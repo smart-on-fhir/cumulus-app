@@ -1,6 +1,6 @@
-import { NavigateFunction } from "react-router"
-import { Command }          from "../Command"
-import { app }              from "../../types"
+import { NavigateFunction }  from "react-router-dom"
+import { Command }           from "../Command"
+import { app }               from "../../types"
 import { requestPermission } from "../../utils"
 
 

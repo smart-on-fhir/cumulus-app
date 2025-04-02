@@ -4,7 +4,7 @@ import Checkbox from "../generic/Checkbox";
 import MenuButton from "../generic/MenuButton";
 import ViewsBrowser from "./ViewsBrowser";
 import Terminology from "../../Terminology";
-import { useMatch } from "react-router";
+import { useMatch } from "react-router-dom";
 
 
 type SortType = "name-asc" | "name-desc" | "mod-asc" | "mod-desc" | ""

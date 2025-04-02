@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router"
+import { Route, Routes } from "react-router-dom"
 import IfAllowed         from "../generic/IfAllowed"
 import Create            from "./Create"
 import Delete            from "./Delete"

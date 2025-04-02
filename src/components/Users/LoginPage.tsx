@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useState }                 from "react"
 import { AlertError }               from "../generic/Alert"
 import { useAuth }                  from "../../auth"

@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useMemo, useState } from "react"
-import { useNavigate }                  from "react-router"
+import { useNavigate }                  from "react-router-dom"
 import { request }                      from "../../backend"
 import { AlertError } from "./Alert"
 import Breadcrumbs from "./Breadcrumbs"

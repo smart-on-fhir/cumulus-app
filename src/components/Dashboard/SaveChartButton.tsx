@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router"
-import { app } from "../../types"
-import MenuButton from "../generic/MenuButton"
+import { useNavigate } from "react-router-dom"
+import MenuButton      from "../generic/MenuButton"
+import { app }         from "../../types"
 
 
 export function SaveChartButton({

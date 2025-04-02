@@ -1,5 +1,5 @@
 import { useCallback, useState }  from "react"
-import { Navigate, useLocation }  from "react-router"
+import { Navigate, useLocation }  from "react-router-dom"
 import { useSearchParams }        from "react-router-dom"
 import { request, createOne }     from "../../backend"
 import { useBackend }             from "../../hooks"
