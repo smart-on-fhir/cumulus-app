@@ -400,7 +400,7 @@ ul {
     margin: 0;
   }
   pre {
-    background   : #FFFC;
+    background   : rgb(from var(--color-window-bg-hard) r g b / 0.6);
     border-radius: 0.25rem;
     padding      : 0.25rem;
     border       : 1px solid #0002;
