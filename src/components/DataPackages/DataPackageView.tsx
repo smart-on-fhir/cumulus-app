@@ -154,7 +154,7 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
 
                         {/* Export Data ---------------------------------------- */}
                         { <div className="mb-1">
-                            <a aria-disabled={!pkg.s3_path} download={escapeForFileName(pkg.name) + ".csv"} className="link" href={`${process.env.REACT_APP_BACKEND_HOST || ""}/api/aggregator/from-parquet/?s3_path=${encodeURIComponent(pkg.s3_path!)}&type=csv`}>
+                            <a aria-disabled={!pkg.s3_path} download={escapeForFileName(pkg.name) + ".csv"} className="link" href={`${REACT_APP_BACKEND_HOST}/api/aggregator/from-parquet/?s3_path=${encodeURIComponent(pkg.s3_path!)}&type=csv`}>
                                 <i className="material-symbols-outlined mr-05 color-brand-2 icon big">download</i>
                                 Export Data
                             </a>

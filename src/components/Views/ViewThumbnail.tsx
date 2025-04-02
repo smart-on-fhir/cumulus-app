@@ -107,7 +107,7 @@ export default function ViewThumbnail({
             }}
         >
             <div className="view-thumbnail-image">
-                 <img src={`${(process.env.REACT_APP_BACKEND_HOST || "")}/api/views/${ view.id }/screenshot?v=${+new Date(view.updatedAt!)}`} loading="lazy" alt={view.name} />
+                 <img src={`${REACT_APP_BACKEND_HOST}/api/views/${ view.id }/screenshot?v=${+new Date(view.updatedAt!)}`} loading="lazy" alt={view.name} />
             </div>
             <div className="view-thumbnail-title">
                 { ToggleFavoriteCmd.on() && <i className="fa-solid fa-star star pr-05"/> }
