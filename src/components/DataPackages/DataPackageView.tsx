@@ -1,6 +1,5 @@
 import { useEffect, useState }     from "react"
-import { useParams }               from "react-router"
-import { Link }                    from "react-router-dom"
+import { useParams, Link }         from "react-router-dom"
 import Grid                        from "../generic/Grid"
 import Prefetch                    from "../generic/Prefetch"
 import ColumnsTable                from "../Subscriptions/ColumnsTable"

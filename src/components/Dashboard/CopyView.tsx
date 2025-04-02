@@ -1,5 +1,5 @@
 import { useCallback }             from "react"
-import { useLocation, useParams }  from "react-router"
+import { useLocation, useParams }  from "react-router-dom"
 import Dashboard                   from "."
 import { AlertError }              from "../generic/Alert"
 import Loader                      from "../generic/Loader"

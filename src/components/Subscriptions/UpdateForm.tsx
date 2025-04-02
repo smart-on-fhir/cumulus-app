@@ -1,5 +1,5 @@
 import { useCallback, useState }         from "react"
-import { Navigate, useParams }           from "react-router"
+import { Navigate, useParams }           from "react-router-dom"
 import { request, updateOne, deleteOne } from "../../backend"
 import { useBackend }                    from "../../hooks"
 import Breadcrumbs                       from "../generic/Breadcrumbs"

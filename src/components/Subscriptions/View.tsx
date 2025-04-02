@@ -1,5 +1,5 @@
 import { ReactNode, useCallback, useState }  from "react"
-import { Navigate, useParams }    from "react-router"
+import { Navigate, useParams }    from "react-router-dom"
 import { Link }                   from "react-router-dom"
 import DataViewer                 from "./DataViewer"
 import ColumnsTable               from "./ColumnsTable"
@@ -221,7 +221,7 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
 
                         {/* Export Data ------------------------------------ */}
                         { canExport && <p className="mb-05">
-                            <a aria-disabled={!model.metadata} className="link" href={`${process.env.REACT_APP_BACKEND_HOST || ""}/api/requests/${id}/data?format=csv`}>
+                            <a aria-disabled={!model.metadata} className="link" href={`${REACT_APP_BACKEND_HOST}/api/requests/${id}/data?format=csv`}>
                                 <i className="material-symbols-outlined mr-05 color-brand-2 icon big">download</i>
                                 Export Data
                             </a>

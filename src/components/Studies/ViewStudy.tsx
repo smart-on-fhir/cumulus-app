@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { useParams }                        from "react-router"
+import { useParams }                        from "react-router-dom"
 import { Data, getStudyData }               from "./lib"
 import PageHeader                           from "../generic/PageHeader"
 import Breadcrumbs                          from "../generic/Breadcrumbs"

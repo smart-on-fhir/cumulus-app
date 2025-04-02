@@ -1,7 +1,6 @@
 import { Fragment, useCallback, useEffect, useState } from "react"
 import moment                     from "moment"
-import { useParams }              from "react-router"
-import { Link }                   from "react-router-dom"
+import { useParams, Link }        from "react-router-dom"
 import Breadcrumbs                from "../generic/Breadcrumbs"
 import PageHeader                 from "../generic/PageHeader"
 import Loader                     from "../generic/Loader"

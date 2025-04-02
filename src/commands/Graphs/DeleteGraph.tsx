@@ -1,4 +1,4 @@
-import { NavigateFunction }  from "react-router"
+import { NavigateFunction }  from "react-router-dom"
 import { deleteOne }         from "../../backend"
 import { Command }           from "../Command"
 import { app }               from "../../types"

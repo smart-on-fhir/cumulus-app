@@ -1,5 +1,5 @@
 import moment          from "moment"
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router-dom"
 import Markdown        from "../generic/Markdown"
 import Grid            from "../generic/Grid"
 import { app }         from "../../types"

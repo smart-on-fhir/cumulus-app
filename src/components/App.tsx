@@ -36,7 +36,7 @@ export default function App()
             <AggregatorProvider>
                 <ContextMenu />
                 <Tooltip />
-                <BrowserRouter>
+                <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                     <Header/>
                     <div className="container container-fluid row p-1">
                         <Navigation />

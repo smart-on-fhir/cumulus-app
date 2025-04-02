@@ -1,6 +1,6 @@
 import moment                            from "moment"
 import { Component }                     from "react"
-import { useNavigate, useParams }        from "react-router"
+import { useNavigate, useParams }        from "react-router-dom"
 import Breadcrumbs                       from "../generic/Breadcrumbs"
 import Alert, { AlertError }             from "../generic/Alert"
 import Loader                            from "../generic/Loader"
@@ -459,7 +459,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
             const { done, value } = await reader.read();
 
             if (done) {
-                const res = await fetch((process.env.REACT_APP_BACKEND_HOST || "") + url, {
+                const res = await fetch(REACT_APP_BACKEND_HOST + url, {
                     method: "PUT",
                     body: extra,
                     signal: this.abortController.signal,
@@ -496,7 +496,7 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
                 body  = body.slice(0, idx)
             }
 
-            await fetch((process.env.REACT_APP_BACKEND_HOST || "") + url, {
+            await fetch(REACT_APP_BACKEND_HOST + url, {
                 method: "PUT",
                 body,
                 signal: this.abortController.signal,

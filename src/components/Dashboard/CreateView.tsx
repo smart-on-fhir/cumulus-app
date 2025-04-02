@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { useLocation, useParams }   from "react-router"
+import { useLocation, useParams } from "react-router-dom"
 import Dashboard       from "."
 import { request }     from "../../backend"
 import { useBackend }  from "../../hooks"
