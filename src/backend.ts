@@ -17,7 +17,7 @@ const pendingRequests = new Map<string, AbortController>()
 
 export async function request<T=any>(path: string, options: RequestOptions = {}): Promise<T> {
     
-    path = path.replace(/^\//, (process.env.REACT_APP_BACKEND_HOST || "") + "/");
+    path = path.replace(/^\//, REACT_APP_BACKEND_HOST + "/");
 
     const abortController = new AbortController()
 

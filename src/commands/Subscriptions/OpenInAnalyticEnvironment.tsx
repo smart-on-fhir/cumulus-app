@@ -31,14 +31,14 @@ export class OpenInAnalyticEnvironment extends Command
         return (
             !!this.subscriptionId &&
             !!this.user &&
-            !!process.env.REACT_APP_NOTEBOOK_URL
+            !!REACT_APP_NOTEBOOK_URL
         );
     }
 
     enabled() {
         return (
             !!this.subscriptionId &&
-            !!process.env.REACT_APP_NOTEBOOK_URL &&
+            !!REACT_APP_NOTEBOOK_URL &&
             requestPermission({
                 user       : this.user,
                 resource   : "Subscriptions",

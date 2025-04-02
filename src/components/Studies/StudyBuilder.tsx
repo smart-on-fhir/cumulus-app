@@ -6459,7 +6459,7 @@ export default function StudyBuilder() {
                         <div className="col col-1"/>
                     </div>
                     <TemplateEditor templateId={templateId} state={variables} onChange={onChange} />
-                    { process.env.NODE_ENV === "development" && <>
+                    { NODE_ENV === "development" && <>
                         <h4 className="color-blue-dark center">Review</h4>
                         <hr className="small color-blue" />
                         <pre>{ JSON.stringify(variables, null, 4) }</pre>
