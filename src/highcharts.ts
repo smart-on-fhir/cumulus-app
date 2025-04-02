@@ -46,5 +46,5 @@ Highcharts.wrap(Highcharts.Tooltip.prototype, 'hide', function(p, delay) {
     }
 });
 
-export * from "highcharts"
+export type * from "highcharts"
 export default Highcharts
