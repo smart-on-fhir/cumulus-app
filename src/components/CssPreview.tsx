@@ -1,4 +1,4 @@
-const Markdown = require("markdown-to-jsx");
+import Markdown from "./generic/Markdown";
 import Grid from "./generic/Grid";
 import Alert from "./generic/Alert";
 import Toggle from "./generic/Toggle";
