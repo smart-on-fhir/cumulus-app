@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from "express"
+import express, { NextFunction, Request, Response, Router } from "express"
 import Crypto                                       from "crypto"
 import Bcrypt                                       from "bcryptjs"
 import { Op }                                       from "sequelize"
@@ -6,7 +6,6 @@ import User                                         from "../db/models/User"
 import { wait }                                     from "../lib"
 import * as logger                                  from "../services/logger"
 import { BadRequest }                               from "../errors"
-import { app }                                      from "../.."
 import { AppRequest }                               from "../types"
 import SystemUser                                   from "../SystemUser"
 
@@ -14,7 +13,7 @@ import SystemUser                                   from "../SystemUser"
 
 const AUTH_DELAY = process.env.NODE_ENV === "test" ? 0 : 1000;
 
-export const router = express.Router({ mergeParams: true });
+export const router: Router = express.Router({ mergeParams: true });
 
 
 /**
@@ -24,7 +23,7 @@ export const router = express.Router({ mergeParams: true });
  * properties. Otherwise `req.user` will be undefined.
  */
 export function authenticate() {
-    return async (req: app.UserRequest, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
         const { sid } = req.cookies;
         // @ts-ignore
         (req as AppRequest).user = { role: "guest", id: -1, permissions: {} }; 

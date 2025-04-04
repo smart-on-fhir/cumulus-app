@@ -1,5 +1,5 @@
 import crypto                                                   from "crypto"
-import express, { Response }                                    from "express"
+import express, { Response, Router }                            from "express"
 import slug                                                     from "slug"
 import { Includeable, QueryTypes }                              from "sequelize"
 import { NotFound, InternalServerError, HttpError, BadRequest } from "../errors"
@@ -18,7 +18,7 @@ import { DATA_TYPES }                                           from "../DataMan
 import config                                                   from "../config"
 
 
-export const router = express.Router({ mergeParams: true });
+export const router: Router = express.Router({ mergeParams: true });
 
 export default router
 

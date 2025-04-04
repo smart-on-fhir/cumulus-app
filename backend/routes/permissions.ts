@@ -67,7 +67,7 @@ interface InputParams {
     permission   : boolean
 }
 
-export const router = Router({ mergeParams: true });
+export const router: Router = Router({ mergeParams: true });
 
 function makeArray(x: any) {
     if (Array.isArray(x)) {

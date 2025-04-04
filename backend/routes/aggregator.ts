@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express"
+import express, { Request, Response, Router } from "express"
 import https, { RequestOptions }      from "https"
 import { cached, rw }                 from "../lib"
 import config                         from "../config"
@@ -6,7 +6,7 @@ import icd10Catalog                   from "../icd10_hierarchy_count.json"
 import loincCatalog                   from "../loinc_tree.json"
 
 
-export const router = express.Router({ mergeParams: true })
+export const router: Router = express.Router({ mergeParams: true })
 
 
 // These are the only paths we recognize and proxy to the aggregator

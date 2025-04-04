@@ -1,12 +1,12 @@
-import express, { Request } from "express"
-import { QueryTypes }       from "sequelize"
-import { route }            from "../lib/route"
-import Tag                  from "../db/models/Tag"
-import config               from "../config"
-import { uInt }             from "../lib"
+import express, { Request, Router } from "express"
+import { QueryTypes }               from "sequelize"
+import { route }                    from "../lib/route"
+import Tag                          from "../db/models/Tag"
+import config                       from "../config"
+import { uInt }                     from "../lib"
 
 
-export const router = express.Router({ mergeParams: true });
+export const router: Router = express.Router({ mergeParams: true });
 
 async function search(q: string) {
     const sql = `with "data" as (

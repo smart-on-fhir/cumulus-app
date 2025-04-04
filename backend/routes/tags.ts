@@ -7,7 +7,7 @@ import { assert }      from "../lib"
 import { route }       from "../lib/route"
 import View            from "../db/models/View"
 
-export const router = Router({ mergeParams: true });
+export const router: Router = Router({ mergeParams: true });
 
 
 // list ------------------------------------------------------------------------

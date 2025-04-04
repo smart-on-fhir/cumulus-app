@@ -1,6 +1,6 @@
 import moment  from "moment"
-import { app } from "../../.."
 import config  from "../../config"
+import { app } from "../../types"
 
 
 export function UserInvitation({

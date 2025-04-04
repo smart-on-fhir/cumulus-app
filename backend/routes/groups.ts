@@ -1,13 +1,13 @@
-import express         from "express"
-import { Includeable } from "sequelize"
-import Subscription    from "../db/models/Subscription"
-import Model           from "../db/models/SubscriptionGroup"
-import * as HttpError  from "../errors"
-import { assert }      from "../lib"
-import { route }       from "../lib/route"
+import express, { Router } from "express"
+import { Includeable }     from "sequelize"
+import Subscription        from "../db/models/Subscription"
+import Model               from "../db/models/SubscriptionGroup"
+import * as HttpError      from "../errors"
+import { assert }          from "../lib"
+import { route }           from "../lib/route"
 
 
-export const router = express.Router({ mergeParams: true })
+export const router: Router = express.Router({ mergeParams: true })
 
 
 // getAll ----------------------------------------------------------------------

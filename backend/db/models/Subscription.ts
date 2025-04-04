@@ -1,6 +1,6 @@
 import { sendDataRequest } from "../../services/email"
-import { app }             from "../../.."
 import * as logger         from "../../services/logger"
+import { app }             from "../../types"
 import BaseModel           from "./BaseModel"
 import Tag                 from "./Tag"
 import {
