@@ -1,7 +1,7 @@
-import { createRoot }    from "react-dom/client"
 import { app }           from "../../../types"
 import { Command }       from "../../Command"
 import PermissionsDialog from "./components/PermissionsDialog"
+import { modalRoot }     from "../../.."
 
 
 export class ManagePermissions extends Command
@@ -50,7 +50,7 @@ export class ManagePermissions extends Command
     }
     
     execute() {
-        createRoot(document.getElementById("modal")!).render(
+        modalRoot.render(
             <PermissionsDialog resource="Graphs" resource_id={ this.graph.id! } />
         )
     }

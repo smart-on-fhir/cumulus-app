@@ -1,8 +1,8 @@
-import { createRoot }        from "react-dom/client"
 import ShareDialog           from "./components/ShareDialog"
 import { Command }           from "../../Command"
 import { app }               from "../../../types"
 import { requestPermission } from "../../../utils"
+import { modalRoot }         from "../../.."
 
 
 export class CreatePermission extends Command
@@ -41,7 +41,7 @@ export class CreatePermission extends Command
     }
 
     execute() {
-        createRoot(document.getElementById("modal")!).render(
+        modalRoot.render(
             <ShareDialog resource="" user={ this.user } dialogTitle="Create Permission" onComplete={ this.onComplete } />
         )
     }
