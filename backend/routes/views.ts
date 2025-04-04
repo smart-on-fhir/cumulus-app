@@ -18,7 +18,7 @@ import {
 } from "../errors"
 
 
-export const router = Router({ mergeParams: true });
+export const router: Router = Router({ mergeParams: true });
 
 
 // list ------------------------------------------------------------------------

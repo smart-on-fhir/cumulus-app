@@ -1,10 +1,9 @@
-import { ReactNode }         from "react"
-import ReactDOMServer        from "react-dom/server"
-import sendEmail             from "./sendMail"
-import config                from "../../config"
-import { AppRequest }        from "../../types"
-import { getRequestBaseURL } from "../../lib/index"
-import { app }               from "../../../index"
+import { ReactNode }            from "react"
+import { renderToStaticMarkup } from "react-dom/server"
+import sendEmail                from "./sendMail"
+import config                   from "../../config"
+import { app, AppRequest }      from "../../types"
+import { getRequestBaseURL }    from "../../lib/index"
 import {
     DataRequestNotification,
     GraphsAccessNotification,
@@ -12,6 +11,7 @@ import {
     ResetPassword,
     UserInvitation
 } from "./components"
+import { Request } from "express"
 
 
 function generateHtml(component: ReactNode): string {
@@ -24,7 +24,7 @@ function generateHtml(component: ReactNode): string {
                 </div>
             </header>
             <div style="margin:0 auto; padding:18px 0;max-width:720px">
-                ${ReactDOMServer.renderToStaticMarkup(component)}
+                ${renderToStaticMarkup(component as any)}
             </div>
             <footer style="color:#666;margin:18px 0">
                 <div style="border-top:3px solid #EEE;margin:0 auto;padding:18px 0;max-width:720px">
@@ -131,7 +131,7 @@ export async function sendDataRequest(subscription: app.Subscription) {
     })
 }
 
-export async function requestLineLevelData(req: AppRequest) {
+export async function requestLineLevelData(req: Request) {
     const baseUrl = getRequestBaseURL(req)
     return sendEmail({
         from   : config.appEmail,
@@ -145,7 +145,7 @@ export async function requestLineLevelData(req: AppRequest) {
                 reason={req.body.reason}
                 dataElements={req.body.dataElements}
                 baseUrl={baseUrl}
-                user={req.user}
+                user={(req as AppRequest).user}
             />
         )
     })

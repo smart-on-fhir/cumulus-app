@@ -1,4 +1,4 @@
-import express                    from "express"
+import express, { Router }        from "express"
 import Model                      from "../db/models/StudyArea"
 import { route }                  from "../lib/route"
 import { NotFound, Unauthorized } from "../errors"
@@ -6,7 +6,7 @@ import { assert, getFindOptions } from "../lib"
 import View                       from "../db/models/View"
 
 
-export const router = express.Router({ mergeParams: true });
+export const router: Router = express.Router({ mergeParams: true });
 
 // List all --------------------------------------------------------------------
 route(router, {

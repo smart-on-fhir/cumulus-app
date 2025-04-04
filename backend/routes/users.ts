@@ -1,6 +1,6 @@
 import Crypto              from "crypto"
 import Bcrypt              from "bcryptjs"
-import express             from "express"
+import express, { Router } from "express"
 import { body }            from "express-validator"
 import { debuglog }        from "util"
 import { InferAttributes } from "sequelize"
@@ -23,7 +23,7 @@ import {
 
 const debug = debuglog("app");
 
-export const router = express.Router({ mergeParams: true });
+export const router: Router = express.Router({ mergeParams: true });
 
 /**
  * Strip some fields from user JSON for security reasons

@@ -1,8 +1,7 @@
-import express, { NextFunction, Response }       from "express"
-import { Router }                                from "express-serve-static-core"
-import { checkSchema, Schema, validationResult } from "express-validator"
-import * as logger                               from "../services/logger"
-import { AppRequest, AppRequestHandler }         from "../types"
+import express, { NextFunction, Response, Router } from "express"
+import { checkSchema, Schema, validationResult }   from "express-validator"
+import * as logger                                 from "../services/logger"
+import { AppRequest, AppRequestHandler }           from "../types"
 
 
 export function route(router: Router, options: {

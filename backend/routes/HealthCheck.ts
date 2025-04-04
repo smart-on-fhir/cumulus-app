@@ -1,15 +1,15 @@
-import express           from "express"
-import { literal, Op }   from "sequelize"
-import moment            from "moment"
-import { route }         from "../lib/route"
-import config            from "../config"
-import View              from "../db/models/View"
-import StudyArea         from "../db/models/StudyArea"
-import SubscriptionGroup from "../db/models/SubscriptionGroup"
-import Tag               from "../db/models/Tag"
-import User              from "../db/models/User"
-import Subscription      from "../db/models/Subscription"
-import { tableExists }   from "../lib"
+import express, { Router } from "express"
+import { literal, Op }     from "sequelize"
+import moment              from "moment"
+import { route }           from "../lib/route"
+import config              from "../config"
+import View                from "../db/models/View"
+import StudyArea           from "../db/models/StudyArea"
+import SubscriptionGroup   from "../db/models/SubscriptionGroup"
+import Tag                 from "../db/models/Tag"
+import User                from "../db/models/User"
+import Subscription        from "../db/models/Subscription"
+import { tableExists }     from "../lib"
 
 
 const STATUS_PASSED = "passed"
@@ -22,7 +22,7 @@ const Dictionary = {
     subscriptionGroups: "Data Slice Groups"
 }
 
-export const router = express.Router({ mergeParams: true });
+export const router: Router = express.Router({ mergeParams: true });
 
 
 route(router, {
