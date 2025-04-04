@@ -1,17 +1,8 @@
-import { CSSProperties, MouseEvent, ReactNode, useLayoutEffect } from "react"
-import { modalRoot } from "../../.."
+import { CSSProperties, MouseEvent, ReactNode, useEffect } from "react"
+import { modalRoot }     from "../../.."
+import { centerElement } from "../../../utils"
 import "./Dialog.scss"
 
-export function centerDialog() {
-    const win = document.getElementById("modal")?.firstElementChild as HTMLDivElement
-    if (win) {
-        win.style.transform = `translate(${
-            window.innerWidth / 2 - win.offsetWidth / 2
-        }px, ${
-            window.innerHeight / 2 - win.offsetHeight / 2
-        }px)`
-    }
-}
 
 export default function Dialog({
     modal,
@@ -38,7 +29,7 @@ export default function Dialog({
         onComplete && onComplete()
     }
 
-    useLayoutEffect(centerDialog, [])
+    useEffect(() => centerElement(document.getElementById("modal")?.firstElementChild as HTMLDivElement), [])
 
     function dragStart(e: MouseEvent) {
 

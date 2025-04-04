@@ -1,5 +1,6 @@
 import moment                               from "moment"
-import Highcharts, { Color, merge, Series } from "../../../highcharts"
+import { Color, merge, Series }             from "highcharts"
+import Highcharts                           from "../../../highcharts"
 import { lengthToEm, roundToPrecision }     from "../../../utils"
 import { app }                              from "../../../types"
 import {
