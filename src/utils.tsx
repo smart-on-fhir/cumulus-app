@@ -508,3 +508,13 @@ export function groupBy(data: Record<string, any>[], prop: string): Record<strin
 
     return groups;
 }
+
+export function centerElement(element: HTMLElement) {
+    if (element) {
+        element.style.transform = `translate(${
+            window.innerWidth / 2 - element.offsetWidth / 2
+        }px, ${
+            window.innerHeight / 2 - element.offsetHeight / 2
+        }px)`
+    }
+}

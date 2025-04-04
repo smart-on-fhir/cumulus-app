@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState }  from "react"
 import { request }              from "../../../../backend"
 import { AlertError }           from "../../../../components/generic/Alert"
-import Dialog, { centerDialog } from "../../../../components/generic/Dialog"
+import Dialog                   from "../../../../components/generic/Dialog"
 import StaticGrid               from "../../../../components/generic/StaticGrid"
-import { buildPermissionLabel } from "../../../../utils"
+import { buildPermissionLabel, centerElement } from "../../../../utils"
 
 
 interface Permission {
@@ -118,7 +118,7 @@ export default function PermissionsDialog({ resource, resource_id }: { resource:
     }
 
     useEffect(() => { fetchPermissions() }, [ fetchPermissions ]);
-    useEffect(() => { centerDialog() }, [ hasPermissions ])
+    useEffect(() => { centerElement(document.getElementById("modal")?.firstElementChild as HTMLDivElement) }, [ hasPermissions ])
 
     return <Dialog
         modal
