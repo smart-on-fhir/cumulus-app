@@ -20,7 +20,10 @@ table {
     }
 
     th {
-        font-weight  : 600;
+        font-weight: 600;
+    }
+
+    thead th {
         border-bottom-color: var(--color-grey);
         border-bottom-width: 2px;
     }
@@ -78,5 +81,12 @@ table {
                 border-bottom: 0;
             }
         }
+    }
+}
+
+.highcharts-tooltip-container,
+.highcharts-tooltip {
+    td, th {
+        padding: 0.2em;
     }
 }

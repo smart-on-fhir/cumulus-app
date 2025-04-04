@@ -6,6 +6,12 @@ export type JSONArray  = JSONValue[];
 export type JSONObject = Record<string, JSONValue>;
 export type JSONValue  = JSONScalar | JSONArray | JSONObject;
 
+declare global {
+    const NODE_ENV: 'development' | 'production' | 'test';
+    const REACT_APP_BACKEND_HOST: string;
+    const REACT_APP_NOTEBOOK_URL: string;
+}
+
 export declare module app {
 
     /**
