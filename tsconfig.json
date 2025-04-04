@@ -1,26 +1,11 @@
 {
+  "files": [],
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": false,
-    "noEmit": true,
-    "jsx": "react-jsx"
+    "composite": true
   },
-  "include": [
-    "src"
+  "exclude": ["node_modules"],
+  "references": [
+    { "path": "./src/tsconfig.json" },
+    { "path": "./backend/tsconfig.json" }
   ]
 }
