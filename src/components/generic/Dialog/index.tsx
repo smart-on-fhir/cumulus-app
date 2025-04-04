@@ -1,5 +1,5 @@
 import { CSSProperties, MouseEvent, ReactNode, useLayoutEffect } from "react"
-import { createRoot }                from "react-dom/client"
+import { modalRoot } from "../../.."
 import "./Dialog.scss"
 
 export function centerDialog() {
@@ -34,7 +34,7 @@ export default function Dialog({
     const container = document.getElementById("modal")!
 
     function close() {
-        createRoot(container).render(<>{}</>)
+        modalRoot.render(<>{}</>)
         onComplete && onComplete()
     }
 

@@ -1,8 +1,9 @@
-import React, { ReactNode } from "react";
-import { createRoot } from "react-dom/client"
-import { classList } from "../../../utils";
-import { Command } from "../../../commands/Command";
+import React, { ReactNode } from "react"
+import { classList }        from "../../../utils"
+import { Command }          from "../../../commands/Command"
+import { contextMenuRoot }  from "../../.."
 import "./Menu.scss"
+
 
 export interface MenuItemConfig {
     label        : ReactNode
@@ -150,11 +151,9 @@ export class ContextMenu extends React.Component
 
             if (this.target) this.target.classList?.add("focus")
 
-            createRoot(document.getElementById("context-menu")!).render(
-                this.renderMenu(e, menuItems)
-            )
+            contextMenuRoot.render(this.renderMenu(e, menuItems))
 
-            this.positionMenu()
+            requestAnimationFrame(() => this.positionMenu())
         }, { capture: false })
     }
 
