@@ -1,5 +1,5 @@
 import { CSSProperties, MouseEvent, ReactNode, useEffect } from "react"
-import { modalRoot }     from "../../.."
+import { modalRoot }     from "../../../roots"
 import { centerElement } from "../../../utils"
 import "./Dialog.scss"
 

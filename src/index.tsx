@@ -1,10 +1,5 @@
-import { createRoot } from 'react-dom/client'
-import App            from './components/App'
-
-const appRoot = createRoot(document.getElementById('root')!)
-const modalRoot = createRoot(document.getElementById("modal")!)
-const contextMenuRoot = createRoot(document.getElementById("context-menu")!)
-
+import App         from './components/App'
+import { appRoot } from "./roots"
 
 appRoot.render(
   // <React.StrictMode>
@@ -12,9 +7,6 @@ appRoot.render(
   // </React.StrictMode>
 );
 
-
 if (import.meta.hot) {
     import.meta.hot.accept();
 }
-
-export { appRoot, modalRoot, contextMenuRoot }

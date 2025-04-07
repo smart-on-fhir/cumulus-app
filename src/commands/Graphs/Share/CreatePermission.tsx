@@ -2,7 +2,7 @@ import ShareDialog           from "./components/ShareDialog"
 import { Command }           from "../../Command"
 import { app }               from "../../../types"
 import { requestPermission } from "../../../utils"
-import { modalRoot }         from "../../.."
+import { modalRoot }         from "../../../roots"
 
 
 export class CreatePermission extends Command

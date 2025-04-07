@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react"
 import { classList }        from "../../../utils"
 import { Command }          from "../../../commands/Command"
-import { contextMenuRoot }  from "../../.."
+import { contextMenuRoot }  from "../../../roots"
 import "./Menu.scss"
 
 
