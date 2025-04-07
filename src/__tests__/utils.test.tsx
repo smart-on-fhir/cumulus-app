@@ -1,4 +1,5 @@
 import { render } from "@testing-library/react"
+import { describe, it } from "vitest"
 import {
     toTitleCase,
     ellipsis,
@@ -57,7 +58,7 @@ describe("utils", () => {
         expect(classList({ a: true, b: false, c: true })).toEqual("a c")
     })
 
-    describe("humanizeColumnName", () => {
+    it("humanizeColumnName", () => {
         expect(humanizeColumnName("x icd 10 y")).toEqual("X ICD10 Y")
         expect(humanizeColumnName("x iCd  10 y")).toEqual("X ICD10 Y")
         expect(humanizeColumnName("x icD-10 y")).toEqual("X ICD10 Y")
@@ -132,7 +133,7 @@ describe("utils", () => {
     })
 
     it("ellipsis", () => {
-        expect(ellipsis("abc", 2)).toEqual("ab...")
+        expect(ellipsis("abc", 2)).toEqual("ab…")
         expect(ellipsis("abc", 5)).toEqual("abc")
     })
 
@@ -163,7 +164,7 @@ describe("utils", () => {
         it.todo ("works")
     })
 
-    describe("strip", () => {
+    it("strip", () => {
         expect(strip({}, ["a"])).toEqual({})
         expect(strip({ a: 1, b: 2 }, ["a"])).toEqual({ b: 2 })
         expect(strip({ a: 1, b: { c: 2, d: 3 }}, ["b.d"])).toEqual({ a: 1, b: { c: 2 }})
@@ -282,7 +283,7 @@ describe("utils", () => {
         })).toEqual("resource#3.attribute.action")
     })
 
-    describe("requestPermission", () => {
+    it("requestPermission", () => {
         let rejection = ""
         
         function onReject(msg: string) {

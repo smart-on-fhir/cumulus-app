@@ -128,7 +128,7 @@ export default class MockServer
 
     start(): Promise<MockServer> {
         return new Promise(resolve => {
-            this.server = this.app.listen(0, "localhost", () => {
+            this.server = this.app.listen(5555, "localhost", () => {
                 const address = this.server!.address() as AddressInfo
                 this._baseUrl = "http://localhost:" + address.port
                 if (!this.silent) console.log(`${this.name} listening at ${this._baseUrl}`)

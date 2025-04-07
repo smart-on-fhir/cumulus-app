@@ -1,11 +1,13 @@
 {
   "files": [],
   "compilerOptions": {
-    "composite": true
+    "composite": true,
+    "types": [] // don't include chai/jest/globals here!
   },
   "exclude": ["node_modules"],
   "references": [
     { "path": "./src/tsconfig.json" },
-    { "path": "./backend/tsconfig.json" }
+    { "path": "./backend/tsconfig.json" },
+    { "path": "./tsconfig.test.json" }
   ]
 }

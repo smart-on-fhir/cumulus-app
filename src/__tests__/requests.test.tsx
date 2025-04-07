@@ -5,17 +5,13 @@ import { auth, createOne, deleteOne, request, updateOne } from "../backend"
 
 describe("request utils", () => {
     
-    let REACT_APP_BACKEND_HOST = process.env.REACT_APP_BACKEND_HOST;
-    
     const mockServer = new MockServer("Mock Server", true)
 
     beforeAll(async () => {
         await mockServer.start()
-        process.env.REACT_APP_BACKEND_HOST = mockServer.baseUrl
     })
 
     afterAll (async () => {
-        process.env.REACT_APP_BACKEND_HOST = REACT_APP_BACKEND_HOST
         await mockServer.stop()
     })
 

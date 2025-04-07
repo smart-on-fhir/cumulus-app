@@ -11,7 +11,7 @@ import { AuthProvider }                              from "../../auth"
 function WrappedChartView(props: DashboardProps) {
     return (
         <AuthProvider>
-            <BrowserRouter>
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                 <Dashboard {...props} />
             </BrowserRouter>
         </AuthProvider>
@@ -234,11 +234,11 @@ describe("Chart View", () => {
         expect(document.querySelector(".highcharts-xaxis .highcharts-axis-title")).toHaveTextContent("X Axis Title")
         expect(document.querySelector(".highcharts-yaxis .highcharts-axis-title")).toHaveTextContent("Y Axis Title")
 
-        expect(document.querySelector(".subscription-link"     )).toHaveAttribute("href", "/requests/" + baseSubscription.id)
-        expect(document.querySelector(".subscription-link span")).toHaveTextContent(baseSubscription.name)
+        expect(document.querySelector(".subscription-link")).toHaveAttribute("href", "/requests/" + baseSubscription.id)
+        expect(document.querySelector(".subscription-link")).toHaveTextContent(baseSubscription.name)
 
-        expect(document.querySelector(".subscription-group-link"     )).toHaveAttribute("href", "/groups/" + baseSubscription.group!.id)
-        expect(document.querySelector(".subscription-group-link span")).toHaveTextContent(baseSubscription.group!.name)
+        expect(document.querySelector(".subscription-group-link")).toHaveAttribute("href", "/groups/" + baseSubscription.group!.id)
+        expect(document.querySelector(".subscription-group-link")).toHaveTextContent(baseSubscription.group!.name)
 
         const xAxisLabels: string[] = []
         const yAxisLabels: string[] = []
