@@ -64,7 +64,6 @@ export class AggregatorError extends Error {
         super(message)
         this.name = "AggregatorError"
         this.message = message
-        Error.captureStackTrace(this, this.constructor)
     }
 }
 
