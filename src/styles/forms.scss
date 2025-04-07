@@ -10,7 +10,9 @@
     background-color: $bg;
     color           : $fg;
     padding         : 0.4em 0.8em;
-    border          : 1px solid transparent;
+    border-width    : 1px;
+    border-style    : solid;
+    border-color    : functions.contrastForColor(var(--color-window-bg-hard), 0.2);
     line-height     : inherit;
     font-size       : 1rem;
     font-weight     : inherit;
@@ -41,6 +43,12 @@
 
     &:active {
         background-color: lch(from $color calc(l * 1.1) calc(c * 1.1) h);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        filter: grayscale(1) contrast(0.5);
+        cursor: not-allowed;
     }
 }
 
@@ -355,7 +363,6 @@ input[type="radio"] {
 }
 
 .btn {
-    border-color: rgb(from var(--color-window-fg-hard) r g b / 0.1);
     @include button(var(--color-window-bg-hard));
 }
 
@@ -444,7 +451,7 @@ input[type="radio"] {
         }
 
         &.active:not(:disabled, .disabled) {
-            background : var(--color-highlight);
+            background : color-mix(in srgb, var(--color-highlight), var(--color-window-bg-hard));
             color      : var(--color-window-fg-hard);
             box-shadow : 0 0 0 1px var(--color-highlight);
             text-shadow: none;
