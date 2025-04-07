@@ -462,7 +462,7 @@ export function requestPermission({ user, resource, resource_id, action }: {
             "Guest" :
             `User${id > 0 ? `#${id}` : ""}(role="${role}")`;
         msg += ` needs at least one of the following permissions: "${tried.join('", "')}".`
-        console.info(msg)
+        // console.info(msg)
         onReject(msg);
     }
 

@@ -8,6 +8,15 @@ export default defineConfig(({ mode }) => {
   return {
     root   : "./src",
     plugins: [react()],
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      tsconfig: "./tsconfig.test.json",
+      setupFiles: './vitest.setup.ts',
+      coverage: {
+        reporter: ['text', 'html'],
+      },
+    },
     assetsInclude: ["../icons/*.png"], // Ensure these file types are included
     build: {
       outDir               : "../dist/frontend",
@@ -41,7 +50,7 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       NODE_ENV              : JSON.stringify(process.env.NODE_ENV || "development"),
-      REACT_APP_BACKEND_HOST: JSON.stringify(process.env.REACT_APP_BACKEND_HOST || ""),
+      REACT_APP_BACKEND_HOST: JSON.stringify(process.env.REACT_APP_BACKEND_HOST || (mode === "test" ? "http://localhost:5555" : "")),
       REACT_APP_NOTEBOOK_URL: JSON.stringify(process.env.REACT_APP_NOTEBOOK_URL || ""),
     },
   }

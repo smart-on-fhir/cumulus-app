@@ -1,5 +1,5 @@
 import { Server as HTTPServer }                from "http"
-import { Express }                             from "express-serve-static-core"
+import { Express }                             from "express"
 import { expect }                              from "chai"
 import main                                    from "../backend/index"
 import Users                                   from "./fixtures/Users"
@@ -7,6 +7,7 @@ import Permissions                             from "./fixtures/Permissions"
 import { buildPermissionId, fixAutoIncrement } from "../backend/lib"
 import setupDB                                 from "../backend/db"
 import config                                  from "../backend/config"
+import { after, before }                       from "mocha"
 
 
 export const admin = Users.find(u => u.role === "admin")!

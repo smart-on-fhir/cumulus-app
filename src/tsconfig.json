@@ -37,6 +37,7 @@
     // "typeRoots": [
     //   ""
     // ]
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
   "include": [
     "./**/*.ts",
@@ -44,6 +45,8 @@
     "./**/*.scss"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "./**/*.test.ts",
+    "./**/*.test.tsx",
   ]
 }
