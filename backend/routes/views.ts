@@ -442,7 +442,8 @@ route(router, {
         const data  = model.getDataValue("screenShot");
 
         if (!data) {
-            return res.sendFile("view.png", { root: Path.join(__dirname, "../../public") })
+            // return res.sendFile("view.png", { root: Path.join(__dirname, "../../public") })
+            return res.sendFile("view.png", { root: Path.join(__dirname, "../../dist/frontend") })
         }
 
         const match = (/^data:(.+?);base64,(.+)$/).exec(data || "");
