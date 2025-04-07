@@ -1,7 +1,7 @@
 import { app }           from "../../../types"
 import { Command }       from "../../Command"
 import PermissionsDialog from "./components/PermissionsDialog"
-import { modalRoot }     from "../../.."
+import { modalRoot }     from "../../../roots"
 
 
 export class ManagePermissions extends Command
