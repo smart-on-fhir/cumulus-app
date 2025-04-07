@@ -1,5 +1,5 @@
 # Stage 1: Build React app -----------------------------------------------------
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 ENV NODE_ENV=production
 
@@ -19,7 +19,7 @@ RUN npm run build
 
 
 # Stage 2: Build and Run Express server ----------------------------------------
-FROM node:18-alpine
+FROM node:22-alpine
 
 ENV NODE_ENV=production
 ENV PORT=80
