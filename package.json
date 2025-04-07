@@ -42,31 +42,29 @@
     "umzug": "^3.1.1"
   },
   "scripts": {
-    "build": "npm run build:frontend && npm run build:server",
-    "build:frontend": "BUILD_PATH='./dist/frontend' react-scripts build",
-    "build:server": "tsc -p backend/tsconfig.json",
-    "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
-    "start:prod": "node dist/backend/index.js",
+
+    "build"         : "npm run build:frontend && npm run build:server",
+    "build:frontend": "vite build",
+    "build:server"  : "tsc -b",
+
+    "start"        : "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
+    "start:prod"   : "node dist/backend/index.js",
     "start:prod:ts": "ts-node -P backend/tsconfig.json backend",
-    "start:dev": "cd docker && docker compose --env-file='../.env.development.local' up",
-    "start:hmr": "PORT=3000 react-scripts start",
-    "watch:server": "nodemon -e js,ts,tsx,json -w backend -x 'ts-node -P backend/tsconfig.json -r dotenv-expand/config backend dotenv_config_path=.env.development.local'",
-    "test": "npm run test:server",
-    "test:frontend:old": "react-scripts test --coverage",
-    "test:frontend:watch:old": "react-scripts test --watch --coverage",
-    "test:server": "DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov ts-mocha -p test/tsconfig.json",
+    "start:dev"    : "cd docker && docker compose --env-file='../.env.development.local' up",
+    "start:hmr"    : "VITE_DEBUG=true vite --force",
+    "watch:server" : "nodemon -e js,ts,tsx,json -w backend -x 'ts-node -P backend/tsconfig.json -r dotenv-expand/config backend dotenv_config_path=.env.development.local'",
+    
+    "test"             : "npm run test:server",
+    "test:server"      : "DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov ts-mocha -p test/tsconfig.json",
     "test:server:watch": "nodemon -w backend -w test -e ts,tsx,json -x 'npm run test:server'",
 
     "test:frontend"         : "vitest",
     "test:frontend:watch"   : "vitest --watch",
     "test:frontend:coverage": "vitest run --coverage",
 
-    "openapi:lint": "redocly lint backend/api.yaml",
+    "openapi:lint" : "redocly lint backend/api.yaml",
     "openapi:build": "redocly build-docs backend/api.yaml --output=docs/api.html",
-    "openapi:watch": "nodemon -w backend/api.yaml -x 'npm run openapi:lint && npm run openapi:build'",
-    "eject": "react-scripts eject",
-    "vite": "VITE_DEBUG=true vite --force",
-    "vite:build": "tsc -b && vite build"
+    "openapi:watch": "nodemon -w backend/api.yaml -x 'npm run openapi:lint && npm run openapi:build'"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
