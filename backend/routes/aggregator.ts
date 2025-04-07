@@ -43,7 +43,8 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
         return res.status(400).type("text").end("The aggregator API is not enabled")
     }
 
-    const { port, hostname } = new URL(baseUrl + req.url);
+    const url = new URL(baseUrl.replace(/\/$/, "") + req.url);
+    const { port, hostname, origin } = url;
 
     // Cache for 2 days --------------------------------------------------------
     if (cached(req, res, 7_200, [baseUrl])) {
@@ -53,7 +54,7 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
     const requestOptions: RequestOptions = {
         host: hostname,
         port: port || undefined,
-        path: req.url,
+        path: url.pathname,
         method: req.method,
         headers: {
             Host: hostname,
@@ -79,11 +80,11 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
                 const jsonResponse = JSON.parse(data);
 
                 // Send the JSON response to the client
-                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'application/json', "X-Upstream-Host": baseUrl });
+                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'application/json', "X-Upstream-Host": origin });
                 res.end(JSON.stringify(jsonResponse));
             } catch (error) {
                 // If the response is not JSON, return it as a plain string
-                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'text/plain', "X-Upstream-Host": baseUrl });
+                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'text/plain', "X-Upstream-Host": origin });
                 res.end(data);
             }
         });
@@ -93,7 +94,7 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
     proxy.on('error', (err) => {
         console.error('Error with proxy request:', err);
         res.writeHead(500, {
-            "X-Upstream-Host": baseUrl,
+            "X-Upstream-Host": origin,
             "Cache-Control"  : "no-cache"
         });
         res.end('Internal Server Error');

@@ -304,7 +304,8 @@ function getPkgData(packageId: string) {
             return;
         }
 
-        const url = new URL(`/data-packages/${packageId}/chart`, baseUrl);
+        const url = new URL(baseUrl.replace(/\/$/, "") + `/data-packages/${packageId}/chart`);
+
         for (const [name, value] of Object.entries(req.query)) {
             url.searchParams.set(name, value + "")
         }
