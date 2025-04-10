@@ -8,6 +8,14 @@ export default defineConfig(({ mode }) => {
   return {
     root   : "./src",
     plugins: [react()],
+    css: {
+      devSourcemap: true,
+      preprocessorOptions: {
+        scss: {
+          sourceMap: true
+        }
+      }
+    },
     test: {
       globals: true,
       environment: 'jsdom',
