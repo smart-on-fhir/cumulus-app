@@ -44,22 +44,24 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
     }
 
     const url = new URL(baseUrl.replace(/\/$/, "") + req.url);
-    const { port, hostname, origin } = url;
+    // console.log(url)
+    const { port, host, origin } = url;
 
     // Cache for 2 days --------------------------------------------------------
-    if (cached(req, res, 7_200, [baseUrl])) {
+    if (cached(req, res, 7_200, [url.href])) {
         return;
     }
 
     const requestOptions: RequestOptions = {
-        host: hostname,
+        host: host,
         port: port || undefined,
-        path: url.pathname,
-        method: req.method,
+        path: url.pathname + (url.search ?? ""),
+        method: req.method,                
         headers: {
-            Host: hostname,
+            Host: host,
             "x-api-key": apiKey,
-            accept: "application/json"
+            accept: "application/json",
+            "User-Agent": "CumulusDashboard/3.0.0"
         }
     }
 
