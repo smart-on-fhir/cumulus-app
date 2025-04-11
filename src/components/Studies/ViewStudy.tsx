@@ -7,7 +7,7 @@ import Loader                               from "../generic/Loader"
 import { AlertError }                       from "../generic/Alert"
 import Terminology                          from "../../Terminology"
 import aggregator                           from "../../Aggregator"
-import { humanizeColumnName }               from "../../utils"
+import { classList, humanizeColumnName }    from "../../utils"
 
 export default function ViewStudy({ studyId }: { studyId?: string }) {
 
@@ -42,8 +42,6 @@ export default function ViewStudy({ studyId }: { studyId?: string }) {
     if (error) {
         return <AlertError>{ error + "" }</AlertError>
     }
-
-    console.log(data)
     
     const study = data[0]
 
@@ -51,6 +49,8 @@ export default function ViewStudy({ studyId }: { studyId?: string }) {
     if (!study) {
         return <AlertError>Study not found</AlertError>
     }
+
+    const latestVersion = data.sort((a, b) => String(b.versionString || "0").localeCompare(String(a.versionString || "0")))[0].versionString
 
     return (
         <div className="container">
@@ -81,15 +81,22 @@ export default function ViewStudy({ studyId }: { studyId?: string }) {
                         </thead>
                         <tbody>
                             { data.length > 1 ?
-                                data.slice(1).map((row, i) => (
-                                    <tr key={i} style={row.type === "study" ? { background: "#8881" } : undefined }>
-                                        <td>{row.version}</td>
-                                        <td className="right color-muted">{row.site}</td>
-                                        <td className="right color-muted">
+                                data
+                                    // .slice(1)
+                                    .map((row, i) => (
+                                    <tr key={i}
+                                    className={ classList({
+                                        "color-muted": row.type === "study",
+                                        "bg-brand-2" : latestVersion === row.versionString,
+                                        "bg-grey"    : row.type === "study"
+                                    }) }>
+                                        <td>{row.version} {latestVersion === row.versionString && <span className="badge bg-brand-2">Current</span>}</td>
+                                        <td className="right">{row.site}</td>
+                                        <td className="right">
                                             <span data-tooltip="The last time data was inserted into this study version by any of the site participants">{row.updated.toDateString()}</span>
                                         </td>
-                                        <td className="right color-muted">{row.packages}</td>
-                                        <td className="right color-muted">{ Number(row.total).toLocaleString() }</td>
+                                        <td className="right">{row.packages}</td>
+                                        <td className="right">{ Number(row.total).toLocaleString() }</td>
                                     </tr>
                                 )) :
                                 <tr>

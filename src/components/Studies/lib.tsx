@@ -12,6 +12,7 @@ export interface Data {
     packages: number
     updated : Date
     type    : "study" | "version"
+    versionString?: string
 }
 
 export function getStudyData(periods: StudyPeriod[], packages: DataPackage[]): Data[] {
@@ -92,7 +93,8 @@ export function getStudyVersionsData(study: string, periods: StudyPeriod[], pack
             version : <Link to={`/studies/${study}/${version}`} className="link"><i className="material-symbols-outlined icon mr-05">history</i>{ version }</Link>,
             packages: versionPackages.length,
             updated,
-            type    : "version"
+            type    : "version",
+            versionString: version
         });
     }
 
