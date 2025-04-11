@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react"
-import { Link }                             from "react-router-dom"
+import { Link, useSearchParams }            from "react-router-dom"
 import Breadcrumbs                          from "../generic/Breadcrumbs"
 import PageHeader                           from "../generic/PageHeader"
 import Loader                               from "../generic/Loader"
 import { AlertError }                       from "../generic/Alert"
 import StaticGrid                           from "../generic/StaticGrid"
+import Toggle                               from "../generic/Toggle"
 import Terminology                          from "../../Terminology"
 import aggregator, { DataPackage }          from "../../Aggregator"
 import { highlight, humanizeColumnName }    from "../../utils"
@@ -14,6 +15,9 @@ export default function DataPackageList() {
     const [data   , setData   ] = useState<DataPackage[]>([])
     const [loading, setLoading] = useState(true)
     const [error  , setError  ] = useState<Error | string | null>(null)
+    const [URLSearchParams, SetURLSearchParams] = useSearchParams()
+
+    const showAll = URLSearchParams.get("showAll") === "true"
 
     const load = useCallback(() => {
         setLoading(true)
@@ -27,6 +31,14 @@ export default function DataPackageList() {
 
     useEffect(() => load(), [load])
 
+    const studyVersions: Record<string, string> = {}
+    data.forEach(row => {
+        const { study, version } = row
+        if (!studyVersions[study] || +studyVersions[study] < +version) {
+            studyVersions[study] = version
+        }
+    })
+
     return (
         <div className="container">
             <title>List {Terminology.dataPackage.namePlural}</title>
@@ -35,7 +47,19 @@ export default function DataPackageList() {
                 { name: Terminology.dataPackage.namePlural, href: "/packages" }
             ]} />
             <PageHeader
-            title={Terminology.dataPackage.namePlural}
+            title={
+                <div className="row">
+                    <div className="col">
+                        { Terminology.dataPackage.namePlural }
+                    </div>
+                    <div className="col col-0 right middle">
+                        <div style={{ fontSize: "1rem" }} >
+                            <label className="pointer fw-400 pr-05" onClick={() => SetURLSearchParams({ showAll: showAll ? "false" : "true" })}>Show all versions</label>
+                            <Toggle checked={showAll} onChange={ () => SetURLSearchParams({ showAll: showAll + "" }) } className="bg-brand-2" />
+                        </div>
+                    </div>
+                </div>
+            }
             icon={Terminology.dataPackage.icon}
             description={`List all available ${Terminology.dataPackage.namePlural}`} />
             { loading ?
@@ -72,6 +96,8 @@ export default function DataPackageList() {
                                     label     : "Version",
                                     value     : row => row.version + "",
                                     searchable: true,
+                                    headerStyle: { textAlign: "center" },
+                                    style      : { textAlign: "center" },
                                 },
                                 {
                                     name      : "last_data_update",
@@ -79,6 +105,8 @@ export default function DataPackageList() {
                                     label     : "Last Data Update",
                                     searchable: true,
                                     value     : row => new Date(row.last_data_update).toLocaleDateString(),
+                                    headerStyle: { textAlign: "center" },
+                                    style      : { textAlign: "center" },
                                 },
                                 {
                                     name       : "total",
@@ -98,6 +126,9 @@ export default function DataPackageList() {
                                 <i className="material-symbols-outlined icon mr-05 color-brand-2">{Terminology.study.icon}</i>
                                 {humanizeColumnName(study)}
                             </>}
+                            filter={row => {
+                                return showAll || row.version === studyVersions[row.study]
+                            }}
                         />
                     </div>
             }
