@@ -8,6 +8,7 @@ import Loader                      from "../generic/Loader"
 import { AlertError }              from "../generic/Alert"
 import PageHeader                  from "../generic/PageHeader"
 import Breadcrumbs                 from "../generic/Breadcrumbs"
+import IconItem                    from "../generic/IconItem"
 import { PackageTemplates }        from "../TemplateManager"
 import { FlatPackageDataViewer }   from "../Subscriptions/DataViewer"
 import ViewsBrowser                from "../Views/ViewsBrowser"
@@ -77,7 +78,7 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                 { name: humanizeColumnName(pkg.name), href: "/packages/" + pkg.id },
             ]} />
             <PageHeader
-                title={ <>{ humanizeColumnName(pkg.name) }<span className="color-muted"> / { pkg.version }</span></> }
+                title={ <>{ humanizeColumnName(pkg.name) }<span className="color-muted fw-400"> / { pkg.version }{ pkg.site && " / " + humanizeColumnName(pkg.site) }</span></> }
                 icon={pkg.type === "flat" ? "table" : "deployed_code" }
                 description="Description not available"
             />
@@ -130,9 +131,10 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                                     { pkg.version }
                                 </Link>
                             </div>
-                        </div>
-                        <div className="mb-1">
-                            <b>Type</b>
+                        { pkg.site && <IconItem icon={Terminology.site.icon} className="mb-1">
+                            <b>{Terminology.site.nameSingular}</b>
+                            <Link className="link" to={`/sites/${pkg.site}`}>{ humanizeColumnName(pkg.site) }</Link>
+                        </IconItem> }
                             <div className="color-muted">{ pkg.type || "cube" }</div>
                         </div>
                         {/* <div className="mb-1">
