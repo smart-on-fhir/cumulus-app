@@ -1,14 +1,15 @@
 .toggle-input {
     display       : inline-block;
-    vertical-align: text-bottom;
+    vertical-align: middle;
     max-width     : 1.8em;
     width         : 1.8em;
     flex          : 0 0 1.8em;
     border-radius : 1em;
     background    : var(--color-grey);
     align-self    : center;
-    margin        : 0 0 0;
+    margin        : -0.1em 0 0;
     box-shadow    : 0 0 0 1px var(--color-grey);
+    height        : 1.2em;
 
     &:after {
         content      : "";

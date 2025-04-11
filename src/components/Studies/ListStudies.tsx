@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState } from "react"
-import { Link }                       from "react-router-dom"
-import { Data, getStudyData }         from "./lib"
-import Breadcrumbs                    from "../generic/Breadcrumbs"
-import PageHeader                     from "../generic/PageHeader"
-import Loader                         from "../generic/Loader"
-import { AlertError }                 from "../generic/Alert"
-import Terminology                    from "../../Terminology"
-import aggregator                     from "../../Aggregator"
-import { humanizeColumnName }         from "../../utils"
+import { Link, useSearchParams }            from "react-router-dom"
+import { Data, getStudyData }               from "./lib"
+import Breadcrumbs                          from "../generic/Breadcrumbs"
+import PageHeader                           from "../generic/PageHeader"
+import Loader                               from "../generic/Loader"
+import { AlertError }                       from "../generic/Alert"
+import Toggle                               from "../generic/Toggle"
+import Terminology                          from "../../Terminology"
+import aggregator                           from "../../Aggregator"
+import { humanizeColumnName }               from "../../utils"
 
 
 async function loadData() {
@@ -22,6 +23,9 @@ export default function ListStudies() {
     const [data   , setData   ] = useState<Data[]>([])
     const [loading, setLoading] = useState(true)
     const [error  , setError  ] = useState<Error | string | null>(null)
+    const [URLSearchParams, SetURLSearchParams] = useSearchParams()
+
+    const showAll = URLSearchParams.get("showAll") === "true"
 
     const load = useCallback(() => {
         setLoading(true)
@@ -58,6 +62,10 @@ export default function ListStudies() {
                     </Link>
                 </div>
             </div>
+            <div className="mb-1 right middle">
+                <label className="pointer fw-400 pr-05" onClick={() => SetURLSearchParams({ showAll: showAll ? "false" : "true" })}>Show all versions</label>
+                <Toggle checked={showAll} onChange={ () => SetURLSearchParams({ showAll: showAll + "" }) } className="bg-brand-2" />
+            </div>
             <hr className="mb-0"/>
             { loading ?
                 <div><br /><Loader /></div> :
@@ -67,7 +75,7 @@ export default function ListStudies() {
                         <thead>
                             <tr>
                                 <th style={{ width: "15%" }}>Study</th>
-                                <th>Version</th>
+                                <th className="center">{ showAll ? "Version" : "Current Version" }</th>
                                 <th className="right">Sites</th>
                                 <th className="right">Last Data Update</th>
                                 <th className="right">Packages</th>
@@ -76,26 +84,29 @@ export default function ListStudies() {
                         </thead>
                         <tbody>
                         { data.length > 0 ?
-                            data.map((row, i) => (
-                                <tr key={i} style={
-                                    {}//row.type === "study" ? { background: "#8881" } : undefined
-                                }>
-                                    <td className="nowrap">
-                                        { !!row.study && <b>
-                                            <i className="material-symbols-outlined icon color-brand-2">
-                                                { Terminology.study.icon }
-                                            </i> <Link to={`./${row.study}`} className="link">{ humanizeColumnName(row.study) }</Link>
-                                        </b> }
-                                    </td>
-                                    <td>{row.version}</td>
-                                    <td className="right color-muted">{row.site}</td>
-                                    <td className="right color-muted">
-                                        <span data-tooltip="The last time data was inserted into this study version by any of the site participants">{row.updated.toDateString()}</span>
-                                    </td>
-                                    <td className="right color-muted">{row.packages}</td>
-                                    <td className="right color-muted">{ Number(row.total).toLocaleString() }</td>
-                                </tr>
-                            )) :
+                            data
+                            .filter(row => showAll || row.type === "study")
+                            .map((row, i) => {
+                                const latestVersion = row.versions?.sort((a, b) => b.localeCompare(a))[0];
+                                return (
+                                    <tr key={i}>
+                                        <td className="nowrap">
+                                            { !!row.study && <b>
+                                                <i className="material-symbols-outlined icon color-brand-2">
+                                                    { Terminology.study.icon }
+                                                </i> <Link to={`./${row.study}${ showAll ? "" : "/" + latestVersion }`} className="link">{ humanizeColumnName(row.study) }</Link>
+                                            </b> }
+                                        </td>
+                                        <td className="center">{ showAll ? row.version : latestVersion }</td>
+                                        <td className="right">{row.site}</td>
+                                        <td className="right">
+                                            <span data-tooltip="The last time data was inserted into this study version by any of the site participants">{row.updated.toDateString()}</span>
+                                        </td>
+                                        <td className="right">{row.packages}</td>
+                                        <td className="right">{ Number(row.total).toLocaleString() }</td>
+                                    </tr>
+                                )
+                            }) :
                             <tr>
                                 <td colSpan={6} className="center">No Data</td>
                             </tr>
