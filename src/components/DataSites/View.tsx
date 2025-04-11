@@ -5,6 +5,7 @@ import Breadcrumbs                from "../generic/Breadcrumbs"
 import PageHeader                 from "../generic/PageHeader"
 import Loader                     from "../generic/Loader"
 import { AlertError }             from "../generic/Alert"
+import IconItem                   from "../generic/IconItem"
 import Terminology                from "../../Terminology"
 import aggregator, { Site }       from "../../Aggregator"
 import { humanizeColumnName }     from "../../utils"
@@ -121,24 +122,22 @@ export default function ViewSite({ site }: { site?: Site })
                 <div className="col" style={{ wordBreak: "break-all", minWidth: "15rem" }}>
                     <h5 className="mt-2">Metadata</h5>
                     <hr className="mb-1" />
-                    <b>ID</b>
-                    <div className="color-muted">{ site.id }</div>
-
-                    { isFinite(earliest) && <>
-                        <br />
+                    <IconItem icon={Terminology.site.icon} className="mb-1">
+                        <b>{Terminology.site.nameSingular} ID</b>
+                        <div className="color-muted">{ site.id }</div>
+                    </IconItem>
+                    { isFinite(earliest) &&  <IconItem icon="event_available" className="mb-1">
                         <b>Earliest Data</b>
                         <div className="color-muted">{ new Date(earliest).toLocaleString() }</div>
-                    </> }
-                    { isFinite(latest) && <>
-                        <br />
+                    </IconItem> }
+                    { isFinite(latest) && <IconItem icon="event_available" className="mb-1">
                         <b>Latest Data: </b>
                         <div className="color-muted">{ new Date(latest).toLocaleString() }</div>
-                    </> }
-                    { isFinite(lastUpdate) && <>
-                        <br />
+                    </IconItem> }
+                    { isFinite(lastUpdate) && <IconItem icon="event_available" className="mb-1">
                         <b>Last Data Update: </b>
                         <div className="color-muted">{ new Date(lastUpdate).toLocaleString() }</div>
-                    </> }
+                    </IconItem> }
                 </div>
             </div>
         </div>
