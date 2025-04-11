@@ -13,6 +13,7 @@ export interface Data {
     updated : Date
     type    : "study" | "version"
     versionString?: string
+    versions?: string[]
 }
 
 export function getStudyData(periods: StudyPeriod[], packages: DataPackage[]): Data[] {
@@ -49,7 +50,8 @@ export function getStudyData(periods: StudyPeriod[], packages: DataPackage[]): D
             version : <span className="color-muted nowrap">{versions.length + " version" + (versions.length === 1 ? "" : "s")}</span>,
             packages: studyPackages.length,
             updated,
-            type: "study"
+            type: "study",
+            versions
         });
 
         data.push(...getStudyVersionsData(study, periods, packages))

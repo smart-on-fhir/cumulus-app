@@ -217,6 +217,11 @@ label {
   font-weight: bold;
 }
 
+.pointer {
+  cursor: pointer;
+  user-select: none;
+}
+
 a {
   color: inherit;
   text-decoration: none;
