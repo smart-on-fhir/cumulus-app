@@ -104,24 +104,24 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                     <div style={{ position: "sticky", top: "4rem" }}>
                         <h5 className="mt-2">Metadata</h5>
                         <hr className="mb-1" />
-                        <div className="mb-1">
-                            <b>Package Name</b>
+                        <IconItem icon={Terminology.dataPackage.icon} className="mb-1">
+                            <b>{Terminology.dataPackage.nameSingular} Name</b>
                             <div className="color-muted">{ pkg.name }</div>
-                        </div>
-                        <div className="mb-1">
-                            <b>Package ID</b>
+                        </IconItem>
+                        <IconItem icon={Terminology.dataPackage.icon} className="mb-1">
+                            <b>{Terminology.dataPackage.nameSingular} ID</b>
                             <div className="color-muted">{ pkg.id }</div>
-                        </div>
-                        <div className="mb-1">
+                        </IconItem>
+                        <IconItem icon="event_available" className="mb-1">
                             <b>Last Data Update</b>
                             <div className="color-muted">{ new Date(pkg.last_data_update).toLocaleString() }</div>
-                        </div>
-                        <div className="mb-1">
+                        </IconItem>
+                        <IconItem icon="calculate" className="mb-1">
                             <b>Total</b>
                             <div className="color-muted">{ Number(pkg.total).toLocaleString() }</div>
-                        </div>
-                        <div className="mb-1">
-                            <b>Study</b>
+                        </IconItem>
+                        <IconItem icon={Terminology.study.icon} className="mb-1">
+                            <b>{Terminology.study.nameSingular}</b>
                             <div>
                                 <Link to={`/studies/${pkg.study}`} className="link">
                                     { humanizeColumnName(pkg.study) }
@@ -131,52 +131,55 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                                     { pkg.version }
                                 </Link>
                             </div>
+                        </IconItem>
                         { pkg.site && <IconItem icon={Terminology.site.icon} className="mb-1">
                             <b>{Terminology.site.nameSingular}</b>
                             <Link className="link" to={`/sites/${pkg.site}`}>{ humanizeColumnName(pkg.site) }</Link>
                         </IconItem> }
+                        {/* <IconItem icon="info" className="mb-1">
+                            <b>{Terminology.dataPackage.nameSingular} Type</b>
                             <div className="color-muted">{ pkg.type || "cube" }</div>
-                        </div>
-                        {/* <div className="mb-1">
+                        </IconItem> */}
+                        {/* <IconItem icon="info" className="mb-1">
                             <b>S3 Path</b>
                             <div className="color-muted">{ pkg.s3_path || "" }</div>
-                        </div> */}
+                        </IconItem> */}
                        
 
                         <h5 className="mt-2">Actions</h5>
                         <hr className="mb-1"/>
 
                         {/* Add Graph -------------------------------------- */}
-                        { canCreateGraphs && <div className="mb-1">
+                        { canCreateGraphs && <IconItem icon="add_photo_alternate" className="mb-1">
                             <Link className="link" to={`/requests/${pkg.id}/create-view`} title={`Click here to create new view from the data provided from this ${Terminology.dataPackage.nameSingular.toLowerCase()}`}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">add_photo_alternate</i>
                                 Add Graph
                             </Link>
-                        </div> }
+                            <div className="color-muted small">Create new Graph from the data in this package</div>
+                        </IconItem> }
 
                         {/* Export Data ---------------------------------------- */}
-                        { <div className="mb-1">
+                        <IconItem icon="download" className="mb-1">
                             <a aria-disabled={!pkg.s3_path} download={escapeForFileName(pkg.name) + ".csv"} className="link" href={`${REACT_APP_BACKEND_HOST}/api/aggregator/from-parquet/?s3_path=${encodeURIComponent(pkg.s3_path!)}&type=csv`}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">download</i>
                                 Export Data
                             </a>
-                        </div> }
+                            <div className="color-muted small">Download the package data as CSV</div>
+                        </IconItem>
 
                         {/* Create Subscription -------------------------------- */}
-                        <div className="mb-1">
+                        <IconItem icon="add_circle" className="mb-1">
                             <Link className="link" to={`/requests/new?packageId=${encodeURIComponent(pkg.id)}`} state={{ dataPackage: pkg }}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">add_circle</i>
                                 Create {Terminology.subscription.nameSingular}
                             </Link>
-                        </div>
+                            <div className="color-muted small">Create a copy of this package to take advantage of additional features available in the dashboard</div>
+                        </IconItem>
 
                         {/* Request Line-level Data --------------------------- */}
-                        <div className="mb-1">
-                            <Link className="link" to="" aria-disabled>
-                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">badge</i>
+                        <IconItem icon="badge" className="mb-1" aria-disabled>
+                            <Link className="link" to="">
                                 Request Line-level Data
                             </Link>
-                        </div>
+                            <div className="color-muted small">Not implemented yet</div>
+                        </IconItem>
                     </div>
                 </div>
             </div>
