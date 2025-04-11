@@ -8,6 +8,7 @@ import { AlertError }                       from "../generic/Alert"
 import Terminology                          from "../../Terminology"
 import aggregator                           from "../../Aggregator"
 import { classList, humanizeColumnName }    from "../../utils"
+import IconItem                             from "../generic/IconItem"
 
 export default function ViewStudy({ studyId }: { studyId?: string }) {
 
@@ -109,17 +110,22 @@ export default function ViewStudy({ studyId }: { studyId?: string }) {
                 <div className="col" style={{ wordBreak: "break-all", minWidth: "15rem" }}>
                     <h5 className="mt-2">Metadata</h5>
                     <hr className="mb-1" />
-                    <b>ID</b>
-                    <div className="color-muted">{ study.study }</div>
-                    <br />
-                    <b>Packages</b>
-                    <div className="color-muted">{ study.packages }</div>
-                    <br />
-                    <b>Total</b>
-                    <div className="color-muted">{ Number(study.total).toLocaleString() }</div>
-                    <br />
-                    <b>Last Data Update</b>
-                    <div className="color-muted">{ study.updated.toDateString() }</div>
+                    <IconItem icon={ Terminology.study.icon } className="mb-1">
+                        <b>{ Terminology.study.nameSingular } ID</b>
+                        <div className="color-muted">{ study.study }</div>
+                    </IconItem>
+                    <IconItem icon={ Terminology.dataPackage.icon } className="mb-1">
+                        <b>{ Terminology.dataPackage.namePlural }</b>
+                        <div className="color-muted">{ study.packages }</div>
+                    </IconItem>
+                    <IconItem icon="calculate" className="mb-1">
+                        <b>Total</b>
+                        <div className="color-muted">{ Number(study.total).toLocaleString() }</div>
+                    </IconItem>
+                    <IconItem icon="event_available" className="mb-1">
+                        <b>Last Data Update</b>
+                        <div className="color-muted">{ study.updated.toDateString() }</div>
+                    </IconItem>
                 </div>
             </div>
         </div>

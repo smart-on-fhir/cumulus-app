@@ -49,6 +49,7 @@ export interface DataPackage {
     version                    : string // example: "000"
     type                      ?: "cube" | "flat"
     s3_path                   ?: string
+    site                      ?: string
 }
 
 export interface Site {
