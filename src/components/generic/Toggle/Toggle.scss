@@ -10,6 +10,7 @@
     margin        : -0.1em 0 0;
     box-shadow    : 0 0 0 1px var(--color-grey);
     height        : 1.2em;
+    transition    : all 0.2s ease-in-out;
 
     &:after {
         content      : "";
