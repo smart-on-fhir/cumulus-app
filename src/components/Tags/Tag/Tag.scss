@@ -1,41 +1,23 @@
 .tag {
-
-    $colorOutline: rgb(from var(--color-window-fg-hard) r g b / 0.4);
-
-    background: linear-gradient(#FD4D, #FB2D);
-    color: #000D;
-    box-shadow: 0 0 0 0.5px $colorOutline inset;
-    text-shadow: 0 1px 0 #FFF6;
-    margin: 0 0.5em 0 0;
-    padding: 2px 0.5em 2px 1.2em;
-    border-top-left-radius: 1.25em 50%;
-    border-bottom-left-radius: 1.25em 50%;
-    border-top-right-radius: 5px 50%;
-    border-bottom-right-radius: 5px 50%;
-    list-style-type: circle;
-    position: relative;
-    font-weight: 500;
-    line-height: 1.5;
-    font-size: 90%; 
-    white-space: nowrap; 
-    overflow: hidden;
+    background   : var(--color-brand-2);
+    color        : var(--color-window-bg-hard);
+    margin       : 0 0.5em 0 0;
+    padding      : 2px 0.5em 2px 1.2em;
+    position     : relative;
+    line-height  : 1.5;
+    font-size    : 90%; 
+    white-space  : nowrap; 
+    overflow     : hidden;
     text-overflow: ellipsis;
-    max-width: 100%;  
-    
-    &:before {
-        content: "";
-        background: var(--color-window-bg);
-        position: absolute;
-        width: 0.5em;
-        height: 0.5em;
-        top: 50%;
-        margin: -0.25em 0 0 -0.9em;
-        border-radius: 50%;
-        box-shadow: 0 0 0 0.5px $colorOutline;
-    }
+    max-width    : 100%;  
+    border-top-left-radius    : 1.25em 50%;
+    border-bottom-left-radius : 1.25em 50%;
+    border-top-right-radius   : 6px 50%;
+    border-bottom-right-radius: 6px 50%;
+    list-style-type           : circle;
+    mask-image: radial-gradient(circle at 0.5em center, transparent 0.25em, black 0.26em);
 }
 
 a.tag:hover {
-    color: #008;
     cursor: pointer;
 }
