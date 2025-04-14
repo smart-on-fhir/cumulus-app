@@ -70,7 +70,7 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
     const canCreateGraphs = user!.permissions.includes("Graphs.create") && pkg.type !== "flat"
 
     return (
-        <div className="container">
+        <div>
             <title>{humanizeColumnName(pkg.name)}</title>
             <Breadcrumbs historic links={[
                 { name: "Home"    , href: "/" },
@@ -89,7 +89,7 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                         <h5 className="mt-2">Graphs</h5>
                         <hr/>
                         
-                        <ViewsBrowser pkgId={ pkg.id } header={
+                        <ViewsBrowser pkgId={ pkg.id } minColWidth="13rem" header={
                             <PackageTemplates pkg={pkg} key={pkg.id} />
                         }  />
                     </> }
@@ -100,7 +100,7 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                     <hr className="mb-1" />
                     <PackageSubscriptionsList pkg={pkg} />
                 </div>
-                <div className="col" style={{ wordBreak: "break-all", minWidth: "16rem" }}>
+                <div className="col" style={{ wordBreak: "break-all", minWidth: "16rem", maxWidth: "26rem" }}>
                     <div style={{ position: "sticky", top: "4rem" }}>
                         <h5 className="mt-2">Metadata</h5>
                         <hr className="mb-1" />
