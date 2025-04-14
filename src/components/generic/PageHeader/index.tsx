@@ -19,7 +19,9 @@ export default function PageHeader({
             <div className="col">
                 <h2 className="mt-0 mb-0">{title}</h2>
                 {/* <hr/> */}
-                { description && <div className="color-muted"><Markdown>{description}</Markdown></div> }
+                <div>
+                    { description ? <Markdown>{description}</Markdown> : <div className="color-muted">No description available</div> }
+                </div>
             </div>
         </header>
     )

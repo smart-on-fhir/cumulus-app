@@ -78,7 +78,7 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
             <PageHeader
                 title={ model.name }
                 icon={ model.metadata?.type === "flat" ? "table" : "deployed_code" }
-                description={ model.description || "No description"}
+                description={ model.description }
             />
 
             { model.dataURL && <PackageVersionCheck pkgId={model.dataURL} /> }
