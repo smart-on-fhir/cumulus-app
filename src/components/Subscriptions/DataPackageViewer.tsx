@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from "react"
+import { Link }                         from "react-router-dom"
 import Loader                           from "../generic/Loader"
 import { AlertError }                   from "../generic/Alert"
+import IconItem                         from "../generic/IconItem"
 import aggregator                       from "../../Aggregator"
 import { DataPackage }                  from "../../Aggregator"
+import Terminology                      from "../../Terminology"
+import { humanizeColumnName }           from "../../utils"
 
 
 export default function DataPackageViewer({ packageId }: { packageId: string }) {
@@ -40,21 +44,18 @@ export default function DataPackageViewer({ packageId }: { packageId: string }) 
 
     return (
         <>
-            <div className="col">
-                <br />
+            <IconItem icon="event_available" className="mb-1">
                 <b>Last Data Update</b>
                 <div className="color-muted">{ new Date(pkg.last_data_update).toLocaleString() }</div>
-            </div>
-            <div className="col">
-                <br />
+            </IconItem>
+            <IconItem icon="calculate" className="mb-1">
                 <b>Total Rows</b>
                 <div className="color-muted">{ Number(pkg.total).toLocaleString() }</div>
-            </div>
-            <div className="col">
-                <br />
+            </IconItem>
+            <IconItem icon={Terminology.study.icon} className="mb-1">
                 <b>Study</b>
-                <div className="color-muted">{ pkg.study }</div>
-            </div>
+                <Link to={`/studies/${pkg.study}`} className="link">{ humanizeColumnName(pkg.study) }</Link>
+            </IconItem>
         </>
     )
 }

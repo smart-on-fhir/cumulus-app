@@ -4,19 +4,20 @@ import { Link }                   from "react-router-dom"
 import DataViewer                 from "./DataViewer"
 import ColumnsTable               from "./ColumnsTable"
 import DataPackageViewer          from "./DataPackageViewer"
-import Markdown                   from "../generic/Markdown"
-import Breadcrumbs                from "../generic/Breadcrumbs"
-import Loader                     from "../generic/Loader"
-import { AlertError }             from "../generic/Alert"
+import PackageVersionCheck        from "./PackageVersionCheck"
+import IconItem                   from "../generic/IconItem"
 import { Format }                 from "../Format"
 import Tag                        from "../Tags/Tag"
+import { Templates }              from "../TemplateManager"
 import ViewsBrowser               from "../Views/ViewsBrowser"
+import Breadcrumbs                from "../generic/Breadcrumbs"
+import Loader                     from "../generic/Loader"
+import PageHeader                 from "../generic/PageHeader"
+import { AlertError }             from "../generic/Alert"
 import { useAuth }                from "../../auth"
 import { deleteOne, request }     from "../../backend"
 import { useBackend }             from "../../hooks"
 import { app }                    from "../../types"
-import PackageVersionCheck        from "./PackageVersionCheck"
-import { Templates }              from "../TemplateManager"
 import Terminology                from "../../Terminology"
 
 
@@ -57,35 +58,28 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
         return <AlertError>Failed to load {Terminology.subscription.nameSingular}</AlertError>
     }
 
+    const isPending       = !model.dataURL && !model.completed
     const isFlatData      = model.metadata?.type === "flat"
     const canHaveCharts   = !isFlatData && (model.dataURL || model.completed)
-    const canCreateGraphs = user!.permissions.includes("Graphs.create") //&& !model.dataURL
+    const canCreateGraphs = !isPending && user!.permissions.includes("Graphs.create") //&& !model.dataURL
     const canEdit         = user!.permissions.includes("Subscriptions.update")
     const canDelete       = user!.permissions.includes("Subscriptions.delete")// && !model.dataURL
     const canExport       = user!.permissions.includes("Subscriptions.export") && !model.dataURL
     const canImport       = canEdit && !model.dataURL
-    const isPending       = !model.dataURL && !model.completed
 
     return (
-        <div className="container">
+        <div>
             <title>{Terminology.subscription.nameSingular}: {model.name}</title>
             <Breadcrumbs historic links={[
                 { name: "Home", href: "/" },
                 { name: Terminology.subscription.namePlural, href: "/requests" },
                 { name: model.name, href: "/requests/" + model.id }
             ]}/>
-            <header className="ml-3">
-                <h2>
-                    <i className="material-symbols-outlined mr-05" style={{ verticalAlign: "middle", fontSize: "1.4em", marginLeft: "-3rem" }}>
-                        { model.metadata?.type === "flat" ? "table" : "deployed_code" }
-                    </i>
-                    { model.name }
-                </h2>
-                { model.description && <div>
-                    <Markdown>{ model.description || "" }</Markdown>
-                    <br/>
-                </div> }
-            </header>
+            <PageHeader
+                title={ model.name }
+                icon={ model.metadata?.type === "flat" ? "table" : "deployed_code" }
+                description={ model.description || "No description"}
+            />
 
             { model.dataURL && <PackageVersionCheck pkgId={model.dataURL} /> }
 
@@ -113,7 +107,7 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
                     { canHaveCharts && (model.completed || model.dataURL) && <>
                         <h5 className="mt-2">Graphs</h5>
                         <hr/>
-                        <ViewsBrowser requestId={ model.id } minColWidth="10rem" header={
+                        <ViewsBrowser requestId={ model.id } minColWidth="13rem" header={
                             <Templates subscription={model} />
                         }  />
                     </> }
@@ -126,13 +120,13 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
                     </> }
                 </div>
 
-                <div className="col" style={{ wordBreak: "break-all", minWidth: "16rem" }}>
+                <div className="col" style={{ wordBreak: "break-all", minWidth: "16rem", maxWidth: "26rem" }}>
                     <div style={{ position: "sticky", top: "3em" }} className="col">
                         <h5 className="mt-2">Metadata</h5>
                         <hr className="mb-1"/>
                         
                         {/* Group ------------------------------------------ */}
-                        <div>
+                        <IconItem icon={Terminology.subscriptionGroup.icon} className="mb-1">
                             <b>Group</b>
                             { model.group ?
                                 <div>
@@ -140,62 +134,55 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
                                 </div> :
                                 <div className="color-muted">GENERAL</div>
                             }
-                        </div>
+                        </IconItem>
 
                         {/* Tags ------------------------------------------- */}
-                        { model.Tags && <div>
-                            <br />
+                        { model.Tags && <IconItem icon={Terminology.tag.icon} className="mb-1">
                             <b>Tags</b>
                             <div>{
                                 model.Tags.length ?
                                     model.Tags.map((t, i) => <Tag tag={t} key={i} />) :
                                     <span className="color-muted">No tag assigned</span>
                             }</div>
-                        </div> }
+                        </IconItem> }
 
                         {/* Last Data Update (local) ----------------------- */}
-                        { !model.dataURL && <div>
-                            <br />
+                        { !model.dataURL && <IconItem icon="event_available" className="mb-1">
                             <b>Last Data Update</b>
                             <div className="color-muted">{
                                 model.completed ?
                                 <Format value={ model.completed } format="date-time" /> :
                                 "Pending"
                             }</div>
-                        </div> }
+                        </IconItem> }
 
                         {/* Created ---------------------------------------- */}
-                        <div>
-                            <br />
+                        <IconItem icon="event_available" className="mb-1">
                             <b>Created</b>
                             <div className="color-muted"><Format value={ model.createdAt } format="date-time" /></div>
-                        </div>
+                        </IconItem>
 
                         {/* Updated ---------------------------------------- */}
-                        <div>
-                            <br />
+                        <IconItem icon="event_available" className="mb-1">
                             <b>Updated</b>
                             <div className="color-muted"><Format value={ model.updatedAt } format="date-time" /></div>
-                        </div>
+                        </IconItem>
 
                         {/* Data Package ----------------------------------- */}
                         { model.dataURL && (
-                            <div>
-                                <br />
+                            <IconItem icon={Terminology.dataPackage.icon} className="mb-1">
                                 <b>Data Package</b>
-                                {/* <div className="color-muted">{ model.dataURL }</div> */}
                                 <div>
                                     <Link className="link" to={`/packages/${model.dataURL}`}>{ model.dataURL }</Link>
                                 </div>
-                            </div>
+                            </IconItem>
                         )}
 
                         {/* Total Rows ------------------------------------- */}
-                        { !model.dataURL && model.metadata?.total && <div>
-                            <br />
+                        { !model.dataURL && model.metadata?.total && <IconItem icon="calculate" className="mb-1">
                             <b>Total Rows</b>
                             <div className="color-muted">{ Number(model.metadata.total).toLocaleString()}</div>
-                        </div>}
+                        </IconItem>}
 
                         {/* Data Package Info ------------------------------ */}
                         { model.dataURL && <DataPackageViewer packageId={ model.dataURL } /> }
@@ -204,44 +191,44 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
                         <hr className="mb-1"/>
 
                         {/* Add Graph -------------------------------------- */}
-                        { canCreateGraphs && <p className="mb-05">
+                        { canCreateGraphs && <IconItem icon="add_photo_alternate" className="mb-1">
                             <Link className="link" to={`/requests/${model.id}/create-view`} title={`Click here to create new view from the data provided from this ${Terminology.subscription.nameSingular.toLowerCase()}`}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">add_photo_alternate</i>
                                 Add Graph
                             </Link>
-                        </p> }
+                            <div className="color-muted small">Create new Graph from the data in this {Terminology.subscription.nameSingular}</div>
+                        </IconItem> }
 
                         {/* Edit ------------------------------------------- */}
-                        { canEdit && <p className="mb-05">
+                        { canEdit && <IconItem icon="tune" className="mb-1">
                             <Link className="link" to={`/requests/${model.id}/edit`}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">tune</i>
                                 Edit
                             </Link>
-                        </p> }
+                            <div className="color-muted small">Modify {Terminology.subscription.nameSingular} properties</div>
+                        </IconItem> }
 
                         {/* Export Data ------------------------------------ */}
-                        { canExport && <p className="mb-05">
+                        { canExport && <IconItem icon="download" className="mb-1">
                             <a aria-disabled={!model.metadata} className="link" href={`${REACT_APP_BACKEND_HOST}/api/requests/${id}/data?format=csv`}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">download</i>
                                 Export Data
                             </a>
-                        </p> }
+                            <div className="color-muted small">Download the {Terminology.subscription.nameSingular} data as CSV</div>
+                        </IconItem> }
 
                         {/* Import Data ------------------------------------ */}
-                        { canImport && <p className="mb-05">
+                        { canImport && <IconItem icon="upload" className="mb-1">
                             <Link className="link" to={`/requests/${model.id}/import`}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">upload</i>
                                 Import Data
                             </Link>
-                        </p> }
+                            <div className="color-muted small">Upload CSV data into this {Terminology.subscription.nameSingular}</div>
+                        </IconItem> }
 
                         {/* Delete ----------------------------------------- */}
-                        { canDelete && <p className="mb-05">
+                        { canDelete && <IconItem icon="delete" className="mb-1">
                             <span className="link" onClick={destroy}>
-                                <i className="material-symbols-outlined mr-05 color-brand-2 icon big">delete</i>
                                 Delete
                             </span>
-                        </p> }
+                            <div className="color-muted small">Delete this {Terminology.subscription.nameSingular}</div>
+                        </IconItem> }
                     </div>
                 </div>
             </div>
