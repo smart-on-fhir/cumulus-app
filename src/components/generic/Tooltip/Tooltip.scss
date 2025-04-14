@@ -5,28 +5,32 @@
     top: 0;
     left: 0;
 
+    $color-top: #FFF;
+    $color-bottom: color-mix(in srgb, var(--color-blue), #EEE 95%);
+
     .tooltip {
         position   : fixed;
         z-index    : 100000;
-        color      : var(--color-window-bg-hard);
         transition : opacity 0.2s ease-in-out;
         margin-top : -8px;
         font-size  : 15px;
         opacity    : 0;
         max-width  : min(90vw, 550px);
         pointer-events : none;
-        backdrop-filter: blur(5px);
-        border-radius  : 9px;
-        background: linear-gradient(rgb(from var(--color-window-fg) r g b / 0.7), rgb(from var(--color-window-fg-hard) r g b / 0.8));
-        filter: drop-shadow(5px 5px 10px #0004);
+        border-radius  : 8px;
+        background: linear-gradient($color-top, $color-bottom);
+        filter: drop-shadow(2px 2px 4px #0003) drop-shadow(0px 0px 1px #000C);
+        text-shadow: 0 1px 0 #FFF8;
+        color: #000C;
 
         > .contents {
-            position: relative;
-            z-index: 2;
-            padding: 5px 10px;
+            position   : relative;
+            z-index    : 2;
+            padding    : 5px 10px;
             line-height: normal;
             white-space: pre-wrap;
-            line-break: anywhere;
+            line-break : anywhere;
+            font-size  : 14px;
 
             img {
                 border-radius: 4px;
@@ -43,21 +47,35 @@
             width: 0;
             height: 0;
             border-width: 5px 5px 0;
-            border-color: rgb(from var(--color-window-fg-hard) r g b / 0.8) #0000 #0000;
+            border-color: $color-bottom #0000 #0000;
             border-style: solid solid solid solid;
             margin: 0 0 -5px -5px;
             z-index: 20000;
+            transform: translate(0, -0.5px) !important;
         }
 
         &.top-pointer {
             margin-top : 8px;
             
             > .pointer {
+                transform: translate(0, 0.5px) !important;
                 top : -5px;
                 left: 50%;
                 margin: -5px 0 0 -5px;
                 border-width: 5px;
-                border-color: #0000 #0000 rgb(from var(--color-window-fg) r g b / 0.7);
+                border-color: #0000 #0000 $color-top;
+            }
+        }
+
+        &:has(img) {
+            $color-top: color-mix(in srgb, var(--color-blue), #DDD 95%);
+            $color-bottom: color-mix(in srgb, var(--color-blue), #CCC 90%);
+            background: linear-gradient($color-top, $color-bottom);
+            > .pointer {
+                border-color: $color-bottom #0000 #0000;
+            }
+            &.top-pointer > .pointer {
+                border-color: #0000 #0000 $color-top;
             }
         }
 
