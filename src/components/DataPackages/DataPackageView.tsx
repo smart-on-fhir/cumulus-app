@@ -67,7 +67,7 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
         }
     });
 
-    const canCreateGraphs = user!.permissions.includes("Graphs.create") //&& !model.dataURL
+    const canCreateGraphs = user!.permissions.includes("Graphs.create") && pkg.type !== "flat"
 
     return (
         <div className="container">
