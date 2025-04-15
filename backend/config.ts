@@ -11,6 +11,7 @@ const {
     PORT                   = "4000",
     THROTTLE               = 0,
     DB_DOCKER_CONTAINER    = "",
+    DB_SYNC                = "none",
     MAILGUN_API_KEY        = "missing mailgun api key",
     MAILGUN_DOMAIN         = "smarthealthit.org",
     APP_EMAIL_FROM         = "",
@@ -47,7 +48,7 @@ const config: Config = {
         containerName: DB_DOCKER_CONTAINER
     },
     db: {
-        sync: String(dbSettings.query.sync || "none") as Config["db"]["sync"],
+        sync: String(dbSettings.query.sync || DB_SYNC || "none") as Config["db"]["sync"],
         options: {
             dialectOptions: {
                 ssl: bool(dbSettings.query.ssl ?? true) ? {
