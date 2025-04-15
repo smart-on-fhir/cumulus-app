@@ -147,7 +147,7 @@ class Aggregator
             if (!this.cache[uri]) {
                 this.cache[uri] = request(uri, { includeResponse: true })
                     .then(({ response, body }) => {
-                        this.baseUrl = String(response.headers.get("X-Upstream-Host") || "")
+                        this.baseUrl = String(response.headers.get("X-Upstream") || "")
                         if (!response.ok) {
                             throw new AggregatorError(body.message || body)
                         }

@@ -45,7 +45,7 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
 
     const url = new URL(baseUrl.replace(/\/$/, "") + req.url);
     // console.log(url)
-    const { port, host, origin } = url;
+    const { port, host } = url;
 
     // Cache for 2 days --------------------------------------------------------
     if (cached(req, res, 7_200, [url.href])) {
@@ -82,11 +82,11 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
                 const jsonResponse = JSON.parse(data);
 
                 // Send the JSON response to the client
-                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'application/json', "X-Upstream-Host": origin });
+                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'application/json', "X-Upstream": baseUrl });
                 res.end(JSON.stringify(jsonResponse));
             } catch (error) {
                 // If the response is not JSON, return it as a plain string
-                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'text/plain', "X-Upstream-Host": origin });
+                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'text/plain', "X-Upstream": baseUrl });
                 res.end(data);
             }
         });
@@ -96,7 +96,7 @@ router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
     proxy.on('error', (err) => {
         console.error('Error with proxy request:', err);
         res.writeHead(500, {
-            "X-Upstream-Host": origin,
+            "X-Upstream": baseUrl,
             "Cache-Control"  : "no-cache"
         });
         res.end('Internal Server Error');
