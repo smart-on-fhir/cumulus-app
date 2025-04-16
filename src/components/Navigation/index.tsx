@@ -40,6 +40,7 @@ async function loadStudies() {
 }
 
 async function loadSites() {
+    await aggregator.initialize()
     const items = await aggregator.getSites()
     return sortBy(items, "name").filter(x => !!x.id).map(x => ({
         render: () => <NavLink to={`/sites/${x.id}`}>{ x.name }</NavLink>,
@@ -48,6 +49,7 @@ async function loadSites() {
 }
 
 async function loadQualityMetrics() {
+    await aggregator.initialize()
     const packages = await aggregator.filterPackages({ type: "flat" })
     const sites = packages.reduce((prev, cur) => {
         if (cur.site && !prev.includes(cur.site)) {

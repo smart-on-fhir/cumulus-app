@@ -157,7 +157,7 @@ export default function MetricsChart({
 
         if (isPctChart) {
 
-            const children = groups[groupName].filter(r => r[stratifyBy] !== CUMULUS_ALL)
+            const children = groups[groupName].filter(r => r[stratifyBy] !== CUMULUS_ALL && r.numerator !== undefined)
 
             children.forEach(r => {
                 const pctY = (r.denominator - r.numerator) / r.denominator * 100
