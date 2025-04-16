@@ -97,7 +97,9 @@ function Graphs() {
                                 </> :
                                 <p>
                                     No Graphs found in the database. You can start by selecting one of the
-                                    existing <Link to="requests" className="link">{Terminology.subscription.namePlural}</Link> and
+                                    existing <Link to="requests" className="link">
+                                        {Terminology.subscription.namePlural}
+                                    </Link> or <Link to="packages" className="link">{Terminology.dataPackage.namePlural}</Link> and
                                     then you can create new graph from it's data.
                                 </p>
                             }
