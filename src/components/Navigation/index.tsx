@@ -28,10 +28,10 @@ async function loadStudies() {
             const versions = await aggregator.getStudyVersions(s.id)
             const v = versions.pop()
             const packages = await aggregator.filterPackages({ study: s.id, version: v })
-            return sortBy(packages, "name").map(p => {
+            return sortBy(packages.filter(p => p.type !== "flat"), "name").map(p => {
                 const [, name] = p.id.trim().split("__")
                 return {
-                    icon  : p.type === "flat" ? "table" : "deployed_code",
+                    icon  : "deployed_code",
                     render: () => <NavLink to={`/packages/${p.id}`}>{humanizeColumnName(name)}</NavLink>,
                 }
             })
@@ -45,6 +45,63 @@ async function loadSites() {
         render: () => <NavLink to={`/sites/${x.id}`}>{ x.name }</NavLink>,
         icon  : Terminology.site.icon,
     } as unknown as DataRow))
+}
+
+async function loadQualityMetrics() {
+    const packages = await aggregator.filterPackages({ type: "flat" })
+    const sites = packages.reduce((prev, cur) => {
+        if (cur.site && !prev.includes(cur.site)) {
+            prev.push(cur.site)
+        }
+        return prev
+    }, [])
+
+    return sites.sort().map(s => ({
+        icon: Terminology.site.icon,
+        render: () => humanizeColumnName(s),
+        loader: async () => {
+
+            const byName = {}
+
+            const sitePackages = packages.filter(p => p.site === s);
+
+            sitePackages.forEach(p => {
+                if (!byName[p.name]) {
+                    byName[p.name] = []
+                }
+                byName[p.name].push(p)
+            })
+
+            return Object.keys(byName).sort().map(name => {
+
+                if (byName[name].length === 1) {
+                    const pkg = byName[name][0];
+                    return {
+                        icon  : "table",
+                        render: () => <NavLink to={`/packages/${pkg.id}`}>{humanizeColumnName(name)}</NavLink>,
+                    }
+                }
+
+                const sorted = byName[name].sort((a, b) => +b.version - +a.version)
+
+                return {
+                    icon  : "table",
+                    render: () => {
+                        const newest = sorted[0];
+                        return <NavLink to={`/packages/${newest.id}`}>{humanizeColumnName(name)}</NavLink>
+                    },
+                    loader: async () => {
+                        return sorted.map(pkg => {
+                            return {
+                                icon  : "history",
+                                render: () => <NavLink to={`/packages/${pkg.id}`}>Version {pkg.version}</NavLink>
+                            }
+                        })
+                    }
+                }
+            })
+        }
+    }));
 }
 
 export interface DataRow {
@@ -264,6 +321,12 @@ export default function Navigation()
                 out.push({
                     icon: Terminology.dataPackage.icon,
                     render: () => <NavLink to="/packages">{Terminology.dataPackage.namePlural}</NavLink>
+                })
+
+                out.push({
+                    icon: "verified",
+                    render: () => "Quality Metrics",
+                    loader: loadQualityMetrics
                 })
 
                 out.push({
