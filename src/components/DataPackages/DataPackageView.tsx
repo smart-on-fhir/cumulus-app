@@ -27,7 +27,7 @@ function Preload() {
     const [error  , setError  ] = useState<Error | string | null>(null)
 
     useEffect(() => {
-        setLoading(true)
+        // setLoading(true)
         aggregator.getPackage(id!)
             .then(pkg => setPkg(pkg))
             .catch(setError)
