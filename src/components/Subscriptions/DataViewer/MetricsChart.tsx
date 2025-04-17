@@ -2,7 +2,7 @@ import Chart                                    from "./Chart"
 import { CUMULUS_ALL, CUMULUS_NONE }            from "./lib"
 import { humanizeColumnName, roundToPrecision } from "../../../utils"
 
-const COLOR_NEGATIVE  = "#D60"
+const COLOR_NEGATIVE  = "#E60"
 const COLOR_POSITIVE  = "#6A0"
 const COLOR_NEUTRAL   = "#4a90e2"
 const ROUND_PRECISION = 2
@@ -301,7 +301,6 @@ export default function MetricsChart({
                 crisp: true,
                 borderWidth: 2,
                 clip: false,
-                opacity: 0.8,
                 groupPadding: 0.1,
                 pointPadding: 0.0
             }
