@@ -2,7 +2,7 @@ import Highcharts from "../../../highcharts";
 import { useLayoutEffect, useRef } from 'react';
 
 
-export default function Chart({ options }: { options: Highcharts.Options })
+export default function Chart({ options, callback }: { options: Highcharts.Options, callback?: (chart: Highcharts.Chart) => void })
 {
     const containerRef = useRef<HTMLDivElement|null>(null);
     const chartRef     = useRef<Highcharts.Chart|null>(null);
@@ -13,7 +13,7 @@ export default function Chart({ options }: { options: Highcharts.Options })
                 if (chartRef.current) {
                     chartRef.current.update(options, true, true, false)
                 } else {
-                    chartRef.current = Highcharts.chart(containerRef.current, options);
+                    chartRef.current = Highcharts.chart(containerRef.current, options, callback);
                 }
             } catch (ex) {
                 console.error(ex)

@@ -1,3 +1,4 @@
+import Highcharts                               from "highcharts"
 import Chart                                    from "./Chart"
 import { CUMULUS_ALL, CUMULUS_NONE }            from "./lib"
 import { humanizeColumnName, roundToPrecision } from "../../../utils"
@@ -230,7 +231,8 @@ export default function MetricsChart({
             spacingTop: 20,
             spacingBottom: 20,
             spacingLeft: 20,
-            spacingRight: 30
+            spacingRight: 30,
+            animation: { duration: 0 }
         },
         caption: valueColumn === "numerator" ? {
             align: "right",
@@ -291,7 +293,7 @@ export default function MetricsChart({
         },
         plotOptions: {
             series: {
-                animation: false
+                animation: { duration: 0 }
             },
             bar: {
                 color: COLOR_NEUTRAL,
@@ -333,6 +335,7 @@ export default function MetricsChart({
                 textDecoration: "none",
                 fontWeight: "400"
             },
+            animation: { duration: 0 },
             breadcrumbs: {
                 relativeTo: "spacingBox",
                 position: {
@@ -357,7 +360,21 @@ export default function MetricsChart({
         options.series = Level3 as any
     }
 
-    return <Chart options={options} />
+    return <Chart options={options} callback={chart => {
+
+        // Enable drilldown animations after the initial render
+        requestAnimationFrame(() => {
+            try {
+                if (chart) {
+                    chart.update({
+                        drilldown: {
+                            animation: { duration: 200 }
+                        }
+                    }, false, true, false);
+                }
+            } catch {}
+        });
+    }} />
 }
 
 function groupData(data: Record<string, any>[], column: string) {
