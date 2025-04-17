@@ -1,7 +1,7 @@
 import Highcharts                               from "highcharts"
 import Chart                                    from "./Chart"
 import { CUMULUS_ALL, CUMULUS_NONE }            from "./lib"
-import { humanizeColumnName, roundToPrecision } from "../../../utils"
+import { humanizeColumnName, pluralize, roundToPrecision } from "../../../utils"
 
 const COLOR_NEGATIVE  = "#E60"
 const COLOR_POSITIVE  = "#6A0"
@@ -41,8 +41,7 @@ export default function MetricsChart({
         id  : "level-1",
         data: data.filter(r => r[stratifyBy] === CUMULUS_ALL && r[groupBy] === CUMULUS_ALL).map(r => ({
             y        : r[valueColumn],
-            name     : humanizeColumnName(groupBy),
-            drilldown: "level-2",
+            name     : "All " + pluralize(humanizeColumnName(groupBy)),
             dataLabels: {
                 enabled: true,
                 align: "end",
@@ -68,7 +67,7 @@ export default function MetricsChart({
     const Level2: any = {
         type: "bar",
         id  : "level-2",
-        name: "Resources",
+        name: "All Resources",
         data: []
     }
 
@@ -352,8 +351,8 @@ export default function MetricsChart({
         options.series = [Level1]
         options.drilldown!.series = [Level2, ...Level3]
     }
-    else if (Level2.data.length) {
-        options.series = [Level2]
+    if (Level2.data.length) {
+        options.series = Level1 ? [Level1, Level2] : [Level2]
         options.drilldown!.series = Level3 as any
     }
     else {
