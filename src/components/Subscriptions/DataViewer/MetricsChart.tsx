@@ -39,6 +39,7 @@ export default function MetricsChart({
         name: "All",
         type: "bar",
         id  : "level-1",
+        color: COLOR_NEUTRAL + "88",
         data: data.filter(r => r[stratifyBy] === CUMULUS_ALL && r[groupBy] === CUMULUS_ALL).map(r => ({
             y        : r[valueColumn],
             name     : "All " + pluralize(humanizeColumnName(groupBy)),
