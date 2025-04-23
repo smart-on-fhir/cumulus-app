@@ -415,7 +415,7 @@ export const schema: Schema = {
                 { value: "SS"    , label: "Short stay" },
                 { value: "VR"    , label: "Virtual" },
             ],
-            description: "Select what class of encounters should be used in your study. [ValueSet](https://terminology.hl7.org/1.0.0/ValueSet-v3-ActEncounterCode.html) 🔗"
+            description: "Select what class of encounters should be used in your study.<br />[ValueSet](https://terminology.hl7.org/1.0.0/ValueSet-v3-ActEncounterCode.html) 🔗"
         },
         encounter_type: {
             name: "FHIR Encounter.serviceType",
