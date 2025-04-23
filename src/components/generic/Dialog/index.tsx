@@ -16,8 +16,8 @@ export default function Dialog({
     modal      ?: boolean
     header     ?: ReactNode
     className  ?: string
-    body        : (props: { close: () => void }) => ReactNode
-    footer     ?: (props: { close: () => void }) => ReactNode
+    body        : (props: { close: () => void, center: () => void }) => ReactNode
+    footer     ?: (props: { close: () => void, center: () => void }) => ReactNode
     style      ?: CSSProperties
     onComplete ?: () => void
 })
@@ -29,7 +29,11 @@ export default function Dialog({
         onComplete && onComplete()
     }
 
-    useEffect(() => centerElement(document.getElementById("modal")?.firstElementChild as HTMLDivElement), [])
+    function center() {
+        centerElement(document.getElementById("modal")?.firstElementChild as HTMLDivElement)
+    }
+
+    useEffect(() => center(), [])
 
     function dragStart(e: MouseEvent) {
 
@@ -69,8 +73,8 @@ export default function Dialog({
                     <div>{ header }</div>
                     <i className="fa-solid fa-circle-xmark close-dialog" title="Close" onMouseDown={() => close()} />
                 </div> }
-                <div className="dialog-body">{ body({ close }) }</div>
-                { !!footer && <div className="dialog-footer">{ footer({ close }) }</div> }
+                <div className="dialog-body">{ body({ close, center }) }</div>
+                { !!footer && <div className="dialog-footer">{ footer({ close, center }) }</div> }
             </div>
             <div className={ "dialog-overlay" + (modal ? " modal" : "") } onMouseDown={e => {
                 e.preventDefault()
