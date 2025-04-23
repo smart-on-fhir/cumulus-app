@@ -315,7 +315,7 @@ export function TemplateEditor({
             groups[group].push(item)
         }
 
-        return <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem 2rem" }}>
+        return <Grid cols="18rem" gap="1rem 2rem">
             { Object.keys(groups).map(group => {
                 if (!groups[group].length) {
                     return null
@@ -325,8 +325,7 @@ export function TemplateEditor({
 
                 return Object.keys(sets).map(((name, i) => {
                     if (name === "undefined") {
-                        return <Grid cols="15rem" gap="1rem 2rem" key={group} style={{ flex: "1 0 10rem" }}>
-                        { sets[name].map((item: any) => {
+                        return sets[name].map((item: any) => {
                             return <Editor
                                 key={item.id}
                                 descriptor={ item }
@@ -334,8 +333,7 @@ export function TemplateEditor({
                                 runtimeParams={ parseRuntimeParams(item, state) }
                                 onChange={value => onChange({ [item.id]: value })}
                             />
-                        })}
-                        </Grid>
+                        })
                     }
                     return (
                         <div key={group} className="editor-set" style={{ flex: "1 0 10rem" }}>
@@ -355,7 +353,7 @@ export function TemplateEditor({
                     )
                 }))
             }) }
-            </div>
+            </Grid>
     }
 
     return (
