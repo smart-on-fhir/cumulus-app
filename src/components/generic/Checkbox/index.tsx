@@ -34,7 +34,7 @@ export default function Checkbox({
             { labelLeft && (label || name) }
             <input
                 type={ type || "checkbox" }
-                checked={ checked }
+                checked={ !!checked }
                 disabled={ !!disabled }
                 onChange={ e => onChange(e.target.checked) }
             /><span className="checkbox-label-focus-highlight"/>
