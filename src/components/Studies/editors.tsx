@@ -3,6 +3,7 @@ import Checkbox       from "../generic/Checkbox"
 import CheckboxList   from "../generic/CheckboxList"
 import Grid           from "../generic/Grid"
 import Markdown       from "../generic/Markdown"
+import RichSelect, { RichSelectOption } from "../generic/RichSelect"
 
 import {
     EnumParameterDescriptor,
@@ -13,7 +14,8 @@ import {
     type DateParameterDescriptor,
     type ParameterDescriptor,
     type CheckListParameterDescriptor,
-    StringParameterDescriptor
+    type StringParameterDescriptor,
+    type ListParameterDescriptor
 } from "./Schema"
 
 function ifTrue(state: Record<string, any>, expr: string, y:any = true, n:any = false) {
@@ -89,6 +91,9 @@ export function Editor({
     if (descriptor.type === "string") {
         return <StringEditor descriptor={descriptor} value={value} onChange={onChange} />
     }
+    if (descriptor.type === "list") {
+        return <ListEditor descriptor={descriptor} value={value || descriptor.defaultValue} onChange={onChange} />
+    }
     // @ts-ignore
     return <b>{descriptor.type} editor not implemented</b>
 }
@@ -126,6 +131,25 @@ export function CheckListEditor({
                     isSelected={item => value.some(x => JSON.stringify(x) === JSON.stringify(item.value))}
                 />
             </div>
+        </div>
+    )
+}
+
+export function ListEditor({
+    descriptor,
+    value,
+    onChange
+}: {
+    descriptor: ListParameterDescriptor
+    value: RichSelectOption | RichSelectOption[]
+    onChange: (selection: typeof value) => void
+}) {
+    const { name, description, endpoint, placeholder = "Please select" } = descriptor
+    return (
+        <div>
+            <label>{ name } <b className="badge bg-blue">{Array.isArray(value) ? value.length : value ? 1 : 0}</b></label>
+            <RichSelect value={value} onChange={onChange} placeholder={placeholder} endpoint={endpoint} title={name} />
+            { !!description && <div className="mb-05 mt-05"><Markdown>{ description }</Markdown></div> }
         </div>
     )
 }
