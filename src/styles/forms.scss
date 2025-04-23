@@ -266,8 +266,10 @@ input[type="color"] {
 fieldset:disabled * {
     color: #888;
 }
+
 ::placeholder,
-::-webkit-input-placeholder {
+::-webkit-input-placeholder,
+.placeholder {
     color: #8888;
 }
 

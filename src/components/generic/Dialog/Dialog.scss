@@ -84,8 +84,7 @@
     right          : 0;
     bottom         : 0;
     left           : 0;
-    background     : rgb(from var(--color-window-bg) r g b / 0.6);
-    backdrop-filter: grayscale(1) contrast(0.75);
+    background     : #0006;
 
     &:not(.modal) {
         pointer-events: none;
