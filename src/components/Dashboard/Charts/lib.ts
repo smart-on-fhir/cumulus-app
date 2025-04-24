@@ -571,29 +571,29 @@ export function buildChartOptions({
     denominator = "",
     type,
     column2type,
-    onSeriesToggle,
+    onSeriesToggle = () => {},
     ranges = {},
-    onInspectionChange,
+    onInspectionChange = () => {},
     inspection,
     sortBy,
     limit,
     offset
 }: {
-    data              : app.ServerResponses.DataResponse
-    data2             : app.ServerResponses.StratifiedDataResponse | null
-    options          ?: Highcharts.Options
-    column            : app.SubscriptionDataColumn
-    groupBy          ?: app.SubscriptionDataColumn
-    type              : SupportedNativeChartTypes
-    denominator      ?: app.DenominatorType
-    column2type      ?: keyof typeof SupportedChartTypes
-    onSeriesToggle    : (s: Record<string, boolean>) => void
-    ranges            : app.RangeOptions
-    inspection        : app.Inspection
-    sortBy            : string
-    limit             : number
-    offset            : number
-    onInspectionChange: (inspection: string[], context: Partial<app.InspectionContext>) => void
+    data               : app.ServerResponses.DataResponse
+    data2              : app.ServerResponses.StratifiedDataResponse | null
+    options           ?: Highcharts.Options
+    column             : app.SubscriptionDataColumn
+    groupBy           ?: app.SubscriptionDataColumn
+    type               : SupportedNativeChartTypes
+    denominator       ?: app.DenominatorType
+    column2type       ?: keyof typeof SupportedChartTypes
+    onSeriesToggle    ?: (s: Record<string, boolean>) => void
+    ranges             : app.RangeOptions
+    inspection         : app.Inspection
+    sortBy             : string
+    limit              : number
+    offset             : number
+    onInspectionChange?: (inspection: string[], context: Partial<app.InspectionContext>) => void
 }): Highcharts.Options
 {
     const xType = getXType(column);

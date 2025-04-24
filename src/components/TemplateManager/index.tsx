@@ -248,8 +248,6 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                 sortBy,
                 limit,
                 offset          : 0,
-                onSeriesToggle  : () => {},
-                onInspectionChange: () => {},
             })
 
             if (counted.match(/^counts?$/i)) {
