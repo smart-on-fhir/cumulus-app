@@ -80,6 +80,11 @@ const DefaultChartOptions: Options = {
             color     : "#333333"
         }
     },
+    boost: {
+        useGPUTranslations: true,
+        pixelRatio: 0,
+        allowForce: true
+    },
     exporting: {
         buttons: {
             contextButton: {
