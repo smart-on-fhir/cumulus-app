@@ -150,15 +150,23 @@ body {
   // -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-color-scheme: dark) {
-  @include darkTheme();
-}
-
-@media (prefers-color-scheme: light) {
+:root {
   @include lightTheme();
 }
 
-:root, :root.light {
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include darkTheme();
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    @include lightTheme();
+  }
+}
+
+:root.light {
   @include lightTheme();
 }
 
