@@ -670,7 +670,10 @@ export function buildChartOptions({
                 dataLabels: {
                     // @ts-ignore
                     // enabled: options.plotOptions?.series?.dataLabels?.enabled ?? (!groupBy && maxPointLength <= 30)
-                    enabled: (!groupBy && !denominator && maxPointLength <= 30 && ["bar", "column", "pie"].includes(type))
+                    enabled: (!groupBy && !denominator && maxPointLength <= 30 && ["bar", "column", "pie"].includes(type)),
+                    formatter() {
+                        return this.y.toLocaleString('en-US');
+                    }
                 }
             },
             pie: {
@@ -842,6 +845,8 @@ export function buildChartOptions({
             dirty: Date.now()
         },
         lang: {
+            thousandsSep: ',',
+            decimalPoint: '.',
             noData: `
                 <text x="180" y="30" text-anchor="middle" fill="#C30F" stroke="#FFF6" stroke-width="0.5" style="font-size:20px; font-weight:900">No data to display!</text>
                 <text x="180" y="50" text-anchor="middle" fill="#888C" stroke="#FFF6" stroke-width="0.5" style="font-size:15px; font-weight:500">If you have filters applied, try changing or removing them.</text>`,
