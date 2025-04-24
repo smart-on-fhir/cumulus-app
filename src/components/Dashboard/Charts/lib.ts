@@ -307,7 +307,8 @@ function getSeriesAndExceptions({
         const cfg: any = {
             // @ts-ignore,
             color: S?.colorByPoint ? undefined : color,
-            id: options.id
+            id: options.id,
+            boostThreshold: 100_000
         }
 
         if ((options.type === "area" || options.type === "areaspline") && color) {
