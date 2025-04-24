@@ -104,7 +104,7 @@ function filterOutExceptions({
     rows       : [any, any, any?, any?][]
     seriesName?: string
     xType      : "datetime" | "linear" | "category"
-    exceptions : string[]
+    exceptions : Set<string>
     column     : app.SubscriptionDataColumn
 }) {
     return rows.filter(row => {
@@ -126,9 +126,7 @@ function filterOutExceptions({
                 msg += `equals <b>${x}</b>`
             }
 
-            if (!exceptions.includes(msg)) {
-                exceptions.push(msg)
-            }
+            exceptions.add(msg)
         }
 
         if (row[0] === "cumulus__none") {
@@ -167,6 +165,79 @@ function sortY(rows: any[], sortBy: string, xType: "datetime" | "linear" | "cate
     return rows
 }
 
+function getPoint({
+    row,
+    xType,
+    denominator,
+    isErrorRange
+}: {
+    row: [string, number | null, number?, number?]
+    xType: "category" | "linear" | "datetime"
+    denominator?: number
+    isErrorRange?: boolean
+}): Highcharts.XrangePointOptionsObject {
+
+    // Y values must be numeric or null
+    if (row[1] !== null && (isNaN(row[1]) || !isFinite(row[1]))) {
+        console.info('Invalid point value "%s". Row: %o', row[1], row)
+        throw new Error("Some invalid values detected. See console for details.")
+    }
+
+    const point: any = {
+        y: row[1] === null ? null : pct(row[1], denominator),
+
+        // The name of the point as shown in the legend, tooltip, dataLabels, etc.
+        name: String(row[0]),
+
+        color: xType === "category" ?
+            String(row[0]).toLowerCase() === "false" ?
+                COLOR_DANGER :
+                String(row[0]).toLowerCase() === "true" ?
+                    COLOR_SUCCESS :
+                    undefined :
+            undefined,
+
+        custom: {
+            data: {
+                cnt    : row[1],
+                low    : row[2],
+                high   : row[3],
+                lowPct : pct(row[2] ?? 0, denominator),
+                highPct: pct(row[3] ?? 0, denominator)
+            },
+            isErrorRange: !!isErrorRange,
+            denominator
+        }
+    };
+
+    if (isErrorRange) {
+        point.low  = pct(row[2] ?? 0, denominator)
+        point.y = point.high = pct(row[3] ?? 0, denominator)
+    }
+
+    // For datetime axes, the X value is the timestamp in milliseconds since 1970.
+    if (xType === "datetime") {
+        const x = moment(row[0], false)
+        if (!x.isValid()) {
+            console.log('Invalid date "%s". Row: %o', row[0], row)
+            throw new Error("Some invalid dates detected. See console for details.")
+        }
+        point.x = x.valueOf()
+    }
+
+    // For linear (numeric) axes, the X value is the numeric value or 0.
+    if (xType === "linear") {
+        const x = +row[0]
+        if (isNaN(x) || !isFinite(x)) {
+            console.log('Invalid number "%s". Row: %o', row[0], row)
+            throw new Error("Some non-numeric values detected. See console for details.")
+        }
+        point.x = x
+    }
+    
+    return point as Highcharts.XrangePointOptionsObject
+}
+
 function getSeriesAndExceptions({
     column,
     data,
@@ -193,100 +264,16 @@ function getSeriesAndExceptions({
     sortBy          : string
     limit           : number
     offset          : number
-}): { series: SeriesOptions[], exceptions: [any, any, any?, any?][] }
+}): { series: SeriesOptions[], exceptions: Set<string> }
 {
     let series: SeriesOptions[] = []
 
-    const exceptions: any[] = [];
+    const exceptions: Set<string> = new Set();
 
     // Collect all the unique X coordinates so that we can limit & offset
     const xAxis = new Set<string>()
 
     let xTicks: string[] = [];
-
-    function getPoint({
-        row,
-        xType,
-        denominator,
-        isErrorRange
-    }: {
-        row: [string, number | null, number?, number?]
-        xType: "category" | "linear" | "datetime"
-        denominator?: number
-        isErrorRange?: boolean
-    }): Highcharts.XrangePointOptionsObject | number | number[] | null {
-    
-        if (row[1] !== null && (isNaN(row[1]) || !isFinite(row[1]))) {
-            const msg = "Some invalid values detected. See console for details."
-            if (!exceptions.includes(msg)) {
-                exceptions.push(msg)
-            }
-            console.info('Invalid point value "%s". Row: %o', row[1], row)
-            return null
-        }
-    
-        const point: any = {
-            y: row[1] === null ? null : pct(row[1], denominator),
-    
-            // The name of the point as shown in the legend, tooltip, dataLabels, etc.
-            name: String(row[0]),
-
-            color: xType === "category" ?
-                String(row[0]).toLowerCase() === "false" ?
-                    COLOR_DANGER :
-                    String(row[0]).toLowerCase() === "true" ?
-                        COLOR_SUCCESS :
-                        undefined :
-                undefined,
-    
-            custom: {
-                data: {
-                    cnt    : row[1],
-                    low    : row[2],
-                    high   : row[3],
-                    lowPct : pct(row[2] ?? 0, denominator),
-                    highPct: pct(row[3] ?? 0, denominator)
-                },
-                isErrorRange: !!isErrorRange,
-                denominator
-            }
-        };
-    
-        if (isErrorRange) {
-            point.low  = pct(row[2] ?? 0, denominator)
-            point.y = point.high = pct(row[3] ?? 0, denominator)
-        }
-    
-        // For datetime axes, the X value is the timestamp in milliseconds since 1970.
-        if (xType === "datetime") {
-            const x = moment(row[0], false)
-            if (!x.isValid()) {
-                const msg = "Some invalid dates detected. See console for details."
-                if (!exceptions.includes(msg)) {
-                    exceptions.push(msg)
-                }
-                console.log('Invalid date "%s". Row: %o', row[0], row)
-                return null
-            }
-            point.x = x.valueOf()
-        }
-    
-        // For linear (numeric) axes, the X value is the numeric value or 0.
-        if (xType === "linear") {
-            const x = +row[0]
-            if (isNaN(x) || !isFinite(x)) {
-                const msg = "Some non-numeric values detected. See console for details."
-                if (!exceptions.includes(msg)) {
-                    exceptions.push(msg)
-                }
-                console.log('Invalid number "%s". Row: %o', row[0], row)
-                return null
-            }
-            point.x = x
-        }
-        
-        return point as Highcharts.XrangePointOptionsObject
-    }
 
     function addSeries(options: any, secondary = false) {
 
@@ -407,11 +394,15 @@ function getSeriesAndExceptions({
                 zIndex     : secondary ? 0 : 1,
                 data       : xTicks.map(key => {
                     const row = rows.find(row => row[0] + "" === key)
-                    return getPoint({
-                        row: row || [key + "", null, 0, 0],
-                        xType,
-                        denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache)
-                    })
+                    try {
+                        return getPoint({
+                            row: row || [key + "", null, 0, 0],
+                            xType,
+                            denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache)
+                        })
+                    } catch (e) {
+                        exceptions.add(e.message)
+                    }
                 })
             }, secondary)
 
@@ -426,12 +417,16 @@ function getSeriesAndExceptions({
                     zIndex  : secondary ? 0 : 1,
                     data    : xTicks.map(key => {
                         const row = rows.find(row => row[0] + "" === key)
-                        return getPoint({
-                            row: row || [key + "", null, 0, 0],
-                            xType,
-                            denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache),
-                            isErrorRange: true
-                        })
+                        try {
+                            return getPoint({
+                                row: row || [key + "", null, 0, 0],
+                                xType,
+                                denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache),
+                                isErrorRange: true
+                            })
+                        } catch (e) {
+                            exceptions.add(e.message)
+                        }
                     })
                 });
             }
@@ -451,11 +446,15 @@ function getSeriesAndExceptions({
 
             const seriesData = rows.map(row => {
                 xAxis.add(row[0] + "")
-                return getPoint({
-                    row,
-                    xType,
-                    denominator: getDenominator(data, denominator, row, denominatorCache),
-                })
+                try {
+                    return getPoint({
+                        row,
+                        xType,
+                        denominator: getDenominator(data, denominator, row, denominatorCache)
+                    })
+                } catch (e) {
+                    exceptions.add(e.message)
+                }
             })
 
             if (type === "pie" && sortBy.startsWith("x:")) {
@@ -490,12 +489,18 @@ function getSeriesAndExceptions({
                     name: old?.name ?? name + " (range)",
                     linkedTo: "primary-" + name,
                     dataSorting: { enabled: false },
-                    data: rows.map(row => getPoint({
-                        row,
-                        xType,
-                        denominator: getDenominator(data, denominator, row, denominatorCache),
-                        isErrorRange: true
-                    }))
+                    data: rows.map(row => {
+                        try {
+                            return getPoint({
+                                row,
+                                xType,
+                                denominator: getDenominator(data, denominator, row, denominatorCache),
+                                isErrorRange: true
+                            })
+                        } catch (e) {
+                            exceptions.add(e.message)
+                        }
+                    })
                 });
             }
         }
@@ -870,9 +875,9 @@ export function buildChartOptions({
 
     result.caption = { text: "" };
 
-    if (exceptions.length) {
+    if (exceptions.size) {
         result.caption = {
-            text: "⚠️ " + exceptions.join("<br />⚠️ "),
+            text: "⚠️ " + Array.from(exceptions).join("<br />⚠️ "),
             margin: 0,
             style: {
                 color: "#BB0000",
