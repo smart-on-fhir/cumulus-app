@@ -349,8 +349,6 @@ function getSeriesAndExceptions({
 
     function stratify(data: app.ServerResponses.StratifiedDataResponse, secondary = false) {
 
-        const _type = secondary ? (column2type || "spline").replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes : type;
-
         const denominatorCache = {}
 
         data.data.forEach(group => {
@@ -389,7 +387,7 @@ function getSeriesAndExceptions({
             addSeries({
                 id,
                 name       : String(old?.name ?? group.stratifier),
-                type       : _type,
+                type       : secondary ? (column2type || "spline").replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes : type,
                 linkedTo   : secondary ? "primary-" + group.stratifier : undefined,
                 zIndex     : secondary ? 0 : 1,
                 data       : xTicks.map(key => {
@@ -402,6 +400,7 @@ function getSeriesAndExceptions({
                         })
                     } catch (e) {
                         exceptions.add(e.message)
+                        return null
                     }
                 })
             }, secondary)
@@ -426,6 +425,7 @@ function getSeriesAndExceptions({
                             })
                         } catch (e) {
                             exceptions.add(e.message)
+                            return null
                         }
                     })
                 });
@@ -454,6 +454,7 @@ function getSeriesAndExceptions({
                     })
                 } catch (e) {
                     exceptions.add(e.message)
+                    return null
                 }
             })
 
@@ -499,6 +500,7 @@ function getSeriesAndExceptions({
                             })
                         } catch (e) {
                             exceptions.add(e.message)
+                            return null
                         }
                     })
                 });
