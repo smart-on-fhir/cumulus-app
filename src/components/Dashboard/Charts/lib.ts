@@ -352,15 +352,13 @@ function getSeriesAndExceptions({
         const denominatorCache = {}
 
         data.data.forEach(group => {
-            if (xType === "category" || xType === "linear") {
-                group.rows.sort((a, b) => String(a[0]).localeCompare(String(b[0]), "en-US", { numeric: true }))
+            // if (xType === "category" || xType === "linear") {
+            //     group.rows.sort((a, b) => String(a[0]).localeCompare(String(b[0]), "en-US", { numeric: true }))
+            // }
+            const rows = filterOutExceptions({ rows: group.rows, seriesName: group.stratifier, column, exceptions, xType })
+            if (!secondary) {
+                rows.forEach(row => xAxis.add(row[0] + ""))
             }
-            filterOutExceptions({ rows: group.rows, seriesName: group.stratifier, column, exceptions, xType })
-            .forEach(row => {
-                if (!secondary) {
-                    xAxis.add(row[0] + "")
-                }
-            })
         })
 
         xTicks = Array.from(xAxis)
@@ -435,9 +433,9 @@ function getSeriesAndExceptions({
 
     if (data.rowCount) {
         if (!data.stratifier) {
-            if (xType === "category" || xType === "linear") {
-                data.data[0].rows.sort((a, b) => String(a[0]).localeCompare(String(b[0]), "en-US", { numeric: true }))
-            }
+            // if (xType === "category" || xType === "linear") {
+            //     data.data[0].rows.sort((a, b) => String(a[0]).localeCompare(String(b[0]), "en-US", { numeric: true }))
+            // }
             const denominatorCache = {}
             const name = String(column.label || column.name)
             const id   = "primary-" + name
