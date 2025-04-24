@@ -482,8 +482,8 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
                         importCompleted: true,
                         uploading: false
                     })
-                    defer(() => this.props.navigate(`/requests/${this.props.requestID}`), 1400)
-                }, estimate);
+                    defer(() => this.props.navigate(`/requests/${this.props.requestID}`), "navigate-after-upload", 1400)
+                }, "upload-complete", estimate);
             }
 
             let body = extra + (value || "")

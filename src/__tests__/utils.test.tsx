@@ -34,8 +34,8 @@ describe("utils", () => {
         it ("works with delay", async () => {
             let calls = 0
             let fn = () => calls += 1
-            defer(fn, 1)
-            defer(fn, 1)
+            defer(fn, "x", 1)
+            defer(fn, "x", 1)
             expect(calls).toEqual(0)
             await wait(10)
             expect(calls).toEqual(1)
@@ -45,8 +45,8 @@ describe("utils", () => {
             // console.log("=====>", requestAnimationFrame)
             let calls = 0
             let fn = () => calls += 1
-            defer(fn)
-            defer(fn)
+            defer(fn, "x")
+            defer(fn, "x")
             expect(calls).toEqual(0)
             await wait(100)
             expect(calls).toEqual(1)

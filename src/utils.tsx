@@ -10,25 +10,24 @@ export function downloadBase64File(contentType:any, base64Data:any, fileName:any
     downloadLink.click();
 }
 
-const deferMap = new WeakMap();
+const deferMap = new Map<string, any>();
 
-export function defer(fn: () => void, delay?: number)
+export function defer(fn: () => void, id: string, delay?: number)
 {
     const f = () => {
         fn()
-        deferMap.delete(fn)
+        deferMap.delete(id)
     };
 
-    const ref = deferMap.get(fn);
-    if (ref) {
-        if (delay === undefined) {
-            cancelAnimationFrame(ref)
-        } else {
-            clearTimeout(ref)
-        }
-    }
+    deferMap.get(id)?.();
 
-    deferMap.set(fn, delay === undefined ? requestAnimationFrame(f) : setTimeout(f, delay));
+    if (delay) {
+        const ref = setTimeout(f, delay);
+        deferMap.set(id, () => clearTimeout(ref));
+    } else {
+        const ref = requestAnimationFrame(f);
+        deferMap.set(id, () => cancelAnimationFrame(ref));
+    }
 }
 
 export function classList(map: Record<string, boolean>): string | undefined {
