@@ -623,7 +623,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             }
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
             await createOne("views", { ...runtimeView, subscriptionId: subscription ? subscription.id : undefined, packageId: dataPackage?.id, screenShot, }).then(
-                v => defer(() => navigate("/views/" + v.id)),
+                v => defer(() => navigate("/views/" + v.id), "navigate-after-create"),
                 e => alert(e.message)
             );
         }

@@ -89,7 +89,7 @@ export default class Chart extends React.Component<ChartProps>
         // The UI can generate too frequent state updates in some cases (for
         // example via color pickers). Using defer here allows us to skip
         // some needless re-rendering 
-        defer(this.updateChart);
+        defer(this.updateChart, "main-chart");
     }
 
     render() {
