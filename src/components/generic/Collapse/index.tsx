@@ -55,7 +55,7 @@ export default function Collapse({ header, children, collapsed, className = "" }
                 }}>
                 <i className={ "fa-solid fa-caret-" + (isCollapsed ? "right" : "down") }/> {header}
             </div>
-            <div className="collapse-body" ref={refBody} onTransitionEnd={onTransitionEnd}>{children}</div>
+            <div className="collapse-body" ref={refBody} onTransitionEnd={onTransitionEnd}>{ isCollapsed ? null : children}</div>
         </div>
     )
 }
