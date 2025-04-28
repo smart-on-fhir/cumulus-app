@@ -1,9 +1,9 @@
-import { BrowserRouter }                             from "react-router-dom"
-import { render }                                    from "@testing-library/react"
-import { getDefaultChartOptions }                    from "./Charts/DefaultChartOptions"
-import Dashboard, { DashboardProps, getViewReducer } from "."
-import { app }                                       from "../../types"
-import { AuthProvider }                              from "../../auth"
+import { BrowserRouter }             from "react-router-dom"
+import { render }                    from "@testing-library/react"
+import { getDefaultChartOptions }    from "./Charts/DefaultChartOptions"
+import Dashboard, { DashboardProps } from "."
+import { app }                       from "../../types"
+import { AuthProvider }              from "../../auth"
 
 
 
@@ -55,67 +55,6 @@ describe("Dashboard", () => {
             ).toBe(type)
         })
     }
-    
-    it.skip ('getViewReducer', () => {
-        
-        const reducer = getViewReducer({
-            onSeriesToggle    : () => {},
-            onInspectionChange: () => {}
-        })
-
-        const input = {
-            chartType: "pie",
-            inspection: {
-                enabled: false,
-                match: []
-            },
-            viewColumn: {
-                dataType: "integer"
-            },
-            data: [],
-            chartOptions: {
-                chart: {
-                    type: "pie"
-                }
-            }
-        }
-
-        const output = reducer(
-            input as any,
-            {
-                type: "UPDATE",
-                payload: {
-                    inspection: {
-                        enabled: true
-                    }
-                }
-            }
-        )
-
-        console.log(output.chartOptions.chart)
-        expect(typeof output).toBe("object");
-        expect(output).not.toBe(input);
-        expect(output.inspection.enabled).toBe(true);
-        expect(output.chartType).toBe("pie");
-        expect(output.chartOptions.chart?.type).toBe("pie");
-
-        const output2 = reducer(
-            input as any,
-            {
-                type: "UPDATE",
-                payload: {
-                    inspection: {
-                        enabled: false
-                    }
-                }
-            }
-        )
-
-        console.log(output2.chartOptions.chart)
-    })
-
-    
-
 })
 
 describe("Chart View", () => {

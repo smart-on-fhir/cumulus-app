@@ -660,15 +660,6 @@ export function buildChartOptions({
     const maxPointLength = Math.max(...series.map(s => s.data!.length))
 
     const dynamicOptions: Highcharts.Options = {
-        chart: {
-            // @ts-ignore
-            // marginTop: type === "pie" || options.title?.text ? undefined : 40,
-            // options3d: {
-            //     depth: options.chart?.options3d?.depth ?? Math.min(series.length * 10, 100),
-            // },
-            // plotBorderWidth: is3d ? 0 : options.chart?.plotBorderWidth,
-            animation: false
-        },
         colors: computeColors(type, series, options),
         title: {
             style: {
@@ -693,7 +684,6 @@ export function buildChartOptions({
         },
         plotOptions: {
             series: {
-                animation: false,
                 events: {
                     click: inspection.enabled ? function(e) {
                         onInspectionChange(["series"], { selectedSeriesId: e.point.series.options.id })
@@ -707,12 +697,6 @@ export function buildChartOptions({
                         }
                     }
                 },
-                dataSorting: { enabled: false },
-                states: {
-                    hover: {
-                        opacity: 1
-                    }
-                },
                 dataLabels: {
                     // @ts-ignore
                     // enabled: options.plotOptions?.series?.dataLabels?.enabled ?? (!groupBy && maxPointLength <= 30)
@@ -724,7 +708,6 @@ export function buildChartOptions({
             },
             pie: {
                 dataLabels: {
-                    useHTML: true,
                     style: {
                         fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
                         fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
@@ -738,14 +721,6 @@ export function buildChartOptions({
                 }
             },
             areasplinerange: {
-                marker: {
-                    enabled: false,
-                    states: {
-                        hover: {
-                            enabled: false
-                        }
-                    }
-                },
                 states: {
                     hover: {
                         enabled: !!inspection.enabled // No hover on ranges normally
@@ -754,10 +729,6 @@ export function buildChartOptions({
             }
         },
         tooltip: {
-            borderColor: "rgba(0, 0, 0, 0.4)",
-            backgroundColor: "#FFFFFFEE",
-            outside: false,
-            hideDelay: 100,
             enabled: !inspection.enabled,
             style: {
                 fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
@@ -869,10 +840,6 @@ export function buildChartOptions({
                 return false
             })(),
             labels: {
-                autoRotation: [-45, -90],
-                // formatter() {
-                //     return ellipsis(this.value + "", 20)
-                // },
                 style: {
                     // @ts-ignore
                     fontSize: lengthToEm(options.xAxis?.labels?.style?.fontSize ?? "0.85em") + "em"
@@ -886,27 +853,8 @@ export function buildChartOptions({
             },
         },
         legend: {
-            useHTML: false,
             // @ts-ignore - a hack to force highcharts to reflow the legend
             dirty: Date.now()
-        },
-        lang: {
-            thousandsSep: ',',
-            decimalPoint: '.',
-            noData: `
-                <text x="180" y="30" text-anchor="middle" fill="#C30F" stroke="#FFF6" stroke-width="0.5" style="font-size:20px; font-weight:900">No data to display!</text>
-                <text x="180" y="50" text-anchor="middle" fill="#888C" stroke="#FFF6" stroke-width="0.5" style="font-size:15px; font-weight:500">If you have filters applied, try changing or removing them.</text>`,
-        },
-        noData: {
-            attr: {
-                fill  : "#CCC3",
-                r     : 5,
-                stroke: "#8883",
-                width : 360,
-                height: 60,
-                "stroke-width": 2
-            },
-            useHTML: false
         },
         series
     };
