@@ -598,10 +598,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         
     }
 
-    const onTransitionEnd = () => {
-        Highcharts.charts.forEach(c => c?.reflow())
-    };
-
     // Save
     const { execute: saveChart, loading: saving } = useBackend(async () => {
         
@@ -830,7 +826,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             { viewDescription && <meta name="description" content={viewDescription} />}
             <div className="row">
                 <div className="col col-0">
-                    <div onTransitionEnd={onTransitionEnd} className="dashboard-sidebar">
+                    <div className="dashboard-sidebar">
                         <ConfigPanel
                             cols={cols}
                             viewType={viewType}
