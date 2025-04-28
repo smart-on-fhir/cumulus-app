@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useReducer }    from "react"
 import { useNavigate, Link }                     from "react-router-dom"
+import { Chart }                                 from "highcharts"
 import { buildChartOptions }                     from "./Charts/lib"
 import ConfigPanel                               from "./ConfigPanel"
-import { default as BaseChart }                  from "./Charts/Chart"
+import BaseChart                                 from "./Charts/ChartFN"
 import CaptionEditor                             from "./CaptionEditor"
 import { getDefaultChartOptions }                from "./Charts/DefaultChartOptions"
 import { GraphBreadcrumbs }                      from "./GraphBreadcrumbs"
@@ -17,7 +18,6 @@ import { app }                                   from "../../types"
 import { createOne, updateOne, fetchChartData }  from "../../backend"
 import { useBackend, useCommand }                from "../../hooks"
 import Highcharts                                from "../../highcharts"
-import { Chart }                                 from "highcharts"
 import { useAuth }                               from "../../auth"
 import { getScreenShot }                         from "../../commands/lib"
 import CommandButton                             from "../../commands/CommandButton"
@@ -986,24 +986,24 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                 generateCaption
                             ]}
                             // This key controls in which cases the chart should be re-created rather than updated!
-                            key={
-                                [
-                                    chartType,
-                                    viewColumn.name,
-                                    viewGroupBy?.name || "no_stratifier",
-                                    // finalChartOptions.annotations?.length || "",
-                                    column2?.name || "no_secondary",
-                                    column2type || "no_second_type",
-                                    state.chartOptions.chart?.options3d?.enabled ?? false,
-                                    (chartType.includes("pie") || chartType.includes("donut")) ? state.chartOptions.chart?.options3d?.alpha : 0,
-                                    state.ranges.enabled,
-                                    state.ranges.type,
-                                    // state.sortBy || "no_sort",
-                                    // state.limit || "no_limit",
-                                    // state.offset || "no_offset",
-                                    // Date.now()
-                                ].join(":")
-                            }
+                            // key={
+                            //     [
+                            //         chartType,
+                            //         viewColumn.name,
+                            //         viewGroupBy?.name || "no_stratifier",
+                            //         // finalChartOptions.annotations?.length || "",
+                            //         column2?.name || "no_secondary",
+                            //         column2type || "no_second_type",
+                            //         state.chartOptions.chart?.options3d?.enabled ?? false,
+                            //         (chartType.includes("pie") || chartType.includes("donut")) ? state.chartOptions.chart?.options3d?.alpha : 0,
+                            //         state.ranges.enabled,
+                            //         state.ranges.type,
+                            //         // state.sortBy || "no_sort",
+                            //         // state.limit || "no_limit",
+                            //         // state.offset || "no_offset",
+                            //         // Date.now()
+                            //     ].join(":")
+                            // }
                         /> }
                         <br/>
                         <CaptionEditor html={caption} onChange={caption => dispatch({ type: "UPDATE", payload: { caption }})}/>
