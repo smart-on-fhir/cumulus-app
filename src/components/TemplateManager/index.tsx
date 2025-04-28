@@ -243,8 +243,6 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                 options         : defaults,
                 type            : chartType,
                 column          : col,
-                ranges          : { enabled: false },
-                inspection      : { enabled: false, context: {selectedAnnotationIndex: -1, selectedPlotLineAxis: "", selectedPlotLineId: "", selectedSeriesId: ""}, match: [] },
                 sortBy,
                 limit,
                 offset          : 0,

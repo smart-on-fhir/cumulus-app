@@ -46,7 +46,7 @@ export function GraphToolbar({
                         className={ "btn" + (state.inspection.enabled ? " active" : "") }
                         data-tooltip="Inspect elements by click"
                         onClick={() => dispatch({
-                            type: "MERGE",
+                            type: "UPDATE",
                             payload: {
                                 inspection: {
                                     ...state.inspection!,

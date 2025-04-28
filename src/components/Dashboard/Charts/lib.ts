@@ -628,8 +628,8 @@ export function buildChartOptions({
     denominator       ?: app.DenominatorType
     column2type       ?: keyof typeof SupportedChartTypes
     onSeriesToggle    ?: (s: Record<string, boolean>) => void
-    ranges             : app.RangeOptions
-    inspection         : app.Inspection
+    ranges            ?: app.RangeOptions
+    inspection        ?: app.Inspection
     sortBy             : string
     limit              : number
     offset             : number
@@ -685,12 +685,12 @@ export function buildChartOptions({
         plotOptions: {
             series: {
                 events: {
-                    click: inspection.enabled ? function(e) {
+                    click: inspection?.enabled ? function(e) {
                         onInspectionChange(["series"], { selectedSeriesId: e.point.series.options.id })
                     } : undefined,
                     legendItemClick(e) {
                         e.preventDefault()
-                        if (!inspection.enabled) {
+                        if (!inspection?.enabled) {
                             const visMap: Record<string, boolean> = {};
                             e.target.chart.series.forEach((s: Series) => visMap[s.userOptions.id!] = s === e.target ? !s.visible : s.visible)
                             onSeriesToggle(visMap)
@@ -723,13 +723,13 @@ export function buildChartOptions({
             areasplinerange: {
                 states: {
                     hover: {
-                        enabled: !!inspection.enabled // No hover on ranges normally
+                        enabled: !!inspection?.enabled // No hover on ranges normally
                     }
                 }
             }
         },
         tooltip: {
-            enabled: !inspection.enabled,
+            enabled: !inspection?.enabled,
             style: {
                 fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
                 fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
@@ -817,7 +817,7 @@ export function buildChartOptions({
         },
         xAxis: {
             type: xType,
-            crosshair: !inspection.enabled && type.includes("line"),
+            crosshair: !inspection?.enabled && type.includes("line"),
             // reversed: false,//dir === "desc",//type === "bar" || sortBy === "x:desc",
             // reversed: col === "x" ? (type === "bar" ? true : dir === "asc") : false,
             // reversed: type === "bar" && dir !== "desc",
@@ -881,7 +881,7 @@ export function buildChartOptions({
         l.useHTML           = false 
         l.className         = `annotation-index-${i}`
     })
-    if (inspection.enabled && result.annotations?.[0]) {
+    if (inspection?.enabled && result.annotations?.[0]) {
         result.annotations[0].events = {
             // @ts-ignore
             click: function(e: any) {
@@ -902,7 +902,7 @@ export function buildChartOptions({
             l.label.style.fontSize = lengthToEm(l.label.style.fontSize) + "em"
         }
         l.id = `x-axis-plot-line-${i}`
-        if (inspection.enabled) {
+        if (inspection?.enabled) {
             l.events = {
                 click: function() {
                     onInspectionChange(["plotLine"], {
@@ -921,7 +921,7 @@ export function buildChartOptions({
             l.label.style.fontSize = lengthToEm(l.label.style.fontSize) + "em"
         }
         l.id = `y-axis-plot-line-${i}`
-        if (inspection.enabled) {
+        if (inspection?.enabled) {
             l.events = {
                 click: function() {
                     onInspectionChange(["plotLine"], {
