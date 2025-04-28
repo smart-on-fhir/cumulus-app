@@ -238,6 +238,90 @@ function getPoint({
     return point as Highcharts.XrangePointOptionsObject
 }
 
+// Build a set of unique X-axis ticks. We need that for our custom
+// sort/limit/offset implementation.
+function getXAxis({
+    xType,
+    data,
+    data2,
+    limit,
+    offset,
+    sortBy
+}: {
+    xType: "category" | "linear" | "datetime"
+    data: app.ServerResponses.DataResponse
+    data2: app.ServerResponses.StratifiedDataResponse | null
+    limit?: number
+    offset?: number
+    sortBy?: string
+}): string[] {
+    const ticks = new Set<string>()
+
+    // For stratified charts use the counts object
+    if (data.stratifier) {
+        Object.keys((data as app.ServerResponses.StratifiedDataResponse).counts).forEach(key => {
+            if (key !== "null" && key !== "cumulus__none") {
+                ticks.add(key)
+            }
+        })
+    }
+
+    if (data2) {
+        Object.keys((data2 as app.ServerResponses.StratifiedDataResponse).counts).forEach(key => {
+            if (key !== "null" && key !== "cumulus__none") {
+                ticks.add(key)
+            }
+        })
+    }
+
+    if (!data.stratifier) {
+        (data as app.ServerResponses.StratifiedDataResponse).data
+            .forEach(group => group.rows.forEach(r => {
+                const k = r[0]
+                if (k !== "null" && k !== "cumulus__none") {
+                    ticks.add(k)
+                }
+            }))
+    }
+
+    let arr = Array.from(ticks)
+
+    // If we have a stratified chart, xTicks needs to be sorted as it can
+    // contain entries from different series that are out of order after
+    // being combined in th Set.
+    if (data.stratifier || data2) {
+        // For category charts we don't allow highcharts to sort the data.
+        // However, for other types we need to sort it ourselves
+        if (xType === "linear") {
+            // @ts-ignore
+            arr.sort((a, b) => a - b);
+        }
+        else if (xType === "datetime") {
+            // @ts-ignore
+            arr.sort((a, b) => +new Date(a) - +new Date(b));
+        }
+        else {
+            arr.sort((a, b) => a.localeCompare(b, "en-US", { numeric: true }));
+        }
+    }
+
+    if (limit || offset) {
+
+        const from = Math.max(offset || 0, 0)
+        if (sortBy === "x:desc") { // reversed!
+            const end = Math.max(arr.length - from, 0)
+            arr = arr.slice(0, end)
+            if (limit) {
+                arr = arr.slice(Math.max(arr.length - limit, 0));
+            }
+        } else {
+            arr = arr.slice(from, limit ? limit + from : undefined);
+        }
+    }
+
+    return arr
+}
+
 function getSeriesAndExceptions({
     column,
     data,
@@ -270,10 +354,7 @@ function getSeriesAndExceptions({
 
     const exceptions: Set<string> = new Set();
 
-    // Collect all the unique X coordinates so that we can limit & offset
-    const xAxis = new Set<string>()
-
-    let xTicks: string[] = [];
+    let xTicks = getXAxis({ xType, data, data2, limit, offset, sortBy })
 
     function addSeries(options: any, secondary = false) {
 
@@ -350,32 +431,6 @@ function getSeriesAndExceptions({
     function stratify(data: app.ServerResponses.StratifiedDataResponse, secondary = false) {
 
         const denominatorCache = {}
-
-        data.data.forEach(group => {
-            // if (xType === "category" || xType === "linear") {
-            //     group.rows.sort((a, b) => String(a[0]).localeCompare(String(b[0]), "en-US", { numeric: true }))
-            // }
-            const rows = filterOutExceptions({ rows: group.rows, seriesName: group.stratifier, column, exceptions, xType })
-            if (!secondary) {
-                rows.forEach(row => xAxis.add(row[0] + ""))
-            }
-        })
-
-        xTicks = Array.from(xAxis)
-
-        // For category charts we don't allow highcharts to sort the data.
-        // However, for other types we need to sort it ourselves
-        if (xType === "linear") {
-            // @ts-ignore
-            xTicks.sort((a, b) => a - b);
-        }
-        else if (xType === "datetime") {
-            // @ts-ignore
-            xTicks.sort((a, b) => +new Date(a) - +new Date(b));
-        }
-        else {
-            xTicks.sort((a, b) => a.localeCompare(b, "en-US", { numeric: true }));
-        }
         
         data.data.forEach(group => {
             const id   = (secondary ? "secondary-" : "primary-") + group.stratifier
@@ -440,10 +495,15 @@ function getSeriesAndExceptions({
             const name = String(column.label || column.name)
             const id   = "primary-" + name
             const old  = serverOptions.series?.find(s => s.id === id)
-            const rows = sortY(filterOutExceptions({ rows: data.data[0].rows, seriesName: name, column, exceptions, xType }), sortBy, xType)
+            const rows = sortY(filterOutExceptions({
+                rows: data.data[0].rows.filter(r => xTicks.includes(r[0])),
+                seriesName: name,
+                column,
+                exceptions,
+                xType
+            }), sortBy, xType)
 
             const seriesData = rows.map(row => {
-                xAxis.add(row[0] + "")
                 try {
                     return getPoint({
                         row,
@@ -477,8 +537,6 @@ function getSeriesAndExceptions({
                     type === "pie",
             });
 
-            xTicks = Array.from(xAxis)
-
             if (ranges?.enabled) {
                 const id  = "primary-" + name + " (range)"
                 const old = serverOptions.series?.find(s => s.id === id)
@@ -510,24 +568,6 @@ function getSeriesAndExceptions({
 
         if (data2?.rowCount) {
             stratify(data2, true)
-        }
-
-        if (limit || offset) {
-
-            const from = Math.max(offset || 0, 0)
-            if (sortBy === "x:desc") { // reversed!
-                const end = Math.max(xTicks.length - from, 0)
-                xTicks = xTicks.slice(0, end)
-                if (limit) {
-                    xTicks = xTicks.slice(Math.max(xTicks.length - limit, 0));
-                }
-            } else {
-                xTicks = xTicks.slice(from, limit ? limit + from : undefined);
-            }
-
-            series.forEach(s => {
-                s.data = s.data!.filter((p: any) => xTicks.includes(p.name))
-            })
         }
     }
 
