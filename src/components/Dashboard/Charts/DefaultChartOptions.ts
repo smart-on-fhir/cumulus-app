@@ -61,10 +61,10 @@ const DefaultChartOptions: Options = {
         spacingRight : 25,
         spacingBottom: 25,
         spacingLeft  : 25,
-        animation: {
+        animation: false /*{
             duration: 400,
             defer: 0,
-        },
+        }*/,
         options3d: {
             enabled: false
         },
@@ -134,6 +134,7 @@ const DefaultChartOptions: Options = {
     },
     legend: {
         enabled: true,
+        useHTML: false,
         // margin: 0,
         // padding: 0
     },
@@ -189,16 +190,22 @@ const DefaultChartOptions: Options = {
             allowPointSelect: true,
             cursor          : 'default',
             showInLegend    : true,
-            animation: {
+            animation: false /*{
                 duration: 0,//400,
                 defer: 0,
-            },
+            }*/,
+            dataSorting: { enabled: false },
             dataLabels: {
                 style: {
                     fontSize   : "0.7em",
                     color      : "contrast",
                     textOutline: "1px contrast",
                     fontWeight : "700"
+                }
+            },
+            states: {
+                hover: {
+                    opacity: 1
                 }
             },
             turboThreshold: TURBO_THRESHOLD
@@ -212,6 +219,7 @@ const DefaultChartOptions: Options = {
             // size            : "75%",
             dataLabels: {
                 enabled: true,
+                useHTML: true,
             }
         },
         column: {
@@ -275,6 +283,21 @@ const DefaultChartOptions: Options = {
             dashStyle: "Solid",
             fillOpacity: 0.5
         },
+        areasplinerange: {
+            marker: {
+                enabled: false,
+                states: {
+                    hover: {
+                        enabled: false
+                    }
+                }
+            },
+            states: {
+                hover: {
+                    enabled: false // No hover on ranges normally
+                }
+            }
+        },
         spline: {
             marker,
             lineWidth: 2,
@@ -290,6 +313,10 @@ const DefaultChartOptions: Options = {
     },
     tooltip: {
         useHTML: true,
+        borderColor: "rgba(0, 0, 0, 0.4)",
+        backgroundColor: "#FFFFFFEE",
+        outside: false,
+        hideDelay: 100,
         style: {
             zIndex: 1000000
         }
@@ -322,6 +349,7 @@ const DefaultChartOptions: Options = {
             autoRotationLimit: 80,
             overflow: "justify",
             padding: 2,
+            autoRotation: [-45, -90],
             // staggerLines: 0,
 
             // style: {
@@ -356,7 +384,28 @@ const DefaultChartOptions: Options = {
             year       : '%Y'
         }
     },
-    annotations: []
+    annotations: [],
+    lang: {
+        thousandsSep: ',',
+        decimalPoint: '.',
+        noData: `
+            <text x="180" y="30" text-anchor="middle" fill="#C30F" stroke="#FFF6"
+                stroke-width="0.5" style="font-size:20px; font-weight:900">No data to display!</text>
+            <text x="180" y="50" text-anchor="middle" fill="#888C" stroke="#FFF6"
+                stroke-width="0.5" style="font-size:15px; font-weight:500">If you have filters applied,
+                try changing or removing them.</text>`,
+    },
+    noData: {
+        attr: {
+            fill  : "#CCC3",
+            r     : 5,
+            stroke: "#8883",
+            width : 360,
+            height: 60,
+            "stroke-width": 2
+        },
+        useHTML: false
+    },
 };
 
 export default DefaultChartOptions
