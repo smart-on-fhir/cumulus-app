@@ -169,12 +169,14 @@ function getPoint({
     row,
     xType,
     denominator,
-    isErrorRange
+    isErrorRange,
+    isStratified
 }: {
     row: [string, number | null, number?, number?]
     xType: "category" | "linear" | "datetime"
     denominator?: number
     isErrorRange?: boolean
+    isStratified?: boolean
 }): Highcharts.XrangePointOptionsObject {
 
     // Y values must be numeric or null
@@ -189,7 +191,7 @@ function getPoint({
         // The name of the point as shown in the legend, tooltip, dataLabels, etc.
         name: String(row[0]),
 
-        color: xType === "category" ?
+        color: !isStratified && xType === "category" ?
             String(row[0]).toLowerCase() === "false" ?
                 COLOR_DANGER :
                 String(row[0]).toLowerCase() === "true" ?
@@ -448,7 +450,8 @@ function getSeriesAndExceptions({
                         return getPoint({
                             row: row || [key + "", null, 0, 0],
                             xType,
-                            denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache)
+                            denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache),
+                            isStratified: true
                         })
                     } catch (e) {
                         exceptions.add(e.message)
@@ -473,7 +476,8 @@ function getSeriesAndExceptions({
                                 row: row || [key + "", null, 0, 0],
                                 xType,
                                 denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache),
-                                isErrorRange: true
+                                isErrorRange: true,
+                                isStratified: true
                             })
                         } catch (e) {
                             exceptions.add(e.message)
