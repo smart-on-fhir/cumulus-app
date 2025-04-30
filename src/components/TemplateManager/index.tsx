@@ -1,4 +1,4 @@
-import { useEffect, useReducer }         from "react"
+import { memo, useEffect, useReducer }   from "react"
 import { Link }                          from "react-router-dom"
 import Loader                            from "../generic/Loader"
 import { buildChartOptions }             from "../Dashboard/Charts/lib"
@@ -86,10 +86,38 @@ function buildVirtualSubscription(pkg: DataPackage) {
         name: humanizeColumnName(pkg.name)
     } as app.Subscription
 }
+
+export const Templates = memo(({ subscription }: { subscription: app.Subscription }) => {
+    const cols = subscription.metadata?.cols.filter(col => col.dataType !== "hidden" && !col.name.startsWith("cnt"));
+    return <>{ cols.map((col, i) => {
+        return [
+            <Thumbnail key={i} col={col} sub={subscription} />,
+            cols.filter(c => c.name !== col.name && canStratifyBy(c.name, c.dataType)).map((c, y) => {
+                return <Thumbnail key={i + "-" + y} col={col} sub={subscription} groupBy={c}  />
+            })
+        ].flat()
+    })}</>
+}, (prev, cur) => prev.subscription.id === cur.subscription.id)
+
+export const PackageTemplates = memo(({ pkg }: { pkg: DataPackage }) => {
+    const cols = Object.keys(pkg.columns).filter(name => !name.startsWith("cnt"));
+    const subscription = buildVirtualSubscription(pkg)
+    return (
+        <>
+            { cols.map((col, i) => {
+                const colMetaData = buildColumnInfo(col, pkg)
+                return [
+                    <Thumbnail key={i} col={colMetaData} pkg={pkg} sub={subscription} />,
+                    cols.filter(c => c !== col && canStratifyBy(c, pkg.columns[c])).map((c, y) => {
+                        return <Thumbnail key={i + "-" + y} col={colMetaData} pkg={pkg} groupBy={buildColumnInfo(c, pkg)} sub={subscription} />
+                    })
+                ]
             }) }
         </>
     )
-}
+}, (prev, cur) => prev.pkg.id === cur.pkg.id)
+
+
 
 interface State {
     chartType  : "areaspline" | "spline" | "column" | "bar"
@@ -304,7 +332,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
 }
 
 
-function Thumbnail({ col, sub, pkg }: { col: app.SubscriptionDataColumn, sub: app.Subscription, pkg?: DataPackage }) {
+const Thumbnail = memo(({ col, sub, pkg, groupBy }: { col: app.SubscriptionDataColumn, sub: app.Subscription, pkg?: DataPackage, groupBy?: app.SubscriptionDataColumn }) => {
     
     const {
         loading,
@@ -317,9 +345,11 @@ function Thumbnail({ col, sub, pkg }: { col: app.SubscriptionDataColumn, sub: ap
         sortBy,
         theme,
         imgUrl
-    } = useDataLoader(sub, col, pkg)
+    } = useDataLoader(sub, col, pkg, groupBy)
 
-    
+    if (error) {
+        console.error(error)
+    }
     
     if (loading || error) {
         return (
@@ -343,6 +373,7 @@ function Thumbnail({ col, sub, pkg }: { col: app.SubscriptionDataColumn, sub: ap
             limit,
             sortBy,
             theme,
+            groupBy: groupBy?.name,
             colors: COLOR_THEMES.find(t => t.id === theme)!.colors
         }}>
             <div className="view-thumbnail-image center"
@@ -354,7 +385,12 @@ function Thumbnail({ col, sub, pkg }: { col: app.SubscriptionDataColumn, sub: ap
             <div className="view-thumbnail-title" title={description}>{ label }</div>
         </Link>
     )
-}
+}, (prev, next) => (
+    prev.sub?.id === next.sub?.id &&
+    prev.pkg?.id === next.pkg?.id &&
+    prev.col.name === next.col.name &&
+    prev.groupBy?.name === next.groupBy?.name
+))
 
 function getSubject(dataSource: app.Subscription) {
     let subject = getSubjectFromMetadata(dataSource)
