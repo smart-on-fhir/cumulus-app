@@ -67,6 +67,25 @@ function canStratifyBy(colName: string, colType: string) {
     return colName.search(/(sex|gender|site|ethnicity|deceased|race)/i) >= 0
 }
 
+function buildColumnInfo(col: string, pkg: DataPackage) {
+    return {
+        name       : col,
+        label      : humanizeColumnName(col),
+        description: humanizeColumnName(col),
+        dataType   : pkg.columns[col]
+            .replace("year" , "date:YYYY")
+            .replace("month", "date:YYYY-MM")
+            .replace("week" , "date:YYYY-MM-DD")
+            .replace("day"  , "date:YYYY-MM-DD") as app.SubscriptionDataColumn["dataType"]
+    }
+}
+
+function buildVirtualSubscription(pkg: DataPackage) {
+    return {
+        id  : pkg.id as any,
+        name: humanizeColumnName(pkg.name)
+    } as app.Subscription
+}
             }) }
         </>
     )
