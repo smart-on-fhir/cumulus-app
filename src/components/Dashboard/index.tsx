@@ -691,7 +691,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             column    : viewColumnName,
             stratifier: stratifierName,
             filters   : filterParams,
-            label     : "Char Primary Data"
+            label     : "Chart Primary Data"
         })
 
         const fetchSecondaryData = async () => {
@@ -702,7 +702,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                 column    : viewColumnName,
                 stratifier: secColumnName,
                 filters   : filterParams,
-                label     : "Char Secondary Data"
+                label     : "Chart Secondary Data"
             })
         }
 
