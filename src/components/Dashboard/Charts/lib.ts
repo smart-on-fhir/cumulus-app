@@ -258,7 +258,7 @@ function getXAxis({
     const ticks = new Set<string>()
 
     // For stratified charts use the counts object
-    if (data.stratifier) {
+    if (data?.stratifier) {
         Object.keys((data as app.ServerResponses.StratifiedDataResponse).counts).forEach(key => {
             if (key !== "null" && key !== "cumulus__none") {
                 ticks.add(key)
@@ -274,8 +274,8 @@ function getXAxis({
         })
     }
 
-    if (!data.stratifier) {
-        (data as app.ServerResponses.StratifiedDataResponse).data
+    if (data?.data && !data.stratifier) {
+        (data as app.ServerResponses.UnStratifiedDataResponse).data
             .forEach(group => group.rows.forEach(r => {
                 const k = r[0]
                 if (k !== "null" && k !== "cumulus__none") {
@@ -376,7 +376,6 @@ function getSeriesAndExceptions({
             // @ts-ignore,
             color: S?.colorByPoint ? undefined : color,
             id: options.id,
-            boostThreshold: 100_000
         }
 
         if ((options.type === "area" || options.type === "areaspline") && color) {

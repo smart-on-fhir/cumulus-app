@@ -89,7 +89,7 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                         <h5 className="mt-2">Graphs</h5>
                         <hr/>
                         
-                        <ViewsBrowser pkgId={ pkg.id } minColWidth="13rem" header={
+                        <ViewsBrowser key={ pkg.id } pkgId={ pkg.id } minColWidth="13rem" header={
                             <PackageTemplates pkg={pkg} key={pkg.id} />
                         }  />
                     </> }

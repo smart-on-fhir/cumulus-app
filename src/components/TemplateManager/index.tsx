@@ -7,7 +7,7 @@ import { COLOR_THEMES }                  from "../Dashboard/config"
 import Highcharts                        from "../../highcharts"
 import { fetchChartData }                from "../../backend"
 import { app }                           from "../../types"
-import { humanizeColumnName, pluralize } from "../../utils"
+import { humanizeColumnName, JobQueue, pluralize } from "../../utils"
 import { FhirResourceTypes }             from "../../config"
 import Terminology                       from "../../Terminology"
 import { DataPackage }                   from "../../Aggregator"
@@ -119,6 +119,8 @@ export const PackageTemplates = memo(({ pkg }: { pkg: DataPackage }) => {
 
 
 
+const templateQueue = new JobQueue(5)
+
 interface State {
     chartType  : "areaspline" | "spline" | "column" | "bar"
     limit      : number
@@ -138,7 +140,7 @@ function reducer(state: State, payload: Partial<State>): State {
     return { ...state, ...payload };
 }
 
-function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, pkg?: DataPackage): State {
+function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, pkg?: DataPackage, groupBy?: app.SubscriptionDataColumn): State {
 
     const counted    = pluralize(getSubject(sub))
     const countLabel = counted.match(/^counts?/i) ? counted : `Count ${counted}`
@@ -152,7 +154,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
         countLabel,
         counted,
         imgUrl     : "",
-        label      : `${countLabel} by ${col.label}`,
+        label      : `${countLabel} by ${col.label}${groupBy ? ` and ${groupBy.label}` : ""}`,
         description: "",
         loading    : true,
         error      : null
@@ -162,158 +164,178 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
 
         let abortController = new AbortController()
 
-        const timer = setTimeout(() => abortController.abort("Operation timed out"), 20_000)
+        let timer: any;
 
-        fetchChartData({
-            subscription: sub,
-            dataPackage : pkg,
-            column      : col.name,
-            signal      : abortController.signal
-        })
-        .then(data => {
+        templateQueue.add(() => {
+            timer = setTimeout(() => abortController.abort("Operation timed out"), 20_000)
+            return fetchChartData({
+                subscription: sub,
+                dataPackage : pkg,
+                column      : col.name,
+                signal      : abortController.signal,
+                stratifier  : groupBy?.name
+            })
+            .then(data => {
 
-            let chartType = state.chartType
-            let limit     = state.limit
-            let sortBy    = state.sortBy
-            let theme     = state.theme
+                let chartType = state.chartType
+                let limit     = state.limit
+                let sortBy    = state.sortBy
+                let theme     = state.theme
 
-            if (chartType === "column" && data.rowCount > 20) {
-                chartType = "bar"
-            }
-            
-            // No limit for lines and up to 30 bars/columns
-            if (!chartType.includes("line") && data.rowCount > 30) {
-                limit = 30
-                sortBy = "y:desc"
-            }
+                if (chartType === "column" && data.rowCount > 20) {
+                    chartType = "bar"
+                }
+                
+                // No limit for lines and up to 30 bars/columns
+                if (!chartType.includes("line") && data.rowCount > 30) {
+                    limit = groupBy ? 20 : 30
+                    sortBy = "y:desc"
+                }
 
-            if (chartType === "areaspline") {
-                theme = "sas_dark"
-            }
+                if (chartType === "areaspline") {
+                    theme = "sas_dark"
+                }
 
-            const colors = COLOR_THEMES.find(t => t.id === "sas_light")!.colors
-            
-            const defaults = getDefaultChartOptions(chartType, {
-                chart: {
-                    width        : 1500,
-                    height       : 900,
-                    spacingLeft  : 10,
-                    spacingBottom: 10,
-                    spacingRight : 10,
-                    spacingTop   : 10
-                },
-                exporting: {
-                    enabled: false
-                },
-                credits: {
-                    enabled: false
-                },
-                title: {
-                    text: col.label,
-                    margin: 10,
-                    style: {
-                        fontSize: "36px",
-                        color: "#555"
-                    }
-                },
-                yAxis: {
+                const colors = COLOR_THEMES.find(t => t.id === "sas_light")!.colors
+                
+                const defaults = getDefaultChartOptions(chartType, {
+                    chart: {
+                        width        : 1500,
+                        height       : 900,
+                        spacingLeft  : 10,
+                        spacingBottom: 10,
+                        spacingRight : 10,
+                        spacingTop   : 10
+                    },
+                    exporting: {
+                        enabled: false
+                    },
+                    credits: {
+                        enabled: false
+                    },
                     title: {
-                        text: ""
-                    },
-                    labels: {
+                        text: col.label + (groupBy ? ` by ${groupBy.label}` : ""),
+                        margin: 10,
                         style: {
-                            fontSize: "30px"
+                            fontSize: "36px",
+                            color: "#555"
                         }
-                    }
-                },
-                xAxis: {
-                    labels: {
-                        padding: 16,
-                        style: {
-                            fontSize: "30px"
-                        }
-                    }
-                },
-                legend: {
-                    enabled: false
-                },
-                plotOptions: {
-                    column: {
-                        groupPadding: 0.1,
-                        pointPadding: 0.1,
-                        minPointLength: 4,
                     },
-                    bar: {
-                        groupPadding: 0.1,
-                        pointPadding: 0.1,
-                        minPointLength: 4,
-                    },
-                    series: {
-                        dataLabels: {
-                            padding: 2,
-                            backgroundColor: "#FFF8",
-                            borderWidth : 3,
-                            borderRadius: 10,
-                            borderColor : "#FFF0",
+                    yAxis: {
+                        title: {
+                            text: ""
+                        },
+                        labels: {
                             style: {
-                                fontSize: "25px",
-                                color: "#444",
-                                textOutline: "2px #FFF8",
-                                fontWeight: "300",
+                                fontSize: "30px"
                             }
                         }
-                    }
-                },
-                colors,
+                    },
+                    xAxis: {
+                        labels: {
+                            padding: 16,
+                            style: {
+                                fontSize: "30px"
+                            }
+                        }
+                    },
+                    legend: {
+                        enabled: !!groupBy,
+                        useHTML: false,
+                        itemStyle: {
+                            // color: "#000"
+                            fontSize: "30px"
+                        }
+                    },
+                    plotOptions: {
+                        column: {
+                            groupPadding: 0.1,
+                            pointPadding: 0.1,
+                            minPointLength: 4,
+                            stacking: groupBy ? "normal" : undefined
+                        },
+                        bar: {
+                            groupPadding: 0.1,
+                            pointPadding: 0.1,
+                            minPointLength: 4,
+                            stacking: groupBy ? "normal" : undefined
+                        },
+                        series: {
+                            borderWidth: 0.5,
+                            borderColor : "#000C",
+                            dataLabels: {
+                                padding: 2,
+                                backgroundColor: "#FFF8",
+                                borderWidth : 3,
+                                borderRadius: 10,
+                                borderColor : "#FFF0",
+                                style: {
+                                    fontSize: "25px",
+                                    color: "#444",
+                                    textOutline: "2px #FFF8",
+                                    fontWeight: "300",
+                                }
+                            }
+                        }
+                    },
+                    colors,
+
+                    // @ts-ignore
+                    custom: { theme }
+                })
 
                 // @ts-ignore
-                custom: { theme }
-            })
-
-            // @ts-ignore
-            const options = buildChartOptions({
-                data,
-                options         : defaults,
-                type            : chartType,
-                column          : col,
-                sortBy,
-                limit,
-                offset          : 0,
-            })
-
-            if (counted.match(/^counts?$/i)) {
-                const label = limit ? `Top ${limit} Counts by ${col.label}` : `Counts by ${col.label}`
-                dispatch({
+                const options = buildChartOptions({
                     data,
-                    chartType,
-                    limit,
+                    options         : defaults,
+                    type            : chartType,
+                    column          : col,
+                    groupBy,
                     sortBy,
-                    theme,
-                    label,
-                    description: `Generated from the "${sub.name}" ${Terminology.subscription.nameSingular.toLowerCase()} to show ${label.toLowerCase()}.`
-                })
-            } else {
-                const label = limit ? `Top ${limit} ${counted} by ${col.label}`: `Count ${counted} by ${col.label}`
-                dispatch({
-                    data,
-                    chartType,
                     limit,
-                    sortBy,
-                    theme,
-                    label,
-                    description: `Generated from the "${sub.name}" ${Terminology.subscription.nameSingular.toLowerCase()} to ${limit ? "show" : ""} ${label.toLowerCase()}.`
+                    offset          : 0,
                 })
-            }
 
-            return renderChartAsPng(options, abortController.signal)
-        })
-        .then(imgUrl => dispatch({ imgUrl }))
-        .catch(error => dispatch({ error }))
-        .finally(() => {
-            if (timer) {
-                clearTimeout(timer)
-            }
-            dispatch({ loading: false })
+                if (counted.match(/^counts?$/i)) {
+                    let label = limit ? `Top ${limit} Counts by ${col.label}` : `Counts by ${col.label}`
+                    if (groupBy) {
+                        label += ` and ${groupBy.label}`
+                    }
+                    dispatch({
+                        data,
+                        chartType,
+                        limit,
+                        sortBy,
+                        theme,
+                        label,
+                        description: `Generated from the "${sub.name}" ${Terminology.subscription.nameSingular.toLowerCase()} to show ${label.toLowerCase()}.`,
+                    })
+                } else {
+                    let label = limit ? `Top ${limit} ${counted} by ${col.label}`: `Count ${counted} by ${col.label}`
+                    if (groupBy) {
+                        label += ` and ${groupBy.label}`
+                    }
+                    dispatch({
+                        data,
+                        chartType,
+                        limit,
+                        sortBy,
+                        theme,
+                        label,
+                        description: `Generated from the "${sub.name}" ${Terminology.subscription.nameSingular.toLowerCase()} to ${limit ? "show" : ""} ${label.toLowerCase()}.`,
+                    })
+                }
+
+                return renderChartAsPng(options, abortController.signal)
+            })
+            .then(imgUrl => dispatch({ imgUrl }))
+            .catch(error => dispatch({ error }))
+            .finally(() => {
+                if (timer) {
+                    clearTimeout(timer)
+                }
+                dispatch({ loading: false })
+            })
         })
 
         return () => {
@@ -325,8 +347,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
             }
         }
 
-    // eslint-disable-next-line
-    }, [sub, col])
+    }, [])
     
     return state
 }
