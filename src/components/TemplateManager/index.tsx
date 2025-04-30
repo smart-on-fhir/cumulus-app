@@ -56,31 +56,17 @@ export default function TemplateManager({ subscription }: { subscription: app.Su
     )
 }
 
-export function Templates({ subscription }: { subscription: app.Subscription }) {
-    return <>{ subscription.metadata?.cols.filter(col => col.dataType !== "hidden" && !col.name.startsWith("cnt")).map((col, i) => {
-        return <Thumbnail key={i} col={col} sub={subscription} />
-    })}</>
+// Given a column name and data type, decides if we can use that column as
+// stratifier. The idea is to only use columns for which we can assume there are
+// limited number of distinct values. This means we exclude numeric and date
+// columns, include booleans, and make guesses based on the column name for
+// string columns.
+function canStratifyBy(colName: string, colType: string) {
+    if (colType === "boolean") return true
+    if (colType !== "string") return false
+    return colName.search(/(sex|gender|site|ethnicity|deceased|race)/i) >= 0
 }
 
-export function PackageTemplates({ pkg }: { pkg: DataPackage }) {
-    return (
-        <>
-            { Object.keys(pkg.columns).filter(name => !name.startsWith("cnt")).map((col, i) => {
-                return <Thumbnail key={i} col={{
-                    dataType   : pkg.columns[col]
-                        .replace("year" , "date:YYYY")
-                        .replace("month", "date:YYYY-MM")
-                        .replace("week" , "date:YYYY-MM-DD")
-                        .replace("day"  , "date:YYYY-MM-DD") as app.SubscriptionDataColumn["dataType"],
-                    name       : col,
-                    label      : humanizeColumnName(col),
-                    description: humanizeColumnName(col)
-                }}
-                pkg={pkg}
-                sub={{
-                    id  : pkg.id as any,
-                    name: humanizeColumnName(pkg.name)
-                } as app.Subscription} />
             }) }
         </>
     )
