@@ -129,7 +129,8 @@ const DefaultChartOptions: Options = {
     },
     legend: {
         enabled: true,
-        useHTML: false,
+        useHTML: true,
+        maxHeight: 200
         // margin: 0,
         // padding: 0
     },
