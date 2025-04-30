@@ -857,7 +857,8 @@ export function buildChartOptions({
         },
         legend: {
             // @ts-ignore - a hack to force highcharts to reflow the legend
-            dirty: Date.now()
+            dirty: Date.now(),
+            enabled: options.legend.enabled ?? series.length <= 30
         },
         series
     };
