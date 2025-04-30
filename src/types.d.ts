@@ -477,6 +477,7 @@ export declare module app {
     type MergeAction           = { type: "MERGE"            , payload: Partial<DashboardState>     }
     type SetChartOptionsAction = { type: "SET_CHART_OPTIONS", payload: Partial<Highcharts.Options> }
     type SetXAxisAction        = { type: "SET_X_AXIS"       , payload: string                      }
+    type UpdateAxisAction      = { type: "UPDATE"           , payload: Partial<DashboardState>     }
     
-    type ViewAction = ToggleOptionsAction | SetViewTypeAction | MergeAction | SetChartOptionsAction | SetXAxisAction
+    type ViewAction = ToggleOptionsAction | SetViewTypeAction | MergeAction | SetChartOptionsAction | SetXAxisAction | UpdateAxisAction
 }

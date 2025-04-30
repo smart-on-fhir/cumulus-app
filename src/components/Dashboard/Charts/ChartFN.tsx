@@ -14,6 +14,7 @@ interface ChartProps {
     visualOverrides: app.VisualOverridesState
     onInspectionChange?: (result: string[], ctx: Partial<app.InspectionContext>) => void
     isDraft?: boolean
+    inspection?: { enabled: boolean }
 }
 
 function setGlobalTextColor(color?: string) {
@@ -41,6 +42,7 @@ export function Chart(props: ChartProps) {
         isDraft,
         options,
         contextMenuItems,
+        inspection: { enabled: inspectionEnabled } = { enabled: false },
         visualOverrides: {
             enabled: overrideEnabled,
             brightness,
@@ -79,7 +81,8 @@ export function Chart(props: ChartProps) {
         saturation,
         fontColor,
         fontColorEnabled,
-        options
+        options,
+        inspectionEnabled
     ]);
 
     useLayoutEffect(() => {

@@ -517,3 +517,33 @@ export function centerElement(element: HTMLElement) {
         }px)`
     }
 }
+
+type Job = () => Promise<void>;
+
+export class JobQueue {
+    private queue: Job[] = [];
+    private running = 0;
+    private concurrency: number;
+
+    constructor(concurrency: number = 3) {
+        this.concurrency = concurrency;
+    }
+
+    add(job: Job) {
+        this.queue.push(job);
+        this.runNext();
+    }
+
+    private runNext() {
+        while (this.running < this.concurrency && this.queue.length > 0) {
+            const job = this.queue.shift();
+            if (job) {
+                this.running++;
+                job().catch(console.error).finally(() => {
+                    this.running--;
+                    this.runNext();
+                });
+            }
+        }
+    }
+}
