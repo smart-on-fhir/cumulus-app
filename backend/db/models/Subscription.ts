@@ -18,7 +18,6 @@ export default class Subscription extends BaseModel<InferAttributes<Subscription
     declare id           : CreationOptional<number>;
     declare name         : string;
     declare description  : CreationOptional<string | null>;
-    declare refresh      : 'manually' | 'yearly' | 'monthly' | 'weekly' | 'daily';
     declare completed    : CreationOptional<Date | null>;
     declare requestedData: CreationOptional<Record<string, any> | null>;
     declare metadata     : CreationOptional<app.SubscriptionMetaData | null>;
@@ -42,56 +41,27 @@ export default class Subscription extends BaseModel<InferAttributes<Subscription
                 primaryKey   : true,
                 autoIncrement: true
             },
-            
             name: {
                 type: DataTypes.STRING(100),
                 allowNull: false
             },
-            
-            description: {
-                type: DataTypes.TEXT
-            },
-            
-            refresh: {
-                type: DataTypes.ENUM('manually', 'yearly', 'monthly', 'weekly', 'daily'),
-                defaultValue: "manually",
-                allowNull: false
-            },
+            description: DataTypes.TEXT,
+            completed  : DataTypes.DATE,
+            metadata   : DataTypes.JSONB,
+            groupId    : DataTypes.INTEGER,
+            dataURL    : DataTypes.STRING(50_000),
+            createdAt  : DataTypes.DATE,
+            updatedAt  : DataTypes.DATE,
 
-            completed: {
-                type: DataTypes.DATE
-            },
-
+            // DEPRECATED
+            // -----------------------------------------------------------------
             requestedData: {
                 type: DataTypes.JSONB
             },
-
-            metadata: {
-                type: DataTypes.JSONB
-            },
-            
-            groupId: {
-                type: DataTypes.INTEGER
-            },
-
-            dataURL: {
-                type: DataTypes.STRING(50_000)
-            },
-
             transmissions: {
                 type: DataTypes.JSONB,
                 defaultValue: null
             },
-
-            createdAt: {
-                type: DataTypes.DATE,
-                allowNull: true
-            },
-    
-            updatedAt: {
-                type: DataTypes.DATE,
-                allowNull: true
-            }
         }, {
             sequelize,
             modelName: "Subscription",

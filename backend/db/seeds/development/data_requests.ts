@@ -3,7 +3,6 @@ export default [
         id: 1,
         name: 'Demo Data Subscription',
         description: 'This data subscription has been created for demo purposes',
-        refresh: 'manually',
         completed: '2022-08-22 18:43:09.245+00',
         requestedData: {
             "fields": {
@@ -45,7 +44,6 @@ export default [
         id: 2,
         name: 'Demo - Large subscription payload',
         description: 'Data inserted from&nbsp;https://us-east-2.console.aws.amazon.com/s3/object/output-bintest2?region=us-east-2&amp;prefix=Unsaved/2022/06/06/8c3a5429-1b60-4a7d-92b4-641920889d43.csv',
-        refresh: 'manually',
         completed: '2022-06-06 22:01:00.821+00',
         metadata: {
             "cols": [
@@ -70,7 +68,6 @@ export default [
     {
         id: 3,
         name: 'Suicidality by Month',
-        refresh: 'manually',
         completed: '2022-06-30 18:48:32.462+00',
         metadata: {
             "cols": [
@@ -87,7 +84,6 @@ export default [
     {
         id: 4,
         name: 'gender identity over time',
-        refresh: 'manually',
         completed: '2022-08-22 20:31:04.55+00', 
         metadata: {
             "cols": [
@@ -105,7 +101,6 @@ export default [
     {
         id: 5,
         name: 'Suicidality by Month v2',
-        refresh: 'manually',
         completed: '2022-08-22 18:52:03.563+00',
         metadata: {
             "cols": [
@@ -126,7 +121,6 @@ export default [
         id: 6,
         name: 'COVID PCR Test Positivity',
         description: '<p dir="ltr" style="margin-top: 0pt; margin-bottom: 0pt; font-family: Nunito, "Helvetica Neue", sans-serif; line-height: 1.38; background-color: rgb(248, 248, 247);"><span style="font-size: 12pt; font-family: Nunito, sans-serif; color: rgb(0, 0, 0); background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; vertical-align: baseline; white-space: pre-wrap;"><span style="font-weight: 700;">This is a sample data subscription providing insights into COVID tests administered each week.</span></span></p><p dir="ltr" style="margin-top: 0pt; margin-bottom: 0pt; font-family: Nunito, "Helvetica Neue", sans-serif; line-height: 1.38; background-color: rgb(248, 248, 247);"><span style="font-size: 12pt; font-family: Nunito, sans-serif; color: rgb(0, 0, 0); background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; vertical-align: baseline; white-space: pre-wrap;">The patient counts in this request are from all ED visits and direct admissions to Boston Children\'s Hospital starting in January 2020.</span></p><p dir="ltr" style="margin-top: 0pt; margin-bottom: 0pt; font-family: Nunito, "Helvetica Neue", sans-serif; line-height: 1.38; background-color: rgb(248, 248, 247);"><span style="font-size: 12pt; font-family: Nunito, sans-serif; color: rgb(0, 0, 0); background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; vertical-align: baseline; white-space: pre-wrap;">Aggregate count data each week are broken down by common demographics and the status of any COVID19 PCR tests given that week.</span></p>',
-        refresh: 'manually',
         completed: '2022-11-15 17:16:28.157+00',
         requestedData: {
             "fields": {
@@ -165,7 +159,6 @@ export default [
         id: 7,
         name: 'COVID Symptoms by Variant of Concern',
         description: 'The patient counts in this subscription are from all ED visits and direct admissions starting in January 2020. Visits are aggregated by variant era:<div><div><br></div><div>Pre-Delta: March 1, 2020 to June 14, 2021,</div><div>Delta: June 15, 2021 to November 29, 2021,</div><div>Omicron November 30, 2021</div><div><br></div><div><span style="color: inherit; font-family: inherit; font-size: inherit; font-style: inherit; font-variant-ligatures: inherit; font-variant-caps: inherit;"><b>Last transmitted dates:</b></span></div><div><span style="color: inherit; font-family: inherit; font-size: inherit; font-style: inherit; font-variant-ligatures: inherit; font-variant-caps: inherit; font-weight: inherit;">BCH: February 2021</span><br></div></div>',
-        refresh: 'manually',
         completed: '2022-06-30 21:51:36.648+00',
         requestedData: {
             "fields": {
@@ -210,7 +203,6 @@ export default [
         id: 8,
         name: 'Z75.1-3 over time',
         description: 'Problems related to medical facilities and other health care (ICD code Z75.*) in patients with suicidality, without, and in total.',
-        refresh: 'manually',
         completed: '2022-08-03 16:42:12.616+00', 
         metadata: {
             "cols": [
@@ -227,7 +219,6 @@ export default [
     {
         id: 9,
         name: 'Number of Suicidal Patients By Month', 
-        refresh: 'manually',
         completed: '2022-07-06 01:02:13.833+00', 
         metadata: {
             "cols": [
@@ -242,8 +233,7 @@ export default [
     },
     {
         id: 10,
-        name: 'Suicidality and Admissions', 
-        refresh: 'manually',
+        name: 'Suicidality and Admissions',
         completed: '2022-07-07 04:16:25.087+00',
         requestedData: {
             "fields": {
@@ -288,8 +278,7 @@ export default [
     },
     {
         id: 11,
-        name: 'Suicidality and Admissions', 
-        refresh: 'manually', 
+        name: 'Suicidality and Admissions',  
         requestedData: {
             "fields": {
                 "labs": [],
@@ -311,7 +300,6 @@ export default [
     {
         id: 13,
         name: 'Comorbidities over time',
-        refresh: 'manually',
         completed: '2022-07-26 18:53:42.608+00', 
         metadata: {
             "cols": [
@@ -329,7 +317,6 @@ export default [
     {
         id: 14,
         name: 'Prevalence of Comorbidities',
-        refresh: 'manually',
         completed: '2022-07-29 00:07:33.12+00',
         metadata: {
             "cols": [
@@ -345,7 +332,6 @@ export default [
     {
         id: 16,
         name: 'Suicidality and Z75 Aug 22',
-        refresh: 'manually',
         completed: '2022-08-22 21:16:25.791+00',
         metadata: {
             "cols": [
@@ -364,7 +350,6 @@ export default [
         id: 15,
         name: 'Suicidality by Month v3',
         description: 'Suicide attempt codes aggregated',
-        refresh: 'manually',
         completed: '2022-08-02 20:27:40.988+00',
         requestedData: {
             "fields": {
@@ -405,7 +390,6 @@ export default [
         id: 49,
         name: 'CDC NLP Symptoms',
         description: 'Aggregated by month',
-        refresh: 'manually',
         completed: '2022-11-15 17:46:06.646+00',
         requestedData: {
             "fields": {

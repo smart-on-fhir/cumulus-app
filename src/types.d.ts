@@ -52,7 +52,7 @@ export declare module app {
         createdAt     : string
         creator      ?: Pick<User, "id" | "email">
         graphs       ?: View[]//Pick<View, "id" | "name" | "description" | "subscriptionId">[]
-        subscriptions?: Pick<Subscription, "id" | "name" | "description" | "completed" | "refresh">[]
+        subscriptions?: Pick<Subscription, "id" | "name" | "description" | "completed">[]
     }
 
     interface Permission {
@@ -164,9 +164,6 @@ export declare module app {
         createdAt: string
 
         updatedAt: string | null
-
-        /** @deprecated */
-        refresh: "none" | "manually" | "daily" | "weekly" | "monthly" | "yearly"
 
         /**
          * - `pending`   - Created but not resolved yet

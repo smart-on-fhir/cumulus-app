@@ -224,7 +224,6 @@ route(router, {
                     "id",
                     "name",
                     "description",
-                    "refresh",
                     "completed",
                     "dataURL",
                     "metadata",
