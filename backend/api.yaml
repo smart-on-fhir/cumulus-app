@@ -125,7 +125,7 @@ paths:
         - name: subscriptions
           in: query
           required: false
-          description: If provided, includes the subscriptions using this tag. Note that only the `id`, `name`, `description`, `completed`, and `refresh` subscription fields are included.
+          description: If provided, includes the subscriptions using this tag. Note that only the `id`, `name`, `description` and `completed` subscription fields are included.
           schema:
             type: boolean
       responses:
@@ -1633,36 +1633,7 @@ paths:
       operationId: uploadSubscriptionData
       tags:
         - Subscriptions
-
-  /requests/{subscription-id}/refresh:
-    get:
-      summary: Refresh Data
-      description: Subscriptions that have a data URL can be manually refreshed
-        by calling this endpoint. Refresh means that the data will be re-fetched
-        and re-inserted, updating it to it's latest version (if changed at all).
-      operationId: refreshSubscriptionData
-      tags:
-        - Subscriptions
-      parameters:
-        - name: subscription-id
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/standardID'
-      responses:
-        '200':
-          description: Successful operation
-        '400':
-          description: In case of bad parameters, or subscription having no dataURL
-        '401':
-          description: If the user is not authorized and guest users are not
-            allowed to read, update, or refresh Subscriptions
-        '403':
-          description: If the user is not allowed to read, update, or refresh
-            Subscriptions
-        '404':
-          description: If we can't find subscription with such ID
-      
+   
   /requests/by-group:
     get:
       summary: Subscriptions by Group
@@ -1698,7 +1669,6 @@ paths:
                       "id": 89,
                       "name": "Aggregated Site Demographics",
                       "description": null,
-                      "refresh": "manually",
                       "completed": "2023-01-30T22:19:46.355Z"
                     }]
                   }]
@@ -1872,7 +1842,6 @@ paths:
             example: {
               "name": "string",
               "description": "string",
-              "refresh": "manually",
               "groupId": 1,
               "dataURL": "string",
               # "transmissions": {}
@@ -3033,14 +3002,6 @@ components:
         description:
           type: string
           nullable: true
-        refresh:
-          type: string
-          enum:
-            - manually
-            - yearly
-            - monthly
-            - weekly
-            - daily
         completed:
           type: string
           format: date-time

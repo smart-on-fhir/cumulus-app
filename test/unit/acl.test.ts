@@ -29,7 +29,6 @@ describe("Permissions", () => {
         // Role permissions ------------------------------------------------
         expect(permissions["SubscriptionGroups.read"]).to.equal(true)
         expect(permissions["Subscriptions.read"]).to.equal(true)
-        expect(permissions["Subscriptions.refresh"]).to.equal(true)
         expect(permissions["Subscriptions.requestLineLevelData"]).to.equal(true)
         expect(permissions["StudyAreas.read"]).to.equal(true)
         expect(permissions["Tags.read"]).to.equal(true)

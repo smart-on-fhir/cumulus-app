@@ -93,7 +93,6 @@ route(router, {
                     "name",
                     "description",
                     "completed",
-                    "refresh",
                     "dataURL",
                     "metadata",
                     // Subquery to count graphs for each request
