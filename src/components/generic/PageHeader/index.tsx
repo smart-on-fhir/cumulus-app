@@ -2,6 +2,7 @@ import { ReactNode } from "react"
 import Markdown from "../Markdown"
 
 
+const htmlPattern = /<[^>]+>/i
 const markdownPattern = /(?:^|\n)\s*(#{1,6}\s|[*-]\s|\d+\.\s)|(\*\*.*?\*\*|__.*?__)|(_.*?_|\*.*?\*)|(```[\s\S]*?```|`[^`]+`)|(!?\[.*?\]\(.*?\))/;
 
 export default function PageHeader({
@@ -23,7 +24,7 @@ export default function PageHeader({
                 {/* <hr/> */}
                 <div>
                     { description ?
-                        markdownPattern.test(description) ?
+                        htmlPattern.test(description) || markdownPattern.test(description) ?
                             <Markdown>{description}</Markdown> :
                             <div className="color-muted">{description}</div> :
                         <div className="color-muted">No description available</div>
