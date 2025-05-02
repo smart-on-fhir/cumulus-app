@@ -61,7 +61,7 @@ export default function CreateView()
                 sortBy  : state?.sortBy    || "x:asc",
                 limit   : state?.limit     || 0,
                 filters : [],
-                groupBy : state.groupBy || "",
+                groupBy : state?.groupBy || "",
                 chartOptions: {
                     title: {
                         text: state?.name || "",                        
@@ -76,10 +76,10 @@ export default function CreateView()
                     custom: { theme: state?.theme },
                     plotOptions: {
                         bar: {
-                            stacking: state.groupBy ? "normal" : undefined
+                            stacking: state?.groupBy ? "normal" : undefined
                         },
                         column: {
-                            stacking: state.groupBy ? "normal" : undefined
+                            stacking: state?.groupBy ? "normal" : undefined
                         }
                     }
                 }
