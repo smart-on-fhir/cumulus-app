@@ -22,13 +22,24 @@ export default function Chart({ options, callback }: { options: Highcharts.Optio
                 '</pre></div>'
             }
         }
+    }, [options])
+
+    useLayoutEffect(() => {
+        window.addEventListener("transitionend", reflow)
         return () => {
+            window.removeEventListener("transitionend", reflow)
             if (chartRef.current) {
-              chartRef.current.destroy();
-              chartRef.current = null;
+                chartRef.current.destroy();
+                chartRef.current = null;
             }
         };
-    }, [options])
+    }, [])
+
+    const reflow = () => {
+        if (chartRef.current) {
+            chartRef.current.reflow()
+        }
+    };
 
     return <div id="flat-chart" className="chart" ref={ containerRef } />
 }
