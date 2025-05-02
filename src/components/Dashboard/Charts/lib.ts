@@ -438,6 +438,14 @@ function getSeriesAndExceptions({
             const old  = serverOptions.series?.find(s => s.id === id)
             const rows = sortY(group.rows, sortBy, xType)
 
+            filterOutExceptions({
+                rows,
+                seriesName: old?.name ?? group.stratifier,
+                column,
+                exceptions,
+                xType
+            })
+
             addSeries({
                 id,
                 name       : String(old?.name ?? group.stratifier),
@@ -499,12 +507,12 @@ function getSeriesAndExceptions({
             const id   = "primary-" + name
             const old  = serverOptions.series?.find(s => s.id === id)
             const rows = sortY(filterOutExceptions({
-                rows: data.data[0].rows.filter(r => xTicks.includes(r[0])),
+                rows: data.data[0].rows,
                 seriesName: name,
                 column,
                 exceptions,
                 xType
-            }), sortBy, xType)
+            }), sortBy, xType).filter(r => xTicks.includes(r[0]))
 
             const seriesData = rows.map(row => {
                 try {
