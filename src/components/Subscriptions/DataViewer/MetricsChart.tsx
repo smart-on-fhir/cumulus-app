@@ -42,7 +42,7 @@ export default function MetricsChart({
         color: COLOR_NEUTRAL + "88",
         data: data.filter(r => r[stratifyBy] === CUMULUS_ALL && r[groupBy] === CUMULUS_ALL).map(r => ({
             y        : r[valueColumn],
-            name     : "All " + pluralize(humanizeColumnName(groupBy)),
+            name     : "ALL " + pluralize(humanizeColumnName(groupBy)).toUpperCase(),
             dataLabels: {
                 enabled: true,
                 align: "end",
@@ -68,14 +68,17 @@ export default function MetricsChart({
     const Level2: any = {
         type: "bar",
         id  : "level-2",
-        name: "All Resources",
+        name: "ALL RESOURCES",
         data: []
     }
 
     if (isPctChart) {
         data.filter(r => r[groupBy] !== CUMULUS_ALL && r[stratifyBy] === CUMULUS_ALL).forEach(r => {
-            const pctY   = (r.denominator - r.numerator) / r.denominator * 100
-            const pctN   = r.numerator / r.denominator * 100
+            const pctN       = r.numerator / r.denominator * 100
+            const pctY       = 100 - pctN
+            const pctNVisual = Math.max(pctN, pctN ? 2 : 0)
+            const pctYVisual = 100 - pctNVisual
+
             const drilldown = (() => {
                 const sub = groups[r[groupBy]]
                 if (!sub || !sub.length) return;
@@ -84,7 +87,7 @@ export default function MetricsChart({
                 return r[groupBy]
             })();
             Level2.data.push({
-                y    : pctY || null,
+                y    : pctYVisual || null,
                 name : r[groupBy],
                 stack: r[groupBy],
                 color: COLOR_POSITIVE,
@@ -97,7 +100,7 @@ export default function MetricsChart({
                     }
                 }
             }, {
-                y    : pctN || null,
+                y    : pctNVisual || null,
                 name : r[groupBy],
                 stack: r[groupBy],
                 color: COLOR_NEGATIVE,
@@ -161,8 +164,11 @@ export default function MetricsChart({
             const children = groups[groupName].filter(r => r[stratifyBy] !== CUMULUS_ALL && r.numerator !== undefined)
 
             children.forEach(r => {
-                const pctY = (r.denominator - r.numerator) / r.denominator * 100
-                const pctN = r.numerator / r.denominator * 100
+                const pctN       = r.numerator / r.denominator * 100
+                const pctY       = 100 - pctN
+                const pctNVisual = Math.max(pctN, pctN ? 2 : 0)
+                const pctYVisual = 100 - pctNVisual
+
                 let name = r[stratifyBy] === CUMULUS_NONE ? `No known ${stratifyBy}` : r[stratifyBy];
                 if (name === null) {
                     name = groupName
@@ -171,7 +177,7 @@ export default function MetricsChart({
                     {
                         name,
                         color : COLOR_POSITIVE,
-                        y     : pctY || null,
+                        y     : pctYVisual || null,
                         custom: {
                             name: name + " - valid",
                             data : {
@@ -183,7 +189,7 @@ export default function MetricsChart({
                     {
                         name,
                         color : COLOR_NEGATIVE,
-                        y     : pctN || null,
+                        y     : pctNVisual || null,
                         custom: {
                             name: name + " - invalid",
                             data : {
@@ -263,22 +269,19 @@ export default function MetricsChart({
                     color: "#777"
                 }
             },
-            lineWidth: 0
+            lineWidth: 0,
+            reversed: false,
         },
         yAxis: {
-            lineWidth: 1,
+            lineWidth: 0,
             endOnTick: false,
             startOnTick: false,
-            tickWidth: 1,
+            tickWidth: 0,
             tickLength: 6,
-            max: isPctChart ? 100.05 : undefined,
+            max: isPctChart ? 100 : undefined,
             offset: 8,
             labels: {
-                format: isPctChart ? `{value}%` : `{value}`,
-                overflow: "allow",
-                style: {
-                    fontSize: FONT_SIZE * 0.9 + "px"
-                }
+                enabled: false,
             },
             gridLineColor: "#0000",
             gridLineDashStyle: "ShortDash",
@@ -289,7 +292,8 @@ export default function MetricsChart({
                     fontSize: FONT_SIZE * 1.1 + "px"
                 }
             },
-            gridZIndex: 8
+            gridZIndex: 8,
+            type: isPctChart ? "linear" : "logarithmic"
         },
         plotOptions: {
             series: {
@@ -297,13 +301,12 @@ export default function MetricsChart({
             },
             bar: {
                 color: COLOR_NEUTRAL,
-                minPointLength: isPctChart ? 6 : 0,
                 borderRadius: 4,
-                stacking: "overlap",
-                crisp: true,
+                stacking: isPctChart ? "percent" : "overlap",
+                crisp: false,
                 borderWidth: 2,
                 clip: false,
-                groupPadding: 0.1,
+                groupPadding: 0.15,
                 pointPadding: 0.0
             }
         },
