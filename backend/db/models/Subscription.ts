@@ -23,7 +23,6 @@ export default class Subscription extends BaseModel<InferAttributes<Subscription
     declare metadata     : CreationOptional<app.SubscriptionMetaData | null>;
     declare groupId      : CreationOptional<number | null>;
     declare dataURL      : CreationOptional<string | null>;
-    declare transmissions: CreationOptional<Record<string, any> | null>;
     declare createdAt    : CreationOptional<Date>;
     declare updatedAt    : CreationOptional<Date>;
     
@@ -53,15 +52,10 @@ export default class Subscription extends BaseModel<InferAttributes<Subscription
             createdAt  : DataTypes.DATE,
             updatedAt  : DataTypes.DATE,
 
-            // DEPRECATED
-            // -----------------------------------------------------------------
+            /** @deprecated */
             requestedData: {
                 type: DataTypes.JSONB
-            },
-            transmissions: {
-                type: DataTypes.JSONB,
-                defaultValue: null
-            },
+            }
         }, {
             sequelize,
             modelName: "Subscription",

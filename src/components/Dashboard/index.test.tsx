@@ -94,7 +94,6 @@ describe("Chart View", () => {
         },
         // Tags?: Pick<Tag, "id" | "name" | "description">[]
         // Views?: View[]s
-        transmissions: null,
         StudyAreas: [
             { id: 1, name: "StudyArea 1", description: "StudyArea 1 Description" } as app.StudyArea,
             { id: 2, name: "StudyArea 2", description: "StudyArea 2 Description" } as app.StudyArea,

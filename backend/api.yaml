@@ -1844,7 +1844,6 @@ paths:
               "description": "string",
               "groupId": 1,
               "dataURL": "string",
-              # "transmissions": {}
             }
       responses:
         '200':
@@ -3018,9 +3017,6 @@ components:
           nullable: true
         dataURL:
           type: string
-          nullable: true
-        transmissions:
-          type: object
           nullable: true
         createdAt:
           $ref: '#/components/schemas/autoTimestamp'

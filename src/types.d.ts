@@ -197,9 +197,6 @@ export declare module app {
 
         Views?: View[]
 
-        /** @deprecated */
-        transmissions: Transmission[] | null
-
         StudyAreas?: StudyArea[]
 
         graphCount?: number
