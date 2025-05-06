@@ -203,6 +203,9 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
 
                 if (chartType === "areaspline") {
                     theme = "sas_dark"
+                    if (data.data?.length > 3) {
+                        chartType = "spline"
+                    }
                 }
 
                 const colors = COLOR_THEMES.find(t => t.id === "sas_light")!.colors
@@ -285,6 +288,12 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                                     fontWeight: "300",
                                 }
                             }
+                        },
+                        spline: {
+                            lineWidth: 4
+                        },
+                        areaspline: {
+                            lineWidth: 3
                         }
                     },
                     colors,
