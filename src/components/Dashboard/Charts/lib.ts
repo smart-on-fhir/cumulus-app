@@ -876,8 +876,18 @@ export function buildChartOptions({
     result.caption = { text: "" };
 
     if (exceptions.size) {
+        let exceptionsArray = Array.from(exceptions);
+        if (exceptionsArray.length > 3) {
+            console.log(
+                `Chart data warnings for chart "%c${result.title.text}%c":\n    ⚠️ ${exceptionsArray.join("\n    ⚠️ ").replace(/<.+?>/g, '')}`,
+                "font-weight: bold",
+                "font-weight: normal"
+            )
+            exceptionsArray = exceptionsArray.slice(0, 3)
+            exceptionsArray.push("More errors detected! See console for the full list.")
+        }
         result.caption = {
-            text: "⚠️ " + Array.from(exceptions).join("<br />⚠️ "),
+            text: "⚠️ " + exceptionsArray.join("<br />⚠️ "),
             margin: 0,
             style: {
                 color: "#BB0000",
