@@ -8,7 +8,7 @@ import PackageVersionCheck        from "./PackageVersionCheck"
 import IconItem                   from "../generic/IconItem"
 import { Format }                 from "../Format"
 import Tag                        from "../Tags/Tag"
-import { Templates }              from "../TemplateManager"
+import { StratifiedTemplates, Templates } from "../TemplateManager"
 import ViewsBrowser               from "../Views/ViewsBrowser"
 import Breadcrumbs                from "../generic/Breadcrumbs"
 import Loader                     from "../generic/Loader"
@@ -107,9 +107,10 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
                     { canHaveCharts && (model.completed || model.dataURL) && <>
                         <h5 className="mt-2">Graphs</h5>
                         <hr/>
-                        <ViewsBrowser requestId={ model.id } minColWidth="13rem" header={
-                            <Templates subscription={model} />
-                        }  />
+                        <ViewsBrowser requestId={ model.id } minColWidth="13rem"
+                            header={ <Templates subscription={model} /> }
+                            footer={ <StratifiedTemplates subscription={model} /> }
+                        />
                     </> }
 
                     {/* Columns -------------------------------------------- */}

@@ -9,7 +9,7 @@ import { AlertError }              from "../generic/Alert"
 import PageHeader                  from "../generic/PageHeader"
 import Breadcrumbs                 from "../generic/Breadcrumbs"
 import IconItem                    from "../generic/IconItem"
-import { PackageTemplates }        from "../TemplateManager"
+import { PackageStratifiedTemplates, PackageTemplates } from "../TemplateManager"
 import { FlatPackageDataViewer }   from "../Subscriptions/DataViewer"
 import ViewsBrowser                from "../Views/ViewsBrowser"
 import aggregator, { DataPackage } from "../../Aggregator"
@@ -88,10 +88,10 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                     { pkg.type !== "flat" && <>
                         <h5 className="mt-2">Graphs</h5>
                         <hr/>
-                        
-                        <ViewsBrowser key={ pkg.id } pkgId={ pkg.id } minColWidth="13rem" header={
-                            <PackageTemplates pkg={pkg} key={pkg.id} />
-                        }  />
+                        <ViewsBrowser key={ pkg.id } pkgId={ pkg.id } minColWidth="13rem"
+                            header={ <PackageTemplates pkg={pkg} key={pkg.id} /> }
+                            footer={ <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} /> }
+                        />
                     </> }
                     <h5 className="mt-2">Columns</h5>
                     <hr className="mb-1" />

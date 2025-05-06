@@ -89,32 +89,41 @@ function buildVirtualSubscription(pkg: DataPackage) {
 
 export const Templates = memo(({ subscription }: { subscription: app.Subscription }) => {
     const cols = subscription.metadata?.cols.filter(col => col.dataType !== "hidden" && !col.name.startsWith("cnt"));
-    return <>{ cols.map((col, i) => {
-        return [
-            <Thumbnail key={i} col={col} sub={subscription} />,
-            cols.filter(c => c.name !== col.name && canStratifyBy(c.name, c.dataType)).map((c, y) => {
-                return <Thumbnail key={i + "-" + y} col={col} sub={subscription} groupBy={c}  />
-            })
-        ].flat()
-    })}</>
+    return cols.map((col, i) => <Thumbnail key={i} col={col} sub={subscription} />)
+}, (prev, cur) => prev.subscription.id === cur.subscription.id)
+
+export const StratifiedTemplates = memo(({ subscription }: { subscription: app.Subscription }) => {
+    const cols = subscription.metadata?.cols.filter(col => col.dataType !== "hidden" && !col.name.startsWith("cnt"));
+    return cols.map((col, i) => {
+        return cols.filter(c => c.name !== col.name && canStratifyBy(c.name, c.dataType)).map((c, y) => {
+            return <Thumbnail key={i + "-" + y} col={col} sub={subscription} groupBy={c}  />
+        })
+    })
 }, (prev, cur) => prev.subscription.id === cur.subscription.id)
 
 export const PackageTemplates = memo(({ pkg }: { pkg: DataPackage }) => {
     const cols = Object.keys(pkg.columns).filter(name => !name.startsWith("cnt"));
     const subscription = buildVirtualSubscription(pkg)
-    return (
-        <>
-            { cols.map((col, i) => {
-                const colMetaData = buildColumnInfo(col, pkg)
-                return [
-                    <Thumbnail key={i} col={colMetaData} pkg={pkg} sub={subscription} />,
-                    cols.filter(c => c !== col && canStratifyBy(c, pkg.columns[c])).map((c, y) => {
-                        return <Thumbnail key={i + "-" + y} col={colMetaData} pkg={pkg} groupBy={buildColumnInfo(c, pkg)} sub={subscription} />
-                    })
-                ]
-            }) }
-        </>
-    )
+    return cols.map((col, i) => {
+        const colMetaData = buildColumnInfo(col, pkg)
+        return <Thumbnail key={i} col={colMetaData} pkg={pkg} sub={subscription} />
+    })
+}, (prev, cur) => prev.pkg.id === cur.pkg.id)
+
+export const PackageStratifiedTemplates = memo(({ pkg }: { pkg: DataPackage }) => {
+    const cols = Object.keys(pkg.columns).filter(name => !name.startsWith("cnt"));
+    const subscription = buildVirtualSubscription(pkg)
+    return cols.map((col, i) => {
+        const colMetaData = buildColumnInfo(col, pkg)
+        return cols.filter(c => c !== col && canStratifyBy(c, pkg.columns[c])).map((c, y) => {
+            return <Thumbnail
+                key={i + "-" + y}
+                col={colMetaData}
+                pkg={pkg}
+                groupBy={buildColumnInfo(c, pkg)}
+                sub={subscription} />
+        })
+    })
 }, (prev, cur) => prev.pkg.id === cur.pkg.id)
 
 
