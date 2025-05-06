@@ -322,7 +322,7 @@ export default function Navigation()
 
                 out.push({
                     icon: Terminology.dataPackage.icon,
-                    render: () => <NavLink to="/packages">{Terminology.dataPackage.namePlural}</NavLink>
+                    render: () => <NavLink to="/packages">All {Terminology.dataPackage.namePlural}</NavLink>
                 })
 
                 out.push({
