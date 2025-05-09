@@ -278,6 +278,10 @@ export declare module app {
          */
         dataType: supportedDataType
 
+        type?: string
+
+        distinct_values_count?: number
+
         meta?: any
 
     }
