@@ -61,23 +61,11 @@ export default function TemplateManager({ subscription }: { subscription: app.Su
 // limited number of distinct values. This means we exclude numeric and date
 // columns, include booleans, and make guesses based on the column name for
 // string columns.
-function canStratifyBy(colName: string, colType: string) {
-    if (colType === "boolean") return true
-    if (colType !== "string") return false
-    return colName.search(/(sex|gender|site|ethnicity|deceased|race)/i) >= 0
-}
-
-function buildColumnInfo(col: string, pkg: DataPackage) {
-    return {
-        name       : col,
-        label      : humanizeColumnName(col),
-        description: humanizeColumnName(col),
-        dataType   : pkg.columns[col]
-            .replace("year" , "date:YYYY")
-            .replace("month", "date:YYYY-MM")
-            .replace("week" , "date:YYYY-MM-DD")
-            .replace("day"  , "date:YYYY-MM-DD") as app.SubscriptionDataColumn["dataType"]
-    }
+function canStratifyBy(col: app.SubscriptionDataColumn) {
+    if (col.distinct_values_count) return col.distinct_values_count > 1 && col.distinct_values_count <= 10;
+    if (col.dataType === "boolean") return true;
+    if (col.dataType !== "string") return false;
+    return col.name.search(/(sex|gender|site|ethnicity|deceased|race)/i) >= 0;
 }
 
 function buildVirtualSubscription(pkg: DataPackage) {
@@ -95,40 +83,37 @@ export const Templates = memo(({ subscription }: { subscription: app.Subscriptio
 export const StratifiedTemplates = memo(({ subscription }: { subscription: app.Subscription }) => {
     const cols = subscription.metadata?.cols.filter(col => col.dataType !== "hidden" && !col.name.startsWith("cnt"));
     return cols.map((col, i) => {
-        return cols.filter(c => c.name !== col.name && canStratifyBy(c.name, c.dataType)).map((c, y) => {
+        return cols.filter(c => c.name !== col.name && canStratifyBy(c)).map((c, y) => {
             return <Thumbnail key={i + "-" + y} col={col} sub={subscription} groupBy={c}  />
         })
     })
 }, (prev, cur) => prev.subscription.id === cur.subscription.id)
 
 export const PackageTemplates = memo(({ pkg }: { pkg: DataPackage }) => {
-    const cols = Object.keys(pkg.columns).filter(name => !name.startsWith("cnt"));
+    const cols = Object.values(pkg.columns).filter(c => c.dataType !== "hidden" && !c.name.startsWith("cnt"));
     const subscription = buildVirtualSubscription(pkg)
-    return cols.map((col, i) => {
-        const colMetaData = buildColumnInfo(col, pkg)
-        return <Thumbnail key={i} col={colMetaData} pkg={pkg} sub={subscription} />
-    })
+    return cols.map((col, i) => <Thumbnail key={i} col={col} pkg={pkg} sub={subscription} />)
 }, (prev, cur) => prev.pkg.id === cur.pkg.id)
 
 export const PackageStratifiedTemplates = memo(({ pkg }: { pkg: DataPackage }) => {
-    const cols = Object.keys(pkg.columns).filter(name => !name.startsWith("cnt"));
+    const cols = Object.values(pkg.columns).filter(c => c.dataType !== "hidden" && !c.name.startsWith("cnt"));
     const subscription = buildVirtualSubscription(pkg)
     return cols.map((col, i) => {
-        const colMetaData = buildColumnInfo(col, pkg)
-        return cols.filter(c => c !== col && canStratifyBy(c, pkg.columns[c])).map((c, y) => {
+        return cols.filter(c => c.name !== col.name && canStratifyBy(c)).map((c, y) => {
             return <Thumbnail
                 key={i + "-" + y}
-                col={colMetaData}
+                col={col}
                 pkg={pkg}
-                groupBy={buildColumnInfo(c, pkg)}
-                sub={subscription} />
+                groupBy={c}
+                sub={subscription}
+            />
         })
     })
 }, (prev, cur) => prev.pkg.id === cur.pkg.id)
 
 
 
-const templateQueue = new JobQueue(5)
+const templateQueue = new JobQueue(10)
 
 interface State {
     chartType  : "areaspline" | "spline" | "column" | "bar"
@@ -389,7 +374,11 @@ const Thumbnail = memo(({ col, sub, pkg, groupBy }: { col: app.SubscriptionDataC
     if (error) {
         console.error(error)
     }
-    
+
+    if (!loading && !error && !imgUrl) {
+        return null
+    }
+
     if (loading || error) {
         return (
             <div className="view-thumbnail template">

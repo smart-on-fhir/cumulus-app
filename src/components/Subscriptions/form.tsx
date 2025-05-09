@@ -308,20 +308,7 @@ function DataSourceSelector({
             payload.metadata = {
                 total: +selectedPackage.total,
                 type : selectedPackage.type || "cube",
-                cols : Object.keys(selectedPackage.columns).map(name => {
-                    let type = String(selectedPackage.columns[name])
-                        .replace("year" , "date:YYYY")
-                        .replace("month", "date:YYYY-MM")
-                        .replace("week" , "date:YYYY-MM-DD")
-                        .replace("day"  , "date:YYYY-MM-DD") as app.supportedDataType;
-    
-                    return {
-                        name,
-                        label      : humanizeColumnName(name),
-                        description: humanizeColumnName(name),
-                        dataType   : type
-                    }
-                })
+                cols : Object.values(selectedPackage.columns)
             }
             payload.dataPackage = selectedPackage
             payload.completed = selectedPackage.last_data_update

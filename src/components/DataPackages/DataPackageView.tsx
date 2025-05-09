@@ -53,32 +53,22 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
         return <Preload />
     }
 
-    const cols = Object.keys(pkg.columns).map(name => {
-        let type = String(pkg.columns[name])
-            .replace("year" , "date:YYYY")
-            .replace("month", "date:YYYY-MM")
-            .replace("week" , "date:YYYY-MM-DD")
-            .replace("day"  , "date:YYYY-MM-DD") as app.supportedDataType;
-        return {
-            name,
-            label      : humanizeColumnName(name),
-            description: humanizeColumnName(name),
-            dataType   : type
-        }
-    });
+    const cols = Object.values(pkg.columns);
 
     const canCreateGraphs = user!.permissions.includes("Graphs.create") && pkg.type !== "flat"
 
+    const humanizedPkgName = humanizeColumnName(pkg.name)
+
     return (
         <div>
-            <title>{humanizeColumnName(pkg.name)}</title>
+            <title>{humanizedPkgName}</title>
             <Breadcrumbs historic links={[
                 { name: "Home"    , href: "/" },
                 { name: Terminology.dataPackage.namePlural, href: "/packages" },
-                { name: humanizeColumnName(pkg.name), href: "/packages/" + pkg.id },
+                { name: humanizedPkgName, href: "/packages/" + pkg.id },
             ]} />
             <PageHeader
-                title={ <>{ humanizeColumnName(pkg.name) }<span className="color-muted fw-400"> / { pkg.version }{ pkg.site && " / " + humanizeColumnName(pkg.site) }</span></> }
+                title={ <>{ humanizedPkgName }<span className="color-muted fw-400"> / { pkg.version }{ pkg.site && " / " + humanizeColumnName(pkg.site) }</span></> }
                 icon={pkg.type === "flat" ? "table" : "deployed_code" }
                 description="Description not available"
             />
