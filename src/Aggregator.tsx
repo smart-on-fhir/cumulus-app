@@ -40,7 +40,7 @@ export interface StudyPeriod {
 
 export interface DataPackage {
     column_types_format_version: string // example: "1"
-    columns                    : Record<string, DataPackageColumnDataType>
+    columns                    : Record<string, DataPackageColumn>
     id                         : string // example: "core__count_condition_icd10_month"
     last_data_update           : string // example: "2024-09-30T18:13:49.211590+00:00"
     name                       : string // example: "count_condition_icd10_month"
@@ -50,6 +50,15 @@ export interface DataPackage {
     type                      ?: "cube" | "flat"
     s3_path                   ?: string
     site                      ?: string
+}
+
+export interface DataPackageColumn {
+    name: string
+    dataType: app.supportedDataType
+    type: string
+    label: string
+    description: string
+    distinct_values_count?: number
 }
 
 export interface Site {
@@ -99,7 +108,7 @@ function packageColumnsChanged(local: DataPackage, remote: DataPackage): boolean
         const localColumn = local.columns[name]
         
         // Remote columns has different data type
-        if (localColumn !== remoteColumn) {
+        if (JSON.stringify(localColumn) !== JSON.stringify(remoteColumn)) {
             return true
         }
     }
@@ -231,7 +240,37 @@ class Aggregator
         if (!Array.isArray(result)) {
             throw new AggregatorError(`Expected array of data packages but got ${typeof result}`)
         }
-        return result
+
+        // Convert to the desired column format!
+        return result.map(p => {
+            for (const name in p.columns) {
+                if (typeof p.columns[name] === "string") {
+                    p.columns[name] = {
+                        name,
+                        type: p.columns[name],
+                        dataType: String(p.columns[name])
+                            .replace("year" , "date:YYYY")
+                            .replace("month", "date:YYYY-MM")
+                            .replace("week" , "date:YYYY-MM-DD")
+                            .replace("day"  , "date:YYYY-MM-DD") as app.supportedDataType,
+                        label      : humanizeColumnName(name),
+                        description: humanizeColumnName(name),
+                        distinct_values_count: undefined
+                    }
+                } else {
+                    const col = p.columns[name];
+                    col.name = name
+                    col.dataType = String(col.type)
+                        .replace("year" , "date:YYYY")
+                        .replace("month", "date:YYYY-MM")
+                        .replace("week" , "date:YYYY-MM-DD")
+                        .replace("day"  , "date:YYYY-MM-DD") as app.supportedDataType;
+                    col.label = col.label || humanizeColumnName(name)
+                    col.description = col.description || col.label
+                }
+            }
+            return p
+        })
     }
 
     public async getPackage(id: string): Promise<DataPackage|undefined> {
@@ -286,20 +325,7 @@ class Aggregator
         return {
             total: +pkg.total,
             type : pkg.type || "cube",
-            cols : Object.keys(pkg.columns).map(name => {
-                let type = String(pkg.columns[name])
-                    .replace("year" , "date:YYYY")
-                    .replace("month", "date:YYYY-MM")
-                    .replace("week" , "date:YYYY-MM-DD")
-                    .replace("day"  , "date:YYYY-MM-DD") as app.supportedDataType;
-
-                return {
-                    name,
-                    label      : humanizeColumnName(name),
-                    description: humanizeColumnName(name),
-                    dataType   : type
-                }
-            })
+            cols : Object.values(pkg.columns)
         }
     }
 }
