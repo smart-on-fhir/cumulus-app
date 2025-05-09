@@ -61,7 +61,7 @@ export function FlatPackageDataViewer({ pkg }: { pkg: DataPackage }) {
     }
 
     
-    const columns = Object.keys(pkg.columns).map(name => ({ name, dataType: pkg.columns[name] }))
+    const columns = Object.values(pkg.columns)
     const out = pickColumns(columns)
 
     return <Viewer
@@ -109,7 +109,8 @@ export default function DataViewer({ subscription }: { subscription: app.Subscri
         data={data}
         groupBy={cols.groupBy}
         stratifyBy={cols.stratifyBy}
-        valueColumn={cols.valueColumn}/>
+        valueColumn={cols.valueColumn}
+    />
 }
 
 function Viewer({
