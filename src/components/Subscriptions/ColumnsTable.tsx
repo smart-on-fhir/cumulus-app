@@ -32,12 +32,17 @@ export default function ColumnsTable({ cols }: { cols?: app.SubscriptionDataColu
         return <AlertError>{ loadingLibraryError + "" }</AlertError>
     }
 
+    const hasDistinctCount = cols.some(c => c.distinct_values_count !== undefined)
+
     return (
         <table className="columns-table">
             <tbody>
                 <tr>
                     <th className="color-muted">Variable Name</th>
                     <th className="color-muted">Description</th>
+                    <th className="color-muted right">
+                        { hasDistinctCount ? <>Distinct&nbsp;Count</> : "" }
+                    </th>
                 </tr>
                 { cols.map((col, i) => <ColumnsTableItem key={i} col={{
                     meta: library[col.name],
@@ -58,10 +63,11 @@ function ColumnsTableItem({ col }: { col: app.SubscriptionDataColumn })
                 <td className="col-name" onClick={() => setOpen(!open)}>
                     <span className="arrow">{ open ? "▿" : "▹" }</span>{ humanizeColumnName(col.name) }
                 </td>
-                <td className="col-description">{ col.meta?.display || col.description || "No description provided" }</td>
+                <td className="col-description">{ col.description || col.meta?.display || "No description provided" }</td>
+                <td className="col-description right">{ col.distinct_values_count || "" }</td>
             </tr>
             { open && <tr>
-                <td colSpan={2} className="col-details">
+                <td colSpan={3} className="col-details">
                         { col.meta?.datatype && <div>
                             <label>FHIR Type:</label> { col.meta.datatype }
                         </div>}
