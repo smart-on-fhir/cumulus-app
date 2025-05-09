@@ -1,5 +1,6 @@
 import Select  from "../generic/Select"
 import { app } from "../../types"
+import Grid from "../generic/Grid"
 
 
 export default function ColumnSelector({
@@ -47,13 +48,22 @@ export default function ColumnSelector({
         disabled: disabled.includes(col.name),
         icon    : "/icons/column.png",
         label   : col.label || col.name,
-        right   : <span className={ col.dataType + " color-muted small right" }> {
-            col.dataType
-                .replace(/date:YYYY-MM-DD/, "Day")
-                .replace(/date:YYYY-MM/, "Month")
-                .replace(/date:YYYY-MM/, "Year")
-                .replace(/date:YYYY wk W/, "Week")
-        }</span>
+        right   : <Grid cols="1fr 6ch" className="middle small" gap="0.25em">
+            <div>
+                { <small data-tooltip={ col.distinct_values_count ? `${Number(col.distinct_values_count).toLocaleString()} distinct values` : undefined}>
+                    { col.distinct_values_count ? Number(col.distinct_values_count).toLocaleString() : "" }
+                </small> }
+            </div>
+            <span className={ col.dataType }> {
+                (col.type || col.dataType)
+                    .replace(/date:YYYY-MM-DD/, "day")
+                    .replace(/date:YYYY-MM/, "month")
+                    .replace(/date:YYYY/, "year")
+                    .replace(/date:YYYY wk W/, "week")
+                    .replace(/boolean/i, "bool")
+                    .replace(/integer/i, "int")
+            }</span>
+        </Grid>
     }));
 
     if (addEmptyOption !== "none") {
