@@ -61,8 +61,10 @@ export function Chart(props: ChartProps) {
             try {
                 if (chartRef.current) {
                     defer(() => {
-                        chartRef.current.update(options, true, true, false)
-                        afterRender()
+                        if (chartRef.current) {
+                            chartRef.current.update(options, true, true, false)
+                            afterRender()
+                        }
                     }, "main-chart", 0);
                 } else {
                     chartRef.current = Highcharts.chart(containerRef.current, options, afterRender);
