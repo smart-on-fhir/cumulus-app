@@ -23,7 +23,7 @@ type SeriesOptions = (
     Highcharts.SeriesBarOptions
 );
 
-function emToPx(em: number) {
+export function emToPx(em: number) {
     return Math.round(DEFAULT_FONT_SIZE * em) + "px"
 }
 
@@ -65,10 +65,18 @@ export function getDateFormat({ dataType }: app.SubscriptionDataColumn, forMomen
             "%Y-%m-%d"
 }
 
-function pct(value: number, denominator?: number) {
+/**
+ * If no denominator is given returns the value as is. Otherwise, returns the
+ * percentage that this value represents from that denominator
+ */
+export function pct(value: number, denominator?: number) {
     return denominator ? value / denominator * 100 : value
 }
 
+/**
+ * Returns the denominator value to be used based on the @type argument:
+ * - "global" - returns the `totalCount` property of the data object
+ */
 function getDenominator(data: app.ServerResponses.DataResponse, type: app.DenominatorType, point: [string, number, ...any[]], cache: Record<string, number> = {}) {
     if (type === "global") {
         return data.totalCount
@@ -94,7 +102,7 @@ function getLocalDenominator(data: app.ServerResponses.StratifiedDataResponse, p
     return out
 }
 
-function filterOutExceptions({
+export function filterOutExceptions({
     rows,
     seriesName,
     exceptions,
@@ -866,7 +874,7 @@ export function buildChartOptions({
         legend: {
             // @ts-ignore - a hack to force highcharts to reflow the legend
             dirty: Date.now(),
-            enabled: options.legend.enabled ?? series.length <= 30
+            enabled: options.legend?.enabled ?? series.length <= 30
         },
         series
     };
