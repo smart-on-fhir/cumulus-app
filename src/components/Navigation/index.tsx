@@ -194,6 +194,7 @@ export default function Navigation()
     let { loading, user, logout } = useAuth();
     let navigate = useNavigate();
     const ref = useRef<HTMLDivElement|null>(null);
+    const [collapsed, setCollapsed] = useState(!!JSON.parse(localStorage.sidebarCollapsed))
 
     function onResizeStart(event: React.MouseEvent) {
 
@@ -218,6 +219,11 @@ export default function Navigation()
                 localStorage.sidebarWidth = e.clientX + diff + "px"
             }, { once: true })
         }
+    }
+
+    function toggle() {
+        localStorage.sidebarCollapsed = !collapsed
+        setCollapsed(!collapsed)
     }
 
     if (!user || user.status !== "Logged in" || !Array.isArray(user.permissions)) {
@@ -415,11 +421,12 @@ export default function Navigation()
     }
 
     return (
-        <div className="navigation" ref={ref} style={{ width: localStorage.sidebarWidth || "16rem" }}>
+        <div className={"navigation" + (collapsed ? " collapsed" : "")} ref={ref} style={{ width: localStorage.sidebarWidth || "16rem" }}>
             <div className="navigation-wrap">
                 <Tree data={TREE_DATA} />
             </div>
             <div className="resizer" onMouseDown={onResizeStart} tabIndex={0} />
+            <div className="sidebar-toggle" onClick={toggle} title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"} />
         </div>
     )
 }

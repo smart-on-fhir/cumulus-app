@@ -10,7 +10,7 @@
     max-height : calc(100vh - 4rem);
     white-space: nowrap;
     padding    : 1rem 0;
-    min-width  : 1.5rem !important;
+    min-width  : 4.8rem !important;
     max-width  : 80vw !important;
 
     .navigation-wrap {
@@ -34,6 +34,68 @@
 
         &:hover {
             opacity: 1;
+        }
+    }
+
+    .sidebar-toggle {
+        background   : var(--color-window-bg);
+        position     : absolute;
+        top          : 50%;
+        right        : 0;
+        height       : 40px;
+        line-height  : 37px;
+        text-align   : left;
+        width        : 12px;
+        z-index      : 2000;
+        font-size    : 16px;
+        border-radius: 3px 0 0 3px;
+        border-color : var(--color-grey);
+        border-style : solid none solid solid;
+        border-width : 1px 0 1px 1px;
+        padding      : 0 0 0 1px;
+        cursor       : pointer;
+        margin       : -20px 0 0 0;
+
+        &:after {
+            content     : "";
+            width       : 0;
+            height      : 0;
+            border-style: solid solid solid none;
+            border-width: 5px 5px 5px 0;
+            border-color: transparent var(--color-window-fg-soft) transparent transparent;
+            position    : absolute;
+            top         : 50%;
+            left        : 50%;
+            margin      : -5px 0 0 -2px;
+        }
+
+        &:hover {
+            &:after {
+                border-right-color: var(--color-window);
+            }
+        }
+    }
+
+    &.collapsed {
+        min-width: 0 !important;
+        width: 14px !important;
+        
+        .navigation-wrap {
+            opacity: 0;
+        }
+        .resizer {
+            display: none;
+        }
+        .sidebar-toggle {
+            &:after {
+                border-style: solid none solid solid;
+                border-width: 5px 0 5px 5px;
+                border-color: transparent transparent transparent var(--color-window-fg-soft);
+                margin: -5px 0 0 0;
+            }
+            &:hover:after {
+                border-left-color: var(--color-window);
+            }
         }
     }
 
