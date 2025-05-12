@@ -240,7 +240,7 @@ export default function MetricsChart({
             spacingRight: 30,
             animation: { duration: 0 }
         },
-        caption: valueColumn === "numerator" ? {
+        caption: isPctChart ? {
             align: "right",
             verticalAlign: "top",
             x: -2,
@@ -377,7 +377,7 @@ export default function MetricsChart({
                 }
             } catch {}
         });
-    }} />
+    }} key={isPctChart + ""}/>
 }
 
 function groupData(data: Record<string, any>[], column: string) {
