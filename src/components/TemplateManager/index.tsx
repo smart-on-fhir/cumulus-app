@@ -171,6 +171,9 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
             })
             .then(data => {
 
+                // Skip empty charts
+                if (!data.rowCount) return null
+
                 let chartType = state.chartType
                 let limit     = state.limit
                 let sortBy    = state.sortBy
