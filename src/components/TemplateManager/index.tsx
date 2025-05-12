@@ -179,6 +179,16 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                 let sortBy    = state.sortBy
                 let theme     = state.theme
 
+                // Line charts with 1 point - convert to column
+                if (chartType.includes("line") && data.rowCount < 2 || data.data?.length < 2) {
+                    chartType = "column"
+                }
+
+                if (chartType.includes("line") && groupBy?.name && data.data.every(d => d.rows.length < 2)) {
+                    chartType = "column"
+                }
+
+                // More than 20 columns - convert to bars
                 if (chartType === "column" && data.rowCount > 20) {
                     chartType = "bar"
                 }
