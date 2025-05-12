@@ -194,7 +194,7 @@ export default function Navigation()
     let { loading, user, logout } = useAuth();
     let navigate = useNavigate();
     const ref = useRef<HTMLDivElement|null>(null);
-    const [collapsed, setCollapsed] = useState(!!JSON.parse(localStorage.sidebarCollapsed))
+    const [collapsed, setCollapsed] = useState(!!JSON.parse(localStorage.sidebarCollapsed ?? "false"))
 
     function onResizeStart(event: React.MouseEvent) {
 
