@@ -61,6 +61,11 @@
             flex         : 1;
             display      : flex;
 
+            b, span {
+                overflow     : hidden;
+                text-overflow: ellipsis;
+            }
+
             .icon, .fas.fa-circle-notch.fa-spin {
                 padding       : 0;
                 flex          : 0 0 $fontSize * 1.7;

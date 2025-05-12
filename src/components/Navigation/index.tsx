@@ -60,7 +60,7 @@ async function loadQualityMetrics() {
 
     return sites.sort().map(s => ({
         icon: Terminology.site.icon,
-        render: () => humanizeColumnName(s),
+        render: () => <span>{humanizeColumnName(s)}</span>,
         loader: async () => {
 
             const byName = {}
@@ -327,13 +327,13 @@ export default function Navigation()
 
                 out.push({
                     icon: "verified",
-                    render: () => "Quality Metrics",
+                    render: () => <span>Quality Metrics</span>,
                     loader: loadQualityMetrics
                 })
 
                 out.push({
                     icon: "inventory_2",
-                    render: () => "Catalog",
+                    render: () => <span>Catalog</span>,
                     loader: async () => [
                         {
                             render: () => <NavLink to="/catalog/icd10">ICD10 Diagnoses</NavLink>,
@@ -366,10 +366,10 @@ export default function Navigation()
 
                 {
                     icon: "power_settings_new",
-                    render: () => <div style={{ cursor: "pointer" }} onClick={() => {
+                    render: () => <label style={{ cursor: "pointer" }} onClick={() => {
                         logout().then(() => navigate("/"));
-                    }}>Sign Out { loading && <i className="fas fa-circle-notch fa-spin color-muted" /> }
-                    </div>,
+                    }}><span>Sign Out { loading && <i className="fas fa-circle-notch fa-spin color-muted" /> }</span>
+                    </label>,
                 }
             ]
         }
