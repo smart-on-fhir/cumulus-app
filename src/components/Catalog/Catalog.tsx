@@ -1,5 +1,5 @@
 import { useState } from "react"
-import CatalogChart from "./Chart"
+import /*CatalogChart,*/ { CatalogTreeMapChart } from "./Chart"
 import MAPPING      from "./DataMapping"
 import Grid         from "./Grid"
 import Tree         from "./Tree"
@@ -85,7 +85,8 @@ export default function Catalog({ title = "Catalog", json }: { title?: string, j
                 }, {
                     name: "Data Graph",
                     children: <div style={{ padding: 1 }}>
-                        <CatalogChart data={data} search={q} />
+                        {/* <CatalogChart data={data} search={q} /> */}
+                        <CatalogTreeMapChart data={data} search={q} />
                     </div>
                 }
             ]}
