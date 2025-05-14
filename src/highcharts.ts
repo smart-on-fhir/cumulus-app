@@ -13,7 +13,8 @@ import coloraxis        from "highcharts/modules/coloraxis"
 // import cylinder      from "highcharts/modules/cylinder"
 // import funnel        from "highcharts/modules/funnel"
 // import heatmap       from "highcharts/modules/heatmap"
-// import treemap       from "highcharts/modules/treemap"
+import treemap       from "highcharts/modules/treemap"
+// import boost         from "highcharts/modules/boost"
 // import venn          from "highcharts/modules/venn"
 
 // Initialize modules
@@ -29,7 +30,8 @@ accessibility(Highcharts)
 drilldown(Highcharts)
 coloraxis(Highcharts)
 // cylinder(Highcharts)
-// treemap(Highcharts)
+treemap(Highcharts)
+// boost(Highcharts)
 // funnel(Highcharts)
 // heatmap(Highcharts)
 // venn(Highcharts)
