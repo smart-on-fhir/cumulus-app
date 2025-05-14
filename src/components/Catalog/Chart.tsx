@@ -168,7 +168,8 @@ export function CatalogTreeMapChart({ data, search }: { data: Record<string, any
             formatter() {
                 // @ts-ignore
                 let out = `<b class="color-orange">◉</b> <b>${this.point.name}</b> <b class="badge bg-orange">${
-                        Number(this.point.value).toLocaleString()}</b><hr style="margin: 8px 0" />`
+                    // @ts-ignore    
+                    Number(this.point.custom.data.Count).toLocaleString()}</b><hr style="margin: 8px 0" />`
 
                 return out + `<div style="min-width:200px;white-space:normal">${
                     // @ts-ignore
