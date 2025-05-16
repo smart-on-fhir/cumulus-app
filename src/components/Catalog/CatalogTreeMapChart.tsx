@@ -1,6 +1,6 @@
 import MAPPING from "./DataMapping";
 
-export function CatalogTreeMapChart({ data, search, title }: { data: Record<string, any>[], search?: string, title: string })
+export function catalogTreeMapChartOptions({ data, search, title }: { data: Record<string, any>[], search?: string, title: string })
 {
     if (!data.length) {
         return search ? 
@@ -152,5 +152,5 @@ export function CatalogTreeMapChart({ data, search, title }: { data: Record<stri
         }]
     }
 
-    return <Chart options={options} />
+    return options
 }
