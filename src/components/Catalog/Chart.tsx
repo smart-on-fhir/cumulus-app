@@ -186,7 +186,10 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
         },
         plotOptions: {
             series: {
-                animation: false
+                animation: false,
+                dataSorting: {
+                    enabled: true
+                }
             },
             column: {
                 // color: "#4a90e2",
