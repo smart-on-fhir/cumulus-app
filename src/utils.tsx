@@ -494,13 +494,18 @@ export function sortBy<T = any>(arr: T[], prop: string): T[] {
         .localeCompare(b[prop], "en-US", { numeric: true, sensitivity: "base" }))
 }
 
-export function groupBy(data: Record<string, any>[], prop: string): Record<string, typeof data> {
+export function groupBy(data: Record<string, any>[], props: string | string[]): Record<string, typeof data> {
     const groups: Record<string, typeof data> = {}
 
+    if (!Array.isArray(props)) {
+        props = [props]
+    }
+
     for (const item of data) {
-        let group = groups[item[prop]]
+        const key = props.map(prop => item[prop]).join("::")
+        let group = groups[key]
         if (!group) {
-            group = groups[item[prop]] = []
+            group = groups[key] = []
         }
         group.push(item)
     }
