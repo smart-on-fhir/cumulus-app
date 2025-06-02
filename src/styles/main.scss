@@ -32,7 +32,7 @@
     --color-window-fg-hard : #FFF;
   }
 
-  #catalog-chart, #flat-chart, #transmission-chart {
+  .chart:not(#chart) {
       filter: invert(1) hue-rotate(180deg);
       mix-blend-mode: screen;
   }
