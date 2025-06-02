@@ -1,63 +1,9 @@
-import { useEffect, useRef } from "react"
-import MAPPING               from "./DataMapping"
-import { highlight }         from "../../utils"
-import Highcharts            from "../../highcharts"
+import MAPPING       from "./DataMapping"
+import Chart         from "../generic/Chart"
+import { highlight } from "../../utils"
+import Highcharts    from "../../highcharts"
 
 
-function Chart({
-    options,
-    callback
-}: {
-    options: Highcharts.Options
-    callback?: (chart: Highcharts.Chart) => void
-})
-{
-    const containerRef = useRef<HTMLDivElement|null>(null);
-    const chartRef     = useRef<Highcharts.Chart|null>(null);
-
-    const reflow = () => {
-        if (chartRef.current) {
-            chartRef.current.reflow()
-        }
-    };
-
-    useEffect(() => {
-        if (containerRef.current) {
-            try {
-                if (chartRef.current) {
-                    chartRef.current.update(options, true, true, false)
-                } else {
-                    chartRef.current = Highcharts.chart(containerRef.current, options);
-                }
-                callback?.(chartRef.current)
-            } catch (ex) {
-                console.error(ex)
-                containerRef.current.innerHTML = '<div><br/><p><b class="color-red">Error rendering chart. See console for details.</b></p><pre>'
-                    + (ex as Error).message + 
-                '</pre></div>'
-            }
-        }
-        return () => {
-            if (chartRef.current) {
-                chartRef.current.destroy();
-                chartRef.current = null;
-            }
-        };
-    }, [options])
-
-    useEffect(() => {
-        window.addEventListener("transitionend", reflow)
-        return () => {
-            window.removeEventListener("transitionend", reflow)
-            if (chartRef.current) {
-                chartRef.current.destroy();
-                chartRef.current = null;
-            }
-        };
-    }, [])
-
-    return <div id="catalog-chart" className="chart" ref={ containerRef } />
-}
 
 export default function CatalogChart({ data, search }: { data: Record<string, any>[], search?: string })
 {
@@ -245,5 +191,5 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
         series: [groups["null"]]
     }
 
-    return <Chart options={options} />
+    return <Chart options={options} containerProps={{ id: "catalog-chart" }} />
 }
