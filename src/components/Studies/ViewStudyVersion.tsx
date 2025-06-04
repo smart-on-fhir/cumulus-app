@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { useParams, Link }              from "react-router-dom"
+import MetaDataList                     from "../generic/MetaDataList"
 import TransmissionView                 from "../Subscriptions/TransmissionView"
 import { AlertError }                   from "../generic/Alert"
 import Loader                           from "../generic/Loader"
@@ -144,23 +145,38 @@ export default function ViewStudyVersion() {
                 <div className="col" style={{ wordBreak: "break-all", minWidth: "15rem" }}>
                     <h5 className="mt-2">Metadata</h5>
                     <hr className="mb-1" />
-                    <b>Study</b>
-                    <Link className="link" to={`../`}>{ id }</Link>
-                    <br />
-                    <b>Version</b>
-                    <div className="color-muted">{ version }</div>
-                    <br />
-                    <b>Sites</b>
-                    <div className="color-muted">{ sites.length.toLocaleString() }</div>
-                    <br />
-                    <b>Packages</b>
-                    <div className="color-muted">{ packages.length.toLocaleString() }</div>
-                    <br />
-                    <b>Total</b>
-                    <div className="color-muted">{ packages.reduce((prev, cur) => prev + cur.total, 0).toLocaleString() }</div>
-                    <br />
-                    <b>Last Data Update</b>
-                    <div className="color-muted">{ new Date(packages.map(p => +new Date(p.last_data_update)).sort().pop()!).toDateString() }</div>
+                    <MetaDataList items={[
+                        {
+                            icon : Terminology.study.icon,
+                            label: Terminology.study.nameSingular,
+                            value: <Link className="link" to={`../`}>{ id }</Link>
+                        },
+                        {
+                            icon : "history",
+                            label: "Version",
+                            value: version
+                        },
+                        {
+                            icon : Terminology.site.icon,
+                            label: Terminology.site.namePlural,
+                            value: sites.length.toLocaleString()
+                        },
+                        {
+                            icon : Terminology.dataPackage.icon,
+                            label: Terminology.dataPackage.namePlural,
+                            value: packages.length.toLocaleString()
+                        },
+                        {
+                            icon : "calculate",
+                            label: "Total",
+                            value: packages.reduce((prev, cur) => prev + cur.total, 0).toLocaleString()
+                        },
+                        {
+                            icon : "event_available",
+                            label: "Last Data Update",
+                            value: new Date(packages.map(p => +new Date(p.last_data_update)).sort().pop()!).toDateString()
+                        }
+                    ]} />
                 </div>
             </div>
         </div>

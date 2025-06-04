@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 import { Link }                         from "react-router-dom"
 import Loader                           from "../generic/Loader"
 import { AlertError }                   from "../generic/Alert"
-import IconItem                         from "../generic/IconItem"
+import MetaDataList                     from "../generic/MetaDataList"
 import aggregator                       from "../../Aggregator"
 import { DataPackage }                  from "../../Aggregator"
 import Terminology                      from "../../Terminology"
@@ -43,19 +43,22 @@ export default function DataPackageViewer({ packageId }: { packageId: string }) 
     }
 
     return (
-        <>
-            <IconItem icon="event_available" className="mb-1">
-                <b>Last Data Update</b>
-                <div className="color-muted">{ new Date(pkg.last_data_update).toLocaleString() }</div>
-            </IconItem>
-            <IconItem icon="calculate" className="mb-1">
-                <b>Total Rows</b>
-                <div className="color-muted">{ Number(pkg.total).toLocaleString() }</div>
-            </IconItem>
-            <IconItem icon={Terminology.study.icon} className="mb-1">
-                <b>Study</b>
-                <Link to={`/studies/${pkg.study}`} className="link">{ humanizeColumnName(pkg.study) }</Link>
-            </IconItem>
-        </>
+        <MetaDataList items={[
+            {
+                icon : "event_available",
+                label: "Last Data Update",
+                value: new Date(pkg.last_data_update).toLocaleString()
+            },
+            {
+                icon : "calculate",
+                label: "Total Rows",
+                value: Number(pkg.total).toLocaleString()
+            },
+            {
+                icon : Terminology.study.icon,
+                label: Terminology.study.nameSingular,
+                value: <Link to={`/studies/${pkg.study}`} className="link">{ humanizeColumnName(pkg.study) }</Link>
+            },
+        ]} />
     )
 }
