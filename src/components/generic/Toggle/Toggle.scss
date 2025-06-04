@@ -1,9 +1,9 @@
 .toggle-input {
     display       : inline-block;
     vertical-align: middle;
-    max-width     : 1.8em;
-    width         : 1.8em;
-    flex          : 0 0 1.8em;
+    max-width     : 2em;
+    width         : 2em;
+    flex          : 0 0 2em;
     border-radius : 1em;
     background    : var(--color-grey);
     align-self    : center;
@@ -19,7 +19,7 @@
         background   : var(--color-window-bg);
         display      : block;
         border-radius: 1em;
-        margin: 1px;
+        margin       : 1px;
         transition   : all 0.2s ease-in-out;
         box-sizing   : border-box;
     }
@@ -28,7 +28,7 @@
         box-shadow: 0 0 0 1px var(--color-blue);
         background    : var(--color-blue);
         &:after {
-            transform: translateX(0.6em);
+            transform: translateX(0.8em);
         }
     }
 
