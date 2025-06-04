@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useState } from "react"
 import { Link, useSearchParams }            from "react-router-dom"
+import { Options }                          from "highcharts"
 import { Data, getStudyData }               from "./lib"
 import Breadcrumbs                          from "../generic/Breadcrumbs"
 import PageHeader                           from "../generic/PageHeader"
 import Loader                               from "../generic/Loader"
 import { AlertError }                       from "../generic/Alert"
 import Toggle                               from "../generic/Toggle"
+import Chart                                from "../generic/Chart"
+import MetaDataList                         from "../generic/MetaDataList"
+import { COLOR_THEMES }                     from "../Dashboard/config"
 import Terminology                          from "../../Terminology"
-import aggregator, { DataPackage }                           from "../../Aggregator"
+import aggregator, { DataPackage }          from "../../Aggregator"
 import { humanizeColumnName }               from "../../utils"
-import Chart from "../generic/Chart"
-import { Options } from "highcharts"
-import { COLOR_THEMES } from "../Dashboard/config"
-import IconItem from "../generic/IconItem"
 
 
 async function loadData() {
@@ -139,22 +139,28 @@ export default function ListStudies() {
                             </> }
                             <h5 className="">Metadata</h5>
                             <hr className="mb-1" />
-                            <IconItem icon={ Terminology.study.icon } className="mb-1">
-                                <b>Total { Terminology.study.namePlural }</b>
-                                <div className="color-muted">{ Number(totalStudies).toLocaleString() }</div>
-                            </IconItem>
-                            <IconItem icon={ Terminology.dataPackage.icon } className="mb-1">
-                                <b>Total { Terminology.dataPackage.namePlural }</b>
-                                <div className="color-muted">{ Number(totalPackages).toLocaleString() }</div>
-                            </IconItem>
-                            <IconItem icon="calculate" className="mb-1">
-                                <b>Total Data Rows</b>
-                                <div className="color-muted">{ Number(totalRows).toLocaleString() }</div>
-                            </IconItem>
-                            <IconItem icon="event_available" className="mb-1">
-                                <b>Last Data Update</b>
-                                <div className="color-muted">{lastUpdate.toLocaleString()}</div>
-                            </IconItem>
+                            <MetaDataList items={[
+                                {
+                                    icon : Terminology.study.icon,
+                                    label: `Total ${ Terminology.study.namePlural }`,
+                                    value: Number(totalStudies).toLocaleString()
+                                },
+                                {
+                                    icon : Terminology.dataPackage.icon,
+                                    label: `Total ${ Terminology.dataPackage.namePlural }`,
+                                    value: Number(totalPackages).toLocaleString()
+                                },
+                                {
+                                    icon : "calculate",
+                                    label: "Total Data Rows",
+                                    value: Number(totalRows).toLocaleString()
+                                },
+                                {
+                                    icon : "event_available",
+                                    label: "Last Data Update",
+                                    value: lastUpdate.toLocaleString()
+                                }
+                            ]} />
                         </div>
                     </div>
             }
