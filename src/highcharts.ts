@@ -14,6 +14,7 @@ import coloraxis        from "highcharts/modules/coloraxis"
 // import funnel        from "highcharts/modules/funnel"
 // import heatmap       from "highcharts/modules/heatmap"
 // import treemap       from "highcharts/modules/treemap"
+// import boost         from "highcharts/modules/boost"
 // import venn          from "highcharts/modules/venn"
 
 // Initialize modules
@@ -30,6 +31,7 @@ drilldown(Highcharts)
 coloraxis(Highcharts)
 // cylinder(Highcharts)
 // treemap(Highcharts)
+// boost(Highcharts)
 // funnel(Highcharts)
 // heatmap(Highcharts)
 // venn(Highcharts)

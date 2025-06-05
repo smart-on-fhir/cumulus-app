@@ -5,10 +5,10 @@ import PageHeader                           from "../generic/PageHeader"
 import Breadcrumbs                          from "../generic/Breadcrumbs"
 import Loader                               from "../generic/Loader"
 import { AlertError }                       from "../generic/Alert"
+import MetaDataList                         from "../generic/MetaDataList"
 import Terminology                          from "../../Terminology"
 import aggregator                           from "../../Aggregator"
 import { classList, humanizeColumnName }    from "../../utils"
-import IconItem                             from "../generic/IconItem"
 
 export default function ViewStudy({ studyId }: { studyId?: string }) {
 
@@ -110,22 +110,28 @@ export default function ViewStudy({ studyId }: { studyId?: string }) {
                 <div className="col" style={{ wordBreak: "break-all", minWidth: "15rem" }}>
                     <h5 className="mt-2">Metadata</h5>
                     <hr className="mb-1" />
-                    <IconItem icon={ Terminology.study.icon } className="mb-1">
-                        <b>{ Terminology.study.nameSingular } ID</b>
-                        <div className="color-muted">{ study.study }</div>
-                    </IconItem>
-                    <IconItem icon={ Terminology.dataPackage.icon } className="mb-1">
-                        <b>{ Terminology.dataPackage.namePlural }</b>
-                        <div className="color-muted">{ study.packages }</div>
-                    </IconItem>
-                    <IconItem icon="calculate" className="mb-1">
-                        <b>Total</b>
-                        <div className="color-muted">{ Number(study.total).toLocaleString() }</div>
-                    </IconItem>
-                    <IconItem icon="event_available" className="mb-1">
-                        <b>Last Data Update</b>
-                        <div className="color-muted">{ study.updated.toDateString() }</div>
-                    </IconItem>
+                    <MetaDataList items={[
+                        {
+                            icon : Terminology.study.icon,
+                            label: Terminology.study.nameSingular + " ID",
+                            value: study.study
+                        },
+                        {
+                            icon : Terminology.dataPackage.icon,
+                            label: Terminology.dataPackage.namePlural,
+                            value: study.packages
+                        },
+                        {
+                            icon : "calculate",
+                            label: "Total",
+                            value: Number(study.total).toLocaleString()
+                        },
+                        {
+                            icon : "event_available",
+                            label: "Last Data Update",
+                            value: study.updated.toDateString()
+                        }
+                    ]} />
                 </div>
             </div>
         </div>

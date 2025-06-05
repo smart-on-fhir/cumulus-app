@@ -469,11 +469,11 @@
 }
 
 .json-null {
-    color: #C60;
+    color: var(--color-orange);
     font-weight: bold;
 }
 .json-bool {
-    color: #606;
+    color: var(--color-date);
     font-weight: bold;
 }
 .json-number {

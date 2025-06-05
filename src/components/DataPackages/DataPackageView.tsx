@@ -9,6 +9,7 @@ import { AlertError }              from "../generic/Alert"
 import PageHeader                  from "../generic/PageHeader"
 import Breadcrumbs                 from "../generic/Breadcrumbs"
 import IconItem                    from "../generic/IconItem"
+import MetaDataList                from "../generic/MetaDataList"
 import { PackageStratifiedTemplates, PackageTemplates } from "../TemplateManager"
 import { FlatPackageDataViewer }   from "../Subscriptions/DataViewer"
 import ViewsBrowser                from "../Views/ViewsBrowser"
@@ -94,46 +95,54 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                     <div style={{ position: "sticky", top: "4rem" }}>
                         <h5 className="mt-2">Metadata</h5>
                         <hr className="mb-1" />
-                        <IconItem icon={Terminology.dataPackage.icon} className="mb-1">
-                            <b>{Terminology.dataPackage.nameSingular} Name</b>
-                            <div className="color-muted">{ pkg.name }</div>
-                        </IconItem>
-                        <IconItem icon={Terminology.dataPackage.icon} className="mb-1">
-                            <b>{Terminology.dataPackage.nameSingular} ID</b>
-                            <div className="color-muted">{ pkg.id }</div>
-                        </IconItem>
-                        <IconItem icon="event_available" className="mb-1">
-                            <b>Last Data Update</b>
-                            <div className="color-muted">{ new Date(pkg.last_data_update).toLocaleString() }</div>
-                        </IconItem>
-                        <IconItem icon="calculate" className="mb-1">
-                            <b>Total</b>
-                            <div className="color-muted">{ Number(pkg.total).toLocaleString() }</div>
-                        </IconItem>
-                        <IconItem icon={Terminology.study.icon} className="mb-1">
-                            <b>{Terminology.study.nameSingular}</b>
-                            <div>
-                                <Link to={`/studies/${pkg.study}`} className="link">
-                                    { humanizeColumnName(pkg.study) }
-                                </Link>
-                                <span className="color-muted"> / </span>
-                                <Link to={`/studies/${pkg.study}/${pkg.version}`} className="link">
-                                    { pkg.version }
-                                </Link>
-                            </div>
-                        </IconItem>
-                        { pkg.site && <IconItem icon={Terminology.site.icon} className="mb-1">
-                            <b>{Terminology.site.nameSingular}</b>
-                            <Link className="link" to={`/sites/${pkg.site}`}>{ humanizeColumnName(pkg.site) }</Link>
-                        </IconItem> }
-                        {/* <IconItem icon="info" className="mb-1">
-                            <b>{Terminology.dataPackage.nameSingular} Type</b>
-                            <div className="color-muted">{ pkg.type || "cube" }</div>
-                        </IconItem> */}
-                        {/* <IconItem icon="info" className="mb-1">
-                            <b>S3 Path</b>
-                            <div className="color-muted">{ pkg.s3_path || "" }</div>
-                        </IconItem> */}
+                        <MetaDataList items={[
+                            {
+                                icon : Terminology.dataPackage.icon,
+                                label: Terminology.dataPackage.nameSingular + " Name",
+                                value: pkg.name
+                            },
+                            {
+                                icon : Terminology.dataPackage.icon,
+                                label: Terminology.dataPackage.nameSingular + " ID",
+                                value: pkg.id
+                            },
+                            {
+                                icon : "event_available",
+                                label: "Last Data Update",
+                                value: new Date(pkg.last_data_update).toLocaleString()
+                            },
+                            {
+                                icon : "calculate",
+                                label: "Total",
+                                value: Number(pkg.total).toLocaleString()
+                            },
+                            {
+                                icon : Terminology.study.icon,
+                                label: Terminology.study.nameSingular,
+                                value: <>
+                                    <Link to={`/studies/${pkg.study}`} className="link">
+                                        { humanizeColumnName(pkg.study) }
+                                    </Link>
+                                    <span className="color-muted"> / </span>
+                                    <Link to={`/studies/${pkg.study}/${pkg.version}`} className="link">
+                                        { pkg.version }
+                                    </Link>
+                                </>
+                            },
+                            pkg.site && {
+                                icon : Terminology.site.icon,
+                                label: Terminology.site.nameSingular,
+                                value: <Link className="link" to={`/sites/${pkg.site}`}>{ humanizeColumnName(pkg.site) }</Link>
+                            },
+                            // {
+                            //     label: Terminology.dataPackage.nameSingular + " Type",
+                            //     value: pkg.type || "cube"
+                            // },
+                            // {
+                            //     label: "S3 Path",
+                            //     value: pkg.s3_path || ""
+                            // },
+                        ]} />
                        
 
                         <h5 className="mt-2">Actions</h5>

@@ -1,39 +1,9 @@
-import { useLayoutEffect, useRef } from "react"
-import Highcharts                  from "../../highcharts"
-import { highlight }               from "../../utils"
-import MAPPING                     from "./DataMapping"
+import MAPPING       from "./DataMapping"
+import Chart         from "../generic/Chart"
+import { highlight } from "../../utils"
+import Highcharts    from "../../highcharts"
 
 
-function Chart({ options }: { options: Highcharts.Options })
-{
-    const containerRef = useRef<HTMLDivElement|null>(null);
-    const chartRef     = useRef<Highcharts.Chart|null>(null);
-
-    useLayoutEffect(() => {
-        if (containerRef.current) {
-            try {
-                if (chartRef.current) {
-                    chartRef.current.update(options, true, true, false)
-                } else {
-                    chartRef.current = Highcharts.chart(containerRef.current, options);
-                }
-            } catch (ex) {
-                console.error(ex)
-                document.getElementById("flat-chart")!.innerHTML = '<div><br/><p><b class="color-red">Error rendering chart. See console for details.</b></p><pre>'
-                    + (ex as Error).message + 
-                '</pre></div>'
-            }
-        }
-        return () => {
-            if (chartRef.current) {
-                chartRef.current.destroy();
-                chartRef.current = null;
-            }
-        };
-    }, [options])
-
-    return <div id="catalog-chart" className="chart" ref={ containerRef } />
-}
 
 export default function CatalogChart({ data, search }: { data: Record<string, any>[], search?: string })
 {
@@ -162,7 +132,10 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
         },
         plotOptions: {
             series: {
-                animation: false
+                animation: false,
+                dataSorting: {
+                    enabled: true
+                }
             },
             column: {
                 // color: "#4a90e2",
@@ -218,5 +191,5 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
         series: [groups["null"]]
     }
 
-    return <Chart options={options} />
+    return <Chart options={options} containerProps={{ id: "catalog-chart" }} />
 }

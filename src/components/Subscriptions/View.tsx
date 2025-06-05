@@ -14,6 +14,7 @@ import Breadcrumbs                from "../generic/Breadcrumbs"
 import Loader                     from "../generic/Loader"
 import PageHeader                 from "../generic/PageHeader"
 import { AlertError }             from "../generic/Alert"
+import MetaDataList               from "../generic/MetaDataList"
 import { useAuth }                from "../../auth"
 import { deleteOne, request }     from "../../backend"
 import { useBackend }             from "../../hooks"
@@ -125,66 +126,51 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
                     <div style={{ position: "sticky", top: "3em" }} className="col">
                         <h5 className="mt-2">Metadata</h5>
                         <hr className="mb-1"/>
-                        
-                        {/* Group ------------------------------------------ */}
-                        <IconItem icon={Terminology.subscriptionGroup.icon} className="mb-1">
-                            <b>Group</b>
-                            { model.group ?
-                                <div>
-                                    <Link to={`/groups/${model.group.id}`} className="link" title={model.group.description}>{ model.group.name }</Link>
-                                </div> :
-                                <div className="color-muted">GENERAL</div>
-                            }
-                        </IconItem>
 
-                        {/* Tags ------------------------------------------- */}
-                        { model.Tags && <IconItem icon={Terminology.tag.icon} className="mb-1">
-                            <b>Tags</b>
-                            <div>{
-                                model.Tags.length ?
+                        <MetaDataList items={[
+                            {
+                                icon : Terminology.subscriptionGroup.icon,
+                                label: Terminology.subscriptionGroup.nameSingular,
+                                value: model.group ?
+                                    <Link to={`/groups/${model.group.id}`} className="link" title={model.group.description}>{ model.group.name }</Link> :
+                                    "GENERAL"
+                            },
+                            model.Tags && {
+                                icon : Terminology.tag.icon,
+                                label: Terminology.tag.namePlural,
+                                value: model.Tags.length ?
                                     model.Tags.map((t, i) => <Tag tag={t} key={i} />) :
-                                    <span className="color-muted">No tag assigned</span>
-                            }</div>
-                        </IconItem> }
-
-                        {/* Last Data Update (local) ----------------------- */}
-                        { !model.dataURL && <IconItem icon="event_available" className="mb-1">
-                            <b>Last Data Update</b>
-                            <div className="color-muted">{
-                                model.completed ?
-                                <Format value={ model.completed } format="date-time" /> :
-                                "Pending"
-                            }</div>
-                        </IconItem> }
-
-                        {/* Created ---------------------------------------- */}
-                        <IconItem icon="event_available" className="mb-1">
-                            <b>Created</b>
-                            <div className="color-muted"><Format value={ model.createdAt } format="date-time" /></div>
-                        </IconItem>
-
-                        {/* Updated ---------------------------------------- */}
-                        <IconItem icon="event_available" className="mb-1">
-                            <b>Updated</b>
-                            <div className="color-muted"><Format value={ model.updatedAt } format="date-time" /></div>
-                        </IconItem>
-
-                        {/* Data Package ----------------------------------- */}
-                        { model.dataURL && (
-                            <IconItem icon={Terminology.dataPackage.icon} className="mb-1">
-                                <b>Data Package</b>
-                                <div>
-                                    <Link className="link" to={`/packages/${model.dataURL}`}>{ model.dataURL }</Link>
-                                </div>
-                            </IconItem>
-                        )}
-
-                        {/* Total Rows ------------------------------------- */}
-                        { !model.dataURL && model.metadata?.total && <IconItem icon="calculate" className="mb-1">
-                            <b>Total Rows</b>
-                            <div className="color-muted">{ Number(model.metadata.total).toLocaleString()}</div>
-                        </IconItem>}
-
+                                    "No tag assigned"
+                            },
+                            !model.dataURL &&  {
+                                icon : "event_available",
+                                label: "Last Data Update",
+                                value: model.completed ?
+                                    <Format value={ model.completed } format="date-time" /> :
+                                    "Pending"
+                            },
+                            {
+                                icon : "event_available",
+                                label: "Created",
+                                value: <Format value={ model.createdAt } format="date-time" />
+                            },
+                            {
+                                icon : "event_available",
+                                label: "Updated",
+                                value: <Format value={ model.updatedAt } format="date-time" />
+                            },
+                            model.dataURL && {
+                                icon : Terminology.dataPackage.icon,
+                                label: Terminology.dataPackage.nameSingular,
+                                value: <Link className="link" to={`/packages/${model.dataURL}`}>{ model.dataURL }</Link>
+                            },
+                            !model.dataURL && model.metadata?.total && {
+                                icon : "calculate",
+                                label: "Total Rows",
+                                value: Number(model.metadata.total).toLocaleString()
+                            }
+                        ]} />
+                        
                         {/* Data Package Info ------------------------------ */}
                         { model.dataURL && <DataPackageViewer packageId={ model.dataURL } /> }
 

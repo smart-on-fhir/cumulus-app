@@ -92,6 +92,12 @@ export default function CssPreview() {
                 <div className="object">.object</div>
                 <div className="array">.array</div>
                 <div className="null">.null</div>
+
+                <div className="json-null">.json-null</div>
+                <div className="json-bool">.json-bool</div>
+                <div className="json-number">.json-number</div>
+                <div className="json-string">.json-string</div>
+                <div className="json-key">.json-key</div>
             </div>
 
             <div>

@@ -1,5 +1,5 @@
 import Highcharts                               from "highcharts"
-import Chart                                    from "./Chart"
+import Chart                                    from "../../generic/Chart"
 import { CUMULUS_ALL, CUMULUS_NONE }            from "./lib"
 import { humanizeColumnName, pluralize, roundToPrecision } from "../../../utils"
 
@@ -363,7 +363,7 @@ export default function MetricsChart({
         options.series = Level3 as any
     }
 
-    return <Chart options={options} callback={chart => {
+    return <Chart options={options} containerProps={{ id: "flat-chart" }} callback={chart => {
 
         // Enable drilldown animations after the initial render
         requestAnimationFrame(() => {
@@ -377,7 +377,7 @@ export default function MetricsChart({
                 }
             } catch {}
         });
-    }} key={isPctChart + ""}/>
+    }} key={isPctChart + ""} />
 }
 
 function groupData(data: Record<string, any>[], column: string) {

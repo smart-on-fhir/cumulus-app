@@ -8,6 +8,7 @@ import { sortBy }                    from "../../utils"
 import StudyAreaCard                 from "../StudyAreas/Card"
 import Prefetch                      from "../generic/Prefetch"
 import Loader                        from "../generic/Loader"
+import EventTimeline                 from "../generic/EventTimeline"
 import "./home.scss"
 
 
@@ -15,12 +16,21 @@ export default function Home() {
     return (
         <>
             <title>Cumulus</title>
-            <div className="home-page container">
+            <div className="home-page">
                 <StudyAreas />
                 <Graphs />
                 <SubscriptionsAndSites />
+                <Timeline />
             </div>
         </>
+    )
+}
+
+function Timeline() {
+    return (
+        <div className="timeline card">
+            <EventTimeline />
+        </div>
     )
 }
 
@@ -113,11 +123,11 @@ function Graphs() {
 
 function SubscriptionsAndSites() {
     return <Prefetch path="/api/requests?order=updatedAt:desc&attributes=id,name,description,dataURL">{subscriptions => (
-        <>
+        <div className="pkg-and-sites">
             <UpdateCheck subscriptions={subscriptions} />
             <Subscriptions data={subscriptions.slice(0, 5)} />
             <Sites />
-        </>
+        </div>
     )}</Prefetch>
 }
 
