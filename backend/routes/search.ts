@@ -3,6 +3,7 @@ import { QueryTypes }               from "sequelize"
 import { route }                    from "../lib/route"
 import Tag                          from "../db/models/Tag"
 import config                       from "../config"
+import * as aggregator              from "../aggregator"
 import { uInt }                     from "../lib"
 
 
@@ -25,36 +26,13 @@ async function search(q: string) {
     })
 }
 
-let CACHE: any;
-
 function aggregatorIsEnabled() {
     return config.aggregator.enabled && config.aggregator.apiKey && config.aggregator.baseUrl
 }
 
-async function aggregatorRequest(req: Request, url: string) {
-    const { apiKey, baseUrl } = config.aggregator
-
-    if (CACHE && req.headers["cache-control"] !== "no-cache") {
-        return CACHE
-    }
-    
-    const response = await fetch(new URL(url, baseUrl), {
-        headers: {
-            "x-api-key": apiKey,
-            accept: "application/json"
-        }
-    })
-
-    CACHE = (async () => {
-        const txt = await response.text()
-        const type = response.headers.get("content-type")
-        if (type && type.match(/\bjson\b/i)) {
-            return JSON.parse(txt || "null")
-        }
-        return txt
-    })()
-
-    return CACHE
+async function aggregatorRequest(url: string) {
+    const { body } = await aggregator.request(url, { cache: "default" })
+    return body
 }
 
 
@@ -69,7 +47,7 @@ route(router, {
 
         // Also search through package names from the aggregator
         if (aggregatorIsEnabled()) {
-            const packages = await aggregatorRequest(req, "/data-packages")
+            const packages = await aggregatorRequest("/data-packages")
             results = results.concat(packages.filter((p: any) => p.name.toLowerCase().includes(q)).map((p: any) => ({
                 name       : p.name,
                 description: null,

@@ -39,7 +39,7 @@ The entire database configuration is provided via the `DATABASE_URL` variable co
     - **sync** - Can be `none` | `normal` | `force` | `alter`. This affects how changes to data models are applied to the database.
         - **none** - Changes are not automatically applied and should be done manually. This is the default behavior on production.
         - **normal** - New models are applied via CREATE TABLE statements
-        - **alter** - Changes are applied via ALTER TABLE statements
+        <!-- - **alter** - Changes are applied via ALTER TABLE statements -->
         - **force** - Tables are dropped and then re-created
 
         **IMPORTANT: Do NOT use this on production (omit it or use 'none'). Production databases should be synchronized via migrations instead!**

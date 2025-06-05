@@ -15,7 +15,7 @@ import ImportJob                                                from "../DataMan
 import { getFindOptions, assert, rw, uInt, bool, cached }       from "../lib"
 import { version as pkgVersion }                                from "../../package.json"
 import { DATA_TYPES }                                           from "../DataManager/dataTypes"
-import config                                                   from "../config"
+import { request }                                              from "../aggregator"
 
 
 export const router: Router = express.Router({ mergeParams: true });
@@ -292,43 +292,24 @@ router.put(
 
 function getPkgData(packageId: string) {
     return async (req: AppRequest, res: Response) => {
-        const { enabled, apiKey, baseUrl } = config.aggregator
-
-        if (!enabled || !apiKey || !baseUrl) {
-            throw new BadRequest("The aggregator API is not enabled")
-        }
 
         // Cached for 2 hours
         if (cached(req, res, 7_200)) {
             return;
         }
 
-        const url = new URL(baseUrl.replace(/\/$/, "") + `/data-packages/${packageId}/chart`);
-
+        const query = new URLSearchParams()
         for (const [name, value] of Object.entries(req.query)) {
-            url.searchParams.set(name, value + "")
+            query.set(name, value + "")
         }
 
         try {
-            var response = await fetch(url, {
-                headers: {
-                    "x-api-key": apiKey,
-                    "accept"   : "application/json"
-                },
-
-            })
+            var { response, body } = await request(`/data-packages/${packageId}/chart?${query}`)
         } catch (ex) {
             console.error("====>", ex)
             throw ex
         }
 
-        let type = response.headers.get("Content-Type") + "";
-
-        let body = await response.text();
-
-        if (body.length && type.match(/\bjson\b/i)) {
-            body = JSON.parse(body);
-        }
 
         if (!response.ok) {
             // @ts-ignore

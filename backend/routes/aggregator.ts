@@ -1,9 +1,8 @@
 import express, { Request, Response, Router } from "express"
-import https, { RequestOptions }      from "https"
-import { cached, rw }                 from "../lib"
-import config                         from "../config"
-import icd10Catalog                   from "../icd10_hierarchy_count.json"
-import loincCatalog                   from "../loinc_tree.json"
+import { rw }                                 from "../lib"
+import icd10Catalog                           from "../icd10_hierarchy_count.json"
+import loincCatalog                           from "../loinc_tree.json"
+import { proxyMiddleware }                    from "../aggregator"
 
 
 export const router: Router = express.Router({ mergeParams: true })
@@ -33,77 +32,7 @@ const AGGREGATOR_PATHS = [
     "/from-parquet"
 ];
 
-router.get(AGGREGATOR_PATHS, rw(async (req: Request, res: Response) => {
-
-    // TODO: Request appropriate permissions
-
-    const { enabled, apiKey, baseUrl } = config.aggregator
-
-    if (!enabled || !apiKey || !baseUrl) {
-        return res.status(400).type("text").end("The aggregator API is not enabled")
-    }
-
-    const url = new URL(baseUrl.replace(/\/$/, "") + req.url);
-    // console.log(url)
-    const { port, host } = url;
-
-    // Cache for 2 days --------------------------------------------------------
-    if (cached(req, res, 7_200, [url.href])) {
-        return;
-    }
-
-    const requestOptions: RequestOptions = {
-        host: host,
-        port: port || undefined,
-        path: url.pathname + (url.search ?? ""),
-        method: req.method,                
-        headers: {
-            Host: host,
-            "x-api-key": apiKey,
-            accept: "application/json",
-            "User-Agent": "CumulusDashboard/3.0.0"
-        }
-    }
-
-    const proxy = https.request(requestOptions, aggRes => {
-
-        let data = '';
-
-        // Receive chunks of data from the external server
-        aggRes.on('data', (chunk) => {
-            data += chunk; // Buffer the data
-        });
-
-        // On response completion
-        aggRes.on('end', () => {
-            // console.log("%s GOT: %s %s", req.url, aggRes.statusCode, data)
-            try {
-                // Attempt to parse the data as JSON (if the content is JSON)
-                const jsonResponse = JSON.parse(data);
-
-                // Send the JSON response to the client
-                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'application/json', "X-Upstream": baseUrl });
-                res.end(JSON.stringify(jsonResponse));
-            } catch (error) {
-                // If the response is not JSON, return it as a plain string
-                res.writeHead(aggRes.statusCode!, { 'Content-Type': 'text/plain', "X-Upstream": baseUrl });
-                res.end(data);
-            }
-        });
-    });
-
-    // Handle any error during the proxy request
-    proxy.on('error', (err) => {
-        console.error('Error with proxy request:', err);
-        res.writeHead(500, {
-            "X-Upstream": baseUrl,
-            "Cache-Control"  : "no-cache"
-        });
-        res.end('Internal Server Error');
-    });
-
-    req.pipe(proxy);
-}))
+router.get(AGGREGATOR_PATHS, rw(proxyMiddleware))
 
 router.get("/catalog/icd10", rw(async (req: Request, res: Response) => {
     res.json(icd10Catalog)

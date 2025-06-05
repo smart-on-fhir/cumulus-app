@@ -1,0 +1,81 @@
+import { join }              from "path"
+import { Request, Response } from "express"
+import config                from "./config"
+import makeFetchHappen, { FetchOptions } from "make-fetch-happen"
+
+
+const fetch = makeFetchHappen.defaults({
+    cachePath: join(__dirname, 'aggregator-cache'), // path where cache will be written (and read)
+})
+
+function mapCacheControlToFetchOption(req: Request): RequestCache {
+    const cc = req.headers['cache-control']?.toLowerCase() || "";
+    if (cc.includes('no-store')) return "no-store";
+    if (cc.includes('no-cache')) return "reload";
+    if (cc.includes('max-age=0') || cc.includes('must-revalidate')) return "reload";
+    if (cc.includes('only-if-cached')) return "only-if-cached";
+    if (cc.includes('max-age')) return "force-cache";
+    return "default";
+}
+
+export async function proxyMiddleware(req: Request, res: Response)
+{
+    const { baseUrl } = config.aggregator
+    try {
+        const { response, body } = await request(req.url, {
+            cache: mapCacheControlToFetchOption(req)
+        })
+        // console.log(response.headers)
+        if (typeof body === "string") {
+            res.writeHead(response.status, { 'Content-Type': 'text/plain', "X-Upstream": baseUrl });
+            res.end(body);
+        } else {
+            res.writeHead(response.status, { 'Content-Type': 'application/json', "X-Upstream": baseUrl });
+            res.end(JSON.stringify(body, null, 4));
+        }
+    } catch (ex) {
+        console.error('Error with proxy request:', ex);
+        res.writeHead(500, {
+            "X-Upstream": baseUrl,
+            "Cache-Control": "no-cache"
+        });
+        res.end('Internal Server Error');
+    }
+}
+
+export async function request(path: string, options: FetchOptions = {})
+{
+    const { enabled, apiKey, baseUrl } = config.aggregator
+
+    if (!enabled || !apiKey || !baseUrl) {
+        throw new Error("The aggregator API is not enabled")
+    }
+
+    const { href } = new URL(baseUrl.replace(/\/$/, "") + path);
+
+    options.headers = {
+        accept: "application/json",
+        ...options.headers,
+        "x-api-key": apiKey,
+        "User-Agent": "CumulusDashboard/3.0.0"
+    }
+
+    return doRequest(href, options)
+}
+
+async function doRequest(url: string, options: FetchOptions)
+{
+    const response = await fetch(url, options)
+
+    // Consuming as text should always be successful
+    const txt = await response.text()
+
+    // If it looks like JSON - parse it
+    const type = response.headers.get("content-type")
+    if (type && type.match(/\bjson\b/i)) {
+        return { response, body: JSON.parse(txt || "null") }
+    }
+
+    // Otherwise, return as text
+    return { response, body: txt }
+}
