@@ -15,7 +15,7 @@ provided to the dashboard image while running it.
 ***Prerequisites***
 1. OS - This app has been only tested on Mac OS and Linux
 2. Git - Needs to be available to pull the source code
-3. NodeJS - The project currently uses NodeJS 18 which needs to be pre-installed.
+3. NodeJS - The project currently uses NodeJS 22+ which needs to be pre-installed.
    If you use [nvm](https://github.com/nvm-sh/nvm), then `cd` into the project
    folder and run `nvm use` to automatically select the required node version
 4. Docker - A recent version needs to be installed on the host machine

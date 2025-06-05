@@ -96,7 +96,8 @@ export default class CSV2DB extends Transform
         }
     }
 
-    _flush(next: (err?: Error | null) => void) {
+    _flush(next: (err?: Error | null) => void)
+    {
         if (this.insertRowsBuffer.length > 0) {
             this.insertData(next);
         } else {

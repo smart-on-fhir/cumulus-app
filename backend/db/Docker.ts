@@ -61,15 +61,6 @@ async function waitForReady(container: Docker.Container, options: Config) {
 }
 
 export async function createContainer(options: Config): Promise<Docker.Container> {
-
-    // docker run -it 
-    //   -v /Users/vlad/dev/cumulus-app/backend/db/postgres-data:/var/lib/postgresql/data
-    //   -e POSTGRES_PASSWORD=********
-    //   -e POSTGRES_USER=postgres
-    //   -e POSTGRES_DB=cumulus
-    //   -p 5432:5432
-    //   postgres:14
-
     return await runSimple({
         name      : options.docker.containerName,
         image     : "postgres:14",

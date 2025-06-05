@@ -1,3 +1,7 @@
+// IMPORTANT!
+// These the default users you get after the initial installation. Once the
+// system is up and running you should invite other user (at least someone as)
+// admin, and then delete these 3 default users!
 export default [
     {
         id      : 1,

@@ -5,7 +5,6 @@ import { Config }                          from "../types"
 import { getDockerContainer }              from "./Docker"
 import * as logger                         from "../services/logger"
 import { attachHooks, init as initModels } from "./models"
-import { seedTable }                       from "./seeds/lib"
 
 
 let connection: Sequelize;
@@ -138,11 +137,11 @@ export default async function setupDB(options: Config): Promise<Sequelize>
     // Load models and call their init method
     initModels(connection)
 
-    // Run pending migrations (if any)
-    await applyMigrations(options, connection)
-
     // Create missing tables (or recreate all of them if sync = 'force')
     await syncModels(options)
+
+    // Run pending migrations (if any)
+    await applyMigrations(options, connection)
 
     // Insert seeds (if enabled)
     await applySeeds(connection)
