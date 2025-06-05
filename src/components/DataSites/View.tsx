@@ -5,7 +5,7 @@ import Breadcrumbs                from "../generic/Breadcrumbs"
 import PageHeader                 from "../generic/PageHeader"
 import Loader                     from "../generic/Loader"
 import { AlertError }             from "../generic/Alert"
-import IconItem                   from "../generic/IconItem"
+import MetaDataList               from "../generic/MetaDataList"
 import Terminology                from "../../Terminology"
 import aggregator, { Site }       from "../../Aggregator"
 import { humanizeColumnName }     from "../../utils"
@@ -122,22 +122,28 @@ export default function ViewSite({ site }: { site?: Site })
                 <div className="col" style={{ wordBreak: "break-all", minWidth: "15rem" }}>
                     <h5 className="mt-2">Metadata</h5>
                     <hr className="mb-1" />
-                    <IconItem icon={Terminology.site.icon} className="mb-1">
-                        <b>{Terminology.site.nameSingular} ID</b>
-                        <div className="color-muted">{ site.id }</div>
-                    </IconItem>
-                    { isFinite(earliest) &&  <IconItem icon="event_available" className="mb-1">
-                        <b>Earliest Data</b>
-                        <div className="color-muted">{ new Date(earliest).toLocaleString() }</div>
-                    </IconItem> }
-                    { isFinite(latest) && <IconItem icon="event_available" className="mb-1">
-                        <b>Latest Data: </b>
-                        <div className="color-muted">{ new Date(latest).toLocaleString() }</div>
-                    </IconItem> }
-                    { isFinite(lastUpdate) && <IconItem icon="event_available" className="mb-1">
-                        <b>Last Data Update: </b>
-                        <div className="color-muted">{ new Date(lastUpdate).toLocaleString() }</div>
-                    </IconItem> }
+                    <MetaDataList items={[
+                        {
+                            icon : Terminology.site.icon,
+                            label: Terminology.site.nameSingular + " ID",
+                            value: site.id
+                        },
+                        isFinite(earliest) &&  {
+                            icon : "event_available",
+                            label: "Earliest Data",
+                            value: new Date(earliest).toLocaleString()
+                        },
+                        isFinite(latest) &&  {
+                            icon : "event_available",
+                            label: "Latest Data",
+                            value: new Date(latest).toLocaleString()
+                        },
+                        isFinite(lastUpdate) &&  {
+                            icon : "event_available",
+                            label: "Last Data Update",
+                            value: new Date(lastUpdate).toLocaleString()
+                        }
+                    ]} />
                 </div>
             </div>
         </div>

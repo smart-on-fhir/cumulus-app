@@ -134,6 +134,14 @@ function reducer(state: State, payload: Partial<State>): State {
     return { ...state, ...payload };
 }
 
+function chartDataIsEmpty(data: app.ServerResponses.DataResponse): boolean {
+    if (!data.rowCount) return true
+
+    return !data.data.some(d => {
+        return d.rows.some(row => row[0] !== "cumulus__none")
+    })
+}
+
 function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, pkg?: DataPackage, groupBy?: app.SubscriptionDataColumn): State {
 
     const counted    = pluralize(getSubject(sub))
@@ -169,10 +177,10 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                 signal      : abortController.signal,
                 stratifier  : groupBy?.name
             })
-            .then(data => {
+            .then((data: app.ServerResponses.DataResponse) => {
 
                 // Skip empty charts
-                if (!data.rowCount) return null
+                if (chartDataIsEmpty(data)) return null
 
                 let chartType = state.chartType
                 let limit     = state.limit

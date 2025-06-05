@@ -19,6 +19,7 @@
     &.center   { justify-content: center;     }
     &.left     { justify-content: flex-start; }
     &.right    { justify-content: flex-end;   }
+    &.space-between { justify-content: space-between;   }
     &.top      { align-items: flex-start;     }
     &.middle   { align-items: center;         }
     &.bottom   { align-items: flex-end;       }
