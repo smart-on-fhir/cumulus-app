@@ -161,3 +161,4 @@ backend/db/postgres-data
 trash/*
 backend/services/email/test.ts
 .env.production
+backend/aggregator-cache
