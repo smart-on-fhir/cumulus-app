@@ -18,6 +18,7 @@ export const ReadOnlyPaths = [
     "plotOptions.series.dataSorting",
     "plotOptions.series.states.hover.opacity",
     "plotOptions.pie.dataLabels.formatter",
+    "plotOptions.series.dataLabels.formatter",
     "plotOptions.pie.dataLabels.useHTML",
     "plotOptions.areasplinerange.linkedTo",
     "plotOptions.areasplinerange.marker.enabled",
