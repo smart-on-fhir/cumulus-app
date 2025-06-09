@@ -428,17 +428,19 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
         let start = Date.now()
         let estimate = 1000
 
+        const textDecoder = new TextDecoder()
+
         const transformStream = new TransformStream({
             transform: (chunk, controller) => {
-                this.setState({
+                const txt = textDecoder.decode(chunk as Uint8Array)
+                controller.enqueue(txt);
+
+                this.setState(prev => ({
                     uploadedBytes: this.state.uploadedBytes + chunk.byteLength,
-                    estimate: 
-                    this.state.uploadedBytes ?
-                        (((Date.now() - start) || 1)  / (this.state.uploadedBytes || 1)) * chunk.byteLength :
+                    estimate: prev.uploadedBytes ?
+                        (((Date.now() - start) || 1)  / (prev.uploadedBytes || 1)) * chunk.byteLength :
                         Math.round(chunk.byteLength * 0.02)
-                }, () => {
-                    controller.enqueue(new TextDecoder().decode(chunk as Uint8Array));
-                })
+                }))
             },
             flush(controller) {
                 controller.terminate();
