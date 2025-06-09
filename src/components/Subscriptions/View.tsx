@@ -123,7 +123,7 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
                 </div>
 
                 <div className="col" style={{ wordBreak: "break-all", minWidth: "16rem", maxWidth: "26rem" }}>
-                    <div style={{ position: "sticky", top: "3em" }} className="col">
+                    <div style={{ position: "sticky", top: "3em" }}>
                         <h5 className="mt-2">Metadata</h5>
                         <hr className="mb-1"/>
 

@@ -142,41 +142,43 @@ export default function ViewStudyVersion() {
                         )
                     })}
                 </div>
-                <div className="col" style={{ wordBreak: "break-all", minWidth: "15rem" }}>
-                    <h5 className="mt-2">Metadata</h5>
-                    <hr className="mb-1" />
-                    <MetaDataList items={[
-                        {
-                            icon : Terminology.study.icon,
-                            label: Terminology.study.nameSingular,
-                            value: <Link className="link" to={`../`}>{ id }</Link>
-                        },
-                        {
-                            icon : "history",
-                            label: "Version",
-                            value: version
-                        },
-                        {
-                            icon : Terminology.site.icon,
-                            label: Terminology.site.namePlural,
-                            value: sites.length.toLocaleString()
-                        },
-                        {
-                            icon : Terminology.dataPackage.icon,
-                            label: Terminology.dataPackage.namePlural,
-                            value: packages.length.toLocaleString()
-                        },
-                        {
-                            icon : "calculate",
-                            label: "Total",
-                            value: packages.reduce((prev, cur) => prev + cur.total, 0).toLocaleString()
-                        },
-                        {
-                            icon : "event_available",
-                            label: "Last Data Update",
-                            value: new Date(packages.map(p => +new Date(p.last_data_update)).sort().pop()!).toDateString()
-                        }
-                    ]} />
+                <div className="col" style={{ wordBreak: "break-all", minWidth: "16rem", maxWidth: "26rem" }}>
+                    <div style={{ position: "sticky", top: "3em" }}>
+                        <h5 className="mt-2">Metadata</h5>
+                        <hr className="mb-1" />
+                        <MetaDataList items={[
+                            {
+                                icon : Terminology.study.icon,
+                                label: Terminology.study.nameSingular,
+                                value: <Link className="link" to={`../`}>{ id }</Link>
+                            },
+                            {
+                                icon : "history",
+                                label: "Version",
+                                value: version
+                            },
+                            {
+                                icon : Terminology.site.icon,
+                                label: Terminology.site.namePlural,
+                                value: sites.length.toLocaleString()
+                            },
+                            {
+                                icon : Terminology.dataPackage.icon,
+                                label: Terminology.dataPackage.namePlural,
+                                value: packages.length.toLocaleString()
+                            },
+                            {
+                                icon : "calculate",
+                                label: "Total",
+                                value: packages.reduce((prev, cur) => prev + cur.total, 0).toLocaleString()
+                            },
+                            {
+                                icon : "event_available",
+                                label: "Last Data Update",
+                                value: new Date(packages.map(p => +new Date(p.last_data_update)).sort().pop()!).toDateString()
+                            }
+                        ]} />
+                    </div>
                 </div>
             </div>
         </div>

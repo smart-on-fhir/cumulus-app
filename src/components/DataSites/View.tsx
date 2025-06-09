@@ -119,31 +119,33 @@ export default function ViewSite({ site }: { site?: Site })
                     <hr className="mb-1" />
                     <Timeline site={site} />
                 </div>
-                <div className="col" style={{ wordBreak: "break-all", minWidth: "15rem" }}>
-                    <h5 className="mt-2">Metadata</h5>
-                    <hr className="mb-1" />
-                    <MetaDataList items={[
-                        {
-                            icon : Terminology.site.icon,
-                            label: Terminology.site.nameSingular + " ID",
-                            value: site.id
-                        },
-                        isFinite(earliest) &&  {
-                            icon : "event_available",
-                            label: "Earliest Data",
-                            value: new Date(earliest).toLocaleString()
-                        },
-                        isFinite(latest) &&  {
-                            icon : "event_available",
-                            label: "Latest Data",
-                            value: new Date(latest).toLocaleString()
-                        },
-                        isFinite(lastUpdate) &&  {
-                            icon : "event_available",
-                            label: "Last Data Update",
-                            value: new Date(lastUpdate).toLocaleString()
-                        }
-                    ]} />
+                <div className="col" style={{ wordBreak: "break-all", minWidth: "16rem", maxWidth: "26rem" }}>
+                    <div style={{ position: "sticky", top: "3em" }}>
+                        <h5 className="mt-2">Metadata</h5>
+                        <hr className="mb-1" />
+                        <MetaDataList items={[
+                            {
+                                icon : Terminology.site.icon,
+                                label: Terminology.site.nameSingular + " ID",
+                                value: site.id
+                            },
+                            isFinite(earliest) &&  {
+                                icon : "event_available",
+                                label: "Earliest Data",
+                                value: new Date(earliest).toLocaleString()
+                            },
+                            isFinite(latest) &&  {
+                                icon : "event_available",
+                                label: "Latest Data",
+                                value: new Date(latest).toLocaleString()
+                            },
+                            isFinite(lastUpdate) &&  {
+                                icon : "event_available",
+                                label: "Last Data Update",
+                                value: new Date(lastUpdate).toLocaleString()
+                            }
+                        ]} />
+                    </div>
                 </div>
             </div>
         </div>

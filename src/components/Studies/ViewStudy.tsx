@@ -107,31 +107,33 @@ export default function ViewStudy({ studyId }: { studyId?: string }) {
                         </tbody>
                     </table>
                 </div>
-                <div className="col" style={{ wordBreak: "break-all", minWidth: "15rem" }}>
-                    <h5 className="mt-2">Metadata</h5>
-                    <hr className="mb-1" />
-                    <MetaDataList items={[
-                        {
-                            icon : Terminology.study.icon,
-                            label: Terminology.study.nameSingular + " ID",
-                            value: study.study
-                        },
-                        {
-                            icon : Terminology.dataPackage.icon,
-                            label: Terminology.dataPackage.namePlural,
-                            value: study.packages
-                        },
-                        {
-                            icon : "calculate",
-                            label: "Total",
-                            value: Number(study.total).toLocaleString()
-                        },
-                        {
-                            icon : "event_available",
-                            label: "Last Data Update",
-                            value: study.updated.toDateString()
-                        }
-                    ]} />
+                <div className="col" style={{ wordBreak: "break-all", minWidth: "16rem", maxWidth: "26rem" }}>
+                    <div style={{ position: "sticky", top: "3em" }}>
+                        <h5 className="mt-2">Metadata</h5>
+                        <hr className="mb-1" />
+                        <MetaDataList items={[
+                            {
+                                icon : Terminology.study.icon,
+                                label: Terminology.study.nameSingular + " ID",
+                                value: study.study
+                            },
+                            {
+                                icon : Terminology.dataPackage.icon,
+                                label: Terminology.dataPackage.namePlural,
+                                value: study.packages
+                            },
+                            {
+                                icon : "calculate",
+                                label: "Total",
+                                value: Number(study.total).toLocaleString()
+                            },
+                            {
+                                icon : "event_available",
+                                label: "Last Data Update",
+                                value: study.updated.toDateString()
+                            }
+                        ]} />
+                    </div>
                 </div>
             </div>
         </div>
