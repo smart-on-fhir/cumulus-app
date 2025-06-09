@@ -132,35 +132,37 @@ export default function ListStudies() {
                             </table>
                         </div>
                         <div className="col" style={{ wordBreak: "break-all", flex: "1 0 20rem" }}>
-                            { totalStudies > 1 && <>
-                                <h5 className="">Packages per Study</h5>
+                            <div style={{ position: "sticky", top: "4em" }}>
+                                { totalStudies > 1 && <>
+                                    <h5 className="">Packages per Study</h5>
+                                    <hr className="mb-1" />
+                                    <StudiesChart packages={packages} />
+                                </> }
+                                <h5 className="">Metadata</h5>
                                 <hr className="mb-1" />
-                                <StudiesChart packages={packages} />
-                            </> }
-                            <h5 className="">Metadata</h5>
-                            <hr className="mb-1" />
-                            <MetaDataList items={[
-                                {
-                                    icon : Terminology.study.icon,
-                                    label: `Total ${ Terminology.study.namePlural }`,
-                                    value: Number(totalStudies).toLocaleString()
-                                },
-                                {
-                                    icon : Terminology.dataPackage.icon,
-                                    label: `Total ${ Terminology.dataPackage.namePlural }`,
-                                    value: Number(totalPackages).toLocaleString()
-                                },
-                                {
-                                    icon : "calculate",
-                                    label: "Total Data Rows",
-                                    value: Number(totalRows).toLocaleString()
-                                },
-                                {
-                                    icon : "event_available",
-                                    label: "Last Data Update",
-                                    value: lastUpdate.toLocaleString()
-                                }
-                            ]} />
+                                <MetaDataList items={[
+                                    {
+                                        icon : Terminology.study.icon,
+                                        label: `Total ${ Terminology.study.namePlural }`,
+                                        value: Number(totalStudies).toLocaleString()
+                                    },
+                                    {
+                                        icon : Terminology.dataPackage.icon,
+                                        label: `Total ${ Terminology.dataPackage.namePlural }`,
+                                        value: Number(totalPackages).toLocaleString()
+                                    },
+                                    {
+                                        icon : "calculate",
+                                        label: "Total Data Rows",
+                                        value: Number(totalRows).toLocaleString()
+                                    },
+                                    {
+                                        icon : "event_available",
+                                        label: "Last Data Update",
+                                        value: lastUpdate.toLocaleString()
+                                    }
+                                ]} />
+                            </div>
                         </div>
                     </div>
             }
