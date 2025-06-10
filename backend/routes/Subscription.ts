@@ -508,7 +508,8 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         
         sql += `, sum(cnt::float) AS total FROM "${table}"`
 
-        let where: string[] = [ `"${stratifier}" IS NULL` ]
+        // let where: string[] = [ `"${stratifier}" IS NULL` ]
+        let where: string[] = []
 
         if (unusedColumns.length) {
             where.push(...unusedColumns.map(c => `"${c.name}" IS NULL`))
@@ -518,7 +519,10 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
             where.push(`(${ filterWhere })`)
         }
 
-        sql += ` WHERE ${where.join(" AND ")}`
+        if (where.length) {
+            sql += ` WHERE ${where.join(" AND ")}`
+        }
+
         sql += ` GROUP BY stratifier`
         sql += ` ORDER BY stratifier`
         
