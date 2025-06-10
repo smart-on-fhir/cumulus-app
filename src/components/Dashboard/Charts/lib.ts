@@ -137,10 +137,11 @@ export function filterOutExceptions({
             exceptions.add(msg)
         }
 
-        if (row[0] === "cumulus__none") {
+        if (row[0] === "cumulus__none" && seriesName !== "cumulus__none") {
             pushException()
             return false
         }
+
         if (xType === "linear") {
             const n = +row[0]
             if (isNaN(n) || !isFinite(n)) {
