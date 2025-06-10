@@ -293,8 +293,8 @@ router.put(
 function getPkgData(packageId: string) {
     return async (req: AppRequest, res: Response) => {
 
-        // Cached for 2 hours
-        if (cached(req, res, 7_200)) {
+        // Cached for a week
+        if (cached(req, res, 60 * 60 * 24 * 7)) {
             return;
         }
 
