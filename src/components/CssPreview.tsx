@@ -432,8 +432,8 @@ export default function CssPreview() {
                     <div>
                         <label>Multi-Select:readonly</label>
                         <div style={{ height: "3rem" }}>
-                            <select size={3} multiple aria-readonly defaultValue={1}>
-                                <option value={1}>Option 1</option>
+                            <select size={3} multiple aria-readonly defaultValue={["1"]}>
+                                <option value="1">Option 1</option>
                                 <option>Option 2</option>
                                 <option>Option 3</option>
                             </select>
@@ -442,8 +442,8 @@ export default function CssPreview() {
                     <div>
                         <label>Multi-Select:disabled</label>
                         <div style={{ height: "3rem" }}>
-                            <select size={3} multiple disabled defaultValue={1}>
-                                <option value={1}>Option 1</option>
+                            <select size={3} multiple disabled defaultValue={["1"]}>
+                                <option value="1">Option 1</option>
                                 <option>Option 2</option>
                                 <option>Option 3</option>
                             </select>
@@ -452,8 +452,8 @@ export default function CssPreview() {
                     <div>
                         <label>Multi-Select:invalid</label>
                         <div style={{ height: "3rem" }}>
-                            <select size={3} multiple defaultValue="3" required>
-                                <option value="0" selected>Option 1</option>
+                            <select size={3} multiple defaultValue={["3"]} required>
+                                <option value="0">Option 1</option>
                                 <option value="1">Option 2</option>
                                 <option value="2">Option 3</option>
                             </select>
