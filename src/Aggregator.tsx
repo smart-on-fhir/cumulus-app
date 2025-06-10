@@ -275,7 +275,11 @@ class Aggregator
 
     public async getPackage(id: string): Promise<DataPackage|undefined> {
         const all = await this.getPackages();
-        return all.find(p => p.id === id)
+        const pkg = all.find(p => p.id === id);
+        if (!pkg) {
+            throw new Error(`Unable to find package with id ${JSON.stringify(id)}`)
+        }
+        return pkg
     }
 
     public async filterPackages(props: Partial<DataPackage>): Promise<DataPackage[]> {
