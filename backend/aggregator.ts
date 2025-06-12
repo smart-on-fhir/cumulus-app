@@ -1,7 +1,8 @@
-import { join }              from "path"
-import { Request, Response } from "express"
-import config                from "./config"
+import { join }                          from "path"
+import { Request, Response }             from "express"
 import makeFetchHappen, { FetchOptions } from "make-fetch-happen"
+import config                            from "./config"
+import { HttpError, ServiceUnavailable } from "./errors"
 
 
 const fetch = makeFetchHappen.defaults({
@@ -35,11 +36,15 @@ export async function proxyMiddleware(req: Request, res: Response)
         }
     } catch (ex) {
         console.error('Error with proxy request:', ex);
-        res.writeHead(500, {
-            "X-Upstream": baseUrl,
-            "Cache-Control": "no-cache"
-        });
-        res.end('Internal Server Error');
+        res.setHeader("X-Upstream", baseUrl)
+        res.setHeader("Cache-Control", "no-cache");
+        if (ex instanceof HttpError) {
+            res.status(ex.statusCode)
+            res.end(ex.message)
+        } else {
+            res.status(500)
+            res.end('Internal Server Error');
+        }
     }
 }
 
@@ -48,7 +53,7 @@ export async function request(path: string, options: FetchOptions = {})
     const { enabled, apiKey, baseUrl } = config.aggregator
 
     if (!enabled || !apiKey || !baseUrl) {
-        throw new Error("The aggregator API is not enabled")
+        throw new ServiceUnavailable("The aggregator API is not enabled")
     }
 
     const { href } = new URL(baseUrl.replace(/\/$/, "") + path);
