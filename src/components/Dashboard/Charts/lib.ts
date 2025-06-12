@@ -312,7 +312,7 @@ function getXAxis({
             arr.sort((a, b) => +new Date(a) - +new Date(b));
         }
         else {
-            arr.sort((a, b) => a.localeCompare(b, "en-US", { numeric: true }));
+            // arr.sort((a, b) => a.localeCompare(b, "en-US", { numeric: true }));
         }
     }
 
