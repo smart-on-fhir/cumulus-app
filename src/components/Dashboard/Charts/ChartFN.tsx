@@ -15,6 +15,7 @@ interface ChartProps {
     onInspectionChange?: (result: string[], ctx: Partial<app.InspectionContext>) => void
     isDraft?: boolean
     inspection?: { enabled: boolean }
+    callback?: (chart: Highcharts.Chart) => void
 }
 
 function setGlobalTextColor(color?: string) {
@@ -43,6 +44,7 @@ export function Chart(props: ChartProps) {
         options,
         contextMenuItems,
         inspection: { enabled: inspectionEnabled } = { enabled: false },
+        callback,
         visualOverrides: {
             enabled: overrideEnabled,
             brightness,
@@ -106,6 +108,7 @@ export function Chart(props: ChartProps) {
 
     const afterRender = () => {
         setGlobalTextColor(overrideEnabled && fontColorEnabled && fontColor)
+        callback?.(chartRef.current)
     };
 
     const onMouseDown = useCallback((e: MouseEvent) => {
