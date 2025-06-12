@@ -82,6 +82,8 @@ export interface ViewState
     sortBy           : string
     limit            : number
     offset           : number
+    chartIsRendered  : boolean
+    pendingSaveProps : Partial<app.View> | null
 }
 
 interface ViewAction
@@ -505,7 +507,11 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
 
         limit: viewSettings.limit || 0,
 
-        offset: viewSettings.offset || 0
+        offset: viewSettings.offset || 0,
+
+        chartIsRendered: false,
+
+        pendingSaveProps: null
 
     } as ViewState);
 
@@ -534,7 +540,9 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         loadingDataError,
         sortBy,
         limit,
-        offset
+        offset,
+        chartIsRendered,
+        pendingSaveProps
     } = state;
 
     const stratifierName = viewGroupBy?.name
@@ -609,7 +617,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
             const result = await updateOne("views", view.id, { ...runtimeView, screenShot }).catch(e => alert(e.message));
 
-            dispatch({ type: "MERGE", payload: { isDraft: result ? result.isDraft : false }})
+            dispatch({ type: "MERGE", payload: { isDraft: result ? result.isDraft : false, pendingSaveProps: null }})
         }
 
         // Create
@@ -626,8 +634,12 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     });
 
     const save = (props: Partial<app.View> = {}) => {
-        Object.assign(runtimeView, props)
-        return saveChart()
+        if (viewType !== "overview") {
+            dispatch({ type: "MERGE", payload: { pendingSaveProps: Object.assign(runtimeView, props), viewType: "overview" }})
+        } else {
+            Object.assign(runtimeView, props)
+            return saveChart()
+        }
     }
 
     // Convert filters to search parameters
@@ -748,6 +760,14 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             }
         }
     }, [copy])
+
+    // Run effect when viewType or chart readiness changes
+    useEffect(() => {
+        if (viewType === "overview" && chartIsRendered && pendingSaveProps) {
+            Object.assign(runtimeView, pendingSaveProps);
+            saveChart();
+        }
+    }, [viewType, chartIsRendered]);
 
     const turbo = data && isTurbo(data, data2);
 
@@ -1004,6 +1024,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                             //         // Date.now()
                             //     ].join(":")
                             // }
+                            callback={() => dispatch({ type: "MERGE", payload: { chartIsRendered: true }})}
                         /> }
                         <br/>
                         <CaptionEditor html={caption} onChange={caption => dispatch({ type: "UPDATE", payload: { caption }})}/>
