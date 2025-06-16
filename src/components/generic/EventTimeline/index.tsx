@@ -2,6 +2,7 @@ import { useEffect, useState }                     from "react"
 import moment, { Moment }                          from "moment"
 import { Link }                                    from "react-router-dom"
 import Grid                                        from "../Grid"
+import Loader                                      from "../Loader"
 import { groupBy, humanizeColumnName }             from "../../../utils"
 import { DataPackage, StudyPeriod, useAggregator } from "../../../Aggregator"
 import { request }                                 from "../../../backend"
@@ -60,8 +61,10 @@ export default function EventTimeline() {
     const [charts  , setCharts  ] = useState<app.View[]>([])
     const [subs    , setSubs    ] = useState<app.Subscription[]>([])
     const [format  , setFormat  ] = useState<"MMM YYYY"|"MM/DD/YYYY"|"YYYY">("MMM YYYY")
+    const [loading , setLoading ] = useState(false)
 
     useEffect(() => {
+        setLoading(true)
         aggregator.initialize()
         .then(async () => Promise.all([
             aggregator.getPackages(),
@@ -76,6 +79,7 @@ export default function EventTimeline() {
             setSubs(subs)
         })
         .catch(() => {})
+        .finally(() => setLoading(false))
     }, [])
 
     const pkgData = new TimelineData(format)
@@ -162,7 +166,7 @@ export default function EventTimeline() {
             </div>
             <hr/>
             <div style={{ maxHeight: "70vh", overflow: "auto" }}>
-            { Object.keys(groups).sort((a, b) => new Date(b).valueOf() - new Date(a).valueOf()).map((date, i) => {
+            { loading ? <Loader msg="Loading events..." /> : Object.keys(groups).sort((a, b) => new Date(b).valueOf() - new Date(a).valueOf()).map((date, i) => {
                 const items = groups[date]
                 return (
                     <div key={i} style={{ margin: "0.25em 0" }} className="ellipsis">
