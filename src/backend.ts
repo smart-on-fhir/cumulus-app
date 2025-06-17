@@ -3,7 +3,7 @@ import HttpError       from "./HttpError"
 import { app }         from "./types"
 import { assert }      from "./utils"
 
-interface RequestOptions extends RequestInit {
+export interface RequestOptions extends RequestInit {
     includeResponse?: boolean
     
     /**
@@ -31,7 +31,11 @@ export async function request<T=any>(path: string, options: RequestOptions = {})
         mode       : "cors",
         credentials: "same-origin",
         ...options,
-        signal: abortController.signal
+        signal: abortController.signal,
+        headers: {
+            "cache-control": "must-revalidate, max-age=" + 60 * 60 * 24 * 30,
+            ...options.headers,
+        }
     }).then(async (res) => {
         let type = res.headers.get("Content-Type") + "";
 
