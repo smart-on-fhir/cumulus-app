@@ -17,6 +17,7 @@
         overflow  : auto;
         max-height: 100%;
         padding: 1px 0;
+        scroll-padding: 4px;
     }
 
     .resizer {
@@ -143,6 +144,13 @@
                 opacity       : 0.6;
             }
 
+            &:has(:focus-visible) {
+                background: var(--color-window-bg);
+                box-shadow: 0 0 0 1px var(--color-blue-dark);
+                outline: 0;
+                z-index: 2;
+            }
+
             &:has(a):hover {
                 background: var(--color-window-bg);
                 box-shadow: 0 0 0 1px rgb(from var(--color-blue-dark) r g b / 0.1);
@@ -152,6 +160,11 @@
                 flex         : 1;
                 overflow     : hidden;
                 text-overflow: ellipsis;
+                user-select  : none;
+
+                &:focus {
+                    outline: 0;
+                }
 
                 &.active {
                     color      : var(--color-brand-2);
