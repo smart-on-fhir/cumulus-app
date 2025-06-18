@@ -7,6 +7,7 @@ import { HttpError, ServiceUnavailable } from "./errors"
 
 const fetch = makeFetchHappen.defaults({
     cachePath: join(__dirname, 'aggregator-cache'), // path where cache will be written (and read)
+    cache: "default"
 })
 
 function mapCacheControlToFetchOption(req: Request): RequestCache {
@@ -24,7 +25,7 @@ export async function proxyMiddleware(req: Request, res: Response)
     const { baseUrl } = config.aggregator
     try {
         const { response, body } = await request(req.url, {
-            cache: mapCacheControlToFetchOption(req)
+            // cache: "reload"//mapCacheControlToFetchOption(req)
         })
         // console.log(response.headers)
         if (typeof body === "string") {

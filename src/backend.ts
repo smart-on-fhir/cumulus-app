@@ -33,7 +33,7 @@ export async function request<T=any>(path: string, options: RequestOptions = {})
         ...options,
         signal: abortController.signal,
         headers: {
-            "cache-control": "must-revalidate, max-age=" + 60 * 60 * 24 * 30,
+            "cache-control": "max-age=" + 60 * 60 * 24 * 30 + ", stale-while-revalidate=86400",
             ...options.headers,
         }
     }).then(async (res) => {
