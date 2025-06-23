@@ -108,7 +108,7 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
         .finally(() => { setLoading(false) })
     }, [])
 
-    useEffect(() => { load(path) }, [])
+    useEffect(() => { load(path) }, [path])
 
     useEffect(() => () => abortController.abort(), [ abortController ]);
 
