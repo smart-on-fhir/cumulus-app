@@ -230,6 +230,10 @@ label {
   user-select: none;
 }
 
+.unselectable {
+  user-select: none;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -513,10 +517,11 @@ ul {
 
 .grey-out, [aria-disabled="true"] {
   pointer-events: none;
-  filter: grayscale(1) opacity(0.6);
+  // filter: grayscale(1) opacity(0.6);
+  filter: grayscale(1);
   // cursor: not-allowed;
   user-select: none;
-  transition: all 0.4s ease-in-out 0.1s;
+  transition: all 0.4s ease-in-out 0.4s;
 }
 
 .string {

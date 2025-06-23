@@ -1,13 +1,12 @@
 import { Route, Routes } from "react-router-dom"
-import LOINC             from "./LOINC"
-import ICD10             from "./ICD10"
+import Catalog           from "./Catalog"
 
 
 export default function Endpoint() {
     return (
         <Routes>
-            <Route path="/icd10" element={ <ICD10 /> } />
-            <Route path="/loinc" element={ <LOINC /> } />
+            <Route path="/icd10" element={ <Catalog title="ICD10 Diagnoses" path="/api/aggregator/static/catalog/icd10" /> } />
+            <Route path="/loinc" element={ <Catalog title="LOINC Laboratories" path="/api/aggregator/static/catalog/loinc" /> } />
         </Routes>
     )
 }
