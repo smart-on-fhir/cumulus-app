@@ -1,5 +1,5 @@
 import { useEffect, useState }     from "react"
-import { useParams, Link }         from "react-router-dom"
+import { useParams, Link, useSearchParams } from "react-router-dom"
 import Grid                        from "../generic/Grid"
 import Prefetch                    from "../generic/Prefetch"
 import ColumnsTable                from "../Subscriptions/ColumnsTable"
@@ -49,6 +49,9 @@ function Preload() {
 export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
 
     const { user } = useAuth()
+    const [query, setQuery] = useSearchParams()
+
+    const filter = query.get("filter")
 
     if (!pkg) {
         return <Preload />
@@ -73,16 +76,30 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                 icon={pkg.type === "flat" ? "table" : "deployed_code" }
                 description="Description not available"
             />
+            { filter && <div>
+                <code className="p-05">
+                    <b className="color-muted">Filter: </b> { filter } <i className="fa-solid fa-circle-xmark color-red pointer" title="Remove filter" onMouseDown={() => {
+                        query.delete("filter")
+                        setQuery(query)
+                    }} /></code>
+            </div> }
             <div className="row gap-2 wrap">
                 <div className="col col-8 responsive">
                     { pkg.type === "flat" && <div className="mt-2"><FlatPackageDataViewer pkg={pkg} /></div> }
                     { pkg.type !== "flat" && <>
                         <h5 className="mt-2">Graphs</h5>
                         <hr/>
-                        <ViewsBrowser key={ pkg.id } pkgId={ pkg.id } minColWidth="13rem"
-                            header={ <PackageTemplates pkg={pkg} key={pkg.id} /> }
-                            footer={ <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} /> }
-                        />
+
+                        { filter ?
+                            <div className="view-browser view-browser-grid" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(13rem, 1fr))` }}>
+                                <PackageTemplates pkg={pkg} key={pkg.id} filter={filter} />
+                                <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} filter={filter} />
+                            </div> :
+                            <ViewsBrowser key={ pkg.id + ":" + (filter || "") } pkgId={ pkg.id } minColWidth="13rem"
+                                header={ <PackageTemplates pkg={pkg} key={pkg.id} /> }
+                                footer={ <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} /> }
+                            />
+                        }
                     </> }
                     <h5 className="mt-2">Columns</h5>
                     <hr className="mb-1" />

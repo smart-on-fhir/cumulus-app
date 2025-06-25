@@ -48,6 +48,18 @@ export default function CreateView()
         return <AlertError>{`Failed fetching data for id=${Terminology.subscription.nameSingular}`}</AlertError>
     }
 
+    let filters = []
+    if (state?.filter) {
+        const [left, operator, right] = state.filter.split(":")
+        filters = [{
+            left,
+            operator,
+            negated: false,
+            join: "and",
+            right: { type: "value", value: right }
+        }]
+    }
+
     // Eventually render a Breadcrumbs and the dashboard
     return <Dashboard
         view={{
@@ -60,7 +72,7 @@ export default function CreateView()
                 viewType: state?.chartType || "spline",
                 sortBy  : state?.sortBy    || "x:asc",
                 limit   : state?.limit     || 0,
-                filters : [],
+                filters,
                 groupBy : state?.groupBy || "",
                 chartOptions: {
                     title: {

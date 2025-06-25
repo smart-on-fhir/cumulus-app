@@ -89,13 +89,13 @@ export const StratifiedTemplates = memo(({ subscription }: { subscription: app.S
     })
 }, (prev, cur) => prev.subscription.id === cur.subscription.id)
 
-export const PackageTemplates = memo(({ pkg }: { pkg: DataPackage }) => {
+export const PackageTemplates = memo(({ pkg, filter }: { pkg: DataPackage, filter?: string }) => {
     const cols = Object.values(pkg.columns).filter(c => c.dataType !== "hidden" && !c.name.startsWith("cnt"));
     const subscription = buildVirtualSubscription(pkg)
-    return cols.map((col, i) => <Thumbnail key={i} col={col} pkg={pkg} sub={subscription} />)
-}, (prev, cur) => prev.pkg.id === cur.pkg.id)
+    return cols.map((col, i) => <Thumbnail key={i} col={col} pkg={pkg} sub={subscription} filter={filter} />)
+}, (prev, cur) => prev.pkg.id === cur.pkg.id && prev.filter === cur.filter)
 
-export const PackageStratifiedTemplates = memo(({ pkg }: { pkg: DataPackage }) => {
+export const PackageStratifiedTemplates = memo(({ pkg, filter }: { pkg: DataPackage, filter?: string }) => {
     const cols = Object.values(pkg.columns).filter(c => c.dataType !== "hidden" && !c.name.startsWith("cnt"));
     const subscription = buildVirtualSubscription(pkg)
     return cols.map((col, i) => {
@@ -106,10 +106,11 @@ export const PackageStratifiedTemplates = memo(({ pkg }: { pkg: DataPackage }) =
                 pkg={pkg}
                 groupBy={c}
                 sub={subscription}
+                filter={filter}
             />
         })
     })
-}, (prev, cur) => prev.pkg.id === cur.pkg.id)
+}, (prev, cur) => prev.pkg.id === cur.pkg.id && prev.filter === cur.filter)
 
 
 
@@ -128,6 +129,7 @@ interface State {
     data       : app.ServerResponses.DataResponse
     loading    : boolean
     error      : Error | string | null
+    filter    ?: string
 }
 
 function reducer(state: State, payload: Partial<State>): State {
@@ -142,7 +144,7 @@ function chartDataIsEmpty(data: app.ServerResponses.DataResponse): boolean {
     })
 }
 
-function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, pkg?: DataPackage, groupBy?: app.SubscriptionDataColumn): State {
+function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, pkg?: DataPackage, groupBy?: app.SubscriptionDataColumn, filter?: string): State {
 
     const counted    = pluralize(getSubject(sub))
     const countLabel = counted.match(/^counts?/i) ? counted : `Count ${counted}`
@@ -159,7 +161,8 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
         label      : `${countLabel} by ${col.label}${groupBy ? ` and ${groupBy.label}` : ""}`,
         description: "",
         loading    : true,
-        error      : null
+        error      : null,
+        filter     : filter || ""
     });
 
     useEffect(() => {
@@ -175,7 +178,8 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                 dataPackage : pkg,
                 column      : col.name,
                 signal      : abortController.signal,
-                stratifier  : groupBy?.name
+                stratifier  : groupBy?.name,
+                filters     : filter ? [filter] : []
             })
             .then((data: app.ServerResponses.DataResponse) => {
 
@@ -377,7 +381,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
 }
 
 
-const Thumbnail = memo(({ col, sub, pkg, groupBy }: { col: app.SubscriptionDataColumn, sub: app.Subscription, pkg?: DataPackage, groupBy?: app.SubscriptionDataColumn }) => {
+const Thumbnail = memo(({ col, sub, pkg, groupBy, filter }: { col: app.SubscriptionDataColumn, sub: app.Subscription, pkg?: DataPackage, groupBy?: app.SubscriptionDataColumn, filter?: string }) => {
     
     const {
         loading,
@@ -390,7 +394,7 @@ const Thumbnail = memo(({ col, sub, pkg, groupBy }: { col: app.SubscriptionDataC
         sortBy,
         theme,
         imgUrl
-    } = useDataLoader(sub, col, pkg, groupBy)
+    } = useDataLoader(sub, col, pkg, groupBy, filter)
 
     if (error) {
         console.error(error)
@@ -423,7 +427,8 @@ const Thumbnail = memo(({ col, sub, pkg, groupBy }: { col: app.SubscriptionDataC
             sortBy,
             theme,
             groupBy: groupBy?.name,
-            colors: COLOR_THEMES.find(t => t.id === theme)!.colors
+            colors: COLOR_THEMES.find(t => t.id === theme)!.colors,
+            filter
         }}>
             <div className="view-thumbnail-image center"
                 style={{ position: "relative", placeContent: "center" }}
@@ -438,7 +443,8 @@ const Thumbnail = memo(({ col, sub, pkg, groupBy }: { col: app.SubscriptionDataC
     prev.sub?.id === next.sub?.id &&
     prev.pkg?.id === next.pkg?.id &&
     prev.col.name === next.col.name &&
-    prev.groupBy?.name === next.groupBy?.name
+    prev.groupBy?.name === next.groupBy?.name &&
+    prev.filter === next.filter
 ))
 
 function getSubject(dataSource: app.Subscription) {
