@@ -5,7 +5,7 @@ import StaticGrid  from "../generic/StaticGrid"
 
 export default function Grid({ q = "", data }: { q?: string, data: DataRow[] }) {
     return (
-        <div className="p-05">
+        <div className="p-05" style={{ display: "contents" }}>
             <StaticGrid
                 q={q}
                 columns={[

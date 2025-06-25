@@ -6,10 +6,12 @@ import { classList, highlight } from "../../utils"
 
 export default function Tree({
     data,
-    search
+    search,
+    navigate
 }: {
     data: DataRow[]
     search?: string
+    navigate?: (...args: any[]) => void
 })
 {
     const { id, pid, stratifier } = MAPPING
@@ -29,7 +31,7 @@ export default function Tree({
         <div className="catalog-tree">
             <div key={search}>
                 { children.map((row, i) => (
-                    <Row data={data} id={row[id] as  string | number} key={i} search={search} open expandOnSearch={data.length < 1000} />
+                    <Row data={data} id={row[id] as  string | number} key={i} search={search} open expandOnSearch={data.length < 1000} navigate={navigate} />
                 )) }
             </div>
         </div>
@@ -41,13 +43,15 @@ function Row({
     data,
     open,
     search,
-    expandOnSearch
+    expandOnSearch,
+    navigate
 }: {
     data: DataRow[]
     id: string | number
     open?: boolean
     search?: string
     expandOnSearch?: boolean
+    navigate?: (...args: any[]) => void
 }) {
     const [isOpen, setIsOpen] = useState(!!open)
     const { id: idColumn, pid: pidColumn, label, count, description, stratifier } = MAPPING
@@ -78,7 +82,7 @@ function Row({
                     })}>{
                         children.length ? "folder_open" : "draft" }
                     </span>
-                    <span>
+                    <span className={ children.length ? undefined : (navigate ? "color-blue-dark link" : undefined) } onClick={() => children.length ? undefined: navigate?.(node)}>
                         <b>{ search ? highlight(node[label] + "", search) : node[label] } </b>
                         { description && (search ? highlight(node[description] + "", search) : node[description]) }
                     </span>
@@ -86,7 +90,7 @@ function Row({
                 </label>
             </summary>
             { ((expandOnSearch && !!search) || isOpen) && children.map((row, i) => (
-                <Row data={data} id={row[idColumn] as string | number} key={i} search={search} expandOnSearch={expandOnSearch} />
+                <Row data={data} id={row[idColumn] as string | number} key={i} search={search} expandOnSearch={expandOnSearch} navigate={navigate} />
             ))}
         </details>
     )

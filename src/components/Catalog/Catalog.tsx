@@ -90,7 +90,15 @@ function search(data: DataRow[], q: string, columns: string[]): DataRow[] {
 
 const { label, description } = MAPPING
 
-export default function Catalog({ title = "Catalog", path }: { title?: string, path: string })
+export default function Catalog({
+    title = "Catalog",
+    path,
+    navigate
+}: {
+    title?: string
+    path: string
+    navigate?: (...args: any[]) => void
+})
 {
     const [q      , setQ      ] = useState("")
     const [loading, setLoading] = useState(true)
@@ -154,7 +162,7 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
                 return [
                     {
                         name: "Data Tree",
-                        children: <Tree data={data} search={q} />
+                        children: <Tree data={data} search={q} navigate={navigate} />
                     }, {
                         name: "Data Grid",
                         children: <CatalogGrid data={data} q={q} />
