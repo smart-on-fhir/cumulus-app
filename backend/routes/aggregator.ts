@@ -1,6 +1,6 @@
 import express, { Router } from "express"
 import { rw }              from "../lib"
-import { proxyMiddleware } from "../aggregator"
+import { download, proxyMiddleware } from "../aggregator"
 
 
 export const router: Router = express.Router({ mergeParams: true })
@@ -27,12 +27,11 @@ const AGGREGATOR_PATHS = [
     "/study-periods/:site",
     "/study-periods",
 
-    "/from-parquet",
-
     "/static/catalog/icd10",
     "/static/catalog/loinc"
 ];
 
 router.get(AGGREGATOR_PATHS, rw(proxyMiddleware))
+router.get("/from-parquet", rw(download))
 
 export default router

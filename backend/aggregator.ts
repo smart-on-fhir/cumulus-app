@@ -20,6 +20,42 @@ function mapCacheControlToFetchOption(req: Request): RequestCache {
     return "default";
 }
 
+export async function download(req: Request, res: Response) {
+    try {
+        const { enabled, apiKey, baseUrl } = config.aggregator
+
+        if (!enabled || !apiKey || !baseUrl) {
+            throw new ServiceUnavailable("The aggregator API is not enabled")
+        }
+
+        const { href } = new URL(baseUrl.replace(/\/$/, "") + req.url);
+        
+        const { status, headers, body } = await fetch(href, {
+            cache: "no-store",
+            headers: {
+                "x-api-key": apiKey,
+                "User-Agent": "CumulusDashboard/3.0.0"
+            }
+        })
+
+        // Forward status and headers
+        res.status(status);
+        headers.forEach((value, key) => {
+            res.setHeader(key, value);
+        });
+
+        // Pipe the response body to the Express response
+        if (body) {
+            body.pipe(res);
+        } else {
+            res.end(); // In case there's no body
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Proxy error");
+    }
+}
+
 export async function proxyMiddleware(req: Request, res: Response)
 {
     const { baseUrl } = config.aggregator
