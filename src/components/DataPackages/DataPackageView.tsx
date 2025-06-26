@@ -1,5 +1,6 @@
 import { useEffect, useState }     from "react"
 import { useParams, Link, useSearchParams } from "react-router-dom"
+import { operators }               from "../Dashboard/config"
 import Grid                        from "../generic/Grid"
 import Prefetch                    from "../generic/Prefetch"
 import ColumnsTable                from "../Subscriptions/ColumnsTable"
@@ -51,7 +52,7 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
     const { user } = useAuth()
     const [query, setQuery] = useSearchParams()
 
-    const filter = query.get("filter")
+    const filter = query.get("filter") || ""
 
     if (!pkg) {
         return <Preload />
@@ -62,6 +63,8 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
     const canCreateGraphs = user!.permissions.includes("Graphs.create") && pkg.type !== "flat"
 
     const humanizedPkgName = humanizeColumnName(pkg.name)
+
+    const [left, operator, right] = filter.split(":")
 
     return (
         <div>
@@ -76,12 +79,20 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                 icon={pkg.type === "flat" ? "table" : "deployed_code" }
                 description="Description not available"
             />
-            { filter && <div>
-                <code className="p-05">
-                    <b className="color-muted">Filter: </b> { filter } <i className="fa-solid fa-circle-xmark color-red pointer" title="Remove filter" onMouseDown={() => {
-                        query.delete("filter")
-                        setQuery(query)
-                    }} /></code>
+            { filter && <div className="form-control color-muted row wrap middle" style={{ padding: "1ex", gap: "1ch" }}>
+                <b className="col-0 color-muted">Filter: </b>
+                <div className="col-0 nowrap"><code className="pl-05 pr-05">{humanizeColumnName(left)}</code></div>
+                <div className="col-0">→</div>
+                <div className="col-0 nowrap"><code className="pl-05 pr-05">{operators.find(op => op.id === operator).label}</code></div>
+                <div className="col-0">→</div>
+                <div className="col-0 nowrap"><code className="pl-05 pr-05">{right}</code></div>
+                <div className="col" />
+                <div className="col-0 link color-brand-2 nowrap" title="Remove filter" onMouseDown={() => {
+                            query.delete("filter")
+                            setQuery(query)
+                        }}>
+                    Remove <i className="fa-solid fa-circle-xmark pointer"/>
+                </div>
             </div> }
             <div className="row gap-2 wrap">
                 <div className="col col-8 responsive">
