@@ -1,4 +1,5 @@
 import { startTransition, useCallback, useEffect, useMemo, useOptimistic, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import CatalogChart   from "./Chart"
 import MAPPING        from "./DataMapping"
 import CatalogGrid    from "./Grid"
@@ -15,6 +16,7 @@ export interface CatalogResponse {
     columns: ColumnDefinition[]
     rows: (string|number|boolean|null)[][]
     sites: SiteDefinition[]
+    pkg?: { id: string, targetColumn: string }
 }
 
 interface SiteDefinition {
@@ -90,20 +92,13 @@ function search(data: DataRow[], q: string, columns: string[]): DataRow[] {
 
 const { label, description } = MAPPING
 
-export default function Catalog({
-    title = "Catalog",
-    path,
-    navigate
-}: {
-    title?: string
-    path: string
-    navigate?: (...args: any[]) => void
-})
+export default function Catalog({ title = "Catalog", path }: { title?: string, path: string })
 {
     const [q      , setQ      ] = useState("")
     const [loading, setLoading] = useState(true)
     const [error  , setError  ] = useState<Error|string|null>(null)
     const [result , setResult ] = useState<CatalogResponse|null>(null)
+    const navigate              = useNavigate()
 
     const abortController = useMemo(() => new AbortController(), [])
 
@@ -155,14 +150,25 @@ export default function Catalog({
                         { name: "Data Graph", children: null }
                     ]
                 }
+
                 let data = getRows(result)
                 if (q) {
                     data = search(data, q, [label, description]) as any
                 }
+
+                const onNavigate = (node: any) => {
+                    if (result.pkg) {
+                        navigate({
+                            pathname: "/packages/" + result.pkg.id,
+                            search: "filter=" + encodeURIComponent(result.pkg.targetColumn + ":strEq:" + node.id)
+                        })
+                    }
+                }
+
                 return [
                     {
                         name: "Data Tree",
-                        children: <Tree data={data} search={q} navigate={navigate} />
+                        children: <Tree data={data} search={q} navigate={onNavigate} />
                     }, {
                         name: "Data Grid",
                         children: <CatalogGrid data={data} q={q} />
