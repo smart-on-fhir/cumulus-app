@@ -53,6 +53,7 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
     const [query, setQuery] = useSearchParams()
 
     const filter = query.get("filter") || ""
+    const filters = filter ? filter.split(",") : []
 
     if (!pkg) {
         return <Preload />
@@ -63,8 +64,6 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
     const canCreateGraphs = user!.permissions.includes("Graphs.create") && pkg.type !== "flat"
 
     const humanizedPkgName = humanizeColumnName(pkg.name)
-
-    const [left, operator, right] = filter.split(":")
 
     return (
         <div>
@@ -79,22 +78,33 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                 icon={pkg.type === "flat" ? "table" : "deployed_code" }
                 description="Description not available"
             />
+
+            { filters.map((f, i) => {
+                const [left, operator, right] = f.split(":")
+                return (
                     <div className="form-control color-muted row wrap middle" style={{ padding: "0.5ex 1ex", gap: "0.5ch", display: "inline-flex", width: "auto", margin: "0.25rem" }} key={i}>
                         <b className="col-0 pr-05 color-brand-2">Filter:</b>
                         <div className="col-0 nowrap"><span className="color-blue-dark">{humanizeColumnName(left)}</span></div>
-                <div className="col-0">→</div>
+                        <div className="col-0">→</div>
                         <div className="col-0 nowrap"><span className="color-blue-dark">{operators.find(op => op.id === operator).label}</span></div>
-                <div className="col-0">→</div>
+                        <div className="col-0">→</div>
                         <div className="col-0 nowrap"><span className="color-blue-dark">{right}</span></div>
-                <div className="col" />
+                        <div className="col" />
                         <div className="col-0 link color-brand-2 nowrap pl-05" title="Remove filter" onMouseDown={() => {
-                            query.delete("filter")
+                            const next = filters.filter((_, y) => y !== i).filter(Boolean).join(",")
+                            if (next) {
+                                query.set("filter", next)
+                            } else {
+                                query.delete("filter")
+                            }
                             setQuery(query)
                         }}>
                             <i className="fa-solid fa-circle-xmark pointer"/>
                         </div>
-                </div>
-            </div> }
+                    </div>
+                )
+            }) }
+
             <div className="row gap-2 wrap">
                 <div className="col col-8 responsive">
                     { pkg.type === "flat" && <div className="mt-2"><FlatPackageDataViewer pkg={pkg} /></div> }
@@ -104,10 +114,10 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
 
                         { filter ?
                             <div className="view-browser view-browser-grid" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(13rem, 1fr))` }}>
-                                <PackageTemplates pkg={pkg} key={pkg.id} filter={filter} />
-                                <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} filter={filter} />
+                                <PackageTemplates pkg={pkg} key={pkg.id + ":" + filter} filter={filter} />
+                                <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified:" + filter} filter={filter} />
                             </div> :
-                            <ViewsBrowser key={ pkg.id + ":" + (filter || "") } pkgId={ pkg.id } minColWidth="13rem"
+                            <ViewsBrowser key={ pkg.id + ":" + filter } pkgId={ pkg.id } minColWidth="13rem"
                                 header={ <PackageTemplates pkg={pkg} key={pkg.id} /> }
                                 footer={ <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} /> }
                             />

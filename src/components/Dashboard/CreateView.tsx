@@ -50,14 +50,16 @@ export default function CreateView()
 
     let filters = []
     if (state?.filter) {
-        const [left, operator, right] = state.filter.split(":")
-        filters = [{
-            left,
-            operator,
-            negated: false,
-            join: "and",
-            right: { type: "value", value: right }
-        }]
+        state.filter.split(",").forEach(f => {
+            const [left, operator, right] = f.split(":")
+            filters.push({
+                left,
+                operator,
+                negated: false,
+                join: "and",
+                right: { type: "value", value: right }
+            })
+        })
     }
 
     // Eventually render a Breadcrumbs and the dashboard

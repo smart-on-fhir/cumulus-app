@@ -98,25 +98,40 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
     const [loading, setLoading] = useState(true)
     const [error  , setError  ] = useState<Error|string|null>(null)
     const [result , setResult ] = useState<CatalogResponse|null>(null)
+    const [query  , setQuery  ] = useSearchParams()
     const navigate              = useNavigate()
 
     const abortController = useMemo(() => new AbortController(), [])
 
-    const load = useCallback((url: string) => {
+    const load = useCallback(() => {
         return Promise.resolve()
         .then(() => setLoading(true))
-        .then(() => request<CatalogResponse>(url, { signal: abortController.signal }))
+        .then(() => {
+            let _url = path
+            if (query.has("sites")) {
+                const p = new URLSearchParams()
+                p.set("sites", query.get("sites"))
+                _url += "?" + p
+            }
+            return request<CatalogResponse>(_url, { signal: abortController.signal })
+        })
         .then(setResult)
         .catch(setError)
         .finally(() => { setLoading(false) })
-    }, [])
+    }, [query])
 
-    useEffect(() => { load(path) }, [path])
+    useEffect(() => { load() }, [path, query])
 
     useEffect(() => () => abortController.abort(), [ abortController ]);
 
     function onSiteChange(list: string[]) {
-        startTransition(() => load(list.length ? path + "?sites=" + list.join(",") : path))
+        if (list.length) {
+            query.set("sites", list.join(","))
+        } else {
+            query.delete("sites")
+        }
+        setQuery(query)
+        startTransition(load)
     }
 
     if (error) {
@@ -158,9 +173,14 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
 
                 const onNavigate = (node: any) => {
                     if (result.pkg) {
+                        let filter = "filter=" + encodeURIComponent(result.pkg.targetColumn + ":strEq:" + node.id)
+                        const sites = query.get("sites")
+                        if (sites) {
+                            filter += "," + encodeURIComponent("site:matchesCI:" + sites.split(",").join("|"))
+                        }
                         navigate({
                             pathname: "/packages/" + result.pkg.id,
-                            search: "filter=" + encodeURIComponent(result.pkg.targetColumn + ":strEq:" + node.id)
+                            search: filter
                         })
                     }
                 }
