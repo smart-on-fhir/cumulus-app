@@ -79,19 +79,20 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                 icon={pkg.type === "flat" ? "table" : "deployed_code" }
                 description="Description not available"
             />
-            { filter && <div className="form-control color-muted row wrap middle" style={{ padding: "1ex", gap: "1ch" }}>
-                <b className="col-0 color-muted">Filter: </b>
-                <div className="col-0 nowrap"><code className="pl-05 pr-05">{humanizeColumnName(left)}</code></div>
+                    <div className="form-control color-muted row wrap middle" style={{ padding: "0.5ex 1ex", gap: "0.5ch", display: "inline-flex", width: "auto", margin: "0.25rem" }} key={i}>
+                        <b className="col-0 pr-05 color-brand-2">Filter:</b>
+                        <div className="col-0 nowrap"><span className="color-blue-dark">{humanizeColumnName(left)}</span></div>
                 <div className="col-0">→</div>
-                <div className="col-0 nowrap"><code className="pl-05 pr-05">{operators.find(op => op.id === operator).label}</code></div>
+                        <div className="col-0 nowrap"><span className="color-blue-dark">{operators.find(op => op.id === operator).label}</span></div>
                 <div className="col-0">→</div>
-                <div className="col-0 nowrap"><code className="pl-05 pr-05">{right}</code></div>
+                        <div className="col-0 nowrap"><span className="color-blue-dark">{right}</span></div>
                 <div className="col" />
-                <div className="col-0 link color-brand-2 nowrap" title="Remove filter" onMouseDown={() => {
+                        <div className="col-0 link color-brand-2 nowrap pl-05" title="Remove filter" onMouseDown={() => {
                             query.delete("filter")
                             setQuery(query)
                         }}>
-                    Remove <i className="fa-solid fa-circle-xmark pointer"/>
+                            <i className="fa-solid fa-circle-xmark pointer"/>
+                        </div>
                 </div>
             </div> }
             <div className="row gap-2 wrap">
