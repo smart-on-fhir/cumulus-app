@@ -5,7 +5,7 @@ import Highcharts    from "../../highcharts"
 
 
 
-export default function CatalogChart({ data, search }: { data: Record<string, any>[], search?: string })
+export default function CatalogChart({ data, search, navigate }: { data: Record<string, any>[], search?: string, navigate?: (...args: any[]) => void })
 {
     if (!data.length) {
         return search ? 
@@ -33,12 +33,20 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
             y        : +row[count],
             name     : row[label],
             drilldown: data.some((r: any) => r[pid] === row[id]) ? row[id] : undefined,
+            events: {
+                click() {
+                    if (!this.drilldown) {
+                        navigate(this.custom.data.row)
+                    }
+                }
+            },
             custom: {
                 data: {
                     stratifier: stratifier? row[stratifier] : "",
                     // Label: row[label],
                     Count: row[count],
-                    Description: row[description]
+                    Description: row[description],
+                    row
                 }
             }
         })
@@ -150,6 +158,7 @@ export default function CatalogChart({ data, search }: { data: Record<string, an
                 pointPadding: 0,
                 maxPointWidth: 160,
                 minPointLength: 8,
+                cursor: "pointer"
             }
         },
         tooltip: {

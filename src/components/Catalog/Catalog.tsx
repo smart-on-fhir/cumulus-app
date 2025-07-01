@@ -1,5 +1,5 @@
 import { startTransition, useCallback, useEffect, useMemo, useOptimistic, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import CatalogChart   from "./Chart"
 import MAPPING        from "./DataMapping"
 import CatalogGrid    from "./Grid"
@@ -194,7 +194,7 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
                         children: <CatalogGrid data={data} q={q} />
                     }, {
                         name: "Data Graph",
-                        children: <CatalogChart data={data} search={q} />
+                        children: <CatalogChart data={data} search={q} navigate={onNavigate} />
                     }
                 ]
             })()}
