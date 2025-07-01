@@ -191,7 +191,7 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
                         children: <Tree data={data} search={q} navigate={onNavigate} />
                     }, {
                         name: "Data Grid",
-                        children: <CatalogGrid data={data} q={q} />
+                        children: <CatalogGrid data={data} q={q} navigate={onNavigate} />
                     }, {
                         name: "Data Graph",
                         children: <CatalogChart data={data} search={q} navigate={onNavigate} />
@@ -204,13 +204,13 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
 }
 
 const update = (sites: SiteDefinition[], site: SiteDefinition) => {
-        return sites.map(s => {
-            if (site.id === s.id) {
-                return { ...site }
-            }
-            return { ...s }
-        })
-    }
+    return sites.map(s => {
+        if (site.id === s.id) {
+            return { ...site }
+        }
+        return { ...s }
+    })
+}
 
 function SitesSelector({
     sites = [],
