@@ -1,39 +1,56 @@
-import { ReactNode, useLayoutEffect, useState } from "react"
+import { ReactNode, useState } from "react"
+import { useSearchParams }     from "react-router-dom"
 import "./Tabs.scss"
+
 
 export function Tabs({
     children,
-    selectedIndex = 0
+    selectedIndex = 0,
+    searchParam
 }: {
     selectedIndex?: number
+    /** If set, a query string param with this name will be used to store the selected tab index */
+    searchParam?: string
     children: {
         name: ReactNode
         children: ReactNode
     }[]
 }) {
-    const [index, setIndex] = useState(
-        Math.max(Math.min(selectedIndex, children.length - 1), 0)
-    )
+    const [query, setQuery] = useSearchParams()
+    const initialIndex = searchParam ? parseInt(query.get(searchParam) || "0", 10) : selectedIndex;
+    const [index, setIndex] = useState(Math.max(Math.min(initialIndex, children.length - 1), 0))
 
-    useLayoutEffect(() => {
-        if (selectedIndex > -1) {
-            setIndex(Math.min(selectedIndex, children.length - 1))
+    function getTabIndex() {
+        if (searchParam) {
+            return parseInt(query.get(searchParam) || "0", 10)
         }
-    }, [selectedIndex, children.length, setIndex])
+        return index
+    }
+
+    function setTabIndex(idx: number) {
+        idx = Math.min(idx, children.length - 1)
+        setIndex(idx)
+        if (searchParam) {
+            query.set(searchParam, idx + "")
+            setQuery(query)
+        }
+    }
+
+    const _selectedIndex = getTabIndex()
 
     return (
         <>
             <div className="tabs">
                 { children.map((c, i) => (
                     <div
-                        className={ "tab-name" + (index === i ? " active" : "") }
+                        className={ "tab-name" + (_selectedIndex === i ? " active" : "") }
                         tabIndex={0}
                         key={i}
-                        onClick={() => setIndex(i)}
+                        onClick={() => setTabIndex(i)}
                         onKeyDown={e => {
                             if (e.key === "Enter" || e.key === " ") {
                                 e.preventDefault()
-                                setIndex(i)
+                                setTabIndex(i)
                             }
                         }}
                     >{ c.name }</div>
@@ -41,7 +58,7 @@ export function Tabs({
                 <div className="tabs-spacer"/>
             </div>
             <div className="tabs-content">
-                { children[index]?.children }
+                { children[_selectedIndex]?.children }
             </div>
         </>
     )

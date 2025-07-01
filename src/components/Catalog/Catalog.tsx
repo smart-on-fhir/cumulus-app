@@ -156,7 +156,7 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
                 </div>
             </div>
             
-            <Tabs selectedIndex={0}>
+            <Tabs selectedIndex={0} searchParam="tab">
             { (() => {
                 if (!result) {
                     return [

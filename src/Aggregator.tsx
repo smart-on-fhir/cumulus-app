@@ -322,7 +322,12 @@ class Aggregator
     }
 
     public async getPackageJson(s3path: string): Promise<{ schema: any, data: any[] }> {
-        return await this.fetch("/api/aggregator/from-parquet/?s3_path=" + encodeURIComponent(s3path));
+        return await this.fetch("/api/aggregator/from-parquet/?s3_path=" + encodeURIComponent(s3path)).then(data => {
+            if (typeof data === "string" && (data.startsWith("{") || data.startsWith("["))) {
+                return JSON.parse(data)
+            }
+            return data
+        })
     }
 
     public getPackageMetadata(pkg: DataPackage) {

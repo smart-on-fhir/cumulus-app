@@ -131,7 +131,7 @@ function Viewer({
             {[
                 {
                     name: "Data Graph",
-                    children: <div className="pl-05 pr-05" style={{ aspectRatio }}>
+                    children: <div className="p-05" style={{ aspectRatio }}>
                         <MetricsChart
                             data={data}
                             height={chartHeight}
