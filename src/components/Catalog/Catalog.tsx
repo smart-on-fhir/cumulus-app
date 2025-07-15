@@ -8,7 +8,9 @@ import { Tabs }       from "../generic/Tabs"
 import { CheckBox }   from "../generic/PropertyGrid/BooleanEditor"
 import Loader         from "../generic/Loader"
 import { AlertError } from "../generic/Alert"
+import PageHeader     from "../generic/PageHeader"
 import { request }    from "../../backend"
+import Terminology    from "../../Terminology"
 import "./Catalog.scss"
 
 
@@ -17,6 +19,7 @@ export interface CatalogResponse {
     rows: (string|number|boolean|null)[][]
     sites: SiteDefinition[]
     pkg?: { id: string, targetColumn: string }
+    description?: string
 }
 
 interface SiteDefinition {
@@ -146,7 +149,12 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
     return (
         <div className="catalog" aria-disabled={!!loading}>
             <div className="catalog-title">
-                <h3 className="nowrap mt-0 mb-0 color-blue-dark"><i className="icon fa-solid fa-archive" /> { title } { loading && <Loader msg="" style={{ color: "#8888" }} /> }</h3>
+                <PageHeader
+                    title={ <>{ title } { loading && <Loader msg="" style={{ color: "#8888" }} /> }</> }
+                    icon={ Terminology.catalog.icon }
+                    description={ result ? result.description : null }
+                    className="mb-1"
+                />
             </div>
             <div className="catalog-search">
                 <input type="search" placeholder="Search" value={q} onChange={e => setQ(e.target.value)} />
