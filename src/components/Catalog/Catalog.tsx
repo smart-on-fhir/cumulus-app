@@ -103,14 +103,16 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
 
     const abortController = useMemo(() => new AbortController(), [])
 
+    const sites = String(query.get("sites") || "")
+
     const load = useCallback(() => {
         return Promise.resolve()
         .then(() => setLoading(true))
         .then(() => {
             let _url = path
-            if (query.has("sites")) {
+            if (sites) {
                 const p = new URLSearchParams()
-                p.set("sites", query.get("sites"))
+                p.set("sites", sites)
                 _url += "?" + p
             }
             return request<CatalogResponse>(_url, { signal: abortController.signal })
@@ -118,9 +120,9 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
         .then(setResult)
         .catch(setError)
         .finally(() => { setLoading(false) })
-    }, [query])
+    }, [sites, path])
 
-    useEffect(() => { load() }, [path, query])
+    useEffect(() => { load() }, [path, sites])
 
     useEffect(() => () => abortController.abort(), [ abortController ]);
 
@@ -131,7 +133,6 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
             query.delete("sites")
         }
         setQuery(query)
-        startTransition(load)
     }
 
     if (error) {
@@ -152,7 +153,7 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
             </div>
             <div className="catalog-sites">
                 <div style={{ display: "inline-block", textAlign: "left" }}>
-                    <SitesSelector sites={ result?.sites } onChange={onSiteChange} loading={loading} />
+                    <SitesSelector sites={ result?.sites?.map(s => sites ? ({ ...s, included: sites.split(",").includes(s.id) }) : s ) } onChange={onSiteChange} loading={loading} />
                 </div>
             </div>
             
