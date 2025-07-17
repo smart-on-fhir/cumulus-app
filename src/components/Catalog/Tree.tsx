@@ -31,7 +31,7 @@ export default function Tree({
         <div className="catalog-tree">
             <div key={search}>
                 { children.map((row, i) => (
-                    <Row data={data} id={row[id] as  string | number} key={i} search={search} open expandOnSearch={data.length < 1000} navigate={navigate} />
+                    <Row data={data} id={row[id] as  string | number} key={i} search={search} open={ children.length < 2 } expandOnSearch={data.length < 1000} navigate={navigate} />
                 )) }
             </div>
         </div>
