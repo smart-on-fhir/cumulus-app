@@ -55,7 +55,7 @@ export default function ColumnSelector({
                 </small> }
             </div>
             <span className={ col.dataType }> {
-                (col.type || col.dataType)
+                (col.dataType || col.type)
                     .replace(/date:YYYY-MM-DD/, "day")
                     .replace(/date:YYYY-MM/, "month")
                     .replace(/date:YYYY/, "year")
