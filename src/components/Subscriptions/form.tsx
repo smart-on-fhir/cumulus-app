@@ -9,6 +9,7 @@ import TagSelector            from "../Tags/TagSelector"
 import MarkdownEditor         from "../generic/MarkdownEditor"
 import Loader                 from "../generic/Loader"
 import { AlertError }         from "../generic/Alert"
+import Grid                   from "../generic/Grid"
 import { useAuth }            from "../../auth"
 import { app }                from "../../types"
 import { humanizeColumnName } from "../../utils"
@@ -190,9 +191,10 @@ export default function SubscriptionForm({
 
             { dataURL?.match(/.+?__.+?__.+?/) && <>
                 <div><PackageVersionCheck pkgId={dataURL} /></div>
-                <div className="row center">
+                <Grid cols="auto auto auto 1fr" gap="3rem">
                     <DataPackageViewer packageId={dataURL} />
-                </div>
+                    <div />
+                </Grid>
             </> }
 
             { id && Array.isArray(record.metadata?.cols) && <div className="mb-1 mt-2">
