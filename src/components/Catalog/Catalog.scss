@@ -1,6 +1,6 @@
 .catalog {
     display: grid;
-    height: calc(100vh - 8rem);
+    min-height: calc(100vh - 8rem);
     grid-template-rows: auto auto auto 1fr;
     grid-template-columns: 1fr auto;
 
