@@ -8,6 +8,7 @@
   "references": [
     { "path": "./src/tsconfig.json" },
     { "path": "./backend/tsconfig.json" },
-    { "path": "./tsconfig.test.json" }
+    { "path": "./tsconfig.vitest.json" },
+    { "path": "./tsconfig.mocha.json" }
   ]
 }
