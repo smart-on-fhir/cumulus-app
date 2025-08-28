@@ -692,13 +692,13 @@ export function buildChartOptions({
                 format: denominator ? "{text}%" : "{text}",
                 style: {
                     // @ts-ignore
-                    fontSize: lengthToEm(options.yAxis?.labels?.style?.fontSize ?? "0.85em") + "em"
+                    fontSize: lengthToEm(options.yAxis?.labels?.style?.fontSize ?? "1em") + "em"
                 }
             },
             title: {
                 style: {
                     // @ts-ignore
-                    fontSize: lengthToEm(options.yAxis?.title?.style?.fontSize) + "em"
+                    fontSize: lengthToEm(options.yAxis?.title?.style?.fontSize ?? "1.2em") + "em"
                 }
             }
         },
@@ -720,7 +720,7 @@ export function buildChartOptions({
                 dataLabels: {
                     // @ts-ignore
                     // enabled: options.plotOptions?.series?.dataLabels?.enabled ?? (!groupBy && maxPointLength <= 30)
-                    enabled: (!groupBy && !denominator && maxPointLength <= 30 && ["bar", "column", "pie"].includes(type)),
+                    enabled: (!groupBy && !denominator && maxPointLength <= 20 && ["bar", "column", "pie"].includes(type)),
                     formatter() {
                         return this.y.toLocaleString('en-US');
                     }
@@ -729,7 +729,7 @@ export function buildChartOptions({
             pie: {
                 dataLabels: {
                     style: {
-                        fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
+                        fontSize  : options.chart?.style?.fontSize   ?? emToPx(1),
                         fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
                     },
                     formatter(): any {
@@ -751,7 +751,7 @@ export function buildChartOptions({
         tooltip: {
             enabled: !inspection?.enabled,
             style: {
-                fontSize  : options.chart?.style?.fontSize   ?? emToPx(0.85),
+                fontSize  : options.chart?.style?.fontSize   ?? emToPx(1),
                 fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
             },
             formatter(ctx): any {
@@ -862,7 +862,7 @@ export function buildChartOptions({
             labels: {
                 style: {
                     // @ts-ignore
-                    fontSize: lengthToEm(options.xAxis?.labels?.style?.fontSize ?? "0.85em") + "em"
+                    fontSize: lengthToEm(options.xAxis?.labels?.style?.fontSize ?? "1em") + "em"
                 }
             },
             title: {

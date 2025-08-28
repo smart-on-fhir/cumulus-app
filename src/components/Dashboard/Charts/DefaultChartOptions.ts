@@ -130,7 +130,10 @@ const DefaultChartOptions: Options = {
     legend: {
         enabled: true,
         useHTML: true,
-        maxHeight: 200
+        maxHeight: 200,
+        itemStyle: {
+            fontSize   : "16px"
+        },
         // margin: 0,
         // padding: 0
     },
@@ -193,7 +196,7 @@ const DefaultChartOptions: Options = {
             dataSorting: { enabled: false },
             dataLabels: {
                 style: {
-                    fontSize   : "0.7em",
+                    fontSize   : "clamp(0.7em, 1vw, 0.9em)",
                     color      : "contrast",
                     textOutline: "1px contrast",
                     fontWeight : "700"

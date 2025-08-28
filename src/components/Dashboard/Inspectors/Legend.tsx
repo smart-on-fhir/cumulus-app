@@ -59,7 +59,7 @@ export default function Legend({
                     } as any,
                     {
                         ...DEFS.fontSize,
-                        value: lengthToEm(legend.itemStyle?.fontSize ?? "0.75em"),
+                        value: lengthToEm(legend.itemStyle?.fontSize ?? "1em"),
                         onChange: (fontSize?: number) => onChange({ itemStyle: { ...legend.itemStyle, fontSize: fontSize + "em" }})
                     } as any,
                     {
