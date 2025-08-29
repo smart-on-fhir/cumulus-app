@@ -118,8 +118,12 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                                 <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified:" + filter} filter={filter} />
                             </div> :
                             <ViewsBrowser key={ pkg.id + ":" + filter } pkgId={ pkg.id } minColWidth="13rem"
-                                header={ <PackageTemplates pkg={pkg} key={pkg.id} /> }
-                                footer={ <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} /> }
+                                footer={
+                                    <>
+                                        <PackageTemplates pkg={pkg} key={pkg.id} />
+                                        <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} />
+                                    </>
+                                }
                             />
                         }
                     </> }

@@ -109,8 +109,12 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
                         <h5 className="mt-2">Graphs</h5>
                         <hr/>
                         <ViewsBrowser requestId={ model.id } minColWidth="13rem"
-                            header={ <Templates subscription={model} /> }
-                            footer={ <StratifiedTemplates subscription={model} /> }
+                            footer={
+                                <>
+                                    <Templates subscription={model} />
+                                    <StratifiedTemplates subscription={model} />
+                                </>
+                            }
                         />
                     </> }
 
