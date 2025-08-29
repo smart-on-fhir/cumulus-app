@@ -27,6 +27,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
 
+      - name: Print Mocha, ts-node, and TypeScript versions
+        run: |
+          npx mocha --version
+          npx ts-node --version
+          npx tsc --version
+          node -v
+          npm -v
       - run: npm ci
       - run: npm run build
       - run: npm run test
