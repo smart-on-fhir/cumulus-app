@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-  "target": "ES2020",
-  "module": "CommonJS",
-  "moduleResolution": "node",
-  "resolveJsonModule": true,
-  "skipLibCheck": true,
-  "types": ["mocha", "chai"],
-  "esModuleInterop": true,
-  "allowSyntheticDefaultImports": true,
-  "noEmit": true,
-  "jsx": "react-jsx"
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "types": ["mocha", "chai"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
   },
   "include": ["backend", "test"]
 }
