@@ -236,12 +236,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                         enabled: false
                     },
                     title: {
-                        text: col.label + (groupBy ? ` by ${groupBy.label}` : ""),
-                        margin: 10,
-                        style: {
-                            fontSize: "36px",
-                            color: "#555"
-                        }
+                        text: "",
                     },
                     yAxis: {
                         title: {
@@ -265,7 +260,6 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                         enabled: !!groupBy,
                         useHTML: false,
                         itemStyle: {
-                            // color: "#000"
                             fontSize: "30px"
                         }
                     },
