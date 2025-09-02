@@ -410,20 +410,20 @@ const Thumbnail = memo(({ col, sub, pkg, groupBy, filter }: { col: app.Subscript
         )
     }
 
+    const query = new URLSearchParams()
+    query.set("column", col.name)
+    query.set("chartType", chartType)
+    query.set("name", label)
+    query.set("description", description)
+    query.set("countLabel", countLabel)
+    query.set("limit", String(limit))
+    query.set("sortBy", sortBy)
+    query.set("theme", theme)
+    query.set("groupBy", groupBy?.name || "")
+    query.set("filter", filter || "")
+
     return (
-        <Link className="view-thumbnail template" to={`/requests/${sub.id}/create-view`} state={{
-            column: col.name,
-            chartType,
-            name: label,
-            description,
-            countLabel,
-            limit,
-            sortBy,
-            theme,
-            groupBy: groupBy?.name,
-            colors: COLOR_THEMES.find(t => t.id === theme)!.colors,
-            filter
-        }}>
+        <Link className="view-thumbnail template" to={`/requests/${sub.id}/create-view?${query.toString()}`}>
             <div className="view-thumbnail-image center"
                 style={{ position: "relative", placeContent: "center" }}
                 data-tooltip={`<img src=${imgUrl || "about:blank"} alt="Chart Preview" style="display:block" />`}

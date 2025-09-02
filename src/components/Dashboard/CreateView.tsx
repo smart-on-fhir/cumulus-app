@@ -1,14 +1,15 @@
-import { useCallback } from "react"
-import { useLocation, useParams } from "react-router-dom"
-import Dashboard       from "."
-import { request }     from "../../backend"
-import { useBackend }  from "../../hooks"
-import { AlertError }  from "../generic/Alert"
-import Loader          from "../generic/Loader"
-import { app }         from "../../types"
-import { useAuth }     from "../../auth"
-import Terminology     from "../../Terminology"
+import { useCallback, useMemo }    from "react"
+import { useLocation, useParams }  from "react-router-dom"
+import Dashboard                   from "."
+import { AlertError }              from "../generic/Alert"
+import Loader                      from "../generic/Loader"
+import { request }                 from "../../backend"
+import { useBackend }              from "../../hooks"
+import { app }                     from "../../types"
+import { useAuth }                 from "../../auth"
+import Terminology                 from "../../Terminology"
 import aggregator, { DataPackage } from "../../Aggregator"
+import { COLOR_THEMES } from "./config"
 
 
 export default function CreateView()
@@ -19,8 +20,37 @@ export default function CreateView()
     const { user } = useAuth()
 
     const location = useLocation()
-
     const state: any = location.state
+
+    // Parse query string parameters as fallback if location.state is not set
+    const queryParams = useMemo(() => {
+        const params = new URLSearchParams(location.search)
+        return {
+            name       : params.get("name"),
+            description: params.get("description"),
+            column     : params.get("column"),
+            chartType  : params.get("chartType"),
+            sortBy     : params.get("sortBy"),
+            limit      : params.get("limit") ? +params.get("limit")! : undefined,
+            filter     : params.get("filter"),
+            groupBy    : params.get("groupBy"),
+            countLabel : params.get("countLabel"),
+            theme      : params.get("theme"),
+        }
+    }, [location.search])
+
+    // Use queryParams if present, otherwise fallback to state
+    // If a query param is set, it overrides the corresponding state value
+    function mergeParams(state: any, queryParams: any) {
+        const out: any = { ...state };
+        Object.keys(queryParams).forEach(key => {
+            if (queryParams[key] !== undefined && queryParams[key] !== null) {
+                out[key] = queryParams[key];
+            }
+        });
+        return out;
+    }
+    const params = mergeParams(state || {}, queryParams)
 
     // Fetch the subscription or package
     const { loading, error, result } = useBackend<[DataPackage | null | undefined, app.Subscription | null]>(
@@ -49,8 +79,8 @@ export default function CreateView()
     }
 
     let filters = []
-    if (state?.filter) {
-        state.filter.split(",").forEach(f => {
+    if (params?.filter) {
+        params.filter.split(",").forEach(f => {
             const [left, operator, right] = f.split(":")
             filters.push({
                 left,
@@ -67,33 +97,33 @@ export default function CreateView()
         view={{
             creatorId  : user!.id,
             isDraft    : true,
-            name       : state?.name        || "",
-            description: state?.description || "",
+            name       : params?.name        || "",
+            description: params?.description || "",
             settings: {
-                column  : state?.column    || "",
-                viewType: state?.chartType || "spline",
-                sortBy  : state?.sortBy    || "x:asc",
-                limit   : state?.limit     || 0,
+                column  : params?.column    || "",
+                viewType: params?.chartType || "spline",
+                sortBy  : params?.sortBy    || "x:asc",
+                limit   : params?.limit     || 0,
                 filters,
-                groupBy : state?.groupBy || "",
+                groupBy : params?.groupBy || "",
                 chartOptions: {
                     title: {
-                        text: state?.name || "",                        
+                        text: params?.name || "",                        
                     },
                     yAxis: {
                         title: {
-                            text: state?.countLabel || ""
+                            text: params?.countLabel || ""
                         }
                     },
-                    colors: state?.colors,
+                    colors: params?.theme ? COLOR_THEMES.find(t => t.id === params.theme)?.colors ?? [] : [],
                     // @ts-ignore
-                    custom: { theme: state?.theme },
+                    custom: { theme: params?.theme },
                     plotOptions: {
                         bar: {
-                            stacking: state?.groupBy ? "normal" : undefined
+                            stacking: params?.groupBy ? "normal" : undefined
                         },
                         column: {
-                            stacking: state?.groupBy ? "normal" : undefined
+                            stacking: params?.groupBy ? "normal" : undefined
                         }
                     }
                 }
