@@ -166,22 +166,10 @@ export declare module app {
         updatedAt: string | null
 
         /**
-         * - `pending`   - Created but not resolved yet
-         * - `loading`   - Currently waiting for response
-         * - `completed` - Created and resolved
-         * - `errored`   - Marked as invalid  or otherwise failed
-         */
-        /** @deprecated */
-        status: "pending" | "completed" | "loading" | "errored"
-
-        /**
          * Timestamp showing when the data has been generated (or last refreshed in
          * case of subscriptions)
          */
         completed: string | null
-
-        /** @deprecated */
-        requestedData: RequestedData | null
 
         dataURL: string | null
 

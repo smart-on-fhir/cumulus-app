@@ -30,14 +30,6 @@ interface Subscription
      * based on pre-defined schedule
      */
     type: "SUBSCRIPTION" | "REQUEST"
-    
-    /**
-     * - `pending`   - Created but not resolved yet
-     * - `loading`   - Currently waiting for response
-     * - `completed` - Created and resolved
-     * - `errored`   - Marked as invalid  or otherwise failed
-     */
-    status: "pending" | "completed" | "loading" | "errored"
 
     /**
      * Timestamp showing when the data has been generated (or last refreshed in
@@ -58,7 +50,6 @@ const Subscriptions: Subscription[] = [
                      "processing.",
         group      : "COVID-19",
         type       : "SUBSCRIPTION",
-        status     : "loading",
         created    : "02/01/2022",
         completed  : "02/01/2022",
     },
@@ -67,7 +58,6 @@ const Subscriptions: Subscription[] = [
         name     : "Positive test + loss of taste or smell by admission status",
         group    : "COVID-19",
         type     : "SUBSCRIPTION",
-        status   : "pending",
         created  : "02/01/2022",
         completed: null,
     },
@@ -76,7 +66,6 @@ const Subscriptions: Subscription[] = [
         name     : "Positive test + ICU admissions",
         group    : "COVID-19",
         type     : "REQUEST",
-        status   : "completed",
         created  : "02/01/2022",
         completed: "02/01/2022"
     },
@@ -85,7 +74,6 @@ const Subscriptions: Subscription[] = [
         name     : "Positive test by phenotype by demographics",
         group    : "INFLUENZA",
         type     : "SUBSCRIPTION",
-        status   : "completed",
         created  : "02/01/2022",
         completed: "02/01/2022",
     },
@@ -94,7 +82,6 @@ const Subscriptions: Subscription[] = [
         name     : "Positive test by phenotype by clinical characteristics",
         group    : "INFLUENZA",
         type     : "SUBSCRIPTION",
-        status   : "pending",
         created  : "02/01/2022",
         completed: null,
     },
@@ -103,7 +90,6 @@ const Subscriptions: Subscription[] = [
         name     : "Positive case by demographics",
         group    : "HIV",
         type     : "SUBSCRIPTION",
-        status   : "completed",
         created  : "02/01/2022",
         completed: "02/01/2022",
     }

@@ -49,9 +49,7 @@ export default function CopyView()
 
     const { view, pkg } = result
 
-    // @ts-ignore
     if (state?.view) {
-        // @ts-ignore
         Object.assign(view, state.view)
     }
 

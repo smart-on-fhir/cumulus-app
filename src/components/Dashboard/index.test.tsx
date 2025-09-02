@@ -74,9 +74,7 @@ describe("Chart View", () => {
         },
         createdAt: "2020-02-02",
         updatedAt: null,
-        status   : "completed",
         completed: "2020-02-02",
-        requestedData: null,
         dataURL: null,
         dataSourceType: "file",
         metadata: {
