@@ -7,7 +7,7 @@ import { HttpError, ServiceUnavailable } from "./errors"
 
 const fetch = makeFetchHappen.defaults({
     cachePath: join(__dirname, 'aggregator-cache'), // path where cache will be written (and read)
-    cache: "default"
+    cache: "no-store",
 })
 
 function mapCacheControlToFetchOption(req: Request): RequestCache {

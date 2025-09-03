@@ -31,7 +31,7 @@ function aggregatorIsEnabled() {
 }
 
 async function aggregatorRequest(url: string) {
-    const { body } = await aggregator.request(url, { cache: "default" })
+    const { body } = await aggregator.request(url)
     return body
 }
 
