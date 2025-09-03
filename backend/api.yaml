@@ -3005,9 +3005,6 @@ components:
           type: string
           format: date-time
           nullable: true
-        requestedData:
-          type: object
-          nullable: true
         metadata:
           type: object
           nullable: true

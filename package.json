@@ -63,7 +63,7 @@
     "start:hmr": "VITE_DEBUG=true vite --force",
     "watch:server": "nodemon -e js,ts,tsx,json -w backend -x 'ts-node -P backend/tsconfig.json -r dotenv-expand/config backend dotenv_config_path=.env.development.local'",
     "test": "npm run test:server",
-  "test:server": "TS_NODE_PROJECT=tsconfig.mocha.json DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov mocha --require ts-node/register --extensions ts",
+    "test:server": "TS_NODE_PROJECT=tsconfig.mocha.json DOTENV_CONFIG_PATH=.env.test nyc --reporter=lcov mocha --require ts-node/register --extensions ts",
     "test:server:watch": "nodemon -w backend -w test -e ts,tsx,json -x 'npm run test:server'",
     "test:frontend": "vitest",
     "test:frontend:watch": "vitest --watch",
@@ -73,6 +73,7 @@
     "openapi:watch": "nodemon -w backend/api.yaml -x 'npm run openapi:lint && npm run openapi:build'"
   },
   "devDependencies": {
+    "@testing-library/user-event": "^14.6.1",
     "@types/cli-color": "^2.0.2",
     "@types/make-fetch-happen": "^10.0.4",
     "@types/node": "^22.13.14",

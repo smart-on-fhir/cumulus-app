@@ -124,7 +124,7 @@ function getXType(column: app.SubscriptionDataColumn): "category" | "linear" | "
 
 // ----------------------------------------------------------------------------
 
-interface ChartConfigPanelState {
+export interface ChartConfigPanelState {
     groupBy        : string
     stratifyBy     : string
     sortBy         : string

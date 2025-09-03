@@ -240,6 +240,7 @@ declare namespace app {
          * - `loading`   - Currently waiting for response
          * - `completed` - Created and resolved
          * - `errored`   - Marked as invalid  or otherwise failed
+         * @deprecated 
          */
         status: "pending" | "completed" | "loading" | "errored"
 
