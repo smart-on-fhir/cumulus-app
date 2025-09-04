@@ -1,6 +1,8 @@
 # Stage 1: Build React app -----------------------------------------------------
 FROM node:22-alpine AS builder
 
+ARG VITE_APP_PREFIX=""
+ENV VITE_APP_PREFIX=${VITE_APP_PREFIX}
 ENV NODE_ENV=production
 
 WORKDIR /app
@@ -21,6 +23,8 @@ RUN npm run build
 # Stage 2: Build and Run Express server ----------------------------------------
 FROM node:22-alpine
 
+ARG VITE_APP_PREFIX=""
+ENV VITE_APP_PREFIX=${VITE_APP_PREFIX}
 ENV NODE_ENV=production
 ENV PORT=80
 ENV NODE_DEBUG=app-verbose,app-error,app-info,app-warn,app-log

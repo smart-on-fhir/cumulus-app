@@ -107,6 +107,11 @@ The default value is to log everything except SQL (`app-sql`). Note that logging
 If set, a "Open in analytics environment" button will be rendered below charts.
 Example: `https://cumulusdemo.notebook.us-east-1.sagemaker.aws/notebooks/cumulus/demo.ipynb`
 
+### VITE_APP_PREFIX
+This is a special variable that if set, will act as a path prefix under which
+the app is "mounted". It must not have leading or trailing slashes. Example: `network` , `bch`, etc.
+Use this when you are building multiple images to be hosted under the same domain and
+different base path.
 
 ## Full .env File Template
 ```
