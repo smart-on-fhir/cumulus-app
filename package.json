@@ -5,6 +5,7 @@
   "dependencies": {
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/bcryptjs": "^2.4.2",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.8",
@@ -73,7 +74,6 @@
     "openapi:watch": "nodemon -w backend/api.yaml -x 'npm run openapi:lint && npm run openapi:build'"
   },
   "devDependencies": {
-    "@testing-library/user-event": "^14.6.1",
     "@types/cli-color": "^2.0.2",
     "@types/make-fetch-happen": "^10.0.4",
     "@types/node": "^22.13.14",
