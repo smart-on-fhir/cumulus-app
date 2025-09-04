@@ -419,9 +419,9 @@ class DataUploader2 extends Component<DataUploader2Props, DataUploader2State>
         params.set("labels", _cols.map(c => encodeURIComponent(c.label)).join(","))
         params.set("descriptions", _cols.map(c => encodeURIComponent(c.description)).join(","))
         params.set("data_type", dataType)
-        
-        let url = "/api/requests/" + this.props.requestID + "/data?" + params.toString();
-        
+
+        let url = `${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/api/requests/${this.props.requestID}/data?${params.toString()}`;
+
         // @ts-ignore
         const readableStream = file.stream() as ReadableStream;
 

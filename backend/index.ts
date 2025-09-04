@@ -60,8 +60,8 @@ function setupAPI(app: Application)
 function setupStaticContent(app: Application)
 {
     // Get the path to the static content
-    const staticPath = Path.join(__dirname, "../frontend");
-    
+    const staticPath = Path.join(__dirname, "../dist/frontend");
+
     // Don't have a favicon
     app.get("/favicon.ico", (req, res) => res.status(404).end());
     

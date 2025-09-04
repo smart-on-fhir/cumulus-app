@@ -1,8 +1,9 @@
 import * as React                from "react"
+import { useLocation, Navigate } from "react-router-dom"
 import { auth }                  from "./backend" 
 import { app }                   from "./types"
 import { useServerEvent }        from "./hooks"
-import { useLocation, Navigate } from "react-router-dom"
+import LocalStorageNS            from "./LocalStorageNS"
 
 
 interface AuthContextType {
@@ -18,7 +19,7 @@ let AuthContext = React.createContext<AuthContextType>(null!);
 
 export function AuthProvider({ children }: { children: React.ReactNode })
 {
-    let storedUser = JSON.parse(localStorage.getItem("user") || "null") as app.User | null;
+    let storedUser = JSON.parse(LocalStorageNS.getItem("user") || "null") as app.User | null;
 
     // transition for users logged in before permissions were implemented
     if (storedUser && !storedUser.permissions) {
@@ -28,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode })
     React.useEffect(() => {
         if (storedUser && !storedUser.permissions?.length) {
             auth.logout();
-            localStorage.removeItem("user");
+            LocalStorageNS.removeItem("user");
             setUser(null);
         }
     }, [storedUser])
@@ -40,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode })
 
     async function update(props: Partial<app.User>) {
         const updatedUser = { ...user, ...props } as app.User;
-        localStorage.setItem("user", JSON.stringify(updatedUser));
+        LocalStorageNS.setItem("user", JSON.stringify(updatedUser));
         setUser(updatedUser)
     }
   
@@ -48,12 +49,12 @@ export function AuthProvider({ children }: { children: React.ReactNode })
 
         return auth.login(username, password, remember).then(
             user => {
-                localStorage.setItem("user", JSON.stringify(user));
+                LocalStorageNS.setItem("user", JSON.stringify(user));
                 setUser(user)
                 setError(null)
             },
             error => {
-                localStorage.removeItem("user");
+                LocalStorageNS.removeItem("user");
                 setUser(null)
                 setError(error)
             });
@@ -63,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode })
         if (user) {
             setLoading(true)
             auth.logout()
-            localStorage.removeItem("user")
+            LocalStorageNS.removeItem("user")
             setUser(null)
             setLoading(false)
         }

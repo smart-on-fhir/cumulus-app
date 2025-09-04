@@ -7,6 +7,7 @@ import { classList, humanizeColumnName, sortBy }  from "../../utils"
 import { app }                                    from "../../types"
 import Terminology                                from "../../Terminology"
 import aggregator                                 from "../../Aggregator"
+import LocalStorageNS                             from "../../LocalStorageNS"
 import "./Navigation.scss"
 
 
@@ -194,7 +195,7 @@ export default function Navigation()
     let { loading, user, logout } = useAuth();
     let navigate = useNavigate();
     const ref = useRef<HTMLDivElement|null>(null);
-    const [collapsed, setCollapsed] = useState(!!JSON.parse(localStorage.sidebarCollapsed ?? "false"))
+    const [collapsed, setCollapsed] = useState(!!JSON.parse(LocalStorageNS.getItem("sidebarCollapsed") ?? "false"))
 
     function onResizeStart(event: React.MouseEvent) {
 
@@ -216,14 +217,14 @@ export default function Navigation()
             document.addEventListener("mouseup", (e) => {
                 document.removeEventListener("mousemove", onResizerMouseMove)
                 document.dispatchEvent(new Event("resize", { bubbles: true }))
-                localStorage.sidebarWidth = e.clientX + diff + "px"
+                LocalStorageNS.setItem("sidebarWidth", e.clientX + diff + "px");
             }, { once: true })
         }
     }
 
     function toggle() {
-        localStorage.sidebarCollapsed = !collapsed
-        setCollapsed(!collapsed)
+        LocalStorageNS.setItem("sidebarCollapsed", !collapsed);
+        setCollapsed(!collapsed);
     }
 
     if (!user || user.status !== "Logged in" || !Array.isArray(user.permissions)) {
@@ -421,7 +422,7 @@ export default function Navigation()
     }
 
     return (
-        <div className={"navigation" + (collapsed ? " collapsed" : "")} ref={ref} style={{ width: localStorage.sidebarWidth || "16rem" }}>
+        <div className={"navigation" + (collapsed ? " collapsed" : "")} ref={ref} style={{ width: LocalStorageNS.getItem("sidebarWidth") || "16rem" }}>
             <div className="navigation-wrap">
                 <Tree data={TREE_DATA} />
             </div>

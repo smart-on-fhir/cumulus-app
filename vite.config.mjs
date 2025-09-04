@@ -2,11 +2,15 @@ import "dotenv/config"
 import { defineConfig } from 'vite'
 import react            from '@vitejs/plugin-react-swc'
 
+// VITE_APP_PREFIX must have no leading or trailing slash
+const VITE_APP_PREFIX = String(process.env.VITE_APP_PREFIX || "").replace(/^\/|\/$/, "");
+
 // @ts-ignore https://vite.dev/config/
 export default defineConfig(({ mode }) => {
 
   return {
     root   : "./src",
+    base: `/${VITE_APP_PREFIX}`,
     plugins: [react()],
     css: {
       devSourcemap: true,
@@ -61,6 +65,7 @@ export default defineConfig(({ mode }) => {
       NODE_ENV              : JSON.stringify(process.env.NODE_ENV || "development"),
       REACT_APP_BACKEND_HOST: JSON.stringify(process.env.REACT_APP_BACKEND_HOST || (mode === "test" ? "http://localhost:5555" : "")),
       REACT_APP_NOTEBOOK_URL: JSON.stringify(process.env.REACT_APP_NOTEBOOK_URL || ""),
+      VITE_APP_PREFIX       : JSON.stringify(VITE_APP_PREFIX),
     },
   }
 })

@@ -10,6 +10,7 @@ declare global {
     const NODE_ENV: 'development' | 'production' | 'test';
     const REACT_APP_BACKEND_HOST: string;
     const REACT_APP_NOTEBOOK_URL: string;
+    const VITE_APP_PREFIX: string;
 }
 
 export declare module app {

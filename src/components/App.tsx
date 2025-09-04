@@ -36,7 +36,10 @@ export default function App()
             <AggregatorProvider>
                 <ContextMenu />
                 <Tooltip />
-                <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <BrowserRouter
+                    future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+                    basename={ "/" + VITE_APP_PREFIX }
+                >
                     <Header/>
                     <div className="container container-fluid row p-1">
                         <Navigation />

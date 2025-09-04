@@ -1,4 +1,5 @@
-import { Command } from "./Command"
+import LocalStorageNS from "../LocalStorageNS";
+import { Command }    from "./Command"
 
 
 export class ToggleFavorite extends Command
@@ -17,7 +18,7 @@ export class ToggleFavorite extends Command
     }
 
     private getList() {
-        return String(window.localStorage[this.group] || "").trim().split(/\s*,\s*/)
+        return String(LocalStorageNS.getItem(this.group) || "").trim().split(/\s*,\s*/)
     }
 
     on() {
@@ -43,7 +44,7 @@ export class ToggleFavorite extends Command
         } else {
             list = [...list, this.id].filter(Boolean)
         }
-        window.localStorage[this.group] = list.join(",")
+        LocalStorageNS.setItem(this.group, list.join(","))
         window.dispatchEvent(new Event('localStorageUpdate'));
     }
 }

@@ -90,7 +90,8 @@ async function login(req: Request, res: Response) {
             expires.setFullYear(new Date().getFullYear() + 1)
         }
 
-        res.cookie("sid", sid, { httpOnly: true, expires });
+        const cookiePath = "/" + String(process.env.VITE_APP_PREFIX || "").replace(/^\/|\/$/, "");
+        res.cookie("sid", sid, { httpOnly: true, expires, path: cookiePath });
 
         res.json({
             id   : user.get("id"),

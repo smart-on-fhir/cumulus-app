@@ -24,26 +24,28 @@ export const SupportedChartTypes = {
     barStack3d   : "Stacked Bar Chart 3D",
 }
 
-export const ChartIcons = {
-    pie          : "/icons/pie_chart.png",
-    pie3d        : "/icons/pie_chart.png",
-    donut        : "/icons/donut_chart.png",
-    donut3d      : "/icons/donut_chart.png",
-    
-    line         : "/icons/line_chart.png",
-    spline       : "/icons/line_chart.png",
-    area         : "/icons/area_chart.png",
-    areaspline   : "/icons/area_chart.png",
+const prefix = VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : "";
 
-    column       : "/icons/column_chart.png",
-    column3d     : "/icons/column_chart.png",
-    columnStack  : "/icons/column_chart_stacked.png",
-    columnStack3d: "/icons/column_chart_stacked.png",
-    
-    bar          : "/icons/bar_chart.png",
-    bar3d        : "/icons/bar_chart.png",
-    barStack     : "/icons/bar_chart.png",
-    barStack3d   : "/icons/bar_chart.png",
+export const ChartIcons = {
+    pie          : `${prefix}/icons/pie_chart.png`,
+    pie3d        : `${prefix}/icons/pie_chart.png`,
+    donut        : `${prefix}/icons/donut_chart.png`,
+    donut3d      : `${prefix}/icons/donut_chart.png`,
+
+    line         : `${prefix}/icons/line_chart.png`,
+    spline       : `${prefix}/icons/line_chart.png`,
+    area         : `${prefix}/icons/area_chart.png`,
+    areaspline   : `${prefix}/icons/area_chart.png`,
+
+    column       : `${prefix}/icons/column_chart.png`,
+    column3d     : `${prefix}/icons/column_chart.png`,
+    columnStack  : `${prefix}/icons/column_chart_stacked.png`,
+    columnStack3d: `${prefix}/icons/column_chart_stacked.png`,
+
+    bar          : `${prefix}/icons/bar_chart.png`,
+    bar3d        : `${prefix}/icons/bar_chart.png`,
+    barStack     : `${prefix}/icons/bar_chart.png`,
+    barStack3d   : `${prefix}/icons/bar_chart.png`,
 }
 
 export type SupportedNativeChartTypes = "pie" | "line" | "spline" | "area" | "areaspline" | "column" | "bar"

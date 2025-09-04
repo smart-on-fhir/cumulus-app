@@ -15,7 +15,7 @@ export default function ColumnsTable({ cols }: { cols?: app.SubscriptionDataColu
         result : library
     } = useBackend(
         useCallback(async () => {
-            return await request("/cumulus_library_columns.json")
+            return await request(`${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/cumulus_library_columns.json`)
         }, []),
         true
     );

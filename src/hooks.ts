@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react"
 import { useAuth } from "./auth";
 import { Command } from "./commands/Command";
+import LocalStorageNS from "./LocalStorageNS";
 
 interface State<T = any> {
     loading: boolean
@@ -86,7 +87,7 @@ export function useServerEvent() {
 
 async function ping() {
     try {
-        let response = await fetch("/api/sse");
+        let response = await fetch(`${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/api/sse`);
         if (response.status === 502) {
             await ping(); // reconnect after timeout!
         } else if (response.status !== 200) {
@@ -136,7 +137,7 @@ export function useCommand(command: Command) {
 }
 
 export function useLocalStorage(storageKey: string) {
-    const [storageValue, setStorageValue] = useState(localStorage.getItem(storageKey));
+    const [storageValue, setStorageValue] = useState(LocalStorageNS.getItem(storageKey));
 
     useEffect(() => {
         const handleStorageChange = (event: any) => {
@@ -149,7 +150,7 @@ export function useLocalStorage(storageKey: string) {
 
         // For same tab changes
         const handleSameTabChange = () => {
-            setStorageValue(localStorage.getItem(storageKey));
+            setStorageValue(LocalStorageNS.getItem(storageKey));
         };
 
         window.addEventListener('localStorageUpdate', handleSameTabChange);

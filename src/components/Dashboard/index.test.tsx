@@ -155,7 +155,7 @@ describe("Chart View", () => {
     }
 
     it('name and description', () => {
-        // localStorage.setItem("user", '{"role":"admin"}')
+        // LocalStorageNS.setItem("user", '{"role":"admin"}')
         render(<WrappedChartView subscription={ baseSubscription } view={{ ...baseView }} />);
         
         expect(document.querySelector("#view-name")).toHaveValue(baseView.name);

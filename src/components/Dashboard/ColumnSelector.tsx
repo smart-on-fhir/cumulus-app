@@ -46,7 +46,7 @@ export default function ColumnSelector({
     const options: any[] = cols.filter(filter).sort(comparator).map((col, i) => ({
         value   : col.name,
         disabled: disabled.includes(col.name),
-        icon    : "/icons/column.png",
+        icon    : `${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/icons/column.png`,
         label   : col.label || col.name,
         right   : <Grid cols="1fr 6ch" className="middle small" gap="0.25em">
             <div>

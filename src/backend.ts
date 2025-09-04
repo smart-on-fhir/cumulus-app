@@ -16,7 +16,10 @@ export interface RequestOptions extends RequestInit {
 const pendingRequests = new Map<string, AbortController>()
 
 export async function request<T=any>(path: string, options: RequestOptions = {}): Promise<T> {
-    
+
+    if (VITE_APP_PREFIX) {
+        path = path.replace(/^\/api\//, "/" + VITE_APP_PREFIX + "/api/");
+    }
     path = path.replace(/^\//, REACT_APP_BACKEND_HOST + "/");
 
     const abortController = new AbortController()

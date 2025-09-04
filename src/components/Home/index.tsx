@@ -80,7 +80,7 @@ function Graphs() {
                     <div className="graphs-row card">
                         <div className="graphs">
                             { data.length ? !!selected && <Link to={`/views/${selected}`}>
-                                <img alt="Current Graph" src={`/api/views/${selected}/screenshot`} />
+                                <img alt="Current Graph" src={`${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/api/views/${selected}/screenshot`} />
                             </Link> : <p className="color-muted center">No preview available</p> }
                         </div>
                         <div className="graphs-list">

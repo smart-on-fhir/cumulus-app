@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import { Link }                from "react-router-dom"
 import MenuButton              from "../generic/MenuButton"
 import Grid                    from "../generic/Grid"
@@ -7,7 +8,7 @@ import Checkbox                from "../generic/Checkbox"
 import { useAuth }             from "../../auth"
 import { useAggregator }       from "../../Aggregator"
 import Terminology             from "../../Terminology"
-import { useEffect, useState } from "react"
+import LocalStorageNS          from "../../LocalStorageNS"
 import "./Header.scss"
 
 
@@ -73,11 +74,11 @@ function CloudMenu() {
 }
 
 function ThemeEditor() {
-    const [theme, setTheme] = useState(localStorage.getItem("colorTheme") || "auto")
+    const [theme, setTheme] = useState(LocalStorageNS.getItem("colorTheme") || "auto")
 
     function setColorTheme(value: "light" | "dark" | "auto") {
-        localStorage.setItem("colorTheme", value)
-        setTheme(localStorage.getItem("colorTheme") || "auto")
+        LocalStorageNS.setItem("colorTheme", value)
+        setTheme(LocalStorageNS.getItem("colorTheme") || "auto")
     }
 
     useEffect(() => {
@@ -109,6 +110,9 @@ export default function Header() {
                         CUMULUS<sup>&#xAE;</sup>
                     </Link>
                 </div>
+                { VITE_APP_PREFIX && <div className="col col-0 pr-1 middle left">
+                    <span className="badge bg-brand-2 small" style={{ padding: "4px 10px 5px 10px" }}>{ VITE_APP_PREFIX }</span>
+                </div> }
                 <div className="col middle center" />
                 <div className="col col-0 pl-1 middle right nowrap">
                     <div className="row middle">
