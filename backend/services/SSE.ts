@@ -18,7 +18,9 @@ export function longPollingHandler(request: AppRequest, response: Response) {
     
     const timer = setTimeout(() => {
         if (clients[id]) {
-            clients[id].sendStatus(205)
+            if (!clients[id].headersSent) {
+                clients[id].sendStatus(205)
+            }
         }
     }, 28_000).unref()
 
