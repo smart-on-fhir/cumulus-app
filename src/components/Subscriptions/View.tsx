@@ -199,7 +199,9 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
 
                         {/* Export Data ------------------------------------ */}
                         { canExport && <IconItem icon="download" className="mb-1">
-                            <a aria-disabled={!model.metadata} className="link" href={`${REACT_APP_BACKEND_HOST}/api/requests/${id}/data?format=csv`}>
+                            <a aria-disabled={!model.metadata} className="link" href={
+                                `${REACT_APP_BACKEND_HOST}${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/api/requests/${id}/data?format=csv`
+                            }>
                                 Export Data
                             </a>
                             <div className="color-muted small">Download the {Terminology.subscription.nameSingular} data as CSV</div>
