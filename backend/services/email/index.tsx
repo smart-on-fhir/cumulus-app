@@ -48,7 +48,12 @@ export async function inviteUser({
     code: string
     message?: string
 }) {
-    const activationUrl = new URL("/activate", baseUrl)
+    const path = [
+        String(process.env.VITE_APP_PREFIX || "").replace(/^\/|\/$/, ""),
+        "activate"
+    ].filter(Boolean).join("/");
+
+    const activationUrl = new URL(`/${path}`, baseUrl)
     activationUrl.searchParams.set("code", code)
 
     return sendEmail({
@@ -68,7 +73,12 @@ export async function sendResetPasswordEmail({
     baseUrl: string
     code: string
 }) {
-    const resetUrl = new URL("/password-reset", baseUrl)
+    const path = [
+        String(process.env.VITE_APP_PREFIX || "").replace(/^\/|\/$/, ""),
+        "password-reset"
+    ].filter(Boolean).join("/");
+
+    const resetUrl = new URL(`/${path}`, baseUrl)
     resetUrl.searchParams.set("code", code)
     return sendEmail({
         from   : config.appEmail,

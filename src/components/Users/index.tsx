@@ -186,7 +186,7 @@ function UserEditor({
     const [ editing, setEditing ] = useState(false)
     const [ role, setRole ] = useState(user.role)
 
-    const activationLink = new URL("/activate?code=" + user.activationCode, window.location.origin).href
+    const activationLink = new URL(`${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/activate?code=` + user.activationCode, window.location.origin).href
 
     return (
         <div className="row wrap">
