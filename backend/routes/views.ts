@@ -443,7 +443,7 @@ route(router, {
 
         if (!data) {
             // return res.sendFile("view.png", { root: Path.join(__dirname, "../../public") })
-            return res.sendFile("view.png", { root: Path.join(__dirname, "../../dist/frontend") })
+            return res.sendFile("view.png", { root: Path.join(__dirname, "../../frontend") })
         }
 
         const match = (/^data:(.+?);base64,(.+)$/).exec(data || "");

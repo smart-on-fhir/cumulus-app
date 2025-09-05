@@ -44,7 +44,7 @@ services:
       - VITE_APP_PREFIX=$VITE_APP_PREFIX
     volumes:
       - ../backend:/app/backend
-      - ../dist/frontend:/app/dist/frontend
+      - ../dist/frontend:/app/frontend
 
   db:
     container_name: cumulus-dashboard-db
