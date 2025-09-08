@@ -51,6 +51,9 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
 
     const { user } = useAuth()
     const [query, setQuery] = useSearchParams()
+    const [showPublic   , setShowPublic   ] = useState(true)
+    const [showTemplates, setShowTemplates] = useState(true)
+    const [showDrafts   , setShowDrafts   ] = useState(false)
 
     const filter = query.get("filter") || ""
     const filters = filter ? filter.split(",") : []
@@ -109,7 +112,36 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                 <div className="col col-8 responsive">
                     { pkg.type === "flat" && <div className="mt-2"><FlatPackageDataViewer pkg={pkg} /></div> }
                     { pkg.type !== "flat" && <>
-                        <h5 className="mt-2">Graphs</h5>
+                        <div className="row wrap middle" style={{ marginTop: "1.25rem" }}>
+                            <div className="col">
+                                <h5 style={{ margin: 0, lineHeight: "2.5rem" }}>Graphs</h5>
+                            </div>
+                            <div className="col col-0">
+                                <div className="toolbar flex">
+                                    <button
+                                        className={ "btn" + (showPublic ? " active" : "") }
+                                        onClick={() => setShowPublic(!showPublic)}
+                                        data-tooltip={"Show Custom Charts"}
+                                        disabled={!!filter}>
+                                        <span className="icon icon-2 material-symbols-outlined" style={{ margin: 0 }}>verified</span>
+                                    </button>
+                                    <button
+                                        className={ "btn" + (showDrafts ? " active" : "") }
+                                        onClick={() => setShowDrafts(!showDrafts)}
+                                        data-tooltip="Show My Draft Charts"
+                                        disabled={!!filter}>
+                                        <span className="icon icon-2 material-symbols-outlined" style={{ margin: 0 }}>edit_square</span>
+                                    </button>
+                                    <button
+                                        className={ "btn" + (showTemplates ? " active" : "") }
+                                        onClick={() => setShowTemplates(!showTemplates)}
+                                        data-tooltip="Show Auto-generated Charts"
+                                        disabled={!!filter}>
+                                        <span className="icon icon-2 material-symbols-outlined" style={{ margin: 0 }}>wand_stars</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                         <hr/>
 
                         { filter ?
@@ -118,11 +150,12 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                                 <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified:" + filter} filter={filter} />
                             </div> :
                             <ViewsBrowser key={ pkg.id + ":" + filter } pkgId={ pkg.id } minColWidth="13rem"
+                                filter={ view => !showDrafts && !showPublic ? false : view.isDraft === showDrafts || view.isDraft === !showPublic }
                                 footer={
-                                    <>
+                                    showTemplates ? <>
                                         <PackageTemplates pkg={pkg} key={pkg.id} />
                                         <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} />
-                                    </>
+                                    </> : null
                                 }
                             />
                         }

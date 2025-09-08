@@ -33,7 +33,8 @@ export default function ViewsBrowser({
     minColWidth,
     header,
     footer,
-    pkgId
+    pkgId,
+    filter
 }: {
     layout?: "grid" | "column" | "list",
     requestId?: string | number,
@@ -47,6 +48,7 @@ export default function ViewsBrowser({
     header?: ReactNode
     footer?: ReactNode
     pkgId?: string
+    filter?: (view: app.View) => boolean
 }) {
 
     let { user } = useAuth();
@@ -104,8 +106,12 @@ export default function ViewsBrowser({
 
     result = result || [];
 
+    if (filter) {
+        result = result.filter(filter);
+    }
+
     if (!requestId && !pkgId && !result.length) {
-        return <p className="center">No Graphs found.</p>
+        return <p className="center">No {Terminology.graph.namePlural} found.</p>
     }
 
     if (starOnly) {
