@@ -439,11 +439,14 @@ route(router, {
 
         assert(model, "Model not found", NotFound)
         
-        const data  = model.getDataValue("screenShot");
+        const data = model.getDataValue("screenShot");
 
         if (!data) {
-            // return res.sendFile("view.png", { root: Path.join(__dirname, "../../public") })
-            return res.sendFile("view.png", { root: Path.join(__dirname, "../../frontend") })
+            const root = process.env.NODE_ENV === "test" ?
+                Path.join(__dirname, "../../src/public") :
+                Path.join(__dirname, "../../frontend");
+
+            return res.sendFile("view.png", { root })
         }
 
         const match = (/^data:(.+?);base64,(.+)$/).exec(data || "");
