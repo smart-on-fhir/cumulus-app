@@ -24,10 +24,9 @@
 
 
     "outDir": "../dist",
-    "declaration": false,
-    // "declarationDir": "../dist/backend/types",
-    "types": ["mocha", "chai"],
-    "lib": ["es2022"]
+    "declaration": true,
+    "declarationDir": "../dist/backend/types",
+    "types": ["mocha", "chai"]
   },
   "include": [
     "../isomorphic",
