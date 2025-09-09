@@ -19,11 +19,15 @@
     "jsx": "react-jsx",
     "sourceMap": true,
     "noEmit": false,
+    "diagnostics": true,
+    "pretty": false,
+
 
     "outDir": "../dist",
-    "declaration": true,
-    "declarationDir": "../dist/backend/types",
-    "types": ["mocha", "chai"]
+    "declaration": false,
+    // "declarationDir": "../dist/backend/types",
+    "types": ["mocha", "chai"],
+    "lib": ["es2022"]
   },
   "include": [
     "../isomorphic",
