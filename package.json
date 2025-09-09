@@ -56,7 +56,7 @@
   "scripts": {
     "build": "npm run build:frontend && npm run build:server",
     "build:frontend": "vite build",
-    "build:server": "tsc -b",
+    "build:server": "tsc --project backend/tsconfig.json --skipLibCheck --diagnostics",
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
     "start:prod": "node dist/backend/index.js",
     "start:prod:ts": "ts-node -P backend/tsconfig.json backend",
