@@ -21,7 +21,8 @@
     "noEmit": false,
     "diagnostics": true,
     "pretty": false,
-
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
 
     "outDir": "../dist",
     "declaration": true,
