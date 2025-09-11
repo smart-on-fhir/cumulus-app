@@ -178,7 +178,8 @@ export const schema: Schema = {
                 {
                     id: "enc_class_list",
                     section: "HealthcareSetting",
-                    defaultValue: ""
+                    list: "encounter-classes",
+                    defaultValue: []
                 },
                 {
                     id: "encounter_type",
@@ -411,21 +412,8 @@ export const schema: Schema = {
         },
         enc_class_list: {
             name: "FHIR Encounter.class",
-            type: "enum",
-            values: [
-                { value: ""      , label: "not specified (include all)" },
-                { value: "AMB"   , label: "Ambulatory" },
-                { value: "EMER"  , label: "Emergency" },
-                { value: "FLD"   , label: "Field" },
-                { value: "HH"    , label: "Home health" },
-                { value: "IMP"   , label: "Inpatient encounter" },
-                { value: "ACUTE" , label: "Inpatient acute" },
-                { value: "NONAC" , label: "Inpatient non-acute" },
-                { value: "OBSENC", label: "Observation encounter" },
-                { value: "PRENC" , label: "Pre-admission" },
-                { value: "SS"    , label: "Short stay" },
-                { value: "VR"    , label: "Virtual" },
-            ],
+            type: "list",
+            endpoint: "/api/static/encounter-classes",
             description: "Select what class of encounters should be used in your study.<br />[ValueSet](https://terminology.hl7.org/1.0.0/ValueSet-v3-ActEncounterCode.html) 🔗"
         },
         encounter_type: {

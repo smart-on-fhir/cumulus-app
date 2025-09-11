@@ -7010,6 +7010,20 @@ const ENCOUNTER_SERVICE_TYPE = [
     { value: "629", label: "Vision Equipment" }
 ].sort((a, b) => a.label.localeCompare(b.label));
 
+const ENCOUNTER_CLASS = [
+    { value: "AMB"   , label: "Ambulatory" },
+    { value: "EMER"  , label: "Emergency" },
+    { value: "FLD"   , label: "Field" },
+    { value: "HH"    , label: "Home health" },
+    { value: "IMP"   , label: "Inpatient encounter" },
+    { value: "ACUTE" , label: "Inpatient acute" },
+    { value: "NONAC" , label: "Inpatient non-acute" },
+    { value: "OBSENC", label: "Observation encounter" },
+    { value: "PRENC" , label: "Pre-admission" },
+    { value: "SS"    , label: "Short stay" },
+    { value: "VR"    , label: "Virtual" },
+].sort((a, b) => a.label.localeCompare(b.label));
+
 // =============================================================================
 
 function handleList(list: { value: string, label: string }[]) {
@@ -7053,4 +7067,10 @@ route(router, {
     path   : "/encounter-service-types",
     method : "post",
     handler: handleList(ENCOUNTER_SERVICE_TYPE)
+})
+
+route(router, {
+    path   : "/encounter-classes",
+    method : "post",
+    handler: handleList(ENCOUNTER_CLASS)
 })
