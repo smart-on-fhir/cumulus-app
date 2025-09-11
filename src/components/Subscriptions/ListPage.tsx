@@ -116,10 +116,9 @@ export default function SubscriptionsListPage()
                     if (links.length > 0) {
                         return (
                             <Collapse key={i} header={
-                                <>
-                                    <i className="icon material-symbols-outlined color-brand-2">{Terminology.subscriptionGroup.icon}</i>
-                                    { group.name }
-                                </>
+                                <span>
+                                    <i className="icon material-symbols-outlined color-brand-2">{Terminology.subscriptionGroup.icon}</i> { group.name }
+                                </span>
                             }>
                                 <Grid cols="22em" key={i} className="link-list mt-05 mb-2">{ links }</Grid>
                             </Collapse>

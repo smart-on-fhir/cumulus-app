@@ -1,6 +1,8 @@
+import { classList }  from "../../utils"
 import { AlertError } from "../generic/Alert"
 import Checkbox       from "../generic/Checkbox"
 import CheckboxList   from "../generic/CheckboxList"
+import Collapse       from "../generic/Collapse"
 import Grid           from "../generic/Grid"
 import Markdown       from "../generic/Markdown"
 import RichSelect, { RichSelectOption } from "../generic/RichSelect"
@@ -198,9 +200,7 @@ export function DateEditor({
     const { name, description } = descriptor
     return (
         <div>
-            <label>
-                <i className="fa-regular fa-calendar-days color-blue" /> { name }
-            </label>
+            <label>{ name }</label>
             <input
                 type="date"
                 value={ value }
@@ -395,13 +395,39 @@ export function TemplateEditor({
                     return <AlertError>Section with ID "{ sectionId }" was not found</AlertError>
                 }
 
+                const valCnt = items.filter(i => {
+                    const rec = state[i.id];
+                    console.log(i.id, rec)
+                    if (Array.isArray(rec)) return rec.length > 0;
+                    return rec !== undefined && rec !== null && rec !== "";
+                }).length;
+
                 return (
-                    <div key={sectionId}>
-                        { section && <h4 className="color-blue-dark center mb-1">{ section.name }</h4> }
-                        { section && !!section.description && <div className="color-muted mb-1 center">{ section.description }</div> }
-                        { section && <hr className="small color-grey mb-2" /> }
-                        { renderSection(items) }
-                    </div>
+                    <Collapse header={
+                        <div className="row middle" style={{ width: "100%" }} >
+                            <div className="col col-0 mr-05">
+                                <span className="material-symbols-outlined">home_storage</span>
+                            </div>
+                            <div className="col">
+                                <b className="mr-05">{ section.name }</b>
+                            </div>
+                            <div className={ classList({
+                                "col col-0 small pl-1": true,
+                                "color-muted": valCnt < items.length,
+                                "color-green": valCnt >= items.length
+                            })}>
+                                <progress value={ valCnt } max={ items.length } style={{ width: "6rem" }} />
+                            </div>
+                            <div className="col col-0 color-muted fw-400 small pl-1" data-tooltip={ `${ valCnt } of ${ items.length } parameters have a value` }>
+                                { valCnt } / { items.length }
+                            </div>
+                        </div>
+                    } key={sectionId}>
+                        <div className="p-2 pb-3 mb-1">
+                            { section && !!section.description && <div className="mb-2">{ section.description }</div> }
+                            { renderSection(items) }
+                        </div>
+                    </Collapse>
                 )
             }) }
         </>

@@ -341,7 +341,7 @@ export const schema: Schema = {
             name: "Healthcare Utilization"
         },
         StudyVariables: {
-            name: "STUDY VARIABLES"
+            name: "Study Variables"
         }
     },
     parameters: {

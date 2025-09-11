@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { TemplateEditor }      from "./editors"
 import { schema, Template }    from "./Schema"
 import { downloadBase64File }  from "../../utils"
+import Collapse                from "../generic/Collapse"
 import "./Study.scss"
 
 
@@ -28,124 +29,36 @@ export default function StudyBuilder() {
 
     return (
         <div className="container">
-            <div className="center mb-2">
+            <div className="center mb-1">
                 <h1>Create Study</h1>
             </div>
             <div className="study-builder">
-                
                 <div className="study-builder-main">
-                    <div className="row gap">
-                        <div className="col col-1"/>
-                        <div className="col col-0 middle right">
-                            <b>Template:</b>
-                        </div>
-                        <div className="col col-auto">
+                    <div className="row gap mb-3">
+                        <div className="col"/>
+                        <div className="col col-0 middle right">Template:</div>
+                        <div className="col col-0 middle">
                             <select value={templateId} onChange={e => setTemplateId(e.target.value)}>
                                 { schema.templates.map(t => (
                                     <option key={t.id} value={t.id}>{t.name}</option>
                                 ))}
                             </select>
                         </div>
-                        <div className="col col-1"/>
+                        <div className="col"/>
                     </div>
                     <TemplateEditor templateId={templateId} state={variables} onChange={onChange} />
-                    { NODE_ENV === "development" && <>
-                        <h4 className="color-blue-dark center">Review</h4>
-                        <hr className="small color-blue" />
-                        <pre>{ JSON.stringify(variables, null, 4) }</pre>
-                    </>}
+                    { NODE_ENV === "development" && <Collapse header={
+                        <div className="row middle" style={{ width: "100%" }}>
+                            <div className="col col-0 mr-05">
+                                <span className="material-symbols-outlined">data_object</span>
+                            </div>
+                            <div className="col"><b>Dev Preview</b></div>
+                        </div>
+                    } collapsed>
+                        <pre className="pt-1 pb-2 pl-1" style={{ maxHeight: "50vh", overflow: "auto" }}>{ JSON.stringify(variables, null, 4) }</pre>
+                    </Collapse>}
                 </div>
             </div>
-            {/* <div className="flex" style={{ width: "calc(min(100%, 47rem))", margin: "1rem auto" }}>
-                <h6 className="center color-blue-dark mt-1">Data Sites</h6>
-                <hr />
-                <Grid cols="15rem" gap="0 1rem" style={{ margin: "0.5rem auto 1rem", maxWidth: "calc(min(100%, 47rem))" }}>
-                    <label>
-                        <Checkbox
-                            name=""
-                            checked={ dataSites.includes("uc_davis") }
-                            onChange={on => {
-                                if (on) {
-                                    setDataSites([...dataSites, "uc_davis"])
-                                } else {
-                                    setDataSites(dataSites.filter(x => x !== "uc_davis"))
-                                }
-                            }}
-                            label="UC Davis"
-                        />
-                    </label>
-                    <label>
-                        <Checkbox
-                            name=""
-                            checked={ dataSites.includes("regenstrief_institute") }
-                            onChange={on => {
-                                if (on) {
-                                    setDataSites([...dataSites, "regenstrief_institute"])
-                                } else {
-                                    setDataSites(dataSites.filter(x => x !== "regenstrief_institute"))
-                                }
-                            }}
-                            label="Regenstrief Institute"
-                        />
-                    </label>
-                    <label>
-                        <Checkbox
-                            name=""
-                            checked={ dataSites.includes("boston_childrens") }
-                            onChange={on => {
-                                if (on) {
-                                    setDataSites([...dataSites, "boston_childrens"])
-                                } else {
-                                    setDataSites(dataSites.filter(x => x !== "boston_childrens"))
-                                }
-                            }}
-                            label="Boston Children's"
-                        />
-                    </label>
-                    <label>
-                        <Checkbox
-                            name=""
-                            checked={ dataSites.includes("washington_university_st_louis") }
-                            onChange={on => {
-                                if (on) {
-                                    setDataSites([...dataSites, "washington_university_st_louis"])
-                                } else {
-                                    setDataSites(dataSites.filter(x => x !== "washington_university_st_louis"))
-                                }
-                            }}
-                            label="WU St. Louis"
-                        />
-                    </label>
-                    <label>
-                        <Checkbox
-                            name=""
-                            checked={ dataSites.includes("boston_childrens_rdw") }
-                            onChange={on => {
-                                if (on) {
-                                    setDataSites([...dataSites, "boston_childrens_rdw"])
-                                } else {
-                                    setDataSites(dataSites.filter(x => x !== "boston_childrens_rdw"))
-                                }
-                            }}
-                            label="Boston Children's RDW"
-                        />
-                    </label>
-                    <label>
-                        <Checkbox
-                            name=""
-                            checked={ dataSites.includes("washu") }
-                            onChange={on => {
-                                if (on) {
-                                    setDataSites([...dataSites, "washu"])
-                                } else {
-                                    setDataSites(dataSites.filter(x => x !== "washu"))
-                                }
-                            }}
-                            label="Washington University"
-                        />
-                    </label>
-                </Grid>
-            </div> */}
             <div className="center">
                 <button
                     className="btn btn-green m-05"

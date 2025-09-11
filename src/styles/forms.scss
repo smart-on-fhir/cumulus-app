@@ -113,6 +113,26 @@
     }
 }
 
+progress {
+    border: 1px solid currentColor;
+    border-radius: var(--border-radius);
+    background: var(--color-window-bg-hard);
+    height: 0.5em;
+    overflow: hidden;
+
+    &::-webkit-progress-bar {
+        background: var(--color-window-bg-hard);
+    }
+
+    &::-webkit-progress-value {
+        background: currentColor;
+    }
+
+    &::-moz-progress-bar {
+        background: currentColor;
+    }
+}
+
 
 input[type="text"],
 input[type="url"],

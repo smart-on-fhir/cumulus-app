@@ -115,7 +115,7 @@ function ObjectPermissions({ permissions }: { permissions: app.Permission[] }) {
 
     return (
         <Collapse header={
-            <><i className="icon icon-2 material-symbols-rounded">database</i> { permissions[0].resource }</>
+            <span><i className="icon icon-2 material-symbols-rounded">database</i> { permissions[0].resource }</span>
         }>
             <div className="pl-3 pt-1 pb-2">
                 <Grid cols="1fr 1fr 1fr" gap="2rem">

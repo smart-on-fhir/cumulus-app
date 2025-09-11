@@ -237,7 +237,7 @@ export function AllSeries({
             { options.series?.map((s: any, i) => {
                 const color = getColorForSeries(options, s.id)
                 return <Collapse key={i} collapsed className={seriesId === s.id ? "selected" : ""} header={
-                    <>
+                    <span>
                          <b style={{
                              background: s.visible !== false ? color : "#DDD",
                              width     : "15px",
@@ -245,13 +245,13 @@ export function AllSeries({
                              display   : "inline-block",
                              boxShadow : s.visible !== false ? "#666 0 0 0 1px inset, #FFF8 0 0 0px 2px inset" : "#CCC 0 0 0 1px inset",
                              borderRadius: "2px",
-                             margin      : "0 2px 0 0"
-                         }}/>
-                        <span
+                             margin      : "0 2px 0 0",
+                             verticalAlign: "middle"
+                         }}/> <span
                             className={ "ellipsis" + (seriesId === s.id ? " selected" : "") }
                             style={{ color: s.visible !== false ? "var(--color-window-fg)" : "#8888" }}
                         >{ String(s.name ?? "") || "Series " + (i + 1)}</span>
-                    </>
+                    </span>
                 }>
                     <PropertyGrid props={getOptions(options, onChange, s.id)} />
                 </Collapse>
