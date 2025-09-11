@@ -1,24 +1,19 @@
 import { useEffect, useState } from "react"
-// import Checkbox                from "../generic/Checkbox"
-// import Grid                    from "../generic/Grid"
 import { TemplateEditor }      from "./editors"
-import { schema }              from "./Schema"
+import { schema, Template }    from "./Schema"
 import { downloadBase64File }  from "../../utils"
 import "./Study.scss"
 
 
 export default function StudyBuilder() {
 
-    const [templateId, setTemplateId] = useState(schema.templates[0].id)
+    const [templateId, setTemplateId] = useState<Template["id"]>(schema.templates[0].id)
 
-    const [variables, setVariables] = useState<Record<string, any>>({})
-    // const [dataSites, setDataSites] = useState<string[]>([])
-
-    // const {} = state
+    const [variables, setVariables] = useState<Record<string, unknown>>({})
 
     useEffect(() => {
         const template = schema.templates.find(t => t.id === templateId)
-        const newVars: Record<string, any> = {}
+        const newVars: Record<string, unknown> = {}
         template?.variables?.forEach(variable => {
             // const descriptor = schema.parameters[variable.id];
             newVars[variable.id] = variable.defaultValue
@@ -27,7 +22,7 @@ export default function StudyBuilder() {
     }, [templateId])
     
 
-    function onChange(data: Record<string, any>) {
+    function onChange(data: Record<string, unknown>) {
         setVariables({ ...variables, ...data })
     }
 

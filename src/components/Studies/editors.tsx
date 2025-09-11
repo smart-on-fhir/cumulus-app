@@ -18,15 +18,15 @@ import {
     type ListParameterDescriptor
 } from "./Schema"
 
-function ifTrue(state: Record<string, any>, expr: string, y:any = true, n:any = false) {
+function ifTrue(state: Record<string, unknown>, expr: string, y:any = true, n:any = false) {
     // eslint-disable-next-line no-new-func
     return Function(
         Object.keys(state).join(","), `if (${expr}) { return ${y}; } return ${n};`
     )(...Object.values(state))
 }
 
-function parseRuntimeParams(params: Record<string, any>, state: Record<string, any>) {
-    const out: Record<string, any> = {}
+function parseRuntimeParams(params: Record<string, unknown>, state: Record<string, unknown>) {
+    const out: Record<string, unknown> = {}
     for (const paramName in params) {
         const paramValue = params[paramName]
         if (typeof paramValue === "string") {
@@ -69,30 +69,30 @@ export function Editor({
     runtimeParams = {}
 }: {
     descriptor: ParameterDescriptor
-    value: any
+    value: unknown
     onChange: (x: typeof value) => void
-    runtimeParams?: Record<string, any>
+    runtimeParams?: Record<string, unknown>
 }) {
     if (descriptor.type === "date") {
-        return <DateEditor descriptor={descriptor} {...runtimeParams} value={value} onChange={onChange} />
+        return <DateEditor descriptor={descriptor} {...runtimeParams} value={value + ""} onChange={onChange} />
     }
     if (descriptor.type === "boolean") {
-        return <BooleanEditor descriptor={descriptor} {...runtimeParams} value={value} onChange={onChange} />
+        return <BooleanEditor descriptor={descriptor} {...runtimeParams} value={value + ""} onChange={onChange} />
     }
     if (descriptor.type === "number") {
-        return <NumberEditor descriptor={descriptor} {...runtimeParams} value={value} onChange={onChange} />
+        return <NumberEditor descriptor={descriptor} {...runtimeParams} value={+value} onChange={onChange} />
     }
     if (descriptor.type === "enum") {
-        return <EnumEditor descriptor={descriptor} {...runtimeParams} value={value} onChange={onChange} />
+        return <EnumEditor descriptor={descriptor} {...runtimeParams} value={value + ""} onChange={onChange} />
     }
     if (descriptor.type === "checklist") {
-        return <CheckListEditor descriptor={descriptor} {...runtimeParams} value={value} onChange={onChange} />
+        return <CheckListEditor descriptor={descriptor} {...runtimeParams} value={value as unknown[]} onChange={onChange} />
     }
     if (descriptor.type === "string") {
-        return <StringEditor descriptor={descriptor} value={value} onChange={onChange} />
+        return <StringEditor descriptor={descriptor} value={value + ""} onChange={onChange} />
     }
     if (descriptor.type === "list") {
-        return <ListEditor descriptor={descriptor} value={value || descriptor.defaultValue} onChange={onChange} />
+        return <ListEditor descriptor={descriptor} value={(value || descriptor.defaultValue) as RichSelectOption | RichSelectOption[]} onChange={onChange} />
     }
     // @ts-ignore
     return <b>{descriptor.type} editor not implemented</b>
@@ -105,9 +105,9 @@ export function CheckListEditor({
     defaultValue
 }: {
     descriptor: CheckListParameterDescriptor
-    value: any[]
-    onChange: (list: any[]) => void
-    defaultValue?: any[]
+    value: unknown[]
+    onChange: (list: unknown[]) => void
+    defaultValue?: unknown[]
 }) {
 
     value = value || defaultValue || [];
@@ -251,7 +251,7 @@ export function NumberEditor({
     max?: number
     min?: number
     value: number
-    onChange: (value: number) => void
+    onChange: (value: number | string) => void
 }) {
     const { name, description } = descriptor
     return (
@@ -259,10 +259,10 @@ export function NumberEditor({
             <label>{ name }</label>
             <input
                 type="number"
-                value={ value }
+                value={ value ?? "" }
                 max={ max }
                 min={ min }
-                onChange={ e => onChange(e.target.valueAsNumber) }
+                onChange={ e => onChange(isNaN(e.target.valueAsNumber) ? e.target.value : e.target.valueAsNumber) }
             />
             { !!description && <div className="mb-05 mt-05"><Markdown>{ description }</Markdown></div> }
         </div>
