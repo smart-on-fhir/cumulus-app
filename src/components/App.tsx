@@ -60,6 +60,12 @@ export default function App()
                                     <Route path="my/drafts/*"         element={ <RequireAuth><Views /></RequireAuth> } />
                                     <Route path="my/account"          element={ <RequireAuth><Account /></RequireAuth> } />
                                     
+                                    <Route path="admin/users/invite"  element={ <RequireAuth><Invite /></RequireAuth> } />
+                                    <Route path="admin/users"         element={ <RequireAuth><Users /></RequireAuth> } />
+                                    <Route path="admin/permissions"   element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
+                                    <Route path="admin/health-check"  element={ <RequireAuth><HealthCheck /></RequireAuth> } />
+                                    <Route path="admin/user-groups/*" element={ <RequireAuth><UserGroups /></RequireAuth> } />
+                                    
                                     <Route path="search"         element={ <RequireAuth><SearchResultsPage /></RequireAuth>} />
                                     <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
                                     <Route path="catalog/*"      element={ <RequireAuth><CatalogRouter /></RequireAuth>} />

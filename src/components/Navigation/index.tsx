@@ -387,36 +387,40 @@ export default function Navigation()
 
     if (canAdminister) {
         TREE_DATA.push({
-            icon: "build_circle",
-            // open: true,
+            icon  : "build_circle",
+            id    : "/admin",
             render: () => <b>Administration</b>,
             loader: async () => {
                 const items = []
 
                 if (canReadUsers) {
                     items.push({
-                        icon: "person",
-                        render: () => <NavLink to="/users" end>Manage Users</NavLink>
+                        icon  : "person",
+                        id    : "/admin/users",
+                        render: () => <NavLink to="/admin/users">Manage Users</NavLink>
                     })
                 }
 
                 if (canReadUserGroups) {
                     items.push({
-                        icon: "group",
-                        render: () => <NavLink to="/user-groups" end>Manage User Groups</NavLink>
+                        icon  : "group",
+                        id    : "/admin/user-groups",
+                        render: () => <NavLink to="/admin/user-groups">Manage User Groups</NavLink>
                     })
                 }
 
                 if (canManagePermissions) {
                     items.push({
-                        icon: "shield_lock",
-                        render: () => <NavLink to="/permissions" end>Manage Permissions</NavLink>
+                        icon  : "shield_lock",
+                        id    : "/admin/permissions",
+                        render: () => <NavLink to="/admin/permissions">Manage Permissions</NavLink>
                     })
                 }
 
                 items.push({
-                    icon: "stethoscope",
-                    render: () => <NavLink to="/health-check" end>Health Check</NavLink>
+                    icon  : "stethoscope",
+                    id    : "/admin/health-check",
+                    render: () => <NavLink to="/admin/health-check">Health Check</NavLink>
                 })
 
                 return items
