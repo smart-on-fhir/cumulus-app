@@ -58,6 +58,8 @@ export default function App()
                                     <Route path="password-reset" element={ <PasswordReset /> } />
 
                                     <Route path="my/drafts/*"         element={ <RequireAuth><Views /></RequireAuth> } />
+                                    <Route path="my/account"          element={ <RequireAuth><Account /></RequireAuth> } />
+                                    
                                     <Route path="search"         element={ <RequireAuth><SearchResultsPage /></RequireAuth>} />
                                     <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
                                     <Route path="catalog/*"      element={ <RequireAuth><CatalogRouter /></RequireAuth>} />

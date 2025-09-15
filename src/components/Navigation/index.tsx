@@ -359,6 +359,7 @@ export default function Navigation()
 
         {
             icon     : "person",
+            id       : "/my",
             render   : () => <b>Personal</b>,
             loader   : async () => [
                 {
@@ -368,8 +369,9 @@ export default function Navigation()
                 },
 
                 {
+                    id    : "/my/account",
                     icon: "manage_accounts",
-                    render: () => <NavLink to="/user">My Account</NavLink>
+                    render: () => <NavLink to="/my/account">My Account</NavLink>
                 },
 
                 {
