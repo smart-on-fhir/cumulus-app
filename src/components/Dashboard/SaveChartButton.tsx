@@ -41,7 +41,7 @@ export function SaveChartButton({
                 <div style={{ cursor: "default" }} onClick={() => {
                     save({ isDraft: true }).then(() => {
                         if (graph.id) {
-                            navigate(`/drafts/${graph.id}`)
+                            navigate(`/my/drafts/${graph.id}`)
                         }
                     })
                 }}>

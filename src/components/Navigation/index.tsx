@@ -362,8 +362,9 @@ export default function Navigation()
             render   : () => <b>Personal</b>,
             loader   : async () => [
                 {
-                    render: () => <NavLink to="/drafts">Draft {Terminology.graph.namePlural}</NavLink>,
-                    icon: "edit_square",
+                    id    : "/my/drafts",
+                    icon  : "edit_square",
+                    render: () => <NavLink to="/my/drafts">Draft {Terminology.graph.namePlural}</NavLink>,
                 },
 
                 {

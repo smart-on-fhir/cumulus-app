@@ -48,7 +48,6 @@ export default function App()
                                 <Route path="/">
                                     <Route index                 element={ <RequireAuth><Home /></RequireAuth> } />
                                     <Route path="views/*"        element={ <RequireAuth><Views /></RequireAuth> } />
-                                    <Route path="drafts/*"       element={ <RequireAuth><Views /></RequireAuth> } />
                                     <Route path="requests/*"     element={ <RequireAuth><Subscriptions /></RequireAuth> } />
                                     <Route path="sites/*"        element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
                                     <Route path="groups/*"       element={ <RequireAuth><SubscriptionGroups /></RequireAuth> } />
@@ -57,11 +56,8 @@ export default function App()
                                     <Route path="login"          element={ <LoginPage /> } />
                                     <Route path="activate"       element={ <Activate /> } />
                                     <Route path="password-reset" element={ <PasswordReset /> } />
-                                    <Route path="user"           element={ <RequireAuth><Account /></RequireAuth> } />
-                                    <Route path="users/invite"   element={ <RequireAuth><Invite /></RequireAuth> } />
-                                    <Route path="users"          element={ <RequireAuth><Users /></RequireAuth> } />
-                                    <Route path="permissions"    element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
-                                    <Route path="health-check"   element={ <RequireAuth><HealthCheck /></RequireAuth> } />
+
+                                    <Route path="my/drafts/*"         element={ <RequireAuth><Views /></RequireAuth> } />
                                     <Route path="search"         element={ <RequireAuth><SearchResultsPage /></RequireAuth>} />
                                     <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
                                     <Route path="catalog/*"      element={ <RequireAuth><CatalogRouter /></RequireAuth>} />

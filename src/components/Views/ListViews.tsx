@@ -21,7 +21,7 @@ export default function ListViews()
     const [ sort    , setSort     ] = useState<SortType>(String(url.searchParams.get("sort") || "") as SortType)
     const [ starOnly, setStarOnly ] = useState<Boolean>(url.searchParams.get("star") === "1")
 
-    const isDraft = useMatch("/drafts")
+    const isDraft = useMatch("/my/drafts")
 
     const draftsMode = !!isDraft
 

@@ -61,7 +61,7 @@ describe("SaveChartButton", () => {
         expect(mockSave).toHaveBeenCalledWith({ isDraft: false })
     })
 
-    it("calls save with isDraft true and navigates to /drafts/:id on Save Draft", async () => {
+    it("calls save with isDraft true and navigates to /my/drafts/:id on Save Draft", async () => {
         render(
             <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                 <SaveChartButton graph={graphPublished} save={mockSave} />

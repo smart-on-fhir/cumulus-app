@@ -85,7 +85,7 @@ export class CopyGraph extends Command
     
     execute() {
         setTimeout(() => {
-            const path = `/${this.view.isDraft ? "drafts" : "views"}/${this.view.id}/copy`
+            const path = `/${this.view.isDraft ? "my/drafts" : "views"}/${this.view.id}/copy`
             if (this.navigate) {
                 if (this.payload) {
                     this.navigate(path, { state: { view: this.payload }, replace: false })

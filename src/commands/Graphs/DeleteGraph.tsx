@@ -59,7 +59,7 @@ export class DeleteGraph extends Command
         if (window.confirm("Yre you sure you want to delete this view?")) {
             return deleteOne("views", this.graphId + "").then(() => {
                 setTimeout(() => {
-                    const match = window.location.pathname.match(/\/(views|drafts)\/\d+/)
+                    const match = window.location.pathname.match(/\/(views|my\/drafts)\/\d+/)
                     if (match && match[1]) {
                         if (this.navigate) {
                             this.navigate("/" + match[1])

@@ -315,8 +315,8 @@ export function RequestDataForm({
             <title>Request Line-level Data</title>
             <Breadcrumbs links={[
                 { name: "Home"  , href: "/" },
-                view.isDraft ? { name: "Draft Graphs", href: "/drafts" } : { name: "Graphs", href: "/views"  },
-                { name: view!.name, href: (view.isDraft ? "/drafts" : "/views") + `/${view!.id}` },
+                view.isDraft ? { name: "Draft Graphs", href: "/my/drafts" } : { name: "Graphs", href: "/views"  },
+                { name: view!.name, href: (view.isDraft ? "/my/drafts" : "/views") + `/${view!.id}` },
                 { name: "Request Line-level Data" }
             ]}/>
             <h1>Request Line-level Data</h1>
