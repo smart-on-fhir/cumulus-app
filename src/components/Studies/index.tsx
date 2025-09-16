@@ -3,6 +3,7 @@ import StudyBuilder      from "./StudyBuilder"
 import ListSites         from "./ListStudies"
 import ViewStudy         from "./ViewStudy"
 import ViewStudyVersion  from "./ViewStudyVersion"
+import DataPackageView   from "../DataPackages/DataPackageView"
 
 
 export default function Endpoint() {
@@ -11,8 +12,9 @@ export default function Endpoint() {
             <Route path="/">
                 <Route index element={ <ListSites /> } />
                 <Route path="new" element={ <StudyBuilder /> } />
-                <Route path=":id">
+                <Route path=":studyId">
                     <Route index element={ <ViewStudy /> } />
+                    <Route path="packages/:id" element={ <DataPackageView /> } />
                     <Route path=":version" element={ <ViewStudyVersion /> } />
                 </Route>
             </Route>

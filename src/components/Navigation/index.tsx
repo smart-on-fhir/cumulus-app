@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useRef, useState } from "react"
-import { NavLink, useNavigate, useParams }        from "react-router-dom"
+import { NavLink, useLocation, useNavigate }      from "react-router-dom"
 import Loader                                     from "../generic/Loader"
 import { useAuth }                                from "../../auth"
 import { request }                                from "../../backend"
@@ -15,6 +15,7 @@ async function loadTags() {
     const items = await request<app.Tag[]>("/api/tags")
     return sortBy(items, "name").map(g => ({
         icon  : "sell",
+        path  : `/tags/${g.id}`,
         render: () => <NavLink to={`/tags/${g.id}`}>{g.name}</NavLink>,
     } as unknown as DataRow))
 }
@@ -24,6 +25,7 @@ async function loadStudies() {
     const studies = await aggregator.getStudies()
     return studies.map(s => ({
         icon  : "experiment",
+        path  : `/studies/${s.id}`,
         render: () => <NavLink to={`/studies/${s.id}`}>{s.label}</NavLink>,
         loader: async () => {
             const versions = await aggregator.getStudyVersions(s.id)
@@ -33,7 +35,8 @@ async function loadStudies() {
                 const [, name] = p.id.trim().split("__")
                 return {
                     icon  : "deployed_code",
-                    render: () => <NavLink to={`/packages/${p.id}`}>{humanizeColumnName(name)}</NavLink>,
+                    path  : `/studies/${s.id}/packages/${p.id}`,
+                    render: () => <NavLink to={`/studies/${s.id}/packages/${p.id}`}>{humanizeColumnName(name)}</NavLink>,
                 }
             })
         }
@@ -46,6 +49,7 @@ async function loadSites() {
     return sortBy(items, "name").filter(x => !!x.id).map(x => ({
         render: () => <NavLink to={`/sites/${x.id}`}>{ x.name }</NavLink>,
         icon  : Terminology.site.icon,
+        path  : `/sites/${x.id}`
     } as unknown as DataRow))
 }
 
@@ -60,7 +64,8 @@ async function loadQualityMetrics() {
     }, [])
 
     return sites.sort().map(s => ({
-        icon: Terminology.site.icon,
+        icon  : Terminology.site.icon,
+        path  : `/metrics/${s}`,
         render: () => <span>{humanizeColumnName(s)}</span>,
         loader: async () => {
 
@@ -81,7 +86,8 @@ async function loadQualityMetrics() {
                     const pkg = byName[name][0];
                     return {
                         icon  : "table",
-                        render: () => <NavLink to={`/packages/${pkg.id}`}>{humanizeColumnName(name)}</NavLink>,
+                        path  : `/metrics/${s}/${pkg.id}`,
+                        render: () => <NavLink to={`/metrics/${s}/${pkg.id}`}>{humanizeColumnName(name)}</NavLink>,
                     }
                 }
 
@@ -89,15 +95,17 @@ async function loadQualityMetrics() {
 
                 return {
                     icon  : "table",
+                    path  : `/metrics/${s}/${sorted[0].id}`,
                     render: () => {
                         const newest = sorted[0];
-                        return <NavLink to={`/packages/${newest.id}`}>{humanizeColumnName(name)}</NavLink>
+                        return <NavLink to={`/metrics/${newest.id}`}>{humanizeColumnName(name)}</NavLink>
                     },
                     loader: async () => {
                         return sorted.map(pkg => {
                             return {
                                 icon  : "history",
-                                render: () => <NavLink to={`/packages/${pkg.id}`}>Version {pkg.version}</NavLink>
+                                path  : `/metrics/${s}/${pkg.id}`,
+                                render: () => <NavLink to={`/metrics/${s}/${pkg.id}`}>Version {pkg.version}</NavLink>
                             }
                         })
                     }
@@ -113,6 +121,7 @@ export interface DataRow {
     loader   ?: () => Promise<DataRow[]>
     render    : (node: DataRow) => ReactNode
     href     ?: string
+    path     ?: string
     [key: string]: any
 }
 
@@ -127,18 +136,19 @@ export function Tree({ data }: { data: DataRow[] }) {
 }
 
 function Row({ node }: { node: DataRow }) {
-    const currentPath             = String(useParams()["*"] || "")
+    const currentPath             = useLocation().pathname
+    const rowRef                  = useRef<HTMLElement|null>(null);
     const [loading , setLoading ] = useState(false)
     const [children, setChildren] = useState<DataRow[]>([])
     const [error   , setError   ] = useState<Error | string>("")
     const [isOpen  , setIsOpen  ] = useState<boolean|undefined>(
-        node.open || (
-            currentPath !== node.id &&
+        node.open ?? (
+            node.path &&
             !!node.loader &&
-            currentPath.startsWith(node.id)
+            currentPath.startsWith(node.path) ? true : undefined
         )
     )
-    
+
     const length = children.length
 
     useEffect(() => {
@@ -152,19 +162,47 @@ function Row({ node }: { node: DataRow }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen, length])
 
+    useEffect(() => {
+        if (node.path && currentPath === node.path) {
+            const handle = setTimeout(() => {
+                const el = rowRef.current;
+                if (!el) return;
+
+                // Find the nearest scrollable parent
+                let parent = el.parentElement;
+                while (parent && parent !== document.body) {
+                    const overflowY = window.getComputedStyle(parent).overflowY;
+                    if (overflowY === "auto" || overflowY === "scroll") break;
+                    parent = parent.parentElement;
+                }
+                const container = parent as HTMLElement | null;
+
+                const rect = el.getBoundingClientRect();
+                const cRect = container ? container.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
+
+                // Only scroll if not fully in container's viewport
+                if (rect.top < cRect.top || rect.bottom > cRect.bottom) {
+                    el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+                }
+            }, 50); // Delay to ensure DOM/layout is ready
+
+            return () => clearTimeout(handle);
+        }
+    }, [currentPath, node.path, isOpen]);
+
     return (
         <div className={ classList({
             details: true,
             "has-children": !!node.loader || children.length > 0
-        }) }>
-            <summary>
-                { !!node.loader ? <b className="toggle" onClick={e => {
+        }) } data-path={node.path}>
+            <summary ref={rowRef}>
+                { !!node.loader ? <b className={"toggle" + (isOpen ? " open" : " closed")} onClick={e => {
                     e.stopPropagation()
                     setIsOpen(!isOpen)
                 }} >{ isOpen ? "▾" : "▸" }</b> : node.inset ? <b className="toggle"/> : null }
                 <label
                     data-tooltip={ error ? error + "" : node.title }
-                    className={ node.id && node.id === currentPath ? "selected" : undefined }>
+                    className={ node.path && node.path === currentPath ? "selected" : undefined }>
                     { loading ?
                         <Loader msg="" /> :
                         <span className={"icon icon-2 material-symbols-outlined" + (!!node.loader ? isOpen ? " open" : "" : "")}>
@@ -192,10 +230,27 @@ function Row({ node }: { node: DataRow }) {
 
 export default function Navigation()
 {
-    let { loading, user, logout } = useAuth();
-    let navigate = useNavigate();
-    const ref = useRef<HTMLDivElement|null>(null);
+    let { loading, user, logout }   = useAuth();
+    let navigate                    = useNavigate();
+    const currentPath               = useLocation().pathname
+    const ref                       = useRef<HTMLDivElement|null>(null);
     const [collapsed, setCollapsed] = useState(!!JSON.parse(LocalStorageNS.getItem("sidebarCollapsed") ?? "false"))
+
+    useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        const handle = requestAnimationFrame(() => {
+            const segments = currentPath.split("/");
+            let path = "/"
+            document.querySelectorAll<HTMLElement>(`[data-path="${path}"] > summary > .toggle.closed`).forEach(el => {
+                el.click();
+            });
+            segments.forEach(segment => {
+                path += (path.endsWith("/") ? "" : "/") + segment;
+                document.querySelector<HTMLElement>(`[data-path="${path}"] > summary > .toggle.closed`)?.click();
+            });
+        });
+        return () => cancelAnimationFrame(handle)
+    }, [currentPath])
 
     function onResizeStart(event: React.MouseEvent) {
 
@@ -247,24 +302,28 @@ export default function Navigation()
     const TREE_DATA: DataRow[] = [
         {
             render: () => <NavLink to="/"><b>Home</b></NavLink>,
-            icon: "house",
-            inset: true
+            icon  : "house",
+            inset : true,
+            path  : "/"
         },
         {
             render: () => <b>Local</b>,
-            icon: "folder_open",
-            open: true,
+            icon  : "folder_open",
+            open  : true,
+            path  : "/",
             loader: async () => {
                 const out = []
 
                 if (canReadStudyAreas) {
                     out.push({
-                        icon: Terminology.studyArea.icon,
+                        icon  : Terminology.studyArea.icon,
+                        path  : `/study-areas`,
                         render: () => <NavLink to="/study-areas">{Terminology.studyArea.namePlural}</NavLink>,
                         loader: async function loadStudyAreas() {
                             const items = await request<app.StudyArea[]>("/api/study-areas")
                             return sortBy(items, "name").map(x => ({
-                                icon: Terminology.studyArea.icon,
+                                icon  : Terminology.studyArea.icon,
+                                path  : `/study-areas/${x.id}`,
                                 render: () => <NavLink to={`/study-areas/${x.id}`}>{x.name}</NavLink>,
                             } as unknown as DataRow))
                         }
@@ -286,12 +345,14 @@ export default function Navigation()
                 if (canListGroups) {
                     out.push({
                         icon: Terminology.subscriptionGroup.icon,
+                        path: `/groups`,
                         render: () => <NavLink to="/groups">{Terminology.subscriptionGroup.namePlural}</NavLink>,
                         loader: async function loadGroups() {
                             const groups = await request<app.SubscriptionGroup[]>("/api/request-groups")
                             return sortBy(groups, "name").filter(g => !!g.id).map(g => ({
-                                render: () => <NavLink to={ `/groups/${g.id}` }>{ g.name }</NavLink>,
+                                render: () => <NavLink to={`/groups/${g.id}`}>{g.name}</NavLink>,
                                 icon  : Terminology.subscriptionGroup.icon,
+                                path  : `/groups/${g.id}`,
                             } as unknown as DataRow));
                         }
                     })
@@ -300,6 +361,7 @@ export default function Navigation()
                 if (canReadTags) {
                     out.push({
                         icon: Terminology.tag.icon,
+                        path: `/tags`,
                         render: () => <NavLink to="/tags">{Terminology.tag.namePlural}</NavLink>,
                         loader: loadTags
                     })
@@ -310,45 +372,54 @@ export default function Navigation()
         },
         {
             render: () => <b>Remote</b>,
-            icon: "cloud",
-            open: true,
+            icon  : "cloud",
+            open  : true,
+            path  : "/",
             loader: async () => {
                 const out = []
 
                 out.push({
-                    icon: Terminology.study.icon,
+                    icon  : Terminology.study.icon,
                     render: () => <NavLink to="/studies">{Terminology.study.namePlural}</NavLink>,
-                    loader: loadStudies
+                    loader: loadStudies,
+                    path  : "/studies"
                 })
 
                 out.push({
-                    icon: Terminology.site.icon,
+                    icon  : Terminology.site.icon,
                     render: () => <NavLink to="/sites">{Terminology.site.namePlural}</NavLink>,
-                    loader: loadSites
+                    loader: loadSites,
+                    path  : "/sites"
                 })
 
                 out.push({
-                    icon: Terminology.dataPackage.icon,
-                    render: () => <NavLink to="/packages">All {Terminology.dataPackage.namePlural}</NavLink>
+                    icon  : Terminology.dataPackage.icon,
+                    render: () => <NavLink to="/packages">All {Terminology.dataPackage.namePlural}</NavLink>,
+                    path  : "/packages"
                 })
 
                 out.push({
-                    icon: "verified",
+                    icon  : "verified",
+                    path  : "/metrics",
                     render: () => <span>Quality Metrics</span>,
                     loader: loadQualityMetrics
                 })
 
                 out.push({
-                    icon: "inventory_2",
+                    icon  : "inventory_2",
+                    path  : "/catalog",
                     render: () => <span>Catalog</span>,
                     loader: async () => [
                         {
                             render: () => <NavLink to="/catalog/icd10">ICD10 Diagnoses</NavLink>,
-                            icon: "list_alt"
+                            icon: "list_alt",
+                            path  : "/catalog/icd10"
+
                         },
                         {
                             render: () => <NavLink to="/catalog/loinc">LOINC Laboratories</NavLink>,
-                            icon: "list_alt"
+                            icon: "list_alt",
+                            path  : "/catalog/loinc"
                         }
                     ]
                 })
@@ -356,20 +427,19 @@ export default function Navigation()
                 return out;
             }
         },
-
         {
             icon     : "person",
-            id       : "/my",
+            path     : "/my",
             render   : () => <b>Personal</b>,
             loader   : async () => [
                 {
-                    id    : "/my/drafts",
+                    path  : "/my/drafts",
                     icon  : "edit_square",
                     render: () => <NavLink to="/my/drafts">Draft {Terminology.graph.namePlural}</NavLink>,
                 },
 
                 {
-                    id    : "/my/account",
+                    path  : "/my/account",
                     icon: "manage_accounts",
                     render: () => <NavLink to="/my/account">My Account</NavLink>
                 },
@@ -388,7 +458,7 @@ export default function Navigation()
     if (canAdminister) {
         TREE_DATA.push({
             icon  : "build_circle",
-            id    : "/admin",
+            path  : "/admin",
             render: () => <b>Administration</b>,
             loader: async () => {
                 const items = []
@@ -396,7 +466,7 @@ export default function Navigation()
                 if (canReadUsers) {
                     items.push({
                         icon  : "person",
-                        id    : "/admin/users",
+                        path  : "/admin/users",
                         render: () => <NavLink to="/admin/users">Manage Users</NavLink>
                     })
                 }
@@ -404,7 +474,7 @@ export default function Navigation()
                 if (canReadUserGroups) {
                     items.push({
                         icon  : "group",
-                        id    : "/admin/user-groups",
+                        path  : "/admin/user-groups",
                         render: () => <NavLink to="/admin/user-groups">Manage User Groups</NavLink>
                     })
                 }
@@ -412,14 +482,14 @@ export default function Navigation()
                 if (canManagePermissions) {
                     items.push({
                         icon  : "shield_lock",
-                        id    : "/admin/permissions",
+                        path  : "/admin/permissions",
                         render: () => <NavLink to="/admin/permissions">Manage Permissions</NavLink>
                     })
                 }
 
                 items.push({
                     icon  : "stethoscope",
-                    id    : "/admin/health-check",
+                    path  : "/admin/health-check",
                     render: () => <NavLink to="/admin/health-check">Health Check</NavLink>
                 })
 

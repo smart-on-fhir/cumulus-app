@@ -49,7 +49,7 @@ async function load(studyId: string, version: string) {
 
 export default function ViewStudyVersion() {
 
-    const {id, version} = useParams()
+    const {studyId, version} = useParams()
 
     const [loading      , setLoading] = useState(true)
     const [error        , setError  ] = useState<Error | string | null>(null)
@@ -59,12 +59,12 @@ export default function ViewStudyVersion() {
     const [packages     , setPackages     ] = useState<DataPackage[]>([])
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const abortController = useMemo(() => new AbortController(), [id, version])
+    const abortController = useMemo(() => new AbortController(), [studyId, version])
 
     useEffect(() => {
         setError(null)
         setLoading(true)
-        load(id!, version!)
+        load(studyId!, version!)
             .then(result => {
                 // setPeriods(result.periods)
                 setSites(result.sites)
@@ -85,7 +85,7 @@ export default function ViewStudyVersion() {
             // are completed 
             abortController.abort()
         }
-    }, [ id, abortController, version ])
+    }, [ studyId, abortController, version ])
 
     if (abortController.signal.aborted) {
         return null
@@ -101,15 +101,15 @@ export default function ViewStudyVersion() {
 
     return (
         <div className="container">
-            <title>{humanizeColumnName(id!)}</title>
+            <title>{humanizeColumnName(studyId!)}</title>
             <Breadcrumbs links={[
                 { name: "Home"    , href: "/" },
                 { name: Terminology.study.namePlural, href: "/studies" },
-                { name: humanizeColumnName(id!), href: "/studies/" + id },
-                { name: "Version " + version, href: "/studies/" + id + "/" + version },
+                { name: humanizeColumnName(studyId!), href: "/studies/" + studyId },
+                { name: "Version " + version, href: "/studies/" + studyId + "/" + version },
             ]} />
             <PageHeader
-                title={ <>{ humanizeColumnName(id!) } <span className="color-muted">/ {version}</span></> }
+                title={ <>{ humanizeColumnName(studyId!) } <span className="color-muted">/ {version}</span></> }
                 icon={Terminology.study.icon}
                 description={`Description not available`} />
             <div className="row gap-2 wrap">
@@ -150,7 +150,7 @@ export default function ViewStudyVersion() {
                             {
                                 icon : Terminology.study.icon,
                                 label: Terminology.study.nameSingular,
-                                value: <Link className="link" to={`../`}>{ id }</Link>
+                                value: <Link className="link" to={`../`}>{ studyId }</Link>
                             },
                             {
                                 icon : "history",

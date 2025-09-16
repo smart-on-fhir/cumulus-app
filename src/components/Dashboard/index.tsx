@@ -1064,6 +1064,10 @@ function ActionButtons({ subscription, id }: { id?: number, subscription?: app.S
 function MetaData({ subscription, dataPackage, tags = [] }: { subscription?: app.Subscription, dataPackage?: DataPackage, tags?: Pick<app.Tag, "id" | "name" | "description">[] }) {
     
     if (subscription) {
+
+        const segments = subscription.dataURL?.split("__") || [];
+        const studyId  = segments.length > 1 ? segments[0] : undefined;
+
         return <div className="row wrap">
             <div className="col col-5 responsive p-1">
                 <Grid cols="auto 1fr" gap="0.5rem">
@@ -1126,7 +1130,9 @@ function MetaData({ subscription, dataPackage, tags = [] }: { subscription?: app
                     <div>
                         <b>Data Package</b>
                         <hr className="small mb-05"/>
-                        <Link className="link" to={`/packages/${subscription.dataURL}`}>{ humanizeColumnName(subscription.dataURL) }</Link>
+                        <Link className="link" to={studyId ? `/studies/${studyId}/packages/${subscription.dataURL}` : `/packages/${subscription.dataURL}`}>
+                            { humanizeColumnName(subscription.dataURL) }
+                        </Link>
                     </div>
                 </Grid>
             </div> }
@@ -1159,7 +1165,7 @@ function MetaData({ subscription, dataPackage, tags = [] }: { subscription?: app
                     <div>
                         <b>Data Package</b>
                         <hr className="small mb-05"/>
-                        <Link className="link" to={`/packages/${dataPackage.id}`}>{ humanizeColumnName(dataPackage.name) }</Link>
+                        <Link className="link" to={`/studies/${dataPackage.study}/packages/${dataPackage.id}`}>{ humanizeColumnName(dataPackage.name) }</Link>
                     </div>
                 </Grid>
             </div>

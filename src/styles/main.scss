@@ -139,6 +139,8 @@
   font-family     : var(--font-family);
   background-color: var(--color-window-bg);
   color           : var(--color-window-fg);
+  scroll-padding-block-start: 6rem;
+  scroll-padding-block-end  : 1rem;
 }
 
 body {

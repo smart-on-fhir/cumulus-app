@@ -12,7 +12,7 @@ import { classList, humanizeColumnName }    from "../../utils"
 
 export default function ViewStudy({ studyId }: { studyId?: string }) {
 
-    const { id: idParam } = useParams()
+    const { studyId: idParam } = useParams()
 
     const id = String(studyId || idParam || "")
 

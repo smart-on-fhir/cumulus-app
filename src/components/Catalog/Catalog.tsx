@@ -187,8 +187,11 @@ export default function Catalog({ title = "Catalog", path }: { title?: string, p
                         if (sites) {
                             filter += "," + encodeURIComponent("site:matchesCI:" + sites.split(",").join("|"))
                         }
+
+                        const studyId = result.pkg.id.split("__").shift();
+
                         navigate({
-                            pathname: "/packages/" + result.pkg.id,
+                            pathname: studyId ? `/studies/${studyId}/packages/${result.pkg.id}` : `/packages/${result.pkg.id}`,
                             search: filter
                         })
                     }

@@ -30,8 +30,17 @@ export default function Tree({
     return (
         <div className="catalog-tree">
             <div key={search}>
-                { children.map(row => (
-                    <Row data={data} id={row[id] as  string | number} key={"/" + row[id]} search={search} open={ children.length < 2 } expandOnSearch={data.length < 1000} navigate={navigate} />
+                { children.map((row, i) => (
+                    <Row
+                        data={data}
+                        id={row[id] as  string | number}
+                        path={"/" + row[id]}
+                        key={"/" + i}
+                        search={search}
+                        open={children.length < 2}
+                        expandOnSearch={data.length < 1000}
+                        navigate={navigate}
+                    />
                 )) }
             </div>
         </div>
@@ -45,7 +54,7 @@ function Row({
     search,
     expandOnSearch,
     navigate,
-    key
+    path
 }: {
     data: DataRow[]
     id: string | number
@@ -53,7 +62,7 @@ function Row({
     search?: string
     expandOnSearch?: boolean
     navigate?: (...args: any[]) => void
-    key: string
+    path: string
 }) {
     const [isOpen, setIsOpen] = useState(!!open)
     const { id: idColumn, pid: pidColumn, label, count, description, stratifier } = MAPPING
@@ -92,7 +101,15 @@ function Row({
                 </label>
             </summary>
             { ((expandOnSearch && !!search) || isOpen) && children.map((row, i) => (
-                <Row data={data} id={row[idColumn] as string | number} search={search} expandOnSearch={expandOnSearch} navigate={navigate} key={[key, node.id].join("/")} />
+                <Row
+                    data={data}
+                    id={row[idColumn] as string | number}
+                    search={search}
+                    expandOnSearch={expandOnSearch}
+                    navigate={navigate}
+                    path={[path, node.id].join("/")}
+                    key={[path, i].join("/")}
+                />
             ))}
         </details>
     )

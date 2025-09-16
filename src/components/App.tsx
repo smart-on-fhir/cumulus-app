@@ -29,6 +29,8 @@ import CssPreview                       from "./CssPreview";
 import "../styles/main.scss";
 
 
+history.scrollRestoration = "manual";
+
 export default function App()
 {
     return (
@@ -46,33 +48,30 @@ export default function App()
                         <div id="main" className="col">
                             <Routes>
                                 <Route path="/">
-                                    <Route index                 element={ <RequireAuth><Home /></RequireAuth> } />
-                                    <Route path="views/*"        element={ <RequireAuth><Views /></RequireAuth> } />
-                                    <Route path="requests/*"     element={ <RequireAuth><Subscriptions /></RequireAuth> } />
-                                    <Route path="sites/*"        element={ <RequireAuth><DataSiteListPage/></RequireAuth> } />
-                                    <Route path="groups/*"       element={ <RequireAuth><SubscriptionGroups /></RequireAuth> } />
-                                    <Route path="study-areas/*"  element={ <RequireAuth><StudyAreas /></RequireAuth> } />
-                                    <Route path="tags/*"         element={ <RequireAuth><Tags /></RequireAuth> } />
-                                    <Route path="login"          element={ <LoginPage /> } />
-                                    <Route path="activate"       element={ <Activate /> } />
-                                    <Route path="password-reset" element={ <PasswordReset /> } />
-
+                                    <Route index                      element={ <RequireAuth><Home /></RequireAuth> } />
+                                    <Route path="views/*"             element={ <RequireAuth><Views /></RequireAuth> } />
+                                    <Route path="requests/*"          element={ <RequireAuth><Subscriptions /></RequireAuth> } />
+                                    <Route path="sites/*"             element={ <RequireAuth><DataSiteListPage /></RequireAuth> } />
+                                    <Route path="groups/*"            element={ <RequireAuth><SubscriptionGroups /></RequireAuth> } />
+                                    <Route path="study-areas/*"       element={ <RequireAuth><StudyAreas /></RequireAuth> } />
+                                    <Route path="tags/*"              element={ <RequireAuth><Tags /></RequireAuth> } />
+                                    <Route path="login"               element={ <LoginPage /> } />
+                                    <Route path="activate"            element={ <Activate /> } />
+                                    <Route path="password-reset"      element={ <PasswordReset /> } />
                                     <Route path="my/drafts/*"         element={ <RequireAuth><Views /></RequireAuth> } />
                                     <Route path="my/account"          element={ <RequireAuth><Account /></RequireAuth> } />
-                                    
                                     <Route path="admin/users/invite"  element={ <RequireAuth><Invite /></RequireAuth> } />
                                     <Route path="admin/users"         element={ <RequireAuth><Users /></RequireAuth> } />
                                     <Route path="admin/permissions"   element={ <RequireAuth><PermissionsManager /></RequireAuth> } />
                                     <Route path="admin/health-check"  element={ <RequireAuth><HealthCheck /></RequireAuth> } />
                                     <Route path="admin/user-groups/*" element={ <RequireAuth><UserGroups /></RequireAuth> } />
-                                    
-                                    <Route path="search"         element={ <RequireAuth><SearchResultsPage /></RequireAuth>} />
-                                    <Route path="user-groups/*"  element={ <RequireAuth><UserGroups /></RequireAuth> } />
-                                    <Route path="catalog/*"      element={ <RequireAuth><CatalogRouter /></RequireAuth>} />
-                                    <Route path="studies/*"      element={ <RequireAuth><Studies /></RequireAuth>} />
-                                    <Route path="packages/*"     element={ <RequireAuth><Packages /></RequireAuth>} />
-                                    <Route path="css"            element={ <CssPreview /> } />
-                                    <Route path="*"              element="Page Not Found" />
+                                    <Route path="search"              element={ <RequireAuth><SearchResultsPage /></RequireAuth>} />
+                                    <Route path="catalog/*"           element={ <RequireAuth><CatalogRouter /></RequireAuth>} />
+                                    <Route path="studies/*"           element={ <RequireAuth><Studies /></RequireAuth>} />
+                                    <Route path="metrics/:siteId/*"   element={ <RequireAuth><Packages /></RequireAuth>} />
+                                    <Route path="packages/*"          element={ <RequireAuth><Packages /></RequireAuth>} />
+                                    <Route path="css"                 element={ <CssPreview /> } />
+                                    <Route path="*"                   element="Page Not Found" />
                                 </Route>
                             </Routes>
                         </div>

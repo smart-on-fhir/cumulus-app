@@ -78,9 +78,10 @@ export default function DataPackageList() {
                                         <>
                                             <i className="material-symbols-outlined icon mr-05 ml-1 color-brand-2">
                                                 { row.type === "flat" ? "table" : "deployed_code" }
-                                            </i><Link to={`/packages/${row.id}`} className="link">{
-                                                highlight(humanizeColumnName(row.name), search)
-                                            }</Link>
+                                            </i>
+                                            <Link to={ row.type === "flat" ? `/packages/${row.id}` : `/studies/${row.study}/packages/${row.id}`} className="link">
+                                                { highlight(humanizeColumnName(row.name), search) }
+                                            </Link>
                                         </>
                                     )
                                 },
