@@ -1,15 +1,19 @@
 import HTTP                     from "http"
 import Path                     from "path"
+import { debuglog }             from "util"
 import express, { Application } from "express"
 import cors                     from "cors"
 import cookieParser             from "cookie-parser"
 import * as Auth                from "./routes/Auth"
 import setupDB                  from "./db"
+import { getRequestBaseURL }    from "./lib"
 import settings                 from "./config"
 import * as logger              from "./services/logger"
 import * as api                 from "./routes"
 import { Config, AppErrorRequestHandler } from "./types"
 
+
+const debugRequest = debuglog("app:request");
 
 function createServer(config: Config)
 {
@@ -17,6 +21,14 @@ function createServer(config: Config)
     const server = new HTTP.Server(app);
 
     app.set('etag', false);  
+
+    app.use((req, res, next) => {
+        debugRequest(`${req.method} ${getRequestBaseURL(req)}`);
+        debugRequest(`\treq.url: ${req.url}`);
+        debugRequest(`\treq.originalUrl: ${req.originalUrl}`);
+        debugRequest(`\treq.headers:\n\t\t${Object.keys(req.headers).map(k => `${k}: ${req.headers[k]}`).join("\n\t\t")}`);
+        next();
+    });
 
     app.use(cors({ origin: true, credentials: true }));
 
