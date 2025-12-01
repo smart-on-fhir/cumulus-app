@@ -1,0 +1,73 @@
+version: 0.0.0
+
+tool:
+  name: Cumulus Fabric Prep-to-Research Dashboard
+  repo_url: https://github.com/smart-on-fhir/cumulus
+  tool_homepage: https://docs.smarthealthit.org/cumulus/
+  documentation_url: https://docs.smarthealthit.org/cumulus/
+  tool_type: WebApp
+
+llm:
+  usesLlm: false
+  bringOwnKey: false
+
+input:
+  - name: Clinical/Phenotype matrix 1
+    dataCategory: clinical-phenotype
+    dataClass: matrix
+    dataType: clinical-ehr
+    format:
+      - csv
+    dataStandard:
+      - Stratified counts, e.g. of FHIR elements
+    proprietary: true
+    source: "TODO"
+
+output:
+  - name: Clinical/phenotype data-viz 1
+    dataCategory: clinical-phenotype
+    dataClass: data-viz
+    dataType: clinical-ehr
+    format:
+      - csv
+    dataStandard:
+      - Can also export aggregate count tables
+    proprietary: true
+    source: "TODO"
+
+license:
+  license_type: Apache-2.0
+  link: https://github.com/smart-on-fhir/cumulus/blob/main/LICENSE
+
+funding:
+  source: CDC, ARPA-H
+  agreement: Not specified
+  link: ""
+
+domains:
+  - Anything in the EHR.
+
+credit:
+  - name: Cumulus-Fab
+    role: Developer
+    org: Boston Children's Hospital
+    url: https://docs.smarthealthit.org/cumulus/
+
+target_users:
+  primary_user:
+    user_type: researcher
+    technical_literacy_level:
+      - intermediate
+    biomedical_literacy_level:
+      - novice
+
+maturity:
+  beginning_maturity: 1
+  current_maturity: 3
+
+publication:
+  [{ type: Journal article, doi: https://doi.org/10.1093/jamia/ocae130 }]
+
+media: [{ "link": "https://doi.org/10.1093/jamia/ocae130" }]
+
+collaborations: []
