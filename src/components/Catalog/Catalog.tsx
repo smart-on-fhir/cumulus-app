@@ -11,6 +11,7 @@ import { AlertError } from "../generic/Alert"
 import PageHeader     from "../generic/PageHeader"
 import { request }    from "../../backend"
 import Terminology    from "../../Terminology"
+import { extract }    from "../../utils"
 import "./Catalog.scss"
 
 
@@ -63,34 +64,29 @@ function search(data: DataRow[], q: string, columns: string[]): DataRow[] {
     if (!q || !columns.length || !data.length) {
         return [...data]
     }
-
-    const input = [...data];
-    const out: DataRow[] = [];
-
     q = q.toLowerCase();
 
-    let i = 0
-    do {
-        let row = input[i];
-        if (columns.some(column => String(row[column]).toLowerCase().includes(q))) {
-            row = input.splice(i, 1)[0]
-            out.push(row)
-            do {
-                // eslint-disable-next-line no-loop-func
-                const idx = input.findIndex(r => r[MAPPING.id] === row[MAPPING.pid])
-                if (idx > -1) {
-                    row = input.splice(idx, 1)[0]
-                    out.push(row)
-                } else {
-                    break
-                }
-            } while (row)
-        } else {
-            i++
-        }
-    } while (i < input.length)
+    // Make a copy to work with
+    const input = [...data];
 
-    return out
+    // Extract matching rows
+    const out = extract(input, row => columns.some(column => String(row[column]).toLowerCase().includes(q)));
+
+    // Extract missing parents
+    out.forEach(row => {
+        do {
+            // eslint-disable-next-line no-loop-func
+            const idx = input.findIndex(r => r[MAPPING.id] === row[MAPPING.pid])
+            if (idx > -1) {
+                row = input.splice(idx, 1)[0]
+                out.push(row)
+            } else {
+                break
+            }
+        } while (row);
+    });
+
+    return out;
 }
 
 const { label, description } = MAPPING

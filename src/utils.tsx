@@ -552,3 +552,24 @@ export class JobQueue {
         }
     }
 }
+
+
+/**
+ * Works like filter but removes the matching elements from the input array.
+ * WARNING: This is a mutating operation that will change the input array!
+ */
+export function extract(input: any[], predicate: (value: any, index: number, array: any[]) => boolean) {
+    const out: any[] = [];
+
+    let i = 0
+    do {
+        const row = input[i];
+        if (predicate(row, i, input)) {
+            out.push(input.splice(i, 1)[0]);
+        } else {
+            i += 1;
+        }
+    } while (i < input.length);
+
+    return out;
+}
