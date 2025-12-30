@@ -60,7 +60,7 @@
     "build:frontend": "vite build",
     "build:server": "tsc --project backend/tsconfig.json",
     "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
-    "start:prod": "node dist/backend/index.js | roarr pretty-print",
+    "start:prod": "node dist/backend/index.js",
     "start:prod:ts": "ts-node -P backend/tsconfig.json backend",
     "start:dev": "cd docker && docker compose --env-file='../.env.development.local' up",
     "start:hmr": "VITE_DEBUG=true vite --force",
