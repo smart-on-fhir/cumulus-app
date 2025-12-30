@@ -33,7 +33,7 @@ async function connectToDatabase(options: Config)
         logger.verbose("✔ Connected to the database");
         return connection
     } catch (ex) {
-        logger.error("✘ Failed to connected to the database", { ...(ex as any) });
+        logger.error(ex, "✘ Failed to connected to the database");
         throw ex;
     }
 }
@@ -77,10 +77,10 @@ async function applyMigrations(options: Config, dbConnection: Sequelize)
         migrations: { glob: ["migrations/*.{js,ts}", { cwd: __dirname }] },
         storage: new SequelizeStorage({ sequelize: dbConnection, tableName: "SequelizeMeta" }),
         logger: {
-            debug: msg => logger.debug(msg.event + " " + msg.name, { ...msg }),
-            info : msg => logger.info (msg.event + " " + msg.name, { ...msg }),
-            warn : msg => logger.warn (msg.event + " " + msg.name, { ...msg }),
-            error: msg => logger.error(msg.event + " " + msg.name, { ...msg })
+            debug: msg => logger.debug(msg, msg.event + " " + msg.name),
+            info : msg => logger.info (msg, msg.event + " " + msg.name),
+            warn : msg => logger.warn (msg, msg.event + " " + msg.name),
+            error: msg => logger.error(msg, msg.event + " " + msg.name)
         }
     });
 
@@ -115,7 +115,7 @@ async function applySeeds(dbConnection: Sequelize)
     try {
         await seed(dbConnection);
     } catch (error) {
-        logger.error("Applying seeds failed %o", error)
+        logger.error(error, "Applying seeds failed from %s: %s", seedPath.replace(__dirname, ""), error.message);
         throw error
     }
 

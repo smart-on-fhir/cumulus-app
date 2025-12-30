@@ -481,13 +481,12 @@ route(router, {
 route(router, {
     method: "post",
     path  : "/:id/request-linelevel-data",
-    async handler(req, res) {
+    async handler(req, res, next) {
         requestPermission({ user: req.user, resource: "Subscriptions", action: "requestLineLevelData" })
         requestLineLevelData(req).then(
             () => res.end(),
             (e: any) => {
-                logger.error(e)
-                res.status(400).json(e)
+                next(new BadRequest("Line-level data request failed: " + e.message))
             }
         )
     }

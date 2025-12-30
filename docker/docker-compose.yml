@@ -42,6 +42,7 @@ services:
       - APP_EMAIL_FROM=$APP_EMAIL_FROM
       - REACT_APP_BACKEND_HOST=$REACT_APP_BACKEND_HOST
       - VITE_APP_PREFIX=$VITE_APP_PREFIX
+      - ROARR_LOG=$ROARR_LOG
     volumes:
       - ../backend:/app/backend
       - ../dist/frontend:/app/frontend

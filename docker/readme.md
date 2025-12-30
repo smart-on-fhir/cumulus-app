@@ -99,9 +99,12 @@ Boolean value to toggle aggregator support. This way you can enable or disable t
 By default the server runs on port `80` and your own port to it when you run the container (e.g.: `-p 6001:80`). However, if this image is part of a docker compose network, it might be useful to use a different port which you can provide here.
 
 ### NODE_DEBUG
-What to log to STDOUT? A comma-separated list of values. The full list is `app-verbose,app-error,app-info,app-warn,app-log,app-sql`.
+What to log to STDOUT? A comma-separated list of values. The full list is `app-verbose,app-error,app-info,app-warn,app-log,app-sql,app-request`. You can also use wildcards, e.g. `app-*` to log everything. Note that ROARR_LOG must be set to `true` to see any logs!
 
 The default value is to log everything except SQL (`app-sql`). Note that logging sql might be useful for debugging but generates a lot of information, as it logs more than just SQL queries. Therefore, it is not recommended to keep that flag on.
+
+### ROARR_LOG
+Set this to `true` to enable JSON-formatted logs.
 
 ### REACT_APP_NOTEBOOK_URL
 If set, a "Open in analytics environment" button will be rendered below charts.

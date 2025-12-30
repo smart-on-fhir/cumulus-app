@@ -2,6 +2,7 @@ import express, { NextFunction, Response, Router } from "express"
 import { checkSchema, Schema, validationResult }   from "express-validator"
 import * as logger                                 from "../services/logger"
 import { AppRequest, AppRequestHandler }           from "../types"
+import { BadRequest } from "../errors"
 
 
 export function route(router: Router, options: {
@@ -48,12 +49,10 @@ export function route(router: Router, options: {
         
                 const array = errors.array()
                 if (array.length === 1) {
-                    logger.error("Request validation error: " + array[0], errors)
+                    next(new BadRequest("Request validation failed: " + array[0]));
                 } else {
-                    logger.error("Multiple request validation errors", errors)
+                    next(new BadRequest("Multiple request validation errors: " + array.map(e => "\n - " + e).join("")));
                 }
-        
-                res.status(400).json({ errors: array });
             }
         )
     }

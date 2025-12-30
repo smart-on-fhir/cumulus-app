@@ -1,16 +1,16 @@
-import Crypto              from "crypto"
-import Bcrypt              from "bcryptjs"
-import express, { Router } from "express"
-import { body }            from "express-validator"
-import { debuglog }        from "util"
-import { InferAttributes } from "sequelize"
-import moment              from "moment"
-import * as lib            from "../lib"
-import User                from "../db/models/User"
-import { route }           from "../lib/route"
-import * as mail           from "../services/email"
-import SystemUser          from "../SystemUser"
-import config              from "../config"
+import Crypto                from "crypto"
+import Bcrypt                from "bcryptjs"
+import express, { Router }   from "express"
+import { body }              from "express-validator"
+import { error as logError } from "../services/logger"
+import { InferAttributes }   from "sequelize"
+import moment                from "moment"
+import * as lib              from "../lib"
+import User                  from "../db/models/User"
+import { route }             from "../lib/route"
+import * as mail             from "../services/email"
+import SystemUser            from "../SystemUser"
+import config                from "../config"
 import {
     BadRequest,
     Conflict,
@@ -21,7 +21,6 @@ import {
     Unauthorized
 } from "../errors"
 
-const debug = debuglog("app");
 
 export const router: Router = express.Router({ mergeParams: true });
 
@@ -320,7 +319,7 @@ route(router, {
                 });
             }
         } catch (e) {
-            debug(e + "")
+            logError({ user: req.user.email, role: req.user.role }, "Error inviting user: " + (e as Error).message)
 
             await transaction.rollback()
 
@@ -339,7 +338,7 @@ route(router, {
                 message
             })
         } catch (e) {
-            debug(e + "")
+            logError({ user: req.user.email, role: req.user.role }, "Error sending invitation email: " + (e as Error).message)
             await transaction.rollback()
             throw new InternalServerError("Error sending invitation email")
         }

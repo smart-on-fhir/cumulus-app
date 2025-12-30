@@ -47,9 +47,9 @@ export default class ImportJob
     static async create() {
         const client = await pool.connect();
         client.setMaxListeners(20)
-        client.on('error'       , err => logger.error('ImportJob error:', err.stack));
+        client.on('error'       , err => logger.error('ImportJob error: %s', err.stack));
         client.on('end'         , ()  => logger.log("ImportJob: database connection closed"));
-        client.on('notification', msg => logger.log("ImportJob notification:", msg));
+        client.on('notification', msg => logger.log("ImportJob notification: %s", msg));
 
         try {
             // await client.query(`ALTER SYSTEM SET min_wal_size = '1GB'`)

@@ -397,7 +397,7 @@ export function TemplateEditor({
 
                 const valCnt = items.filter(i => {
                     const rec = state[i.id];
-                    console.log(i.id, rec)
+                    // console.log(i.id, rec)
                     if (Array.isArray(rec)) return rec.length > 0;
                     return rec !== undefined && rec !== null && rec !== "";
                 }).length;

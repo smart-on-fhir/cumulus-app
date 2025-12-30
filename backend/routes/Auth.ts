@@ -37,7 +37,7 @@ export function authenticate() {
                     (req as AppRequest).user = currentUser
                 }
             } catch (ex) {
-                logger.error(ex + "");
+                logger.error(ex, "Error during authentication: %s", ex.message);
             }
         }
         else {
@@ -104,7 +104,7 @@ async function login(req: Request, res: Response) {
         });
 
     } catch (ex) {
-        logger.error(ex + "")
+        logger.error(ex, "Login failed: %s", ex.message);
         res.status(401).end("Login failed");
     }
 }
@@ -123,7 +123,7 @@ async function logout(req: AppRequest, res: Response) {
                     }
                 });
         } catch (ex) {
-            logger.error(ex + "");
+            logger.error(ex, "Logout failed: %s", ex.message);
         }
     }
     res.clearCookie("sid").json({ message: "Logged out" }).end();

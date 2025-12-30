@@ -10,10 +10,12 @@ import { getRequestBaseURL }    from "./lib"
 import settings                 from "./config"
 import * as logger              from "./services/logger"
 import * as api                 from "./routes"
-import { Config, AppErrorRequestHandler } from "./types"
+import { Config, AppErrorRequestHandler, AppRequest } from "./types"
 
 
-const debugRequest = debuglog("app:request");
+const debugRequest = debuglog("app-request");
+
+
 
 function createServer(config: Config)
 {
@@ -22,11 +24,48 @@ function createServer(config: Config)
 
     app.set('etag', false);  
 
-    app.use((req, res, next) => {
-        debugRequest(`${req.method} ${getRequestBaseURL(req)}`);
-        debugRequest(`\treq.url: ${req.url}`);
-        debugRequest(`\treq.originalUrl: ${req.originalUrl}`);
-        debugRequest(`\treq.headers:\n\t\t${Object.keys(req.headers).map(k => `${k}: ${req.headers[k]}`).join("\n\t\t")}`);
+    app.use((req: AppRequest, res, next) => {
+        if (debugRequest.enabled) {
+            // function redactHeaders(headers: any) {
+            //     if (!headers) return headers;
+            //     const out: Record<string, any> = {};
+            //     Object.keys(headers).forEach(k => {
+            //         const lk = k.toLowerCase();
+            //         if (lk === 'cookie') {
+            //             out[k] = '[REDACTED]';
+            //         }
+            //         else if (lk === 'set-cookie') {
+            //             const v = (headers as any)[k];
+            //             if (Array.isArray(v)) out[k] = `[REDACTED ${v.length} cookies]`;
+            //             else out[k] = '[REDACTED]';
+            //         }
+            //         else {
+            //             out[k] = (headers as any)[k];
+            //         }
+            //     });
+            //     return out;
+            // }
+
+            const start = process.hrtime.bigint(); // high-res start time
+            res.on("finish", () => {
+                logger.info(
+                    // {
+                    //     reqHeaders: redactHeaders(req.headers as any),
+                    //     resHeaders: redactHeaders(res.getHeaders() as any),
+                    // },
+                    "%s as %s %s %s%s -> %d %s %dms",
+                    req.user?.email || "anonymous",
+                    req.user?.role || "guest",
+                    req.method,
+                    getRequestBaseURL(req),
+                    req.originalUrl,
+                    res.statusCode,
+                    res.statusMessage,
+                    Number((process.hrtime.bigint() - start) / BigInt(1_000_000))
+                );
+            });
+        }
+
         next();
     });
 
@@ -93,8 +132,13 @@ function setupStaticContent(app: Application)
 function setUpErrorHandlers(app: Application)
 {
     // Global error 404 handler
-    app.use((req, res) => {
-        logger.error(`${req.method} ${decodeURIComponent(req.originalUrl)} -> 404 Not Found`)
+    app.use((req: AppRequest, res) => {
+        logger.error({
+            user: {
+                email: req.user?.email || "anonymous",
+                role : req.user?.role  || "guest"
+            }
+        }, `${req.method} ${decodeURIComponent(req.originalUrl)} -> 404 Not Found`)
         res.status(404).end("Not Found");
     });
 
@@ -111,22 +155,36 @@ function setUpErrorHandlers(app: Application)
             if (req.method === "POST" || req.method === "PUT") {
                 error.data.requestBody = req.body
             }
-            logger.error(`${error.status} ${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => `, error)
+            logger.error(error, `${error.status} ${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => ${error.message}`);
             const msg = error.message.replace(/^\s*\w*Error:\s+/, "")
             res.status(error.status).send(msg)
         }
 
         // Sequelize Validation Errors
         else if (error.name === "SequelizeValidationError" || error.name === "SequelizeUniqueConstraintError") {
-            const msg = error.errors.map((e: any) => `${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => ${e.type || "Error"} while validating ${e.path || "data"}: ${e.message}`).join("\n")
-            logger.error("Sequelize Validation Error " + JSON.stringify(error, null, 4))
+            const msg = error.errors.map((e: any) => 
+                `${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => ${e.type || "Error"} while validating ${e.path || "data"}: ${e.message}`
+            ).join("\n")
+            logger.error({
+                error,
+                user: {
+                    email: req.user?.email || "anonymous",
+                    role : req.user?.role  || "guest"
+                }
+            }, "Sequelize Validation Error " + error.errors.map((e: any) => `${e.type || "Error"} on ${e.path || "data"}: ${e.message}`).join("; "));
             res.status(400).send(msg);
         }
 
         // Other Errors
         else {
-            const msg = `${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => ${error.message.replace(/^\s*\w*Error:\s+/, "")}`
-            logger.error(msg, error)
+            // const msg = `${req.method.padStart(6)} ${decodeURIComponent(req.originalUrl)} => ${error.message.replace(/^\s*\w*Error:\s+/, "")}`
+            logger.error({
+                error,
+                user: {
+                    email: req.user?.email || "anonymous",
+                    role : req.user?.role  || "guest"
+                }
+            }, error.stack || error.toString());
             res.status(500).send("Internal Server Error");
         }
 

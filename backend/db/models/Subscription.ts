@@ -64,7 +64,7 @@ export default class Subscription extends BaseModel<InferAttributes<Subscription
                 async afterCreate(model) {
                     // Note that we don't wait for this to complete
                     sendDataRequest(model.toJSON() as any).catch(error => {
-                        logger.error("Failed sending data request: " + error, error)
+                        logger.error(error, "Failed sending data request: %s", error.message)
                     });
                 }
             }

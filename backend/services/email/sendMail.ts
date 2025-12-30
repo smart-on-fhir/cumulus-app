@@ -1,9 +1,8 @@
 import Mailgun      from "mailgun.js"
 import formData     from "form-data"
-import { debuglog } from "util"
 import config       from "../../config"
+import { debug }    from "../logger"
 
-const debug = debuglog("app:email");
 
 const mailgun = new Mailgun(formData);
 
@@ -14,7 +13,7 @@ const client = mailgun.client({
 });
 
 export default async function sendEmail(options: { from: string, to: string, subject: string, html: string }) {
-    debug("Sending email:", JSON.stringify(options, null, 4));
+    debug("Sending email: %s", JSON.stringify(options, null, 4));
     // istanbul ignore next
     return client.messages.create(config.mailGun.domain, options)
 }
