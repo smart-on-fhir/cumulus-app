@@ -35,8 +35,11 @@ export default function TypeAhead({
     const [ search          , setSearch           ] = useState(selectedOption.label)
     const [ searchValue     , setSearchValue      ] = useState(selectedOption.label)
 
-    // Only show options starting with what we searched for
-    let filteredOptions = options.filter(o => o.label.toLowerCase().startsWith(search.toLowerCase())).sort((a, b) => a.label.length - b.label.length)
+    // Only show options containing what we searched for
+    let filteredOptions = options.filter(o => o.label.toLowerCase().includes(search.toLowerCase()))
+        // .sort((a, b) => a.label.length - b.label.length)
+        .sort((a, b) => a.label.localeCompare(b.label))
+
 
     const menu  = useRef<HTMLDivElement>(null!)
     const input = useRef<HTMLInputElement>(null!)
