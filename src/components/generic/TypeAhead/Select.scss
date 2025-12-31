@@ -53,14 +53,36 @@
         }
     }
 
+    .select-component-group {
+        margin: 0 0 0.5em;
+    }
+
+    .select-component-group-label {
+        padding       : 0.25em 2px;
+        font-weight   : 500;
+        font-size     : 0.9em;
+        border-bottom : 1px solid var(--color-grey);
+        color         : var(--color-grey-dark);
+        opacity       : 0.75;
+        margin-bottom : 0.25em;
+        text-transform: uppercase;
+        font-size     : smaller;
+
+        .fa {
+            margin: 0 0.4em 0 0.2em;
+        }
+    }
+
     .select-component-option {
         padding      : 0.2em 12px;
-        white-space  : nowrap;
+        white-space  : pre;
         cursor       : default;
         border-radius: 2px;
         position     : relative;
         overflow     : hidden;
         text-overflow: ellipsis;
+        font-family  : monospace;
+        font-size    : 0.84em;
 
         &:hover {
             background: var(--color-highlight);
@@ -76,5 +98,9 @@
             color: #999;
             pointer-events: none;
         }
+    }
+
+    .select-component-group .select-component-option {
+        margin-left: 1em;
     }
 }

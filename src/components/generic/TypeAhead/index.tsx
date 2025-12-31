@@ -1,5 +1,5 @@
 import { KeyboardEvent, useEffect, useMemo, useRef, useState } from "react"
-import { classList } from "../../../utils"
+import { classList, groupBy } from "../../../utils"
 import "./Select.scss"
 
 
@@ -16,6 +16,7 @@ export interface TypeAheadOption {
     value    : any
     label    : string
     disabled?: boolean
+    group?   : string
 }
 
 export default function TypeAhead({
@@ -40,6 +41,7 @@ export default function TypeAhead({
         // .sort((a, b) => a.label.length - b.label.length)
         .sort((a, b) => a.label.localeCompare(b.label))
 
+    const groups = groupBy(filteredOptions, "group")
 
     const menu  = useRef<HTMLDivElement>(null!)
     const input = useRef<HTMLInputElement>(null!)
@@ -159,24 +161,33 @@ export default function TypeAhead({
                 })
             }>
                 <div className="select-component-menu-wrap" ref={menu}>
-                { filteredOptions.map((option, i) => {
-                    return (
-                        <div key={i} className={ classList({
-                                "select-component-option": true,
-                                disabled: !!option.disabled,
-                                selected: highlightedIndex === i
-                            })}
-                            onMouseDown={() => {
-                                if (!option.disabled) {
-                                    setSearchValue(option.label)
-                                    onChange(option.value)
-                                    closeMenu()
-                                }
-                            }}>
-                            <span>{ option.label }</span>
-                        </div>
-                    )
-                })}
+                    { Object.keys(groups).map((groupKey, gi) => {
+                        const group = groups[groupKey];
+                        return (
+                            <div key={gi} className="select-component-group">
+                                { groupKey && <div className="select-component-group-label"><i className="fa fa-folder-open"/>{ groupKey }</div> }
+                                { group.map((option, i) => {
+                                    const index = filteredOptions.findIndex(o => o.value === option.value)
+                                    return (
+                                        <div key={i} className={ classList({
+                                                "select-component-option": true,
+                                                disabled: !!option.disabled,
+                                                selected: highlightedIndex === index
+                                            })}
+                                            onMouseDown={() => {
+                                                if (!option.disabled) {
+                                                    setSearchValue(option.label)
+                                                    onChange(option.value)
+                                                    closeMenu()
+                                                }
+                                            }}>
+                                            <span>{ option.label }</span>
+                                        </div>
+                                    )
+                                }) }
+                            </div>
+                        )
+                    }) }
                 </div>
             </div> }
         </div>

@@ -107,9 +107,26 @@ function Filter({
                             })
                         }}
                         options={
-                            operators
-                                .filter(o => o.type.includes("string") || o.type.includes(leftDataType))
-                                .map(o => ({ value: o.id, label: o.label }))
+                            operators.map(o => {
+                                    
+                                // operators valid for the selected column
+                                if (o.type.includes(leftDataType)) {
+                                    return { value: o.id, label: o.label, group: `${leftDataType.split(":").shift()} operators`}
+                                }
+
+                                // operators valid for strings (those are always valid)
+                                if (o.type.includes("string")) {
+                                    return { value: o.id, label: o.label, group: "String operators" }
+                                }
+                                
+                                // operators valid for all types
+                                if (o.type.includes("*")) {
+                                    return { value: o.id, label: o.label, group: "Universal operators" }
+                                }
+
+                                return null
+                            })
+                            .filter(Boolean)
                         }
                     />
                 </div>
