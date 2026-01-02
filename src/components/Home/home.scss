@@ -7,10 +7,10 @@
     gap: 2rem;
 
     .card {
-        background: var(--color-window-bg-hard);
+        // background: var(--color-window-bg-hard);
         padding: 1.5em 2em;
         border-radius: 0.5em;
-        border: 1px solid var(--color-grey);
+        // border: 1px solid var(--color-grey);
         transition: all 0.2s;
 
         li::marker, .icon {
@@ -37,7 +37,7 @@
             -webkit-box-orient: vertical;
             flex: 1;
             font-size: 110%;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.2s;
             text-transform: uppercase;
 
@@ -87,12 +87,18 @@
         }
     }
 
-    .graphs-row {
-        display: grid;
+    .graphs-row-wrap {
         grid-row: 2;
         grid-column: 1 / 6;
+    }
+
+    .graphs-row {
+        display: grid;
+        // grid-row: 2;
+        // grid-column: 1 / 6;
         gap: 0 2rem;
         grid-template-columns: 23rem auto;
+        padding: 1rem 0;
     }
 
     .graphs {
@@ -107,6 +113,19 @@
     .graphs-list {
         grid-column: 2 / 6;
         overflow: hidden;
+        columns: auto;
+        column-gap: 2rem;
+        column-rule: 1px dotted var(--color-grey);
+        column-width: 22em;
+
+        li {
+            break-inside: avoid;
+            margin-bottom: 0.25rem;
+            display: block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
     }
 
     .pkg-and-sites {
@@ -174,4 +193,7 @@
             overflow: hidden;
         }
     }
+}
+:root.light .home-page .graphs img {
+    mix-blend-mode: multiply;
 }

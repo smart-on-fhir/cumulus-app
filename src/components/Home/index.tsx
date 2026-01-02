@@ -69,7 +69,7 @@ function Graphs() {
     const [selected, setSelected] = useState(0)
 
     return (
-        <Prefetch path="/api/views?order=updatedAt:desc&limit=7&attributes=id,name,description,updatedAt">
+        <Prefetch path="/api/views?order=updatedAt:desc&limit=17&attributes=id,name,description,updatedAt">
             { (data: app.StudyArea[]) => {
 
                 if (!selected && data.length) {
@@ -77,42 +77,47 @@ function Graphs() {
                 }
                 
                 return (
-                    <div className="graphs-row card">
-                        <div className="graphs">
-                            { data.length ? !!selected && <Link to={`/views/${selected}`}>
-                                <img alt="Current Graph" src={`${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/api/views/${selected}/screenshot`} />
-                            </Link> : <p className="color-muted center">No preview available</p> }
-                        </div>
-                        <div className="graphs-list">
-                            <h4>
-                                <span className="icon material-symbols-outlined">{Terminology.graph.icon}</span>Latest Graphs
-                            </h4>
-                            <hr/>
-                            { data.length ?
-                                <>
-                                { data.map((item, i) => (
-                                    <li key={i}>
-                                        <Link
-                                            to={ `/views/${item.id}` }
-                                            className={"link" + (selected === item.id ? " color-brand-2" : "")}
-                                            title={ item.description || undefined }
-                                            onMouseEnter={() => setSelected(item.id)}
-                                        >
-                                            <span className="icon material-symbols-outlined">{Terminology.graph.icon}</span>{ item.name }
-                                        </Link>
-                                    </li>
-                                ))}
-                                <br />
-                                <Link to="/views/?view=column&group=subscription" className="link"><b className="color-brand-2">Browse All...</b></Link>
-                                </> :
-                                <p>
-                                    No Graphs found in the database. You can start by selecting one of the
-                                    existing <Link to="/requests" className="link">
-                                        {Terminology.subscription.namePlural}
-                                    </Link> or <Link to="/packages" className="link">{Terminology.dataPackage.namePlural}</Link> and
-                                    then you can create new graph from it's data.
-                                </p>
-                            }
+                    <div className="graphs-row-wrap card">
+                        <h4>
+                            <span className="icon material-symbols-outlined">{Terminology.graph.icon}</span>Latest Graphs
+                        </h4>
+                        <hr/>
+                        <div className="graphs-row">
+                            <div className="graphs">
+                                { data.length ? !!selected && <Link to={`/views/${selected}`}>
+                                    <img alt="Current Graph" src={`${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/api/views/${selected}/screenshot`} />
+                                </Link> : <p className="color-muted center">No preview available</p> }
+                            </div>
+                            <div className="graphs-list">
+                                
+                                { data.length ?
+                                    <>
+                                    { data.map((item, i) => (
+                                        <li key={i}>
+                                            <Link
+                                                to={ `/views/${item.id}` }
+                                                className={"link" + (selected === item.id ? " color-brand-2" : "")}
+                                                title={ item.description || undefined }
+                                                onMouseEnter={() => setSelected(item.id)}
+                                            >
+                                                <span className="icon material-symbols-outlined">{Terminology.graph.icon}</span>{ item.name }
+                                            </Link>
+                                        </li>
+                                    ))}
+                                    <Link to="/views/?view=column&group=subscription" className="link fw-600">
+                                        <span className="icon material-symbols-outlined">arrow_circle_right</span>
+                                        <i className="color-brand-2">Browse All...</i>
+                                    </Link>
+                                    </> :
+                                    <p>
+                                        No Graphs found in the database. You can start by selecting one of the
+                                        existing <Link to="/requests" className="link">
+                                            {Terminology.subscription.namePlural}
+                                        </Link> or <Link to="/packages" className="link">{Terminology.dataPackage.namePlural}</Link> and
+                                        then you can create new graph from it's data.
+                                    </p>
+                                }
+                            </div>
                         </div>
                     </div>
                 )
@@ -211,8 +216,10 @@ function Subscriptions({ data }: { data: app.Subscription[] }) {
                             </Link>
                         </li>
                     ))}
-                    <br/>
-                    <Link to="/requests/" className="link"><b className="color-brand-2">Browse All...</b></Link>
+                    <Link to="/requests/" className="link fw-600">
+                        <span className="icon material-symbols-outlined">arrow_circle_right</span>
+                        <i className="color-brand-2">Browse All...</i>
+                    </Link>
                 </> :
                 <div>
                     <p>No {Terminology.subscription.namePlural} found in the database.</p>
@@ -280,8 +287,10 @@ function Sites() {
                                 </Link>
                             </li>
                         )) }
-                        <br />
-                        <Link to="/sites/" className="link"><b className="color-brand-2">Browse All...</b></Link>
+                        <Link to="/sites/" className="link fw-600">
+                            <span className="icon material-symbols-outlined">arrow_circle_right</span>
+                            <i className="color-brand-2">Browse All...</i>
+                        </Link>
                         </>
 
             }
