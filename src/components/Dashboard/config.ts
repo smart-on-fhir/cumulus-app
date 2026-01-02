@@ -126,6 +126,8 @@ interface FilterConfig {
 }
 
 export const operators: FilterConfig[] = [
+
+    // Number Operators --------------------------------------------------------
     { id: "eq"                , label: "== (equal)"                , type: ["integer", "float" ] },
     { id: "ne"                , label: "!= (not equal)"            , type: ["integer", "float" ] },
     { id: "gt"                , label: ">  (greater than)"         , type: ["integer", "float" ] },
@@ -133,27 +135,29 @@ export const operators: FilterConfig[] = [
     { id: "lt"                , label: "<  (less than)"            , type: ["integer", "float" ] },
     { id: "lte"               , label: "<= (less than or equal)"   , type: ["integer", "float" ] },
 
-    { id: "strEq"             , label: "Equal"                     , type: ["string"           ] },
-    { id: "strContains"       , label: "Contains"                  , type: ["string"           ] },
-    { id: "strStartsWith"     , label: "Starts with"               , type: ["string"           ] },
-    { id: "strEndsWith"       , label: "Ends with"                 , type: ["string"           ] },
-    { id: "matches"           , label: "Matches RegExp"            , type: ["string"           ] },
-    { id: "strEqCI"           , label: "Equal (CI)"                , type: ["string"           ] },
-    { id: "strContainsCI"     , label: "Contains (CI)"             , type: ["string"           ] },
-    { id: "strStartsWithCI"   , label: "Starts with (CI)"          , type: ["string"           ] },
-    { id: "strEndsWithCI"     , label: "Ends with (CI)"            , type: ["string"           ] },
-    { id: "matchesCI"         , label: "Matches RegExp (CI)"       , type: ["string"           ] },
-    { id: "strNotEq"          , label: "Not: Equals"               , type: ["string"           ] },
-    { id: "strNotContains"    , label: "Not: Contains"             , type: ["string"           ] },
-    { id: "strNotStartsWith"  , label: "Not: Starts with"          , type: ["string"           ] },
-    { id: "strNotEndsWith"    , label: "Not: Ends with"            , type: ["string"           ] },
-    { id: "notMatches"        , label: "Not: Matches RegExp"       , type: ["string"           ] },
-    { id: "strNotEqCI"        , label: "Not: Equals (CI)"          , type: ["string"           ] },
-    { id: "strNotContainsCI"  , label: "Not: Contains (CI)"        , type: ["string"           ] },
-    { id: "strNotStartsWithCI", label: "Not: Starts with (CI)"     , type: ["string"           ] },
-    { id: "strNotEndsWithCI"  , label: "Not: Ends with (CI)"       , type: ["string"           ] },
-    { id: "notMatchesCI"      , label: "Not: Matches RegExp (CI)"  , type: ["string"           ] },
+    // String Operators --------------------------------------------------------
+    { id: "strEq"             , label: "Equal"                     , type: ["string"] },
+    { id: "strContains"       , label: "Contains"                  , type: ["string"] },
+    { id: "strStartsWith"     , label: "Starts with"               , type: ["string"] },
+    { id: "strEndsWith"       , label: "Ends with"                 , type: ["string"] },
+    { id: "matches"           , label: "Matches RegExp"            , type: ["string"] },
+    { id: "strEqCI"           , label: "Equal (CI)"                , type: ["string"] },
+    { id: "strContainsCI"     , label: "Contains (CI)"             , type: ["string"] },
+    { id: "strStartsWithCI"   , label: "Starts with (CI)"          , type: ["string"] },
+    { id: "strEndsWithCI"     , label: "Ends with (CI)"            , type: ["string"] },
+    { id: "matchesCI"         , label: "Matches RegExp (CI)"       , type: ["string"] },
+    { id: "strNotEq"          , label: "Not: Equals"               , type: ["string"] },
+    { id: "strNotContains"    , label: "Not: Contains"             , type: ["string"] },
+    { id: "strNotStartsWith"  , label: "Not: Starts with"          , type: ["string"] },
+    { id: "strNotEndsWith"    , label: "Not: Ends with"            , type: ["string"] },
+    { id: "notMatches"        , label: "Not: Matches RegExp"       , type: ["string"] },
+    { id: "strNotEqCI"        , label: "Not: Equals (CI)"          , type: ["string"] },
+    { id: "strNotContainsCI"  , label: "Not: Contains (CI)"        , type: ["string"] },
+    { id: "strNotStartsWithCI", label: "Not: Starts with (CI)"     , type: ["string"] },
+    { id: "strNotEndsWithCI"  , label: "Not: Ends with (CI)"       , type: ["string"] },
+    { id: "notMatchesCI"      , label: "Not: Matches RegExp (CI)"  , type: ["string"] },
     
+    // Date Operators ----------------------------------------------------------
     { id: "sameDay"           , label: "Same date"                 , type: [ "date:YYYY-MM-DD"                                                ] },
     { id: "sameWeek"          , label: "Same week"                 , type: [ "date:YYYY-MM-DD", "date:YYYY wk W"                              ] },
     { id: "sameMonth"         , label: "Same month"                , type: [ "date:YYYY-MM-DD", "date:YYYY wk W", "date:YYYY-MM"              ] },
@@ -175,12 +179,12 @@ export const operators: FilterConfig[] = [
     { id: "afterMonth"        , label: "After month"               , type: [ "date:YYYY-MM-DD", "date:YYYY wk W", "date:YYYY-MM"              ] },
     { id: "afterYear"         , label: "After year"                , type: [ "date:YYYY-MM-DD", "date:YYYY wk W", "date:YYYY-MM", "date:YYYY" ] },
     
-    { id: "isTrue"            , label: "IS TRUE"                   , type: ["boolean"          ] },
-    { id: "isFalse"           , label: "IS FALSE"                  , type: ["boolean"          ] },
-    { id: "isNotTrue"         , label: "IS NOT TRUE"               , type: ["boolean"          ] },
-    { id: "isNotFalse"        , label: "IS NOT FALSE"              , type: ["boolean"          ] },
+    // Boolean Operators -------------------------------------------------------
+    { id: "isTrue"            , label: "IS TRUE"                   , type: ["boolean"] },
+    { id: "isFalse"           , label: "IS FALSE"                  , type: ["boolean"] },
+    { id: "isNotTrue"         , label: "IS NOT TRUE"               , type: ["boolean"] },
+    { id: "isNotFalse"        , label: "IS NOT FALSE"              , type: ["boolean"] },
 
-    
     // { id: "isNull"            , label: "IS NULL"                   , type: ["*"] },
     // { id: "isNotNull"         , label: "IS NOT NULL"               , type: ["*"] },
 ];
