@@ -139,6 +139,7 @@ export async function fetchChartData({
 
     if (dataPackage) {
         params.set("pkg", dataPackage.id)
+        params.set("last_data_update", new Date(dataPackage.last_data_update).valueOf().toString())
     }
 
     params.set("column", column)

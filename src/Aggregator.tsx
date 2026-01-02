@@ -89,7 +89,7 @@ function filter<T>(data: T[], props: Partial<T>): T[] {
 /**
  * Used to check if a local subscription can be upgraded to newer data package.
  * Compares the local package with a remote one and returns true if they are
- * compatible. The be considered compatible:
+ * compatible. To be considered compatible:
  * - Both packages should have the same `column_types_format_version`
  * - All local columns should exist in the remote package
  * - All local columns should have the same data type as in the remote package
@@ -321,8 +321,12 @@ class Aggregator
         return pkg.id;
     }
 
-    public async getPackageJson(s3path: string): Promise<{ schema: any, data: any[] }> {
-        return await this.fetch("/api/aggregator/from-parquet/?s3_path=" + encodeURIComponent(s3path)).then(data => {
+    public async getPackageJson(pkg: DataPackage): Promise<{ schema: any, data: any[] }> {
+        return await this.fetch(
+            `/api/aggregator/from-parquet/?s3_path=${
+                encodeURIComponent(pkg.s3_path)
+            }&last_data_update=${new Date(pkg.last_data_update).valueOf()}`
+        ).then(data => {
             if (typeof data === "string" && (data.startsWith("{") || data.startsWith("["))) {
                 return JSON.parse(data)
             }

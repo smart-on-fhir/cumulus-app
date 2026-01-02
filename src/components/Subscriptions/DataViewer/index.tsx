@@ -43,8 +43,8 @@ export function FlatPackageDataViewer({ pkg }: { pkg: DataPackage }) {
     const loadData = useCallback(() => {
         setLoading(true)
         setError(null)
-        return aggregator.getPackageJson(pkg.s3_path || "").then(setData, setError).finally(() => setLoading(false))
-    }, [pkg.s3_path]);
+        return aggregator.getPackageJson(pkg).then(setData, setError).finally(() => setLoading(false))
+    }, [pkg.s3_path, pkg.last_data_update]);
 
     useEffect(() => { loadData() }, [loadData])
 

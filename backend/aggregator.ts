@@ -3,6 +3,7 @@ import { Request, Response }             from "express"
 import makeFetchHappen, { FetchOptions } from "make-fetch-happen"
 import config                            from "./config"
 import { HttpError, ServiceUnavailable } from "./errors"
+import { cached }                        from "./lib"
 
 
 const fetch = makeFetchHappen.defaults({
@@ -26,6 +27,11 @@ export async function download(req: Request, res: Response) {
 
         if (!enabled || !apiKey || !baseUrl) {
             throw new ServiceUnavailable("The aggregator API is not enabled")
+        }
+
+        // Cached for a week
+        if (cached(req, res, 60 * 60 * 24 * 7)) {
+            return;
         }
 
         const { href } = new URL(baseUrl.replace(/\/$/, "") + req.url);
