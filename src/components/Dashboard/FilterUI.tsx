@@ -36,7 +36,7 @@ function Filter({
     const leftColumn   = filter.left ? cols.find(c => c.name === filter.left) : null;
     const leftDataType = leftColumn ? leftColumn.dataType : "";
 
-    const noRightOps = [/*"isNull", "isNotNull", */"isTrue", "isFalse", "isNotTrue", "isNotFalse"];
+    const noRightOps = [/*"isNull", "isNotNull", */"isTrue", "isFalse", "isNone", "isNotTrue", "isNotFalse", "isNotNone"];
 
     const types = operators.find(o => o.id === filter.operator)?.type || [];
 

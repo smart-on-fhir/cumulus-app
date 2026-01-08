@@ -649,7 +649,9 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         "isTrue",
         "isFalse",
         "isNotTrue",
-        "isNotFalse"
+        "isNotFalse",
+        "isNotNone",
+        "isNone"
     ];
     const filterParams: string[] = []
     let chain: string[] = [];
