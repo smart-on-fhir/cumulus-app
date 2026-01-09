@@ -148,9 +148,12 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
 
     const counted    = pluralize(getSubject(sub))
     const countLabel = counted.match(/^counts?/i) ? counted : `Count ${counted}`
+    
+    const isDateType = (col: app.SubscriptionDataColumn) => col.dataType.startsWith("date");
+    const isAgeType  = (col: app.SubscriptionDataColumn) => !!col.label.match(/\bage\b/i) || !!col.name.match(/\bage\b/i);
 
     const [state, dispatch] = useReducer(reducer, {
-        chartType: (col.dataType === "float" || col.dataType === "integer" || col.dataType.startsWith("date")) ? "areaspline" : "column",
+        chartType: (col.dataType === "float" || col.dataType === "integer" || isDateType(col) || isAgeType(col)) ? "areaspline" : "column",
         limit      : 0,
         sortBy     : "x:asc",
         theme      : "sas_light",
@@ -201,7 +204,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                 }
 
                 // More than 20 columns - convert to bars
-                if (chartType === "column" && data.rowCount > 20) {
+                if (chartType === "column" && data.rowCount > 20 && !(isDateType(col) || (groupBy && isDateType(groupBy))) && !(isAgeType(col) || (groupBy && isAgeType(groupBy)))) {
                     chartType = "bar"
                 }
                 
@@ -249,6 +252,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                         }
                     },
                     xAxis: {
+                        minTickInterval: chartType.includes("line") ? 4 : undefined,
                         labels: {
                             padding: 16,
                             style: {
