@@ -1,6 +1,6 @@
-import Highcharts                               from "highcharts"
-import Chart                                    from "../../generic/Chart"
-import { CUMULUS_ALL, CUMULUS_NONE }            from "./lib"
+import Highcharts                      from "highcharts"
+import Chart                           from "../../generic/Chart"
+import { CUMULUS__ALL, CUMULUS__NONE } from "../../Dashboard/config"
 import { humanizeColumnName, pluralize, roundToPrecision } from "../../../utils"
 
 const COLOR_NEGATIVE  = "#E60"
@@ -40,7 +40,7 @@ export default function MetricsChart({
         type: "bar",
         id  : "level-1",
         color: COLOR_NEUTRAL + "88",
-        data: data.filter(r => r[stratifyBy] === CUMULUS_ALL && r[groupBy] === CUMULUS_ALL).map(r => ({
+        data: data.filter(r => r[stratifyBy] === CUMULUS__ALL && r[groupBy] === CUMULUS__ALL).map(r => ({
             y        : r[valueColumn],
             name     : "ALL " + pluralize(humanizeColumnName(groupBy)).toUpperCase(),
             dataLabels: {
@@ -73,7 +73,7 @@ export default function MetricsChart({
     }
 
     if (isPctChart) {
-        data.filter(r => r[groupBy] !== CUMULUS_ALL && r[stratifyBy] === CUMULUS_ALL).forEach(r => {
+        data.filter(r => r[groupBy] !== CUMULUS__ALL && r[stratifyBy] === CUMULUS__ALL).forEach(r => {
             const pctN       = r.numerator / r.denominator * 100
             const pctY       = 100 - pctN
             const pctNVisual = Math.max(pctN, pctN ? 2 : 0)
@@ -82,7 +82,7 @@ export default function MetricsChart({
             const drilldown = (() => {
                 const sub = groups[r[groupBy]]
                 if (!sub || !sub.length) return;
-                const rows = sub.filter(r => r[stratifyBy] !== CUMULUS_ALL).reduce((prev, cur) => prev + cur[valueColumn], 0)
+                const rows = sub.filter(r => r[stratifyBy] !== CUMULUS__ALL).reduce((prev, cur) => prev + cur[valueColumn], 0)
                 if (!rows) return;
                 return r[groupBy]
             })();
@@ -115,14 +115,14 @@ export default function MetricsChart({
             })
         })
     } else {
-        data.filter(r => r[groupBy] !== CUMULUS_ALL && r[stratifyBy] === CUMULUS_ALL).forEach(r => {
+        data.filter(r => r[groupBy] !== CUMULUS__ALL && r[stratifyBy] === CUMULUS__ALL).forEach(r => {
             Level2.data.push({
                 y   : r[valueColumn],
                 name: r[groupBy],
                 drilldown: (() => {
                     const sub = groups[r[groupBy]]
                     if (!sub || !sub.length) return;
-                    const rows = sub.filter(r => r[stratifyBy] !== CUMULUS_ALL).reduce((prev, cur) => prev + cur[valueColumn], 0)
+                    const rows = sub.filter(r => r[stratifyBy] !== CUMULUS__ALL).reduce((prev, cur) => prev + cur[valueColumn], 0)
                     if (!rows) return;
                     return r[groupBy]
                 })(),
@@ -161,7 +161,7 @@ export default function MetricsChart({
 
         if (isPctChart) {
 
-            const children = groups[groupName].filter(r => r[stratifyBy] !== CUMULUS_ALL && r.numerator !== undefined)
+            const children = groups[groupName].filter(r => r[stratifyBy] !== CUMULUS__ALL && r.numerator !== undefined)
 
             children.forEach(r => {
                 const pctN       = r.numerator / r.denominator * 100
@@ -169,7 +169,7 @@ export default function MetricsChart({
                 const pctNVisual = Math.max(pctN, pctN ? 2 : 0)
                 const pctYVisual = 100 - pctNVisual
 
-                let name = r[stratifyBy] === CUMULUS_NONE ? `No known ${stratifyBy}` : r[stratifyBy];
+                let name = r[stratifyBy] === CUMULUS__NONE ? `No known ${stratifyBy}` : r[stratifyBy];
                 if (name === null) {
                     name = groupName
                 }
@@ -201,10 +201,10 @@ export default function MetricsChart({
                 )
             })
         } else {
-            groups[groupName].filter(r => r[stratifyBy] !== CUMULUS_ALL).forEach(r => {
+            groups[groupName].filter(r => r[stratifyBy] !== CUMULUS__ALL).forEach(r => {
                 series.data.push({
                     y           : r[valueColumn],
-                    name        : r[stratifyBy] === CUMULUS_NONE ? `No known ${stratifyBy}` : r[stratifyBy],
+                    name        : r[stratifyBy] === CUMULUS__NONE ? `No known ${stratifyBy}` : r[stratifyBy],
                     showInLegend: true,
                     custom      : { data: r },
                     dataLabels: {

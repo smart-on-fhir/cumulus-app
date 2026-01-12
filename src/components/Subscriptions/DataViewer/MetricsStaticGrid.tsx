@@ -1,7 +1,7 @@
 import { CSSProperties, Fragment, ReactNode, useState } from "react"
 import { JSONObject }                        from "../../../types"
 import { classList, highlight }              from "../../../utils"
-import { CUMULUS_ALL, CUMULUS_NONE }         from "./lib"
+import { CUMULUS__ALL, CUMULUS__NONE }       from "../../Dashboard/config"
 import "../../generic/StaticGrid/StaticGrid.scss"
 
 
@@ -104,16 +104,16 @@ export default function MetricsStaticGrid({
             _rows.sort((a, b) => {
                 let _a = a[sortColumn]
                 let _b = b[sortColumn]
-                // if (_a === CUMULUS_ALL && sortColumn === stratifyBy) {
+                // if (_a === CUMULUS__ALL && sortColumn === stratifyBy) {
                 //     _a = a[groupBy]
                 // }
-                // if (_b === CUMULUS_ALL && sortColumn === stratifyBy) {
+                // if (_b === CUMULUS__ALL && sortColumn === stratifyBy) {
                 //     _b = b[groupBy]
                 // }
-                if (_a === CUMULUS_NONE) return  Infinity
-                if (_b === CUMULUS_NONE) return -Infinity
-                if (_a === CUMULUS_ALL ) return  Infinity
-                if (_b === CUMULUS_ALL ) return -Infinity
+                if (_a === CUMULUS__NONE) return  Infinity
+                if (_b === CUMULUS__NONE) return -Infinity
+                if (_a === CUMULUS__ALL ) return  Infinity
+                if (_b === CUMULUS__ALL ) return -Infinity
                 return defaultComparator(_a, _b) * (sortDir === "asc" ? -1 : 1)
             })
         }
@@ -121,10 +121,10 @@ export default function MetricsStaticGrid({
         // Group
         // ---------------------------------------------------------------------
         let groups: { groupRow: Record<string, any>; children: any[] }[] = _rows
-            .filter(r => r[stratifyBy] === CUMULUS_ALL)
+            .filter(r => r[stratifyBy] === CUMULUS__ALL)
             .map(groupRow => ({
                 groupRow,
-                children: _rows.filter(r => r[stratifyBy] !== CUMULUS_ALL && r[groupBy] === groupRow[groupBy])
+                children: _rows.filter(r => r[stratifyBy] !== CUMULUS__ALL && r[groupBy] === groupRow[groupBy])
             }));
         
         // Search
@@ -133,7 +133,7 @@ export default function MetricsStaticGrid({
             groups = groups.filter(group => {
                 group.children = group.children.filter(row => {
                     return searchableCols.some(c => {
-                        if (row[c.name] === CUMULUS_ALL || row[c.name] === CUMULUS_NONE) {
+                        if (row[c.name] === CUMULUS__ALL || row[c.name] === CUMULUS__NONE) {
                             return false
                         }
                         let val = c.value ? c.value(row, c) : row[c.name];
@@ -204,7 +204,7 @@ export default function MetricsStaticGrid({
                                 <tr className={classList({
                                     "group-header-row": true,
                                     open: groupMap[label] !== false,
-                                    summary: label === CUMULUS_ALL
+                                    summary: label === CUMULUS__ALL
                                 })}>
                                     { Object.keys(groupRow).map((name, i) => {
                                         if (name === groupBy) {
@@ -217,10 +217,10 @@ export default function MetricsStaticGrid({
                                                     closed: groupMap[label] === false,
                                                     opened: groupMap[label] !== false,
                                                 }) }
-                                                onClick={label === CUMULUS_ALL ? undefined : () => setGroupMap({ ...groupMap, [label]: groupMap[label] === false ? true : false })}
+                                                onClick={label === CUMULUS__ALL ? undefined : () => setGroupMap({ ...groupMap, [label]: groupMap[label] === false ? true : false })}
                                             >
                                                 {
-                                                    label === CUMULUS_ALL ?
+                                                    label === CUMULUS__ALL ?
                                                         <i className="fas icon fa-calculator"/> :
                                                         groupMap[label] === false ?
                                                             <i className="fas icon fa-angle-right"/> :
@@ -235,7 +235,7 @@ export default function MetricsStaticGrid({
                                     }) }
                                 </tr>
                                 {
-                                    groupMap[label] !== false && label !== CUMULUS_ALL ?
+                                    groupMap[label] !== false && label !== CUMULUS__ALL ?
                                         kids.length > 0 ?
                                             kids.map(renderRow) :
                                             <tr>
@@ -264,11 +264,11 @@ export default function MetricsStaticGrid({
     const cellValue = (row: any, col: string, isHeaderRow = false) => {
         let value: any = row[col] + "";
 
-        if (value === CUMULUS_ALL) {
+        if (value === CUMULUS__ALL) {
             return isHeaderRow ? "ALL" : <i className="color-muted">ALL</i>
         }
 
-        if (value === CUMULUS_NONE) {
+        if (value === CUMULUS__NONE) {
             return <i className="color-muted">No known {stratifyBy}</i>
         }
 

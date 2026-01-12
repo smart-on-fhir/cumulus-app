@@ -2,6 +2,9 @@ import { DashStyleValue } from "highcharts"
 import { generateColors } from "../../utils"
 export { ReadOnlyPaths }  from "../../config"
 
+export const CUMULUS__NONE = "cumulus__none";
+export const CUMULUS__ALL  = "cumulus__all";
+
 export const SupportedChartTypes = {
     pie          : "Pie Chart",
     pie3d        : "Pie Chart 3D",

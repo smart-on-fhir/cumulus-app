@@ -11,7 +11,8 @@ import {
     COLOR_THEMES,
     DEFAULT_COLOR_THEME,
     COLOR_DANGER,
-    COLOR_SUCCESS
+    COLOR_SUCCESS,
+    CUMULUS__NONE
 } from "../config"
 
 
@@ -128,7 +129,7 @@ export function filterOutExceptions({
             }
             msg += `where <b>${column.label}</b> `
             
-            if (x === "cumulus__none") {
+            if (x === CUMULUS__NONE) {
                 msg += `is empty in the source data`
             } else {
                 msg += `equals <b>${x}</b>`
@@ -137,7 +138,7 @@ export function filterOutExceptions({
             exceptions.add(msg)
         }
 
-        if (row[0] === "cumulus__none" && seriesName !== "cumulus__none") {
+        if (row[0] === CUMULUS__NONE && seriesName !== CUMULUS__NONE) {
             pushException()
             return false
         }
@@ -271,7 +272,7 @@ function getXAxis({
     // For stratified charts use the counts object
     if (data?.stratifier) {
         Object.keys((data as app.ServerResponses.StratifiedDataResponse).counts).forEach(key => {
-            if (key !== "null" && key !== "cumulus__none") {
+            if (key !== "null" && key !== CUMULUS__NONE) {
                 ticks.add(key)
             }
         })
@@ -279,7 +280,7 @@ function getXAxis({
 
     if (data2) {
         Object.keys((data2 as app.ServerResponses.StratifiedDataResponse).counts).forEach(key => {
-            if (key !== "null" && key !== "cumulus__none") {
+            if (key !== "null" && key !== CUMULUS__NONE) {
                 ticks.add(key)
             }
         })
@@ -289,7 +290,7 @@ function getXAxis({
         (data as app.ServerResponses.UnStratifiedDataResponse).data
             .forEach(group => group.rows.forEach(r => {
                 const k = r[0]
-                if (k !== "null" && k !== "cumulus__none") {
+                if (k !== "null" && k !== CUMULUS__NONE) {
                     ticks.add(k)
                 }
             }))
@@ -455,9 +456,11 @@ function getSeriesAndExceptions({
                 xType
             })
 
+            const name = String(old?.name ?? group.stratifier.replace(CUMULUS__NONE, "none*"))
+
             addSeries({
                 id,
-                name       : String(old?.name ?? group.stratifier),
+                name,
                 type       : secondary ? (column2type || "spline").replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes : type,
                 linkedTo   : secondary ? "primary-" + group.stratifier : undefined,
                 zIndex     : secondary ? 0 : 1,
@@ -482,7 +485,7 @@ function getSeriesAndExceptions({
                 const old = serverOptions.series?.find(s => s.id === _id)
                 addSeries({
                     type    : ranges.type ?? "errorbar",
-                    name    : old?.name ?? group.stratifier + " (range)",
+                    name    : old?.name ?? name + " (range)",
                     id      : _id,
                     linkedTo: id,
                     zIndex  : secondary ? 0 : 1,

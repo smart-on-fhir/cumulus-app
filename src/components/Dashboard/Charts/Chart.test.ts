@@ -6,7 +6,7 @@ import {
     getXType,
     pct,
 } from "./lib"
-import { DEFAULT_FONT_SIZE } from "../config"
+import { CUMULUS__NONE, DEFAULT_FONT_SIZE } from "../config"
 
 
 describe("Chart", () => {
@@ -86,7 +86,7 @@ describe("Chart", () => {
 
         const data: [any, any, any?, any?][] = [
             ["a", 1],
-            ["cumulus__none", 2],
+            [CUMULUS__NONE, 2],
             [2, 4],
             [3, 5],
             [date, 6],
@@ -120,7 +120,7 @@ describe("Chart", () => {
 
         const data: [any, any, any?, any?][] = [
             ["a", 1],
-            ["cumulus__none", 2],
+            [CUMULUS__NONE, 2],
             [2, 4],
             [3, 5],
             [date, 6],

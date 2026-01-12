@@ -3,7 +3,7 @@ import { Link }                          from "react-router-dom"
 import Loader                            from "../generic/Loader"
 import { buildChartOptions }             from "../Dashboard/Charts/lib"
 import { getDefaultChartOptions }        from "../Dashboard/Charts/DefaultChartOptions"
-import { COLOR_THEMES }                  from "../Dashboard/config"
+import { COLOR_THEMES, CUMULUS__NONE }   from "../Dashboard/config"
 import Highcharts                        from "../../highcharts"
 import { fetchChartData }                from "../../backend"
 import { app }                           from "../../types"
@@ -140,7 +140,7 @@ function chartDataIsEmpty(data: app.ServerResponses.DataResponse): boolean {
     if (!data.rowCount) return true
 
     return !data.data.some(d => {
-        return d.rows.some(row => row[0] !== "cumulus__none")
+        return d.rows.some(row => row[0] !== CUMULUS__NONE)
     })
 }
 
