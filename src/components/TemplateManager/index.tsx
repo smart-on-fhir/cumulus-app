@@ -334,7 +334,11 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                         sortBy,
                         theme,
                         label,
-                        description: `Generated from the "${sub.name}" ${Terminology.subscription.nameSingular.toLowerCase()} to show ${label.toLowerCase()}.`,
+                        description: `Generated from the ${
+                            pkg ?
+                                `"${humanizeColumnName(pkg.name)} v${pkg.version}" ${Terminology.dataPackage.nameSingular.toLowerCase()}` :
+                                `"${sub.name}" ${Terminology.subscription.nameSingular.toLowerCase()}`
+                        } to show ${label.toLowerCase()}.`,
                     })
                 } else {
                     let label = limit ? `Top ${limit} ${counted} by ${col.label}`: `Count ${counted} by ${col.label}`
@@ -348,7 +352,11 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                         sortBy,
                         theme,
                         label,
-                        description: `Generated from the "${sub.name}" ${Terminology.subscription.nameSingular.toLowerCase()} to ${limit ? "show" : ""} ${label.toLowerCase()}.`,
+                        description: `Generated from the ${
+                            pkg ?
+                                `"${humanizeColumnName(pkg.name)} v${pkg.version}" ${Terminology.dataPackage.nameSingular.toLowerCase()}` :
+                                `"${sub.name}" ${Terminology.subscription.nameSingular.toLowerCase()}`
+                        } to ${limit ? "show" : ""} ${label.toLowerCase}.`,
                     })
                 }
 
