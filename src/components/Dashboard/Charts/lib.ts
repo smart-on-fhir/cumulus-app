@@ -677,6 +677,11 @@ export function buildChartOptions({
     const maxPointLength = Math.max(...series.map(s => s.data!.length))
 
     const dynamicOptions: Highcharts.Options = {
+        chart: {
+            zooming: {
+                type: xType === 'category' ? undefined : 'x'
+            }
+        },
         colors: computeColors(type, series, options),
         title: {
             style: {

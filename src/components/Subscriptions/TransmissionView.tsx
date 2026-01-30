@@ -149,7 +149,7 @@ function buildChartOptions(transmissions: app.Transmission[], sites: app.DataSit
             tickColor: "#0002",
             tickLength: 10,
             tickWidth: 1,
-            zoomEnabled: true,
+            // zoomEnabled: true,
             labels: {
                 // rotation: 0,
                 padding: 100,
