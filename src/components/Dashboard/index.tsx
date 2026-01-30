@@ -1008,24 +1008,24 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                 generateCaption
                             ]}
                             // This key controls in which cases the chart should be re-created rather than updated!
-                            // key={
-                            //     [
-                            //         chartType,
-                            //         viewColumn.name,
-                            //         viewGroupBy?.name || "no_stratifier",
-                            //         // finalChartOptions.annotations?.length || "",
-                            //         column2?.name || "no_secondary",
-                            //         column2type || "no_second_type",
-                            //         state.chartOptions.chart?.options3d?.enabled ?? false,
-                            //         (chartType.includes("pie") || chartType.includes("donut")) ? state.chartOptions.chart?.options3d?.alpha : 0,
-                            //         state.ranges.enabled,
-                            //         state.ranges.type,
-                            //         // state.sortBy || "no_sort",
-                            //         // state.limit || "no_limit",
-                            //         // state.offset || "no_offset",
-                            //         // Date.now()
-                            //     ].join(":")
-                            // }
+                            key={
+                                [
+                                    chartType,
+                                    viewColumn.name,
+                                    viewGroupBy?.name || "no_stratifier",
+                                    // finalChartOptions.annotations?.length || "",
+                                    column2?.name || "no_secondary",
+                                    column2type || "no_second_type",
+                                    state.chartOptions.chart?.options3d?.enabled ?? false,
+                                    (chartType.includes("pie") || chartType.includes("donut")) ? state.chartOptions.chart?.options3d?.alpha : 0,
+                                    state.ranges.enabled,
+                                    state.ranges.type,
+                                    // state.sortBy || "no_sort",
+                                    // state.limit || "no_limit",
+                                    // state.offset || "no_offset",
+                                    // Date.now()
+                                ].join(":")
+                            }
                             callback={() => dispatch({ type: "MERGE", payload: { chartIsRendered: true }})}
                         /> }
                         <br/>

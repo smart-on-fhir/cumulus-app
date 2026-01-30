@@ -161,19 +161,19 @@ export function filterOutExceptions({
 // Sort data by Y if so requested by the user. Note that we do not sort in 
 // case of X because it only works for category charts. For linear and date
 // axises we need to use axis.reversed instead.
-function sortY(rows: any[], sortBy: string, xType: "datetime" | "linear" | "category") {
-    const [col, dir] = sortBy.split(":")
-    if (col === "y" && xType === "category") {
-        rows.sort((a, b) => {
-            let _a = +a[1]
-            let _b = +b[1]    
-            if (isNaN(_a) || !isFinite(_a)) return 0
-            if (isNaN(_b) || !isFinite(_b)) return 0
-            return dir === "desc" ? _b - _a : _a - _b
-        })
-    }
-    return rows
-}
+// function sortY(rows: any[], sortBy: string, xType: "datetime" | "linear" | "category") {
+//     const [col, dir] = sortBy.split(":")
+//     if (col === "y" && xType === "category") {
+//         rows.sort((a, b) => {
+//             let _a = +a[1]
+//             let _b = +b[1]    
+//             if (isNaN(_a) || !isFinite(_a)) return 0
+//             if (isNaN(_b) || !isFinite(_b)) return 0
+//             return dir === "desc" ? _b - _a : _a - _b
+//         })
+//     }
+//     return rows
+// }
 
 function getPoint({
     row,
@@ -267,13 +267,13 @@ function getXAxis({
     offset?: number
     sortBy?: string
 }): string[] {
-    const ticks = new Set<string>()
+    const ticks = new Map<string, any>()
 
     // For stratified charts use the counts object
     if (data?.stratifier) {
         Object.keys((data as app.ServerResponses.StratifiedDataResponse).counts).forEach(key => {
             if (key !== "null" && key !== CUMULUS__NONE) {
-                ticks.add(key)
+                ticks.set(key, data[key])
             }
         })
     }
@@ -281,26 +281,41 @@ function getXAxis({
     if (data2) {
         Object.keys((data2 as app.ServerResponses.StratifiedDataResponse).counts).forEach(key => {
             if (key !== "null" && key !== CUMULUS__NONE) {
-                ticks.add(key)
+                ticks.set(key, data2[key])
             }
         })
     }
 
+    // Normal unstratified data
     if (data?.data && !data.stratifier) {
-        (data as app.ServerResponses.UnStratifiedDataResponse).data
-            .forEach(group => group.rows.forEach(r => {
-                const k = r[0]
-                if (k !== "null" && k !== CUMULUS__NONE) {
-                    ticks.add(k)
-                }
-            }))
+        (data as app.ServerResponses.UnStratifiedDataResponse).data.forEach(group => group.rows.forEach(r => {
+            const k = r[0]
+            if (k !== "null" && k !== CUMULUS__NONE) {
+                ticks.set(k, r[1])
+            }
+        }))
     }
 
-    let arr = Array.from(ticks)
+    let arr = Array.from(ticks.keys());
+
+    // At this point we have a set of unique axis labels, but we also need to
+    // sort them if this is a category axis
+    const [col, dir] = sortBy.split(":")
+    if (col === "y" && xType === "category") {
+        arr.sort((a, b) => {
+            let _a = +ticks.get(a)
+            let _b = +ticks.get(b)
+            if (isNaN(_a) || !isFinite(_a)) return 0
+            if (isNaN(_b) || !isFinite(_b)) return 0
+            return dir === "desc" ? _b - _a : _a - _b
+        })
+    }
+
+    ticks.clear();
 
     // If we have a stratified chart, xTicks needs to be sorted as it can
     // contain entries from different series that are out of order after
-    // being combined in th Set.
+    // being combined in the Set.
     if (data.stratifier || data2) {
         // For category charts we don't allow highcharts to sort the data.
         // However, for other types we need to sort it ourselves
@@ -439,6 +454,23 @@ function getSeriesAndExceptions({
         });
     }
 
+    function ticksToPoints(rows: [any, any, any?, any?][], denominatorCache: Record<string, any>, pointProps: Record<string, any> = {}) {
+        return xTicks.map(key => {
+            const row = rows.find(row => row[0] + "" === key + "")
+            try {
+                return getPoint({
+                    row: row || [key + "", null, 0, 0],
+                    xType,
+                    denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache),
+                    ...pointProps
+                })
+            } catch (e) {
+                exceptions.add(e.message)
+                return null
+            }
+        })
+    }
+
     function stratify(data: app.ServerResponses.StratifiedDataResponse, secondary = false) {
 
         const denominatorCache = {}
@@ -446,7 +478,7 @@ function getSeriesAndExceptions({
         data.data.forEach(group => {
             const id   = (secondary ? "secondary-" : "primary-") + group.stratifier
             const old  = serverOptions.series?.find(s => s.id === id)
-            const rows = sortY(group.rows, sortBy, xType)
+            const rows = group.rows
 
             filterOutExceptions({
                 rows,
@@ -461,23 +493,10 @@ function getSeriesAndExceptions({
             addSeries({
                 id,
                 name,
-                type       : secondary ? (column2type || "spline").replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes : type,
-                linkedTo   : secondary ? "primary-" + group.stratifier : undefined,
-                zIndex     : secondary ? 0 : 1,
-                data       : xTicks.map(key => {
-                    const row = rows.find(row => row[0] + "" === key)
-                    try {
-                        return getPoint({
-                            row: row || [key + "", null, 0, 0],
-                            xType,
-                            denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache),
-                            isStratified: true
-                        })
-                    } catch (e) {
-                        exceptions.add(e.message)
-                        return null
-                    }
-                })
+                type    : secondary ? (column2type || "spline").replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes : type,
+                linkedTo: secondary ? "primary-" + group.stratifier : undefined,
+                zIndex  : secondary ? 0 : 1,
+                data    : ticksToPoints(rows, denominatorCache, { isStratified: true })
             }, secondary)
 
             if (ranges?.enabled) {
@@ -489,21 +508,7 @@ function getSeriesAndExceptions({
                     id      : _id,
                     linkedTo: id,
                     zIndex  : secondary ? 0 : 1,
-                    data    : xTicks.map(key => {
-                        const row = rows.find(row => row[0] + "" === key)
-                        try {
-                            return getPoint({
-                                row: row || [key + "", null, 0, 0],
-                                xType,
-                                denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache),
-                                isErrorRange: true,
-                                isStratified: true
-                            })
-                        } catch (e) {
-                            exceptions.add(e.message)
-                            return null
-                        }
-                    })
+                    data    : ticksToPoints(rows, denominatorCache, { isErrorRange: true, isStratified: true })
                 });
             }
         })
@@ -518,26 +523,15 @@ function getSeriesAndExceptions({
             const name = String(column.label || column.name)
             const id   = "primary-" + name
             const old  = serverOptions.series?.find(s => s.id === id)
-            const rows = sortY(filterOutExceptions({
+            const rows = filterOutExceptions({
                 rows: data.data[0].rows,
                 seriesName: name,
                 column,
                 exceptions,
                 xType
-            }), sortBy, xType).filter(r => xTicks.includes(r[0]))
-
-            const seriesData = rows.map(row => {
-                try {
-                    return getPoint({
-                        row,
-                        xType,
-                        denominator: getDenominator(data, denominator, row, denominatorCache)
-                    })
-                } catch (e) {
-                    exceptions.add(e.message)
-                    return null
-                }
             })
+
+            const seriesData = ticksToPoints(rows, denominatorCache);
 
             if (type === "pie" && sortBy.startsWith("x:")) {
                 // @ts-ignore
@@ -845,22 +839,15 @@ export function buildChartOptions({
             // reversed: col === "x" ? (type === "bar" ? true : dir === "asc") : false,
             // reversed: type === "bar" && dir !== "desc",
             reversed: (() => {
-                if (type === "bar") {
-                    return col === "y" || (col === "x" && dir === "asc")
+                if (col !== 'x') {
+                    return undefined;
                 }
-                if (col === "x") {
-                    return dir === "desc"
-            //         if (xType === "category") {
-            //             return type === "bar" ? dir === "asc" : dir === "desc"
-            //         }
-            //         if (xType === "datetime") {
-            //             return type === "bar" ? dir === "asc" : dir === "desc"
-            //         }
-            //         if (xType === "linear") {
-            //             return type === "bar" ? dir === "asc" : dir === "desc"
-            //         }
+
+                if (xType !== 'category') {
+                    return dir === (type === 'bar' ? 'asc' : 'desc');
                 }
-                return false
+
+                return dir === (type === 'bar' ? 'desc' : 'asc');
             })(),
             labels: {
                 style: {

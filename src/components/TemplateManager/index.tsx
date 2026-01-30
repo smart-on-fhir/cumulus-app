@@ -218,7 +218,9 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                 // No limit for lines and up to 30 bars/columns
                 if (!chartType.includes("line") && data.rowCount > 30) {
                     limit = groupBy ? 20 : 30
-                    sortBy = "y:desc"
+                    if (!groupBy) {
+                        sortBy = "y:desc"
+                    }
                 }
 
                 if (chartType === "areaspline") {
