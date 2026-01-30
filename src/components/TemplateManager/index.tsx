@@ -150,7 +150,14 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
     const countLabel = counted.match(/^counts?/i) ? counted : `Count ${counted}`
     
     const isDateType = (col: app.SubscriptionDataColumn) => col.dataType.startsWith("date");
-    const isAgeType  = (col: app.SubscriptionDataColumn) => !!col.label.match(/\bage\b/i) || !!col.name.match(/\bage\b/i);
+    const isAgeType  = (col: app.SubscriptionDataColumn) => {
+        if (/\b(group|range)\b/i.test(col.name)) return false;
+        if (/\b(group|range)\b/i.test(col.label)) return false;
+        return (
+            !!col.label.match(/\b(age|days|years|months|weeks|period|ordinal)\b/i) ||
+            !!col.name .match(/\b(age|days|years|months|weeks|period|ordinal)\b/i)
+        );
+    }
 
     const [state, dispatch] = useReducer(reducer, {
         chartType: (col.dataType === "float" || col.dataType === "integer" || isDateType(col) || isAgeType(col)) ? "areaspline" : "column",
