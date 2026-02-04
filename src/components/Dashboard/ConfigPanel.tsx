@@ -552,7 +552,7 @@ export default function ConfigPanel({
                                                 value: "y:desc",
                                                 disabled: !isCategory || !!state.stratifyBy
                                             }
-                                        ]}
+                                        ].filter(option => !option.disabled)}
                                         value={ state.sortBy }
                                         onChange={ sortBy => onChange({ ...state, sortBy })} />
                                 </div>

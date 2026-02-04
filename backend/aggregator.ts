@@ -62,33 +62,35 @@ export async function download(req: Request, res: Response) {
     }
 }
 
-export async function proxyMiddleware(req: Request, res: Response)
-{
-    const { baseUrl } = config.aggregator
-    try {
-        const { response, body } = await request(req.url, {
-            // cache: "reload"//mapCacheControlToFetchOption(req)
-        })
-        // console.log(response.headers)
-        if (typeof body === "string") {
-            res.writeHead(response.status, { 'Content-Type': 'text/plain', "X-Upstream": baseUrl });
-            res.end(body);
-        } else {
-            res.writeHead(response.status, { 'Content-Type': 'application/json', "X-Upstream": baseUrl });
-            res.end(JSON.stringify(body, null, 4));
+export function proxyMiddleware(transform?: (body: unknown) => any) {
+    return async function(req: Request, res: Response)
+    {
+        const { baseUrl } = config.aggregator
+        try {
+            const { response, body } = await request(req.url, {
+                // cache: "reload"//mapCacheControlToFetchOption(req)
+            })
+            // console.log(response.headers)
+            if (typeof body === "string") {
+                res.writeHead(response.status, { 'Content-Type': 'text/plain', "X-Upstream": baseUrl });
+                res.end(body);
+            } else {
+                res.writeHead(response.status, { 'Content-Type': 'application/json', "X-Upstream": baseUrl });
+                res.end(JSON.stringify(transform ? transform(body) : body, null, 4));
+            }
+        } catch (ex) {
+            console.error('Error with proxy request:', ex);
+            res.setHeader("X-Upstream", baseUrl)
+            res.setHeader("Cache-Control", "no-cache");
+            if (ex instanceof HttpError) {
+                res.status(ex.statusCode)
+                res.end(ex.message)
+            } else {
+                res.status(500)
+                res.end('Internal Server Error');
+            }
         }
-    } catch (ex) {
-        console.error('Error with proxy request:', ex);
-        res.setHeader("X-Upstream", baseUrl)
-        res.setHeader("Cache-Control", "no-cache");
-        if (ex instanceof HttpError) {
-            res.status(ex.statusCode)
-            res.end(ex.message)
-        } else {
-            res.status(500)
-            res.end('Internal Server Error');
-        }
-    }
+    };
 }
 
 export async function request(path: string, options: FetchOptions = {})

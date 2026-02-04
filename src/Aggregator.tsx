@@ -240,37 +240,7 @@ class Aggregator
         if (!Array.isArray(result)) {
             throw new AggregatorError(`Expected array of data packages but got ${typeof result}`)
         }
-
-        // Convert to the desired column format!
-        return result.map(p => {
-            for (const name in p.columns) {
-                if (typeof p.columns[name] === "string") {
-                    p.columns[name] = {
-                        name,
-                        type: p.columns[name],
-                        dataType: String(p.columns[name])
-                            .replace("year" , "date:YYYY")
-                            .replace("month", "date:YYYY-MM")
-                            .replace("week" , "date:YYYY-MM-DD")
-                            .replace("day"  , "date:YYYY-MM-DD") as app.supportedDataType,
-                        label      : humanizeColumnName(name),
-                        description: humanizeColumnName(name),
-                        distinct_values_count: undefined
-                    }
-                } else {
-                    const col = p.columns[name];
-                    col.name = name
-                    col.dataType = String(col.type)
-                        .replace("year" , "date:YYYY")
-                        .replace("month", "date:YYYY-MM")
-                        .replace("week" , "date:YYYY-MM-DD")
-                        .replace("day"  , "date:YYYY-MM-DD") as app.supportedDataType;
-                    col.label = col.label || humanizeColumnName(name)
-                    col.description = col.description || col.label
-                }
-            }
-            return p
-        })
+        return result;
     }
 
     public async getPackage(id: string): Promise<DataPackage|undefined> {

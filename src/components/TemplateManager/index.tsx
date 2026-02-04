@@ -159,8 +159,12 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
         );
     }
 
+    let xType: "category" | "linear" | "datetime" = "category";
+    if (col.dataType === "integer" || col.dataType === "float") xType = "linear";
+    if (col.dataType.startsWith("date")) xType = "datetime";
+
     const [state, dispatch] = useReducer(reducer, {
-        chartType: (col.dataType === "float" || col.dataType === "integer" || isDateType(col) || isAgeType(col)) ? "areaspline" : "column",
+        chartType: (xType === "linear" || isDateType(col) || isAgeType(col)) ? "areaspline" : "column",
         limit      : 0,
         sortBy     : "x:asc",
         theme      : "sas_light",
@@ -218,7 +222,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                 // No limit for lines and up to 30 bars/columns
                 if (!chartType.includes("line") && data.rowCount > 30) {
                     limit = groupBy ? 20 : 30
-                    if (!groupBy) {
+                    if (!groupBy && xType === "category") {
                         sortBy = "y:desc"
                     }
                 }
