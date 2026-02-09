@@ -369,7 +369,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                             pkg ?
                                 `"${humanizeColumnName(pkg.name)} v${pkg.version}" ${Terminology.dataPackage.nameSingular.toLowerCase()}` :
                                 `"${sub.name}" ${Terminology.subscription.nameSingular.toLowerCase()}`
-                        } to ${limit ? "show" : ""} ${label.toLowerCase}.`,
+                        } to ${limit ? "show" : ""} ${label.toLowerCase()}.`,
                     })
                 }
 
