@@ -147,14 +147,18 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                         { filter ?
                             <div className="view-browser view-browser-grid" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(13rem, 1fr))` }}>
                                 <PackageTemplates pkg={pkg} key={pkg.id + ":" + filter} filter={filter} />
-                                <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified:" + filter} filter={filter} />
+                                {/*
+                                TEMPORARY! Implement a filter later!
+                                <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified:" + filter} filter={filter} /> */}
                             </div> :
                             <ViewsBrowser key={ pkg.id + ":" + filter } pkgId={ pkg.id } minColWidth="13rem"
                                 filter={ view => !showDrafts && !showPublic ? false : view.isDraft === showDrafts || view.isDraft === !showPublic }
                                 footer={
                                     showTemplates ? <>
                                         <PackageTemplates pkg={pkg} key={pkg.id} />
-                                        <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} />
+                                        {/*
+                                        TEMPORARY! Implement a filter later!
+                                        <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} /> */}
                                     </> : null
                                 }
                             />

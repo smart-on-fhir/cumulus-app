@@ -112,7 +112,9 @@ export default function SubscriptionView({ id }: { id?: number }): ReactNode
                             footer={
                                 <>
                                     <Templates subscription={model} />
-                                    <StratifiedTemplates subscription={model} />
+                                    {/*
+                                    TEMPORARY! Implement a filter later!
+                                    <StratifiedTemplates subscription={model} /> */}
                                 </>
                             }
                         />
