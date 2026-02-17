@@ -466,7 +466,7 @@ input[type="radio"] {
         }
 
         &.active:not(:disabled, .disabled) {
-            background : color-mix(in srgb, var(--color-highlight), var(--color-window-bg-hard));
+            background : var(--color-highlight);
             color      : var(--color-window-fg-hard);
             box-shadow : 0 0 0 1px var(--color-highlight);
             text-shadow: none;
@@ -523,6 +523,47 @@ input[type="radio"] {
             white-space: pre;
             min-width: auto;
             align-items: stretch;
+        }
+    }
+
+    &.virtual {
+        background: transparent;
+        .btn, .btn-blue, .btn-green, .btn-brand-2 {
+            background   : transparent;
+            border       : none;
+            box-shadow   : none;
+            color        : currentColor;
+            margin       : 0 2px; 
+            border-radius: var(--border-radius);
+            padding-left : 0.5em;
+            padding-right: 0.5em;
+
+            &:first-child {
+                margin-left: 0;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
+
+            &.active:not(:disabled, .disabled) {
+                box-shadow : 0 0 0 1px rgba(from var(--color-window-fg-hard) r g b / 0.1) inset;
+                text-shadow: none;
+            }
+
+            &:active {
+                box-shadow: 0 3px 10px -2px #0003 inset,
+                    0 0 0 1px rgba(from var(--color-window-fg-hard) r g b / 0.3) inset !important;
+            }
+
+            &:focus-visible {
+                outline: 1px dotted;
+                outline-offset: -3px;
+            }
+        }
+
+        .btn.active {
+            text-shadow: 0 0 2px var(--color-highlight);
         }
     }
 }

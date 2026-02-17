@@ -546,6 +546,45 @@ export default function CssPreview() {
             </div>
             <div>
                 <div>
+                    <div className="toolbar virtual">
+                        <button className="btn">btn</button>
+                        <button className="btn active">btn</button>
+                        <button className="btn active">btn</button>
+                    </div>
+                    <br/>
+                    <div className="toolbar virtual">
+                        <button className="btn-blue">btn</button>
+                        <button className="btn-blue active">btn</button>
+                        <button className="btn-blue active">btn</button>
+                    </div>
+                    <br/>
+                    <div className="toolbar virtual">
+                        <button className="btn-green">btn</button>
+                        <button className="btn-green active">btn</button>
+                        <button className="btn-green active">btn</button>
+                    </div>
+                    <br/>
+                    <div className="toolbar virtual">
+                        <button className="btn-brand-2">btn</button>
+                        <button className="btn-brand-2 active">btn</button>
+                        <button className="btn-brand-2 active">btn</button>
+                    </div>
+                    <br/>
+                    <div className="toolbar virtual">
+                        <button className="btn">btn</button>
+                        <button className="btn active">btn</button>
+                        <button className="btn active">btn</button>
+                    </div>
+                    <br/>
+                    <div className="toolbar virtual">
+                        <button className="btn-blue btn-virtual">btn</button>
+                        <button className="btn-blue btn-virtual active">btn</button>
+                        <button className="btn-blue btn-virtual active">btn</button>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div>
                     <p><Toggle checked onChange={() => {}} />                          <Toggle checked={false} onChange={() => {}} />                          <Toggle checked disabled onChange={() => {}} />                          <Toggle checked={false} disabled onChange={() => {}} /></p>
                     <p><Toggle checked onChange={() => {}} className="bg-green" />     <Toggle checked={false} onChange={() => {}} className="bg-green" />     <Toggle checked disabled onChange={() => {}} className="bg-green" />     <Toggle checked={false} disabled onChange={() => {}} className="bg-green" /></p>
                     <p><Toggle checked onChange={() => {}} className="bg-blue-dark" /> <Toggle checked={false} onChange={() => {}} className="bg-blue-dark" /> <Toggle checked disabled onChange={() => {}} className="bg-blue-dark" /> <Toggle checked={false} disabled onChange={() => {}} className="bg-blue-dark" /></p>

@@ -18,6 +18,7 @@ import aggregator, { DataPackage } from "../../Aggregator"
 import Terminology                 from "../../Terminology"
 import { app }                     from "../../types"
 import { useAuth }                 from "../../auth"
+import { useLocalStorage }         from "../../hooks"
 import { escapeForFileName, humanizeColumnName } from "../../utils"
 
 
@@ -51,9 +52,10 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
 
     const { user } = useAuth()
     const [query, setQuery] = useSearchParams()
-    const [showPublic   , setShowPublic   ] = useState(true)
-    const [showTemplates, setShowTemplates] = useState(true)
-    const [showDrafts   , setShowDrafts   ] = useState(false)
+    const [showPublic    , setShowPublic    ] = useLocalStorage("showPublic")
+    const [showTemplates , setShowTemplates ] = useLocalStorage("showTemplates")
+    const [showDrafts    , setShowDrafts    ] = useLocalStorage("showDrafts")
+    const [showStratified, setShowStratified] = useLocalStorage("showStratifiedCharts")
 
     const filter = query.get("filter") || ""
     const filters = filter ? filter.split(",") : []
@@ -117,27 +119,34 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
                                 <h5 style={{ margin: 0, lineHeight: "2.5rem" }}>Graphs</h5>
                             </div>
                             <div className="col col-0">
-                                <div className="toolbar flex">
+                                <div className="toolbar virtual flex">
                                     <button
-                                        className={ "btn" + (showPublic ? " active" : "") }
-                                        onClick={() => setShowPublic(!showPublic)}
+                                        className={ "btn" + (showPublic === "false" ? "" : " active") }
+                                        onClick={() => setShowPublic(showPublic === "false" ? "true" : "false")}
                                         data-tooltip={"Show Custom Charts"}
                                         disabled={!!filter}>
-                                        <span className="icon icon-2 material-symbols-outlined" style={{ margin: 0 }}>verified</span>
+                                        <span className="icon icon-2 material-symbols-outlined" style={{ margin: 0 }}>insert_chart</span>
                                     </button>
                                     <button
-                                        className={ "btn" + (showDrafts ? " active" : "") }
-                                        onClick={() => setShowDrafts(!showDrafts)}
+                                        className={ "btn" + (showDrafts === "true" ? " active" : "") }
+                                        onClick={() => setShowDrafts(showDrafts === "true" ? "false" : "true")}
                                         data-tooltip="Show My Draft Charts"
                                         disabled={!!filter}>
-                                        <span className="icon icon-2 material-symbols-outlined" style={{ margin: 0 }}>edit_square</span>
+                                        <span className="icon icon-2 material-symbols-outlined" style={{ margin: 0 }}>person</span>
                                     </button>
                                     <button
-                                        className={ "btn" + (showTemplates ? " active" : "") }
-                                        onClick={() => setShowTemplates(!showTemplates)}
+                                        className={ "btn" + (showTemplates === "false" ? "" : " active") }
+                                        onClick={() => setShowTemplates(showTemplates === "false" ? "true" : "false")}
                                         data-tooltip="Show Auto-generated Charts"
                                         disabled={!!filter}>
-                                        <span className="icon icon-2 material-symbols-outlined" style={{ margin: 0 }}>wand_stars</span>
+                                        <span className="icon icon-2 material-symbols-outlined" style={{ margin: 0 }}>bar_chart</span>
+                                    </button>
+                                    <button
+                                        className={ "btn" + (showStratified === "true" ? " active" : "") }
+                                        onClick={() => setShowStratified(showStratified === "true" ? "false" : "true")}
+                                        data-tooltip="Show Auto-generated Stratified Charts"
+                                        disabled={!!filter}>
+                                        <span className="icon icon-2 material-symbols-outlined" style={{ margin: 0 }}>full_stacked_bar_chart</span>
                                     </button>
                                 </div>
                             </div>
@@ -146,20 +155,24 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
 
                         { filter ?
                             <div className="view-browser view-browser-grid" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(13rem, 1fr))` }}>
-                                <PackageTemplates pkg={pkg} key={pkg.id + ":" + filter} filter={filter} />
-                                {/*
-                                TEMPORARY! Implement a filter later!
-                                <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified:" + filter} filter={filter} /> */}
+                                { showTemplates !== "false" && <PackageTemplates pkg={pkg} key={pkg.id + ":" + filter} filter={filter} /> }
+                                { showStratified === "true" && <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified:" + filter} filter={filter} /> }
                             </div> :
                             <ViewsBrowser key={ pkg.id + ":" + filter } pkgId={ pkg.id } minColWidth="13rem"
-                                filter={ view => !showDrafts && !showPublic ? false : view.isDraft === showDrafts || view.isDraft === !showPublic }
+                                filter={ view => {
+                                    if (showDrafts !== "true" && view.isDraft) {
+                                        return false
+                                    }
+                                    if (showPublic === "false" && !view.isDraft) {
+                                        return false
+                                    }
+                                    return true
+                                } }
                                 footer={
-                                    showTemplates ? <>
-                                        <PackageTemplates pkg={pkg} key={pkg.id} />
-                                        {/*
-                                        TEMPORARY! Implement a filter later!
-                                        <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} /> */}
-                                    </> : null
+                                    <>
+                                        { showTemplates !== "false" && <PackageTemplates pkg={pkg} key={pkg.id} /> }
+                                        { showStratified === "true" && <PackageStratifiedTemplates pkg={pkg} key={pkg.id + "-stratified"} /> }
+                                    </>
                                 }
                             />
                         }

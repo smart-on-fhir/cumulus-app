@@ -136,7 +136,7 @@ export function useCommand(command: Command) {
     }
 }
 
-export function useLocalStorage(storageKey: string) {
+export function useLocalStorage(storageKey: string): [string | null, (val: string) => void] {
     const [storageValue, setStorageValue] = useState(LocalStorageNS.getItem(storageKey));
 
     useEffect(() => {
@@ -162,7 +162,7 @@ export function useLocalStorage(storageKey: string) {
     }, [storageKey])
 
     return [storageValue, (val: string) => {
-        setStorageValue(val)
+        LocalStorageNS.setItem(storageKey, val)
         window.dispatchEvent(new Event('localStorageUpdate'));
     }]
 }
