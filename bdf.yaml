@@ -2,7 +2,7 @@ version: 0.0.0
 
 tool:
   name: Cumulus Fabric Prep-to-Research Dashboard
-  repo_url: https://github.com/smart-on-fhir/cumulus
+  repo_url: https://github.com/smart-on-fhir/cumulus-app
   tool_homepage: https://docs.smarthealthit.org/cumulus/
   documentation_url: https://docs.smarthealthit.org/cumulus/
   tool_type: WebApp
@@ -21,7 +21,7 @@ input:
     dataStandard:
       - Stratified counts, e.g. of FHIR elements
     proprietary: true
-    source: "TODO"
+    source: https://github.com/smart-on-fhir/cumulus-library
 
 output:
   - name: Clinical/phenotype data-viz 1
@@ -33,7 +33,7 @@ output:
     dataStandard:
       - Can also export aggregate count tables
     proprietary: true
-    source: "TODO"
+    source: https://github.com/smart-on-fhir/cumulus-library
 
 license:
   license_type: Apache-2.0
@@ -42,7 +42,7 @@ license:
 funding:
   source: CDC, ARPA-H
   agreement: Not specified
-  link: ""
+  link: https://arpa-h.gov/explore-funding/programs/arpa-h-bdf-toolbox
 
 domains:
   - Anything in the EHR.
