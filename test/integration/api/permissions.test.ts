@@ -31,7 +31,10 @@ use(chaiAsPromised);
 
 describe("Permissions", () => {
         
-    beforeEach(async () => await resetTable("Permission", Permissions))
+    beforeEach(async () => {
+        await resetTable("Permission", Permissions)
+        await resetTable("UserGroup", UserGroups)
+    })
 
     describe("list", () => {
         testEndpoint("Permissions.read", "GET", "/api/permissions")
