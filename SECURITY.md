@@ -10,7 +10,7 @@ We provide security fixes for the latest released version of cumulus-app.
 
 To report a vulnerability, please use [GitHub's private vulnerability reporting](https://github.com/smart-on-fhir/cumulus-app/security/advisories/new). This allows you to submit a report directly to the maintainers without public disclosure.
 
-If you are unable to use GitHub's private reporting, you may contact the maintainers via the [smart-on-fhir organization contact page](https://github.com/smart-on-fhir).
+If you are unable to use GitHub's private reporting, you may contact the maintainers via the [SMART on FHIR organization page](https://github.com/smart-on-fhir).
 
 ### What to Include
 
