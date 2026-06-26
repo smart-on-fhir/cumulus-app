@@ -10,7 +10,7 @@ const links: BreadcrumbLink[] = [
 
 it("renders breadcrumbs with links and current", () => {
   const { container } = render(
-    <MemoryRouter>
+    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Breadcrumbs links={links} />
     </MemoryRouter>
   )
@@ -22,7 +22,7 @@ it("renders breadcrumbs with links and current", () => {
 
 it("renders historic breadcrumbs", () => {
   const { container } = render(
-    <MemoryRouter>
+    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Breadcrumbs links={links} historic />
     </MemoryRouter>
   )

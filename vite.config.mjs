@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
       globals: true,
       environment: 'jsdom',
       tsconfig: "./tsconfig.test.json",
-      setupFiles: './vitest.setup.ts',
+      setupFiles: '../vitest.setup.ts',
       coverage: {
         reporter: ['text', 'html'],
       },

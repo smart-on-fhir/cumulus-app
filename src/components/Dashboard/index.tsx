@@ -691,7 +691,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     // Variables that control if new data needs to be fetched
     const filter = filterParams.map(encodeURIComponent).join("&filter=")
 
-    const loadData = useCallback(() => {
+    const loadData = useCallback((signal?: AbortSignal) => {
         dispatch({ type: "UPDATE", payload: {
             loadingData: true,
             loadingDataError: null,
@@ -705,7 +705,8 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             column    : viewColumnName,
             stratifier: stratifierName,
             filters   : filterParams,
-            label     : "Chart Primary Data"
+            label     : "Chart Primary Data",
+            signal
         })
 
         const fetchSecondaryData = async () => {
@@ -716,7 +717,8 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                 column    : viewColumnName,
                 stratifier: secColumnName,
                 filters   : filterParams,
-                label     : "Chart Secondary Data"
+                label     : "Chart Secondary Data",
+                signal
             })
         }
 
@@ -727,6 +729,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             primaryData,
             secondaryData
         ]) => {
+            if (signal?.aborted) return
             try {
                 validateData(primaryData, { column: viewColumnName, stratifier: stratifierName, filters: filterParams })
                 if (secColumnName) {
@@ -742,6 +745,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                 loadingData: false
             }})
         }).catch(error => {
+            if (signal?.aborted) return
             dispatch({ type: "UPDATE", payload: {
                 loadingDataError: error,
                 loadingData: false
@@ -751,7 +755,11 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [requestId, stratifierName, viewColumnName, filter, secColumnName]);
 
-    useEffect(() => { loadData() }, [loadData])
+    useEffect(() => {
+        const controller = new AbortController()
+        loadData(controller.signal)
+        return () => controller.abort()
+    }, [loadData])
 
     useEffect(() => {
         if (copy) {

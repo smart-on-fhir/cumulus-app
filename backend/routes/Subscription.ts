@@ -1,6 +1,5 @@
 import crypto                                                   from "crypto"
 import express, { Response, Router }                            from "express"
-import slug                                                     from "slug"
 import { Includeable, QueryTypes }                              from "sequelize"
 import { NotFound, InternalServerError, HttpError, BadRequest } from "../errors"
 import Model                                                    from "../db/models/Subscription"
@@ -102,6 +101,10 @@ const filtersWithoutParams = [
     "isNotNone",
     "isNone"
 ];
+
+function slug(str: string) {
+    return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
 
 
 // Views -----------------------------------------------------------------------
