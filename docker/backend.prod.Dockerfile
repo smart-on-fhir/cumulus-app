@@ -1,5 +1,5 @@
 # Stage 1: Build React app -----------------------------------------------------
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 ARG VITE_APP_PREFIX=""
 ENV VITE_APP_PREFIX=${VITE_APP_PREFIX}
@@ -21,7 +21,7 @@ RUN npm run build
 
 
 # Stage 2: Build and Run Express server ----------------------------------------
-FROM node:22-alpine
+FROM node:24-alpine
 
 ARG VITE_APP_PREFIX=""
 ENV VITE_APP_PREFIX=${VITE_APP_PREFIX}
@@ -35,7 +35,7 @@ WORKDIR /app
 COPY --from=builder /app/package.json /app/package-lock.json /app/dist .
 
 # Install only production dependencies
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Expose the necessary port
 EXPOSE $PORT

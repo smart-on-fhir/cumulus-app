@@ -77,7 +77,7 @@
   "devDependencies": {
     "@types/cli-color": "^2.0.2",
     "@types/make-fetch-happen": "^10.0.4",
-    "@types/node": "^22.13.14",
+    "@types/node": "^24.19.2",
     "@vitest/coverage-v8": "^5.0.5",
     "commander": "^11.1.0",
     "jsdom": "^29.1.1",
@@ -87,7 +87,17 @@
     "ts-mocha": "^11.1.0"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
-  "type": "commonjs"
+  "type": "commonjs",
+  "allowScripts": {
+    "@swc/core": false,
+    "es5-ext": false,
+    "protobufjs": false,
+    "ssh2": false,
+    "core-js": false,
+    "@parcel/watcher": false,
+    "cpu-features": false,
+    "fsevents": false
+  }
 }
