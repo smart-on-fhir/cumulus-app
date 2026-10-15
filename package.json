@@ -77,7 +77,7 @@
   "devDependencies": {
     "@types/cli-color": "^2.0.2",
     "@types/make-fetch-happen": "^10.0.4",
-    "@types/node": "^24.19.2",
+    "@types/node": "^26.6.5",
     "@vitest/coverage-v8": "^5.0.5",
     "commander": "^11.1.0",
     "jsdom": "^29.1.1",
