@@ -52,7 +52,7 @@
     "typescript": "~5.7.2",
     "umzug": "^3.8.3",
     "vite": "^8.1.0",
-    "vitest": "^4.1.9"
+    "vitest": "^5.0.5"
   },
   "scripts": {
     "build": "npm run build:frontend && npm run build:server",
@@ -78,7 +78,7 @@
     "@types/cli-color": "^2.0.2",
     "@types/make-fetch-happen": "^10.0.4",
     "@types/node": "^22.13.14",
-    "@vitest/coverage-v8": "^4.1.9",
+    "@vitest/coverage-v8": "^5.0.5",
     "commander": "^11.1.0",
     "jsdom": "^29.1.1",
     "mocha": "^11.7.6",

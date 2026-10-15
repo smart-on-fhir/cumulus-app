@@ -4,7 +4,7 @@
         "lib": ["ES2021", "DOM", "DOM.Iterable"],
         "module": "ESNext",
         "skipLibCheck": true,
-        "types": ["vitest/globals", "@testing-library/jest-dom"],
+        "types": ["vitest/globals", "@testing-library/jest-dom/vitest"],
         "moduleResolution": "bundler",
         "allowImportingTsExtensions": true,
         "isolatedModules": true,
