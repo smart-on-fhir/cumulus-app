@@ -67,7 +67,7 @@ maturity:
 
 publication:
   - type: Journal article
-    doi: 10.1093/jamia/ocae130
+    url: https://doi.org/10.1093/jamia/ocae130
 
 media: [{ "link": "https://doi.org/10.1093/jamia/ocae130" }]
 
