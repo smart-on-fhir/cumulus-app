@@ -66,7 +66,8 @@ maturity:
   current_maturity: 3
 
 publication:
-  [{ type: Journal article, doi: https://doi.org/10.1093/jamia/ocae130 }]
+  - type: Journal article
+    doi: 10.1093/jamia/ocae130
 
 media: [{ "link": "https://doi.org/10.1093/jamia/ocae130" }]
 
