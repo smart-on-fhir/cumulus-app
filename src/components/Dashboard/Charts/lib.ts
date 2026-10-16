@@ -502,31 +502,34 @@ function getSeriesAndExceptions({
         const denominatorCache = {}
         
         data.data.forEach(group => {
-            const id   = (secondary ? "secondary-" : "primary-") + group.stratifier
+            // The aggregator returns stratifier values with their JSON type,
+            // e.g. 12 or true, so they are not always strings
+            const stratifier = String(group.stratifier)
+            const id   = (secondary ? "secondary-" : "primary-") + stratifier
             const old  = serverOptions.series?.find(s => s.id === id)
             const rows = group.rows
 
             filterOutExceptions({
                 rows,
-                seriesName: old?.name ?? group.stratifier,
+                seriesName: old?.name ?? stratifier,
                 column,
                 exceptions,
                 xType
             })
 
-            const name = String(old?.name ?? group.stratifier.replace(CUMULUS__NONE, "none*"))
+            const name = String(old?.name ?? stratifier.replace(CUMULUS__NONE, "none*"))
 
             addSeries({
                 id,
                 name,
                 type    : secondary ? (column2type || "spline").replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes : type,
-                linkedTo: secondary ? "primary-" + group.stratifier : undefined,
+                linkedTo: secondary ? "primary-" + stratifier : undefined,
                 zIndex  : secondary ? 0 : 1,
                 data    : ticksToPoints(rows, denominatorCache, { isStratified: true })
             }, secondary)
 
             if (ranges?.enabled) {
-                const _id  = (secondary ? "secondary-" : "primary-") + group.stratifier + " (range)"
+                const _id  = (secondary ? "secondary-" : "primary-") + stratifier + " (range)"
                 const old = serverOptions.series?.find(s => s.id === _id)
                 addSeries({
                     type    : ranges.type ?? "errorbar",

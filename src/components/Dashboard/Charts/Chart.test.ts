@@ -149,6 +149,32 @@ describe("Chart", () => {
         expect(result[2]).to.equal('There are <b>6</b> records in the <b>Series 1</b> series where <b>Col 1</b> equals <b>' + date + '</b>')
     })
 
+    it ("supports non-string stratifier values, as returned by the aggregator", () => {
+        const options = buildChartOptions({
+            type: "line",
+            data: {
+                column    : "t",
+                stratifier: "g",
+                filters   : [],
+                totalCount: 4,
+                rowCount  : 4,
+                counts    : { "0": 2, "1": 2 },
+                data      : [
+                    { stratifier: 1    as any, rows: [["0", 1], ["1", 1]] },
+                    { stratifier: true as any, rows: [["0", 1], ["1", 1]] }
+                ]
+            },
+            data2  : null,
+            column : { name: "t", label: "T", dataType: "string" , description: "" },
+            groupBy: { name: "g", label: "G", dataType: "integer", description: "" },
+            sortBy : "x:asc",
+            limit  : 0,
+            offset : 0
+        })
+        expect(options.series!.map(s => s.id)).toEqual(["primary-1", "primary-true"])
+        expect(options.series!.map(s => s.name)).toEqual(["1", "true"])
+    })
+
     describe("survival charts", () => {
 
         function build(values: string[], isSurvival: boolean) {
