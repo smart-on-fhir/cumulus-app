@@ -395,12 +395,20 @@ export default function ConfigPanel({
                             <ColumnSelector
                                 cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max" && c.dataType !== "hidden") }
                                 value={ state.groupBy }
-                                disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
+                                disabled={[
+                                    "cnt",
+                                    state.stratifyBy,
+                                    state.column2,
+                                    // Survival time must be a duration (number or numeric label like ">=5")
+                                    ...(isSurvival ? cols.filter(c => !["integer", "float", "string"].includes(c.dataType)).map(c => c.name) : [])
+                                ].filter(Boolean)}
                                 onChange={ (groupBy: string) => onChange({ ...state, groupBy, offset: 0, limit: 0, sortBy: "x:asc" }) }
                             />
                             <p className="small color-muted"> {
                                 isPie ?
                                     "Select which data column provides the slices of the pie" :
+                                isSurvival ?
+                                    "Select the column holding the time to event, such as age or years since diagnosis" :
                                     `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
                             }</p>
                         </div>
