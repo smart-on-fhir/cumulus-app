@@ -176,6 +176,54 @@ describe("Chart", () => {
         expect(options.series!.map(s => s.name)).toEqual(["1", "true"])
     })
 
+    describe("legend click", () => {
+
+        function build(onSeriesToggle: (map: Record<string, boolean>) => void, inspection = false) {
+            return buildChartOptions({
+                type: "line",
+                data: { column: "t", filters: [], totalCount: 1, rowCount: 1, data: [{ rows: [["0", 1]] }] },
+                data2: null,
+                column: { name: "t", label: "T", dataType: "string", description: "" },
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                onSeriesToggle,
+                inspection: { enabled: inspection } as any
+            })
+        }
+
+        function click(options: ReturnType<typeof buildChartOptions>, legendItem: any) {
+            const event = { legendItem, preventDefault: vi.fn() }
+            ;(options.legend!.events!.itemClick as any)(event)
+            return event
+        }
+
+        const a: any = { userOptions: { id: "a" }, visible: true  }
+        const b: any = { userOptions: { id: "b" }, visible: false }
+        a.chart = b.chart = { series: [a, b] }
+
+        it ("replaces the default series toggle with a state update", () => {
+            const onSeriesToggle = vi.fn()
+            const event = click(build(onSeriesToggle), a)
+            expect(event.preventDefault).toHaveBeenCalled()
+            expect(onSeriesToggle).toHaveBeenCalledWith({ a: false, b: false })
+        })
+
+        it ("does not toggle series in inspection mode", () => {
+            const onSeriesToggle = vi.fn()
+            const event = click(build(onSeriesToggle, true), a)
+            expect(event.preventDefault).toHaveBeenCalled()
+            expect(onSeriesToggle).not.toHaveBeenCalled()
+        })
+
+        it ("keeps the default toggle for points, e.g. pie slices", () => {
+            const onSeriesToggle = vi.fn()
+            const event = click(build(onSeriesToggle), { series: a })
+            expect(event.preventDefault).not.toHaveBeenCalled()
+            expect(onSeriesToggle).not.toHaveBeenCalled()
+        })
+    })
+
     describe("survival charts", () => {
 
         function build(values: string[], isSurvival: boolean) {

@@ -790,15 +790,7 @@ export function buildChartOptions({
                 events: {
                     click: inspection?.enabled ? function(e) {
                         onInspectionChange(["series"], { selectedSeriesId: e.point.series.options.id })
-                    } : undefined,
-                    legendItemClick(e) {
-                        e.preventDefault()
-                        if (!inspection?.enabled) {
-                            const visMap: Record<string, boolean> = {};
-                            e.target.chart.series.forEach((s: Series) => visMap[s.userOptions.id!] = s === e.target ? !s.visible : s.visible)
-                            onSeriesToggle(visMap)
-                        }
-                    }
+                    } : undefined
                 },
                 dataLabels: {
                     // @ts-ignore
@@ -967,7 +959,26 @@ export function buildChartOptions({
         legend: {
             // @ts-ignore - a hack to force highcharts to reflow the legend
             dirty: Date.now(),
-            enabled: options.legend?.enabled ?? series.length <= 30
+            enabled: options.legend?.enabled ?? series.length <= 30,
+            events: {
+                // Series visibility is kept in the chart options (so that it
+                // is saved), so the default toggle is replaced with a state
+                // update. Only this event can prevent the default toggle in
+                // Highcharts 13; series.events.legendItemClick fires after it.
+                itemClick(e) {
+                    // Points (e.g. pie slices) keep the default behavior
+                    if ("series" in e.legendItem) {
+                        return
+                    }
+                    e.preventDefault()
+                    if (!inspection?.enabled) {
+                        const target = e.legendItem as Series
+                        const visMap: Record<string, boolean> = {};
+                        target.chart.series.forEach((s: Series) => visMap[s.userOptions.id!] = s === target ? !s.visible : s.visible)
+                        onSeriesToggle(visMap)
+                    }
+                }
+            }
         },
         series
     };
