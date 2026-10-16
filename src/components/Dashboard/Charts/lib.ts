@@ -1,6 +1,6 @@
 import moment                               from "moment"
 import { Color, merge, Series }             from "highcharts"
-import { parseDuration }                    from "./duration"
+import { compareDurations, parseDuration }  from "./duration"
 import Highcharts                           from "../../../highcharts"
 import { lengthToEm, roundToPrecision }     from "../../../utils"
 import { app }                              from "../../../types"
@@ -263,7 +263,8 @@ function getXAxis({
     data2,
     limit,
     offset,
-    sortBy
+    sortBy,
+    isSurvival
 }: {
     xType: "category" | "linear" | "datetime"
     data: app.ServerResponses.DataResponse
@@ -271,6 +272,7 @@ function getXAxis({
     limit?: number
     offset?: number
     sortBy?: string
+    isSurvival?: boolean
 }): string[] {
     const ticks = new Map<string, any>()
 
@@ -302,6 +304,12 @@ function getXAxis({
     }
 
     let arr = Array.from(ticks.keys());
+
+    // Survival time always runs forward, and the survival estimate needs every
+    // time point, so sortBy, limit and offset do not apply
+    if (isSurvival) {
+        return arr.sort(compareDurations)
+    }
 
     // At this point we have a set of unique axis labels, but we also need to
     // sort them if this is a category axis
@@ -388,7 +396,7 @@ function getSeriesAndExceptions({
 
     const exceptions: Set<string> = new Set();
 
-    let xTicks = getXAxis({ xType, data, data2, limit, offset, sortBy })
+    let xTicks = getXAxis({ xType, data, data2, limit, offset, sortBy, isSurvival })
 
     if (isSurvival) {
         const invalid = xTicks.filter(x => parseDuration(x) === null)

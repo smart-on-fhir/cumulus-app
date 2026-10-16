@@ -1,4 +1,4 @@
-import { parseDuration } from "./duration"
+import { compareDurations, parseDuration } from "./duration"
 
 describe("parseDuration", () => {
 
@@ -38,5 +38,21 @@ describe("parseDuration", () => {
         expect(parseDuration(-1)).toBeNull()
         expect(parseDuration(NaN)).toBeNull()
         expect(parseDuration(Infinity)).toBeNull()
+    })
+})
+
+describe("compareDurations", () => {
+
+    it ("sorts by value, numerically", () => {
+        expect(["10", "2", "1", 0].sort(compareDurations)).toEqual([0, "1", "2", "10"])
+    })
+
+    it ("sorts below, exact and above bounds of the same value", () => {
+        expect([">=1", "1", "<1"].sort(compareDurations)).toEqual(["<1", "1", ">=1"])
+        expect([">=5", "<1", "4", "0", "5"].sort(compareDurations)).toEqual(["0", "<1", "4", "5", ">=5"])
+    })
+
+    it ("puts values that are not durations last, in their original order", () => {
+        expect(["male", "2", "female", "1"].sort(compareDurations)).toEqual(["1", "2", "male", "female"])
     })
 })

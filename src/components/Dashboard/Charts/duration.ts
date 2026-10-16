@@ -44,3 +44,18 @@ export function parseDuration(input: string | number): Duration | null {
 
     return null
 }
+
+const BOUND_ORDER: Record<Duration["bound"], number> = { below: 0, exact: 1, above: 2 }
+
+/**
+ * Sort comparator for durations: by value, then "<1" before "1" before ">=1".
+ * Values that are not durations go last, in their original order.
+ */
+export function compareDurations(a: string | number, b: string | number): number {
+    const da = parseDuration(a)
+    const db = parseDuration(b)
+    if (!da || !db) {
+        return da ? -1 : db ? 1 : 0
+    }
+    return da.value - db.value || BOUND_ORDER[da.bound] - BOUND_ORDER[db.bound]
+}

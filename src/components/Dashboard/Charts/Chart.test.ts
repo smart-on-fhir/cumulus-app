@@ -184,6 +184,26 @@ describe("Chart", () => {
             expect(build(["female", "male"], false).caption?.text).toBe("")
         })
 
+        it ("sorts X by duration and ignores sortBy, limit and offset", () => {
+            const options = buildChartOptions({
+                type: "line",
+                data: {
+                    column    : "t",
+                    filters   : [],
+                    totalCount: 15,
+                    rowCount  : 5,
+                    data      : [{ rows: [["10", 1], [">=5", 2], ["2", 3], ["<1", 4], ["1", 5]] }]
+                },
+                data2 : null,
+                column: { name: "t", label: "T", dataType: "string", description: "" },
+                sortBy: "y:desc",
+                limit : 2,
+                offset: 1,
+                isSurvival: true
+            })
+            expect((options.series![0] as any).data.map((p: any) => p.name)).toEqual(["<1", "1", "2", ">=5", "10"])
+        })
+
         it ("lists at most 3 examples", () => {
             expect(build(["a", "b", "c", "d"], true).caption?.text).toContain('(found "a", "b", "c", ...)')
         })
