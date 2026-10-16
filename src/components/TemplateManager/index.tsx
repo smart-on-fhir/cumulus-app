@@ -151,11 +151,14 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
     
     const isDateType = (col: app.SubscriptionDataColumn) => col.dataType.startsWith("date");
     const isAgeType  = (col: app.SubscriptionDataColumn) => {
-        if (/\b(group|range)\b/i.test(col.name)) return false;
-        if (/\b(group|range)\b/i.test(col.label)) return false;
+        // "\b" treats "_" as a word character, so "age_group" would not match
+        const name  = col.name .replace(/_/g, " ");
+        const label = col.label.replace(/_/g, " ");
+        if (/\b(group|range)\b/i.test(name)) return false;
+        if (/\b(group|range)\b/i.test(label)) return false;
         return (
-            !!col.label.match(/\b(age|days|years|months|weeks|period|ordinal)\b/i) ||
-            !!col.name .match(/\b(age|days|years|months|weeks|period|ordinal)\b/i)
+            !!label.match(/\b(age|days|years|months|weeks|period|ordinal)\b/i) ||
+            !!name .match(/\b(age|days|years|months|weeks|period|ordinal)\b/i)
         );
     }
 
