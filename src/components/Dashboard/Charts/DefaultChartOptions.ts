@@ -418,6 +418,7 @@ const chartTypes: Record<string, Options> = {
     "spline"       : Spline,
     "area"         : Area,
     "areaspline"   : AreaSpline,
+    "survival"     : Line,
     "column"       : Column,
     "column3d"     : Column3d,
     "columnStack"  : ColumnStack,

@@ -29,6 +29,7 @@ describe("Dashboard", () => {
         "spline"       : "spline",
         "area"         : "area",
         "areaspline"   : "areaspline",
+        "survival"     : "line",
         "column"       : "column",
         "column3d"     : "column",
         "columnStack"  : "column",

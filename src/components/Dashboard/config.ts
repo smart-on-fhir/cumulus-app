@@ -15,6 +15,7 @@ export const SupportedChartTypes = {
     spline       : "Soft Line Chart",
     area         : "Area Chart",
     areaspline   : "Soft Area Chart",
+    survival     : "Survival Chart",
 
     column       : "Column Chart",
     column3d     : "Column Chart 3D",
@@ -39,6 +40,7 @@ export const ChartIcons = {
     spline       : `${prefix}/icons/line_chart.png`,
     area         : `${prefix}/icons/area_chart.png`,
     areaspline   : `${prefix}/icons/area_chart.png`,
+    survival     : `${prefix}/icons/survival_chart.png`,
 
     column       : `${prefix}/icons/column_chart.png`,
     column3d     : `${prefix}/icons/column_chart.png`,
