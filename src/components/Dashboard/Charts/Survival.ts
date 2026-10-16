@@ -14,7 +14,7 @@ const options: Options = {
             // the curve stays flat until the next point
             connectNulls: true,
             // Survival curves often overlap
-            opacity: 0.7
+            opacity: 0.6
         }
     }
 }

@@ -1,4 +1,4 @@
-import { isDurationColumn, isStatusColumn, suggestedFirst } from "./columnRoles"
+import { getDurationTitle, isDurationColumn, isDurationTitle, isStatusColumn, suggestedFirst } from "./columnRoles"
 
 describe("isDurationColumn", () => {
 
@@ -38,5 +38,35 @@ describe("suggestedFirst", () => {
     it ("puts matching columns first, each group sorted by name", () => {
         const cols = ["gender", "efs_status", "age", "died"].map(name => ({ name }))
         expect(cols.sort(suggestedFirst(isStatusColumn)).map(c => c.name)).toEqual(["died", "efs_status", "age", "gender"])
+    })
+})
+
+describe("getDurationTitle", () => {
+
+    it ("uses Age for ages and Time for anything else", () => {
+        expect(getDurationTitle({ name: "age" })).toBe("Age")
+        expect(getDurationTitle({ name: "follow_up" })).toBe("Time")
+    })
+
+    it ("adds the unit if the name or label has one", () => {
+        expect(getDurationTitle({ name: "event_free_survival_years" })).toBe("Time (years)")
+        expect(getDurationTitle({ name: "age_months" })).toBe("Age (months)")
+        expect(getDurationTitle({ name: "x", label: "Days since admission" })).toBe("Time (days)")
+        expect(getDurationTitle({ name: "age", label: "Age at visit (year)" })).toBe("Age (years)")
+    })
+})
+
+describe("isDurationTitle", () => {
+
+    it ("recognizes every default title", () => {
+        for (const name of ["age", "follow_up", "event_free_survival_years", "age_months", "days", "weeks"]) {
+            expect(isDurationTitle(getDurationTitle({ name }))).toBe(true)
+        }
+    })
+
+    it ("does not recognize other titles", () => {
+        expect(isDurationTitle("Years since diagnosis")).toBe(false)
+        expect(isDurationTitle("")).toBe(false)
+        expect(isDurationTitle(undefined)).toBe(false)
     })
 })

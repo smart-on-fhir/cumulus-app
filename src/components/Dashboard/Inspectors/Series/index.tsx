@@ -122,7 +122,7 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
         // },
         {
             ...DEFS.opacity,
-            // Falls back to the chart type default, e.g. 0.7 for survival charts
+            // Falls back to the chart type default, e.g. 0.6 for survival charts
             value: series.opacity ?? (getSeriesPlotOptionsById(options, seriesId) as typeof series).opacity ?? 1,
             onChange: (opacity: number) => onSeriesChange({ opacity })
         },

@@ -41,3 +41,24 @@ export function isStatusColumn(col: NamedColumn): boolean {
 export function suggestedFirst(test: (col: NamedColumn) => boolean) {
     return (a: NamedColumn, b: NamedColumn) => Number(test(b)) - Number(test(a)) || a.name.localeCompare(b.name)
 }
+
+const DURATION_UNITS = ["days", "weeks", "months", "years"]
+
+/**
+ * A default axis title for a duration column: "Age" for ages and "Time" for
+ * anything else, with the unit if the name or label has one. For example
+ * "event_free_survival_years" -> "Time (years)", "age_months" -> "Age (months)"
+ */
+export function getDurationTitle(col: NamedColumn): string {
+    const base = matches(col, /\bage\b/i) ? "Age" : "Time"
+    const unit = DURATION_UNITS.find(unit => matches(col, new RegExp(`\\b${unit.slice(0, -1)}s?\\b`, "i")))
+    return unit ? `${base} (${unit})` : base
+}
+
+/**
+ * True for every title getDurationTitle can return, i.e. for titles that were
+ * not set by the user
+ */
+export function isDurationTitle(title?: string | null): boolean {
+    return ["Time", "Age"].some(base => title === base || DURATION_UNITS.some(unit => title === `${base} (${unit})`))
+}

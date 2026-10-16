@@ -1,5 +1,6 @@
 import {
     buildChartOptions,
+    removeSurvivalTitles,
     emToPx,
     filterOutExceptions,
     getChartTitleText,
@@ -436,6 +437,53 @@ describe("Chart", () => {
             })
             expect(options.series!.map(s => s.name)).toEqual(["1", "true"])
             expect(options.series!.map((s: any) => s.data.map((p: any) => p.y))).toEqual([[100, 50], [100, 90]])
+        })
+
+        describe("axis titles", () => {
+
+            function build(options: any, column: Parameters<typeof buildChartOptions>[0]["column"] = T) {
+                return buildChartOptions({
+                    type: "line",
+                    options,
+                    data: flat([["0", 1], ["1", 1]]),
+                    data2 : null,
+                    column,
+                    sortBy: "x:asc",
+                    limit : 0,
+                    offset: 0,
+                    isSurvival: true,
+                    survivalData: { events: flat([["0", 25]]), censored: flat([["1", 75]]) }
+                }) as any
+            }
+
+            const YEARS = { name: "event_free_survival_years", label: "", dataType: "string", description: "" } as const
+            const AGE   = { name: "age", label: "", dataType: "integer", description: "" } as const
+
+            it ("default to Survival and a title inferred from the X column", () => {
+                const options = build({}, YEARS)
+                expect(options.yAxis.title.text).toBe("Survival")
+                expect(options.xAxis.title.text).toBe("Time (years)")
+            })
+
+            it ("keep titles set by the user", () => {
+                const options = build({ xAxis: { title: { text: "Years" } }, yAxis: { title: { text: "Event-free" } } }, YEARS)
+                expect(options.yAxis.title.text).toBe("Event-free")
+                expect(options.xAxis.title.text).toBe("Years")
+            })
+
+            it ("update a default X title when the X column changes", () => {
+                expect(build(build({}, YEARS), AGE).xAxis.title.text).toBe("Age")
+            })
+
+            it ("are removed when switching to another chart type, unless set by the user", () => {
+                const defaults = removeSurvivalTitles(build({}, YEARS)) as any
+                expect(defaults.xAxis.title.text).toBe("")
+                expect(defaults.yAxis.title.text).toBe("")
+
+                const custom = removeSurvivalTitles(build({ xAxis: { title: { text: "Years" } }, yAxis: { title: { text: "Event-free" } } }, YEARS)) as any
+                expect(custom.xAxis.title.text).toBe("Years")
+                expect(custom.yAxis.title.text).toBe("Event-free")
+            })
         })
 
         it ("ignores a saved denominator", () => {

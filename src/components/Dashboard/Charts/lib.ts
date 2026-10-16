@@ -2,6 +2,25 @@ import moment                               from "moment"
 import { Color, merge, Series }             from "highcharts"
 import { compareDurations, parseDuration }  from "./duration"
 import { getCountsByTime, lifeTable, SurvivalData } from "./kaplanMeier"
+import { getDurationTitle, isDurationTitle }        from "../columnRoles"
+
+/**
+ * The default Y axis title of survival charts
+ */
+export const SURVIVAL_Y_TITLE = "Survival"
+
+/**
+ * Removes the default survival axis titles (but not ones the user has set).
+ * Used when switching from a survival chart to another chart type.
+ */
+export function removeSurvivalTitles(options: Highcharts.Options): Highcharts.Options {
+    // @ts-ignore
+    const xTitle = options.xAxis?.title?.text, yTitle = options.yAxis?.title?.text
+    return merge(options, {
+        xAxis: isDurationTitle(xTitle)     ? { title: { text: "" } } : {},
+        yAxis: yTitle === SURVIVAL_Y_TITLE ? { title: { text: "" } } : {}
+    })
+}
 import Highcharts                           from "../../../highcharts"
 import { lengthToEm, roundToPrecision }     from "../../../utils"
 import { app }                              from "../../../types"
@@ -729,6 +748,12 @@ export function buildChartOptions({
     // Survival curves are shown as % of each series
     const isPercent = !!denominator || !!(isSurvival && survivalData)
 
+    // Survival charts: default axis titles, unless the user has set their own
+    // @ts-ignore
+    const xTitle = options.xAxis?.title?.text, yTitle = options.yAxis?.title?.text
+    const survivalXTitle = isSurvival && (!xTitle || isDurationTitle(xTitle)) ? getDurationTitle(column) : undefined
+    const survivalYTitle = isSurvival && survivalData && !yTitle ? SURVIVAL_Y_TITLE : undefined
+
     // const is3d = !!options.chart?.options3d?.enabled
 
     const { series, exceptions } = getSeriesAndExceptions({
@@ -779,6 +804,7 @@ export function buildChartOptions({
                 }
             },
             title: {
+                ...(survivalYTitle ? { text: survivalYTitle } : {}),
                 style: {
                     // @ts-ignore
                     fontSize: lengthToEm(options.yAxis?.title?.style?.fontSize ?? "1.2em") + "em"
@@ -950,6 +976,7 @@ export function buildChartOptions({
                 }
             },
             title: {
+                ...(survivalXTitle ? { text: survivalXTitle } : {}),
                 style: {
                     // @ts-ignore
                     fontSize: lengthToEm(options.xAxis?.title?.style?.fontSize ?? "1em") + "em"

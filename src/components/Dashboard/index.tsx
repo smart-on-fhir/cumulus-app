@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer, useState } from "react"
 import { useNavigate, Link }                     from "react-router-dom"
 import { Chart }                                 from "highcharts"
-import { buildChartOptions }                     from "./Charts/lib"
+import { buildChartOptions, removeSurvivalTitles } from "./Charts/lib"
 import ConfigPanel                               from "./ConfigPanel"
 import BaseChart                                 from "./Charts/ChartFN"
 import CaptionEditor                             from "./CaptionEditor"
@@ -192,6 +192,10 @@ function getViewReducer({
             const chartType = action.payload
 
             const nextState = { ...state, chartType };
+
+            if (state.chartType === "survival" && chartType !== "survival") {
+                nextState.chartOptions = removeSurvivalTitles(nextState.chartOptions)
+            }
 
             if (chartType.startsWith("pie") || chartType.startsWith("donut")) {
                 nextState.viewGroupBy = undefined
