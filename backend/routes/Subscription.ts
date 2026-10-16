@@ -15,6 +15,7 @@ import { getFindOptions, assert, rw, uInt, bool, cached }       from "../lib"
 import { version as pkgVersion }                                from "../../package.json"
 import { DATA_TYPES }                                           from "../DataManager/dataTypes"
 import { request }                                              from "../aggregator"
+import { toAggregatorFilters }                                  from "../aggregatorFilters"
 
 
 export const router: Router = express.Router({ mergeParams: true });
@@ -307,7 +308,15 @@ function getPkgData(packageId: string) {
 
         const query = new URLSearchParams()
         for (const [name, value] of Object.entries(req.query)) {
-            query.set(name, value + "")
+            if (name !== "filter") {
+                query.set(name, value + "")
+            }
+        }
+
+        // The aggregator reads filters differently - see toAggregatorFilters
+        const filters = [req.query.filter ?? []].flat().map(String)
+        for (const filter of toAggregatorFilters(filters)) {
+            query.append("filter", filter)
         }
 
         try {
