@@ -8,6 +8,7 @@ import {
     pct,
 } from "./lib"
 import { CUMULUS__NONE, DEFAULT_FONT_SIZE } from "../config"
+import { roundToPrecision } from "../../../utils"
 
 
 describe("Chart", () => {
@@ -203,7 +204,24 @@ describe("Chart", () => {
         })
 
         it ("does not warn for durations", () => {
-            expect(build(["0", "1", "2", ">=5"], true).caption?.text).toBe("")
+            const flat = (rows: [string, number][]) => ({ column: "t", filters: [], totalCount: 0, rowCount: rows.length, data: [{ rows }] }) as any
+            expect(buildChartOptions({
+                type: "line",
+                data: flat([["0", 10], ["1", 10], ["2", 10], [">=5", 10]]),
+                data2 : null,
+                column: { name: "t", label: "T", dataType: "string", description: "" },
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                isSurvival: true,
+                survivalData: { events: flat([["0", 5]]), censored: flat([[">=5", 35]]) }
+            }).caption?.text).toBe("")
+        })
+
+        it ("asks for a status column until survival data is available", () => {
+            expect(build(["0", "1"], true).caption?.text).toContain(
+                "Select a Status Column and an Event Value to compute the survival curve"
+            )
         })
 
         it ("does not warn for non-survival charts", () => {
@@ -264,4 +282,128 @@ describe("Chart", () => {
         })
     })
 
+    describe("survival curve", () => {
+
+        const T = { name: "t", label: "T", dataType: "string", description: "" } as const
+
+        function flat(rows: [string, number][]) {
+            return { column: "t", filters: [], totalCount: 0, rowCount: rows.length, data: [{ rows }] } as any
+        }
+
+        // Pass typed = true to return stratifier values as JSON types, e.g. 1 or true
+        function stratified(groups: Record<string, [string, number][]>, typed = false) {
+            const counts: Record<string, number> = {}
+            Object.values(groups).forEach(rows => rows.forEach(([x, y]) => counts[x] = (counts[x] || 0) + y))
+            return {
+                column: "t", stratifier: "g", filters: [], totalCount: 0, rowCount: 1, counts,
+                data: Object.entries(groups).map(([stratifier, rows]) => ({
+                    stratifier: typed ? JSON.parse(stratifier) : stratifier,
+                    rows
+                }))
+            } as any
+        }
+
+        it ("plots the survival at the start of each time point, in %", () => {
+            const options = buildChartOptions({
+                type: "line",
+                // The primary data provides the time points; its counts are not used
+                data: flat([["0", 1], ["1", 1], ["2", 1], [">=5", 1]]),
+                data2 : null,
+                column: T,
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                isSurvival: true,
+                survivalData: {
+                    events  : flat([["0", 10], ["1", 18]]),
+                    censored: flat([[">=5", 72]])
+                }
+            })
+            const data = (options.series![0] as any).data
+            // 10 of 100 have the event at "0", then 18 of the remaining 90 at "1"
+            expect(data.map((p: any) => roundToPrecision(p.y, 6))).toEqual([100, 90, 72, 72])
+            expect(data[1].custom.survival).toEqual({ x: "1", atRisk: 90, events: 18, censored: 0, survival: 0.9 })
+            expect((options.yAxis as any).labels.format).toBe("{text}%")
+            expect((options.yAxis as any).softMin).toBe(0)
+            expect((options.yAxis as any).softMax).toBe(100)
+        })
+
+        it ("computes every series separately", () => {
+            const options = buildChartOptions({
+                type: "line",
+                data: stratified({ a: [["0", 1], ["1", 1]], b: [["0", 1], ["1", 1]] }),
+                data2 : null,
+                column: T,
+                groupBy: { name: "g", label: "G", dataType: "string", description: "" },
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                isSurvival: true,
+                survivalData: {
+                    events  : stratified({ a: [["0", 50]], b: [["0", 10]] }),
+                    censored: stratified({ a: [["1", 50]], b: [["1", 90]] })
+                }
+            })
+            expect(options.series!.map(s => s.id)).toEqual(["primary-a", "primary-b"])
+            expect(options.series!.map((s: any) => s.data.map((p: any) => p.y))).toEqual([[100, 50], [100, 90]])
+        })
+
+        it ("warns if no records have the event value", () => {
+            const options = buildChartOptions({
+                type: "line",
+                data: flat([["0", 1], ["1", 1]]),
+                data2 : null,
+                column: T,
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                isSurvival: true,
+                survivalData: {
+                    events  : flat([]),
+                    censored: flat([["1", 100]]),
+                    status  : { label: "EFS Status", eventValue: "Event" }
+                }
+            })
+            expect(options.caption?.text).toContain(
+                "No records have <b>EFS Status</b> equal to <b>Event</b>, so the survival curves cannot drop"
+            )
+            expect((options.series![0] as any).data.map((p: any) => p.y)).toEqual([100, 100])
+        })
+
+        it ("supports non-string stratifier values, as returned by the aggregator", () => {
+            const options = buildChartOptions({
+                type: "line",
+                data: stratified({ 1: [["0", 1], ["1", 1]], true: [["0", 1], ["1", 1]] }, true),
+                data2 : null,
+                column: T,
+                groupBy: { name: "g", label: "G", dataType: "integer", description: "" },
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                isSurvival: true,
+                survivalData: {
+                    events  : stratified({ 1: [["0", 50]], true: [["0", 10]] }, true),
+                    censored: stratified({ 1: [["1", 50]], true: [["1", 90]] }, true)
+                }
+            })
+            expect(options.series!.map(s => s.name)).toEqual(["1", "true"])
+            expect(options.series!.map((s: any) => s.data.map((p: any) => p.y))).toEqual([[100, 50], [100, 90]])
+        })
+
+        it ("ignores a saved denominator", () => {
+            const options = buildChartOptions({
+                type: "line",
+                data: flat([["0", 1], ["1", 1]]),
+                data2 : null,
+                column: T,
+                denominator: "global",
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                isSurvival: true,
+                survivalData: { events: flat([["0", 25]]), censored: flat([["1", 75]]) }
+            })
+            expect((options.series![0] as any).data.map((p: any) => p.y)).toEqual([100, 75])
+        })
+    })
 })

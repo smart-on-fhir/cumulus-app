@@ -1,6 +1,7 @@
 import moment                               from "moment"
 import { Color, merge, Series }             from "highcharts"
 import { compareDurations, parseDuration }  from "./duration"
+import { getCountsByTime, lifeTable, SurvivalData } from "./kaplanMeier"
 import Highcharts                           from "../../../highcharts"
 import { lengthToEm, roundToPrecision }     from "../../../utils"
 import { app }                              from "../../../types"
@@ -375,7 +376,8 @@ function getSeriesAndExceptions({
     sortBy,
     limit,
     offset,
-    isSurvival
+    isSurvival,
+    survivalData
 }: {
     data            : app.ServerResponses.DataResponse
     data2           : app.ServerResponses.StratifiedDataResponse | null
@@ -390,6 +392,7 @@ function getSeriesAndExceptions({
     limit           : number
     offset          : number
     isSurvival     ?: boolean
+    survivalData   ?: SurvivalData | null
 }): { series: SeriesOptions[], exceptions: Set<string> }
 {
     let series: SeriesOptions[] = []
@@ -405,6 +408,17 @@ function getSeriesAndExceptions({
             exceptions.add(
                 `<b>${escapeHtml(column.label || column.name)}</b> does not look like a duration ` +
                 `(found ${examples}${invalid.length > 3 ? ", ..." : ""}), so this will not be a proper survival chart`
+            )
+        }
+        if (!survivalData) {
+            exceptions.add("Select a Status Column and an Event Value to compute the survival curve. Showing counts for now.")
+        }
+        // Usually means the saved Event Value no longer exists in the data
+        else if (!survivalData.events.rowCount) {
+            const { label, eventValue } = survivalData.status ?? { label: "status", eventValue: "the selected Event Value" }
+            exceptions.add(
+                `No records have <b>${escapeHtml(label)}</b> equal to <b>${escapeHtml(eventValue)}</b>, ` +
+                `so the survival curves cannot drop. Check the Event Value.`
             )
         }
     }
@@ -497,6 +511,23 @@ function getSeriesAndExceptions({
         })
     }
 
+    // Survival charts: the survival curve (in %) of one series instead of its counts
+    function toSurvivalPoints(stratifier?: string) {
+        const table = lifeTable(
+            xTicks.map(String),
+            getCountsByTime(survivalData!.events, stratifier),
+            getCountsByTime(survivalData!.censored, stratifier)
+        )
+        const rows = table.map(r => [r.x, r.survival === null ? null : r.survival * 100] as [string, number | null])
+        const points = ticksToPoints(rows, {}, { isStratified: stratifier !== undefined })
+        points.forEach((point: any, i) => {
+            if (point) point.custom.survival = table[i]
+        })
+        return points
+    }
+
+    const showSurvival = !!(isSurvival && survivalData)
+
     function stratify(data: app.ServerResponses.StratifiedDataResponse, secondary = false) {
 
         const denominatorCache = {}
@@ -525,10 +556,12 @@ function getSeriesAndExceptions({
                 type    : secondary ? (column2type || "spline").replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes : type,
                 linkedTo: secondary ? "primary-" + stratifier : undefined,
                 zIndex  : secondary ? 0 : 1,
-                data    : ticksToPoints(rows, denominatorCache, { isStratified: true })
+                data    : showSurvival && !secondary ?
+                    toSurvivalPoints(stratifier) :
+                    ticksToPoints(rows, denominatorCache, { isStratified: true })
             }, secondary)
 
-            if (ranges?.enabled) {
+            if (ranges?.enabled && !isSurvival) {
                 const _id  = (secondary ? "secondary-" : "primary-") + stratifier + " (range)"
                 const old = serverOptions.series?.find(s => s.id === _id)
                 addSeries({
@@ -560,7 +593,7 @@ function getSeriesAndExceptions({
                 xType
             })
 
-            const seriesData = ticksToPoints(rows, denominatorCache);
+            const seriesData = showSurvival ? toSurvivalPoints() : ticksToPoints(rows, denominatorCache);
 
             if (type === "pie" && sortBy.startsWith("x:")) {
                 // @ts-ignore
@@ -583,7 +616,7 @@ function getSeriesAndExceptions({
                     type === "pie",
             });
 
-            if (ranges?.enabled) {
+            if (ranges?.enabled && !isSurvival) {
                 const id  = "primary-" + name + " (range)"
                 const old = serverOptions.series?.find(s => s.id === id)
                 addSeries({
@@ -664,7 +697,8 @@ export function buildChartOptions({
     sortBy,
     limit,
     offset,
-    isSurvival
+    isSurvival,
+    survivalData
 }: {
     data               : app.ServerResponses.DataResponse
     data2              : app.ServerResponses.StratifiedDataResponse | null
@@ -682,9 +716,18 @@ export function buildChartOptions({
     offset             : number
     onInspectionChange?: (inspection: string[], context: Partial<app.InspectionContext>) => void
     isSurvival        ?: boolean
+    survivalData      ?: SurvivalData | null
 }): Highcharts.Options
 {
     const xType = getXType(column);
+
+    // Survival charts have no denominator, even if one was saved
+    if (isSurvival) {
+        denominator = ""
+    }
+
+    // Survival curves are shown as % of each series
+    const isPercent = !!denominator || !!(isSurvival && survivalData)
 
     // const is3d = !!options.chart?.options3d?.enabled
 
@@ -702,7 +745,8 @@ export function buildChartOptions({
         sortBy,
         limit,
         offset,
-        isSurvival
+        isSurvival,
+        survivalData
     });
 
     const [col, dir] = (sortBy || "").split(":")
@@ -723,9 +767,12 @@ export function buildChartOptions({
             }
         },
         yAxis: {
-            allowDecimals: denominator ? true : false,
+            allowDecimals: isPercent,
+            // Survival is always shown on a full 0-100% axis
+            softMin: isSurvival && survivalData ? 0   : undefined,
+            softMax: isSurvival && survivalData ? 100 : undefined,
             labels: {
-                format: denominator ? "{text}%" : "{text}",
+                format: isPercent ? "{text}%" : "{text}",
                 style: {
                     // @ts-ignore
                     fontSize: lengthToEm(options.yAxis?.labels?.style?.fontSize ?? "1em") + "em"
@@ -812,7 +859,8 @@ export function buildChartOptions({
                     // rows.push(`<tr><td style="text-align:right">X:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
                     rows.push(`<b>${groupBy.label || groupBy.name}: ${this.series.name}</b><hr/></td></tr>`)
                 } else {
-                    rows.push(`<b>${this.series.name}: Count</b><hr/></td></tr>`)
+                    // @ts-ignore
+                    rows.push(`<b>${this.series.name}: ${this.custom?.survival ? "Survival" : "Count"}</b><hr/></td></tr>`)
                 }
                 //     rows.push(`<b>${x}</b><hr/></td></tr>`)
                 // } else {
@@ -828,8 +876,20 @@ export function buildChartOptions({
                 // }
 
                 // Value -------------------------------------------------------
+                // Survival ----------------------------------------------------
                 // @ts-ignore
-                if (!this.custom?.isErrorRange) {
+                const survival = this.custom?.survival
+                if (survival) {
+                    rows.push(
+                        `<tr><td style="text-align:right">Survival:</td><td style="width: 100%"><b>${roundToPrecision(this.y!, 3)}%</b></td></tr>`,
+                        `<tr style="opacity:0.6"><td style="text-align:right">At risk:</td><td><b>${roundToPrecision(survival.atRisk, 3).toLocaleString()}</b></td></tr>`,
+                        `<tr style="opacity:0.6"><td style="text-align:right">Events:</td><td><b>${roundToPrecision(survival.events, 3).toLocaleString()}</b></td></tr>`,
+                        `<tr style="opacity:0.6"><td style="text-align:right">Censored:</td><td><b>${roundToPrecision(survival.censored, 3).toLocaleString()}</b></td></tr>`
+                    )
+                }
+
+                // @ts-ignore
+                else if (!this.custom?.isErrorRange) {
                     rows.push(
                         `<tr><td style="text-align:right">Count:</td>`,
                         `<td style="width: 100%"><b>${

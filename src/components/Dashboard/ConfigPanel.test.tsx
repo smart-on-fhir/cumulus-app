@@ -50,6 +50,8 @@ const mockState: ChartConfigPanelState = {
   denominator: "",
   column2: "",
   column2type: undefined,
+  statusColumn: "",
+  eventValue: "",
   annotations: [],
   xCol: { name: "age", label: "Age", dataType: "integer", description: "" },
   tags: [],

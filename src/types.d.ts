@@ -118,6 +118,8 @@ export declare module app {
         denominator ?: string
         column2    ?: string // Extra Column
         column2type?: string // Extra Column render as
+        statusColumn?: string // Survival charts: event/censored column
+        eventValue?: string // Survival charts: the statusColumn value meaning "event"
         caption?: string // HTML chart caption
         seriesVisibility?: Record<string, boolean>
         ranges?: RangeOptions

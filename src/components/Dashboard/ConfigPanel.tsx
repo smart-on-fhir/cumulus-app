@@ -138,6 +138,8 @@ export interface ChartConfigPanelState {
     denominator    : string
     column2        : string
     column2type   ?: string
+    statusColumn   : string
+    eventValue     : string
     annotations    : app.Annotation[]
     xCol           : app.SubscriptionDataColumn
     tags           : Pick<app.Tag, "id"|"name"|"description">[]
@@ -153,7 +155,8 @@ export default function ConfigPanel({
     onChartTypeChange,
     onChartOptionsChange,
     onRangeOptionsChange,
-    onSecondaryDataOptionsChange
+    onSecondaryDataOptionsChange,
+    statusValues
 } : {
     cols: app.SubscriptionDataColumn[]
     view?: Partial<app.View>
@@ -164,6 +167,12 @@ export default function ConfigPanel({
     onChartOptionsChange: (options: Options) => void
     onRangeOptionsChange: (ranges: app.RangeOptions) => void
     onSecondaryDataOptionsChange: (payload: { column?: string, type?: string }) => void
+
+    /**
+     * Survival charts: the values of the selected status column, or null
+     * while loading
+     */
+    statusValues?: string[] | null
 }) {
 
     const { chartOptions, chartType } = state;
@@ -399,6 +408,7 @@ export default function ConfigPanel({
                                     "cnt",
                                     state.stratifyBy,
                                     state.column2,
+                                    isSurvival ? state.statusColumn : "",
                                     // Survival time must be a duration (number or numeric label like ">=5")
                                     ...(isSurvival ? cols.filter(c => !["integer", "float", "string"].includes(c.dataType)).map(c => c.name) : [])
                                 ].filter(Boolean)}
@@ -408,7 +418,7 @@ export default function ConfigPanel({
                                 isPie ?
                                     "Select which data column provides the slices of the pie" :
                                 isSurvival ?
-                                    "Select the column holding the time to event, such as age or years since diagnosis" :
+                                    "Select the column holding the time to event" :
                                     `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
                             }</p>
                         </div>
@@ -425,7 +435,8 @@ export default function ConfigPanel({
                                         "cnt_min",
                                         "cnt_max",
                                         state.groupBy,
-                                        state.column2
+                                        state.column2,
+                                        isSurvival ? state.statusColumn : ""
                                     ].filter(Boolean)}
                                     onChange={ (stratifyBy: string) => onChange({
                                         ...state,
@@ -437,10 +448,55 @@ export default function ConfigPanel({
                                     }) }
                                 />
                                 <p className="small color-muted">
-                                    Stratify the data into multiple series based on the chosen column. For example,
-                                    this would produce multiple lines in a line chart.
+                                    Used to stratify the data into multiple series
                                 </p>
                             </div>
+                            { isSurvival && <>
+                                <label>Status Column</label>
+                                <ColumnSelector
+                                    cols={ cols.filter(c => c.dataType !== "hidden") }
+                                    placeholder="Select Column"
+                                    addEmptyOption="start"
+                                    value={ state.statusColumn }
+                                    disabled={[
+                                        "cnt",
+                                        "cnt_min",
+                                        "cnt_max",
+                                        state.groupBy,
+                                        state.stratifyBy,
+                                        ...cols.filter(c => c.dataType.startsWith("date")).map(c => c.name)
+                                    ].filter(Boolean)}
+                                    onChange={ (statusColumn: string) => onChange({ ...state, statusColumn: statusColumn || "", eventValue: "" }) }
+                                />
+                                <p className="small color-muted">
+                                    The column that tells whether the event happened for each record
+                                </p>
+                                { !!state.statusColumn && <div className="pt-1">
+                                    <label>Event Value</label>
+                                    <Select
+                                        placeholder={ statusValues ? "Select Value" : "Loading values..." }
+                                        disabled={ !statusValues }
+                                        value={ state.eventValue }
+                                        options={[
+                                            ...(statusValues || []),
+                                            // Keep a saved value even if it is no longer in the data
+                                            ...(state.eventValue && statusValues && !statusValues.includes(state.eventValue) ? [state.eventValue] : [])
+                                        ].map(value => ({
+                                            value,
+                                            label: statusValues?.includes(value) ? value : `${value} (not found in the data)`
+                                        }))}
+                                        onChange={ (eventValue: string) => onChange({ ...state, eventValue }) }
+                                    />
+                                    <p className="small color-muted">
+                                        The value from the status column that means the event happened
+                                    </p>
+                                    { (statusValues?.length ?? 0) > 2 && <p className="small color-muted">
+                                        <i className="fa-solid fa-triangle-exclamation color-orange" /> This column has more than two
+                                        values ({ statusValues!.join(", ") }). Status columns are expected to have two: one for the
+                                        event and one for no event.
+                                    </p> }
+                                </div> }
+                            </> }
                             { !isSurvival && <>
                                 <label>Denominator</label>
                                 <Select
