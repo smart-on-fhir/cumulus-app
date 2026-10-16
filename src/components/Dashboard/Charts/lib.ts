@@ -1,5 +1,6 @@
 import moment                               from "moment"
 import { Color, merge, Series }             from "highcharts"
+import { parseDuration }                    from "./duration"
 import Highcharts                           from "../../../highcharts"
 import { lengthToEm, roundToPrecision }     from "../../../utils"
 import { app }                              from "../../../types"
@@ -23,6 +24,10 @@ type SeriesOptions = (
     Highcharts.SeriesColumnOptions |
     Highcharts.SeriesBarOptions
 );
+
+function escapeHtml(input: string) {
+    return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+}
 
 export function emToPx(em: number) {
     return Math.round(DEFAULT_FONT_SIZE * em) + "px"
@@ -361,12 +366,13 @@ function getSeriesAndExceptions({
     ranges = {},
     sortBy,
     limit,
-    offset
+    offset,
+    isSurvival
 }: {
     data            : app.ServerResponses.DataResponse
     data2           : app.ServerResponses.StratifiedDataResponse | null
     column          : app.SubscriptionDataColumn
-    type            : SupportedNativeChartTypes 
+    type            : SupportedNativeChartTypes
     denominator     : app.DenominatorType
     column2type    ?: keyof typeof SupportedChartTypes
     xType           : "category" | "linear" | "datetime"
@@ -375,6 +381,7 @@ function getSeriesAndExceptions({
     sortBy          : string
     limit           : number
     offset          : number
+    isSurvival     ?: boolean
 }): { series: SeriesOptions[], exceptions: Set<string> }
 {
     let series: SeriesOptions[] = []
@@ -382,6 +389,17 @@ function getSeriesAndExceptions({
     const exceptions: Set<string> = new Set();
 
     let xTicks = getXAxis({ xType, data, data2, limit, offset, sortBy })
+
+    if (isSurvival) {
+        const invalid = xTicks.filter(x => parseDuration(x) === null)
+        if (invalid.length) {
+            const examples = invalid.slice(0, 3).map(x => `"${escapeHtml(x + "")}"`).join(", ")
+            exceptions.add(
+                `<b>${escapeHtml(column.label || column.name)}</b> does not look like a duration ` +
+                `(found ${examples}${invalid.length > 3 ? ", ..." : ""}), so this will not be a proper survival chart`
+            )
+        }
+    }
 
     function addSeries(options: any, secondary = false) {
 
@@ -634,7 +652,8 @@ export function buildChartOptions({
     inspection,
     sortBy,
     limit,
-    offset
+    offset,
+    isSurvival
 }: {
     data               : app.ServerResponses.DataResponse
     data2              : app.ServerResponses.StratifiedDataResponse | null
@@ -651,6 +670,7 @@ export function buildChartOptions({
     limit              : number
     offset             : number
     onInspectionChange?: (inspection: string[], context: Partial<app.InspectionContext>) => void
+    isSurvival        ?: boolean
 }): Highcharts.Options
 {
     const xType = getXType(column);
@@ -669,7 +689,8 @@ export function buildChartOptions({
         ranges,
         sortBy,
         limit,
-        offset
+        offset,
+        isSurvival
     });
 
     const [col, dir] = (sortBy || "").split(":")

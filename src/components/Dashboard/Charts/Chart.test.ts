@@ -1,4 +1,5 @@
 import {
+    buildChartOptions,
     emToPx,
     filterOutExceptions,
     getChartTitleText,
@@ -146,6 +147,46 @@ describe("Chart", () => {
         expect(result[0]).to.equal('There is <b>1</b> record in the <b>Series 1</b> series where <b>Col 1</b> equals <b>a</b>')
         expect(result[1]).to.equal('There are <b>2</b> records in the <b>Series 1</b> series where <b>Col 1</b> is empty in the source data')
         expect(result[2]).to.equal('There are <b>6</b> records in the <b>Series 1</b> series where <b>Col 1</b> equals <b>' + date + '</b>')
+    })
+
+    describe("survival charts", () => {
+
+        function build(values: string[], isSurvival: boolean) {
+            return buildChartOptions({
+                type: "line",
+                data: {
+                    column    : "gender",
+                    filters   : [],
+                    totalCount: 30,
+                    rowCount  : values.length,
+                    data      : [{ rows: values.map(v => [v, 10] as [string, number]) }]
+                },
+                data2 : null,
+                column: { name: "gender", label: "Gender", dataType: "string", description: "" },
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                isSurvival
+            })
+        }
+
+        it ("warns if the X column does not look like a duration", () => {
+            expect(build(["female", "male"], true).caption?.text).toContain(
+                '<b>Gender</b> does not look like a duration (found "female", "male"), so this will not be a proper survival chart'
+            )
+        })
+
+        it ("does not warn for durations", () => {
+            expect(build(["0", "1", "2", ">=5"], true).caption?.text).toBe("")
+        })
+
+        it ("does not warn for non-survival charts", () => {
+            expect(build(["female", "male"], false).caption?.text).toBe("")
+        })
+
+        it ("lists at most 3 examples", () => {
+            expect(build(["a", "b", "c", "d"], true).caption?.text).toContain('(found "a", "b", "c", ...)')
+        })
     })
 
 })

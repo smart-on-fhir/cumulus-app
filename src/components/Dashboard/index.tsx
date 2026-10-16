@@ -121,6 +121,7 @@ function getViewReducer({
                     sortBy          : currentState.sortBy,
                     limit           : currentState.limit,
                     offset          : currentState.offset,
+                    isSurvival      : currentState.chartType === "survival",
                     onSeriesToggle,
                     onInspectionChange,
                 })
@@ -155,6 +156,7 @@ function getViewReducer({
                         sortBy          : state.sortBy,
                         limit           : state.limit,
                         offset          : state.offset,
+                        isSurvival      : state.chartType === "survival",
                         onSeriesToggle,
                         onInspectionChange,
                     })
@@ -206,6 +208,7 @@ function getViewReducer({
                     sortBy          : nextState.sortBy,
                     limit           : nextState.limit,
                     offset          : nextState.offset,
+                    isSurvival      : nextState.chartType === "survival",
                     onSeriesToggle,
                     onInspectionChange,
                 })
@@ -269,6 +272,7 @@ function getViewReducer({
                     sortBy          : nextState.sortBy,
                     limit           : nextState.limit,
                     offset          : nextState.offset,
+                    isSurvival      : nextState.chartType === "survival",
                     onSeriesToggle,
                     onInspectionChange,
                 })
