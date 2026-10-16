@@ -6,6 +6,12 @@ const options: Options = {
         options3d: {
             enabled: false
         }
+    },
+    plotOptions: {
+        line: {
+            // Reset the step that survival charts set by default
+            step: false as any
+        }
     }
 }
 

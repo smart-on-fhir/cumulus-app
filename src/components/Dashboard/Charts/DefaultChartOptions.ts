@@ -15,6 +15,7 @@ import Spline             from "./Spline"
 import AreaSpline         from "./AreaSpline"
 import Line               from "./Line"
 import Area               from "./Area"
+import Survival           from "./Survival"
 import {
     SupportedChartTypes,
     DEFAULT_FONT_SIZE,
@@ -418,7 +419,7 @@ const chartTypes: Record<string, Options> = {
     "spline"       : Spline,
     "area"         : Area,
     "areaspline"   : AreaSpline,
-    "survival"     : Line,
+    "survival"     : Survival,
     "column"       : Column,
     "column3d"     : Column3d,
     "columnStack"  : ColumnStack,

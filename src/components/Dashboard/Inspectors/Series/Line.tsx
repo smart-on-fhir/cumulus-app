@@ -53,8 +53,9 @@ export function getOptions(options: Options, onChange: (o: Partial<Options>) => 
                 { label: "center", value: "center" },
                 { label: "right" , value: "right"  }
             ],
-            value: series.step ?? seriesTypeOptions.step,
-            onChange: (step?: OptionsStepValue) => onSeriesChange({ step: step || undefined }),
+            value: (series.step ?? seriesTypeOptions.step) || "",
+            // Store "none" as false so it can override a default step (e.g. in survival charts)
+            onChange: (step?: OptionsStepValue) => onSeriesChange({ step: (step || false) as any }),
             description: "Whether to apply steps to the line."
         },
         {
