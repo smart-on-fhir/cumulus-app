@@ -184,7 +184,7 @@ describe("Chart", () => {
             expect(build(["female", "male"], false).caption?.text).toBe("")
         })
 
-        it ("sorts X by duration and ignores sortBy, limit and offset", () => {
+        it ("sorts X by duration, left to right, and ignores sortBy, limit and offset", () => {
             const options = buildChartOptions({
                 type: "line",
                 data: {
@@ -202,6 +202,7 @@ describe("Chart", () => {
                 isSurvival: true
             })
             expect((options.series![0] as any).data.map((p: any) => p.name)).toEqual(["<1", "1", "2", ">=5", "10"])
+            expect((options.xAxis as any).reversed).toBe(false)
         })
 
         it ("lists at most 3 examples", () => {

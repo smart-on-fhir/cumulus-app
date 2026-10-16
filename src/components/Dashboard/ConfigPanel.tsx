@@ -535,6 +535,7 @@ export default function ConfigPanel({
 
                         { isPie && <SliceEditor state={state} onChange={onChange} /> }
 
+                        { !isSurvival && <>
                         <div className="row half-gap">
                                 <div className="col col-5">
                                     <label>Sort {!!state.stratifyBy && state.sortBy.startsWith("y:") && <i className="fa fa-info-circle color-muted" data-tooltip="Sorting by count may produce unexpected results in stratified charts because every group is sorted separately." />}</label>
@@ -579,6 +580,7 @@ export default function ConfigPanel({
                             <p className="small color-muted">
                                 Use offset, limit, and sort to slice the dataset retrieved from the backend
                             </p>
+                        </> }
                         <br />
                     </div>
                 </Collapse>

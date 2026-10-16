@@ -872,6 +872,11 @@ export function buildChartOptions({
             // reversed: col === "x" ? (type === "bar" ? true : dir === "asc") : false,
             // reversed: type === "bar" && dir !== "desc",
             reversed: (() => {
+                // Survival time always runs left to right
+                if (isSurvival) {
+                    return false;
+                }
+
                 if (col !== 'x') {
                     return undefined;
                 }

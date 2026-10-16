@@ -9,8 +9,9 @@ const options: Options = {
     },
     plotOptions: {
         line: {
-            // Reset the step that survival charts set by default
-            step: false as any
+            // Reset the defaults that survival charts set
+            step: false as any,
+            connectNulls: false
         }
     }
 }

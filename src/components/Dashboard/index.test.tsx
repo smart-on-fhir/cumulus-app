@@ -57,13 +57,16 @@ describe("Dashboard", () => {
         })
     }
 
-    it ("survival charts use left steps by default", () => {
-        expect(getDefaultChartOptions("survival", {}, true).plotOptions?.line?.step).toBe("left")
+    it ("survival charts use left steps and connect nulls by default", () => {
+        const options = getDefaultChartOptions("survival", {}, true)
+        expect(options.plotOptions?.line?.step).toBe("left")
+        expect(options.plotOptions?.line?.connectNulls).toBe(true)
     })
 
-    it ("switching from survival to line chart removes the default step", () => {
-        const survival = getDefaultChartOptions("survival", {}, true)
-        expect(getDefaultChartOptions("line", survival, true).plotOptions?.line?.step).toBe(false)
+    it ("switching from survival to line chart removes the survival defaults", () => {
+        const options = getDefaultChartOptions("line", getDefaultChartOptions("survival", {}, true), true)
+        expect(options.plotOptions?.line?.step).toBe(false)
+        expect(options.plotOptions?.line?.connectNulls).toBe(false)
     })
 })
 

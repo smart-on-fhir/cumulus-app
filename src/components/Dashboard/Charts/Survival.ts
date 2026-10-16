@@ -9,7 +9,10 @@ const options: Options = {
     },
     plotOptions: {
         line: {
-            step: "left"
+            step: "left",
+            // A time point missing from a series means no events there, so
+            // the curve stays flat until the next point
+            connectNulls: true
         }
     }
 }
