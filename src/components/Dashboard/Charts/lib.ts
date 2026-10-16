@@ -685,6 +685,7 @@ export function buildChartOptions({
         colors: computeColors(type, series, options),
         title: {
             style: {
+                // @ts-ignore
                 fontSize: lengthToEm(options.title?.style?.fontSize ?? "2em") + "em"
             }
         },
@@ -735,10 +736,8 @@ export function buildChartOptions({
                         fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
                     },
                     formatter(): any {
-                        if (this.point) {
-                            return `<span style="font-weight:500">${this.point.name}</span><span style="opacity:0.5;font-weight:400">` +
-                                ` - ${parseFloat((this.point.percentage || 0).toPrecision(2))} %</span>`
-                        }
+                        return `<span style="font-weight:500">${this.name}</span><span style="opacity:0.5;font-weight:400">` +
+                            ` - ${parseFloat((this.percentage || 0).toPrecision(2))} %</span>`
                     }
                 }
             },
@@ -761,26 +760,26 @@ export function buildChartOptions({
 
                 let x: any
                 if (xType === "datetime") {
-                    x = this.point.name//moment(this.point.x).format("YYYY-MM-DD")
+                    x = this.name//moment(this.point.x).format("YYYY-MM-DD")
                 } else if (xType === "linear") {
-                    x = this.point.x
+                    x = this.x
                 } else {
-                    x = this.point.name
+                    x = this.name
                 }
 
                 // Bullet ------------------------------------------------------
                 rows.push(`<tr><td colspan="2"><b style="color:${
                     // @ts-ignore
-                    this.point.color?.pattern?.color || this.point.series?.color?.stops?.[0]?.[1] || this.point.color ||
-                    ctx.chart.options.colors?.[this.point.series.index % ctx.chart.options.colors.length] || "#888888"
+                    this.color?.pattern?.color || this.series?.color?.stops?.[0]?.[1] || this.color ||
+                    ctx.chart.options.colors?.[this.series.index % ctx.chart.options.colors.length] || "#888888"
                 };-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
                 
                 // Header ------------------------------------------------------
                 if (groupBy) {
                     // rows.push(`<tr><td style="text-align:right">X:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
-                    rows.push(`<b>${groupBy.label || groupBy.name}: ${this.point.series.name}</b><hr/></td></tr>`)
+                    rows.push(`<b>${groupBy.label || groupBy.name}: ${this.series.name}</b><hr/></td></tr>`)
                 } else {
-                    rows.push(`<b>${this.point.series.name}: Count</b><hr/></td></tr>`)
+                    rows.push(`<b>${this.series.name}: Count</b><hr/></td></tr>`)
                 }
                 //     rows.push(`<b>${x}</b><hr/></td></tr>`)
                 // } else {
@@ -797,21 +796,21 @@ export function buildChartOptions({
 
                 // Value -------------------------------------------------------
                 // @ts-ignore
-                if (!this.point.custom?.isErrorRange) {
+                if (!this.custom?.isErrorRange) {
                     rows.push(
                         `<tr><td style="text-align:right">Count:</td>`,
                         `<td style="width: 100%"><b>${
                             denominator ?
                                 // @ts-ignore
-                                roundToPrecision(this.point.custom?.data?.cnt, 3).toLocaleString() + " (" + roundToPrecision(this.point.y!, 3) + "%)" :
-                                roundToPrecision(this.point.y!, 3).toLocaleString()
+                                roundToPrecision(this.custom?.data?.cnt, 3).toLocaleString() + " (" + roundToPrecision(this.y!, 3) + "%)" :
+                                roundToPrecision(this.y!, 3).toLocaleString()
                         }</b></td></tr>`
                     )
                 }
 
                 // Range -------------------------------------------------------
                 // @ts-ignore
-                const { data: { low, high, lowPct, highPct } = {}, denominator: d } = this.point.custom || {}
+                const { data: { low, high, lowPct, highPct } = {}, denominator: d } = this.custom || {}
 
                 if (high !== undefined && low !== undefined) {
                     if (denominator && d) {
@@ -829,9 +828,9 @@ export function buildChartOptions({
 
                 // Denominator -------------------------------------------------
                 // @ts-ignore
-                if (denominator && this.point.custom?.denominator) {
+                if (denominator && this.custom?.denominator) {
                     // @ts-ignore
-                    rows.push(`<tr style="opacity:0.6"><td style="text-align:right">Denominator:</td><td><b>${roundToPrecision(this.point.custom.denominator, 2).toLocaleString()}</b></td></tr>`)
+                    rows.push(`<tr style="opacity:0.6"><td style="text-align:right">Denominator:</td><td><b>${roundToPrecision(this.custom.denominator, 2).toLocaleString()}</b></td></tr>`)
                 }
                 
                 return `<table>${rows.join("")}</table>`
