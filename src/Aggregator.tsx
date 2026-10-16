@@ -243,10 +243,13 @@ class Aggregator
         return result;
     }
 
+    /**
+     * Fetched on its own rather than picked from the list: the single-package
+     * route also corrects column types that the package's data disproves.
+     */
     public async getPackage(id: string): Promise<DataPackage|undefined> {
-        const all = await this.getPackages();
-        const pkg = all.find(p => p.id === id);
-        if (!pkg) {
+        const pkg = await this.fetch(`/api/aggregator/data-packages/${encodeURIComponent(id)}`)
+        if (!pkg?.columns) {
             throw new Error(`Unable to find package with id ${JSON.stringify(id)}`)
         }
         return pkg
@@ -258,14 +261,17 @@ class Aggregator
     }
 
     public async getLatestPackageId(pkgId: string) {
-        const pkg = await this.getPackage(pkgId)
+        const allPackages = await this.getPackages()
+
+        // Taken from the list, like the versions it is compared to below, so
+        // column types differ only where the packages do
+        const pkg = allPackages.find(p => p.id === pkgId)
 
         // PACKAGE NOT FOUND
         if (!pkg) {
-            return "" 
+            return ""
         }
 
-        const allPackages = await this.getPackages()
         const allVersions = filter(allPackages, { study: pkg.study, name: pkg.name })
 
         // PACKAGE VERSION NOT FOUND
