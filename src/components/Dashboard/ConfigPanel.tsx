@@ -486,6 +486,7 @@ export default function ConfigPanel({
                                             ...(state.eventValue && statusValues && !statusValues.includes(state.eventValue) ? [state.eventValue] : [])
                                         ].map(value => ({
                                             value,
+                                            icon : `${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/icons/cell.png`,
                                             label: statusValues?.includes(value) ? value : `${value} (not found in the data)`
                                         }))}
                                         onChange={ (eventValue: string) => onChange({ ...state, eventValue }) }
