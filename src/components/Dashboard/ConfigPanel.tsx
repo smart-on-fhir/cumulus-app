@@ -530,7 +530,7 @@ export default function ConfigPanel({
                                 </p>
                             </div> }
 
-                            <SecondaryDataEditor state={state} cols={[ ...cols ]} onChange={onSecondaryDataOptionsChange} />
+                            { !isSurvival && <SecondaryDataEditor state={state} cols={[ ...cols ]} onChange={onSecondaryDataOptionsChange} /> }
                         </> }
 
                         { isPie && <SliceEditor state={state} onChange={onChange} /> }

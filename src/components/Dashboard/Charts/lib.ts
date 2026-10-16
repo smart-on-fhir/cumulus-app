@@ -687,7 +687,8 @@ export function buildChartOptions({
 
     const { series, exceptions } = getSeriesAndExceptions({
         data,
-        data2,
+        // Survival charts have no secondary data, even if some was saved
+        data2: isSurvival ? null : data2,
         column,
         type,
         denominator,

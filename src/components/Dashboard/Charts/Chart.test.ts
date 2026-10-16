@@ -205,6 +205,34 @@ describe("Chart", () => {
             expect((options.xAxis as any).reversed).toBe(false)
         })
 
+        it ("ignores secondary data", () => {
+            const options = buildChartOptions({
+                type: "line",
+                data: {
+                    column    : "t",
+                    filters   : [],
+                    totalCount: 20,
+                    rowCount  : 2,
+                    data      : [{ rows: [["0", 10], ["1", 10]] }]
+                },
+                data2: {
+                    column    : "t",
+                    stratifier: "g",
+                    filters   : [],
+                    totalCount: 20,
+                    rowCount  : 2,
+                    counts    : { "0": 10, "1": 10 },
+                    data      : [{ stratifier: "a", rows: [["0", 10], ["1", 10]] }]
+                },
+                column: { name: "t", label: "T", dataType: "string", description: "" },
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                isSurvival: true
+            })
+            expect(options.series!.map(s => s.id)).toEqual(["primary-T"])
+        })
+
         it ("lists at most 3 examples", () => {
             expect(build(["a", "b", "c", "d"], true).caption?.text).toContain('(found "a", "b", "c", ...)')
         })
