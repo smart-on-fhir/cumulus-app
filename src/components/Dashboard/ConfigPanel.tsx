@@ -17,6 +17,7 @@ import Chart              from "./Inspectors/Chart"
 import { AllPlotLines }   from "./Inspectors/AxisPlotLines"
 import { DEFS }           from "./Schema"
 import { AllSeries }      from "./Inspectors/Series"
+import { isDurationColumn, isStatusColumn, suggestedFirst } from "./columnRoles"
 import {
     DashStyleValue,
     merge,
@@ -403,6 +404,7 @@ export default function ConfigPanel({
                             <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
                             <ColumnSelector
                                 cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max" && c.dataType !== "hidden") }
+                                comparator={ isSurvival ? suggestedFirst(isDurationColumn) : undefined }
                                 value={ state.groupBy }
                                 disabled={[
                                     "cnt",
@@ -455,6 +457,7 @@ export default function ConfigPanel({
                                 <label>Status Column</label>
                                 <ColumnSelector
                                     cols={ cols.filter(c => c.dataType !== "hidden") }
+                                    comparator={ suggestedFirst(isStatusColumn) }
                                     placeholder="Select Column"
                                     addEmptyOption="start"
                                     value={ state.statusColumn }

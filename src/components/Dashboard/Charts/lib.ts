@@ -876,7 +876,7 @@ export function buildChartOptions({
                         `<tr><td style="text-align:right">Survival:</td><td style="width: 100%"><b>${roundToPrecision(this.y!, 3)}%</b></td></tr>`,
                         `<tr style="opacity:0.6"><td style="text-align:right">At risk:</td><td><b>${roundToPrecision(survival.atRisk, 3).toLocaleString()}</b></td></tr>`,
                         `<tr style="opacity:0.6"><td style="text-align:right">Events:</td><td><b>${roundToPrecision(survival.events, 3).toLocaleString()}</b></td></tr>`,
-                        `<tr style="opacity:0.6"><td style="text-align:right">Censored:</td><td><b>${roundToPrecision(survival.censored, 3).toLocaleString()}</b></td></tr>`
+                        `<tr style="opacity:0.6"><td style="text-align:right">No event:</td><td><b>${roundToPrecision(survival.censored, 3).toLocaleString()}</b></td></tr>`
                     )
                 }
 

@@ -12,7 +12,9 @@ const options: Options = {
             step: "left",
             // A time point missing from a series means no events there, so
             // the curve stays flat until the next point
-            connectNulls: true
+            connectNulls: true,
+            // Survival curves often overlap
+            opacity: 0.7
         }
     }
 }

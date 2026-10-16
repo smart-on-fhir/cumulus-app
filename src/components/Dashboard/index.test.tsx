@@ -61,12 +61,14 @@ describe("Dashboard", () => {
         const options = getDefaultChartOptions("survival", {}, true)
         expect(options.plotOptions?.line?.step).toBe("left")
         expect(options.plotOptions?.line?.connectNulls).toBe(true)
+        expect(options.plotOptions?.line?.opacity).toBe(0.7)
     })
 
     it ("switching from survival to line chart removes the survival defaults", () => {
         const options = getDefaultChartOptions("line", getDefaultChartOptions("survival", {}, true), true)
         expect(options.plotOptions?.line?.step).toBe(false)
         expect(options.plotOptions?.line?.connectNulls).toBe(false)
+        expect(options.plotOptions?.line?.opacity).toBe(1)
     })
 })
 

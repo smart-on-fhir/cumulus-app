@@ -14,7 +14,7 @@ import {
     SeriesOptionsType,
     SeriesPieOptions
 } from "highcharts"
-import { getColorForSeries, getIndexOfSeriesId, getSeriesById, getSeriesUpdater } from "../lib"
+import { getColorForSeries, getIndexOfSeriesId, getSeriesById, getSeriesPlotOptionsById, getSeriesUpdater } from "../lib"
 import Collapse from "../../../generic/Collapse"
 import PropertyGrid from "../../../generic/PropertyGrid"
 import { Tabs } from "../../../generic/Tabs"
@@ -122,7 +122,8 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
         // },
         {
             ...DEFS.opacity,
-            value: series.opacity ?? 1,
+            // Falls back to the chart type default, e.g. 0.7 for survival charts
+            value: series.opacity ?? (getSeriesPlotOptionsById(options, seriesId) as typeof series).opacity ?? 1,
             onChange: (opacity: number) => onSeriesChange({ opacity })
         },
         {
