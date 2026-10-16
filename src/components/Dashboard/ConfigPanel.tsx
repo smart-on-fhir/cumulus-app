@@ -172,6 +172,7 @@ export default function ConfigPanel({
     const isColumn      = chartType.startsWith("column")
     const isPie         = chartType.startsWith("pie") || chartType.startsWith("donut")
     const isStack       = chartType.endsWith("Stack")
+    const isSurvival    = chartType === "survival"
     const isBarOrColumn = isBar || isColumn
     const xType         = getXType(cols.find(c => c.name === state.groupBy)!)
     const isCategory    = xType === "category"
@@ -432,64 +433,66 @@ export default function ConfigPanel({
                                     this would produce multiple lines in a line chart.
                                 </p>
                             </div>
-                            <label>Denominator</label>
-                            <Select
-                                options={[
-                                    {
-                                        label: <div>
-                                            <div>None</div>
-                                            <div className="small color-muted">
-                                                Render the aggregate counts as found in the<br/>
-                                                {Terminology.subscription.nameSingular.toLowerCase()} without further processing
-                                            </div>
-                                        </div>,
-                                        value: "",
-                                        icon: "fa-solid fa-percent grey-out"
-                                    },
-                                    {
-                                        label: <div>
-                                            <div>Stratified Count</div>
-                                            <div className="small color-muted">
-                                                Convert counts to percentage of the total<br />
-                                                count of every given data group.<br />
-                                                Not available with no stratifier.
-                                            </div>
-                                        </div>,
-                                        value: "count",
-                                        icon: "fa-solid fa-percent color-brand-2",
-                                        disabled: !state.stratifyBy
-                                    },
-                                    {
-                                        label: <div>
-                                            <div>Stratified Sum</div>
-                                            <div className="small color-muted">
-                                                Convert counts to percentage of the sum<br />
-                                                of values in every given data group.<br />
-                                                Not available with no stratifier.
-                                            </div>
-                                        </div>,
-                                        value: "local",
-                                        icon: "fa-solid fa-percent color-brand-2",
-                                        disabled: !state.stratifyBy
-                                    },
-                                    {
-                                        label: <div>
-                                            <div>Total Count</div>
-                                            <div className="small color-muted">
-                                                Convert counts to percentage of the total<br />
-                                                count within the entire dataset.
-                                            </div>
-                                        </div>,
-                                        value: "global",
-                                        icon: "fa-solid fa-percent color-blue"
-                                    }
-                                ]}
-                                value={ state.denominator }
-                                onChange={ denominator => onChange({ ...state, denominator })}
-                            />
-                            <p className="small color-muted">
-                                If set, renders the values as percentages of the given denominator
-                            </p>
+                            { !isSurvival && <>
+                                <label>Denominator</label>
+                                <Select
+                                    options={[
+                                        {
+                                            label: <div>
+                                                <div>None</div>
+                                                <div className="small color-muted">
+                                                    Render the aggregate counts as found in the<br/>
+                                                    {Terminology.subscription.nameSingular.toLowerCase()} without further processing
+                                                </div>
+                                            </div>,
+                                            value: "",
+                                            icon: "fa-solid fa-percent grey-out"
+                                        },
+                                        {
+                                            label: <div>
+                                                <div>Stratified Count</div>
+                                                <div className="small color-muted">
+                                                    Convert counts to percentage of the total<br />
+                                                    count of every given data group.<br />
+                                                    Not available with no stratifier.
+                                                </div>
+                                            </div>,
+                                            value: "count",
+                                            icon: "fa-solid fa-percent color-brand-2",
+                                            disabled: !state.stratifyBy
+                                        },
+                                        {
+                                            label: <div>
+                                                <div>Stratified Sum</div>
+                                                <div className="small color-muted">
+                                                    Convert counts to percentage of the sum<br />
+                                                    of values in every given data group.<br />
+                                                    Not available with no stratifier.
+                                                </div>
+                                            </div>,
+                                            value: "local",
+                                            icon: "fa-solid fa-percent color-brand-2",
+                                            disabled: !state.stratifyBy
+                                        },
+                                        {
+                                            label: <div>
+                                                <div>Total Count</div>
+                                                <div className="small color-muted">
+                                                    Convert counts to percentage of the total<br />
+                                                    count within the entire dataset.
+                                                </div>
+                                            </div>,
+                                            value: "global",
+                                            icon: "fa-solid fa-percent color-blue"
+                                        }
+                                    ]}
+                                    value={ state.denominator }
+                                    onChange={ denominator => onChange({ ...state, denominator })}
+                                />
+                                <p className="small color-muted">
+                                    If set, renders the values as percentages of the given denominator
+                                </p>
+                            </> }
                             { state.ranges && <div className="pt-1">
                                 <label>Confidence Intervals</label>
                                 <Select value={ state.ranges?.type || "" } options={[
