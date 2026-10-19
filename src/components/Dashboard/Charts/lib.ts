@@ -671,6 +671,16 @@ function getSeriesAndExceptions({
         }
     }
 
+    // Survival charts: left steps are the only correct way to draw the curves,
+    // even if another step was saved for a series
+    if (isSurvival) {
+        series.forEach((s: any) => {
+            if (s.type === "line") {
+                s.step = "left"
+            }
+        })
+    }
+
     // Survival charts: 95% confidence bands. Added after all the curves, so
     // that they don't shift the colors of the curves.
     if (showSurvival && survivalBands) {
@@ -1023,6 +1033,10 @@ export function buildChartOptions({
                     fontSize: lengthToEm(options.xAxis?.title?.style?.fontSize ?? "1em") + "em"
                 }
             },
+        },
+        // @ts-ignore - lets the inspectors tell survival charts apart
+        custom: {
+            isSurvival: !!isSurvival
         },
         legend: {
             // @ts-ignore - a hack to force highcharts to reflow the legend

@@ -541,6 +541,25 @@ describe("Chart", () => {
             })
         })
 
+        it ("always draws curves with left steps and marks the chart as a survival chart", () => {
+            const build = (isSurvival: boolean) => buildChartOptions({
+                type: "line",
+                options: { series: [{ id: "primary-T", type: "line", step: "center" }] } as any,
+                data: flat([["0", 1], ["1", 1]]),
+                data2 : null,
+                column: T,
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                isSurvival,
+                survivalData: { events: flat([["0", 25]]), censored: flat([["1", 75]]) }
+            }) as any
+            expect(build(true).series[0].step).toBe("left")
+            expect(build(true).custom.isSurvival).toBe(true)
+            expect(build(false).series[0].step).toBe("center")
+            expect(build(false).custom.isSurvival).toBe(false)
+        })
+
         it ("ignores a saved denominator", () => {
             const options = buildChartOptions({
                 type: "line",
