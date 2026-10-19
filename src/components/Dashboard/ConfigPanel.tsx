@@ -141,6 +141,7 @@ export interface ChartConfigPanelState {
     column2type   ?: string
     statusColumn   : string
     eventValue     : string
+    survivalBands  : boolean
     annotations    : app.Annotation[]
     xCol           : app.SubscriptionDataColumn
     tags           : Pick<app.Tag, "id"|"name"|"description">[]
@@ -499,6 +500,14 @@ export default function ConfigPanel({
                                         values ({ statusValues!.join(", ") }). Status columns are expected to have two: one for the
                                         event and one for no event.
                                     </p> }
+                                    <div className="pt-1">
+                                        <Checkbox
+                                            name="survivalBands"
+                                            label="Show 95% confidence bands"
+                                            checked={ state.survivalBands }
+                                            onChange={ survivalBands => onChange({ ...state, survivalBands }) }
+                                        />
+                                    </div>
                                 </div> }
                             </> }
                             { !isSurvival && <>

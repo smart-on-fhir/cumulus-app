@@ -371,7 +371,7 @@ describe("Chart", () => {
             const data = (options.series![0] as any).data
             // 10 of 100 have the event at "0", then 18 of the remaining 90 at "1"
             expect(data.map((p: any) => roundToPrecision(p.y, 6))).toEqual([100, 90, 72, 72])
-            expect(data[1].custom.survival).toEqual({ x: "1", atRisk: 90, events: 18, censored: 0, survival: 0.9 })
+            expect(data[1].custom.survival).toMatchObject({ x: "1", atRisk: 90, events: 18, censored: 0, survival: 0.9 })
             expect((options.yAxis as any).labels.format).toBe("{text}%")
             expect((options.yAxis as any).softMin).toBe(0)
             expect((options.yAxis as any).softMax).toBe(100)
@@ -483,6 +483,61 @@ describe("Chart", () => {
                 const custom = removeSurvivalTitles(build({ xAxis: { title: { text: "Years" } }, yAxis: { title: { text: "Event-free" } } }, YEARS)) as any
                 expect(custom.xAxis.title.text).toBe("Years")
                 expect(custom.yAxis.title.text).toBe("Event-free")
+            })
+        })
+
+        describe("confidence bands", () => {
+
+            function build(survivalBands?: boolean) {
+                return buildChartOptions({
+                    type: "line",
+                    data: stratified({ a: [["0", 1], ["1", 1], ["2", 1]], b: [["0", 1], ["1", 1], ["2", 1]] }),
+                    data2 : null,
+                    column: T,
+                    groupBy: { name: "g", label: "G", dataType: "string", description: "" },
+                    sortBy: "x:asc",
+                    limit : 0,
+                    offset: 0,
+                    isSurvival: true,
+                    survivalData: {
+                        events  : stratified({ a: [["0", 10]], b: [["0", 20]] }),
+                        censored: stratified({ a: [["1", 90]], b: [["1", 80]] })
+                    },
+                    survivalBands
+                }) as any
+            }
+
+            it ("are not shown by default", () => {
+                expect(build().series.map((s: any) => s.type)).toEqual(["line", "line"])
+            })
+
+            it ("add one band per curve, linked to it and in its color", () => {
+                const series = build(true).series
+                expect(series.map((s: any) => s.id)).toEqual(["primary-a", "primary-b", "primary-a (95% CI)", "primary-b (95% CI)"])
+                expect(series[2]).toMatchObject({ type: "arearange", linkedTo: "primary-a", color: series[0].color, step: "left" })
+                expect(series[3]).toMatchObject({ type: "arearange", linkedTo: "primary-b", color: series[1].color, step: "left" })
+            })
+
+            it ("do not change the colors of the curves", () => {
+                expect(build(true).series.slice(0, 2).map((s: any) => s.color)).toEqual(build().series.map((s: any) => s.color))
+            })
+
+            it ("follow the confidence interval of each time point, in %", () => {
+                const [curve, , band] = build(true).series
+                expect(band.data.map((p: any) => p && [p.name, p.low, p.high])).toEqual(curve.data.map((p: any) =>
+                    // No band where nobody is left under follow-up
+                    p.custom.survival.ciLow === null ? null : [
+                        p.name,
+                        p.custom.survival.ciLow  * 100,
+                        p.custom.survival.ciHigh * 100
+                    ]
+                ))
+                expect(band.data[2]).toBeNull()
+                // Zero width at the start
+                expect([band.data[0].low, band.data[0].high]).toEqual([100, 100])
+                // Wider after the first events
+                expect(band.data[1].low).toBeLessThan(curve.data[1].y)
+                expect(band.data[1].high).toBeGreaterThan(curve.data[1].y)
             })
         })
 

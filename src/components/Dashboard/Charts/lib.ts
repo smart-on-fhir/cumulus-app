@@ -396,7 +396,8 @@ function getSeriesAndExceptions({
     limit,
     offset,
     isSurvival,
-    survivalData
+    survivalData,
+    survivalBands
 }: {
     data            : app.ServerResponses.DataResponse
     data2           : app.ServerResponses.StratifiedDataResponse | null
@@ -412,6 +413,7 @@ function getSeriesAndExceptions({
     offset          : number
     isSurvival     ?: boolean
     survivalData   ?: SurvivalData | null
+    survivalBands  ?: boolean
 }): { series: SeriesOptions[], exceptions: Set<string> }
 {
     let series: SeriesOptions[] = []
@@ -669,6 +671,37 @@ function getSeriesAndExceptions({
         }
     }
 
+    // Survival charts: 95% confidence bands. Added after all the curves, so
+    // that they don't shift the colors of the curves.
+    if (showSurvival && survivalBands) {
+        series.slice().forEach((curve: any) => addSeries({
+            type               : "arearange",
+            id                 : curve.id + " (95% CI)",
+            name               : curve.name + " (95% CI)",
+            linkedTo           : curve.id,
+            color              : curve.color,
+            zIndex             : 0,
+            step               : "left",
+            lineWidth          : 0,
+            fillOpacity        : 0.15,
+            connectNulls       : true,
+            enableMouseTracking: false,
+            marker             : { enabled: false },
+            data: curve.data.map((point: any) => {
+                const row = point?.custom?.survival
+                if (!row || row.ciLow === null) {
+                    return null
+                }
+                return {
+                    ...(point.x !== undefined ? { x: point.x } : {}),
+                    name: point.name,
+                    low : row.ciLow  * 100,
+                    high: row.ciHigh * 100
+                }
+            })
+        }))
+    }
+
     return { series, exceptions }
 }
 
@@ -717,7 +750,8 @@ export function buildChartOptions({
     limit,
     offset,
     isSurvival,
-    survivalData
+    survivalData,
+    survivalBands
 }: {
     data               : app.ServerResponses.DataResponse
     data2              : app.ServerResponses.StratifiedDataResponse | null
@@ -736,6 +770,7 @@ export function buildChartOptions({
     onInspectionChange?: (inspection: string[], context: Partial<app.InspectionContext>) => void
     isSurvival        ?: boolean
     survivalData      ?: SurvivalData | null
+    survivalBands     ?: boolean
 }): Highcharts.Options
 {
     const xType = getXType(column);
@@ -771,7 +806,8 @@ export function buildChartOptions({
         limit,
         offset,
         isSurvival,
-        survivalData
+        survivalData,
+        survivalBands
     });
 
     const [col, dir] = (sortBy || "").split(":")
@@ -904,6 +940,11 @@ export function buildChartOptions({
                         `<tr style="opacity:0.6"><td style="text-align:right">Events:</td><td><b>${roundToPrecision(survival.events, 3).toLocaleString()}</b></td></tr>`,
                         `<tr style="opacity:0.6"><td style="text-align:right">No event:</td><td><b>${roundToPrecision(survival.censored, 3).toLocaleString()}</b></td></tr>`
                     )
+                    if (survivalBands && survival.ciLow !== null) {
+                        rows.splice(rows.length - 3, 0,
+                            `<tr style="opacity:0.6"><td style="text-align:right">95% CI:</td><td><b>${roundToPrecision(survival.ciLow * 100, 3)}% – ${roundToPrecision(survival.ciHigh * 100, 3)}%</b></td></tr>`
+                        )
+                    }
                 }
 
                 // @ts-ignore

@@ -41,6 +41,17 @@ export interface LifeTableRow {
      * Null once nobody is left under follow-up.
      */
     survival: number | null
+
+    /**
+     * Lower and upper bounds (0 to 1) of the 95% confidence interval of
+     * `survival`, using Greenwood's formula. Null when `survival` is null.
+     */
+    ciLow : number | null
+    ciHigh: number | null
+}
+
+function clamp01(n: number) {
+    return Math.min(1, Math.max(0, n))
 }
 
 /**
@@ -53,6 +64,8 @@ export interface LifeTableRow {
  * reached by then without inventing a step for it.
  *
  * Censored records count as half at risk during the interval they leave in.
+ * The confidence interval uses Greenwood's variance over the same effective
+ * number at risk.
  *
  * @param ticks    The time points, already sorted
  * @param events   Event counts by time point
@@ -67,16 +80,31 @@ export function lifeTable(
 
     let atRisk   = n
     let survival = 1
+    let variance = 0
 
     return ticks.map(x => {
         const d = events[x]   || 0
         const c = censored[x] || 0
 
-        const row = { x, atRisk, events: d, censored: c, survival: atRisk > 0 ? survival : null }
+        const se  = survival * Math.sqrt(variance)
+        const row = {
+            x,
+            atRisk,
+            events  : d,
+            censored: c,
+            survival: atRisk > 0 ? survival : null,
+            ciLow   : atRisk > 0 ? clamp01(survival - 1.96 * se) : null,
+            ciHigh  : atRisk > 0 ? clamp01(survival + 1.96 * se) : null
+        }
 
         const effective = atRisk - c / 2
         if (effective > 0) {
             survival *= Math.max(0, 1 - d / effective)
+
+            // Undefined when everyone at risk has the event
+            if (effective > d) {
+                variance += d / (effective * (effective - d))
+            }
         }
 
         atRisk -= d + c

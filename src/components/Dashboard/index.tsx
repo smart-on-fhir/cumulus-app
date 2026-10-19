@@ -72,6 +72,7 @@ export interface ViewState
     column2type     ?: keyof typeof SupportedChartTypes
     statusColumn    ?: app.SubscriptionDataColumn
     eventValue       : string
+    survivalBands    : boolean
     caption          : string
     data             : app.ServerResponses.DataResponse | null
     data2            : app.ServerResponses.StratifiedDataResponse | null
@@ -128,6 +129,7 @@ function getViewReducer({
                     offset          : currentState.offset,
                     isSurvival      : currentState.chartType === "survival",
                     survivalData    : currentState.survivalData,
+                    survivalBands   : currentState.survivalBands,
                     onSeriesToggle,
                     onInspectionChange,
                 })
@@ -164,6 +166,7 @@ function getViewReducer({
                         offset          : state.offset,
                         isSurvival      : state.chartType === "survival",
                         survivalData    : state.survivalData,
+                        survivalBands   : state.survivalBands,
                         onSeriesToggle,
                         onInspectionChange,
                     })
@@ -221,6 +224,7 @@ function getViewReducer({
                     offset          : nextState.offset,
                     isSurvival      : nextState.chartType === "survival",
                     survivalData    : nextState.survivalData,
+                    survivalBands   : nextState.survivalBands,
                     onSeriesToggle,
                     onInspectionChange,
                 })
@@ -256,6 +260,7 @@ function getViewReducer({
                 "data",
                 "data2",
                 "survivalData",
+                "survivalBands",
                 // "column"
                 "inspection",
                 "sortBy",
@@ -287,6 +292,7 @@ function getViewReducer({
                     offset          : nextState.offset,
                     isSurvival      : nextState.chartType === "survival",
                     survivalData    : nextState.survivalData,
+                    survivalBands   : nextState.survivalBands,
                     onSeriesToggle,
                     onInspectionChange,
                 })
@@ -477,6 +483,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         // survival charts: the event/censored column and its "event" value
         statusColumn: cols.find(c => c.name === viewSettings.statusColumn),
         eventValue: viewSettings.eventValue || "",
+        survivalBands: !!viewSettings.survivalBands,
 
         // View caption if any
         caption: viewSettings.caption || "",
@@ -553,6 +560,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         column2type,
         statusColumn,
         eventValue,
+        survivalBands,
         caption,
         data,
         data2,
@@ -594,6 +602,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             column2type,
             statusColumn: statusColumn?.name || "",
             eventValue,
+            survivalBands,
             caption,
             ranges,
             sortBy,
@@ -976,6 +985,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                 column2type,
                                 statusColumn: statusColumn?.name || "",
                                 eventValue,
+                                survivalBands,
                                 tags,
                                 ranges: hasRanges(data, data2) ? ranges : null,
                                 visualOverrides: state.visualOverrides,
@@ -994,6 +1004,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                     denominator    : state.denominator,
                                     statusColumn   : cols.find(c => c.name === state.statusColumn),
                                     eventValue     : state.eventValue,
+                                    survivalBands  : state.survivalBands,
                                     tags           : state.tags,
                                     visualOverrides: state.visualOverrides,
                                     sortBy         : state.sortBy,
