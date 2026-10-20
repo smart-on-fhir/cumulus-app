@@ -15,6 +15,12 @@ const options: Options = {
             connectNulls: true,
             // Survival curves often overlap
             opacity: 0.3,
+            // Off, but shown on hover. Otherwise Highcharts turns markers on
+            // for a series with a single point, e.g. a group whose records
+            // all fall in the last time point
+            marker: {
+                enabled: false
+            },
             // Helps to tell overlapping curves apart
             shadow: {
                 color  : "#000000",

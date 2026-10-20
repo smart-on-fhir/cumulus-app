@@ -532,7 +532,8 @@ describe("Chart", () => {
                         p.custom.survival.ciHigh * 100
                     ]
                 ))
-                expect(band.data[2]).toBeNull()
+                // The curve ends at "2", right after its last records
+                expect(band.data[2]).not.toBeNull()
                 // Zero width at the start
                 expect([band.data[0].low, band.data[0].high]).toEqual([100, 100])
                 // Wider after the first events

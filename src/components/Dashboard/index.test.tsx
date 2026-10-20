@@ -63,6 +63,7 @@ describe("Dashboard", () => {
         expect(options.plotOptions?.line?.connectNulls).toBe(true)
         expect(options.plotOptions?.line?.opacity).toBe(0.3)
         expect(options.plotOptions?.line?.shadow).toEqual({ color: "#000000", opacity: 0.4, offsetX: 1, offsetY: 1, width: 1 })
+        expect(options.plotOptions?.line?.marker?.enabled).toBe(false)
     })
 
     it ("switching from survival to line chart removes the survival defaults", () => {
@@ -71,6 +72,7 @@ describe("Dashboard", () => {
         expect(options.plotOptions?.line?.connectNulls).toBe(false)
         expect(options.plotOptions?.line?.opacity).toBe(1)
         expect(options.plotOptions?.line?.shadow).toBe(false)
+        expect(options.plotOptions?.line?.marker?.enabled).toBeUndefined()
     })
 })
 

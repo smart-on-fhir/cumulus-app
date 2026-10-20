@@ -24,9 +24,16 @@ describe("lifeTable", () => {
         expect(table.map(r => r.survival)).toEqual([1, 0.5, 0.5, 0.5])
     })
 
-    it ("returns null once nobody is left under follow-up", () => {
+    it ("ends at the time point after the last records, and is null after that", () => {
+        // 20 at risk, 10 events and 10 censored at "0" (effective 15)
         const table = lifeTable(["0", "1", "2"], { "0": 10 }, { "0": 10 })
-        expect(table.map(r => r.survival)).toEqual([1, null, null])
+        expect(table.map(r => r.survival)).toEqual([1, 1 - 10 / 15, null])
+    })
+
+    it ("drops to 0 when its last records had the event", () => {
+        // e.g. a group whose 2 records both had the event in the first year
+        const table = lifeTable(["0", "1", "2", ">=5"], { "0": 2 }, {})
+        expect(table.map(r => r.survival)).toEqual([1, 0, null, null])
     })
 
     it ("handles a series with no records", () => {
@@ -66,9 +73,10 @@ describe("lifeTable confidence interval", () => {
         expect(table[1].ciHigh).toBeLessThanOrEqual(1)
     })
 
-    it ("is null once nobody is left under follow-up", () => {
-        const table = lifeTable(["0", "1"], { "0": 10 }, {})
-        expect(table[1]).toMatchObject({ survival: null, ciLow: null, ciHigh: null })
+    it ("is null after the curve ends", () => {
+        const table = lifeTable(["0", "1", "2"], { "0": 10 }, {})
+        expect(table[1]).toMatchObject({ survival: 0, ciLow: 0, ciHigh: 0 })
+        expect(table[2]).toMatchObject({ survival: null, ciLow: null, ciHigh: null })
     })
 })
 

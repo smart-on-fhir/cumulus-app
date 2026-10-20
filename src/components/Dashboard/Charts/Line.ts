@@ -13,7 +13,11 @@ const options: Options = {
             step: false as any,
             connectNulls: false,
             opacity: 1,
-            shadow: false
+            shadow: false,
+            // Highcharts decides by how dense the points are
+            marker: {
+                enabled: undefined
+            }
         }
     }
 }

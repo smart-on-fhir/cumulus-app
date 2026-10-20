@@ -38,7 +38,9 @@ export interface LifeTableRow {
 
     /**
      * Survival (0 to 1) at the start of this time point, before its events.
-     * Null once nobody is left under follow-up.
+     * At the first time point where nobody is left under follow-up this is
+     * where the curve ends (0 if its last records had the event), and null at
+     * every time point after it.
      */
     survival: number | null
 
@@ -81,10 +83,15 @@ export function lifeTable(
     let atRisk   = n
     let survival = 1
     let variance = 0
+    let previousAtRisk = 0
 
     return ticks.map(x => {
         const d = events[x]   || 0
         const c = censored[x] || 0
+
+        // Known while anyone is at risk, and once more right after that: the
+        // value the last interval ended with
+        const known = atRisk > 0 || previousAtRisk > 0
 
         const se  = survival * Math.sqrt(variance)
         const row = {
@@ -92,10 +99,12 @@ export function lifeTable(
             atRisk,
             events  : d,
             censored: c,
-            survival: atRisk > 0 ? survival : null,
-            ciLow   : atRisk > 0 ? clamp01(survival - 1.96 * se) : null,
-            ciHigh  : atRisk > 0 ? clamp01(survival + 1.96 * se) : null
+            survival: known ? survival : null,
+            ciLow   : known ? clamp01(survival - 1.96 * se) : null,
+            ciHigh  : known ? clamp01(survival + 1.96 * se) : null
         }
+
+        previousAtRisk = atRisk
 
         const effective = atRisk - c / 2
         if (effective > 0) {
