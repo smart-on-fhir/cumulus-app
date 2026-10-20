@@ -11,6 +11,20 @@ interface ShadowProps {
     opacity?: number
 }
 
+/**
+ * The values shown for options that are not set. Every change saves the whole
+ * shadow, these included: Highcharts fills missing options with its own,
+ * different defaults (offsetX 0, offsetY 2, width 6, opacity 0.05), so a
+ * partial shadow would not look like what the editor shows.
+ */
+export const SHADOW_DEFAULTS: Required<ShadowProps> = {
+    color  : "#000000",
+    offsetX: 1,
+    offsetY: 1,
+    width  : 3,
+    opacity: 0.15
+}
+
 export default function ShadowEditor({
     props,
     onChange,
@@ -19,14 +33,26 @@ export default function ShadowEditor({
     level = 0,
     open
 }: {
-    props: ShadowProps | false,
+    props: ShadowProps | boolean | undefined,
     onChange: (props: ShadowProps | boolean) => void
     name?: string
     description?: string
     level?: number
     open?: boolean
 }) {
-    const p = props === false ? {} : props
+    // `true` means a shadow with default options
+    const p: ShadowProps = props && typeof props === "object" ? props : {}
+
+    // The whole shadow as shown, with one option changed (a cleared field
+    // goes back to its default)
+    const set = (patch: ShadowProps) => onChange({
+        ...SHADOW_DEFAULTS,
+        ...p,
+        ...Object.fromEntries(Object.entries(patch).map(([key, value]) => [
+            key,
+            value ?? SHADOW_DEFAULTS[key as keyof ShadowProps]
+        ]))
+    })
 
     const [_open, setOpen] = useState(!!open)
 
@@ -59,7 +85,7 @@ export default function ShadowEditor({
                         name: "Enabled",
                         type: "boolean",
                         value: props !== undefined && props !== false,
-                        onChange: (on: boolean) => onChange(on ? {} : false),
+                        onChange: (on: boolean) => onChange(on ? { ...SHADOW_DEFAULTS, ...p } : false),
                     }} />
                 </div>
                 <div className="prop-label" style={{ paddingLeft: pl(level + 1) }}>Color</div>
@@ -67,9 +93,9 @@ export default function ShadowEditor({
                     <ColorEditor prop={{
                         name : "Color",
                         type : "color",
-                        value: p?.color ?? "#000000",
+                        value: p.color ?? SHADOW_DEFAULTS.color,
                         onChange(color: string) {
-                            onChange({ ...(p || {}), color})
+                            set({ color })
                         }
                     }} />
                 </div>
@@ -78,9 +104,9 @@ export default function ShadowEditor({
                     <NumberEditor prop={{
                         name : "OffsetX",
                         type : "number",
-                        value: p?.offsetX ?? 1,
+                        value: p.offsetX ?? SHADOW_DEFAULTS.offsetX,
                         onChange(offsetX?: number) {
-                            onChange({ ...(p || {}), offsetX})
+                            set({ offsetX })
                         }
                     }} />
                 </div>
@@ -89,9 +115,9 @@ export default function ShadowEditor({
                     <NumberEditor prop={{
                         name : "OffsetY",
                         type : "number",
-                        value: p?.offsetY ?? 1,
+                        value: p.offsetY ?? SHADOW_DEFAULTS.offsetY,
                         onChange(offsetY?: number) {
-                            onChange({ ...(p || {}), offsetY})
+                            set({ offsetY })
                         }
                     }} />
                 </div>
@@ -100,11 +126,11 @@ export default function ShadowEditor({
                     <NumberEditor prop={{
                         name : "Width",
                         type : "number",
-                        value: p?.width ?? 3,
+                        value: p.width ?? SHADOW_DEFAULTS.width,
                         min  : 0,
                         max  : 10,
                         onChange(width?: number) {
-                            onChange({ ...(p || {}), width})
+                            set({ width })
                         }
                     }} />
                 </div>
@@ -113,12 +139,12 @@ export default function ShadowEditor({
                     <NumberEditor prop={{
                         name : "Opacity",
                         type : "number",
-                        value: p?.opacity ?? 0.15,
+                        value: p.opacity ?? SHADOW_DEFAULTS.opacity,
                         min  : 0,
                         max  : 1,
                         step : 0.01,
                         onChange(opacity?: number) {
-                            onChange({ ...(p || {}), opacity})
+                            set({ opacity })
                         }
                     }} />
                 </div>

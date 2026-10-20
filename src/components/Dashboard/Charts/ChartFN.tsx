@@ -36,6 +36,19 @@ function setGlobalTextColor(color?: string) {
 
 export default memo(Chart);
 
+/**
+ * Highcharts adds the shadow of a series' line when it draws the line, but
+ * never removes it, and an update keeps the existing line. So a shadow that
+ * was turned off would stay until the chart is re-created.
+ */
+export function removeStaleShadows(chart: Highcharts.Chart) {
+    chart.series.forEach((series: any) => {
+        if (!series.options.shadow) {
+            series.graph?.shadow(false)
+        }
+    })
+}
+
 export function Chart(props: ChartProps) {
     const {
         loading,
@@ -65,6 +78,7 @@ export function Chart(props: ChartProps) {
                     defer(() => {
                         if (chartRef.current) {
                             chartRef.current.update(options, true, true, false)
+                            removeStaleShadows(chartRef.current)
                             afterRender()
                         }
                     }, "main-chart", 0);
