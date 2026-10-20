@@ -14,7 +14,15 @@ const options: Options = {
             // the curve stays flat until the next point
             connectNulls: true,
             // Survival curves often overlap
-            opacity: 0.6
+            opacity: 0.3,
+            // Helps to tell overlapping curves apart
+            shadow: {
+                color  : "#000000",
+                opacity: 0.4,
+                offsetX: 1,
+                offsetY: 1,
+                width  : 1
+            }
         }
     }
 }

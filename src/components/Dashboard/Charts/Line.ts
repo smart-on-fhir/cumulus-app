@@ -12,7 +12,8 @@ const options: Options = {
             // Reset the defaults that survival charts set
             step: false as any,
             connectNulls: false,
-            opacity: 1
+            opacity: 1,
+            shadow: false
         }
     }
 }
