@@ -684,32 +684,38 @@ function getSeriesAndExceptions({
     // Survival charts: 95% confidence bands. Added after all the curves, so
     // that they don't shift the colors of the curves.
     if (showSurvival && survivalBands) {
-        series.slice().forEach((curve: any) => addSeries({
-            type               : "arearange",
-            id                 : curve.id + " (95% CI)",
-            name               : curve.name + " (95% CI)",
-            linkedTo           : curve.id,
-            color              : curve.color,
-            zIndex             : 0,
-            step               : "left",
-            lineWidth          : 0,
-            fillOpacity        : 0.15,
-            connectNulls       : true,
-            enableMouseTracking: false,
-            marker             : { enabled: false },
-            data: curve.data.map((point: any) => {
-                const row = point?.custom?.survival
-                if (!row || row.ciLow === null) {
-                    return null
-                }
-                return {
-                    ...(point.x !== undefined ? { x: point.x } : {}),
-                    name: point.name,
-                    low : row.ciLow  * 100,
-                    high: row.ciHigh * 100
-                }
+        series.slice().forEach((curve: any) => {
+            const id  = curve.id + " (95% CI)"
+            // Saved options win over these defaults (addSeries would let
+            // anything passed here override them)
+            const old: any = serverOptions.series?.find(s => s.id === id)
+            addSeries({
+                type               : "arearange",
+                id,
+                name               : old?.name ?? curve.name + " (95% CI)",
+                linkedTo           : curve.id,
+                color              : curve.color,
+                zIndex             : 0,
+                step               : "left",
+                lineWidth          : old?.lineWidth ?? 0.2,
+                fillOpacity        : old?.fillOpacity ?? 0.15,
+                connectNulls       : true,
+                enableMouseTracking: false,
+                marker             : { enabled: false },
+                data: curve.data.map((point: any) => {
+                    const row = point?.custom?.survival
+                    if (!row || row.ciLow === null) {
+                        return null
+                    }
+                    return {
+                        ...(point.x !== undefined ? { x: point.x } : {}),
+                        name: point.name,
+                        low : row.ciLow  * 100,
+                        high: row.ciHigh * 100
+                    }
+                })
             })
-        }))
+        })
     }
 
     return { series, exceptions }

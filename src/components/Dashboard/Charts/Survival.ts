@@ -14,7 +14,7 @@ const options: Options = {
             // the curve stays flat until the next point
             connectNulls: true,
             // Survival curves often overlap
-            opacity: 0.3,
+            opacity: 0.7,
             // Off, but shown on hover. Otherwise Highcharts turns markers on
             // for a series with a single point, e.g. a group whose records
             // all fall in the last time point

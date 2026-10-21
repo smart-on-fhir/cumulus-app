@@ -61,7 +61,7 @@ describe("Dashboard", () => {
         const options = getDefaultChartOptions("survival", {}, true)
         expect(options.plotOptions?.line?.step).toBe("left")
         expect(options.plotOptions?.line?.connectNulls).toBe(true)
-        expect(options.plotOptions?.line?.opacity).toBe(0.3)
+        expect(options.plotOptions?.line?.opacity).toBe(0.7)
         expect(options.plotOptions?.line?.shadow).toEqual({ color: "#000000", opacity: 0.4, offsetX: 1, offsetY: 1, width: 1 })
         expect(options.plotOptions?.line?.marker?.enabled).toBe(false)
     })

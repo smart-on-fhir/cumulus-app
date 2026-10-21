@@ -47,6 +47,8 @@ export function getOptions(options: Options, onChange: (o: Partial<Options>) => 
         out.push({
             name: "Step",
             type: "options",
+            // @ts-ignore - set by buildChartOptions
+            disabled: !!options.custom?.isSurvival,
             options: [
                 { label: "none"  , value: ""       },
                 { label: "left"  , value: "left"   },
@@ -55,7 +57,10 @@ export function getOptions(options: Options, onChange: (o: Partial<Options>) => 
             ],
             value: series.step ?? (seriesTypeOptions as SeriesArearangeOptions).step,
             onChange: (step?: OptionsStepValue) => onSeriesChange({ step: step || undefined }),
-            description: "Whether to apply steps to the line."
+            // @ts-ignore - set by buildChartOptions
+            description: options.custom?.isSurvival ?
+                "Confidence bands are always drawn with left steps, like their survival curves." :
+                "Whether to apply steps to the line."
         })
     }
 

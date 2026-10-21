@@ -488,9 +488,10 @@ describe("Chart", () => {
 
         describe("confidence bands", () => {
 
-            function build(survivalBands?: boolean) {
+            function build(survivalBands?: boolean, options?: any) {
                 return buildChartOptions({
                     type: "line",
+                    options,
                     data: stratified({ a: [["0", 1], ["1", 1], ["2", 1]], b: [["0", 1], ["1", 1], ["2", 1]] }),
                     data2 : null,
                     column: T,
@@ -516,6 +517,16 @@ describe("Chart", () => {
                 expect(series.map((s: any) => s.id)).toEqual(["primary-a", "primary-b", "primary-a (95% CI)", "primary-b (95% CI)"])
                 expect(series[2]).toMatchObject({ type: "arearange", linkedTo: "primary-a", color: series[0].color, step: "left" })
                 expect(series[3]).toMatchObject({ type: "arearange", linkedTo: "primary-b", color: series[1].color, step: "left" })
+            })
+
+            it ("keep the line width, fill opacity and name saved for them", () => {
+                const [, , band] = build(true).series
+                expect(band).toMatchObject({ lineWidth: 0.2, fillOpacity: 0.15, name: "a (95% CI)" })
+
+                const [, , saved] = build(true, {
+                    series: [{ id: "primary-a (95% CI)", type: "arearange", lineWidth: 2, fillOpacity: 0.4, name: "A CI", step: "center" }]
+                }).series
+                expect(saved).toMatchObject({ lineWidth: 2, fillOpacity: 0.4, name: "A CI", step: "left" })
             })
 
             it ("do not change the colors of the curves", () => {
