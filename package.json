@@ -87,7 +87,7 @@
     "ts-mocha": "^11.1.0"
   },
   "engines": {
-    "node": ">=24"
+    "node": "^24.22.1"
   },
   "type": "commonjs",
   "allowScripts": {
