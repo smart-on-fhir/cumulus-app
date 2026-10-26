@@ -251,3 +251,40 @@ it("calls onChange when groupBy column is changed", async () => {
   await userEvent.click(dateOption)
   expect(onChange).toHaveBeenCalled()
 })
+
+// The X axis and stratifier columns can be swapped, except in survival charts
+describe("swapping the X axis and stratifier columns", () => {
+
+  async function renderPanel(chartType: string) {
+    const onChange = vi.fn()
+    const { container } = render(
+      <ConfigPanel
+        cols={mockCols}
+        state={{ ...mockState, chartType } as any}
+        viewType="overview"
+        onChange={onChange}
+        onChartTypeChange={onChartTypeChange}
+        onChartOptionsChange={onChartOptionsChange}
+        onRangeOptionsChange={onRangeOptionsChange}
+        onSecondaryDataOptionsChange={onSecondaryDataOptionsChange}
+      />
+    )
+    await userEvent.click(screen.getByText("Data"))
+    return { onChange, swap: container.querySelector(".dashboard-sidebar-swap-btn-wrap > div") as HTMLElement }
+  }
+
+  it("swaps them", async () => {
+    const { onChange, swap } = await renderPanel("column")
+    expect(swap.getAttribute("aria-disabled")).toBe("false")
+    await userEvent.click(swap)
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ groupBy: "gender", stratifyBy: "age" }))
+  })
+
+  it("is disabled in survival charts, and says why", async () => {
+    const { onChange, swap } = await renderPanel("survival")
+    expect(swap.getAttribute("aria-disabled")).toBe("true")
+    expect(swap.getAttribute("data-tooltip")).toMatch(/follow-up time on the X axis/)
+    await userEvent.click(swap)
+    expect(onChange).not.toHaveBeenCalled()
+  })
+})

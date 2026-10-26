@@ -408,13 +408,24 @@ export default function ConfigPanel({
                     </div>
                     <div style={{ position: "relative" }}>
                         { state.stratifyBy && <div className="dashboard-sidebar-swap-btn-wrap">
-                            <div className="fas fa-exchange-alt" onClick={() => {
-                                onChange({
-                                    ...state,
-                                    groupBy: state.stratifyBy,
-                                    stratifyBy: state.groupBy,
-                                })
-                            }} data-tooltip="Swap selected columns" />
+                            { /* Survival charts need the follow-up time on the X axis, so
+                                 its column can't trade places with the stratifier */ }
+                            <div
+                                className={ "fas fa-exchange-alt" + (isSurvival ? " disabled" : "") }
+                                aria-disabled={ isSurvival }
+                                onClick={() => {
+                                    if (!isSurvival) {
+                                        onChange({
+                                            ...state,
+                                            groupBy: state.stratifyBy,
+                                            stratifyBy: state.groupBy,
+                                        })
+                                    }
+                                }}
+                                data-tooltip={ isSurvival ?
+                                    "Survival charts need the follow-up time on the X axis, so it can't be swapped with the stratifier" :
+                                    "Swap selected columns" }
+                            />
                         </div> }
                         <div className="pt-1">
                             <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>

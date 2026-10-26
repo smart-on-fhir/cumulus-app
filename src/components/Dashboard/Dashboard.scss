@@ -459,16 +459,23 @@
         rotate       : 90deg;
         font-size    : 12px;
 
-        &:hover {
+        &:not(.disabled):hover {
             color     : var(--color-window-fg);
             background: var(--color-window-bg-hard);
         }
         
-        &:active {
+        &:not(.disabled):active {
             color      : var(--color-window-fg-hard);
             background : var(--color-grey);
             box-shadow : 0 0 0 1px var(--color-window-fg-hard), 4px 0 6px 1px #0003 inset;
             text-shadow: 0 0 2px var(--color-window-bg-hard);
+        }
+
+        // Still hoverable, so that its tooltip can say why. Dimmed by color
+        // instead of opacity, which would show the line behind it.
+        &.disabled {
+            color : var(--color-grey);
+            cursor: not-allowed;
         }
     }
 }
