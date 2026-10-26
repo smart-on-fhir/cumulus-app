@@ -529,6 +529,19 @@ describe("Chart", () => {
                 expect(saved).toMatchObject({ lineWidth: 2, fillOpacity: 0.4, name: "A CI", step: "left" })
             })
 
+            it ("show survival and its interval as whole percentages in the tooltip", () => {
+                const point = {
+                    y     : 72.44,
+                    name  : "1",
+                    color : "#000000",
+                    series: { name: "a", index: 0 },
+                    custom: { survival: { atRisk: 90, events: 9, censored: 3, ciLow: 0.583, ciHigh: 0.839 } }
+                }
+                const html = (build(true).tooltip.formatter as any).call(point, { chart: { options: { colors: [] } } })
+                expect(html).toContain("<b>72%</b>")
+                expect(html).toContain("<b>58% – 84%</b>")
+            })
+
             it ("do not change the colors of the curves", () => {
                 expect(build(true).series.slice(0, 2).map((s: any) => s.color)).toEqual(build().series.map((s: any) => s.color))
             })

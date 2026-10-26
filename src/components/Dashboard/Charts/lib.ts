@@ -951,14 +951,14 @@ export function buildChartOptions({
                 const survival = this.custom?.survival
                 if (survival) {
                     rows.push(
-                        `<tr><td style="text-align:right">Survival:</td><td style="width: 100%"><b>${roundToPrecision(this.y!, 3)}%</b></td></tr>`,
+                        `<tr><td style="text-align:right">Survival:</td><td style="width: 100%"><b>${Math.round(this.y!)}%</b></td></tr>`,
                         `<tr style="opacity:0.6"><td style="text-align:right">At risk:</td><td><b>${roundToPrecision(survival.atRisk, 3).toLocaleString()}</b></td></tr>`,
                         `<tr style="opacity:0.6"><td style="text-align:right">Events:</td><td><b>${roundToPrecision(survival.events, 3).toLocaleString()}</b></td></tr>`,
                         `<tr style="opacity:0.6"><td style="text-align:right">No event:</td><td><b>${roundToPrecision(survival.censored, 3).toLocaleString()}</b></td></tr>`
                     )
                     if (survivalBands && survival.ciLow !== null) {
                         rows.splice(rows.length - 3, 0,
-                            `<tr style="opacity:0.6"><td style="text-align:right">95% CI:</td><td><b>${roundToPrecision(survival.ciLow * 100, 3)}% – ${roundToPrecision(survival.ciHigh * 100, 3)}%</b></td></tr>`
+                            `<tr style="opacity:0.6"><td style="text-align:right">95% CI:</td><td><b>${Math.round(survival.ciLow * 100)}% – ${Math.round(survival.ciHigh * 100)}%</b></td></tr>`
                         )
                     }
                 }
