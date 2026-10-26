@@ -633,6 +633,46 @@ describe("Chart", () => {
                 expect((options.legend.labelFormatter as any).call({ name: "slice" })).toBe("slice")
             })
 
+            it ("warn about small groups", () => {
+                const build = (events: Record<string, number>, censored: Record<string, number>) => buildChartOptions({
+                    type: "line",
+                    data: stratified({ a: [["0", 1], ["1", 1]], b: [["0", 1], ["1", 1]] }),
+                    data2 : null,
+                    column: T,
+                    groupBy: { name: "g", label: "G", dataType: "string", description: "" },
+                    sortBy: "x:asc",
+                    limit : 0,
+                    offset: 0,
+                    isSurvival: true,
+                    survivalData: {
+                        events  : stratified(Object.fromEntries(Object.entries(events  ).map(([g, n]) => [g, [["0", n]]])) as any),
+                        censored: stratified(Object.fromEntries(Object.entries(censored).map(([g, n]) => [g, [["1", n]]])) as any)
+                    }
+                }) as any
+
+                expect(build({ a: 1, b: 2 }, { a: 4, b: 30 }).caption.text).toContain(
+                    "Small group (fewer than 10): <b>a</b> (n=5). Its curve and the log-rank p-value are less reliable."
+                )
+                expect(build({ a: 1, b: 2 }, { a: 4, b: 3 }).caption.text).toContain(
+                    "Small groups (fewer than 10): <b>a</b> (n=5), <b>b</b> (n=5). Their curves and the log-rank p-value are less reliable."
+                )
+                expect(build({ a: 1, b: 2 }, { a: 9, b: 30 }).caption.text).not.toContain("Small group")
+
+                // A single curve has no log-rank p-value
+                const single = buildChartOptions({
+                    type: "line",
+                    data: flat([["0", 1], ["1", 1]]),
+                    data2 : null,
+                    column: T,
+                    sortBy: "x:asc",
+                    limit : 0,
+                    offset: 0,
+                    isSurvival: true,
+                    survivalData: { events: flat([["0", 1]]), censored: flat([["1", 4]]) }
+                }) as any
+                expect(single.caption.text).toContain("(n=5). Its curve is less reliable.")
+            })
+
             it ("do not change the colors of the curves", () => {
                 expect(build(true).series.slice(0, 2).map((s: any) => s.color)).toEqual(build().series.map((s: any) => s.color))
             })

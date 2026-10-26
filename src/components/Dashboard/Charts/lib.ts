@@ -45,6 +45,11 @@ type SeriesOptions = (
     Highcharts.SeriesBarOptions
 );
 
+/**
+ * Survival charts warn about groups with fewer records than this
+ */
+export const MIN_SURVIVAL_GROUP_SIZE = 10
+
 function escapeHtml(input: string) {
     return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 }
@@ -668,6 +673,22 @@ function getSeriesAndExceptions({
 
         if (data2?.rowCount) {
             stratify(data2, true)
+        }
+    }
+
+    // Survival charts: small groups are shown, but their curves are uncertain
+    if (showSurvival) {
+        const small = series
+            .map((s: any) => [s.name, s.data?.find((p: any) => p?.custom?.survival)?.custom.survival.atRisk ?? 0])
+            .filter(([, n]) => n > 0 && n < MIN_SURVIVAL_GROUP_SIZE)
+        if (small.length) {
+            exceptions.add(
+                `Small group${small.length > 1 ? "s" : ""} (fewer than ${MIN_SURVIVAL_GROUP_SIZE}): ` +
+                small.map(([name, n]) => `<b>${escapeHtml(String(name))}</b> (n=${n})`).join(", ") +
+                `. ${small.length > 1 ? "Their curves" : "Its curve"}` +
+                (series.length > 1 ? " and the log-rank p-value are" : small.length > 1 ? " are" : " is") +
+                " less reliable."
+            )
         }
     }
 
