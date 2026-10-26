@@ -1048,6 +1048,12 @@ export function buildChartOptions({
             // @ts-ignore - a hack to force highcharts to reflow the legend
             dirty: Date.now(),
             enabled: options.legend?.enabled ?? series.length <= 30,
+            // Survival curves show the size of their group, e.g. "SHH (n=16)".
+            // Not used when the legend has its own labelFormat.
+            labelFormatter() {
+                const row = (this as any).options?.data?.find?.((p: any) => p?.custom?.survival)?.custom.survival
+                return row ? `${this.name} (n=${row.atRisk.toLocaleString()})` : this.name
+            },
             events: {
                 // Series visibility is kept in the chart options (so that it
                 // is saved), so the default toggle is replaced with a state

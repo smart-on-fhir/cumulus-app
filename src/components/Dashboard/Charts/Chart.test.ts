@@ -542,6 +542,16 @@ describe("Chart", () => {
                 expect(html).toContain("<b>58% – 84%</b>")
             })
 
+            it ("show the group size of each curve in the legend", () => {
+                const options = build()
+                const label = (series: any) => (options.legend.labelFormatter as any).call({ name: series.name, options: series })
+                expect(options.series.map(label)).toEqual(["a (n=100)", "b (n=100)"])
+
+                // Other series and pie slices keep their name
+                expect(label({ name: "x", data: [{ y: 1 }] })).toBe("x")
+                expect((options.legend.labelFormatter as any).call({ name: "slice" })).toBe("slice")
+            })
+
             it ("do not change the colors of the curves", () => {
                 expect(build(true).series.slice(0, 2).map((s: any) => s.color)).toEqual(build().series.map((s: any) => s.color))
             })
