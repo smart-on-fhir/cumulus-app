@@ -16,6 +16,7 @@ export const ReadOnlyPaths = [
     "yAxis.labels.format",
     "plotOptions.series.events",
     "legend.events",
+    "legend.labelFormatter",
     "plotOptions.series.dataSorting",
     "plotOptions.series.states.hover.opacity",
     "plotOptions.pie.dataLabels.formatter",
