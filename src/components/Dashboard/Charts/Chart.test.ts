@@ -11,8 +11,8 @@ import {
     getXType,
     pct,
 } from "./lib"
-import { CUMULUS__NONE, DEFAULT_FONT_SIZE } from "../config"
-import { roundToPrecision } from "../../../utils"
+import { CUMULUS__NONE, DEFAULT_FONT_SIZE, ReadOnlyPaths } from "../config"
+import { roundToPrecision, strip } from "../../../utils"
 
 
 describe("Chart", () => {
@@ -178,6 +178,26 @@ describe("Chart", () => {
         })
         expect(options.series!.map(s => s.id)).toEqual(["primary-1", "primary-true"])
         expect(options.series!.map(s => s.name)).toEqual(["1", "true"])
+    })
+
+    // The saved options are also passed as history state when copying a chart,
+    // which fails with a DataCloneError if they contain functions
+    it("saved options can be cloned (no functions)", () => {
+        for (const type of ["line", "areaspline", "column", "pie"] as const) {
+            const options = buildChartOptions({
+                type,
+                data: { column: "t", filters: [], totalCount: 1, rowCount: 1, data: [{ rows: [["0", 1]] }] },
+                data2: null,
+                column: { name: "t", label: "T", dataType: "string", description: "" },
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                onSeriesToggle: () => {},
+                onInspectionChange: () => {},
+                inspection: { enabled: false } as any
+            })
+            expect(() => structuredClone(strip(options, ReadOnlyPaths)), type).not.toThrow()
+        }
     })
 
     describe("legend click", () => {
