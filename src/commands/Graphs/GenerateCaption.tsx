@@ -52,14 +52,16 @@ export class GenerateCaption extends Command
 
     private generateCaption() {
 
-        if (this.chartOptions.series?.[0]?.type === "pie") {
+        const series = this.chartOptions.series?.[0] as Highcharts.SeriesOptionsType | undefined
+
+        if (series?.type === "pie") {
 
             let s = "";
 
-            this.chartOptions.series![0].data!.forEach((x: any, i) => {
+            series.data!.forEach((x: any, i) => {
                 const color = this.chartOptions.colors![i % this.chartOptions.colors!.length];
                 s += `<div>${this.generateBullet(color)} `
-                let name  = this.chartOptions.series![0]!.name!;
+                let name  = series.name!;
                 let value = x.name
                 if (value && value.toLowerCase() === name.toLowerCase()) {
                     value = ""

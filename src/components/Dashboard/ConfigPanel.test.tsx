@@ -70,10 +70,10 @@ const mockState: ChartConfigPanelState = {
     enabled: false,
     match: [],
     context: {
-      selectedAnnotationIndex: null,
-      selectedPlotLineId: null,
-      selectedPlotLineAxis: null,
-      selectedSeriesId: null
+      selectedAnnotationIndex: -1,
+      selectedPlotLineId: "",
+      selectedPlotLineAxis: "",
+      selectedSeriesId: ""
     }
   },
 }

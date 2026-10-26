@@ -1,7 +1,7 @@
 import { DEFAULT_FONT_FAMILY }    from "../Dashboard/config"
 import Chart                      from "../generic/Chart"
 import { app }                    from "../../types"
-import Highcharts, { AlignValue } from "../../highcharts"
+import Highcharts                 from "../../highcharts"
 
 
 interface TransmissionChartProps {
@@ -283,7 +283,7 @@ function buildChartOptions(transmissions: app.Transmission[], sites: app.DataSit
             {
                 name: "Data Range",
                 type: "columnrange",
-                data: series.map(s => ({
+                data: series.map((s): Highcharts.PointOptionsObject => ({
                     low  : s.dataStart,
                     high : s.dataEnd,
                     color: s.failed ? "rgba(255,170,0,0.7)" : "rgba(100,170,250,0.4)",
@@ -295,7 +295,7 @@ function buildChartOptions(transmissions: app.Transmission[], sites: app.DataSit
                     },
                     dataLabels: {
                         enabled : true,
-                        align   : 'left' as AlignValue,
+                        align   : 'left',
                         color   : '#1b5dab',
                         overflow: "justify",
                         filter : {
