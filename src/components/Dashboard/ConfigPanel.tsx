@@ -231,6 +231,15 @@ export default function ConfigPanel({
                         />
                         <br/>
                     </div>
+                    <div className="mt-1">
+                        <label>Chart Subtitle</label>
+                        <input
+                            type="text"
+                            value={ chartOptions.subtitle?.text || "" }
+                            onChange={ e => onChartOptionsChange({ subtitle: { text: e.target.value }})}
+                        />
+                        <br/>
+                    </div>
 
                     <div className="mt-1">
                         <label>Color Theme</label>

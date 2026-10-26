@@ -1,13 +1,22 @@
-import { TitleOptions }    from "highcharts"
+import { SubtitleOptions, TitleOptions } from "highcharts"
 import PropertyGrid        from "../../generic/PropertyGrid"
 import { getStyleOptions } from "./Style"
 
+/**
+ * Editor of the chart title, also used for the subtitle
+ */
 export default function Title({
     title = {} as TitleOptions,
-    onChange
+    onChange,
+    defaultColor = "#000000"
 }: {
-    title?: TitleOptions,
-    onChange: (a: Partial<TitleOptions>) => void
+    title?: TitleOptions | SubtitleOptions,
+    onChange: (a: Partial<TitleOptions | SubtitleOptions>) => void
+
+    /**
+     * The color Highcharts uses when none is set (gray for subtitles)
+     */
+    defaultColor?: string
 }) {
     return (
         <PropertyGrid props={[
@@ -20,8 +29,8 @@ export default function Title({
             {
                 name: "Color",
                 type: "color",
-                value: title.style?.color || "#000000",
-                onChange: (color?: string) => onChange({ style: { ...title.style, color: color || "#000000"  } })
+                value: title.style?.color || defaultColor,
+                onChange: (color?: string) => onChange({ style: { ...title.style, color: color || defaultColor } })
             },
             ...getStyleOptions(
                 title.style ?? {},
