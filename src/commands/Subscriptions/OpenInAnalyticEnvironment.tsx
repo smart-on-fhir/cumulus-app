@@ -49,7 +49,7 @@ export class OpenInAnalyticEnvironment extends Command
     }
     
     execute() {
-        const url = new URL(process.env.REACT_APP_NOTEBOOK_URL!)
+        const url = new URL(REACT_APP_NOTEBOOK_URL)
         url.searchParams.set("fileLoc", window.location.origin + "/api/requests/" + this.subscriptionId + "/data?format=csv")
         window.open(url.href, "_blank")
     }
