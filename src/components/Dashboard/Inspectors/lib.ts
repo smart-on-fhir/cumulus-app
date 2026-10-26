@@ -1,4 +1,4 @@
-import { merge, Options, SeriesOptions } from "highcharts";
+import { merge, Options, SeriesOptions, SeriesOptionsType } from "highcharts";
 
 export function getIndexOfSeriesId(options: Options, seriesId: string) {
     return options.series?.findIndex(s => s.id === seriesId) ?? -1
@@ -6,7 +6,8 @@ export function getIndexOfSeriesId(options: Options, seriesId: string) {
 
 export function getSeriesById(options: Options, seriesId: string) {
     const index = getIndexOfSeriesId(options, seriesId)
-    return options.series![index]
+    // Not UnknownSeriesOptions, which has no type or color
+    return options.series![index] as SeriesOptionsType
 }
 
 export function getSeriesPlotOptionsById(options: Options, seriesId: string) {
@@ -33,13 +34,11 @@ export function getSeriesPlotOptionsUpdater<T extends SeriesOptions>(options: Op
 
 export function getColorForSeries(options: Options, seriesId: string) {
     const index = getIndexOfSeriesId(options, seriesId)
-    const series = options.series![index]
-    
+    const series = getSeriesById(options, seriesId) as any
+
     const color = (
-        // @ts-ignore
         series.color?.pattern?.color || series.color?.stops?.[0]?.[1] ||
         series.color ||
-        // @ts-ignore
         series.colors?.[index % series.colors!.length] ||
         options.colors?.[index % options.colors!.length] ||
         "#888888"
