@@ -1,6 +1,7 @@
 import { BrowserRouter }             from "react-router-dom"
 import { render }                    from "@testing-library/react"
 import { getDefaultChartOptions }    from "./Charts/DefaultChartOptions"
+import { getCaptionForChartType, SURVIVAL_CAPTION } from "./Charts/Survival"
 import Dashboard, { DashboardProps } from "."
 import { app }                       from "../../types"
 import { AuthProvider }              from "../../auth"
@@ -73,6 +74,27 @@ describe("Dashboard", () => {
         expect(options.plotOptions?.line?.opacity).toBe(1)
         expect(options.plotOptions?.line?.shadow).toBe(false)
         expect(options.plotOptions?.line?.marker?.enabled).toBeUndefined()
+    })
+})
+
+describe("Survival chart caption", () => {
+
+    it ("is added when changing to a survival chart without a caption", () => {
+        expect(getCaptionForChartType("", "line", "survival")).toBe(SURVIVAL_CAPTION)
+        expect(getCaptionForChartType("<br>", "line", "survival")).toBe(SURVIVAL_CAPTION)
+    })
+
+    it ("does not replace an existing caption", () => {
+        expect(getCaptionForChartType("<p>Mine</p>", "line", "survival")).toBe("<p>Mine</p>")
+    })
+
+    it ("is removed when changing to another type, unless it was edited", () => {
+        expect(getCaptionForChartType(SURVIVAL_CAPTION, "survival", "column")).toBe("")
+        expect(getCaptionForChartType("<p>Edited</p>", "survival", "column")).toBe("<p>Edited</p>")
+    })
+
+    it ("leaves other chart types alone", () => {
+        expect(getCaptionForChartType("", "line", "column")).toBe("")
     })
 })
 

@@ -7,6 +7,7 @@ import ConfigPanel                               from "./ConfigPanel"
 import BaseChart                                 from "./Charts/ChartFN"
 import CaptionEditor                             from "./CaptionEditor"
 import { getDefaultChartOptions }                from "./Charts/DefaultChartOptions"
+import { getCaptionForChartType }                from "./Charts/Survival"
 import { SurvivalData }                          from "./Charts/kaplanMeier"
 import { GraphBreadcrumbs }                      from "./GraphBreadcrumbs"
 import { GraphTitle }                            from "./GraphTitle"
@@ -196,7 +197,11 @@ function getViewReducer({
 
             const chartType = action.payload
 
-            const nextState = { ...state, chartType };
+            const nextState = {
+                ...state,
+                chartType,
+                caption: getCaptionForChartType(state.caption, state.chartType, chartType)
+            };
 
             if (state.chartType === "survival" && chartType !== "survival") {
                 nextState.chartOptions = removeSurvivalTitles(nextState.chartOptions)
