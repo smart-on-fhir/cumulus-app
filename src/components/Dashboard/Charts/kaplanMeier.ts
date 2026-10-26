@@ -155,3 +155,183 @@ export function getCountsByTime(data: app.ServerResponses.DataResponse, stratifi
     }
     return out
 }
+
+export interface LogRankResult {
+
+    /**
+     * The test statistic
+     */
+    chi2: number
+
+    /**
+     * Degrees of freedom: the number of groups minus 1
+     */
+    df: number
+
+    /**
+     * The probability of differences at least this large if all groups had
+     * the same survival
+     */
+    p: number
+}
+
+/**
+ * Log-rank test of whether two or more survival curves differ, from their life
+ * tables (one per group, with the same time points).
+ *
+ * At every time point, the events of each group are compared with what it
+ * would have had if all groups had the same risk: its share of the total
+ * events, by its share of the records at risk. Since the time points are
+ * intervals rather than exact times, this is an approximation of the test on
+ * exact times that statistics software runs, and gets closer to it with
+ * finer time points.
+ *
+ * @returns null when there are fewer than 2 groups with records, or nothing
+ * to compare (e.g. no events at all)
+ */
+export function logRankTest(tables: Pick<LifeTableRow, "atRisk" | "events">[][]): LogRankResult | null
+{
+    // Groups without records can't be compared
+    const groups = tables.filter(rows => rows.some(row => row?.atRisk > 0))
+    const G = groups.length
+    if (G < 2) {
+        return null
+    }
+
+    const T = Math.max(...groups.map(rows => rows.length))
+
+    // Observed minus expected events of each group, and their covariance
+    const U = new Array(G).fill(0)
+    const V = Array.from({ length: G }, () => new Array(G).fill(0))
+
+    for (let j = 0; j < T; j++) {
+        const n = groups.map(rows => rows[j]?.atRisk || 0)
+        const d = groups.map(rows => rows[j]?.events || 0)
+        const N = n.reduce((a, b) => a + b, 0)
+        const D = d.reduce((a, b) => a + b, 0)
+        if (N < 2 || D === 0) {
+            continue
+        }
+        const factor = D * (N - D) / (N - 1)
+        for (let g = 0; g < G; g++) {
+            U[g] += d[g] - n[g] * D / N
+            for (let h = 0; h < G; h++) {
+                V[g][h] += factor * (n[g] / N) * ((g === h ? 1 : 0) - n[h] / N)
+            }
+        }
+    }
+
+    // The groups add up to zero, so one of them is left out
+    const x = solve(V.slice(0, -1).map(row => row.slice(0, -1)), U.slice(0, -1))
+    if (!x) {
+        return null
+    }
+
+    const chi2 = Math.max(0, x.reduce((sum, xi, i) => sum + xi * U[i], 0))
+    const df   = G - 1
+    return { chi2, df, p: chiSquareSurvival(chi2, df) }
+}
+
+/**
+ * Solves A x = b by Gaussian elimination. Returns null if A is singular.
+ */
+function solve(A: number[][], b: number[]): number[] | null
+{
+    const n = b.length
+    const M = A.map((row, i) => [...row, b[i]])
+
+    for (let col = 0; col < n; col++) {
+        let pivot = col
+        for (let row = col + 1; row < n; row++) {
+            if (Math.abs(M[row][col]) > Math.abs(M[pivot][col])) {
+                pivot = row
+            }
+        }
+        if (Math.abs(M[pivot][col]) < 1e-12) {
+            return null
+        }
+        [M[col], M[pivot]] = [M[pivot], M[col]]
+        for (let row = 0; row < n; row++) {
+            if (row !== col) {
+                const f = M[row][col] / M[col][col]
+                for (let k = col; k <= n; k++) {
+                    M[row][k] -= f * M[col][k]
+                }
+            }
+        }
+    }
+
+    return M.map((row, i) => row[n] / row[i])
+}
+
+/**
+ * P(X >= x) for a chi-square distribution with `df` degrees of freedom
+ */
+export function chiSquareSurvival(x: number, df: number): number
+{
+    if (x <= 0) {
+        return 1
+    }
+    return upperGamma(df / 2, x / 2)
+}
+
+/**
+ * The regularized upper incomplete gamma function Q(a, x), using its series
+ * for small x and its continued fraction otherwise (Numerical Recipes)
+ */
+function upperGamma(a: number, x: number): number
+{
+    const lnPrefix = a * Math.log(x) - x - logGamma(a)
+
+    if (x < a + 1) {
+        let term = 1 / a, sum = term
+        for (let n = 1; n < 500; n++) {
+            term *= x / (a + n)
+            sum  += term
+            if (Math.abs(term) < Math.abs(sum) * 1e-15) {
+                break
+            }
+        }
+        return Math.max(0, 1 - sum * Math.exp(lnPrefix))
+    }
+
+    const tiny = 1e-300
+    let b = x + 1 - a, c = 1 / tiny, d = 1 / b, h = d
+    for (let i = 1; i < 500; i++) {
+        const an = -i * (i - a)
+        b += 2
+        d = an * d + b
+        if (Math.abs(d) < tiny) d = tiny
+        c = b + an / c
+        if (Math.abs(c) < tiny) c = tiny
+        d = 1 / d
+        const delta = d * c
+        h *= delta
+        if (Math.abs(delta - 1) < 1e-15) {
+            break
+        }
+    }
+    return Math.min(1, Math.exp(lnPrefix) * h)
+}
+
+/**
+ * ln(Γ(x)) for x > 0 (Lanczos approximation)
+ */
+function logGamma(x: number): number
+{
+    const c = [
+        676.5203681218851, -1259.1392167224028, 771.32342877765313,
+        -176.61502916214059, 12.507343278686905, -0.13857109526572012,
+        9.9843695780195716e-6, 1.5056327351493116e-7
+    ]
+    if (x < 0.5) {
+        return Math.log(Math.PI / Math.abs(Math.sin(Math.PI * x))) - logGamma(1 - x)
+    }
+    x -= 1
+    let sum = 0.99999999999980993
+    for (let i = 0; i < c.length; i++) {
+        sum += c[i] / (x + i + 1)
+    }
+    const t = x + c.length - 0.5
+    return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(sum)
+}

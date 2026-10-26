@@ -169,6 +169,26 @@ it("calls onChartOptionsChange when chart subtitle is changed", async () => {
   expect(onChartOptionsChange).toHaveBeenLastCalledWith({ subtitle: { text: "Chart Subtitle!" } })
 })
 
+// Charts can suggest subtitles, e.g. survival charts their log-rank sentences
+it("suggests the subtitles the chart offers", async () => {
+  const sentences = ["Log-rank test: p = 0.32", "Differences at least this large would occur by chance 32% of the time if all groups had the same survival (log-rank p = 0.32)."]
+  const { container } = render(
+    <ConfigPanel
+      cols={mockCols}
+      state={{ ...mockState, chartOptions: { ...mockState.chartOptions, custom: { subtitleSuggestions: sentences } } as any }}
+      viewType="overview"
+      onChange={onChange}
+      onChartTypeChange={onChartTypeChange}
+      onChartOptionsChange={onChartOptionsChange}
+      onRangeOptionsChange={onRangeOptionsChange}
+      onSecondaryDataOptionsChange={onSecondaryDataOptionsChange}
+    />
+  )
+  await userEvent.click(screen.getByText("Chart"))
+  const options = container.querySelectorAll("#chart-subtitle-suggestions option")
+  expect(Array.from(options).map(o => o.getAttribute("value"))).toEqual(sentences)
+})
+
 // Test legend toggle
 it("renders legend controls and calls onChartOptionsChange when legend is changed", async () => {
   render(

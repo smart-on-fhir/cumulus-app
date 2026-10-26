@@ -1,7 +1,7 @@
 import moment                               from "moment"
 import { Color, merge, Series }             from "highcharts"
 import { compareDurations, parseDuration }  from "./duration"
-import { getCountsByTime, lifeTable, SurvivalData } from "./kaplanMeier"
+import { getCountsByTime, lifeTable, logRankTest, SurvivalData } from "./kaplanMeier"
 import { getDurationTitle, isDurationTitle }        from "../columnRoles"
 
 /**
@@ -830,12 +830,29 @@ export function buildChartOptions({
 
     const maxPointLength = Math.max(...series.map(s => s.data!.length))
 
+    // Survival charts: the log-rank test of the curves
+    const logRank = isSurvival && survivalData ? logRankTest(
+        series
+            .filter((s: any) => s.type === "line" && s.data?.some((p: any) => p?.custom?.survival))
+            .map((s: any) => s.data.map((p: any) => p?.custom?.survival ?? { atRisk: 0, events: 0 }))
+    ) : null
+
+    // The log-rank sentences are suggested as subtitles (custom.subtitleSuggestions),
+    // and a subtitle that is one of them is kept up to date, or removed when
+    // there is no p-value anymore
+    const logRankSentences = logRank ? getLogRankSentences(logRank.p) : null
+    const logRankKind = getLogRankSentenceKind(options.subtitle?.text || "")
+    const logRankSubtitle = logRankKind ?
+        { subtitle: { text: logRankSentences?.[logRankKind] ?? "" } } :
+        {}
+
     const dynamicOptions: Highcharts.Options = {
         chart: {
             zooming: {
                 type: xType === 'category' ? undefined : 'x'
             }
         },
+        ...logRankSubtitle,
         colors: computeColors(type, series, options),
         title: {
             style: {
@@ -1042,7 +1059,9 @@ export function buildChartOptions({
         },
         // @ts-ignore - lets the inspectors tell survival charts apart
         custom: {
-            isSurvival: !!isSurvival
+            isSurvival: !!isSurvival,
+            // Offered in the subtitle field of the config panel
+            subtitleSuggestions: logRankSentences ? [logRankSentences.short, logRankSentences.long] : []
         },
         legend: {
             // @ts-ignore - a hack to force highcharts to reflow the legend
@@ -1162,4 +1181,57 @@ export function buildChartOptions({
     })
 
     return result
+}
+
+/**
+ * Formats a p-value the way it is usually reported, e.g. "p = 0.04",
+ * "p = 0.003" or "p < 0.001"
+ */
+export function formatPValue(p: number): string
+{
+    if (p < 0.001) {
+        return "p < 0.001"
+    }
+    return "p = " + p.toFixed(p < 0.01 ? 3 : 2)
+}
+
+/**
+ * The subtitles a survival chart offers for its log-rank p-value: the result
+ * alone, and the same with what it means. Neither judges whether the curves
+ * differ, so they never contradict what the chart shows.
+ *
+ *     "Log-rank test: p = 0.32"
+ *     "Differences at least this large would occur by chance 32% of the time
+ *      if all groups had the same survival (log-rank p = 0.32)."
+ */
+export function getLogRankSentences(p: number): { short: string, long: string }
+{
+    const percent = p < 0.001 ?
+        "less than 0.1%" :
+        (p < 0.01 ? Number((p * 100).toFixed(1)) : Math.round(p * 100)) + "%"
+    return {
+        short: `Log-rank test: ${formatPValue(p)}`,
+        long : `Differences at least this large would occur by chance ${percent} of the ` +
+               `time if all groups had the same survival (log-rank ${formatPValue(p)}).`
+    }
+}
+
+const P_VALUE = String.raw`p (= (0\.\d{2,3}|1\.00)|< 0\.001)`
+
+/**
+ * Which of the log-rank subtitles (see getLogRankSentences) a text is exactly,
+ * so it can be kept up to date. Any change to its words makes it the user's.
+ */
+export function getLogRankSentenceKind(text: string): "short" | "long" | null
+{
+    if (new RegExp(`^Log-rank test: ${P_VALUE}$`).test(text)) {
+        return "short"
+    }
+    if (new RegExp(
+        String.raw`^Differences at least this large would occur by chance (less than 0\.1|\d+(\.\d)?)% of the ` +
+        String.raw`time if all groups had the same survival \(log-rank ${P_VALUE}\)\.$`
+    ).test(text)) {
+        return "long"
+    }
+    return null
 }

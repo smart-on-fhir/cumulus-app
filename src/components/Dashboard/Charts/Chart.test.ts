@@ -3,6 +3,9 @@ import {
     removeSurvivalTitles,
     emToPx,
     filterOutExceptions,
+    formatPValue,
+    getLogRankSentences,
+    getLogRankSentenceKind,
     getChartTitleText,
     getDateFormat,
     getXType,
@@ -542,6 +545,84 @@ describe("Chart", () => {
                 expect(html).toContain("<b>58% – 84%</b>")
             })
 
+            it ("compare the curves with a log-rank test, offered as subtitles", () => {
+                // a: 10 events of 100, b: 20 of 100, both at "0"
+                const options = build()
+                expect(options.custom.subtitleSuggestions.map(getLogRankSentenceKind)).toEqual(["short", "long"])
+
+                // Not applied unless the user picks it
+                expect(options.subtitle?.text).toBeFalsy()
+
+                // Without survival data there is nothing to test
+                const counts = buildChartOptions({
+                    type: "line",
+                    data: stratified({ a: [["0", 1]], b: [["0", 1]] }),
+                    data2 : null,
+                    column: T,
+                    groupBy: { name: "g", label: "G", dataType: "string", description: "" },
+                    sortBy: "x:asc",
+                    limit : 0,
+                    offset: 0,
+                    isSurvival: true
+                }) as any
+                expect(counts.custom.subtitleSuggestions).toEqual([])
+            })
+
+            for (const kind of ["short", "long"] as const) it (`keep a ${kind} log-rank subtitle up to date`, () => {
+                const options = buildChartOptions({
+                    type: "line",
+                    options: { subtitle: { text: getLogRankSentences(0.5)[kind] } } as any,
+                    data: stratified({ a: [["0", 1], ["1", 1]], b: [["0", 1], ["1", 1]] }),
+                    data2 : null,
+                    column: T,
+                    groupBy: { name: "g", label: "G", dataType: "string", description: "" },
+                    sortBy: "x:asc",
+                    limit : 0,
+                    offset: 0,
+                    isSurvival: true,
+                    survivalData: {
+                        events  : stratified({ a: [["0", 10]], b: [["0", 20]] }),
+                        censored: stratified({ a: [["1", 90]], b: [["1", 80]] })
+                    }
+                }) as any
+                expect(options.subtitle.text).toBe(options.custom.subtitleSuggestions[kind === "short" ? 0 : 1])
+                expect(options.subtitle.text).not.toBe(getLogRankSentences(0.5)[kind])
+            })
+
+            it ("keep a subtitle written by the user", () => {
+                const options = buildChartOptions({
+                    type: "line",
+                    options: { subtitle: { text: "Mine" } } as any,
+                    data: stratified({ a: [["0", 1], ["1", 1]], b: [["0", 1], ["1", 1]] }),
+                    data2 : null,
+                    column: T,
+                    groupBy: { name: "g", label: "G", dataType: "string", description: "" },
+                    sortBy: "x:asc",
+                    limit : 0,
+                    offset: 0,
+                    isSurvival: true,
+                    survivalData: {
+                        events  : stratified({ a: [["0", 10]], b: [["0", 20]] }),
+                        censored: stratified({ a: [["1", 90]], b: [["1", 80]] })
+                    }
+                }) as any
+                expect(options.subtitle.text).toBe("Mine")
+            })
+
+            it ("remove the log-rank subtitle from other charts", () => {
+                const options = buildChartOptions({
+                    type: "line",
+                    options: { subtitle: { text: getLogRankSentences(0.04).long } } as any,
+                    data: stratified({ a: [["0", 1]] }),
+                    data2 : null,
+                    column: T,
+                    sortBy: "x:asc",
+                    limit : 0,
+                    offset: 0
+                }) as any
+                expect(options.subtitle.text).toBe("")
+            })
+
             it ("show the group size of each curve in the legend", () => {
                 const options = build()
                 const label = (series: any) => (options.legend.labelFormatter as any).call({ name: series.name, options: series })
@@ -610,5 +691,41 @@ describe("Chart", () => {
             })
             expect((options.series![0] as any).data.map((p: any) => p.y)).toEqual([100, 75])
         })
+    })
+})
+
+describe("formatPValue", () => {
+    it ("rounds like published p-values", () => {
+        expect(formatPValue(0.4567)).toBe("p = 0.46")
+        expect(formatPValue(0.0412)).toBe("p = 0.04")
+        expect(formatPValue(0.0034)).toBe("p = 0.003")
+        expect(formatPValue(0.0004)).toBe("p < 0.001")
+    })
+})
+
+describe("getLogRankSentences", () => {
+    it ("show the p-value alone, or with what it means", () => {
+        expect(getLogRankSentences(0.32)).toEqual({
+            short: "Log-rank test: p = 0.32",
+            long : "Differences at least this large would occur by chance 32% of the time if all groups had the same survival (log-rank p = 0.32)."
+        })
+        expect(getLogRankSentences(0.0412).long).toContain("by chance 4% of the time")
+        expect(getLogRankSentences(0.0034).long).toContain("by chance 0.3% of the time")
+        expect(getLogRankSentences(0.0004)).toEqual({
+            short: "Log-rank test: p < 0.001",
+            long : "Differences at least this large would occur by chance less than 0.1% of the time if all groups had the same survival (log-rank p < 0.001)."
+        })
+    })
+
+    it ("can be told apart from other subtitles", () => {
+        for (const p of [1, 0.32, 0.04, 0.0034, 0.0004]) {
+            expect(getLogRankSentenceKind(getLogRankSentences(p).short)).toBe("short")
+            expect(getLogRankSentenceKind(getLogRankSentences(p).long)).toBe("long")
+        }
+        expect(getLogRankSentenceKind("Patients diagnosed 2010-2020")).toBeNull()
+
+        // Edited by the user
+        expect(getLogRankSentenceKind("Log-rank test: p = 0.32 (small groups)")).toBeNull()
+        expect(getLogRankSentenceKind(getLogRankSentences(0.32).long.replace("chance", "luck"))).toBeNull()
     })
 })

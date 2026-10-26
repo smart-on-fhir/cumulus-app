@@ -248,9 +248,14 @@ export default function ConfigPanel({
                         <label>Chart Subtitle</label>
                         <input
                             type="text"
+                            list="chart-subtitle-suggestions"
                             value={ chartOptions.subtitle?.text || "" }
                             onChange={ e => onChartOptionsChange({ subtitle: { text: e.target.value }})}
                         />
+                        { /* Subtitles the chart suggests (see custom.subtitleSuggestions) */ }
+                        <datalist id="chart-subtitle-suggestions">
+                            { ((chartOptions as any).custom?.subtitleSuggestions || []).map((text: string) => <option key={ text } value={ text } />) }
+                        </datalist>
                         <br/>
                     </div>
 

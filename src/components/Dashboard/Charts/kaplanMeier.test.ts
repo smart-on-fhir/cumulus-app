@@ -1,4 +1,4 @@
-import { confidenceInterval, getCountsByTime, lifeTable } from "./kaplanMeier"
+import { chiSquareSurvival, confidenceInterval, getCountsByTime, lifeTable, logRankTest } from "./kaplanMeier"
 
 describe("lifeTable", () => {
 
@@ -120,5 +120,65 @@ describe("getCountsByTime", () => {
             column: "t", stratifier: "g", filters: [], totalCount: 0, rowCount: 0, counts: {}, data: []
         } as any, "x")).toEqual({})
         expect(getCountsByTime({ column: "t", filters: [], totalCount: 0, rowCount: 0, data: [] } as any)).toEqual({})
+    })
+})
+
+describe("chiSquareSurvival", () => {
+    it ("matches known critical values", () => {
+        expect(chiSquareSurvival(3.841459, 1)).toBeCloseTo(0.05, 6)
+        expect(chiSquareSurvival(5.991465, 2)).toBeCloseTo(0.05, 6)
+        expect(chiSquareSurvival(6.634897, 1)).toBeCloseTo(0.01, 6)
+        expect(chiSquareSurvival(11.34487, 3)).toBeCloseTo(0.01, 6)
+        expect(chiSquareSurvival(1, 4)).toBeCloseTo(0.909796, 5)
+        expect(chiSquareSurvival(0, 1)).toBe(1)
+    })
+})
+
+describe("logRankTest", () => {
+
+    const table = (rows: [number, number][]) => rows.map(([atRisk, events]) => ({ atRisk, events }))
+
+    it ("needs at least two groups with records", () => {
+        expect(logRankTest([])).toBeNull()
+        expect(logRankTest([table([[10, 1]])])).toBeNull()
+        expect(logRankTest([table([[10, 1]]), table([[0, 0]])])).toBeNull()
+    })
+
+    it ("finds no difference between identical groups", () => {
+        const a = table([[20, 2], [15, 3], [10, 1]])
+        expect(logRankTest([a, a])).toMatchObject({ chi2: 0, df: 1, p: 1 })
+    })
+
+    it ("matches the two-group formula", () => {
+        const a = table([[20, 1], [18, 2], [14, 1]])
+        const b = table([[20, 5], [13, 4], [8, 3]])
+
+        // (O - E)² / V for group a
+        let O = 0, E = 0, V = 0
+        a.forEach((ra, j) => {
+            const rb = b[j], N = ra.atRisk + rb.atRisk, D = ra.events + rb.events
+            O += ra.events
+            E += ra.atRisk * D / N
+            V += D * (N - D) / (N - 1) * (ra.atRisk / N) * (1 - ra.atRisk / N)
+        })
+        const result = logRankTest([a, b])!
+        expect(result.chi2).toBeCloseTo((O - E) ** 2 / V, 10)
+        expect(result.df).toBe(1)
+        expect(result.p).toBeCloseTo(chiSquareSurvival((O - E) ** 2 / V, 1), 10)
+    })
+
+    it ("compares any number of groups", () => {
+        const result = logRankTest([
+            table([[30, 1], [29, 1], [28, 1]]),
+            table([[30, 5], [25, 5], [20, 5]]),
+            table([[30, 2], [28, 2], [26, 2]])
+        ])!
+        expect(result.df).toBe(2)
+        expect(result.p).toBeLessThan(0.05)
+    })
+
+    it ("ignores groups without records", () => {
+        const a = table([[20, 1], [18, 2]]), b = table([[20, 5], [13, 4]])
+        expect(logRankTest([a, table([[0, 0], [0, 0]]), b])).toEqual(logRankTest([a, b]))
     })
 })
