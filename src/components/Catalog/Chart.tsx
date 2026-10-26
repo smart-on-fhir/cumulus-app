@@ -170,13 +170,12 @@ export default function CatalogChart({ data, search, navigate }: { data: Record<
             backgroundColor: "#FCFCFC",
             useHTML: true,
             formatter() {
-                // @ts-ignore
-                let out = `<b style="color:${this.point.color}">◉</b> <b>${this.point.custom?.name || this.point.name}</b> <b class="badge" style="background-color:${this.point.color}">${
-                        Number(this.point.y).toLocaleString()}</b><hr style="margin: 8px 0" />`
+                const custom = this.options.custom
+                let out = `<b style="color:${this.color}">◉</b> <b>${custom?.name || this.name}</b> <b class="badge" style="background-color:${this.color}">${
+                        Number(this.y).toLocaleString()}</b><hr style="margin: 8px 0" />`
 
                 return out + `<div style="min-width:200px;white-space:normal">${
-                    // @ts-ignore
-                    search ? highlight(this.point.custom.data.Description, search, true).join("") : this.point.custom.data.Description
+                    search ? (highlight(custom?.data.Description, search, true) as string[]).join("") : custom?.data.Description
                 }</div>`
             }
         },
