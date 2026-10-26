@@ -344,7 +344,7 @@ export function escapeForFileName(input: string): string {
         .replace(/(_|\s|\.)$/, "");
 }
  
-export function lengthToEm(length?: string, base = 16) {
+export function lengthToEm(length?: string | number, base = 16) {
     length = String(length || "")
     const num = parseFloat(length)
     if (isNaN(num) || !isFinite(num)) {

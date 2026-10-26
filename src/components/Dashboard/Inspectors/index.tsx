@@ -1,4 +1,4 @@
-import { AnnotationsLabelsOptions, ChartOptions, LegendOptions, TitleOptions, XAxisOptions, YAxisOptions } from "highcharts"
+import { AnnotationsLabelsOptions, ChartOptions, LegendOptions, SubtitleOptions, TitleOptions, XAxisOptions, YAxisOptions } from "highcharts"
 import { app }                 from "../../../types"
 import { SupportedChartTypes } from "../config"
 import Annotations             from "./Annotations"
@@ -152,6 +152,17 @@ function Editor({
                 <Title title={chartOptions.title} onChange={ t => onChange({ title: t as TitleOptions }) } />
             </>
 
+        case "subtitle":
+            return <>
+                <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> Chart Subtitle</h5>
+                <hr/>
+                <Title
+                    title={chartOptions.subtitle}
+                    defaultColor="#666666"
+                    onChange={ t => onChange({ subtitle: t as SubtitleOptions }) }
+                />
+            </>
+
         case "chart":
             return <>
                 <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> Chart</h5>
@@ -188,7 +199,6 @@ function Editor({
 
 
         // "highcharts-caption"        : ["caption"],
-        // "highcharts-subtitle"       : ["subtitle"],
 
         default:
             return <p><b className="color-red">No editors configured for "{type}"</b></p>

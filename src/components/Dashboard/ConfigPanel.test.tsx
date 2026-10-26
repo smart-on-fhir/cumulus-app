@@ -149,6 +149,26 @@ it("calls onChartOptionsChange when chart title is changed", async () => {
   expect(onChartOptionsChange).toHaveBeenCalled()
 })
 
+// Test chart subtitle input
+it("calls onChartOptionsChange when chart subtitle is changed", async () => {
+  render(
+    <ConfigPanel
+      cols={mockCols}
+      state={{ ...mockState, chartOptions: { ...mockState.chartOptions, subtitle: { text: "Chart Subtitle" } } }}
+      viewType="overview"
+      onChange={onChange}
+      onChartTypeChange={onChartTypeChange}
+      onChartOptionsChange={onChartOptionsChange}
+      onRangeOptionsChange={onRangeOptionsChange}
+      onSecondaryDataOptionsChange={onSecondaryDataOptionsChange}
+    />
+  )
+  await userEvent.click(screen.getByText("Chart"))
+  const input = screen.getByDisplayValue("Chart Subtitle")
+  await userEvent.type(input, "!")
+  expect(onChartOptionsChange).toHaveBeenLastCalledWith({ subtitle: { text: "Chart Subtitle!" } })
+})
+
 // Test legend toggle
 it("renders legend controls and calls onChartOptionsChange when legend is changed", async () => {
   render(

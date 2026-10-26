@@ -122,6 +122,12 @@ const DefaultChartOptions: Options = {
         },
         text: "SMART®"
     },
+    subtitle: {
+        style: {
+            // Highcharts uses 0.8em
+            fontSize: "0.9em"
+        }
+    },
     title: {
         text: "",
         style: {

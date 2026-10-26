@@ -6,11 +6,18 @@ import { DEFAULT_FONT_FAMILY }    from "../config"
 import { DEFS }                   from "../Schema"
 
 
+/**
+ * @param elementStyle The style to edit. Highcharts types each element's style
+ * separately (e.g. title colors can be gradients), but these are all plain CSS
+ * properties.
+ */
 export function getStyleOptions(
-    style: Partial<CSSObject>,
+    elementStyle: object,
     onChange: (style: Partial<CSSObject>) => void,
     whiteList: ("textOutline" | keyof CSSProperties)[]
 ): EditableProperty[] {
+
+    const style = elementStyle as Partial<CSSObject>
 
     const props: any[] = whiteList.map(key => {
         
@@ -74,7 +81,8 @@ export function getStyleOptions(
                 min: 0,
                 max: 50,
                 value: style.borderRadius,
-                onChange: (borderRadius?: number) => onChange({ borderRadius })
+                // Typed as a string, but Highcharts takes numbers as px
+                onChange: (borderRadius?: number) => onChange({ borderRadius: borderRadius as any })
             }
         }
 
