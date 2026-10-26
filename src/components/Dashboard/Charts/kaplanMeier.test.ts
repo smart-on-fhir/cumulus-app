@@ -1,4 +1,4 @@
-import { getCountsByTime, lifeTable } from "./kaplanMeier"
+import { confidenceInterval, getCountsByTime, lifeTable } from "./kaplanMeier"
 
 describe("lifeTable", () => {
 
@@ -48,12 +48,12 @@ describe("lifeTable confidence interval", () => {
         expect(table[0]).toMatchObject({ survival: 1, ciLow: 1, ciHigh: 1 })
     })
 
-    it ("uses Greenwood's formula", () => {
+    it ("uses Greenwood's formula on the log-log scale", () => {
         // 100 at risk, 10 events: S = 0.9, var(log S) = 10 / (100 * 90)
         const table = lifeTable(["0", "1"], { "0": 10 }, { "1": 90 })
-        const se = 0.9 * Math.sqrt(10 / (100 * 90))
-        expect(table[1].ciLow ).toBeCloseTo(0.9 - 1.96 * se, 10)
-        expect(table[1].ciHigh).toBeCloseTo(0.9 + 1.96 * se, 10)
+        const se = Math.sqrt(10 / (100 * 90)) / Math.abs(Math.log(0.9))
+        expect(table[1].ciLow ).toBeCloseTo(0.9 ** Math.exp( 1.96 * se), 10)
+        expect(table[1].ciHigh).toBeCloseTo(0.9 ** Math.exp(-1.96 * se), 10)
     })
 
     it ("accumulates the variance over time points, using the effective number at risk", () => {
@@ -61,16 +61,32 @@ describe("lifeTable confidence interval", () => {
         // "1":  70 at risk, 14 events              -> effective 70
         const table = lifeTable(["0", "1", "2"], { "0": 10, "1": 14 }, { "0": 20, "2": 56 })
         const s = (1 - 10 / 90) * (1 - 14 / 70)
-        const se = s * Math.sqrt(10 / (90 * 80) + 14 / (70 * 56))
+        const se = Math.sqrt(10 / (90 * 80) + 14 / (70 * 56)) / Math.abs(Math.log(s))
         expect(table[2].survival).toBeCloseTo(s, 10)
-        expect(table[2].ciLow   ).toBeCloseTo(s - 1.96 * se, 10)
-        expect(table[2].ciHigh  ).toBeCloseTo(s + 1.96 * se, 10)
+        expect(table[2].ciLow   ).toBeCloseTo(s ** Math.exp( 1.96 * se), 10)
+        expect(table[2].ciHigh  ).toBeCloseTo(s ** Math.exp(-1.96 * se), 10)
     })
 
-    it ("stays within 0 and 1", () => {
+    it ("stays within 0 and 1, without being cut", () => {
+        // 3 at risk, 2 events: S = 1/3, with a very wide interval
         const table = lifeTable(["0", "1"], { "0": 2 }, { "1": 1 })
-        expect(table[1].ciLow ).toBe(0)
-        expect(table[1].ciHigh).toBeLessThanOrEqual(1)
+        expect(table[1].ciLow ).toBeGreaterThan(0)
+        expect(table[1].ciHigh).toBeLessThan(1)
+        expect(table[1].ciLow ).toBeLessThan(table[1].survival!)
+        expect(table[1].ciHigh).toBeGreaterThan(table[1].survival!)
+    })
+
+    it ("is narrower on the side closer to 100%", () => {
+        const [, row] = lifeTable(["0", "1"], { "0": 5 }, { "1": 95 })
+        expect(row.ciHigh! - row.survival!).toBeLessThan(row.survival! - row.ciLow!)
+    })
+
+    it ("matches a published Stata estimate", () => {
+        // SHH group in the CBTN medulloblastoma manuscript (Table 3): 16
+        // patients, 3-year EFS 0.81 [0.52, 0.94]. Assuming 3 events and no
+        // censoring: S = 13/16
+        const [low, high] = confidenceInterval(13 / 16, 3 / (16 * 13))
+        expect([+low.toFixed(2), +high.toFixed(2)]).toEqual([0.52, 0.94])
     })
 
     it ("is null after the curve ends", () => {

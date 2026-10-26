@@ -46,14 +46,33 @@ export interface LifeTableRow {
 
     /**
      * Lower and upper bounds (0 to 1) of the 95% confidence interval of
-     * `survival`, using Greenwood's formula. Null when `survival` is null.
+     * `survival` (see confidenceInterval). Null when `survival` is null.
      */
     ciLow : number | null
     ciHigh: number | null
 }
 
-function clamp01(n: number) {
-    return Math.min(1, Math.max(0, n))
+/**
+ * The 95% confidence interval of a survival estimate, computed on the log-log
+ * scale (Kalbfleisch–Prentice), which is Stata's default. Unlike a plain
+ * `survival ± 1.96 SE`, it never leaves 0 to 1, and it is narrower on the side
+ * closer to 0% or 100%, as published Kaplan–Meier results are.
+ *
+ * At 100% and at 0% the interval has no width.
+ *
+ * @param survival The survival estimate (0 to 1)
+ * @param variance Greenwood's sum, Σ d / (n (n - d)), the variance of log(S)
+ */
+export function confidenceInterval(survival: number, variance: number): [number, number] {
+    if (survival <= 0 || survival >= 1 || variance <= 0) {
+        return [survival, survival]
+    }
+    // Standard error of log(-log S)
+    const se = Math.sqrt(variance) / Math.abs(Math.log(survival))
+    return [
+        Math.pow(survival, Math.exp( 1.96 * se)),
+        Math.pow(survival, Math.exp(-1.96 * se))
+    ]
 }
 
 /**
@@ -67,7 +86,7 @@ function clamp01(n: number) {
  *
  * Censored records count as half at risk during the interval they leave in.
  * The confidence interval uses Greenwood's variance over the same effective
- * number at risk.
+ * number at risk, on the log-log scale (see confidenceInterval).
  *
  * @param ticks    The time points, already sorted
  * @param events   Event counts by time point
@@ -93,15 +112,15 @@ export function lifeTable(
         // value the last interval ended with
         const known = atRisk > 0 || previousAtRisk > 0
 
-        const se  = survival * Math.sqrt(variance)
+        const [ciLow, ciHigh] = confidenceInterval(survival, variance)
         const row = {
             x,
             atRisk,
             events  : d,
             censored: c,
             survival: known ? survival : null,
-            ciLow   : known ? clamp01(survival - 1.96 * se) : null,
-            ciHigh  : known ? clamp01(survival + 1.96 * se) : null
+            ciLow   : known ? ciLow  : null,
+            ciHigh  : known ? ciHigh : null
         }
 
         previousAtRisk = atRisk
