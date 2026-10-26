@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useReducer, useState } from "react"
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react"
 import { useNavigate, Link }                     from "react-router-dom"
 import { Chart }                                 from "highcharts"
 import { buildChartOptions, removeSurvivalTitles } from "./Charts/lib"
+import { withRiskTable }                         from "./Charts/riskTable"
 import ConfigPanel                               from "./ConfigPanel"
 import BaseChart                                 from "./Charts/ChartFN"
 import CaptionEditor                             from "./CaptionEditor"
@@ -73,6 +74,7 @@ export interface ViewState
     statusColumn    ?: app.SubscriptionDataColumn
     eventValue       : string
     survivalBands    : boolean
+    survivalRiskTable: boolean
     caption          : string
     data             : app.ServerResponses.DataResponse | null
     data2            : app.ServerResponses.StratifiedDataResponse | null
@@ -484,6 +486,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         statusColumn: cols.find(c => c.name === viewSettings.statusColumn),
         eventValue: viewSettings.eventValue || "",
         survivalBands: !!viewSettings.survivalBands,
+        survivalRiskTable: !!viewSettings.survivalRiskTable,
 
         // View caption if any
         caption: viewSettings.caption || "",
@@ -561,6 +564,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         statusColumn,
         eventValue,
         survivalBands,
+        survivalRiskTable,
         caption,
         data,
         data2,
@@ -583,6 +587,13 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     const viewColumnName = viewColumn.name
     const requestId      = subscription?.id || dataPackage?.id
 
+    // The rendered chart only: the saved options keep a single x axis
+    const renderedChartOptions = useMemo(() => {
+        return chartType === "survival" && survivalRiskTable ?
+            withRiskTable(state.chartOptions) :
+            state.chartOptions
+    }, [chartType, survivalRiskTable, state.chartOptions])
+
     const runtimeView: Partial<app.View> = {
         id         : view.id,
         name       : viewName,
@@ -603,6 +614,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             statusColumn: statusColumn?.name || "",
             eventValue,
             survivalBands,
+            survivalRiskTable,
             caption,
             ranges,
             sortBy,
@@ -986,6 +998,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                 statusColumn: statusColumn?.name || "",
                                 eventValue,
                                 survivalBands,
+                                survivalRiskTable,
                                 tags,
                                 ranges: hasRanges(data, data2) ? ranges : null,
                                 visualOverrides: state.visualOverrides,
@@ -1005,6 +1018,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                     statusColumn   : cols.find(c => c.name === state.statusColumn),
                                     eventValue     : state.eventValue,
                                     survivalBands  : state.survivalBands,
+                                    survivalRiskTable: state.survivalRiskTable,
                                     tags           : state.tags,
                                     visualOverrides: state.visualOverrides,
                                     sortBy         : state.sortBy,
@@ -1076,7 +1090,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
 
                         { viewColumn && viewType === "overview" && <BaseChart
                             loading={ loadingData }
-                            options={ state.chartOptions }
+                            options={ renderedChartOptions }
                             visualOverrides={ state.visualOverrides }
                             onInspectionChange={ state.inspection.enabled ? onInspectionChange : undefined }
                             isDraft={ isDraft }

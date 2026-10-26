@@ -142,6 +142,7 @@ export interface ChartConfigPanelState {
     statusColumn   : string
     eventValue     : string
     survivalBands  : boolean
+    survivalRiskTable: boolean
     annotations    : app.Annotation[]
     xCol           : app.SubscriptionDataColumn
     tags           : Pick<app.Tag, "id"|"name"|"description">[]
@@ -506,6 +507,12 @@ export default function ConfigPanel({
                                             label="Show 95% confidence bands"
                                             checked={ state.survivalBands }
                                             onChange={ survivalBands => onChange({ ...state, survivalBands }) }
+                                        />
+                                        <Checkbox
+                                            name="survivalRiskTable"
+                                            label="Show number at risk"
+                                            checked={ state.survivalRiskTable }
+                                            onChange={ survivalRiskTable => onChange({ ...state, survivalRiskTable }) }
                                         />
                                     </div>
                                 </div> }

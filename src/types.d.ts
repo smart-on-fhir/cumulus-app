@@ -121,6 +121,7 @@ export declare module app {
         statusColumn?: string // Survival charts: event/censored column
         eventValue?: string // Survival charts: the statusColumn value meaning "event"
         survivalBands?: boolean // Survival charts: show 95% confidence bands
+        survivalRiskTable?: boolean // Survival charts: show the number at risk under the chart
         caption?: string // HTML chart caption
         seriesVisibility?: Record<string, boolean>
         ranges?: RangeOptions

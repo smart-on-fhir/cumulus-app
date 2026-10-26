@@ -77,6 +77,17 @@
             pointer-events: none;
         }
 
+        // The "number at risk" table of survival charts is made of x axes (see
+        // RISK_TABLE_CLASS in Charts/riskTable.ts), but has no editors: no
+        // highlights, clicks go through, and its lines (which it doesn't draw)
+        // are not made visible by the axis and grid line highlights below
+        .survival-at-risk, .survival-at-risk * {
+            pointer-events: none !important;
+        }
+        .survival-at-risk .highcharts-axis-line, .highcharts-grid.survival-at-risk {
+            display: none !important;
+        }
+
         // Chart ---------------------------------------------------------------
         .highcharts-background {
             outline-color: #06C0;

@@ -94,11 +94,13 @@ export const COLOR_THEMES = [
 export const DEFAULT_COLOR_THEME = "cumulus"
 
 export const INSPECTORS = {
-    xAxisTitle    : ".highcharts-xaxis .highcharts-axis-title",
+    // The "number at risk" rows of survival charts are x axes too, but not
+    // the one the x axis inspectors edit
+    xAxisTitle    : ".highcharts-xaxis:not(.survival-at-risk) .highcharts-axis-title",
     yAxisTitle    : ".highcharts-yaxis .highcharts-axis-title",
-    xAxis         : ".highcharts-xaxis, .highcharts-xaxis *",
+    xAxis         : ".highcharts-xaxis:not(.survival-at-risk), .highcharts-xaxis:not(.survival-at-risk) *",
     yAxis         : ".highcharts-yaxis, .highcharts-yaxis *",
-    xAxisLabels   : ".highcharts-xaxis-labels *",
+    xAxisLabels   : ".highcharts-xaxis-labels:not(.survival-at-risk) *",
     yAxisLabels   : ".highcharts-yaxis-labels *",
     xAxisGridLines: ".highcharts-xaxis-grid path",
     yAxisGridLines: ".highcharts-yaxis-grid path",

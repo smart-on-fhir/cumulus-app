@@ -53,6 +53,7 @@ const mockState: ChartConfigPanelState = {
   statusColumn: "",
   eventValue: "",
   survivalBands: false,
+  survivalRiskTable: false,
   annotations: [],
   xCol: { name: "age", label: "Age", dataType: "integer", description: "" },
   tags: [],
