@@ -7,7 +7,7 @@ export default class Tooltip extends Component<any> {
 
     tooltip: RefObject<HTMLDivElement>;
 
-    timer: NodeJS.Timeout | null = null
+    timer: ReturnType<typeof setTimeout> | null = null
 
     constructor(props: any) {
         super(props);

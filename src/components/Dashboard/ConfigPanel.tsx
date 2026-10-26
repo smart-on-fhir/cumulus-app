@@ -21,6 +21,7 @@ import {
     DashStyleValue,
     merge,
     Options,
+    SeriesOptionsType,
     SeriesPieOptions,
     XAxisOptions,
     YAxisOptions
@@ -932,8 +933,9 @@ function AllSeriesEditor({
     const S: any = state.chartOptions.series?.[0] || {}
 
     const currentTypes = (state.chartOptions.series || []).reduce((prev, cur) => {
-        if (!prev.includes(cur.type)) {
-            prev.push(cur.type)
+        const { type } = cur as SeriesOptionsType
+        if (type && !prev.includes(type)) {
+            prev.push(type)
         }
         return prev
     }, [] as string[])

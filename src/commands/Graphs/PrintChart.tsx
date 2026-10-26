@@ -17,6 +17,7 @@ export class PrintChart extends Command
     }
 
     execute() {
-        Highcharts.charts[Highcharts.charts.length-1]!.print()
+        // @ts-expect-error print() exists at runtime but is missing from the Highcharts 13 types
+        Highcharts.charts[Highcharts.charts.length-1]!.exporting.print()
     }
 }
