@@ -37,7 +37,7 @@ export default function Invite()
                 <br/>
                 <br/>
                 <div className="center">
-                    <Link className="link" to="/users">Manage Users</Link>
+                    <Link className="link" to="/admin/users">Manage Users</Link>
                 </div>
             </div>
         )
