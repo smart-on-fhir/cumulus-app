@@ -9,7 +9,31 @@ import { uInt }                     from "../lib"
 
 export const router: Router = express.Router({ mergeParams: true });
 
-async function search(q: string) {
+/**
+ * Splits a search query into lowercase words. A name matches the query if it
+ * contains all of them, in any order.
+ */
+export function getSearchTerms(q: string) {
+    return q.toLowerCase().split(/\s+/).filter(Boolean)
+}
+
+export function matchesAllTerms(name: string, terms: string[]) {
+    const lowerName = String(name || "").toLowerCase()
+    return terms.every(term => lowerName.includes(term))
+}
+
+/**
+ * Escapes the LIKE wildcards (% and _) so that they match literally
+ */
+export function escapeLike(term: string) {
+    return term.replace(/[\\%_]/g, "\\$&")
+}
+
+async function search(terms: string[]) {
+    const where = terms.length ?
+        terms.map((_, i) => `"name" ilike :term${i}`).join(" and ") :
+        `"name" is not null`
+
     const sql = `with "data" as (
               select "name", "description", "id", 'subscription'      as "type" from "DataRequests"
         union select "name", "description", "id", 'graph'             as "type" from "Views"
@@ -17,11 +41,11 @@ async function search(q: string) {
         union select "name", "description", "id", 'tag'               as "type" from "Tags"
         union select "name", "description", "id", 'studyArea'         as "type" from "Projects"
         ORDER BY "type", "name"
-    ) SELECT * FROM "data" where "name" ilike :query`;
+    ) SELECT * FROM "data" where ${where}`;
 
     return Tag.sequelize!.query(sql, {
         raw: true,
-        replacements: { query: `%${q}%` },
+        replacements: Object.fromEntries(terms.map((term, i) => [`term${i}`, `%${escapeLike(term)}%`])),
         type: QueryTypes.SELECT
     })
 }
@@ -42,13 +66,13 @@ route(router, {
     method: "get",
     async handler(req, res) {
         const limit = uInt(req.query.limit)
-        const q = String(req.query.q || "")
-        let results = await search(q)
+        const terms = getSearchTerms(String(req.query.q || ""))
+        let results = await search(terms)
 
         // Also search through package names from the aggregator
         if (aggregatorIsEnabled()) {
             const packages = await aggregatorRequest("/data-packages")
-            results = results.concat(packages.filter((p: any) => p.name.toLowerCase().includes(q)).map((p: any) => ({
+            results = results.concat(packages.filter((p: any) => matchesAllTerms(p.name, terms)).map((p: any) => ({
                 name       : p.name,
                 description: null,
                 id         : p.id,

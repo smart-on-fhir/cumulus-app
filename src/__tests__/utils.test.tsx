@@ -184,6 +184,16 @@ describe("utils", () => {
         expect(document.querySelector(".search-match")).toHaveTextContent("is a");
     })
 
+    it("highlight with several words", () => {
+        // Each word wherever it appears, in any order
+        expect((highlight("Histology by Symptom", ["symptom", "histology"], true) as string[]).join("")).toBe(
+            '<span class="search-match">Histology</span> by <span class="search-match">Symptom</span>'
+        )
+        // The longest word wins when several match at the same place
+        expect((highlight("ages", ["age", "ages"], true) as string[]).join("")).toBe('<span class="search-match">ages</span>')
+        expect(highlight("Name", ["", ""])).toBe("Name")
+    })
+
     it("Json", () => {
         render(<span>{ Json({ a: 1, b: true, c: "test", d: null, e: [1,2,3,4,5], f: {}, g: [1,2], h: () => {} }) }</span>);
         expect(document.querySelector(".json-null")).toHaveTextContent("null");

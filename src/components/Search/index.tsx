@@ -105,7 +105,7 @@ function Match({ result, search }: { result: SearchResult, search: string }) {
     return (
         <Link to={ getHref(result) } className="name color-blue-dark">
             <Icon type={result.type} />
-            <span className="name color-blue-dark">{highlight(result.name, search)}</span>
+            <span className="name color-blue-dark">{highlight(result.name, search.split(/\s+/))}</span>
             <div className="small color-brand-2">
                 {result.study ?
                     <span><b>{Terminology[result.type].nameSingular}</b>: {result.study} / {result.id}</span> :
