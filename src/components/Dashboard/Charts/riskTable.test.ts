@@ -69,6 +69,7 @@ describe("withRiskTable", () => {
             xAxis : { type: "category" },
             series: [curve("primary-a", [point(10)])] as any
         }).xAxis as any[]
+        expect(row.labels.overflow).toBe("allow")
         expect(row.labels.style.whiteSpace).toBe("nowrap")
     })
 

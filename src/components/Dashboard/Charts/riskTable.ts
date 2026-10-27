@@ -133,12 +133,15 @@ export function withRiskTable(options: Highcharts.Options): Highcharts.Options
             distance    : ROW_DISTANCE,
             // Typed as number[], but false turns it off
             autoRotation: false as any,
+            // Highcharts would squeeze every number into the width of one time
+            // point and blank the ones that don't fit (e.g. 3 digits), although
+            // the formatter leaves room for them by skipping time points. Both
+            // settings are needed: "justify" limits the width of every label
+            // (not only at the edges), and wrapping limits it otherwise.
+            overflow    : "allow",
             style: {
                 color   : curve.color,
                 fontSize,
-                // Highcharts would squeeze every number into the width of one
-                // time point and cut the ones that don't fit, although the
-                // formatter leaves room for them by skipping time points
                 whiteSpace: "nowrap"
             },
             formatter() {
