@@ -88,7 +88,10 @@ export class CopyGraph extends Command
             const path = `/${this.view.isDraft ? "my/drafts" : "views"}/${this.view.id}/copy`
             if (this.navigate) {
                 if (this.payload) {
-                    this.navigate(path, { state: { view: this.payload }, replace: false })
+                    // History state is structured-cloned, which fails on functions
+                    // (e.g. Highcharts formatters). Pass what a save would store.
+                    const view = JSON.parse(JSON.stringify(this.payload))
+                    this.navigate(path, { state: { view }, replace: false })
                 } else {
                     this.navigate(path, { replace: false })
                 }

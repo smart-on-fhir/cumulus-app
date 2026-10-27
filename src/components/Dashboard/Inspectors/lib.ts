@@ -34,7 +34,7 @@ export function getSeriesPlotOptionsUpdater<T extends SeriesOptions>(options: Op
 
 export function getColorForSeries(options: Options, seriesId: string) {
     const index = getIndexOfSeriesId(options, seriesId)
-    const series = getSeriesById(options, seriesId) as any
+    const series = options.series![index] as any
 
     const color = (
         series.color?.pattern?.color || series.color?.stops?.[0]?.[1] ||

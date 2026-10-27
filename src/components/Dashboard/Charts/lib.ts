@@ -212,7 +212,7 @@ function getPoint({
     isErrorRange,
     isStratified
 }: {
-    row: [string, number | null, number?, number?]
+    row: [string, number | null, (number | null)?, (number | null)?]
     xType: "category" | "linear" | "datetime"
     denominator?: number
     isErrorRange?: boolean
@@ -253,8 +253,8 @@ function getPoint({
     };
 
     if (isErrorRange) {
-        point.low  = pct(row[2] ?? 0, denominator)
-        point.y = point.high = pct(row[3] ?? 0, denominator)
+        point.low  = row[2] == null ? null : pct(row[2], denominator)
+        point.y = point.high = row[3] == null ? null : pct(row[3], denominator)
     }
 
     // For datetime axes, the X value is the timestamp in milliseconds since 1970.
@@ -525,7 +525,8 @@ function getSeriesAndExceptions({
             const row = rows.find(row => row[0] + "" === key + "")
             try {
                 return getPoint({
-                    row: row || [key + "", null, 0, 0],
+                    // A missing row is a gap, in the series and in its intervals
+                    row: row || [key + "", null, null, null],
                     xType,
                     denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache),
                     ...pointProps
@@ -595,6 +596,7 @@ function getSeriesAndExceptions({
                     name    : old?.name ?? name + " (range)",
                     id      : _id,
                     linkedTo: id,
+                    showInLegend: false,
                     zIndex  : secondary ? 0 : 1,
                     data    : ticksToPoints(rows, denominatorCache, { isErrorRange: true, isStratified: true })
                 });
@@ -650,6 +652,7 @@ function getSeriesAndExceptions({
                     id,
                     name: old?.name ?? name + " (range)",
                     linkedTo: "primary-" + name,
+                    showInLegend: false,
                     dataSorting: { enabled: false },
                     data: rows.map(row => {
                         try {
@@ -1107,8 +1110,15 @@ export function buildChartOptions({
                     e.preventDefault()
                     if (!inspection?.enabled) {
                         const target = e.legendItem as Series
+                        const visible = !target.visible
                         const visMap: Record<string, boolean> = {};
-                        target.chart.series.forEach((s: Series) => visMap[s.userOptions.id!] = s === target ? !s.visible : s.visible)
+                        target.chart.series.forEach((s: Series) => {
+                            // Linked series without a legend item of their
+                            // own (e.g. confidence intervals) follow the
+                            // series they are linked to
+                            const follows = "linkedTo" in s.userOptions && s.userOptions.linkedTo === target.userOptions.id && s.options.showInLegend === false
+                            visMap[s.userOptions.id!] = s === target || follows ? visible : s.visible
+                        })
                         onSeriesToggle(visMap)
                     }
                 }

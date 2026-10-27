@@ -222,8 +222,8 @@ describe("Chart", () => {
             return event
         }
 
-        const a: any = { userOptions: { id: "a" }, visible: true  }
-        const b: any = { userOptions: { id: "b" }, visible: false }
+        const a: any = { userOptions: { id: "a" }, options: {}, visible: true  }
+        const b: any = { userOptions: { id: "b" }, options: {}, visible: false }
         a.chart = b.chart = { series: [a, b] }
 
         it ("replaces the default series toggle with a state update", () => {
@@ -245,6 +245,16 @@ describe("Chart", () => {
             const event = click(build(onSeriesToggle), { series: a })
             expect(event.preventDefault).not.toHaveBeenCalled()
             expect(onSeriesToggle).not.toHaveBeenCalled()
+        })
+
+        it ("toggles linked series without a legend item along with their series", () => {
+            const s     : any = { userOptions: { id: "s" }, options: {}, visible: true }
+            const range : any = { userOptions: { id: "s (range)", linkedTo: "s" }, options: { showInLegend: false }, visible: true }
+            const second: any = { userOptions: { id: "s2", linkedTo: "s" }, options: { showInLegend: true }, visible: true }
+            s.chart = range.chart = second.chart = { series: [s, range, second] }
+            const onSeriesToggle = vi.fn()
+            click(build(onSeriesToggle), s)
+            expect(onSeriesToggle).toHaveBeenCalledWith({ s: false, "s (range)": false, s2: true })
         })
     })
 
@@ -787,5 +797,44 @@ describe("getLogRankSentences", () => {
         // Edited by the user
         expect(getLogRankSentenceKind("Log-rank test: p = 0.32 (small groups)")).toBeNull()
         expect(getLogRankSentenceKind(getLogRankSentences(0.32).long.replace("chance", "luck"))).toBeNull()
+    })
+
+    describe("confidence intervals", () => {
+
+        function build() {
+            return buildChartOptions({
+                type: "line",
+                data: {
+                    column    : "t",
+                    stratifier: "g",
+                    filters   : [],
+                    totalCount: 3,
+                    rowCount  : 3,
+                    counts    : { "1": 40, "2": 20 },
+                    data: [
+                        { stratifier: "a", rows: [["1", 10, 8, 12], ["2", 20, 18, 22]] },
+                        { stratifier: "b", rows: [["1", 30, 28, 32]] }
+                    ]
+                } as any,
+                data2 : null,
+                column: { name: "t", label: "T", dataType: "string", description: "" },
+                groupBy: { name: "g", label: "G", dataType: "string", description: "" },
+                ranges: { type: "errorbar", enabled: true } as any,
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0
+            })
+        }
+
+        it ("have no legend item of their own", () => {
+            const ranges = build().series!.filter(s => String(s.id).endsWith(" (range)"))
+            expect(ranges.map(s => s.id)).toEqual(["primary-a (range)", "primary-b (range)"])
+            ranges.forEach(s => expect(s.showInLegend).toBe(false))
+        })
+
+        it ("have gaps where their series has gaps", () => {
+            const range: any = build().series!.find(s => s.id === "primary-b (range)")
+            expect(range.data[1]).toMatchObject({ y: null, low: null, high: null })
+        })
     })
 })
