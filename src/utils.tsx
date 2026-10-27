@@ -251,26 +251,47 @@ export function stripTags(s: string) {
     return s.replace(/<.*?>/g, "")
 }
 
-export function highlight(str: string, stringToFind = "", useHtml = false) {
-    if (!stringToFind) {
+/**
+ * Wraps every match of `stringToFind` in `str` in a search-match span. Pass an
+ * array to highlight each of several words wherever they appear.
+ */
+export function highlight(str: string, stringToFind: string | string[] = "", useHtml = false) {
+    const terms = (Array.isArray(stringToFind) ? stringToFind : [stringToFind])
+        .map(t => t.toLowerCase())
+        .filter(Boolean)
+
+    if (!terms.length) {
         return str
     }
 
+    // The earliest match of any term, and the longest one if several start there
+    function findNext(text: string) {
+        const lower = text.toLowerCase()
+        let index = -1, length = 0
+        for (const term of terms) {
+            const i = lower.indexOf(term)
+            if (i > -1 && (index === -1 || i < index || (i === index && term.length > length))) {
+                index  = i
+                length = term.length
+            }
+        }
+        return { index, length }
+    }
+
     const fragments = []
-    const q = stringToFind.toLowerCase()
 
     let i = 0;
     let temp = str;
-    let index = temp.toLowerCase().indexOf(q);
+    let { index, length } = findNext(temp);
     while (index > -1) {
         fragments.push(temp.substring(0, index))
-        const endIndex = index + q.length;
+        const endIndex = index + length;
         fragments.push(useHtml ?
             `<span class="search-match">${ temp.substring(index, endIndex) }</span>` :
             <span className="search-match" key={i++}>{ temp.substring(index, endIndex) }</span>
         )
         temp  = temp.substring(endIndex);
-        index = temp.toLowerCase().indexOf(q);
+        ({ index, length } = findNext(temp));
     }
 
     if (temp) {
