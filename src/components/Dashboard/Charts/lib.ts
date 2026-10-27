@@ -182,7 +182,7 @@ function getPoint({
     isErrorRange,
     isStratified
 }: {
-    row: [string, number | null, number?, number?]
+    row: [string, number | null, (number | null)?, (number | null)?]
     xType: "category" | "linear" | "datetime"
     denominator?: number
     isErrorRange?: boolean
@@ -223,8 +223,8 @@ function getPoint({
     };
 
     if (isErrorRange) {
-        point.low  = pct(row[2] ?? 0, denominator)
-        point.y = point.high = pct(row[3] ?? 0, denominator)
+        point.low  = row[2] == null ? null : pct(row[2], denominator)
+        point.y = point.high = row[3] == null ? null : pct(row[3], denominator)
     }
 
     // For datetime axes, the X value is the timestamp in milliseconds since 1970.
@@ -459,7 +459,8 @@ function getSeriesAndExceptions({
             const row = rows.find(row => row[0] + "" === key + "")
             try {
                 return getPoint({
-                    row: row || [key + "", null, 0, 0],
+                    // A missing row is a gap, in the series and in its intervals
+                    row: row || [key + "", null, null, null],
                     xType,
                     denominator: getDenominator(data, denominator, row || [key + "", 0, 0, 0], denominatorCache),
                     ...pointProps
@@ -507,6 +508,7 @@ function getSeriesAndExceptions({
                     name    : old?.name ?? name + " (range)",
                     id      : _id,
                     linkedTo: id,
+                    showInLegend: false,
                     zIndex  : secondary ? 0 : 1,
                     data    : ticksToPoints(rows, denominatorCache, { isErrorRange: true, isStratified: true })
                 });
@@ -562,6 +564,7 @@ function getSeriesAndExceptions({
                     id,
                     name: old?.name ?? name + " (range)",
                     linkedTo: "primary-" + name,
+                    showInLegend: false,
                     dataSorting: { enabled: false },
                     data: rows.map(row => {
                         try {
@@ -710,15 +713,7 @@ export function buildChartOptions({
                 events: {
                     click: inspection?.enabled ? function(e) {
                         onInspectionChange(["series"], { selectedSeriesId: e.point.series.options.id })
-                    } : undefined,
-                    legendItemClick(e) {
-                        e.preventDefault()
-                        if (!inspection?.enabled) {
-                            const visMap: Record<string, boolean> = {};
-                            e.target.chart.series.forEach((s: Series) => visMap[s.userOptions.id!] = s === e.target ? !s.visible : s.visible)
-                            onSeriesToggle(visMap)
-                        }
-                    }
+                    } : undefined
                 },
                 dataLabels: {
                     // @ts-ignore
@@ -869,7 +864,33 @@ export function buildChartOptions({
         legend: {
             // @ts-ignore - a hack to force highcharts to reflow the legend
             dirty: Date.now(),
-            enabled: options.legend?.enabled ?? series.length <= 30
+            enabled: options.legend?.enabled ?? series.length <= 30,
+            events: {
+                // Series visibility is kept in the chart options (so that it
+                // is saved), so the default toggle is replaced with a state
+                // update. Only this event can prevent the default toggle in
+                // Highcharts 13; series.events.legendItemClick fires after it.
+                itemClick(e) {
+                    // Points (e.g. pie slices) keep the default behavior
+                    if ("series" in e.legendItem) {
+                        return
+                    }
+                    e.preventDefault()
+                    if (!inspection?.enabled) {
+                        const target = e.legendItem as Series
+                        const visible = !target.visible
+                        const visMap: Record<string, boolean> = {};
+                        target.chart.series.forEach((s: Series) => {
+                            // Linked series without a legend item of their
+                            // own (e.g. confidence intervals) follow the
+                            // series they are linked to
+                            const follows = "linkedTo" in s.userOptions && s.userOptions.linkedTo === target.userOptions.id && s.options.showInLegend === false
+                            visMap[s.userOptions.id!] = s === target || follows ? visible : s.visible
+                        })
+                        onSeriesToggle(visMap)
+                    }
+                }
+            }
         },
         series
     };

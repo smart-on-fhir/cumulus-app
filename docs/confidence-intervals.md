@@ -78,16 +78,13 @@ out of charts.
 ## How confidence intervals are drawn
 
 - **One interval series per series.** Each series gets a linked series for
-  its intervals, named `<series name> (range)` in the legend, with the id
-  `primary-<name> (range)` (`secondary-…` for secondary data).
-- **Separate legend items.** The intervals have their own legend item, and
-  they are shown or hidden separately: hiding a series does not hide its
-  intervals.
-- **Names.** An interval series takes its series' name when the chart is
-  first built, and that name is saved with the chart. Renaming the series
-  later does not rename its intervals, so rename them too.
+  its intervals, with the id `primary-<name> (range)` (`secondary-…` for
+  secondary data).
+- **No legend item.** The intervals have no legend item of their own.
+  Hiding a series in the legend hides its intervals too. To hide all
+  intervals, set the **Confidence Intervals** option to **None**.
 - **Gaps.** In a stratified chart, where a series has no data for an x
-  value, its line has a gap but its interval is drawn at 0.
+  value, both its line and its interval have a gap.
 - **Percentages.** When the chart uses a denominator, the bounds are
   converted to percentages with the same denominator as the count.
 - **Tooltips.** The tooltip shows the interval as "Range: low - high", in

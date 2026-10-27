@@ -1031,8 +1031,10 @@ function AllSeriesEditor({
         })
     }
 
-    const allShowInLegendN = state.chartOptions.series?.every(s => s.showInLegend === false)
-    const allShowInLegendY = state.chartOptions.series?.every(s => s.showInLegend !== false )
+    // Confidence intervals never have a legend item of their own
+    const legendSeries = state.chartOptions.series?.filter(s => !String(s.id).endsWith(" (range)"))
+    const allShowInLegendN = legendSeries?.every(s => s.showInLegend === false)
+    const allShowInLegendY = legendSeries?.every(s => s.showInLegend !== false )
     props.push({
         name : "Show in Legend",
         type : "boolean",
