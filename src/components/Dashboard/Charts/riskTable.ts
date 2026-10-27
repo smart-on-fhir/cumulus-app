@@ -135,7 +135,11 @@ export function withRiskTable(options: Highcharts.Options): Highcharts.Options
             autoRotation: false as any,
             style: {
                 color   : curve.color,
-                fontSize
+                fontSize,
+                // Highcharts would squeeze every number into the width of one
+                // time point and cut the ones that don't fit, although the
+                // formatter leaves room for them by skipping time points
+                whiteSpace: "nowrap"
             },
             formatter() {
                 const axis = this.axis as any

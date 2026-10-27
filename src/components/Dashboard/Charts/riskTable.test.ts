@@ -64,6 +64,14 @@ describe("withRiskTable", () => {
         expect(b).toMatchObject({ margin: 5 , labels: { style: { fontSize: "1.104em" } }, title: { style: { fontSize: "1.104em" } } })
     })
 
+    it ("does not cut numbers wider than one time point", () => {
+        const [, , row] = withRiskTable({
+            xAxis : { type: "category" },
+            series: [curve("primary-a", [point(10)])] as any
+        }).xAxis as any[]
+        expect(row.labels.style.whiteSpace).toBe("nowrap")
+    })
+
     it ("does not change the saved options", () => {
         const options: any = { xAxis: { type: "category" }, series: [curve("primary-a", [point(10)])] }
         withRiskTable(options)
