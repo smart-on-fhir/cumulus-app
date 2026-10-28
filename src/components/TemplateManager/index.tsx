@@ -322,7 +322,6 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                     },
                     colors,
 
-                    // @ts-ignore
                     custom: { theme }
                 })
 
