@@ -3,7 +3,6 @@ import { INSPECTORS }        from "../config"
 import Loader                from "../../generic/Loader"
 import { MenuItemConfig }    from "../../generic/Menu"
 import Highcharts            from "../../../highcharts"
-import { defer  }            from "../../../utils"
 import { app }               from "../../../types"
 
 
@@ -70,18 +69,36 @@ export function Chart(props: ChartProps) {
 
     const containerRef = useRef<HTMLDivElement|null>(null);
     const chartRef     = useRef<Highcharts.Chart|null>(null);
+    const updateTimer  = useRef<ReturnType<typeof setTimeout>>(undefined);
+    const latestUpdate = useRef<() => void>(undefined);
+    const nextUpdateAt = useRef(0);
 
     useEffect(() => {
         if (containerRef.current) {
             try {
                 if (chartRef.current) {
-                    defer(() => {
+                    latestUpdate.current = () => {
                         if (chartRef.current) {
                             chartRef.current.update(options, true, true, false)
                             removeStaleShadows(chartRef.current)
                             afterRender()
                         }
-                    }, "main-chart", 0);
+                    }
+
+                    // Updating a big chart can take longer than the time
+                    // between two changes (a color picker sends many per
+                    // second). Run one update at a time with the latest
+                    // options, and wait as long as the last update took, so
+                    // the browser can paint and handle input in between.
+                    if (!updateTimer.current) {
+                        updateTimer.current = setTimeout(() => {
+                            updateTimer.current = undefined
+                            const start = performance.now()
+                            latestUpdate.current?.()
+                            const end = performance.now()
+                            nextUpdateAt.current = end + (end - start)
+                        }, Math.max(nextUpdateAt.current - performance.now(), 0))
+                    }
                 } else {
                     chartRef.current = Highcharts.chart(containerRef.current, options, afterRender);
                 }
@@ -107,6 +124,7 @@ export function Chart(props: ChartProps) {
         window.addEventListener("transitionend", reflow)
         return () => {
             window.removeEventListener("transitionend", reflow)
+            clearTimeout(updateTimer.current)
             if (chartRef.current) {
                 chartRef.current.destroy();
                 chartRef.current = null;
