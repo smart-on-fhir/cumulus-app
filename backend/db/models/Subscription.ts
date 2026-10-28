@@ -1,5 +1,3 @@
-import { sendDataRequest } from "../../services/email"
-import * as logger         from "../../services/logger"
 import { app }             from "../../types"
 import BaseModel           from "./BaseModel"
 import Tag                 from "./Tag"
@@ -59,15 +57,7 @@ export default class Subscription extends BaseModel<InferAttributes<Subscription
         }, {
             sequelize,
             modelName: "Subscription",
-            tableName: "DataRequests",
-            hooks: {
-                async afterCreate(model) {
-                    // Note that we don't wait for this to complete
-                    sendDataRequest(model.toJSON() as any).catch(error => {
-                        logger.error(error, "Failed sending data request: %s", error.message)
-                    });
-                }
-            }
+            tableName: "DataRequests"
         });
     }
 };
