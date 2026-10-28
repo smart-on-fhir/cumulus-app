@@ -90,7 +90,6 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
             onChange: (colorByPoint: boolean) => {
                 onSeriesChange({ colorByPoint })
                 if (colorByPoint) {
-                    // @ts-ignore
                     onChange({ colors: COLOR_THEMES.find(t => t.id === (options.custom?.theme || DEFAULT_COLOR_THEME))!.colors })
                 }
             }

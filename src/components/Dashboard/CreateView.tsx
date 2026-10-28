@@ -116,7 +116,6 @@ export default function CreateView()
                         }
                     },
                     colors: params?.theme ? COLOR_THEMES.find(t => t.id === params.theme)?.colors ?? [] : [],
-                    // @ts-ignore
                     custom: { theme: params?.theme },
                     plotOptions: {
                         bar: {

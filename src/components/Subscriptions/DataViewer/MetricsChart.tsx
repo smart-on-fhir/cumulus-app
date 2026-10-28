@@ -318,13 +318,10 @@ export default function MetricsChart({
             backgroundColor: "#FCFCFC",
             useHTML: true,
             formatter() {
-                // @ts-ignore
-                let out = `<b style="color:${this.point.color}">◉</b> <b>${this.point.custom?.name || this.point.name}</b><hr/><table><tbody>`
+                let out = `<b style="color:${this.color}">◉</b> <b>${this.custom?.name || this.name}</b><hr/><table><tbody>`
 
-                // @ts-ignore
-                for (let name in this.point.custom?.data) {
-                    // @ts-ignore
-                    const value = this.point.custom.data[name]
+                for (let name in this.custom?.data) {
+                    const value = this.custom.data[name]
                     if (value !== undefined) {
                         out += `<tr><td style="text-align:right;font-weight:600;color:#888">${humanizeColumnName(name)}:</td><td>${value.toLocaleString()}</td></tr>`
                     }
