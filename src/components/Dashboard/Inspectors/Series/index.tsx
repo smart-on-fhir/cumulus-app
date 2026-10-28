@@ -143,6 +143,11 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
             // @ts-ignore
             disabled: !!series.colorByPoint || isBool(),
             onChange: (color: string) => {
+                // Confidence bands take their curve's color, unless they have
+                // their own (an empty one follows the curve again)
+                if (series.custom?.isConfidenceBand) {
+                    return onSeriesChange({ custom: { color } })
+                }
                 const colors = [...options.colors!]
                 colors[seriesIndex % colors.length] = color
                 onChange({ colors })

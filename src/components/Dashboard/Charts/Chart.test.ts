@@ -552,6 +552,19 @@ describe("Chart", () => {
                 expect(series[3]).toMatchObject({ type: "arearange", linkedTo: "primary-b", color: series[1].color, step: "left" })
             })
 
+            it ("keep a color picked for them, and follow the curve without one", () => {
+                const series = build(true, {
+                    series: [{ id: "primary-a (95% CI)", type: "arearange", custom: { color: "#123456" } }]
+                }).series
+                expect(series[2]).toMatchObject({ color: "#123456", custom: { color: "#123456", isConfidenceBand: true } })
+                expect(series[3].color).toBe(series[1].color)
+
+                const [, , band] = build(true, {
+                    series: [{ id: "primary-a (95% CI)", type: "arearange", custom: { color: "" } }]
+                }).series
+                expect(band.color).toBe(build(true).series[0].color)
+            })
+
             it ("keep the line width, fill opacity and name saved for them", () => {
                 const [, , band] = build(true).series
                 expect(band).toMatchObject({ lineWidth: 0.2, fillOpacity: 0.15, name: "a (95% CI)" })

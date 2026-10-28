@@ -718,7 +718,10 @@ function getSeriesAndExceptions({
                 id,
                 name               : old?.name ?? curve.name + " (95% CI)",
                 linkedTo           : curve.id,
-                color              : curve.color,
+                // A band follows its curve's color unless the user picked one
+                // for it (the series inspector saves that in custom.color)
+                color              : old?.custom?.color || curve.color,
+                custom             : { ...old?.custom, isConfidenceBand: true },
                 zIndex             : 0,
                 step               : "left",
                 lineWidth          : old?.lineWidth ?? 0.2,
