@@ -6,6 +6,12 @@ import "highcharts"
 export interface ChartCustomOptions {
     /** The id of the color theme (see COLOR_THEMES) */
     theme?: string
+
+    /** Set by buildChartOptions, so that the inspectors can tell survival charts apart */
+    isSurvival?: boolean
+
+    /** Set by buildChartOptions: subtitles offered in the config panel (log-rank test results) */
+    subtitleSuggestions?: string[]
 }
 
 // Highcharts types `custom` on series, axis and point options, but not on the

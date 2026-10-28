@@ -255,7 +255,7 @@ export default function ConfigPanel({
                         />
                         { /* Subtitles the chart suggests (see custom.subtitleSuggestions) */ }
                         <datalist id="chart-subtitle-suggestions">
-                            { ((chartOptions as any).custom?.subtitleSuggestions || []).map((text: string) => <option key={ text } value={ text } />) }
+                            { (chartOptions.custom?.subtitleSuggestions || []).map((text: string) => <option key={ text } value={ text } />) }
                         </datalist>
                         <br/>
                     </div>
@@ -263,13 +263,11 @@ export default function ConfigPanel({
                     <div className="mt-1">
                         <label>Color Theme</label>
                         <Select
-                            // @ts-ignore
                             value={ state.chartOptions.custom?.theme ?? DEFAULT_COLOR_THEME }
                             onChange={ (id) => {
                                 const theme = COLOR_THEMES.find(t => t.id === id)
                                 onChartOptionsChange({
                                     colors: theme!.colors,
-                                    // @ts-ignore
                                     custom: { theme: id }
                                 })
                             }}

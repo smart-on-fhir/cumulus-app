@@ -455,7 +455,6 @@ function getSeriesAndExceptions({
         // @ts-ignore
         const prev = serverOptions.plotOptions?.[options.type || "series"] ?? {}
 
-        // @ts-ignore
         const themeId = serverOptions.custom?.theme || DEFAULT_COLOR_THEME
 
         const themeColors = COLOR_THEMES.find(t => t.id === themeId)!.colors
@@ -637,7 +636,6 @@ function getSeriesAndExceptions({
                 colorByPoint: (type === "column" || type === "bar") ?
                     // @ts-ignore
                     old?.colorByPoint === undefined ?
-                        // @ts-ignore    
                         data.data.length === 1 && xType === "category" && seriesData.length <= 12 && serverOptions.custom?.theme :
                         // @ts-ignore
                         !!old.colorByPoint :
@@ -750,7 +748,7 @@ function getSeriesAndExceptions({
 
 function computeColors(chartType: string, series: any[], options: any)
 {
-    // @ts-ignore What theme is currently being used
+    // What theme is currently being used
     const themeId = options.custom?.theme || DEFAULT_COLOR_THEME
 
     const themeColors = COLOR_THEMES.find(t => t.id === themeId)!.colors
@@ -973,7 +971,6 @@ export function buildChartOptions({
                     // rows.push(`<tr><td style="text-align:right">X:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
                     rows.push(`<b>${groupBy.label || groupBy.name}: ${this.series.name}</b><hr/></td></tr>`)
                 } else {
-                    // @ts-ignore
                     rows.push(`<b>${this.series.name}: ${this.custom?.survival ? "Survival" : "Count"}</b><hr/></td></tr>`)
                 }
                 //     rows.push(`<b>${x}</b><hr/></td></tr>`)
@@ -991,7 +988,6 @@ export function buildChartOptions({
 
                 // Value -------------------------------------------------------
                 // Survival ----------------------------------------------------
-                // @ts-ignore
                 const survival = this.custom?.survival
                 if (survival) {
                     rows.push(
@@ -1007,13 +1003,11 @@ export function buildChartOptions({
                     }
                 }
 
-                // @ts-ignore
                 else if (!this.custom?.isErrorRange) {
                     rows.push(
                         `<tr><td style="text-align:right">Count:</td>`,
                         `<td style="width: 100%"><b>${
                             denominator ?
-                                // @ts-ignore
                                 roundToPrecision(this.custom?.data?.cnt, 3).toLocaleString() + " (" + roundToPrecision(this.y!, 3) + "%)" :
                                 roundToPrecision(this.y!, 3).toLocaleString()
                         }</b></td></tr>`
@@ -1021,7 +1015,6 @@ export function buildChartOptions({
                 }
 
                 // Range -------------------------------------------------------
-                // @ts-ignore
                 const { data: { low, high, lowPct, highPct } = {}, denominator: d } = this.custom || {}
 
                 if (high !== undefined && low !== undefined) {
@@ -1039,9 +1032,7 @@ export function buildChartOptions({
                 }
 
                 // Denominator -------------------------------------------------
-                // @ts-ignore
                 if (denominator && this.custom?.denominator) {
-                    // @ts-ignore
                     rows.push(`<tr style="opacity:0.6"><td style="text-align:right">Denominator:</td><td><b>${roundToPrecision(this.custom.denominator, 2).toLocaleString()}</b></td></tr>`)
                 }
                 
@@ -1084,7 +1075,6 @@ export function buildChartOptions({
                 }
             },
         },
-        // @ts-ignore - lets the inspectors tell survival charts apart
         custom: {
             isSurvival: !!isSurvival,
             // Offered in the subtitle field of the config panel

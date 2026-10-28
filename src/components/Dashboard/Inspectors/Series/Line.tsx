@@ -47,7 +47,6 @@ export function getOptions(options: Options, onChange: (o: Partial<Options>) => 
         {
             name: "Step",
             type: "options",
-            // @ts-ignore - set by buildChartOptions
             disabled: !!options.custom?.isSurvival,
             options: [
                 { label: "none"  , value: ""       },
@@ -58,7 +57,6 @@ export function getOptions(options: Options, onChange: (o: Partial<Options>) => 
             value: (series.step ?? seriesTypeOptions.step) || "",
             // Store "none" as false so it can override a default step (e.g. in survival charts)
             onChange: (step?: OptionsStepValue) => onSeriesChange({ step: (step || false) as any }),
-            // @ts-ignore - set by buildChartOptions
             description: options.custom?.isSurvival ?
                 "Survival curves are always drawn with left steps: each drop shows where its events are counted." :
                 "Whether to apply steps to the line."
