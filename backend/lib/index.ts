@@ -298,6 +298,15 @@ export function getRequestBaseURL(req: Request) {
     return protocol + "://" + host;
 }
 
+/**
+ * The URL of a page of the app, which may be deployed at a subpath
+ * (VITE_APP_PREFIX)
+ */
+export function appUrl(path: string, baseUrl: string) {
+    const prefix = String(process.env.VITE_APP_PREFIX || "").replace(/^\/|\/$/g, "")
+    return new URL("/" + [prefix, path].filter(Boolean).join("/"), baseUrl)
+}
+
 export async function fixAutoIncrement(connection: Sequelize, tableName: string, incrementColumnName: string) {
     await connection.query(
         `select setval(

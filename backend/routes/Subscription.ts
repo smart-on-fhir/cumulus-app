@@ -10,8 +10,10 @@ import { requestPermission }                                    from "../service
 import ViewModel                                                from "../db/models/View"
 import ColumnsMetadata                                          from "../cumulus_library_columns.json"
 import { sql as logSql }                                        from "../services/logger"
+import * as logger                                              from "../services/logger"
+import { sendDataRequest }                                      from "../services/email"
 import ImportJob                                                from "../DataManager/ImportJob"
-import { getFindOptions, assert, rw, uInt, bool, cached }       from "../lib"
+import { getFindOptions, assert, rw, uInt, bool, cached, getRequestBaseURL } from "../lib"
 import { version as pkgVersion }                                from "../../package.json"
 import { DATA_TYPES }                                           from "../DataManager/dataTypes"
 import { request }                                              from "../aggregator"
@@ -876,6 +878,20 @@ route(router, {
         if (Array.isArray(req.body.Tags)) {
             await model.setTags(req.body.Tags.map((t: any) => t.id))
         }
-        res.json(model)
+        res.json(model);
+
+        // Sent after responding, so a slow or failing email doesn't affect
+        // the request
+        (async () => {
+            const group = model.groupId ? await GroupModel.findByPk(model.groupId) : null
+            await sendDataRequest({
+                subscription: model.toJSON(),
+                baseUrl     : getRequestBaseURL(req),
+                createdBy   : req.user?.email,
+                groupName   : group?.name
+            })
+        })().catch(error => {
+            logger.error(error, "Failed sending data request: %s", error.message)
+        });
     }
 });

@@ -2,8 +2,8 @@ import { ReactNode }            from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import sendEmail                from "./sendMail"
 import config                   from "../../config"
-import { app, AppRequest }      from "../../types"
-import { getRequestBaseURL }    from "../../lib/index"
+import { AppRequest }           from "../../types"
+import { appUrl, getRequestBaseURL } from "../../lib/index"
 import {
     DataRequestNotification,
     GraphsAccessNotification,
@@ -48,12 +48,7 @@ export async function inviteUser({
     code: string
     message?: string
 }) {
-    const path = [
-        String(process.env.VITE_APP_PREFIX || "").replace(/^\/|\/$/, ""),
-        "activate"
-    ].filter(Boolean).join("/");
-
-    const activationUrl = new URL(`/${path}`, baseUrl)
+    const activationUrl = appUrl("activate", baseUrl)
     activationUrl.searchParams.set("code", code)
 
     return sendEmail({
@@ -73,12 +68,7 @@ export async function sendResetPasswordEmail({
     baseUrl: string
     code: string
 }) {
-    const path = [
-        String(process.env.VITE_APP_PREFIX || "").replace(/^\/|\/$/, ""),
-        "password-reset"
-    ].filter(Boolean).join("/");
-
-    const resetUrl = new URL(`/${path}`, baseUrl)
+    const resetUrl = appUrl("password-reset", baseUrl)
     resetUrl.searchParams.set("code", code)
     return sendEmail({
         from   : config.appEmail,
@@ -132,12 +122,32 @@ export async function notifyForGraphsAccess({
     }))
 }
 
-export async function sendDataRequest(subscription: app.Subscription) {
+/**
+ * Tells the Cumulus admin that a Data Slice has been created
+ */
+export async function sendDataRequest({
+    subscription,
+    baseUrl,
+    createdBy,
+    groupName
+}: {
+    subscription: Parameters<typeof DataRequestNotification>[0]["subscription"] & { id: number }
+    baseUrl     : string
+    createdBy  ?: string
+    groupName  ?: string
+}) {
     return sendEmail({
         from   : config.appEmail,
         to     : config.cumulusAdminEmail,
-        subject: "New Request for Cumulus Data",
-        html   : generateHtml(<DataRequestNotification subscription={ subscription } />)
+        subject: `New Data Slice: ${subscription.name}`,
+        html   : generateHtml(
+            <DataRequestNotification
+                subscription={ subscription }
+                url={ appUrl(`requests/${subscription.id}`, baseUrl).href }
+                createdBy={ createdBy }
+                groupName={ groupName }
+            />
+        )
     })
 }
 

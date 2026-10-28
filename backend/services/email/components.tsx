@@ -1,6 +1,6 @@
-import moment  from "moment"
-import config  from "../../config"
-import { app } from "../../types"
+import moment     from "moment"
+import config     from "../../config"
+import { appUrl } from "../../lib"
 
 
 export function UserInvitation({
@@ -90,13 +90,13 @@ export function GraphsAccessNotification({
 
             { graphId.length ?
                 graphId.map((id, i) => {
-                    const href = new URL("/views/" + id, baseUrl).href
+                    const href = appUrl("views/" + id, baseUrl).href
                     return <div key={i}>
                         <a href={href} target="_blank">{href}</a>
                     </div>
                 }) :
                 (() => {
-                    const href = new URL("/views/", baseUrl).href
+                    const href = appUrl("views/", baseUrl).href
                     return <div>
                         <a href={href} target="_blank">{href}</a>
                     </div>
@@ -113,21 +113,34 @@ export function GraphsAccessNotification({
     )
 }
 
-export function DataRequestNotification({ subscription }: { subscription: app.Subscription }) {
+export function DataRequestNotification({
+    subscription,
+    url,
+    createdBy,
+    groupName
+}: {
+    subscription: {
+        name        : string
+        description?: string | null
+        dataURL    ?: string | null
+        createdAt  ?: Date | string
+    }
+    url         : string
+    createdBy  ?: string
+    groupName  ?: string
+}) {
     return (
         <>
-            <h2>New Data Request</h2>
-            <h3>{ subscription.name }</h3>
+            <h2>New Data Slice</h2>
+            <h3><a href={ url } target="_blank">{ subscription.name }</a></h3>
             { subscription.description && <p style={{ color: "#999" }}>{ subscription.description }</p> }
-            <hr />
-            <List name="Requested data from the following data sites" items={ subscription.requestedData?.dataSites } />
-            <List name="Requested Demographics"                       items={ subscription.requestedData?.fields.demographics } />
-            <List name="Requested Labs"                               items={ subscription.requestedData?.fields.labs } />
-            <List name="Requested Diagnoses"                          items={ subscription.requestedData?.fields.diagnoses } />
-            <List name="Requested Immunizations"                      items={ subscription.requestedData?.fields.immunizations } />
-            <List name="Requested Procedures"                         items={ subscription.requestedData?.fields.procedures } />
-            <List name="Requested Medications"                        items={ subscription.requestedData?.fields.medications } />
-            <List name="Requested Computable Phenotypes"              items={ subscription.requestedData?.fields.phenotypes } />
+            <p>
+                <b>Created by: </b>{ createdBy || "Unknown user" }<br />
+                <b>Created at: </b>{ moment(subscription.createdAt).utc().format("YYYY-MM-DD HH:mm [UTC]") }<br />
+                <b>Slice Group: </b>{ groupName || "None" }
+                { subscription.dataURL && <><br /><b>Data URL: </b>{ subscription.dataURL }</> }
+            </p>
+            <p><a href={ url } target="_blank">{ url }</a></p>
         </>
     );
 }
@@ -169,8 +182,8 @@ export function LineLevelDataRequest({
     dataElements: any[],
     baseUrl     : string
 }) {
-    const subscriptionUrl = new URL(`/requests/${subscription.id}`, baseUrl)
-    const chartUrl = new URL(`/views/${view.id}`, baseUrl)
+    const subscriptionUrl = appUrl(`requests/${subscription.id}`, baseUrl)
+    const chartUrl = appUrl(`views/${view.id}`, baseUrl)
 
     return (
         <>
