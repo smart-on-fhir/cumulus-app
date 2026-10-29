@@ -13,7 +13,7 @@ import { sql as logSql }                                        from "../service
 import * as logger                                              from "../services/logger"
 import { sendDataRequest }                                      from "../services/email"
 import ImportJob                                                from "../DataManager/ImportJob"
-import { getFindOptions, assert, rw, uInt, bool, cached, getRequestBaseURL } from "../lib"
+import { getFindOptions, assert, uInt, bool, cached, getRequestBaseURL } from "../lib"
 import { version as pkgVersion }                                from "../../package.json"
 import { DATA_TYPES }                                           from "../DataManager/dataTypes"
 import { request }                                              from "../aggregator"
@@ -111,7 +111,7 @@ function slug(str: string) {
 
 
 // Views -----------------------------------------------------------------------
-router.get("/:id/views", rw(async (req: AppRequest, res: Response) => {
+router.get("/:id/views", async (req: AppRequest, res: Response) => {
     const options = getFindOptions(req);
     const views = await ViewModel.scope({ method: ['visible', req.user] }).findAll({
         ...options,
@@ -119,10 +119,10 @@ router.get("/:id/views", rw(async (req: AppRequest, res: Response) => {
         user: req.user,
     });
     res.json(views);
-}));
+});
 
 // Export Data endpoint --------------------------------------------------------
-router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
+router.get("/:id/data", async (req: AppRequest, res: Response) => {
     requestPermission({ user: req.user, resource: "Subscriptions", action: "export" })
     const model = await Model.findByPk(req.params.id, { ...getFindOptions(req), user: req.user })
     assert(model, "Model not found", NotFound)
@@ -191,7 +191,7 @@ router.get("/:id/data", rw(async (req: AppRequest, res: Response) => {
     }
     loop()
 
-}));
+});
 
 // By Group --------------------------------------------------------------------
 route(router, {
@@ -280,7 +280,7 @@ route(router, {
 router.put(
     "/:id/data",
     express.raw({ limit: "100MB" }),
-    rw(async (req: AppRequest, res: Response) => {
+    async (req: AppRequest, res: Response) => {
         const jobId = String(req.headers["x-job-id"] || "");
         
         // if job is passed in - continue
@@ -297,7 +297,7 @@ router.put(
             const job = await ImportJob.create();
             await job.handle(req, res);
         }
-    })
+    }
 );
 
 function getPkgData(packageId: string) {
@@ -340,13 +340,13 @@ function getPkgData(packageId: string) {
     }
 }
 
-router.get("/pkg-api", rw(async (req: AppRequest, res: Response) => {
+router.get("/pkg-api", async (req: AppRequest, res: Response) => {
     const packageId = String(req.query.pkg || "")
     return getPkgData(packageId)(req, res)
-}))
+})
 
 // Data API endpoint -----------------------------------------------------------
-router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
+router.get("/:id/api", async (req: AppRequest, res: Response) => {
 
     const subscription = await Model.findByPk(req.params.id, { user: req.user })
 
@@ -609,9 +609,9 @@ router.get("/:id/api", rw(async (req: AppRequest, res: Response) => {
         counts,
         data
     });
-}));
+});
 
-router.get("/:id/raw-data", rw(async (req: AppRequest, res: Response) => {
+router.get("/:id/raw-data", async (req: AppRequest, res: Response) => {
 
     const subscription = await Model.findByPk(req.params.id, { user: req.user })
 
@@ -659,7 +659,7 @@ router.get("/:id/raw-data", rw(async (req: AppRequest, res: Response) => {
         }
         return row
     }));
-}));
+});
 
 // Get all ---------------------------------------------------------------------
 route(router, {

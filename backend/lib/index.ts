@@ -1,5 +1,5 @@
 import crypto                                from "crypto"
-import { Request, RequestHandler, Response } from "express"
+import { Request, Response }                 from "express"
 import {
     FindAttributeOptions,
     FindOptions,
@@ -159,14 +159,6 @@ export function getFindOptions(req: Request): FindOptions
     }
 
     return options;
-}
-
-/**
- * Creates and returns a route-wrapper function that allows for using an async
- * route handlers without try/catch.
- */
-export function rw(fn: RequestHandler): RequestHandler {
-    return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 }
 
 export function assert(condition: any, error?: string | ErrorConstructor, ctor = Error): asserts condition {

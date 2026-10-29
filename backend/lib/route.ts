@@ -69,11 +69,8 @@ export function route(router: Router, options: {
     }
 
     // Handler -------------------------------------------------------------
-    middlewares.push((req, res, next) => {
-        Promise.resolve(options.handler(req, res, next)).catch(error => {
-            return next(error)
-        })
-    })
+    // Express 5 forwards rejected promises to the error handlers
+    middlewares.push(options.handler)
 
     router[options.method](options.path, middlewares)
 }

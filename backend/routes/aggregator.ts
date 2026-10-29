@@ -1,5 +1,4 @@
 import express, { Router }           from "express"
-import { rw }                        from "../lib"
 import { download, proxyMiddleware } from "../aggregator"
 import { humanizeColumnName }        from "../DataManager/lib";
 import * as library                  from "../cumulus_library_columns.json"
@@ -29,12 +28,12 @@ const AGGREGATOR_PATHS = [
     "/static/catalog/loinc"
 ];
 
-router.get(AGGREGATOR_PATHS, rw(proxyMiddleware()))
+router.get(AGGREGATOR_PATHS, proxyMiddleware())
 
-router.get("/from-parquet", rw(download))
+router.get("/from-parquet", download)
 
-router.get("/data-packages"    , rw(proxyMiddleware((packages: DataPackage[]) => packages.map(fixDataPackage))))
-router.get("/data-packages/:id", rw(proxyMiddleware((pkg: DataPackage) => fixDataPackage(pkg))))
+router.get("/data-packages"    , proxyMiddleware((packages: DataPackage[]) => packages.map(fixDataPackage)))
+router.get("/data-packages/:id", proxyMiddleware((pkg: DataPackage) => fixDataPackage(pkg)))
 
 export default router
 
