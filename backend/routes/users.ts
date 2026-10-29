@@ -65,7 +65,7 @@ route(router, {
 
 // Activate account ------------------------------------------------------------
 route(router, {
-    path: "/activate/:code?",
+    path: "/activate{/:code}",
     method: "get",
     request: {
         schema: {

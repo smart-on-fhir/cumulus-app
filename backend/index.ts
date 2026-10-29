@@ -123,7 +123,7 @@ function setupStaticContent(app: Application)
     app.use(express.static(staticPath));
     
     // Serve the index.html file for all other requests
-    app.get("*", (req, res) => res.sendFile("index.html", { root: staticPath }));
+    app.get("/{*splat}", (req, res) => res.sendFile("index.html", { root: staticPath }));
     
     // Declare the static content hosted
     logger.verbose("✔ Static content hosted");

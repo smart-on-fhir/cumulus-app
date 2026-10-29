@@ -29,6 +29,18 @@ export function route(router: Router, options: {
     // Request validation --------------------------------------------------
     if (options.request?.schema) {
         middlewares.push(
+            // Express 5 makes req.query a getter that parses the URL again on
+            // every read, so values converted by sanitizers like toInt or
+            // toBoolean would be lost. Replace it with a plain object.
+            (req, res, next) => {
+                Object.defineProperty(req, "query", {
+                    value: { ...req.query },
+                    writable: true,
+                    enumerable: true,
+                    configurable: true
+                })
+                next()
+            },
             // @ts-ignore
             checkSchema(options.request.schema),
             (req, res, next) => {
@@ -38,9 +50,8 @@ export function route(router: Router, options: {
                 // }
                 // handle the request as usual
 
-                const errors = validationResult(req).formatWith(({ location, msg, param, value, nestedErrors }) => {
-                    // Build your resulting errors however you want! String, object, whatever - it works!
-                    return `${param}: ${msg}`;
+                const errors = validationResult(req).formatWith(error => {
+                    return error.type === "field" ? `${error.path}: ${error.msg}` : error.msg;
                 });
         
                 if (errors.isEmpty()) {
