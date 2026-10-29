@@ -66,6 +66,7 @@ export default defineConfig(({ mode }) => {
       REACT_APP_BACKEND_HOST: JSON.stringify(process.env.REACT_APP_BACKEND_HOST || (mode === "test" ? "http://localhost:5555" : "")),
       REACT_APP_NOTEBOOK_URL: JSON.stringify(process.env.REACT_APP_NOTEBOOK_URL || ""),
       VITE_APP_PREFIX       : JSON.stringify(VITE_APP_PREFIX),
+      SURVIVAL_CHARTS       : JSON.stringify(process.env.SURVIVAL_CHARTS === "true"),
     },
   }
 })

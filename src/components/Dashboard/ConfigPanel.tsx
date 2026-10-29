@@ -152,6 +152,16 @@ export interface ChartConfigPanelState {
     inspection     : app.Inspection
 }
 
+/**
+ * The chart types to choose from. New survival charts can only be created when
+ * the SURVIVAL_CHARTS build flag is on, but existing ones stay editable.
+ */
+export function getChartTypes(currentType: string, survivalCharts = SURVIVAL_CHARTS): SupportedChartType[] {
+    return (Object.keys(SupportedChartTypes) as SupportedChartType[]).filter(
+        type => type !== "survival" || survivalCharts || currentType === "survival"
+    )
+}
+
 export default function ConfigPanel({
     cols,
     state,
@@ -226,7 +236,7 @@ export default function ConfigPanel({
                         <Select
                             value={ state.chartType }
                             onChange={ onChartTypeChange }
-                            options={Object.keys(SupportedChartTypes).map((type, i) => ({
+                            options={getChartTypes(chartType).map(type => ({
                                 value: type,
                                 label: SupportedChartTypes[type as SupportedChartType],
                                 icon: ChartIcons[type as keyof typeof ChartIcons],

@@ -11,6 +11,8 @@ declare global {
     const REACT_APP_BACKEND_HOST: string;
     const REACT_APP_NOTEBOOK_URL: string;
     const VITE_APP_PREFIX: string;
+    /** Whether new survival charts can be created (set at build time) */
+    const SURVIVAL_CHARTS: boolean;
 }
 
 export declare module app {

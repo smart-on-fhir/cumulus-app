@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import ConfigPanel from "./ConfigPanel"
+import ConfigPanel, { getChartTypes } from "./ConfigPanel"
 
 
 // Mock useAuth globally for all tests
@@ -286,5 +286,22 @@ describe("swapping the X axis and stratifier columns", () => {
     expect(swap.getAttribute("data-tooltip")).toMatch(/follow-up time on the X axis/)
     await userEvent.click(swap)
     expect(onChange).not.toHaveBeenCalled()
+  })
+})
+
+// New survival charts need the SURVIVAL_CHARTS build flag
+describe("chart types", () => {
+  it("leave out survival charts without the flag", () => {
+    const types = getChartTypes("column", false)
+    expect(types).not.toContain("survival")
+    expect(types).toContain("column")
+  })
+
+  it("include survival charts with the flag", () => {
+    expect(getChartTypes("column", true)).toContain("survival")
+  })
+
+  it("keep survival charts that already exist editable without the flag", () => {
+    expect(getChartTypes("survival", false)).toContain("survival")
   })
 })
