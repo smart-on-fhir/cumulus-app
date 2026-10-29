@@ -44,7 +44,7 @@ export class BulkDelete extends Command
     }
     
     async execute() {
-        if (window.confirm("Yre you sure you want to delete these graphs?")) {
+        if (window.confirm("Are you sure you want to delete these graphs?")) {
             return request(`/api/views?id=${this.graphs.map(g => g.id).join(",")}`, { method: "DELETE" }).then(() => {
                 window.location.reload()
             })

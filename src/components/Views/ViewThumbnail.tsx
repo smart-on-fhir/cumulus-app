@@ -59,7 +59,7 @@ export default function ViewThumbnail({
             })}
             title={ showDescription ? undefined : view.description || undefined }
             onClick={e => {
-                if (selection && e.metaKey) {
+                if (selection && (e.metaKey || e.ctrlKey)) {
                     e.preventDefault()
                     selection.toggle(view)
                 }
