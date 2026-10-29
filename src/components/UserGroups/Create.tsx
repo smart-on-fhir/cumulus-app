@@ -8,7 +8,7 @@ export default function Create()
     return createCreatePage<app.UserGroup>({
         endpoint    : "/api/user-groups",
         namePlural  : "User Groups",
-        basePath    : "/user-groups",
+        basePath    : "/admin/user-groups",
         nameSingular: "User Group",
         renderForm  : props => <Form { ...props } />
     })

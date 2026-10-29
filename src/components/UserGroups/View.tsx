@@ -16,7 +16,7 @@ export default function View() {
         namePlural  : "User Groups",
         icon        : <i className="fa-solid fa-user-friends color-brand-2" />,
         query       : "users=true",
-        basePath    : "/user-groups",
+        basePath    : "/admin/user-groups",
         canUpdate,
         canDelete,
         renderView  : data => <>
