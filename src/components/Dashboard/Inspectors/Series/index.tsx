@@ -14,7 +14,7 @@ import {
     SeriesOptionsType,
     SeriesPieOptions
 } from "highcharts"
-import { getColorForSeries, getIndexOfSeriesId, getSeriesById, getSeriesUpdater } from "../lib"
+import { getColorForSeries, getIndexOfSeriesId, getSeriesById, getSeriesPlotOptionsById, getSeriesUpdater } from "../lib"
 import Collapse from "../../../generic/Collapse"
 import PropertyGrid from "../../../generic/PropertyGrid"
 import { Tabs } from "../../../generic/Tabs"
@@ -121,7 +121,8 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
         // },
         {
             ...DEFS.opacity,
-            value: series.opacity ?? 1,
+            // Falls back to the chart type default, e.g. 0.3 for survival charts
+            value: series.opacity ?? (getSeriesPlotOptionsById(options, seriesId) as typeof series).opacity ?? 1,
             onChange: (opacity: number) => onSeriesChange({ opacity })
         },
         {
@@ -141,6 +142,11 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
             // @ts-ignore
             disabled: !!series.colorByPoint || isBool(),
             onChange: (color: string) => {
+                // Confidence bands take their curve's color, unless they have
+                // their own (an empty one follows the curve again)
+                if (series.custom?.isConfidenceBand) {
+                    return onSeriesChange({ custom: { color } })
+                }
                 const colors = [...options.colors!]
                 colors[seriesIndex % colors.length] = color
                 onChange({ colors })

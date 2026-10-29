@@ -11,6 +11,8 @@ declare global {
     const REACT_APP_BACKEND_HOST: string;
     const REACT_APP_NOTEBOOK_URL: string;
     const VITE_APP_PREFIX: string;
+    /** Whether new survival charts can be created (set at build time) */
+    const SURVIVAL_CHARTS: boolean;
 }
 
 export declare module app {
@@ -118,6 +120,10 @@ export declare module app {
         denominator ?: string
         column2    ?: string // Extra Column
         column2type?: string // Extra Column render as
+        statusColumn?: string // Survival charts: event/censored column
+        eventValue?: string // Survival charts: the statusColumn value meaning "event"
+        survivalBands?: boolean // Survival charts: show 95% confidence bands
+        survivalRiskTable?: boolean // Survival charts: show the number at risk under the chart
         caption?: string // HTML chart caption
         seriesVisibility?: Record<string, boolean>
         ranges?: RangeOptions

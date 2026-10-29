@@ -1,6 +1,7 @@
 import { BrowserRouter }             from "react-router-dom"
 import { render }                    from "@testing-library/react"
 import { getDefaultChartOptions }    from "./Charts/DefaultChartOptions"
+import { getCaptionForChartType, SURVIVAL_CAPTION } from "./Charts/Survival"
 import Dashboard, { DashboardProps } from "."
 import { app }                       from "../../types"
 import { AuthProvider }              from "../../auth"
@@ -29,6 +30,7 @@ describe("Dashboard", () => {
         "spline"       : "spline",
         "area"         : "area",
         "areaspline"   : "areaspline",
+        "survival"     : "line",
         "column"       : "column",
         "column3d"     : "column",
         "columnStack"  : "column",
@@ -55,6 +57,45 @@ describe("Dashboard", () => {
             ).toBe(type)
         })
     }
+
+    it ("survival charts use left steps and connect nulls by default", () => {
+        const options = getDefaultChartOptions("survival", {}, true)
+        expect(options.plotOptions?.line?.step).toBe("left")
+        expect(options.plotOptions?.line?.connectNulls).toBe(true)
+        expect(options.plotOptions?.line?.opacity).toBe(0.7)
+        expect(options.plotOptions?.line?.shadow).toEqual({ color: "#000000", opacity: 0.4, offsetX: 1, offsetY: 1, width: 1 })
+        expect(options.plotOptions?.line?.marker?.enabled).toBe(false)
+    })
+
+    it ("switching from survival to line chart removes the survival defaults", () => {
+        const options = getDefaultChartOptions("line", getDefaultChartOptions("survival", {}, true), true)
+        expect(options.plotOptions?.line?.step).toBe(false)
+        expect(options.plotOptions?.line?.connectNulls).toBe(false)
+        expect(options.plotOptions?.line?.opacity).toBe(1)
+        expect(options.plotOptions?.line?.shadow).toBe(false)
+        expect(options.plotOptions?.line?.marker?.enabled).toBeUndefined()
+    })
+})
+
+describe("Survival chart caption", () => {
+
+    it ("is added when changing to a survival chart without a caption", () => {
+        expect(getCaptionForChartType("", "line", "survival")).toBe(SURVIVAL_CAPTION)
+        expect(getCaptionForChartType("<br>", "line", "survival")).toBe(SURVIVAL_CAPTION)
+    })
+
+    it ("does not replace an existing caption", () => {
+        expect(getCaptionForChartType("<p>Mine</p>", "line", "survival")).toBe("<p>Mine</p>")
+    })
+
+    it ("is removed when changing to another type, unless it was edited", () => {
+        expect(getCaptionForChartType(SURVIVAL_CAPTION, "survival", "column")).toBe("")
+        expect(getCaptionForChartType("<p>Edited</p>", "survival", "column")).toBe("<p>Edited</p>")
+    })
+
+    it ("leaves other chart types alone", () => {
+        expect(getCaptionForChartType("", "line", "column")).toBe("")
+    })
 })
 
 describe("Chart View", () => {

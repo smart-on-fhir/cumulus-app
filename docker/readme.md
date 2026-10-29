@@ -116,6 +116,15 @@ the app is "mounted". It must not have leading or trailing slashes. Example: `ne
 Use this when you are building multiple images to be hosted under the same domain and
 different base path.
 
+### SURVIVAL_CHARTS
+Set this to `true` to offer "Survival Chart" as a chart type when creating charts.
+It is off by default. Existing survival charts are rendered and can be edited
+either way. This is read when the frontend is built, so it must be passed as a
+build argument, and changing it requires a new build:
+```sh
+docker build -t dashboard-prod -f docker/backend.prod.Dockerfile --build-arg SURVIVAL_CHARTS=true .
+```
+
 ## Full .env File Template
 ```
 # Database

@@ -75,8 +75,11 @@ export function proxyMiddleware(transform?: (body: unknown) => any) {
                 res.writeHead(response.status, { 'Content-Type': 'text/plain', "X-Upstream": baseUrl });
                 res.end(body);
             } else {
+                // Transform before writing the head, so a failed (or async)
+                // transform can still be reported with a proper status
+                const output = transform ? await transform(body) : body
                 res.writeHead(response.status, { 'Content-Type': 'application/json', "X-Upstream": baseUrl });
-                res.end(JSON.stringify(transform ? transform(body) : body, null, 4));
+                res.end(JSON.stringify(output, null, 4));
             }
         } catch (ex) {
             console.error('Error with proxy request:', ex);

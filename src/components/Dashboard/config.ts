@@ -15,6 +15,7 @@ export const SupportedChartTypes = {
     spline       : "Soft Line Chart",
     area         : "Area Chart",
     areaspline   : "Soft Area Chart",
+    survival     : "Survival Chart",
 
     column       : "Column Chart",
     column3d     : "Column Chart 3D",
@@ -39,6 +40,7 @@ export const ChartIcons = {
     spline       : `${prefix}/icons/line_chart.png`,
     area         : `${prefix}/icons/area_chart.png`,
     areaspline   : `${prefix}/icons/area_chart.png`,
+    survival     : `${prefix}/icons/survival_chart.png`,
 
     column       : `${prefix}/icons/column_chart.png`,
     column3d     : `${prefix}/icons/column_chart.png`,
@@ -92,11 +94,13 @@ export const COLOR_THEMES = [
 export const DEFAULT_COLOR_THEME = "cumulus"
 
 export const INSPECTORS = {
-    xAxisTitle    : ".highcharts-xaxis .highcharts-axis-title",
+    // The "number at risk" rows of survival charts are x axes too, but not
+    // the one the x axis inspectors edit
+    xAxisTitle    : ".highcharts-xaxis:not(.survival-at-risk) .highcharts-axis-title",
     yAxisTitle    : ".highcharts-yaxis .highcharts-axis-title",
-    xAxis         : ".highcharts-xaxis, .highcharts-xaxis *",
+    xAxis         : ".highcharts-xaxis:not(.survival-at-risk), .highcharts-xaxis:not(.survival-at-risk) *",
     yAxis         : ".highcharts-yaxis, .highcharts-yaxis *",
-    xAxisLabels   : ".highcharts-xaxis-labels *",
+    xAxisLabels   : ".highcharts-xaxis-labels:not(.survival-at-risk) *",
     yAxisLabels   : ".highcharts-yaxis-labels *",
     xAxisGridLines: ".highcharts-xaxis-grid path",
     yAxisGridLines: ".highcharts-yaxis-grid path",

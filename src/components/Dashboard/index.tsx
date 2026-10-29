@@ -1,11 +1,14 @@
-import { useCallback, useEffect, useReducer }    from "react"
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react"
 import { useNavigate, Link }                     from "react-router-dom"
 import { Chart }                                 from "highcharts"
-import { buildChartOptions }                     from "./Charts/lib"
+import { buildChartOptions, removeSurvivalTitles } from "./Charts/lib"
+import { withRiskTable }                         from "./Charts/riskTable"
 import ConfigPanel                               from "./ConfigPanel"
 import BaseChart                                 from "./Charts/ChartFN"
 import CaptionEditor                             from "./CaptionEditor"
 import { getDefaultChartOptions }                from "./Charts/DefaultChartOptions"
+import { getCaptionForChartType }                from "./Charts/Survival"
+import { SurvivalData }                          from "./Charts/kaplanMeier"
 import { GraphBreadcrumbs }                      from "./GraphBreadcrumbs"
 import { GraphTitle }                            from "./GraphTitle"
 import { GraphDescription }                      from "./GraphDescription"
@@ -43,6 +46,7 @@ import {
     strip
 } from "../../utils"
 import {
+    CUMULUS__NONE,
     ReadOnlyPaths,
     SupportedChartTypes,
     SupportedNativeChartTypes,
@@ -68,9 +72,14 @@ export interface ViewState
     denominator      : app.DenominatorType
     column2         ?: app.SubscriptionDataColumn
     column2type     ?: keyof typeof SupportedChartTypes
+    statusColumn    ?: app.SubscriptionDataColumn
+    eventValue       : string
+    survivalBands    : boolean
+    survivalRiskTable: boolean
     caption          : string
     data             : app.ServerResponses.DataResponse | null
     data2            : app.ServerResponses.StratifiedDataResponse | null
+    survivalData    ?: SurvivalData | null
     loadingData      : boolean
     dataTabIndex     : number
     tags             : Pick<app.Tag, "id"|"name"|"description">[]
@@ -121,6 +130,9 @@ function getViewReducer({
                     sortBy          : currentState.sortBy,
                     limit           : currentState.limit,
                     offset          : currentState.offset,
+                    isSurvival      : currentState.chartType === "survival",
+                    survivalData    : currentState.survivalData,
+                    survivalBands   : currentState.survivalBands,
                     onSeriesToggle,
                     onInspectionChange,
                 })
@@ -155,6 +167,9 @@ function getViewReducer({
                         sortBy          : state.sortBy,
                         limit           : state.limit,
                         offset          : state.offset,
+                        isSurvival      : state.chartType === "survival",
+                        survivalData    : state.survivalData,
+                        survivalBands   : state.survivalBands,
                         onSeriesToggle,
                         onInspectionChange,
                     })
@@ -182,7 +197,15 @@ function getViewReducer({
 
             const chartType = action.payload
 
-            const nextState = { ...state, chartType };
+            const nextState = {
+                ...state,
+                chartType,
+                caption: getCaptionForChartType(state.caption, state.chartType, chartType)
+            };
+
+            if (state.chartType === "survival" && chartType !== "survival") {
+                nextState.chartOptions = removeSurvivalTitles(nextState.chartOptions)
+            }
 
             if (chartType.startsWith("pie") || chartType.startsWith("donut")) {
                 nextState.viewGroupBy = undefined
@@ -206,6 +229,9 @@ function getViewReducer({
                     sortBy          : nextState.sortBy,
                     limit           : nextState.limit,
                     offset          : nextState.offset,
+                    isSurvival      : nextState.chartType === "survival",
+                    survivalData    : nextState.survivalData,
+                    survivalBands   : nextState.survivalBands,
                     onSeriesToggle,
                     onInspectionChange,
                 })
@@ -240,6 +266,8 @@ function getViewReducer({
                 "denominator",
                 "data",
                 "data2",
+                "survivalData",
+                "survivalBands",
                 // "column"
                 "inspection",
                 "sortBy",
@@ -269,6 +297,9 @@ function getViewReducer({
                     sortBy          : nextState.sortBy,
                     limit           : nextState.limit,
                     offset          : nextState.offset,
+                    isSurvival      : nextState.chartType === "survival",
+                    survivalData    : nextState.survivalData,
+                    survivalBands   : nextState.survivalBands,
                     onSeriesToggle,
                     onInspectionChange,
                 })
@@ -456,6 +487,12 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         // secondary data type
         column2type: viewSettings.column2type,
 
+        // survival charts: the event/censored column and its "event" value
+        statusColumn: cols.find(c => c.name === viewSettings.statusColumn),
+        eventValue: viewSettings.eventValue || "",
+        survivalBands: !!viewSettings.survivalBands,
+        survivalRiskTable: !!viewSettings.survivalRiskTable,
+
         // View caption if any
         caption: viewSettings.caption || "",
         
@@ -529,6 +566,10 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         denominator,
         column2,
         column2type,
+        statusColumn,
+        eventValue,
+        survivalBands,
+        survivalRiskTable,
         caption,
         data,
         data2,
@@ -546,9 +587,17 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     } = state;
 
     const stratifierName = viewGroupBy?.name
+    const statusColumnName = chartType === "survival" ? statusColumn?.name || "" : ""
     const secColumnName  = column2?.name || ""
     const viewColumnName = viewColumn.name
     const requestId      = subscription?.id || dataPackage?.id
+
+    // The rendered chart only: the saved options keep a single x axis
+    const renderedChartOptions = useMemo(() => {
+        return chartType === "survival" && survivalRiskTable ?
+            withRiskTable(state.chartOptions) :
+            state.chartOptions
+    }, [chartType, survivalRiskTable, state.chartOptions])
 
     const runtimeView: Partial<app.View> = {
         id         : view.id,
@@ -567,6 +616,10 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             denominator,
             column2: secColumnName,
             column2type,
+            statusColumn: statusColumn?.name || "",
+            eventValue,
+            survivalBands,
+            survivalRiskTable,
             caption,
             ranges,
             sortBy,
@@ -697,6 +750,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             loadingDataError: null,
             data : null,
             data2: null,
+            survivalData: null,
         }})
 
         const fetchPrimaryData = async () => fetchChartData({
@@ -722,12 +776,48 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             })
         }
 
+        // Survival charts: the primary query split into events and censored records
+        const fetchSurvivalData = async (): Promise<SurvivalData | null> => {
+            if (!statusColumnName || !eventValue) return null
+            const [events, censored] = await Promise.all([
+                fetchChartData({
+                    subscription,
+                    dataPackage,
+                    column    : viewColumnName,
+                    stratifier: stratifierName,
+                    filters   : [...filterParams, `${statusColumnName}:strEq:${eventValue}`],
+                    label     : "Chart Survival Events",
+                    signal
+                }),
+                fetchChartData({
+                    subscription,
+                    dataPackage,
+                    column    : viewColumnName,
+                    stratifier: stratifierName,
+                    filters   : [
+                        ...filterParams,
+                        `${statusColumnName}:strNotEq:${eventValue}`,
+                        `${statusColumnName}:strNotEq:${CUMULUS__NONE}`
+                    ],
+                    label     : "Chart Survival Censored",
+                    signal
+                })
+            ])
+            return {
+                events,
+                censored,
+                status: { label: statusColumn?.label || statusColumnName, eventValue }
+            }
+        }
+
         return Promise.all([
             fetchPrimaryData(),
-            fetchSecondaryData()
+            fetchSecondaryData(),
+            fetchSurvivalData()
         ]).then(([
             primaryData,
-            secondaryData
+            secondaryData,
+            survivalData
         ]) => {
             if (signal?.aborted) return
             try {
@@ -742,6 +832,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             dispatch({ type: "UPDATE", payload: {
                 data : primaryData,
                 data2: secondaryData,
+                survivalData,
                 loadingData: false
             }})
         }).catch(error => {
@@ -753,13 +844,35 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         })
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [requestId, stratifierName, viewColumnName, filter, secColumnName]);
+    }, [requestId, stratifierName, viewColumnName, filter, secColumnName, statusColumnName, eventValue]);
 
     useEffect(() => {
         const controller = new AbortController()
         loadData(controller.signal)
         return () => controller.abort()
     }, [loadData])
+
+    // Survival charts: load the values of the status column, so that the user
+    // can pick the one that means "event"
+    const [statusValues, setStatusValues] = useState<string[] | null>(null)
+    useEffect(() => {
+        setStatusValues(null)
+        if (!statusColumnName) return
+        const controller = new AbortController()
+        fetchChartData({
+            subscription,
+            dataPackage,
+            column: statusColumnName,
+            label : "Survival Status Values",
+            signal: controller.signal
+        }).then((data: app.ServerResponses.DataResponse) => {
+            setStatusValues((data.data[0]?.rows || []).map(row => String(row[0])).filter(v => v !== CUMULUS__NONE))
+        }).catch(() => {
+            if (!controller.signal.aborted) setStatusValues([])
+        })
+        return () => controller.abort()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [requestId, statusColumnName])
 
     useEffect(() => {
         if (copy) {
@@ -859,6 +972,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                     <div className="dashboard-sidebar">
                         <ConfigPanel
                             cols={cols}
+                            statusValues={statusValues}
                             viewType={viewType}
                             view={view}
                             onChartTypeChange={ (type: string) => dispatch({ type: "SET_CHART_TYPE", payload: type }) }
@@ -886,6 +1000,10 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                 denominator,
                                 column2: column2?.name || "",
                                 column2type,
+                                statusColumn: statusColumn?.name || "",
+                                eventValue,
+                                survivalBands,
+                                survivalRiskTable,
                                 tags,
                                 ranges: hasRanges(data, data2) ? ranges : null,
                                 visualOverrides: state.visualOverrides,
@@ -902,6 +1020,10 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                     viewGroupBy    : cols.find(c => c.name === state.stratifyBy),
                                     filters        : [...state.filters],
                                     denominator    : state.denominator,
+                                    statusColumn   : cols.find(c => c.name === state.statusColumn),
+                                    eventValue     : state.eventValue,
+                                    survivalBands  : state.survivalBands,
+                                    survivalRiskTable: state.survivalRiskTable,
                                     tags           : state.tags,
                                     visualOverrides: state.visualOverrides,
                                     sortBy         : state.sortBy,
@@ -973,7 +1095,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
 
                         { viewColumn && viewType === "overview" && <BaseChart
                             loading={ loadingData }
-                            options={ state.chartOptions }
+                            options={ renderedChartOptions }
                             visualOverrides={ state.visualOverrides }
                             onInspectionChange={ state.inspection.enabled ? onInspectionChange : undefined }
                             isDraft={ isDraft }

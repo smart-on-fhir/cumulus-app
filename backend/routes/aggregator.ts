@@ -1,5 +1,6 @@
 import express, { Router }           from "express"
 import { download, proxyMiddleware } from "../aggregator"
+import { verifyColumnTypes }         from "../aggregatorColumnTypes"
 import { humanizeColumnName }        from "../DataManager/lib";
 import * as library                  from "../cumulus_library_columns.json"
 
@@ -33,7 +34,10 @@ router.get(AGGREGATOR_PATHS, proxyMiddleware())
 router.get("/from-parquet", download)
 
 router.get("/data-packages"    , proxyMiddleware((packages: DataPackage[]) => packages.map(fixDataPackage)))
-router.get("/data-packages/:id", proxyMiddleware((pkg: DataPackage) => fixDataPackage(pkg)))
+// TEMPORARY: verifyColumnTypes corrects aggregator types the data disproves
+// (see aggregatorColumnTypes.ts). It reads the package's data, so it runs here
+// and not for the whole list.
+router.get("/data-packages/:id", proxyMiddleware((pkg: DataPackage) => verifyColumnTypes(fixDataPackage(pkg))))
 
 export default router
 
@@ -71,8 +75,9 @@ function fixDataPackage(pkg: DataPackage) {
             // Add the name to the object (instead of only using the key)
             col.name = name; 
 
-            // Try to detect the column dataType
-            col.dataType = detectColumnDataType(name, col.type);
+            // The dashboard's name for the type the aggregator declares. Name-based
+            // corrections are verified separately, for single packages only
+            col.dataType = toDashboardDataType(col.type);
 
             // Try in this order: aggregator label, generated humanized name
             col.label = col.label || humanizeColumnName(name);
@@ -85,27 +90,7 @@ function fixDataPackage(pkg: DataPackage) {
     };
 }
 
-function detectColumnDataType(name: string, type: string): string {
-
-    const keywords: [RegExp, string][] = [
-        [/(?:\b|_)(group|range)(?:\b|_)/i                , 'string' ],
-        [/(?:\b|_)year(?:\b|_)/i                         , 'date:YYYY'],
-        [/(?:\b|_)month(?:\b|_)/i                        , 'date:YYYY-MM'],
-        [/(?:\b|_)(week|day|date)(?:\b|_)/i              , 'date:YYYY-MM-DD'],
-        [/(?:\b|_)(age|days|years|months|weeks)(?:\b|_)/i, 'integer'],
-        [/(?:\b|_)(daily|yearly|monthly|weekly)(?:\b|_)/i, 'integer'],
-        [/(?:\b|_)(period|ordinal|count|cnt)(?:\b|_)/i   , 'integer'],
-        [/(?:\b|_)(int|integer)(?:\b|_)/i                , 'integer'],
-        [/(?:\b|_)float(?:\b|_)/i                        , 'float'  ],
-        [/(?:\b|_)(bool|boolean)(?:\b|_)/i               , 'boolean'],
-        [/^(is|has|not|was)(?:\b|_)/i                    , 'boolean'],
-    ];
-
-    for (const [re, dataType] of keywords) {
-        if (name.match(re)) {
-            return dataType
-        }
-    }
+export function toDashboardDataType(type: string): string {
 
     // Convert aggregator types to dashboard types
     if (type === "year") {
@@ -120,6 +105,5 @@ function detectColumnDataType(name: string, type: string): string {
         return "date:YYYY-MM-DD"
     }
 
-    // return original type if no special match is detected
     return type;
 }

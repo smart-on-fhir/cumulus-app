@@ -1,5 +1,26 @@
 import moment                               from "moment"
 import { Color, merge, Series }             from "highcharts"
+import { compareDurations, parseDuration }  from "./duration"
+import { getCountsByTime, lifeTable, logRankTest, SurvivalData } from "./kaplanMeier"
+import { getDurationTitle, isDurationTitle }        from "../columnRoles"
+
+/**
+ * The default Y axis title of survival charts
+ */
+export const SURVIVAL_Y_TITLE = "Survival"
+
+/**
+ * Removes the default survival axis titles (but not ones the user has set).
+ * Used when switching from a survival chart to another chart type.
+ */
+export function removeSurvivalTitles(options: Highcharts.Options): Highcharts.Options {
+    // @ts-ignore
+    const xTitle = options.xAxis?.title?.text, yTitle = options.yAxis?.title?.text
+    return merge(options, {
+        xAxis: isDurationTitle(xTitle)     ? { title: { text: "" } } : {},
+        yAxis: yTitle === SURVIVAL_Y_TITLE ? { title: { text: "" } } : {}
+    })
+}
 import Highcharts                           from "../../../highcharts"
 import { lengthToEm, roundToPrecision }     from "../../../utils"
 import { app }                              from "../../../types"
@@ -23,6 +44,15 @@ type SeriesOptions = (
     Highcharts.SeriesColumnOptions |
     Highcharts.SeriesBarOptions
 );
+
+/**
+ * Survival charts warn about groups with fewer records than this
+ */
+export const MIN_SURVIVAL_GROUP_SIZE = 10
+
+function escapeHtml(input: string) {
+    return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+}
 
 export function emToPx(em: number) {
     return Math.round(DEFAULT_FONT_SIZE * em) + "px"
@@ -258,7 +288,8 @@ function getXAxis({
     data2,
     limit,
     offset,
-    sortBy
+    sortBy,
+    isSurvival
 }: {
     xType: "category" | "linear" | "datetime"
     data: app.ServerResponses.DataResponse
@@ -266,6 +297,7 @@ function getXAxis({
     limit?: number
     offset?: number
     sortBy?: string
+    isSurvival?: boolean
 }): string[] {
     const ticks = new Map<string, any>()
 
@@ -297,6 +329,12 @@ function getXAxis({
     }
 
     let arr = Array.from(ticks.keys());
+
+    // Survival time always runs forward, and the survival estimate needs every
+    // time point, so sortBy, limit and offset do not apply
+    if (isSurvival) {
+        return arr.sort(compareDurations)
+    }
 
     // At this point we have a set of unique axis labels, but we also need to
     // sort them if this is a category axis
@@ -361,12 +399,15 @@ function getSeriesAndExceptions({
     ranges = {},
     sortBy,
     limit,
-    offset
+    offset,
+    isSurvival,
+    survivalData,
+    survivalBands
 }: {
     data            : app.ServerResponses.DataResponse
     data2           : app.ServerResponses.StratifiedDataResponse | null
     column          : app.SubscriptionDataColumn
-    type            : SupportedNativeChartTypes 
+    type            : SupportedNativeChartTypes
     denominator     : app.DenominatorType
     column2type    ?: keyof typeof SupportedChartTypes
     xType           : "category" | "linear" | "datetime"
@@ -375,13 +416,38 @@ function getSeriesAndExceptions({
     sortBy          : string
     limit           : number
     offset          : number
+    isSurvival     ?: boolean
+    survivalData   ?: SurvivalData | null
+    survivalBands  ?: boolean
 }): { series: SeriesOptions[], exceptions: Set<string> }
 {
     let series: SeriesOptions[] = []
 
     const exceptions: Set<string> = new Set();
 
-    let xTicks = getXAxis({ xType, data, data2, limit, offset, sortBy })
+    let xTicks = getXAxis({ xType, data, data2, limit, offset, sortBy, isSurvival })
+
+    if (isSurvival) {
+        const invalid = xTicks.filter(x => parseDuration(x) === null)
+        if (invalid.length) {
+            const examples = invalid.slice(0, 3).map(x => `"${escapeHtml(x + "")}"`).join(", ")
+            exceptions.add(
+                `<b>${escapeHtml(column.label || column.name)}</b> does not look like a duration ` +
+                `(found ${examples}${invalid.length > 3 ? ", ..." : ""}), so this will not be a proper survival chart`
+            )
+        }
+        if (!survivalData) {
+            exceptions.add("Select a Status Column and an Event Value to compute the survival curve. Showing counts for now.")
+        }
+        // Usually means the saved Event Value no longer exists in the data
+        else if (!survivalData.events.rowCount) {
+            const { label, eventValue } = survivalData.status ?? { label: "status", eventValue: "the selected Event Value" }
+            exceptions.add(
+                `No records have <b>${escapeHtml(label)}</b> equal to <b>${escapeHtml(eventValue)}</b>, ` +
+                `so the survival curves cannot drop. Check the Event Value.`
+            )
+        }
+    }
 
     function addSeries(options: any, secondary = false) {
 
@@ -389,7 +455,6 @@ function getSeriesAndExceptions({
         // @ts-ignore
         const prev = serverOptions.plotOptions?.[options.type || "series"] ?? {}
 
-        // @ts-ignore
         const themeId = serverOptions.custom?.theme || DEFAULT_COLOR_THEME
 
         const themeColors = COLOR_THEMES.find(t => t.id === themeId)!.colors
@@ -472,36 +537,58 @@ function getSeriesAndExceptions({
         })
     }
 
+    // Survival charts: the survival curve (in %) of one series instead of its counts
+    function toSurvivalPoints(stratifier?: string) {
+        const table = lifeTable(
+            xTicks.map(String),
+            getCountsByTime(survivalData!.events, stratifier),
+            getCountsByTime(survivalData!.censored, stratifier)
+        )
+        const rows = table.map(r => [r.x, r.survival === null ? null : r.survival * 100] as [string, number | null])
+        const points = ticksToPoints(rows, {}, { isStratified: stratifier !== undefined })
+        points.forEach((point: any, i) => {
+            if (point) point.custom.survival = table[i]
+        })
+        return points
+    }
+
+    const showSurvival = !!(isSurvival && survivalData)
+
     function stratify(data: app.ServerResponses.StratifiedDataResponse, secondary = false) {
 
         const denominatorCache = {}
         
         data.data.forEach(group => {
-            const id   = (secondary ? "secondary-" : "primary-") + group.stratifier
+            // The aggregator returns stratifier values with their JSON type,
+            // e.g. 12 or true, so they are not always strings
+            const stratifier = String(group.stratifier)
+            const id   = (secondary ? "secondary-" : "primary-") + stratifier
             const old  = serverOptions.series?.find(s => s.id === id)
             const rows = group.rows
 
             filterOutExceptions({
                 rows,
-                seriesName: old?.name ?? group.stratifier,
+                seriesName: old?.name ?? stratifier,
                 column,
                 exceptions,
                 xType
             })
 
-            const name = String(old?.name ?? group.stratifier.replace(CUMULUS__NONE, "none*"))
+            const name = String(old?.name ?? stratifier.replace(CUMULUS__NONE, "none*"))
 
             addSeries({
                 id,
                 name,
                 type    : secondary ? (column2type || "spline").replace(/(Stack|3d|Stack3d)$/, "") as SupportedNativeChartTypes : type,
-                linkedTo: secondary ? "primary-" + group.stratifier : undefined,
+                linkedTo: secondary ? "primary-" + stratifier : undefined,
                 zIndex  : secondary ? 0 : 1,
-                data    : ticksToPoints(rows, denominatorCache, { isStratified: true })
+                data    : showSurvival && !secondary ?
+                    toSurvivalPoints(stratifier) :
+                    ticksToPoints(rows, denominatorCache, { isStratified: true })
             }, secondary)
 
-            if (ranges?.enabled) {
-                const _id  = (secondary ? "secondary-" : "primary-") + group.stratifier + " (range)"
+            if (ranges?.enabled && !isSurvival) {
+                const _id  = (secondary ? "secondary-" : "primary-") + stratifier + " (range)"
                 const old = serverOptions.series?.find(s => s.id === _id)
                 addSeries({
                     type    : ranges.type ?? "errorbar",
@@ -533,7 +620,7 @@ function getSeriesAndExceptions({
                 xType
             })
 
-            const seriesData = ticksToPoints(rows, denominatorCache);
+            const seriesData = showSurvival ? toSurvivalPoints() : ticksToPoints(rows, denominatorCache);
 
             if (type === "pie" && sortBy.startsWith("x:")) {
                 // @ts-ignore
@@ -549,14 +636,13 @@ function getSeriesAndExceptions({
                 colorByPoint: (type === "column" || type === "bar") ?
                     // @ts-ignore
                     old?.colorByPoint === undefined ?
-                        // @ts-ignore    
                         data.data.length === 1 && xType === "category" && seriesData.length <= 12 && serverOptions.custom?.theme :
                         // @ts-ignore
                         !!old.colorByPoint :
                     type === "pie",
             });
 
-            if (ranges?.enabled) {
+            if (ranges?.enabled && !isSurvival) {
                 const id  = "primary-" + name + " (range)"
                 const old = serverOptions.series?.find(s => s.id === id)
                 addSeries({
@@ -591,12 +677,78 @@ function getSeriesAndExceptions({
         }
     }
 
+    // Survival charts: small groups are shown, but their curves are uncertain
+    if (showSurvival) {
+        const small = series
+            .map((s: any) => [s.name, s.data?.find((p: any) => p?.custom?.survival)?.custom.survival.atRisk ?? 0])
+            .filter(([, n]) => n > 0 && n < MIN_SURVIVAL_GROUP_SIZE)
+        if (small.length) {
+            exceptions.add(
+                `Small group${small.length > 1 ? "s" : ""} (fewer than ${MIN_SURVIVAL_GROUP_SIZE}): ` +
+                small.map(([name, n]) => `<b>${escapeHtml(String(name))}</b> (n=${n})`).join(", ") +
+                `. ${small.length > 1 ? "Their curves" : "Its curve"}` +
+                (series.length > 1 ? " and the log-rank p-value are" : small.length > 1 ? " are" : " is") +
+                " less reliable."
+            )
+        }
+    }
+
+    // Survival charts: left steps are the only correct way to draw the curves,
+    // even if another step was saved for a series
+    if (isSurvival) {
+        series.forEach((s: any) => {
+            if (s.type === "line") {
+                s.step = "left"
+            }
+        })
+    }
+
+    // Survival charts: 95% confidence bands. Added after all the curves, so
+    // that they don't shift the colors of the curves.
+    if (showSurvival && survivalBands) {
+        series.slice().forEach((curve: any) => {
+            const id  = curve.id + " (95% CI)"
+            // Saved options win over these defaults (addSeries would let
+            // anything passed here override them)
+            const old: any = serverOptions.series?.find(s => s.id === id)
+            addSeries({
+                type               : "arearange",
+                id,
+                name               : old?.name ?? curve.name + " (95% CI)",
+                linkedTo           : curve.id,
+                // A band follows its curve's color unless the user picked one
+                // for it (the series inspector saves that in custom.color)
+                color              : old?.custom?.color || curve.color,
+                custom             : { ...old?.custom, isConfidenceBand: true },
+                zIndex             : 0,
+                step               : "left",
+                lineWidth          : old?.lineWidth ?? 0.2,
+                fillOpacity        : old?.fillOpacity ?? 0.15,
+                connectNulls       : true,
+                enableMouseTracking: false,
+                marker             : { enabled: false },
+                data: curve.data.map((point: any) => {
+                    const row = point?.custom?.survival
+                    if (!row || row.ciLow === null) {
+                        return null
+                    }
+                    return {
+                        ...(point.x !== undefined ? { x: point.x } : {}),
+                        name: point.name,
+                        low : row.ciLow  * 100,
+                        high: row.ciHigh * 100
+                    }
+                })
+            })
+        })
+    }
+
     return { series, exceptions }
 }
 
 function computeColors(chartType: string, series: any[], options: any)
 {
-    // @ts-ignore What theme is currently being used
+    // What theme is currently being used
     const themeId = options.custom?.theme || DEFAULT_COLOR_THEME
 
     const themeColors = COLOR_THEMES.find(t => t.id === themeId)!.colors
@@ -637,7 +789,10 @@ export function buildChartOptions({
     inspection,
     sortBy,
     limit,
-    offset
+    offset,
+    isSurvival,
+    survivalData,
+    survivalBands
 }: {
     data               : app.ServerResponses.DataResponse
     data2              : app.ServerResponses.StratifiedDataResponse | null
@@ -654,15 +809,33 @@ export function buildChartOptions({
     limit              : number
     offset             : number
     onInspectionChange?: (inspection: string[], context: Partial<app.InspectionContext>) => void
+    isSurvival        ?: boolean
+    survivalData      ?: SurvivalData | null
+    survivalBands     ?: boolean
 }): Highcharts.Options
 {
     const xType = getXType(column);
+
+    // Survival charts have no denominator, even if one was saved
+    if (isSurvival) {
+        denominator = ""
+    }
+
+    // Survival curves are shown as % of each series
+    const isPercent = !!denominator || !!(isSurvival && survivalData)
+
+    // Survival charts: default axis titles, unless the user has set their own
+    // @ts-ignore
+    const xTitle = options.xAxis?.title?.text, yTitle = options.yAxis?.title?.text
+    const survivalXTitle = isSurvival && (!xTitle || isDurationTitle(xTitle)) ? getDurationTitle(column) : undefined
+    const survivalYTitle = isSurvival && survivalData && !yTitle ? SURVIVAL_Y_TITLE : undefined
 
     // const is3d = !!options.chart?.options3d?.enabled
 
     const { series, exceptions } = getSeriesAndExceptions({
         data,
-        data2,
+        // Survival charts have no secondary data, even if some was saved
+        data2: isSurvival ? null : data2,
         column,
         type,
         denominator,
@@ -672,12 +845,31 @@ export function buildChartOptions({
         ranges,
         sortBy,
         limit,
-        offset
+        offset,
+        isSurvival,
+        survivalData,
+        survivalBands
     });
 
     const [col, dir] = (sortBy || "").split(":")
 
     const maxPointLength = Math.max(...series.map(s => s.data!.length))
+
+    // Survival charts: the log-rank test of the curves
+    const logRank = isSurvival && survivalData ? logRankTest(
+        series
+            .filter((s: any) => s.type === "line" && s.data?.some((p: any) => p?.custom?.survival))
+            .map((s: any) => s.data.map((p: any) => p?.custom?.survival ?? { atRisk: 0, events: 0 }))
+    ) : null
+
+    // The log-rank sentences are suggested as subtitles (custom.subtitleSuggestions),
+    // and a subtitle that is one of them is kept up to date, or removed when
+    // there is no p-value anymore
+    const logRankSentences = logRank ? getLogRankSentences(logRank.p) : null
+    const logRankKind = getLogRankSentenceKind(options.subtitle?.text || "")
+    const logRankSubtitle = logRankKind ?
+        { subtitle: { text: logRankSentences?.[logRankKind] ?? "" } } :
+        {}
 
     const dynamicOptions: Highcharts.Options = {
         chart: {
@@ -685,6 +877,7 @@ export function buildChartOptions({
                 type: xType === 'category' ? undefined : 'x'
             }
         },
+        ...logRankSubtitle,
         colors: computeColors(type, series, options),
         title: {
             style: {
@@ -693,15 +886,19 @@ export function buildChartOptions({
             }
         },
         yAxis: {
-            allowDecimals: denominator ? true : false,
+            allowDecimals: isPercent,
+            // Survival is always shown on a full 0-100% axis
+            softMin: isSurvival && survivalData ? 0   : undefined,
+            softMax: isSurvival && survivalData ? 100 : undefined,
             labels: {
-                format: denominator ? "{text}%" : "{text}",
+                format: isPercent ? "{text}%" : "{text}",
                 style: {
                     // @ts-ignore
                     fontSize: lengthToEm(options.yAxis?.labels?.style?.fontSize ?? "1em") + "em"
                 }
             },
             title: {
+                ...(survivalYTitle ? { text: survivalYTitle } : {}),
                 style: {
                     // @ts-ignore
                     fontSize: lengthToEm(options.yAxis?.title?.style?.fontSize ?? "1.2em") + "em"
@@ -774,7 +971,7 @@ export function buildChartOptions({
                     // rows.push(`<tr><td style="text-align:right">X:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
                     rows.push(`<b>${groupBy.label || groupBy.name}: ${this.series.name}</b><hr/></td></tr>`)
                 } else {
-                    rows.push(`<b>${this.series.name}: Count</b><hr/></td></tr>`)
+                    rows.push(`<b>${this.series.name}: ${this.custom?.survival ? "Survival" : "Count"}</b><hr/></td></tr>`)
                 }
                 //     rows.push(`<b>${x}</b><hr/></td></tr>`)
                 // } else {
@@ -790,13 +987,27 @@ export function buildChartOptions({
                 // }
 
                 // Value -------------------------------------------------------
-                // @ts-ignore
-                if (!this.custom?.isErrorRange) {
+                // Survival ----------------------------------------------------
+                const survival = this.custom?.survival
+                if (survival) {
+                    rows.push(
+                        `<tr><td style="text-align:right">Survival:</td><td style="width: 100%"><b>${Math.round(this.y!)}%</b></td></tr>`,
+                        `<tr style="opacity:0.6"><td style="text-align:right">At risk:</td><td><b>${roundToPrecision(survival.atRisk, 3).toLocaleString()}</b></td></tr>`,
+                        `<tr style="opacity:0.6"><td style="text-align:right">Events:</td><td><b>${roundToPrecision(survival.events, 3).toLocaleString()}</b></td></tr>`,
+                        `<tr style="opacity:0.6"><td style="text-align:right">No event:</td><td><b>${roundToPrecision(survival.censored, 3).toLocaleString()}</b></td></tr>`
+                    )
+                    if (survivalBands && survival.ciLow !== null) {
+                        rows.splice(rows.length - 3, 0,
+                            `<tr style="opacity:0.6"><td style="text-align:right">95% CI:</td><td><b>${Math.round(survival.ciLow * 100)}% – ${Math.round(survival.ciHigh * 100)}%</b></td></tr>`
+                        )
+                    }
+                }
+
+                else if (!this.custom?.isErrorRange) {
                     rows.push(
                         `<tr><td style="text-align:right">Count:</td>`,
                         `<td style="width: 100%"><b>${
                             denominator ?
-                                // @ts-ignore
                                 roundToPrecision(this.custom?.data?.cnt, 3).toLocaleString() + " (" + roundToPrecision(this.y!, 3) + "%)" :
                                 roundToPrecision(this.y!, 3).toLocaleString()
                         }</b></td></tr>`
@@ -804,7 +1015,6 @@ export function buildChartOptions({
                 }
 
                 // Range -------------------------------------------------------
-                // @ts-ignore
                 const { data: { low, high, lowPct, highPct } = {}, denominator: d } = this.custom || {}
 
                 if (high !== undefined && low !== undefined) {
@@ -822,9 +1032,7 @@ export function buildChartOptions({
                 }
 
                 // Denominator -------------------------------------------------
-                // @ts-ignore
                 if (denominator && this.custom?.denominator) {
-                    // @ts-ignore
                     rows.push(`<tr style="opacity:0.6"><td style="text-align:right">Denominator:</td><td><b>${roundToPrecision(this.custom.denominator, 2).toLocaleString()}</b></td></tr>`)
                 }
                 
@@ -838,6 +1046,11 @@ export function buildChartOptions({
             // reversed: col === "x" ? (type === "bar" ? true : dir === "asc") : false,
             // reversed: type === "bar" && dir !== "desc",
             reversed: (() => {
+                // Survival time always runs left to right
+                if (isSurvival) {
+                    return false;
+                }
+
                 if (col !== 'x') {
                     return undefined;
                 }
@@ -855,16 +1068,28 @@ export function buildChartOptions({
                 }
             },
             title: {
+                ...(survivalXTitle ? { text: survivalXTitle } : {}),
                 style: {
                     // @ts-ignore
                     fontSize: lengthToEm(options.xAxis?.title?.style?.fontSize ?? "1em") + "em"
                 }
             },
         },
+        custom: {
+            isSurvival: !!isSurvival,
+            // Offered in the subtitle field of the config panel
+            subtitleSuggestions: logRankSentences ? [logRankSentences.short, logRankSentences.long] : []
+        },
         legend: {
             // @ts-ignore - a hack to force highcharts to reflow the legend
             dirty: Date.now(),
             enabled: options.legend?.enabled ?? series.length <= 30,
+            // Survival curves show the size of their group, e.g. "SHH (n=16)".
+            // Not used when the legend has its own labelFormat.
+            labelFormatter() {
+                const row = (this as any).options?.data?.find?.((p: any) => p?.custom?.survival)?.custom.survival
+                return row ? `${this.name} (n=${row.atRisk.toLocaleString()})` : this.name
+            },
             events: {
                 // Series visibility is kept in the chart options (so that it
                 // is saved), so the default toggle is replaced with a state
@@ -980,4 +1205,57 @@ export function buildChartOptions({
     })
 
     return result
+}
+
+/**
+ * Formats a p-value the way it is usually reported, e.g. "p = 0.04",
+ * "p = 0.003" or "p < 0.001"
+ */
+export function formatPValue(p: number): string
+{
+    if (p < 0.001) {
+        return "p < 0.001"
+    }
+    return "p = " + p.toFixed(p < 0.01 ? 3 : 2)
+}
+
+/**
+ * The subtitles a survival chart offers for its log-rank p-value: the result
+ * alone, and the same with what it means. Neither judges whether the curves
+ * differ, so they never contradict what the chart shows.
+ *
+ *     "Log-rank test: p = 0.32"
+ *     "Differences at least this large would occur by chance 32% of the time
+ *      if all groups had the same survival (log-rank p = 0.32)."
+ */
+export function getLogRankSentences(p: number): { short: string, long: string }
+{
+    const percent = p < 0.001 ?
+        "less than 0.1%" :
+        (p < 0.01 ? Number((p * 100).toFixed(1)) : Math.round(p * 100)) + "%"
+    return {
+        short: `Log-rank test: ${formatPValue(p)}`,
+        long : `Differences at least this large would occur by chance ${percent} of the ` +
+               `time if all groups had the same survival (log-rank ${formatPValue(p)}).`
+    }
+}
+
+const P_VALUE = String.raw`p (= (0\.\d{2,3}|1\.00)|< 0\.001)`
+
+/**
+ * Which of the log-rank subtitles (see getLogRankSentences) a text is exactly,
+ * so it can be kept up to date. Any change to its words makes it the user's.
+ */
+export function getLogRankSentenceKind(text: string): "short" | "long" | null
+{
+    if (new RegExp(`^Log-rank test: ${P_VALUE}$`).test(text)) {
+        return "short"
+    }
+    if (new RegExp(
+        String.raw`^Differences at least this large would occur by chance (less than 0\.1|\d+(\.\d)?)% of the ` +
+        String.raw`time if all groups had the same survival \(log-rank ${P_VALUE}\)\.$`
+    ).test(text)) {
+        return "long"
+    }
+    return null
 }

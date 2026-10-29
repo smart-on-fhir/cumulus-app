@@ -17,6 +17,7 @@ import Chart              from "./Inspectors/Chart"
 import { AllPlotLines }   from "./Inspectors/AxisPlotLines"
 import { DEFS }           from "./Schema"
 import { AllSeries }      from "./Inspectors/Series"
+import { isDurationColumn, isStatusColumn, suggestedFirst } from "./columnRoles"
 import {
     DashStyleValue,
     merge,
@@ -139,12 +140,26 @@ export interface ChartConfigPanelState {
     denominator    : string
     column2        : string
     column2type   ?: string
+    statusColumn   : string
+    eventValue     : string
+    survivalBands  : boolean
+    survivalRiskTable: boolean
     annotations    : app.Annotation[]
     xCol           : app.SubscriptionDataColumn
     tags           : Pick<app.Tag, "id"|"name"|"description">[]
     ranges         : app.RangeOptions | null
     visualOverrides: app.VisualOverridesState
     inspection     : app.Inspection
+}
+
+/**
+ * The chart types to choose from. New survival charts can only be created when
+ * the SURVIVAL_CHARTS build flag is on, but existing ones stay editable.
+ */
+export function getChartTypes(currentType: string, survivalCharts = SURVIVAL_CHARTS): SupportedChartType[] {
+    return (Object.keys(SupportedChartTypes) as SupportedChartType[]).filter(
+        type => type !== "survival" || survivalCharts || currentType === "survival"
+    )
 }
 
 export default function ConfigPanel({
@@ -154,7 +169,8 @@ export default function ConfigPanel({
     onChartTypeChange,
     onChartOptionsChange,
     onRangeOptionsChange,
-    onSecondaryDataOptionsChange
+    onSecondaryDataOptionsChange,
+    statusValues
 } : {
     cols: app.SubscriptionDataColumn[]
     view?: Partial<app.View>
@@ -165,6 +181,12 @@ export default function ConfigPanel({
     onChartOptionsChange: (options: Options) => void
     onRangeOptionsChange: (ranges: app.RangeOptions) => void
     onSecondaryDataOptionsChange: (payload: { column?: string, type?: string }) => void
+
+    /**
+     * Survival charts: the values of the selected status column, or null
+     * while loading
+     */
+    statusValues?: string[] | null
 }) {
 
     const { chartOptions, chartType } = state;
@@ -173,6 +195,7 @@ export default function ConfigPanel({
     const isColumn      = chartType.startsWith("column")
     const isPie         = chartType.startsWith("pie") || chartType.startsWith("donut")
     const isStack       = chartType.endsWith("Stack")
+    const isSurvival    = chartType === "survival"
     const isBarOrColumn = isBar || isColumn
     const xType         = getXType(cols.find(c => c.name === state.groupBy)!)
     const isCategory    = xType === "category"
@@ -213,7 +236,7 @@ export default function ConfigPanel({
                         <Select
                             value={ state.chartType }
                             onChange={ onChartTypeChange }
-                            options={Object.keys(SupportedChartTypes).map((type, i) => ({
+                            options={getChartTypes(chartType).map(type => ({
                                 value: type,
                                 label: SupportedChartTypes[type as SupportedChartType],
                                 icon: ChartIcons[type as keyof typeof ChartIcons],
@@ -236,22 +259,25 @@ export default function ConfigPanel({
                         <label>Chart Subtitle</label>
                         <input
                             type="text"
+                            list="chart-subtitle-suggestions"
                             value={ chartOptions.subtitle?.text || "" }
                             onChange={ e => onChartOptionsChange({ subtitle: { text: e.target.value }})}
                         />
+                        { /* Subtitles the chart suggests (see custom.subtitleSuggestions) */ }
+                        <datalist id="chart-subtitle-suggestions">
+                            { (chartOptions.custom?.subtitleSuggestions || []).map((text: string) => <option key={ text } value={ text } />) }
+                        </datalist>
                         <br/>
                     </div>
 
                     <div className="mt-1">
                         <label>Color Theme</label>
                         <Select
-                            // @ts-ignore
                             value={ state.chartOptions.custom?.theme ?? DEFAULT_COLOR_THEME }
                             onChange={ (id) => {
                                 const theme = COLOR_THEMES.find(t => t.id === id)
                                 onChartOptionsChange({
                                     colors: theme!.colors,
-                                    // @ts-ignore
                                     custom: { theme: id }
                                 })
                             }}
@@ -391,25 +417,46 @@ export default function ConfigPanel({
                     </div>
                     <div style={{ position: "relative" }}>
                         { state.stratifyBy && <div className="dashboard-sidebar-swap-btn-wrap">
-                            <div className="fas fa-exchange-alt" onClick={() => {
-                                onChange({
-                                    ...state,
-                                    groupBy: state.stratifyBy,
-                                    stratifyBy: state.groupBy,
-                                })
-                            }} data-tooltip="Swap selected columns" />
+                            { /* Survival charts need the follow-up time on the X axis, so
+                                 its column can't trade places with the stratifier */ }
+                            <div
+                                className={ "fas fa-exchange-alt" + (isSurvival ? " disabled" : "") }
+                                aria-disabled={ isSurvival }
+                                onClick={() => {
+                                    if (!isSurvival) {
+                                        onChange({
+                                            ...state,
+                                            groupBy: state.stratifyBy,
+                                            stratifyBy: state.groupBy,
+                                        })
+                                    }
+                                }}
+                                data-tooltip={ isSurvival ?
+                                    "Survival charts need the follow-up time on the X axis, so it can't be swapped with the stratifier" :
+                                    "Swap selected columns" }
+                            />
                         </div> }
                         <div className="pt-1">
                             <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
                             <ColumnSelector
                                 cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max" && c.dataType !== "hidden") }
+                                comparator={ isSurvival ? suggestedFirst(isDurationColumn) : undefined }
                                 value={ state.groupBy }
-                                disabled={[ "cnt", state.stratifyBy, state.column2 ].filter(Boolean)}
+                                disabled={[
+                                    "cnt",
+                                    state.stratifyBy,
+                                    state.column2,
+                                    isSurvival ? state.statusColumn : "",
+                                    // Survival time must be a duration (number or numeric label like ">=5")
+                                    ...(isSurvival ? cols.filter(c => !["integer", "float", "string"].includes(c.dataType)).map(c => c.name) : [])
+                                ].filter(Boolean)}
                                 onChange={ (groupBy: string) => onChange({ ...state, groupBy, offset: 0, limit: 0, sortBy: "x:asc" }) }
                             />
                             <p className="small color-muted"> {
                                 isPie ?
                                     "Select which data column provides the slices of the pie" :
+                                isSurvival ?
+                                    "Select the column holding the time to event" :
                                     `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
                             }</p>
                         </div>
@@ -426,7 +473,8 @@ export default function ConfigPanel({
                                         "cnt_min",
                                         "cnt_max",
                                         state.groupBy,
-                                        state.column2
+                                        state.column2,
+                                        isSurvival ? state.statusColumn : ""
                                     ].filter(Boolean)}
                                     onChange={ (stratifyBy: string) => onChange({
                                         ...state,
@@ -438,68 +486,131 @@ export default function ConfigPanel({
                                     }) }
                                 />
                                 <p className="small color-muted">
-                                    Stratify the data into multiple series based on the chosen column. For example,
-                                    this would produce multiple lines in a line chart.
+                                    Used to stratify the data into multiple series
                                 </p>
                             </div>
-                            <label>Denominator</label>
-                            <Select
-                                options={[
-                                    {
-                                        label: <div>
-                                            <div>None</div>
-                                            <div className="small color-muted">
-                                                Render the aggregate counts as found in the<br/>
-                                                {Terminology.subscription.nameSingular.toLowerCase()} without further processing
-                                            </div>
-                                        </div>,
-                                        value: "",
-                                        icon: "fa-solid fa-percent grey-out"
-                                    },
-                                    {
-                                        label: <div>
-                                            <div>Stratified Count</div>
-                                            <div className="small color-muted">
-                                                Convert counts to percentage of the total<br />
-                                                count of every given data group.<br />
-                                                Not available with no stratifier.
-                                            </div>
-                                        </div>,
-                                        value: "count",
-                                        icon: "fa-solid fa-percent color-brand-2",
-                                        disabled: !state.stratifyBy
-                                    },
-                                    {
-                                        label: <div>
-                                            <div>Stratified Sum</div>
-                                            <div className="small color-muted">
-                                                Convert counts to percentage of the sum<br />
-                                                of values in every given data group.<br />
-                                                Not available with no stratifier.
-                                            </div>
-                                        </div>,
-                                        value: "local",
-                                        icon: "fa-solid fa-percent color-brand-2",
-                                        disabled: !state.stratifyBy
-                                    },
-                                    {
-                                        label: <div>
-                                            <div>Total Count</div>
-                                            <div className="small color-muted">
-                                                Convert counts to percentage of the total<br />
-                                                count within the entire dataset.
-                                            </div>
-                                        </div>,
-                                        value: "global",
-                                        icon: "fa-solid fa-percent color-blue"
-                                    }
-                                ]}
-                                value={ state.denominator }
-                                onChange={ denominator => onChange({ ...state, denominator })}
-                            />
-                            <p className="small color-muted">
-                                If set, renders the values as percentages of the given denominator
-                            </p>
+                            { isSurvival && <>
+                                <label>Status Column</label>
+                                <ColumnSelector
+                                    cols={ cols.filter(c => c.dataType !== "hidden") }
+                                    comparator={ suggestedFirst(isStatusColumn) }
+                                    placeholder="Select Column"
+                                    addEmptyOption="start"
+                                    value={ state.statusColumn }
+                                    disabled={[
+                                        "cnt",
+                                        "cnt_min",
+                                        "cnt_max",
+                                        state.groupBy,
+                                        state.stratifyBy,
+                                        ...cols.filter(c => c.dataType.startsWith("date")).map(c => c.name)
+                                    ].filter(Boolean)}
+                                    onChange={ (statusColumn: string) => onChange({ ...state, statusColumn: statusColumn || "", eventValue: "" }) }
+                                />
+                                <p className="small color-muted">
+                                    The column that tells whether the event happened for each record
+                                </p>
+                                { !!state.statusColumn && <div className="pt-1">
+                                    <label>Event Value</label>
+                                    <Select
+                                        placeholder={ statusValues ? "Select Value" : "Loading values..." }
+                                        disabled={ !statusValues }
+                                        value={ state.eventValue }
+                                        options={[
+                                            ...(statusValues || []),
+                                            // Keep a saved value even if it is no longer in the data
+                                            ...(state.eventValue && statusValues && !statusValues.includes(state.eventValue) ? [state.eventValue] : [])
+                                        ].map(value => ({
+                                            value,
+                                            icon : `${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/icons/cell.png`,
+                                            label: statusValues?.includes(value) ? value : `${value} (not found in the data)`
+                                        }))}
+                                        onChange={ (eventValue: string) => onChange({ ...state, eventValue }) }
+                                    />
+                                    <p className="small color-muted">
+                                        The value from the status column that means the event happened
+                                    </p>
+                                    { (statusValues?.length ?? 0) > 2 && <p className="small color-muted">
+                                        <i className="fa-solid fa-triangle-exclamation color-orange" /> This column has more than two
+                                        values ({ statusValues!.join(", ") }). Status columns are expected to have two: one for the
+                                        event and one for no event.
+                                    </p> }
+                                    <div className="pt-1">
+                                        <Checkbox
+                                            name="survivalBands"
+                                            label="Show 95% confidence bands"
+                                            checked={ state.survivalBands }
+                                            onChange={ survivalBands => onChange({ ...state, survivalBands }) }
+                                        />
+                                        <Checkbox
+                                            name="survivalRiskTable"
+                                            label="Show number at risk"
+                                            checked={ state.survivalRiskTable }
+                                            onChange={ survivalRiskTable => onChange({ ...state, survivalRiskTable }) }
+                                        />
+                                    </div>
+                                </div> }
+                            </> }
+                            { !isSurvival && <>
+                                <label>Denominator</label>
+                                <Select
+                                    options={[
+                                        {
+                                            label: <div>
+                                                <div>None</div>
+                                                <div className="small color-muted">
+                                                    Render the aggregate counts as found in the<br/>
+                                                    {Terminology.subscription.nameSingular.toLowerCase()} without further processing
+                                                </div>
+                                            </div>,
+                                            value: "",
+                                            icon: "fa-solid fa-percent grey-out"
+                                        },
+                                        {
+                                            label: <div>
+                                                <div>Stratified Count</div>
+                                                <div className="small color-muted">
+                                                    Convert counts to percentage of the total<br />
+                                                    count of every given data group.<br />
+                                                    Not available with no stratifier.
+                                                </div>
+                                            </div>,
+                                            value: "count",
+                                            icon: "fa-solid fa-percent color-brand-2",
+                                            disabled: !state.stratifyBy
+                                        },
+                                        {
+                                            label: <div>
+                                                <div>Stratified Sum</div>
+                                                <div className="small color-muted">
+                                                    Convert counts to percentage of the sum<br />
+                                                    of values in every given data group.<br />
+                                                    Not available with no stratifier.
+                                                </div>
+                                            </div>,
+                                            value: "local",
+                                            icon: "fa-solid fa-percent color-brand-2",
+                                            disabled: !state.stratifyBy
+                                        },
+                                        {
+                                            label: <div>
+                                                <div>Total Count</div>
+                                                <div className="small color-muted">
+                                                    Convert counts to percentage of the total<br />
+                                                    count within the entire dataset.
+                                                </div>
+                                            </div>,
+                                            value: "global",
+                                            icon: "fa-solid fa-percent color-blue"
+                                        }
+                                    ]}
+                                    value={ state.denominator }
+                                    onChange={ denominator => onChange({ ...state, denominator })}
+                                />
+                                <p className="small color-muted">
+                                    If set, renders the values as percentages of the given denominator
+                                </p>
+                            </> }
                             { state.ranges && <div className="pt-1">
                                 <label>Confidence Intervals</label>
                                 <Select value={ state.ranges?.type || "" } options={[
@@ -529,11 +640,12 @@ export default function ConfigPanel({
                                 </p>
                             </div> }
 
-                            <SecondaryDataEditor state={state} cols={[ ...cols ]} onChange={onSecondaryDataOptionsChange} />
+                            { !isSurvival && <SecondaryDataEditor state={state} cols={[ ...cols ]} onChange={onSecondaryDataOptionsChange} /> }
                         </> }
 
                         { isPie && <SliceEditor state={state} onChange={onChange} /> }
 
+                        { !isSurvival && <>
                         <div className="row half-gap">
                                 <div className="col col-5">
                                     <label>Sort {!!state.stratifyBy && state.sortBy.startsWith("y:") && <i className="fa fa-info-circle color-muted" data-tooltip="Sorting by count may produce unexpected results in stratified charts because every group is sorted separately." />}</label>
@@ -578,6 +690,7 @@ export default function ConfigPanel({
                             <p className="small color-muted">
                                 Use offset, limit, and sort to slice the dataset retrieved from the backend
                             </p>
+                        </> }
                         <br />
                     </div>
                 </Collapse>

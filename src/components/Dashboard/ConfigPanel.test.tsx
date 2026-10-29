@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import ConfigPanel from "./ConfigPanel"
+import ConfigPanel, { getChartTypes } from "./ConfigPanel"
 
 
 // Mock useAuth globally for all tests
@@ -50,6 +50,10 @@ const mockState: ChartConfigPanelState = {
   denominator: "",
   column2: "",
   column2type: undefined,
+  statusColumn: "",
+  eventValue: "",
+  survivalBands: false,
+  survivalRiskTable: false,
   annotations: [],
   xCol: { name: "age", label: "Age", dataType: "integer", description: "" },
   tags: [],
@@ -165,6 +169,26 @@ it("calls onChartOptionsChange when chart subtitle is changed", async () => {
   expect(onChartOptionsChange).toHaveBeenLastCalledWith({ subtitle: { text: "Chart Subtitle!" } })
 })
 
+// Charts can suggest subtitles, e.g. survival charts their log-rank sentences
+it("suggests the subtitles the chart offers", async () => {
+  const sentences = ["Log-rank test: p = 0.32", "Differences at least this large would occur by chance 32% of the time if all groups had the same survival (log-rank p = 0.32)."]
+  const { container } = render(
+    <ConfigPanel
+      cols={mockCols}
+      state={{ ...mockState, chartOptions: { ...mockState.chartOptions, custom: { subtitleSuggestions: sentences } } as any }}
+      viewType="overview"
+      onChange={onChange}
+      onChartTypeChange={onChartTypeChange}
+      onChartOptionsChange={onChartOptionsChange}
+      onRangeOptionsChange={onRangeOptionsChange}
+      onSecondaryDataOptionsChange={onSecondaryDataOptionsChange}
+    />
+  )
+  await userEvent.click(screen.getByText("Chart"))
+  const options = container.querySelectorAll("#chart-subtitle-suggestions option")
+  expect(Array.from(options).map(o => o.getAttribute("value"))).toEqual(sentences)
+})
+
 // Test legend toggle
 it("renders legend controls and calls onChartOptionsChange when legend is changed", async () => {
   render(
@@ -226,4 +250,58 @@ it("calls onChange when groupBy column is changed", async () => {
   const dateOption = screen.getAllByText(/Date/i)[0]
   await userEvent.click(dateOption)
   expect(onChange).toHaveBeenCalled()
+})
+
+// The X axis and stratifier columns can be swapped, except in survival charts
+describe("swapping the X axis and stratifier columns", () => {
+
+  async function renderPanel(chartType: string) {
+    const onChange = vi.fn()
+    const { container } = render(
+      <ConfigPanel
+        cols={mockCols}
+        state={{ ...mockState, chartType } as any}
+        viewType="overview"
+        onChange={onChange}
+        onChartTypeChange={onChartTypeChange}
+        onChartOptionsChange={onChartOptionsChange}
+        onRangeOptionsChange={onRangeOptionsChange}
+        onSecondaryDataOptionsChange={onSecondaryDataOptionsChange}
+      />
+    )
+    await userEvent.click(screen.getByText("Data"))
+    return { onChange, swap: container.querySelector(".dashboard-sidebar-swap-btn-wrap > div") as HTMLElement }
+  }
+
+  it("swaps them", async () => {
+    const { onChange, swap } = await renderPanel("column")
+    expect(swap.getAttribute("aria-disabled")).toBe("false")
+    await userEvent.click(swap)
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ groupBy: "gender", stratifyBy: "age" }))
+  })
+
+  it("is disabled in survival charts, and says why", async () => {
+    const { onChange, swap } = await renderPanel("survival")
+    expect(swap.getAttribute("aria-disabled")).toBe("true")
+    expect(swap.getAttribute("data-tooltip")).toMatch(/follow-up time on the X axis/)
+    await userEvent.click(swap)
+    expect(onChange).not.toHaveBeenCalled()
+  })
+})
+
+// New survival charts need the SURVIVAL_CHARTS build flag
+describe("chart types", () => {
+  it("leave out survival charts without the flag", () => {
+    const types = getChartTypes("column", false)
+    expect(types).not.toContain("survival")
+    expect(types).toContain("column")
+  })
+
+  it("include survival charts with the flag", () => {
+    expect(getChartTypes("column", true)).toContain("survival")
+  })
+
+  it("keep survival charts that already exist editable without the flag", () => {
+    expect(getChartTypes("survival", false)).toContain("survival")
+  })
 })
