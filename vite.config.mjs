@@ -1,12 +1,16 @@
 import "dotenv/config"
-import { defineConfig } from 'vite'
-import react            from '@vitejs/plugin-react-swc'
+import { defineConfig, loadEnv } from 'vite'
+import react                     from '@vitejs/plugin-react-swc'
 
 // VITE_APP_PREFIX must have no leading or trailing slash
 const VITE_APP_PREFIX = String(process.env.VITE_APP_PREFIX || "").replace(/^\/|\/$/, "");
 
 // @ts-ignore https://vite.dev/config/
 export default defineConfig(({ mode }) => {
+
+  // Shell variables win over the .env files. Builds run in production mode, so
+  // .env.development.local only applies to the dev server.
+  const { SURVIVAL_CHARTS } = loadEnv(mode, process.cwd(), "")
 
   return {
     root   : "./src",
@@ -66,7 +70,7 @@ export default defineConfig(({ mode }) => {
       REACT_APP_BACKEND_HOST: JSON.stringify(process.env.REACT_APP_BACKEND_HOST || (mode === "test" ? "http://localhost:5555" : "")),
       REACT_APP_NOTEBOOK_URL: JSON.stringify(process.env.REACT_APP_NOTEBOOK_URL || ""),
       VITE_APP_PREFIX       : JSON.stringify(VITE_APP_PREFIX),
-      SURVIVAL_CHARTS       : JSON.stringify(process.env.SURVIVAL_CHARTS === "true"),
+      SURVIVAL_CHARTS       : JSON.stringify(SURVIVAL_CHARTS === "true"),
     },
   }
 })
