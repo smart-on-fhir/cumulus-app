@@ -306,6 +306,65 @@ describe("Chart", () => {
         })
     })
 
+    describe("tooltip", () => {
+
+        function tooltip(point: any, { groupBy, denominator, dataType = "string" }: { groupBy?: any, denominator?: any, dataType?: any } = {}) {
+            const options = buildChartOptions({
+                type: "column",
+                data: { column: "t", filters: [], totalCount: 1, rowCount: 1, data: [{ rows: [["0", 1]] }] },
+                data2: null,
+                column: { name: "t", label: "Age", dataType, description: "" },
+                groupBy,
+                denominator,
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0
+            }) as any
+            const html: string = options.tooltip.formatter.call(
+                { color: "#123456", series: { name: "Series A", index: 0 }, ...point },
+                { chart: { options: { colors: [] } } }
+            )
+            // Just the text of each row
+            return html.split("</tr>").map(row => row.replace(/<[^>]+>/g, "").trim()).filter(Boolean)
+        }
+
+        it ("shows the series, the X value and the count", () => {
+            expect(tooltip({ name: "5 years", y: 1234 })).toEqual(["◉ Series A: Count", "Age:5 years", "Count:1,234"])
+        })
+
+        it ("names the stratifier in the header", () => {
+            const groupBy = { name: "gender", label: "Gender" }
+            expect(tooltip({ name: "5 years", y: 1 }, { groupBy })[0]).toBe("◉ Gender: Series A")
+        })
+
+        it ("shows the X value of linear axes", () => {
+            expect(tooltip({ x: 7, y: 1 }, { dataType: "integer" })[1]).toBe("Age:7")
+        })
+
+        it ("shows the count and the percentage with a denominator", () => {
+            const rows = tooltip({ name: "a", y: 25, custom: { data: { cnt: 50 }, denominator: 200 } }, { denominator: "global" })
+            expect(rows).toEqual(["◉ Series A: Count", "Age:a", "Count:50 (25%)", "Denominator:200"])
+        })
+
+        it ("shows the range of a point", () => {
+            const rows = tooltip({ name: "a", y: 5, custom: { data: { low: 4, high: 6.25 } } })
+            expect(rows).toEqual(["◉ Series A: Count", "Age:a", "Count:5", "Range:4 - 6.25"])
+        })
+
+        it ("shows the range in percent with a denominator", () => {
+            const rows = tooltip(
+                { name: "a", y: 5, custom: { data: { cnt: 10, low: 4, high: 6, lowPct: 2, highPct: 3 }, denominator: 200 } },
+                { denominator: "global" }
+            )
+            expect(rows).toContain("Range:2% - 3%")
+        })
+
+        it ("leaves out the count of error range points", () => {
+            const rows = tooltip({ name: "a", y: 5, custom: { isErrorRange: true, data: { low: 4, high: 6 } } })
+            expect(rows).toEqual(["◉ Series A: Count", "Age:a", "Range:4 - 6"])
+        })
+    })
+
     describe("survival charts", () => {
 
         function build(values: string[], isSurvival: boolean) {

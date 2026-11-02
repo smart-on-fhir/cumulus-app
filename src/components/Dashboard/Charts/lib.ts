@@ -918,87 +918,7 @@ export function buildChartOptions({
                 fontSize  : options.chart?.style?.fontSize   ?? emToPx(1),
                 fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
             },
-            formatter(ctx): any {
-                const rows = [];
-
-                let x: any
-                if (xType === "datetime") {
-                    x = this.name//moment(this.point.x).format("YYYY-MM-DD")
-                } else if (xType === "linear") {
-                    x = this.x
-                } else {
-                    x = this.name
-                }
-
-                // Bullet ------------------------------------------------------
-                rows.push(`<tr><td colspan="2"><b style="color:${
-                    // @ts-ignore
-                    this.color?.pattern?.color || this.series?.color?.stops?.[0]?.[1] || this.color ||
-                    ctx.chart.options.colors?.[this.series.index % ctx.chart.options.colors.length] || "#888888"
-                };-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
-                
-                // Header ------------------------------------------------------
-                if (groupBy) {
-                    rows.push(`<b>${groupBy.label || groupBy.name}: ${this.series.name}</b><hr/></td></tr>`)
-                } else {
-                    rows.push(`<b>${this.series.name}: ${this.custom?.survival ? "Survival" : "Count"}</b><hr/></td></tr>`)
-                }
-
-                // Group -------------------------------------------------------
-                rows.push(`<tr><td style="text-align:right">${column.label || column.name}:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
-
-                // Value -------------------------------------------------------
-                // Survival ----------------------------------------------------
-                const survival = this.custom?.survival
-                if (survival) {
-                    rows.push(
-                        `<tr><td style="text-align:right">Survival:</td><td style="width: 100%"><b>${Math.round(this.y!)}%</b></td></tr>`,
-                        `<tr style="opacity:0.6"><td style="text-align:right">At risk:</td><td><b>${roundToPrecision(survival.atRisk, 3).toLocaleString()}</b></td></tr>`,
-                        `<tr style="opacity:0.6"><td style="text-align:right">Events:</td><td><b>${roundToPrecision(survival.events, 3).toLocaleString()}</b></td></tr>`,
-                        `<tr style="opacity:0.6"><td style="text-align:right">No event:</td><td><b>${roundToPrecision(survival.censored, 3).toLocaleString()}</b></td></tr>`
-                    )
-                    if (survivalBands && survival.ciLow !== null) {
-                        rows.splice(rows.length - 3, 0,
-                            `<tr style="opacity:0.6"><td style="text-align:right">95% CI:</td><td><b>${Math.round(survival.ciLow * 100)}% – ${Math.round(survival.ciHigh * 100)}%</b></td></tr>`
-                        )
-                    }
-                }
-
-                else if (!this.custom?.isErrorRange) {
-                    rows.push(
-                        `<tr><td style="text-align:right">Count:</td>`,
-                        `<td style="width: 100%"><b>${
-                            denominator ?
-                                roundToPrecision(this.custom?.data?.cnt, 3).toLocaleString() + " (" + roundToPrecision(this.y!, 3) + "%)" :
-                                roundToPrecision(this.y!, 3).toLocaleString()
-                        }</b></td></tr>`
-                    )
-                }
-
-                // Range -------------------------------------------------------
-                const { data: { low, high, lowPct, highPct } = {}, denominator: d } = this.custom || {}
-
-                if (high !== undefined && low !== undefined) {
-                    if (denominator && d) {
-                        rows.push(
-                            `<tr style="opacity:0.6"><td style="text-align:right">Range:</td>` +
-                            `<td style="width: 100%"><b>${roundToPrecision(lowPct, 2) + "%"} - ${roundToPrecision(highPct, 2) + "%"}</b></td></tr>`
-                        )
-                    } else {
-                        rows.push(
-                            `<tr style="opacity:0.6"><td style="text-align:right">Range:</td>` +
-                            `<td style="width: 100%"><b>${roundToPrecision(low, 2).toLocaleString()} - ${roundToPrecision(high, 2).toLocaleString()}</b></td></tr>`
-                        )
-                    }
-                }
-
-                // Denominator -------------------------------------------------
-                if (denominator && this.custom?.denominator) {
-                    rows.push(`<tr style="opacity:0.6"><td style="text-align:right">Denominator:</td><td><b>${roundToPrecision(this.custom.denominator, 2).toLocaleString()}</b></td></tr>`)
-                }
-                
-                return `<table>${rows.join("")}</table>`
-            }
+            formatter: getTooltipFormatter({ xType, column, groupBy, denominator, survivalBands })
         },
         xAxis: {
             type: xType,
@@ -1158,6 +1078,107 @@ function preparePlotLines(
             }
         }
     })
+}
+
+/**
+ * The tooltip of a point: a table with its series, its X value, its count (or
+ * survival estimate) and, when available, its range and denominator
+ */
+function getTooltipFormatter({
+    xType,
+    column,
+    groupBy,
+    denominator,
+    survivalBands
+}: {
+    xType         : "category" | "linear" | "datetime"
+    column        : app.SubscriptionDataColumn
+    groupBy      ?: app.SubscriptionDataColumn
+    denominator  ?: app.DenominatorType
+    survivalBands?: boolean
+}): Highcharts.TooltipFormatterCallbackFunction
+{
+    return function(ctx): any {
+        const rows = [];
+
+        let x: any
+        if (xType === "datetime") {
+            x = this.name//moment(this.point.x).format("YYYY-MM-DD")
+        } else if (xType === "linear") {
+            x = this.x
+        } else {
+            x = this.name
+        }
+
+        // Bullet ------------------------------------------------------
+        rows.push(`<tr><td colspan="2"><b style="color:${
+            // @ts-ignore
+            this.color?.pattern?.color || this.series?.color?.stops?.[0]?.[1] || this.color ||
+            ctx.chart.options.colors?.[this.series.index % ctx.chart.options.colors.length] || "#888888"
+        };-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
+        
+        // Header ------------------------------------------------------
+        if (groupBy) {
+            rows.push(`<b>${groupBy.label || groupBy.name}: ${this.series.name}</b><hr/></td></tr>`)
+        } else {
+            rows.push(`<b>${this.series.name}: ${this.custom?.survival ? "Survival" : "Count"}</b><hr/></td></tr>`)
+        }
+
+        // Group -------------------------------------------------------
+        rows.push(`<tr><td style="text-align:right">${column.label || column.name}:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
+
+        // Value -------------------------------------------------------
+        // Survival ----------------------------------------------------
+        const survival = this.custom?.survival
+        if (survival) {
+            rows.push(
+                `<tr><td style="text-align:right">Survival:</td><td style="width: 100%"><b>${Math.round(this.y!)}%</b></td></tr>`,
+                `<tr style="opacity:0.6"><td style="text-align:right">At risk:</td><td><b>${roundToPrecision(survival.atRisk, 3).toLocaleString()}</b></td></tr>`,
+                `<tr style="opacity:0.6"><td style="text-align:right">Events:</td><td><b>${roundToPrecision(survival.events, 3).toLocaleString()}</b></td></tr>`,
+                `<tr style="opacity:0.6"><td style="text-align:right">No event:</td><td><b>${roundToPrecision(survival.censored, 3).toLocaleString()}</b></td></tr>`
+            )
+            if (survivalBands && survival.ciLow !== null) {
+                rows.splice(rows.length - 3, 0,
+                    `<tr style="opacity:0.6"><td style="text-align:right">95% CI:</td><td><b>${Math.round(survival.ciLow * 100)}% – ${Math.round(survival.ciHigh * 100)}%</b></td></tr>`
+                )
+            }
+        }
+
+        else if (!this.custom?.isErrorRange) {
+            rows.push(
+                `<tr><td style="text-align:right">Count:</td>`,
+                `<td style="width: 100%"><b>${
+                    denominator ?
+                        roundToPrecision(this.custom?.data?.cnt, 3).toLocaleString() + " (" + roundToPrecision(this.y!, 3) + "%)" :
+                        roundToPrecision(this.y!, 3).toLocaleString()
+                }</b></td></tr>`
+            )
+        }
+
+        // Range -------------------------------------------------------
+        const { data: { low, high, lowPct, highPct } = {}, denominator: d } = this.custom || {}
+
+        if (high !== undefined && low !== undefined) {
+            if (denominator && d) {
+                rows.push(
+                    `<tr style="opacity:0.6"><td style="text-align:right">Range:</td>` +
+                    `<td style="width: 100%"><b>${roundToPrecision(lowPct, 2) + "%"} - ${roundToPrecision(highPct, 2) + "%"}</b></td></tr>`
+                )
+            } else {
+                rows.push(
+                    `<tr style="opacity:0.6"><td style="text-align:right">Range:</td>` +
+                    `<td style="width: 100%"><b>${roundToPrecision(low, 2).toLocaleString()} - ${roundToPrecision(high, 2).toLocaleString()}</b></td></tr>`
+                )
+            }
+        }
+
+        // Denominator -------------------------------------------------
+        if (denominator && this.custom?.denominator) {
+            rows.push(`<tr style="opacity:0.6"><td style="text-align:right">Denominator:</td><td><b>${roundToPrecision(this.custom.denominator, 2).toLocaleString()}</b></td></tr>`)
+        }
+        
+        return `<table>${rows.join("")}</table>`
+    }
 }
 
 /**
