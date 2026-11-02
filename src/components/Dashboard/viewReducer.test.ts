@@ -163,3 +163,151 @@ describe("Dashboard reducer without data", () => {
         })
     })
 })
+
+describe("Dashboard reducer with data", () => {
+
+    const genderColumn: app.SubscriptionDataColumn = { name: "gender", label: "Gender", description: "", dataType: "string" }
+
+    function getData(rows: [string, number][]): app.ServerResponses.DataResponse {
+        return { column: "gender", filters: [], totalCount: 30, rowCount: rows.length, data: [{ rows }] }
+    }
+
+    // A state as it is once the data has loaded and the chart has been built
+    function getStateWithData(patch: Partial<ViewState> = {}): ViewState {
+        return reducer(
+            getState({ viewColumn: genderColumn, ...patch }),
+            { type: "UPDATE", payload: { data: getData([["female", 10], ["male", 20]]) } }
+        )
+    }
+
+    function getPoints(state: ViewState) {
+        // @ts-ignore
+        return state.chartOptions.series![0].data.map((p: any) => [p.name, p.y])
+    }
+
+    it ("loading the data builds the chart", () => {
+        const state = getStateWithData()
+        expect(state.chartOptions.series![0].id).toBe("primary-Gender")
+        expect(getPoints(state)).toEqual([["female", 10], ["male", 20]])
+    })
+
+    describe("UPDATE", () => {
+
+        it ("rebuilds the chart when the data changes", () => {
+            const next = reducer(getStateWithData(), { type: "UPDATE", payload: { data: getData([["other", 5]]) } })
+            expect(getPoints(next)).toEqual([["other", 5]])
+        })
+
+        it ("rebuilds the chart when the denominator changes", () => {
+            const next = reducer(getStateWithData(), { type: "UPDATE", payload: { denominator: "global" } })
+            const [[, female], [, male]] = getPoints(next)
+            expect(female).toBeCloseTo(100 / 3)
+            expect(male).toBeCloseTo(200 / 3)
+        })
+
+        it ("rebuilds the chart when sorting or paging changes", () => {
+            const state = getStateWithData()
+            expect(getPoints(reducer(state, { type: "UPDATE", payload: { sortBy: "y:desc" } }))).toEqual([["male", 20], ["female", 10]])
+            expect(getPoints(reducer(state, { type: "UPDATE", payload: { limit : 1        } }))).toEqual([["female", 10]])
+            expect(getPoints(reducer(state, { type: "UPDATE", payload: { offset: 1        } }))).toEqual([["male", 20]])
+        })
+
+        it ("rebuilds the chart for object values even if they are equal", () => {
+            const state = getStateWithData()
+            const next  = reducer(state, { type: "UPDATE", payload: { inspection: { ...state.inspection } } })
+            expect(next.chartOptions.series).not.toBe(state.chartOptions.series)
+        })
+
+        it ("doesn't rebuild the chart when a value is set to what it already is", () => {
+            const state = getStateWithData()
+            const next  = reducer(state, { type: "UPDATE", payload: { sortBy: state.sortBy } })
+            expect(next.chartOptions.series).toBe(state.chartOptions.series)
+        })
+
+        // Highcharts.merge copies arrays by reference, so an unchanged series
+        // array means the chart was not rebuilt
+        for (const key of ["viewName", "viewColumn", "viewGroupBy", "filters", "column2type", "ranges", "chartOptions"] as const) {
+            it (`doesn't rebuild the chart when ${key} changes`, () => {
+                const values = {
+                    viewName    : "New Name",
+                    viewColumn  : ageColumn,
+                    viewGroupBy : ageColumn,
+                    filters     : [{ left: "gender", operator: "eq", negated: false, right: { type: "value", value: "male" }, join: "and" }],
+                    column2type : "line",
+                    ranges      : { enabled: true, type: "errorbar" },
+                    chartOptions: { title: { text: "New" } }
+                }
+                const state = getStateWithData()
+                const next  = reducer(state, { type: "UPDATE", payload: { [key]: values[key] } })
+                expect(next.chartOptions.series).toBe(state.chartOptions.series)
+            })
+        }
+    })
+
+    describe("SET_CHART_OPTIONS", () => {
+
+        it ("merges the changes and rebuilds the chart", () => {
+            const state = getStateWithData()
+            const next  = reducer(state, { type: "SET_CHART_OPTIONS", payload: { title: { text: "New" } } })
+            expect(next.chartOptions.title?.text).toBe("New")
+            expect(next.chartOptions.series).not.toBe(state.chartOptions.series)
+            expect(getPoints(next)).toEqual([["female", 10], ["male", 20]])
+        })
+
+        it ("leaves the previous state unchanged", () => {
+            const state = getStateWithData()
+            reducer(state, { type: "SET_CHART_OPTIONS", payload: { title: { text: "New" } } })
+            expect(state.chartOptions.title?.text).toBe("Chart Title")
+        })
+    })
+
+    describe("SET_CHART_TYPE", () => {
+
+        it ("rebuilds the chart as the new type", () => {
+            const next = reducer(getStateWithData(), { type: "SET_CHART_TYPE", payload: "line" })
+            expect(next.chartOptions.chart?.type).toBe("line")
+            expect((next.chartOptions.series![0] as Highcharts.SeriesOptionsType).type).toBe("line")
+        })
+
+        it ("rebuilds pie charts with a pie series", () => {
+            const next = reducer(getStateWithData(), { type: "SET_CHART_TYPE", payload: "pie" })
+            expect(next.chartOptions.chart?.type).toBe("pie")
+            expect((next.chartOptions.series![0] as Highcharts.SeriesOptionsType).type).toBe("pie")
+        })
+    })
+
+    describe("default chart options", () => {
+
+        // `credits` only appears when getDefaultChartOptions has been applied
+        const getBareState = () => ({ ...getStateWithData(), chartOptions: { chart: { type: "column" } } as Partial<Highcharts.Options> })
+
+        it ("UPDATE applies them when it rebuilds", () => {
+            const next = reducer(getBareState(), { type: "UPDATE", payload: { denominator: "global" } })
+            expect(next.chartOptions.credits).toBeDefined()
+        })
+
+        it ("SET_CHART_OPTIONS applies them", () => {
+            const next = reducer(getBareState(), { type: "SET_CHART_OPTIONS", payload: { title: { text: "New" } } })
+            expect(next.chartOptions.credits).toBeDefined()
+        })
+
+        it ("SET_CHART_TYPE applies them", () => {
+            const next = reducer(getBareState(), { type: "SET_CHART_TYPE", payload: "line" })
+            expect(next.chartOptions.credits).toBeDefined()
+        })
+
+        it ("SET_RANGE_OPTIONS rebuilds without them", () => {
+            const state = getBareState()
+            const next  = reducer(state, { type: "SET_RANGE_OPTIONS", payload: { enabled: true, type: "errorbar" } })
+            expect(next.chartOptions.series).toBeDefined()
+            expect(next.chartOptions.credits).toBeUndefined()
+        })
+
+        it ("SET_SECONDARY_DATA_OPTIONS rebuilds without them", () => {
+            const state = getBareState()
+            const next  = reducer(state, { type: "SET_SECONDARY_DATA_OPTIONS", payload: { column: ageColumn, type: "line" } })
+            expect(next.chartOptions.series).toBeDefined()
+            expect(next.chartOptions.credits).toBeUndefined()
+        })
+    })
+})
