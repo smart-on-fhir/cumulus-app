@@ -18,6 +18,7 @@ import { AllPlotLines }   from "./Inspectors/AxisPlotLines"
 import { DEFS }           from "./Schema"
 import { AllSeries }      from "./Inspectors/Series"
 import { isDurationColumn, isStatusColumn, suggestedFirst } from "./columnRoles"
+import { getXType }       from "./Charts/lib"
 import {
     DashStyleValue,
     merge,
@@ -107,21 +108,6 @@ function SecondaryDataEditor({
             </div> }
         </>
     )
-}
-
-function getXType(column: app.SubscriptionDataColumn): "category" | "linear" | "datetime" {
-    
-    let xType: "category" | "linear" | "datetime" = "category";
-
-    if (column.dataType === "integer" || column.dataType === "float") {
-        xType = "linear"
-    }
-
-    else if (column.dataType.startsWith("date")) {
-        xType = "datetime"
-    }
-
-    return xType;
 }
 
 // ----------------------------------------------------------------------------
