@@ -58,7 +58,7 @@ describe("Dashboard reducer without data", () => {
 
     it ("returns the same state for unknown actions", () => {
         const state = getState()
-        expect(reducer(state, { type: "NO_SUCH_ACTION" })).toBe(state)
+        expect(reducer(state, { type: "NO_SUCH_ACTION" } as any)).toBe(state)
     })
 
     it ("SET_CHART_OPTIONS is ignored", () => {
@@ -128,7 +128,7 @@ describe("Dashboard reducer without data", () => {
         })
 
         it ("clears the stratifier and the secondary data for pie and donut charts", () => {
-            for (const type of ["pie", "pie3d", "donut", "donut3d"]) {
+            for (const type of ["pie", "pie3d", "donut", "donut3d"] as const) {
                 const next = reducer(getState({ viewGroupBy: ageColumn, data2: {} as any }), { type: "SET_CHART_TYPE", payload: type })
                 expect(next.viewGroupBy).toBeUndefined()
                 expect(next.data2).toBeNull()

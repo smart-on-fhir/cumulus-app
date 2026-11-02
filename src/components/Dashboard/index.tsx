@@ -95,11 +95,17 @@ export interface ViewState
     pendingSaveProps : Partial<app.View> | null
 }
 
-export interface ViewAction
-{
-    type: string
-    payload?: any
-}
+export type ViewAction =
+    | { type: "SET_CHART_OPTIONS"         , payload: Partial<Highcharts.Options> }
+    | { type: "SET_RANGE_OPTIONS"         , payload: app.RangeOptions }
+    | { type: "SET_SECONDARY_DATA_OPTIONS", payload: { column?: app.SubscriptionDataColumn, type?: ViewState["column2type"] } }
+    | { type: "SET_CHART_TYPE"            , payload: keyof typeof SupportedChartTypes }
+    | { type: "SET_VIEW_TYPE"             , payload: ViewState["viewType"] }
+    | { type: "TOGGLE_OPTIONS" }
+    // Deep-merges the payload into the state, and rebuilds the chart if needed
+    | { type: "UPDATE"                    , payload: Partial<ViewState> }
+    // Replaces the top-level keys of the state
+    | { type: "MERGE"                     , payload: Partial<ViewState> }
 
 
 export function getViewReducer({
@@ -653,14 +659,14 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                             statusValues={statusValues}
                             viewType={viewType}
                             view={view}
-                            onChartTypeChange={ (type: string) => dispatch({ type: "SET_CHART_TYPE", payload: type }) }
+                            onChartTypeChange={ (type: string) => dispatch({ type: "SET_CHART_TYPE", payload: type as keyof typeof SupportedChartTypes }) }
                             onChartOptionsChange={ (payload: Highcharts.Options) => dispatch({ type: "SET_CHART_OPTIONS", payload }) }
                             onRangeOptionsChange={ (payload: app.RangeOptions) => dispatch({ type: "SET_RANGE_OPTIONS", payload }) }
                             onSecondaryDataOptionsChange={ (payload: { column?: string, type?: string }) => dispatch({
                                 type: "SET_SECONDARY_DATA_OPTIONS",
                                 payload: {
                                     column: payload.column ? cols.find(c => c.name === payload.column) : undefined,
-                                    type: payload.type
+                                    type: payload.type as ViewState["column2type"]
                                 }
                             }) }
                             state={{
@@ -696,7 +702,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                     viewColumn     : cols.find(c => c.name === state.groupBy),
                                     viewGroupBy    : cols.find(c => c.name === state.stratifyBy),
                                     filters        : [...state.filters],
-                                    denominator    : state.denominator,
+                                    denominator    : state.denominator as app.DenominatorType,
                                     statusColumn   : cols.find(c => c.name === state.statusColumn),
                                     eventValue     : state.eventValue,
                                     survivalBands  : state.survivalBands,
