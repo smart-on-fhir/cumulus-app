@@ -1,8 +1,9 @@
 import moment                               from "moment"
 import { Color, merge, Series }             from "highcharts"
-import { compareDurations, parseDuration }  from "./duration"
+import { compareDurations }                 from "./duration"
 import { getCountsByTime, lifeTable, logRankTest, SurvivalData } from "./kaplanMeier"
 import { getDurationTitle, isDurationTitle }        from "../columnRoles"
+import { getConfidenceBands, getSmallGroupsWarning, getSurvivalDataWarnings, setLeftSteps } from "./survivalSeries"
 
 /**
  * The default Y axis title of survival charts
@@ -58,15 +59,6 @@ type SeriesOptions = (
     Highcharts.SeriesColumnOptions |
     Highcharts.SeriesBarOptions
 );
-
-/**
- * Survival charts warn about groups with fewer records than this
- */
-export const MIN_SURVIVAL_GROUP_SIZE = 10
-
-function escapeHtml(input: string) {
-    return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-}
 
 export function emToPx(em: number) {
     return Math.round(DEFAULT_FONT_SIZE * em) + "px"
@@ -422,25 +414,7 @@ function getSeriesAndExceptions({
     let xTicks = getXAxis({ xType, data, data2, limit, offset, sortBy, isSurvival })
 
     if (isSurvival) {
-        const invalid = xTicks.filter(x => parseDuration(x) === null)
-        if (invalid.length) {
-            const examples = invalid.slice(0, 3).map(x => `"${escapeHtml(x + "")}"`).join(", ")
-            exceptions.add(
-                `<b>${escapeHtml(column.label || column.name)}</b> does not look like a duration ` +
-                `(found ${examples}${invalid.length > 3 ? ", ..." : ""}), so this will not be a proper survival chart`
-            )
-        }
-        if (!survivalData) {
-            exceptions.add("Select a Status Column and an Event Value to compute the survival curve. Showing counts for now.")
-        }
-        // Usually means the saved Event Value no longer exists in the data
-        else if (!survivalData.events.rowCount) {
-            const { label, eventValue } = survivalData.status ?? { label: "status", eventValue: "the selected Event Value" }
-            exceptions.add(
-                `No records have <b>${escapeHtml(label)}</b> equal to <b>${escapeHtml(eventValue)}</b>, ` +
-                `so the survival curves cannot drop. Check the Event Value.`
-            )
-        }
+        getSurvivalDataWarnings(xTicks, column, survivalData).forEach(w => exceptions.add(w))
     }
 
     function addSeries(options: any, secondary = false) {
@@ -652,70 +626,19 @@ function getSeriesAndExceptions({
         }
     }
 
-    // Survival charts: small groups are shown, but their curves are uncertain
     if (showSurvival) {
-        const small = series
-            .map((s: any) => [s.name, s.data?.find((p: any) => p?.custom?.survival)?.custom.survival.atRisk ?? 0])
-            .filter(([, n]) => n > 0 && n < MIN_SURVIVAL_GROUP_SIZE)
-        if (small.length) {
-            exceptions.add(
-                `Small group${small.length > 1 ? "s" : ""} (fewer than ${MIN_SURVIVAL_GROUP_SIZE}): ` +
-                small.map(([name, n]) => `<b>${escapeHtml(String(name))}</b> (n=${n})`).join(", ") +
-                `. ${small.length > 1 ? "Their curves" : "Its curve"}` +
-                (series.length > 1 ? " and the log-rank p-value are" : small.length > 1 ? " are" : " is") +
-                " less reliable."
-            )
+        const warning = getSmallGroupsWarning(series)
+        if (warning) {
+            exceptions.add(warning)
         }
     }
 
-    // Survival charts: left steps are the only correct way to draw the curves,
-    // even if another step was saved for a series
     if (isSurvival) {
-        series.forEach((s: any) => {
-            if (s.type === "line") {
-                s.step = "left"
-            }
-        })
+        setLeftSteps(series)
     }
 
-    // Survival charts: 95% confidence bands. Added after all the curves, so
-    // that they don't shift the colors of the curves.
     if (showSurvival && survivalBands) {
-        series.slice().forEach((curve: any) => {
-            const id  = curve.id + " (95% CI)"
-            // Saved options win over these defaults (addSeries would let
-            // anything passed here override them)
-            const old: any = serverOptions.series?.find(s => s.id === id)
-            addSeries({
-                type               : "arearange",
-                id,
-                name               : old?.name ?? curve.name + " (95% CI)",
-                linkedTo           : curve.id,
-                // A band follows its curve's color unless the user picked one
-                // for it (the series inspector saves that in custom.color)
-                color              : old?.custom?.color || curve.color,
-                custom             : { ...old?.custom, isConfidenceBand: true },
-                zIndex             : 0,
-                step               : "left",
-                lineWidth          : old?.lineWidth ?? 0.2,
-                fillOpacity        : old?.fillOpacity ?? 0.15,
-                connectNulls       : true,
-                enableMouseTracking: false,
-                marker             : { enabled: false },
-                data: curve.data.map((point: any) => {
-                    const row = point?.custom?.survival
-                    if (!row || row.ciLow === null) {
-                        return null
-                    }
-                    return {
-                        ...(point.x !== undefined ? { x: point.x } : {}),
-                        name: point.name,
-                        low : row.ciLow  * 100,
-                        high: row.ciHigh * 100
-                    }
-                })
-            })
-        })
+        getConfidenceBands(series, serverOptions.series).forEach(band => addSeries(band))
     }
 
     return { series, exceptions }
