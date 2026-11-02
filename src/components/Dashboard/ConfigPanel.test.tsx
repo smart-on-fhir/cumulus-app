@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import ConfigPanel, { getChartTypes } from "./ConfigPanel"
 
@@ -303,5 +303,108 @@ describe("chart types", () => {
 
   it("keep survival charts that already exist editable without the flag", () => {
     expect(getChartTypes("survival", false)).toContain("survival")
+  })
+})
+
+// Some editors change the chart options of the state they were given in place.
+// Highcharts.merge copies arrays by reference, so even after merge(state) the
+// series and colors are the Dashboard's own. These tests pin that down, because
+// SliceEditor's changes only reach the chart that way.
+describe("editors that change the chart options in place", () => {
+
+  function getPieState(): ChartConfigPanelState {
+    return {
+      ...structuredClone(mockState),
+      chartType: "pie",
+      stratifyBy: "",
+      chartOptions: {
+        chart : { type: "pie" },
+        colors: ["#111111", "#222222"],
+        series: [{ type: "pie", id: "primary-Gender", data: [{ name: "female", y: 10 }, { name: "male", y: 20 }] }]
+      }
+    }
+  }
+
+  function renderPanel(state: ChartConfigPanelState) {
+    const onChange             = vi.fn()
+    const onChartOptionsChange = vi.fn()
+    render(
+      <ConfigPanel
+        cols={mockCols}
+        state={state}
+        viewType="overview"
+        onChange={onChange}
+        onChartTypeChange={vi.fn()}
+        onChartOptionsChange={onChartOptionsChange}
+        onRangeOptionsChange={vi.fn()}
+        onSecondaryDataOptionsChange={vi.fn()}
+      />
+    )
+    return { onChange, onChartOptionsChange }
+  }
+
+  // The input next to a property grid label
+  function getPropertyInput(container: HTMLElement, name: string) {
+    const label = within(container).getByText(name, { selector: ".prop-label span" })
+    return label.closest(".prop-label")!.nextElementSibling!.querySelector("input")!
+  }
+
+  // The content of a collapsed section, after expanding it
+  async function expand(header: string | RegExp, container: HTMLElement = document.body) {
+    const el = within(container).getByText(header)
+    await userEvent.click(el)
+    return el.closest<HTMLElement>(".collapse")!
+  }
+
+  it("SliceEditor changes the series in place and sends the settings", async () => {
+    const state = getPieState()
+    const { onChange } = renderPanel(state)
+    await userEvent.click(screen.getByText("Data"))
+    // The Advanced section next to Slice Colors
+    const sliceEditor = screen.getByText("Slice Colors").closest(".collapse")!.parentElement!
+    const advanced    = await expand("Advanced", sliceEditor)
+    fireEvent.change(getPropertyInput(advanced, "Opacity"), { target: { value: "0.5" } })
+    expect(onChange).toHaveBeenCalledTimes(1)
+    // @ts-ignore
+    expect(state.chartOptions.series![0].opacity).toBe(0.5)
+    expect(onChange.mock.calls[0][0].chartOptions.series).toBe(state.chartOptions.series)
+  })
+
+  it("SliceEditor changes the slice colors in place and sends the same state", async () => {
+    const state = getPieState()
+    const { onChange } = renderPanel(state)
+    await userEvent.click(screen.getByText("Data"))
+    const colors = await expand("Slice Colors")
+    const input  = getPropertyInput(colors, "female").parentElement!.querySelector<HTMLInputElement>("input[type=text]")!
+    fireEvent.change(input, { target: { value: "#ff0000" } })
+    expect(onChange).toHaveBeenCalledWith(state)
+    expect(state.chartOptions.colors![0]).toBe("#ff0000")
+  })
+
+  it("Start Angle changes the series in place and sends the same options", async () => {
+    const state = getPieState()
+    const { onChartOptionsChange } = renderPanel(state)
+    await userEvent.click(screen.getByText("Chart"))
+    fireEvent.change(screen.getByLabelText("Start Angle"), { target: { value: "90" } })
+    expect(onChartOptionsChange).toHaveBeenCalledWith(state.chartOptions)
+    // @ts-ignore
+    expect(state.chartOptions.series![0].startAngle).toBe(90)
+  })
+
+  it("AllSeriesEditor changes every series in place and sends the options", async () => {
+    const state = structuredClone(mockState)
+    state.chartOptions.series = [
+      { type: "column", id: "a", data: [1, 2] },
+      { type: "column", id: "b", data: [3, 4] }
+    ]
+    const series = state.chartOptions.series
+    const { onChartOptionsChange } = renderPanel(state)
+    await userEvent.click(screen.getByText("Series"))
+    const override = await expand(/All Serries Override/)
+    fireEvent.change(getPropertyInput(override, "Opacity"), { target: { value: "0.5" } })
+    expect(onChartOptionsChange).toHaveBeenCalledTimes(1)
+    expect(onChartOptionsChange.mock.calls[0][0].series).toBe(series)
+    // @ts-ignore
+    expect(series.map(s => s.opacity)).toEqual([0.5, 0.5])
   })
 })

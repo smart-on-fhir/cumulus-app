@@ -242,6 +242,19 @@ describe("Dashboard reducer with data", () => {
                 expect(next.chartOptions.series).toBe(state.chartOptions.series)
             })
         }
+
+        // SliceEditor changes the series and colors in place, then sends the
+        // settings without chartOptions (see ConfigPanel.test.tsx)
+        it ("keeps chart options that were changed in place", () => {
+            const state = getStateWithData()
+            // @ts-ignore
+            state.chartOptions.series![0].opacity = 0.5
+            state.chartOptions.colors![0] = "#ff0000"
+            const next = reducer(state, { type: "UPDATE", payload: { viewName: "New Name" } })
+            // @ts-ignore
+            expect(next.chartOptions.series![0].opacity).toBe(0.5)
+            expect(next.chartOptions.colors![0]).toBe("#ff0000")
+        })
     })
 
     describe("SET_CHART_OPTIONS", () => {
