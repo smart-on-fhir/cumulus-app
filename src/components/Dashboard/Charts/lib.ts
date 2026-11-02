@@ -188,23 +188,6 @@ export function filterOutExceptions({
     })
 }
 
-// Sort data by Y if so requested by the user. Note that we do not sort in 
-// case of X because it only works for category charts. For linear and date
-// axises we need to use axis.reversed instead.
-// function sortY(rows: any[], sortBy: string, xType: "datetime" | "linear" | "category") {
-//     const [col, dir] = sortBy.split(":")
-//     if (col === "y" && xType === "category") {
-//         rows.sort((a, b) => {
-//             let _a = +a[1]
-//             let _b = +b[1]    
-//             if (isNaN(_a) || !isFinite(_a)) return 0
-//             if (isNaN(_b) || !isFinite(_b)) return 0
-//             return dir === "desc" ? _b - _a : _a - _b
-//         })
-//     }
-//     return rows
-// }
-
 function getPoint({
     row,
     xType,
@@ -365,9 +348,6 @@ function getXAxis({
             // @ts-ignore
             arr.sort((a, b) => +new Date(a) - +new Date(b));
         }
-        else {
-            // arr.sort((a, b) => a.localeCompare(b, "en-US", { numeric: true }));
-        }
     }
 
     if (limit || offset) {
@@ -493,22 +473,6 @@ function getSeriesAndExceptions({
                 }
             }
 
-            // There is a bug in Highcharts that prevents us from rendering hidden series
-            // having pattern fills
-            // if (options.type.includes("column")) {
-            //     cfg.color = {
-            //         pattern: {
-            //             path: {
-            //                 d: 'M 0 0 L 0 6',
-            //                 strokeWidth: 11.25
-            //             },
-            //             width : 6,
-            //             height: 6,
-            //             patternTransform: 'scale(0.5) rotate(45)'
-            //         }
-            //     }
-            // }
-
             cfg.stacking = column2type?.includes("columnStack") ? "normal" : undefined
         }
 
@@ -605,9 +569,6 @@ function getSeriesAndExceptions({
 
     if (data.rowCount) {
         if (!data.stratifier) {
-            // if (xType === "category" || xType === "linear") {
-            //     data.data[0].rows.sort((a, b) => String(a[0]).localeCompare(String(b[0]), "en-US", { numeric: true }))
-            // }
             const denominatorCache = {}
             const name = String(column.label || column.name)
             const id   = "primary-" + name
@@ -830,8 +791,6 @@ export function buildChartOptions({
     const survivalXTitle = isSurvival && (!xTitle || isDurationTitle(xTitle)) ? getDurationTitle(column) : undefined
     const survivalYTitle = isSurvival && survivalData && !yTitle ? SURVIVAL_Y_TITLE : undefined
 
-    // const is3d = !!options.chart?.options3d?.enabled
-
     const { series, exceptions } = getSeriesAndExceptions({
         data,
         // Survival charts have no secondary data, even if some was saved
@@ -913,8 +872,6 @@ export function buildChartOptions({
                     } : undefined
                 },
                 dataLabels: {
-                    // @ts-ignore
-                    // enabled: options.plotOptions?.series?.dataLabels?.enabled ?? (!groupBy && maxPointLength <= 30)
                     enabled: (!groupBy && !denominator && maxPointLength <= 20 && ["bar", "column", "pie"].includes(type)),
                     formatter() {
                         return this.y.toLocaleString('en-US');
@@ -968,23 +925,13 @@ export function buildChartOptions({
                 
                 // Header ------------------------------------------------------
                 if (groupBy) {
-                    // rows.push(`<tr><td style="text-align:right">X:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
                     rows.push(`<b>${groupBy.label || groupBy.name}: ${this.series.name}</b><hr/></td></tr>`)
                 } else {
                     rows.push(`<b>${this.series.name}: ${this.custom?.survival ? "Survival" : "Count"}</b><hr/></td></tr>`)
                 }
-                //     rows.push(`<b>${x}</b><hr/></td></tr>`)
-                // } else {
-                //     rows.push(`<b>${x}</b><hr/></td></tr>`)
-                //     // rows.push(`<b>${this.point.series.name}</b><hr/></td></tr>`)
-                // }
-
-                // rows.push(`<tr><td>${this.point.series.name}</td><td>${groupBy}</td></tr>`)
 
                 // Group -------------------------------------------------------
-                // if (groupBy) {
-                    rows.push(`<tr><td style="text-align:right">${column.label || column.name}:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
-                // }
+                rows.push(`<tr><td style="text-align:right">${column.label || column.name}:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
 
                 // Value -------------------------------------------------------
                 // Survival ----------------------------------------------------
@@ -1042,9 +989,6 @@ export function buildChartOptions({
         xAxis: {
             type: xType,
             crosshair: !inspection?.enabled && type.includes("line"),
-            // reversed: false,//dir === "desc",//type === "bar" || sortBy === "x:desc",
-            // reversed: col === "x" ? (type === "bar" ? true : dir === "asc") : false,
-            // reversed: type === "bar" && dir !== "desc",
             reversed: (() => {
                 // Survival time always runs left to right
                 if (isSurvival) {
