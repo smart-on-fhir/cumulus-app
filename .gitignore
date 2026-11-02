@@ -162,3 +162,6 @@ trash/*
 backend/services/email/test.ts
 .env.production
 backend/aggregator-cache
+
+# Playwright MCP snapshots, screenshots and logs
+.playwright-mcp/
