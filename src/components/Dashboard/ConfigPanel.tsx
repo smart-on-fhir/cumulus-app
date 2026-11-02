@@ -130,7 +130,6 @@ export interface ChartConfigPanelState {
     eventValue     : string
     survivalBands  : boolean
     survivalRiskTable: boolean
-    annotations    : app.Annotation[]
     xCol           : app.SubscriptionDataColumn
     tags           : Pick<app.Tag, "id"|"name"|"description">[]
     ranges         : app.RangeOptions | null
@@ -159,9 +158,7 @@ export default function ConfigPanel({
     statusValues
 } : {
     cols: app.SubscriptionDataColumn[]
-    view?: Partial<app.View>
     state: ChartConfigPanelState
-    viewType: "overview" | "data"
     onChange: (state: ChartConfigPanelState) => void
     onChartTypeChange: (type: string) => void
     onChartOptionsChange: (options: Options) => void

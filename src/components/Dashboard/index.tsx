@@ -67,7 +67,7 @@ export interface ViewState
     viewColumn       : app.SubscriptionDataColumn
     viewGroupBy     ?: app.SubscriptionDataColumn
     filters          : app.Filter[]
-    chartType        : string
+    chartType        : keyof typeof SupportedChartTypes
     chartOptions     : Partial<Highcharts.Options>
     denominator      : app.DenominatorType
     column2         ?: app.SubscriptionDataColumn
@@ -146,7 +146,7 @@ export function getViewReducer({
         if (action.type === "SET_CHART_OPTIONS") {
             if (state.data) {
                 const options = getDefaultChartOptions(
-                    state.chartType as any,
+                    state.chartType,
                     Highcharts.merge(state.chartOptions, action.payload)
                 )
                 return { ...state, chartOptions: rebuildChartOptions(state, options) }
@@ -234,7 +234,7 @@ export function getViewReducer({
             // @ts-ignore
             if (nextState.data && Object.keys(action.payload).some(key => chartable.includes(key) && action.payload[key] !== state[key])) {
                 const options = getDefaultChartOptions(
-                    nextState.chartType as keyof typeof SupportedChartTypes,
+                    nextState.chartType,
                     nextState.chartOptions
                 );
                 nextState.chartOptions = rebuildChartOptions(nextState, options)
@@ -303,7 +303,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         viewDescription: view.description || "",
 
         // Line chart seems to be most universal so begin with it
-        chartType: viewSettings.viewType || "spline",
+        chartType: (viewSettings.viewType || "spline") as keyof typeof SupportedChartTypes,
 
         // If column is not set pick the firs one other than "cnt"
         viewColumn: cols.find(c => c.name === viewSettings.column || "") ||
@@ -657,8 +657,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                         <ConfigPanel
                             cols={cols}
                             statusValues={statusValues}
-                            viewType={viewType}
-                            view={view}
                             onChartTypeChange={ (type: string) => dispatch({ type: "SET_CHART_TYPE", payload: type as keyof typeof SupportedChartTypes }) }
                             onChartOptionsChange={ (payload: Highcharts.Options) => dispatch({ type: "SET_CHART_OPTIONS", payload }) }
                             onRangeOptionsChange={ (payload: app.RangeOptions) => dispatch({ type: "SET_RANGE_OPTIONS", payload }) }
@@ -675,7 +673,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                 filters   : [...filters],
                                 xCol      : viewColumn,
 
-                                // @ts-ignore
                                 chartType,
                                 viewName,
                                 viewDescription,

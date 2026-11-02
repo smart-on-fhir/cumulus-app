@@ -54,7 +54,6 @@ const mockState: ChartConfigPanelState = {
   eventValue: "",
   survivalBands: false,
   survivalRiskTable: false,
-  annotations: [],
   xCol: { name: "age", label: "Age", dataType: "integer", description: "" },
   tags: [],
   ranges: null,
@@ -84,7 +83,6 @@ it("renders ConfigPanel and expands Chart section", async () => {
     <ConfigPanel
       cols={mockCols}
       state={mockState}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -109,7 +107,6 @@ it("calls onChartTypeChange when chart type is changed", async () => {
     <ConfigPanel
       cols={mockCols}
       state={mockState}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -133,7 +130,6 @@ it("calls onChartOptionsChange when chart title is changed", async () => {
     <ConfigPanel
       cols={mockCols}
       state={mockState}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -155,7 +151,6 @@ it("calls onChartOptionsChange when chart subtitle is changed", async () => {
     <ConfigPanel
       cols={mockCols}
       state={{ ...mockState, chartOptions: { ...mockState.chartOptions, subtitle: { text: "Chart Subtitle" } } }}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -176,7 +171,6 @@ it("suggests the subtitles the chart offers", async () => {
     <ConfigPanel
       cols={mockCols}
       state={{ ...mockState, chartOptions: { ...mockState.chartOptions, custom: { subtitleSuggestions: sentences } } as any }}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -195,7 +189,6 @@ it("renders legend controls and calls onChartOptionsChange when legend is change
     <ConfigPanel
       cols={mockCols}
       state={mockState}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -215,7 +208,6 @@ it("renders tag selector label", () => {
     <ConfigPanel
       cols={mockCols}
       state={mockState}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -234,7 +226,6 @@ it("calls onChange when groupBy column is changed", async () => {
     <ConfigPanel
       cols={mockCols}
       state={mockState}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -261,7 +252,6 @@ describe("swapping the X axis and stratifier columns", () => {
       <ConfigPanel
         cols={mockCols}
         state={{ ...mockState, chartType } as any}
-        viewType="overview"
         onChange={onChange}
         onChartTypeChange={onChartTypeChange}
         onChartOptionsChange={onChartOptionsChange}
@@ -332,7 +322,6 @@ describe("editors that change the chart options in place", () => {
       <ConfigPanel
         cols={mockCols}
         state={state}
-        viewType="overview"
         onChange={onChange}
         onChartTypeChange={vi.fn()}
         onChartOptionsChange={onChartOptionsChange}
