@@ -258,6 +258,54 @@ describe("Chart", () => {
         })
     })
 
+    describe("plot lines", () => {
+
+        function build(onInspectionChange: any = vi.fn(), inspection = false) {
+            return buildChartOptions({
+                type: "line",
+                options: {
+                    xAxis: { plotLines: [{ value: 1, label: { text: "a", style: { fontSize: "32px" } } }, { value: 2 }] },
+                    yAxis: { plotLines: [{ value: 3, label: { text: "b", style: { fontSize: "8px"  } } }] }
+                },
+                data: { column: "t", filters: [], totalCount: 1, rowCount: 1, data: [{ rows: [["0", 1]] }] },
+                data2: null,
+                column: { name: "t", label: "T", dataType: "string", description: "" },
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                onInspectionChange,
+                inspection: { enabled: inspection } as any
+            }) as any
+        }
+
+        it ("get ids that inspect mode selects them by", () => {
+            const options = build()
+            expect(options.xAxis.plotLines.map((l: any) => l.id)).toEqual(["x-axis-plot-line-0", "x-axis-plot-line-1"])
+            expect(options.yAxis.plotLines.map((l: any) => l.id)).toEqual(["y-axis-plot-line-0"])
+        })
+
+        it ("convert old px label font sizes to em", () => {
+            const options = build()
+            expect(options.xAxis.plotLines[0].label.style.fontSize).toBe(32 / DEFAULT_FONT_SIZE + "em")
+            expect(options.yAxis.plotLines[0].label.style.fontSize).toBe(8 / DEFAULT_FONT_SIZE + "em")
+        })
+
+        it ("have no click handlers outside inspect mode", () => {
+            const options = build()
+            expect(options.xAxis.plotLines[0].events).toBeUndefined()
+            expect(options.yAxis.plotLines[0].events).toBeUndefined()
+        })
+
+        it ("report their id and axis when clicked in inspect mode", () => {
+            const onInspectionChange = vi.fn()
+            const options = build(onInspectionChange, true)
+            options.xAxis.plotLines[1].events.click()
+            expect(onInspectionChange).toHaveBeenLastCalledWith(["plotLine"], { selectedPlotLineId: "x-axis-plot-line-1", selectedPlotLineAxis: "x" })
+            options.yAxis.plotLines[0].events.click()
+            expect(onInspectionChange).toHaveBeenLastCalledWith(["plotLine"], { selectedPlotLineId: "y-axis-plot-line-0", selectedPlotLineAxis: "y" })
+        })
+    })
+
     describe("survival charts", () => {
 
         function build(values: string[], isSurvival: boolean) {

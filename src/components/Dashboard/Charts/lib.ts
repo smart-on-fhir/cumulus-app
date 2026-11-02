@@ -1124,45 +1124,40 @@ export function buildChartOptions({
         }
     }
 
-    // @ts-ignore Convert px to em in old chart xAxis plotLines
-    const xAxisPlotLines = (result.xAxis?.plotLines || []) as XAxisPlotLinesOptions[];
-    xAxisPlotLines.forEach((l, i) => {
-        if (l.label?.style?.fontSize) {
-            l.label.style.fontSize = lengthToEm(l.label.style.fontSize) + "em"
-        }
-        l.id = `x-axis-plot-line-${i}`
-        if (inspection?.enabled) {
-            l.events = {
-                click: function() {
-                    onInspectionChange(["plotLine"], {
-                        selectedPlotLineId: this.id,
-                        selectedPlotLineAxis: "x"
-                    })
-                }
-            }
-        }
-    })
-
-    // @ts-ignore Convert px to em in old chart yAxis plotLines
-    const yAxisPlotLines = (result.yAxis?.plotLines || []) as YAxisPlotLinesOptions[];
-    yAxisPlotLines.forEach((l, i) => {
-        if (l.label?.style?.fontSize) {
-            l.label.style.fontSize = lengthToEm(l.label.style.fontSize) + "em"
-        }
-        l.id = `y-axis-plot-line-${i}`
-        if (inspection?.enabled) {
-            l.events = {
-                click: function() {
-                    onInspectionChange(["plotLine"], {
-                        selectedPlotLineId: this.id,
-                        selectedPlotLineAxis: "y"
-                    })
-                }
-            }
-        }
-    })
+    // @ts-ignore xAxis and yAxis are single objects here
+    preparePlotLines(result.xAxis?.plotLines || [], "x", inspection, onInspectionChange)
+    // @ts-ignore
+    preparePlotLines(result.yAxis?.plotLines || [], "y", inspection, onInspectionChange)
 
     return result
+}
+
+/**
+ * Prepares the plot lines of one axis: converts old px label font sizes to em,
+ * and gives each line an id, which inspect mode selects it by. In inspect
+ * mode, clicking a line reports its id and axis.
+ */
+function preparePlotLines(
+    plotLines: (Highcharts.XAxisPlotLinesOptions | Highcharts.YAxisPlotLinesOptions)[],
+    axis: "x" | "y",
+    inspection: app.Inspection | undefined,
+    onInspectionChange: (inspection: string[], context: Partial<app.InspectionContext>) => void
+) {
+    plotLines.forEach((l, i) => {
+        if (l.label?.style?.fontSize) {
+            l.label.style.fontSize = lengthToEm(l.label.style.fontSize) + "em"
+        }
+        const id = `${axis}-axis-plot-line-${i}`
+        l.id = id
+        if (inspection?.enabled) {
+            l.events = {
+                click: () => onInspectionChange(["plotLine"], {
+                    selectedPlotLineId: id,
+                    selectedPlotLineAxis: axis
+                })
+            }
+        }
+    })
 }
 
 /**
