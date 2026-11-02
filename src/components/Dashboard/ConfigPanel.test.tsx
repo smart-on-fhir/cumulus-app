@@ -430,3 +430,67 @@ describe("editors that change the chart options in place", () => {
     expect(names.slice(0, 2)).toEqual(["Border Width", "Border Color"])
   })
 })
+
+describe("axis sections", () => {
+
+  function renderPanel(state: ChartConfigPanelState) {
+    const onChartOptionsChange = vi.fn()
+    render(
+      <ConfigPanel
+        cols={mockCols}
+        state={state}
+        onChange={vi.fn()}
+        onChartTypeChange={vi.fn()}
+        onChartOptionsChange={onChartOptionsChange}
+        onRangeOptionsChange={vi.fn()}
+        onSecondaryDataOptionsChange={vi.fn()}
+      />
+    )
+    return onChartOptionsChange
+  }
+
+  // Expands the section with that header and returns it
+  async function expandSection(header: string) {
+    const el = [...document.querySelectorAll<HTMLElement>(".collapse-header")].find(h => h.textContent!.trim() === header)!
+    await userEvent.click(el)
+    return el.closest<HTMLElement>(".collapse")!
+  }
+
+  const ticks = (section: HTMLElement) => within(section).getByLabelText("Render axis tick marks") as HTMLInputElement
+
+  it("send title changes to their own axis", async () => {
+    const onChartOptionsChange = renderPanel(structuredClone(mockState))
+    fireEvent.change(within(await expandSection("X Axis")).getByDisplayValue("X Axis"), { target: { value: "Age" } })
+    expect(onChartOptionsChange).toHaveBeenLastCalledWith({ xAxis: { title: { text: "Age" } } })
+    fireEvent.change(within(await expandSection("Y Axis")).getByDisplayValue("Y Axis"), { target: { value: "Count" } })
+    expect(onChartOptionsChange).toHaveBeenLastCalledWith({ yAxis: { title: { text: "Count" } } })
+  })
+
+  it("show the X column as the X title placeholder", async () => {
+    renderPanel(structuredClone(mockState))
+    expect(within(await expandSection("X Axis")).getByDisplayValue("X Axis").getAttribute("placeholder")).toBe("Age")
+  })
+
+  it("show tick marks as off when tickWidth is unset or 0, on both axes", async () => {
+    const state = structuredClone(mockState)
+    state.chartOptions.xAxis = { tickWidth: 0 }
+    renderPanel(state)
+    expect(ticks(await expandSection("X Axis")).checked).toBe(false)
+    expect(ticks(await expandSection("Y Axis")).checked).toBe(false)
+  })
+
+  it("show tick marks as on when tickWidth is set, and turn them off", async () => {
+    const state = structuredClone(mockState)
+    state.chartOptions.yAxis = { tickWidth: 1 }
+    const onChartOptionsChange = renderPanel(state)
+    const box = ticks(await expandSection("Y Axis"))
+    expect(box.checked).toBe(true)
+    await userEvent.click(box)
+    expect(onChartOptionsChange).toHaveBeenLastCalledWith({ yAxis: { tickWidth: 0 } })
+  })
+
+  it("swap headers in bar charts, where the Y axis is horizontal", async () => {
+    renderPanel({ ...structuredClone(mockState), chartType: "bar" })
+    expect(within(await expandSection("X Axis")).getByDisplayValue("Y Axis")).toBeTruthy()
+  })
+})

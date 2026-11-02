@@ -697,100 +697,20 @@ export default function ConfigPanel({
 
                 { !isPie && <SeriesEditor state={state} onChange={onChartOptionsChange} /> }
 
-                { !isPie && <Collapse collapsed header={ isBar ? "X Axis" : "Y Axis" }>
-                    <div className="mt-1">
-                        <label>Axis Title</label>
-                        <input
-                            type="text"
-                            // @ts-ignore
-                            value={ chartOptions.yAxis?.title?.text || "" }
-                            onChange={ e => onChartOptionsChange({
-                                yAxis: {
-                                    title: {
-                                        text: e.target.value
-                                    }
-                                }
-                            })}
-                        />
-                    </div>
-                    <div className="mt-1 pb-1">
-                        <Checkbox
-                            name="YTicks"
-                            label="Render axis tick marks"
-                            // @ts-ignore
-                            checked={chartOptions.yAxis?.tickWidth !== 0}
-                            onChange={checked => onChartOptionsChange({
-                                yAxis: {
-                                    tickWidth: checked ? 1 : 0
-                                }
-                            })}
-                        />
-                        <Checkbox
-                            name="YLabels"
-                            label="Render labels"
-                            // @ts-ignore
-                            checked={chartOptions.yAxis?.labels?.enabled !== false}
-                            onChange={checked => onChartOptionsChange({
-                                yAxis: {
-                                    labels: { enabled: checked }
-                                }
-                            })}
-                        />
-                    </div>
-                    <div className="pb-1">
-                        <Collapse collapsed header="Advanced Axis Options">
-                            <AxisEditor axis={state.chartOptions.yAxis as YAxisOptions} onChange={(yAxis: YAxisOptions) => onChartOptionsChange({ yAxis })} />
-                        </Collapse>
-                    </div>
-                </Collapse> }
+                { !isPie && <AxisSection
+                    header={ isBar ? "X Axis" : "Y Axis" }
+                    which="yAxis"
+                    axis={ chartOptions.yAxis as YAxisOptions }
+                    onChange={ onChartOptionsChange }
+                /> }
 
-                { !isPie && <Collapse collapsed header={ isBar ? "Y Axis" : "X Axis" }>
-                    <div className="mt-1">
-                        <label>Axis Title</label>
-                        <input
-                            type="text"
-                            placeholder={state.xCol.label || state.xCol.name || ""}
-                            // @ts-ignore
-                            value={ chartOptions.xAxis?.title?.text || "" }
-                            onChange={ e => onChartOptionsChange({
-                                xAxis: {
-                                    title: {
-                                        text: e.target.value
-                                    }
-                                }
-                            })}
-                        />
-                    </div>
-                    <div className="mt-1 pb-1">
-                        <Checkbox
-                            name="XTicks"
-                            label="Render axis tick marks"
-                            // @ts-ignore
-                            checked={ !!chartOptions.xAxis?.tickWidth }
-                            onChange={checked => onChartOptionsChange({
-                                xAxis: {
-                                    tickWidth: checked ? 1 : 0
-                                }
-                            })}
-                        />
-                        <Checkbox
-                            name="XLabels"
-                            label="Render labels"
-                            // @ts-ignore
-                            checked={chartOptions.xAxis?.labels?.enabled !== false}
-                            onChange={checked => onChartOptionsChange({
-                                xAxis: {
-                                    labels: { enabled: checked }
-                                }
-                            })}
-                        />
-                    </div>
-                    <div className="pb-1">
-                        <Collapse collapsed header="Advanced Axis Options">
-                            <AxisEditor axis={state.chartOptions.xAxis as XAxisOptions} onChange={(xAxis: any) => onChartOptionsChange({ xAxis })} />
-                        </Collapse>
-                    </div>
-                </Collapse> }
+                { !isPie && <AxisSection
+                    header={ isBar ? "Y Axis" : "X Axis" }
+                    which="xAxis"
+                    axis={ chartOptions.xAxis as XAxisOptions }
+                    placeholder={ state.xCol.label || state.xCol.name || "" }
+                    onChange={ onChartOptionsChange }
+                /> }
 
                 { !isPie && <Collapse collapsed header="Plot Lines">
                     <AllPlotLines chartOptions={state.chartOptions} onChange={onChartOptionsChange} />
@@ -841,6 +761,63 @@ export default function ConfigPanel({
 
 
 
+
+/**
+ * The title, tick marks and labels of one axis. Bar charts swap the axes, so
+ * the caller picks the header.
+ */
+function AxisSection({
+    header,
+    which,
+    axis,
+    placeholder,
+    onChange
+}: {
+    header      : string
+    which       : "xAxis" | "yAxis"
+    axis       ?: XAxisOptions | YAxisOptions
+    placeholder?: string
+    onChange    : (options: Options) => void
+}) {
+    const change = (patch: XAxisOptions | YAxisOptions) => onChange(
+        which === "xAxis" ? { xAxis: patch as XAxisOptions } : { yAxis: patch as YAxisOptions }
+    )
+    const prefix = which === "xAxis" ? "X" : "Y"
+
+    return (
+        <Collapse collapsed header={ header }>
+            <div className="mt-1">
+                <label>Axis Title</label>
+                <input
+                    type="text"
+                    placeholder={ placeholder }
+                    value={ axis?.title?.text || "" }
+                    onChange={ e => change({ title: { text: e.target.value } }) }
+                />
+            </div>
+            <div className="mt-1 pb-1">
+                <Checkbox
+                    name={ prefix + "Ticks" }
+                    label="Render axis tick marks"
+                    // Unset counts as off, like the default tickWidth of 0
+                    checked={ !!axis?.tickWidth }
+                    onChange={ checked => change({ tickWidth: checked ? 1 : 0 }) }
+                />
+                <Checkbox
+                    name={ prefix + "Labels" }
+                    label="Render labels"
+                    checked={ axis?.labels?.enabled !== false }
+                    onChange={ checked => change({ labels: { enabled: checked } }) }
+                />
+            </div>
+            <div className="pb-1">
+                <Collapse collapsed header="Advanced Axis Options">
+                    <AxisEditor axis={ axis } onChange={ change } />
+                </Collapse>
+            </div>
+        </Collapse>
+    )
+}
 
 /**
  * The outline of columns, bars and slices: edges in 3D charts, borders in 2D
