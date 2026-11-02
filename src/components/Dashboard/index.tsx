@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer }        from "react"
+import { useEffect, useMemo, useReducer, useRef } from "react"
 import { useNavigate, Link }                     from "react-router-dom"
 import { Chart }                                 from "highcharts"
 import { buildChartOptions, removeSurvivalOptions } from "./Charts/lib"
@@ -490,16 +490,21 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         
     }
 
+    // Extra view properties for the next save, e.g. isDraft
+    const saveProps = useRef<Partial<app.View>>({})
+
     // Save
     const { execute: saveChart, loading: saving } = useBackend(async () => {
-        
+
+        const viewToSave = { ...runtimeView, ...saveProps.current }
+
         // Update
         if (view.id) {
             if (!canUpdate) {
                 return alert("You don't have permission to update graphs")
             }
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
-            const result = await updateOne("views", view.id, { ...runtimeView, screenShot }).catch(e => alert(e.message));
+            const result = await updateOne("views", view.id, { ...viewToSave, screenShot }).catch(e => alert(e.message));
 
             dispatch({ type: "MERGE", payload: { isDraft: result ? result.isDraft : false, pendingSaveProps: null }})
         }
@@ -510,7 +515,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                 return alert("You don't have permission to create graphs")
             }
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
-            await createOne("views", { ...runtimeView, subscriptionId: subscription ? subscription.id : undefined, packageId: dataPackage?.id, screenShot, }).then(
+            await createOne("views", { ...viewToSave, subscriptionId: subscription ? subscription.id : undefined, packageId: dataPackage?.id, screenShot, }).then(
                 v => defer(() => navigate("/views/" + v.id), "navigate-after-create"),
                 e => alert(e.message)
             );
@@ -518,10 +523,12 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     });
 
     const save = (props: Partial<app.View> = {}) => {
+        // The screenshot needs the chart, so switch to it and save once it
+        // has rendered (see the effect below)
         if (viewType !== "overview") {
-            dispatch({ type: "MERGE", payload: { pendingSaveProps: Object.assign(runtimeView, props), viewType: "overview" }})
+            dispatch({ type: "MERGE", payload: { pendingSaveProps: props, viewType: "overview" }})
         } else {
-            Object.assign(runtimeView, props)
+            saveProps.current = props
             return saveChart()
         }
     }
@@ -552,7 +559,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     // Run effect when viewType or chart readiness changes
     useEffect(() => {
         if (viewType === "overview" && chartIsRendered && pendingSaveProps) {
-            Object.assign(runtimeView, pendingSaveProps);
+            saveProps.current = pendingSaveProps
             saveChart();
         }
     }, [viewType, chartIsRendered]);
