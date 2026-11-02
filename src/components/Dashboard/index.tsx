@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react"
+import { useEffect, useMemo, useReducer }        from "react"
 import { useNavigate, Link }                     from "react-router-dom"
 import { Chart }                                 from "highcharts"
 import { buildChartOptions, removeSurvivalOptions } from "./Charts/lib"
@@ -13,13 +13,14 @@ import { GraphBreadcrumbs }                      from "./GraphBreadcrumbs"
 import { GraphTitle }                            from "./GraphTitle"
 import { GraphDescription }                      from "./GraphDescription"
 import { GraphToolbar }                          from "./GraphToolbar"
-import { getFilterParams, hasRanges, isTurbo, validateData } from "./chartData"
+import { hasRanges, isTurbo }                    from "./chartData"
+import { useChartData }                          from "./useChartData"
 import Tag                                       from "../Tags/Tag"
 import Alert, { AlertError }                     from "../generic/Alert"
 import Loader                                    from "../generic/Loader"
 import Grid                                      from "../generic/Grid"
 import { app }                                   from "../../types"
-import { createOne, updateOne, fetchChartData }  from "../../backend"
+import { createOne, updateOne }                  from "../../backend"
 import { useBackend, useCommand }                from "../../hooks"
 import Highcharts                                from "../../highcharts"
 import { useAuth }                               from "../../auth"
@@ -47,7 +48,6 @@ import {
     strip
 } from "../../utils"
 import {
-    CUMULUS__NONE,
     ReadOnlyPaths,
     SupportedChartTypes,
     SupportedNativeChartTypes
@@ -95,7 +95,7 @@ export interface ViewState
     pendingSaveProps : Partial<app.View> | null
 }
 
-interface ViewAction
+export interface ViewAction
 {
     type: string
     payload?: any
@@ -422,7 +422,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     const statusColumnName = chartType === "survival" ? statusColumn?.name || "" : ""
     const secColumnName  = column2?.name || ""
     const viewColumnName = viewColumn.name
-    const requestId      = subscription?.id || dataPackage?.id
 
     // The rendered chart only: the saved options keep a single x axis
     const renderedChartOptions = useMemo(() => {
@@ -527,141 +526,18 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         }
     }
 
-    // Convert filters to search parameters
-    const filterParams = getFilterParams(filters)
-
-    // Variables that control if new data needs to be fetched
-    const filter = filterParams.map(encodeURIComponent).join("&filter=")
-
-    const loadData = useCallback((signal?: AbortSignal) => {
-        dispatch({ type: "UPDATE", payload: {
-            loadingData: true,
-            loadingDataError: null,
-            data : null,
-            data2: null,
-            survivalData: null,
-        }})
-
-        const fetchPrimaryData = async () => fetchChartData({
-            subscription,
-            dataPackage,
-            column    : viewColumnName,
-            stratifier: stratifierName,
-            filters   : filterParams,
-            label     : "Chart Primary Data",
-            signal
-        })
-
-        const fetchSecondaryData = async () => {
-            if (!secColumnName) return null
-            return fetchChartData({
-                subscription,
-                dataPackage,
-                column    : viewColumnName,
-                stratifier: secColumnName,
-                filters   : filterParams,
-                label     : "Chart Secondary Data",
-                signal
-            })
-        }
-
-        // Survival charts: the primary query split into events and censored records
-        const fetchSurvivalData = async (): Promise<SurvivalData | null> => {
-            if (!statusColumnName || !eventValue) return null
-            const [events, censored] = await Promise.all([
-                fetchChartData({
-                    subscription,
-                    dataPackage,
-                    column    : viewColumnName,
-                    stratifier: stratifierName,
-                    filters   : [...filterParams, `${statusColumnName}:strEq:${eventValue}`],
-                    label     : "Chart Survival Events",
-                    signal
-                }),
-                fetchChartData({
-                    subscription,
-                    dataPackage,
-                    column    : viewColumnName,
-                    stratifier: stratifierName,
-                    filters   : [
-                        ...filterParams,
-                        `${statusColumnName}:strNotEq:${eventValue}`,
-                        `${statusColumnName}:strNotEq:${CUMULUS__NONE}`
-                    ],
-                    label     : "Chart Survival Censored",
-                    signal
-                })
-            ])
-            return {
-                events,
-                censored,
-                status: { label: statusColumn?.label || statusColumnName, eventValue }
-            }
-        }
-
-        return Promise.all([
-            fetchPrimaryData(),
-            fetchSecondaryData(),
-            fetchSurvivalData()
-        ]).then(([
-            primaryData,
-            secondaryData,
-            survivalData
-        ]) => {
-            if (signal?.aborted) return
-            try {
-                validateData(primaryData, { column: viewColumnName, stratifier: stratifierName, filters: filterParams })
-                if (secColumnName) {
-                    validateData(secondaryData, { column: viewColumnName, stratifier: secColumnName, filters: filterParams })
-                }
-            } catch (ex) {
-                dispatch({ type: "UPDATE", payload: { loadingDataError: ex }})
-            }
-
-            dispatch({ type: "UPDATE", payload: {
-                data : primaryData,
-                data2: secondaryData,
-                survivalData,
-                loadingData: false
-            }})
-        }).catch(error => {
-            if (signal?.aborted) return
-            dispatch({ type: "UPDATE", payload: {
-                loadingDataError: error,
-                loadingData: false
-            }})
-        })
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [requestId, stratifierName, viewColumnName, filter, secColumnName, statusColumnName, eventValue]);
-
-    useEffect(() => {
-        const controller = new AbortController()
-        loadData(controller.signal)
-        return () => controller.abort()
-    }, [loadData])
-
-    // Survival charts: load the values of the status column, so that the user
-    // can pick the one that means "event"
-    const [statusValues, setStatusValues] = useState<string[] | null>(null)
-    useEffect(() => {
-        setStatusValues(null)
-        if (!statusColumnName) return
-        const controller = new AbortController()
-        fetchChartData({
-            subscription,
-            dataPackage,
-            column: statusColumnName,
-            label : "Survival Status Values",
-            signal: controller.signal
-        }).then((data: app.ServerResponses.DataResponse) => {
-            setStatusValues((data.data[0]?.rows || []).map(row => String(row[0])).filter(v => v !== CUMULUS__NONE))
-        }).catch(() => {
-            if (!controller.signal.aborted) setStatusValues([])
-        })
-        return () => controller.abort()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [requestId, statusColumnName])
+    const { statusValues } = useChartData({
+        subscription,
+        dataPackage,
+        viewColumnName,
+        stratifierName,
+        secColumnName,
+        statusColumnName,
+        statusLabel: statusColumn?.label || statusColumnName,
+        eventValue,
+        filters,
+        dispatch
+    })
 
     useEffect(() => {
         if (copy) {
