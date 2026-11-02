@@ -1,6 +1,6 @@
 import {
     buildChartOptions,
-    removeSurvivalTitles,
+    removeSurvivalOptions,
     emToPx,
     filterOutExceptions,
     formatPValue,
@@ -509,13 +509,26 @@ describe("Chart", () => {
             })
 
             it ("are removed when switching to another chart type, unless set by the user", () => {
-                const defaults = removeSurvivalTitles(build({}, YEARS)) as any
+                const defaults = removeSurvivalOptions(build({}, YEARS)) as any
                 expect(defaults.xAxis.title.text).toBe("")
                 expect(defaults.yAxis.title.text).toBe("")
 
-                const custom = removeSurvivalTitles(build({ xAxis: { title: { text: "Years" } }, yAxis: { title: { text: "Event-free" } } }, YEARS)) as any
+                const custom = removeSurvivalOptions(build({ xAxis: { title: { text: "Years" } }, yAxis: { title: { text: "Event-free" } } }, YEARS)) as any
                 expect(custom.xAxis.title.text).toBe("Years")
                 expect(custom.yAxis.title.text).toBe("Event-free")
+            })
+
+            it ("left steps are removed when switching to another chart type", () => {
+                const options = build({}, YEARS) as any
+                expect(options.series.length).toBeGreaterThan(0)
+                expect(options.series.every((s: any) => s.step === "left")).toBe(true)
+
+                const removed = removeSurvivalOptions(options) as any
+                expect(removed.series.length).toBe(options.series.length)
+                expect(removed.series.every((s: any) => s.step === undefined)).toBe(true)
+
+                // The options passed in are not changed
+                expect(options.series.every((s: any) => s.step === "left")).toBe(true)
             })
         })
 
