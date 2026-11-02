@@ -175,11 +175,8 @@ export default function ConfigPanel({
     const { chartOptions, chartType } = state;
 
     const isBar         = chartType.startsWith("bar")
-    const isColumn      = chartType.startsWith("column")
     const isPie         = chartType.startsWith("pie") || chartType.startsWith("donut")
-    const isStack       = chartType.endsWith("Stack")
     const isSurvival    = chartType === "survival"
-    const isBarOrColumn = isBar || isColumn
     const xType         = getXType(cols.find(c => c.name === state.groupBy)!)
     const isCategory    = xType === "category"
     const xLabel        = isPie ? "Label" : isBar ? "Y" : "X"
@@ -212,181 +209,11 @@ export default function ConfigPanel({
 
                 
 
-                <Collapse collapsed header="Chart">
-                    <div className="mt-1">
-                        <label>Chart Type</label>
-                        <Select
-                            value={ state.chartType }
-                            onChange={ onChartTypeChange }
-                            options={getChartTypes(chartType).map(type => ({
-                                value: type,
-                                label: SupportedChartTypes[type as SupportedChartType],
-                                icon: ChartIcons[type as keyof typeof ChartIcons],
-                                disabled: (type.includes("Stack") && !state.stratifyBy) || (
-                                    (type.includes("pie") || type.includes("donut")) && !!state.stratifyBy
-                                )
-                            }))}
-                        />
-                    </div>
-                    <div className="mt-1">
-                        <label>Chart Title</label>
-                        <input
-                            type="text"
-                            value={ chartOptions.title?.text || "" }
-                            onChange={ e => onChartOptionsChange({ title: { text: e.target.value }})}
-                        />
-                        <br/>
-                    </div>
-                    <div className="mt-1">
-                        <label>Chart Subtitle</label>
-                        <input
-                            type="text"
-                            list="chart-subtitle-suggestions"
-                            value={ chartOptions.subtitle?.text || "" }
-                            onChange={ e => onChartOptionsChange({ subtitle: { text: e.target.value }})}
-                        />
-                        { /* Subtitles the chart suggests (see custom.subtitleSuggestions) */ }
-                        <datalist id="chart-subtitle-suggestions">
-                            { (chartOptions.custom?.subtitleSuggestions || []).map((text: string) => <option key={ text } value={ text } />) }
-                        </datalist>
-                        <br/>
-                    </div>
-
-                    <div className="mt-1">
-                        <label>Color Theme</label>
-                        <Select
-                            value={ state.chartOptions.custom?.theme ?? DEFAULT_COLOR_THEME }
-                            onChange={ (id) => {
-                                const theme = COLOR_THEMES.find(t => t.id === id)
-                                onChartOptionsChange({
-                                    colors: theme!.colors,
-                                    custom: { theme: id }
-                                })
-                            }}
-                            options={COLOR_THEMES.map((theme, i) => ({
-                                value: theme.id,
-                                label: theme.name,
-                                right: <>{ theme.colors.map((c, i) => <div key={i} style={{
-                                    background: c,
-                                    display: "inline-block",
-                                    width: "8px",
-                                    height: "1em",
-                                    margin: "-2px 1px 0",
-                                    boxShadow: "0 0 0 0.5px #0008 inset, 0 0 0 0.5px #FFF8",
-                                    verticalAlign: "middle"
-                                }} />)}</>,
-                                icon: "fas fa-palette color-muted"
-                            }))}
-                        />
-                    </div>
-
-                    { isBarOrColumn && state.stratifyBy && 
-                        <div className="mt-1">
-                            <label>
-                                Group Padding
-                                <input
-                                    type="range"
-                                    min={0}
-                                    max={0.5}
-                                    step={0.01}
-                                    value={
-                                        isColumn ? 
-                                            chartOptions.plotOptions?.column?.groupPadding === undefined ?
-                                                0.2 :
-                                                chartOptions.plotOptions.column.groupPadding :
-                                            chartOptions.plotOptions?.bar?.groupPadding === undefined ?
-                                                0.2 :
-                                                chartOptions.plotOptions.bar.groupPadding
-                                    }
-                                    onChange={e => onChartOptionsChange({
-                                        plotOptions: {
-                                            [isColumn ? "column" : "bar"]: {
-                                                groupPadding: e.target.valueAsNumber
-                                            }
-                                        }
-                                    })}
-                                    style={{ width: "100%", margin: 0 }}
-                                />
-                            </label>
-                            <p className="small color-muted">Padding between each value groups</p>
-                        </div>
-                    }
-                    { isBarOrColumn && !isStack &&
-                        <div className="mt-1">
-                            <label>
-                                Point Padding
-                                <input
-                                    type="range"
-                                    min={0}
-                                    max={0.5}
-                                    step={0.01}
-                                    value={
-                                        isColumn ? 
-                                            chartOptions.plotOptions?.column?.pointPadding === undefined ?
-                                                0.02 :
-                                                chartOptions.plotOptions.column.pointPadding :
-                                            chartOptions.plotOptions?.bar?.pointPadding === undefined ?
-                                                0.02 :
-                                                chartOptions.plotOptions.bar.pointPadding
-                                    }
-                                    onChange={e => onChartOptionsChange({
-                                        plotOptions: {
-                                            [isColumn ? "column" : "bar"]: {
-                                                pointPadding: e.target.valueAsNumber
-                                            }
-                                        }
-                                    })}
-                                    style={{ width: "100%", margin: 0 }}
-                                />
-                            </label>
-                            <p className="small color-muted">Padding between each column or bar</p>
-                        </div>
-                    }
-                    { isPie && <div className="mt-1">
-                        <label>
-                            Start Angle
-                            <input
-                                type="range"
-                                min={0}
-                                max={360}
-                                step={1}
-                                // @ts-ignore
-                                value={ chartOptions.series?.[0]?.startAngle || 0 }
-                                onChange={e => {
-                                    chartOptions.series![0] = merge(chartOptions.series?.[0], { startAngle: e.target.valueAsNumber })
-                                    onChartOptionsChange(chartOptions)
-                                }}
-                                style={{ width: "100%", margin: 0 }}
-                            />
-                        </label>
-                    </div> }
-                    { isPie && <div className="mt-1">
-                        <label>
-                            Selected Slice Offset
-                            <input
-                                type="range"
-                                min={0}
-                                max={30}
-                                step={1}
-                                value={ chartOptions.plotOptions?.pie?.slicedOffset === undefined ? 30 : chartOptions.plotOptions.pie.slicedOffset }
-                                onChange={e => onChartOptionsChange({
-                                    plotOptions: {
-                                        pie: {
-                                            slicedOffset: e.target.valueAsNumber
-                                        }
-                                    }
-                                })}
-                                style={{ width: "100%", margin: 0 }}
-                            />
-                        </label>
-                    </div> }
-                    <div className="mt-1 pb-1">
-                        <Collapse collapsed header="Advanced">
-                            <Chart chart={state.chartOptions.chart} onChange={chart => onChartOptionsChange({ chart })} />
-                        </Collapse>
-                    </div>
-                    <br/>
-                </Collapse>
+                <ChartSection
+                    state={state}
+                    onChartTypeChange={onChartTypeChange}
+                    onChartOptionsChange={onChartOptionsChange}
+                />
 
                 <Collapse collapsed header="Data">
                     <div className="color-muted small mt-1" style={{ padding: "0 0 0 1.5em", margin: "1em 0 0" }}>
@@ -755,6 +582,205 @@ export default function ConfigPanel({
                 <br/>
             </>}
         </div>
+    )
+}
+
+/**
+ * The chart type, titles, colors and the spacing of columns, bars and slices
+ */
+function ChartSection({
+    state,
+    onChartTypeChange,
+    onChartOptionsChange
+}: {
+    state: ChartConfigPanelState
+    onChartTypeChange: (type: string) => void
+    onChartOptionsChange: (options: Options) => void
+}) {
+    const { chartOptions, chartType } = state;
+
+    const isBar         = chartType.startsWith("bar")
+    const isColumn      = chartType.startsWith("column")
+    const isPie         = chartType.startsWith("pie") || chartType.startsWith("donut")
+    const isStack       = chartType.endsWith("Stack")
+    const isBarOrColumn = isBar || isColumn
+
+    return (
+        <Collapse collapsed header="Chart">
+            <div className="mt-1">
+                <label>Chart Type</label>
+                <Select
+                    value={ state.chartType }
+                    onChange={ onChartTypeChange }
+                    options={getChartTypes(chartType).map(type => ({
+                        value: type,
+                        label: SupportedChartTypes[type as SupportedChartType],
+                        icon: ChartIcons[type as keyof typeof ChartIcons],
+                        disabled: (type.includes("Stack") && !state.stratifyBy) || (
+                            (type.includes("pie") || type.includes("donut")) && !!state.stratifyBy
+                        )
+                    }))}
+                />
+            </div>
+            <div className="mt-1">
+                <label>Chart Title</label>
+                <input
+                    type="text"
+                    value={ chartOptions.title?.text || "" }
+                    onChange={ e => onChartOptionsChange({ title: { text: e.target.value }})}
+                />
+                <br/>
+            </div>
+            <div className="mt-1">
+                <label>Chart Subtitle</label>
+                <input
+                    type="text"
+                    list="chart-subtitle-suggestions"
+                    value={ chartOptions.subtitle?.text || "" }
+                    onChange={ e => onChartOptionsChange({ subtitle: { text: e.target.value }})}
+                />
+                { /* Subtitles the chart suggests (see custom.subtitleSuggestions) */ }
+                <datalist id="chart-subtitle-suggestions">
+                    { (chartOptions.custom?.subtitleSuggestions || []).map((text: string) => <option key={ text } value={ text } />) }
+                </datalist>
+                <br/>
+            </div>
+
+            <div className="mt-1">
+                <label>Color Theme</label>
+                <Select
+                    value={ state.chartOptions.custom?.theme ?? DEFAULT_COLOR_THEME }
+                    onChange={ (id) => {
+                        const theme = COLOR_THEMES.find(t => t.id === id)
+                        onChartOptionsChange({
+                            colors: theme!.colors,
+                            custom: { theme: id }
+                        })
+                    }}
+                    options={COLOR_THEMES.map((theme, i) => ({
+                        value: theme.id,
+                        label: theme.name,
+                        right: <>{ theme.colors.map((c, i) => <div key={i} style={{
+                            background: c,
+                            display: "inline-block",
+                            width: "8px",
+                            height: "1em",
+                            margin: "-2px 1px 0",
+                            boxShadow: "0 0 0 0.5px #0008 inset, 0 0 0 0.5px #FFF8",
+                            verticalAlign: "middle"
+                        }} />)}</>,
+                        icon: "fas fa-palette color-muted"
+                    }))}
+                />
+            </div>
+
+            { isBarOrColumn && state.stratifyBy && 
+                <div className="mt-1">
+                    <label>
+                        Group Padding
+                        <input
+                            type="range"
+                            min={0}
+                            max={0.5}
+                            step={0.01}
+                            value={
+                                isColumn ? 
+                                    chartOptions.plotOptions?.column?.groupPadding === undefined ?
+                                        0.2 :
+                                        chartOptions.plotOptions.column.groupPadding :
+                                    chartOptions.plotOptions?.bar?.groupPadding === undefined ?
+                                        0.2 :
+                                        chartOptions.plotOptions.bar.groupPadding
+                            }
+                            onChange={e => onChartOptionsChange({
+                                plotOptions: {
+                                    [isColumn ? "column" : "bar"]: {
+                                        groupPadding: e.target.valueAsNumber
+                                    }
+                                }
+                            })}
+                            style={{ width: "100%", margin: 0 }}
+                        />
+                    </label>
+                    <p className="small color-muted">Padding between each value groups</p>
+                </div>
+            }
+            { isBarOrColumn && !isStack &&
+                <div className="mt-1">
+                    <label>
+                        Point Padding
+                        <input
+                            type="range"
+                            min={0}
+                            max={0.5}
+                            step={0.01}
+                            value={
+                                isColumn ? 
+                                    chartOptions.plotOptions?.column?.pointPadding === undefined ?
+                                        0.02 :
+                                        chartOptions.plotOptions.column.pointPadding :
+                                    chartOptions.plotOptions?.bar?.pointPadding === undefined ?
+                                        0.02 :
+                                        chartOptions.plotOptions.bar.pointPadding
+                            }
+                            onChange={e => onChartOptionsChange({
+                                plotOptions: {
+                                    [isColumn ? "column" : "bar"]: {
+                                        pointPadding: e.target.valueAsNumber
+                                    }
+                                }
+                            })}
+                            style={{ width: "100%", margin: 0 }}
+                        />
+                    </label>
+                    <p className="small color-muted">Padding between each column or bar</p>
+                </div>
+            }
+            { isPie && <div className="mt-1">
+                <label>
+                    Start Angle
+                    <input
+                        type="range"
+                        min={0}
+                        max={360}
+                        step={1}
+                        // @ts-ignore
+                        value={ chartOptions.series?.[0]?.startAngle || 0 }
+                        onChange={e => {
+                            chartOptions.series![0] = merge(chartOptions.series?.[0], { startAngle: e.target.valueAsNumber })
+                            onChartOptionsChange(chartOptions)
+                        }}
+                        style={{ width: "100%", margin: 0 }}
+                    />
+                </label>
+            </div> }
+            { isPie && <div className="mt-1">
+                <label>
+                    Selected Slice Offset
+                    <input
+                        type="range"
+                        min={0}
+                        max={30}
+                        step={1}
+                        value={ chartOptions.plotOptions?.pie?.slicedOffset === undefined ? 30 : chartOptions.plotOptions.pie.slicedOffset }
+                        onChange={e => onChartOptionsChange({
+                            plotOptions: {
+                                pie: {
+                                    slicedOffset: e.target.valueAsNumber
+                                }
+                            }
+                        })}
+                        style={{ width: "100%", margin: 0 }}
+                    />
+                </label>
+            </div> }
+            <div className="mt-1 pb-1">
+                <Collapse collapsed header="Advanced">
+                    <Chart chart={state.chartOptions.chart} onChange={chart => onChartOptionsChange({ chart })} />
+                </Collapse>
+            </div>
+            <br/>
+        </Collapse>
     )
 }
 
