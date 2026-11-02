@@ -176,11 +176,6 @@ export default function ConfigPanel({
 
     const isBar         = chartType.startsWith("bar")
     const isPie         = chartType.startsWith("pie") || chartType.startsWith("donut")
-    const isSurvival    = chartType === "survival"
-    const xType         = getXType(cols.find(c => c.name === state.groupBy)!)
-    const isCategory    = xType === "category"
-    const xLabel        = isPie ? "Label" : isBar ? "Y" : "X"
-    const yLabel        = isPie ? "Value" : isBar ? "X" : "Y"
 
     return (
         <div className="color-soft" style={{
@@ -215,294 +210,14 @@ export default function ConfigPanel({
                     onChartOptionsChange={onChartOptionsChange}
                 />
 
-                <Collapse collapsed header="Data">
-                    <div className="color-muted small mt-1" style={{ padding: "0 0 0 1.5em", margin: "1em 0 0" }}>
-                        <i className="fas fa-exclamation-circle" style={{ color: "#D30", width: "1.2em", margin: "0 0.2em 0 -1.5em" }} />
-                        Changing these settings may result in new data being fetched.
-                        That will create a different chart using different series and
-                        some of your visualization settings may have to be re-applied.
-                        To avoid that try to configure your <b>Data</b> and <b>Filters</b> settings
-                        first.
-                    </div>
-                    <div style={{ position: "relative" }}>
-                        { state.stratifyBy && <div className="dashboard-sidebar-swap-btn-wrap">
-                            { /* Survival charts need the follow-up time on the X axis, so
-                                 its column can't trade places with the stratifier */ }
-                            <div
-                                className={ "fas fa-exchange-alt" + (isSurvival ? " disabled" : "") }
-                                aria-disabled={ isSurvival }
-                                onClick={() => {
-                                    if (!isSurvival) {
-                                        onChange({
-                                            ...state,
-                                            groupBy: state.stratifyBy,
-                                            stratifyBy: state.groupBy,
-                                        })
-                                    }
-                                }}
-                                data-tooltip={ isSurvival ?
-                                    "Survival charts need the follow-up time on the X axis, so it can't be swapped with the stratifier" :
-                                    "Swap selected columns" }
-                            />
-                        </div> }
-                        <div className="pt-1">
-                            <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
-                            <ColumnSelector
-                                cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max" && c.dataType !== "hidden") }
-                                comparator={ isSurvival ? suggestedFirst(isDurationColumn) : undefined }
-                                value={ state.groupBy }
-                                disabled={[
-                                    "cnt",
-                                    state.stratifyBy,
-                                    state.column2,
-                                    isSurvival ? state.statusColumn : "",
-                                    // Survival time must be a duration (number or numeric label like ">=5")
-                                    ...(isSurvival ? cols.filter(c => !["integer", "float", "string"].includes(c.dataType)).map(c => c.name) : [])
-                                ].filter(Boolean)}
-                                onChange={ (groupBy: string) => onChange({ ...state, groupBy, offset: 0, limit: 0, sortBy: "x:asc" }) }
-                            />
-                            <p className="small color-muted"> {
-                                isPie ?
-                                    "Select which data column provides the slices of the pie" :
-                                isSurvival ?
-                                    "Select the column holding the time to event" :
-                                    `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
-                            }</p>
-                        </div>
-                        { !isPie && <>
-                            <div className="pt-1 pb-1">
-                                <label>Stratifier</label>
-                                <ColumnSelector
-                                    cols={ cols.filter(c => c.dataType !== "hidden") }
-                                    placeholder="Select Column"
-                                    addEmptyOption="start"
-                                    value={ state.stratifyBy }
-                                    disabled={[
-                                        "cnt",
-                                        "cnt_min",
-                                        "cnt_max",
-                                        state.groupBy,
-                                        state.column2,
-                                        isSurvival ? state.statusColumn : ""
-                                    ].filter(Boolean)}
-                                    onChange={ (stratifyBy: string) => onChange({
-                                        ...state,
-                                        stratifyBy,
-                                        offset: 0,
-                                        limit: 0,
-                                        sortBy: "x:asc",
-                                        denominator: (state.denominator === "local" || state.denominator === "count") && !stratifyBy ? "" : state.denominator
-                                    }) }
-                                />
-                                <p className="small color-muted">
-                                    Used to stratify the data into multiple series
-                                </p>
-                            </div>
-                            { isSurvival && <>
-                                <label>Status Column</label>
-                                <ColumnSelector
-                                    cols={ cols.filter(c => c.dataType !== "hidden") }
-                                    comparator={ suggestedFirst(isStatusColumn) }
-                                    placeholder="Select Column"
-                                    addEmptyOption="start"
-                                    value={ state.statusColumn }
-                                    disabled={[
-                                        "cnt",
-                                        "cnt_min",
-                                        "cnt_max",
-                                        state.groupBy,
-                                        state.stratifyBy,
-                                        ...cols.filter(c => c.dataType.startsWith("date")).map(c => c.name)
-                                    ].filter(Boolean)}
-                                    onChange={ (statusColumn: string) => onChange({ ...state, statusColumn: statusColumn || "", eventValue: "" }) }
-                                />
-                                <p className="small color-muted">
-                                    The column that tells whether the event happened for each record
-                                </p>
-                                { !!state.statusColumn && <div className="pt-1">
-                                    <label>Event Value</label>
-                                    <Select
-                                        placeholder={ statusValues ? "Select Value" : "Loading values..." }
-                                        disabled={ !statusValues }
-                                        value={ state.eventValue }
-                                        options={[
-                                            ...(statusValues || []),
-                                            // Keep a saved value even if it is no longer in the data
-                                            ...(state.eventValue && statusValues && !statusValues.includes(state.eventValue) ? [state.eventValue] : [])
-                                        ].map(value => ({
-                                            value,
-                                            icon : `${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/icons/cell.png`,
-                                            label: statusValues?.includes(value) ? value : `${value} (not found in the data)`
-                                        }))}
-                                        onChange={ (eventValue: string) => onChange({ ...state, eventValue }) }
-                                    />
-                                    <p className="small color-muted">
-                                        The value from the status column that means the event happened
-                                    </p>
-                                    { (statusValues?.length ?? 0) > 2 && <p className="small color-muted">
-                                        <i className="fa-solid fa-triangle-exclamation color-orange" /> This column has more than two
-                                        values ({ statusValues!.join(", ") }). Status columns are expected to have two: one for the
-                                        event and one for no event.
-                                    </p> }
-                                    <div className="pt-1">
-                                        <Checkbox
-                                            name="survivalBands"
-                                            label="Show 95% confidence bands"
-                                            checked={ state.survivalBands }
-                                            onChange={ survivalBands => onChange({ ...state, survivalBands }) }
-                                        />
-                                        <Checkbox
-                                            name="survivalRiskTable"
-                                            label="Show number at risk"
-                                            checked={ state.survivalRiskTable }
-                                            onChange={ survivalRiskTable => onChange({ ...state, survivalRiskTable }) }
-                                        />
-                                    </div>
-                                </div> }
-                            </> }
-                            { !isSurvival && <>
-                                <label>Denominator</label>
-                                <Select
-                                    options={[
-                                        {
-                                            label: <div>
-                                                <div>None</div>
-                                                <div className="small color-muted">
-                                                    Render the aggregate counts as found in the<br/>
-                                                    {Terminology.subscription.nameSingular.toLowerCase()} without further processing
-                                                </div>
-                                            </div>,
-                                            value: "",
-                                            icon: "fa-solid fa-percent grey-out"
-                                        },
-                                        {
-                                            label: <div>
-                                                <div>Stratified Count</div>
-                                                <div className="small color-muted">
-                                                    Convert counts to percentage of the total<br />
-                                                    count of every given data group.<br />
-                                                    Not available with no stratifier.
-                                                </div>
-                                            </div>,
-                                            value: "count",
-                                            icon: "fa-solid fa-percent color-brand-2",
-                                            disabled: !state.stratifyBy
-                                        },
-                                        {
-                                            label: <div>
-                                                <div>Stratified Sum</div>
-                                                <div className="small color-muted">
-                                                    Convert counts to percentage of the sum<br />
-                                                    of values in every given data group.<br />
-                                                    Not available with no stratifier.
-                                                </div>
-                                            </div>,
-                                            value: "local",
-                                            icon: "fa-solid fa-percent color-brand-2",
-                                            disabled: !state.stratifyBy
-                                        },
-                                        {
-                                            label: <div>
-                                                <div>Total Count</div>
-                                                <div className="small color-muted">
-                                                    Convert counts to percentage of the total<br />
-                                                    count within the entire dataset.
-                                                </div>
-                                            </div>,
-                                            value: "global",
-                                            icon: "fa-solid fa-percent color-blue"
-                                        }
-                                    ]}
-                                    value={ state.denominator }
-                                    onChange={ denominator => onChange({ ...state, denominator })}
-                                />
-                                <p className="small color-muted">
-                                    If set, renders the values as percentages of the given denominator
-                                </p>
-                            </> }
-                            { state.ranges && <div className="pt-1">
-                                <label>Confidence Intervals</label>
-                                <Select value={ state.ranges?.type || "" } options={[
-                                    {
-                                        value: "",
-                                        icon : "fa-solid fa-plus-minus color-muted",
-                                        label: "None"
-                                    },
-                                    {
-                                        label: "Error Bars",
-                                        value: "errorbar",
-                                        icon : "fa-solid fa-plus-minus color-blue"
-                                    },
-                                    {
-                                        label: "Area",
-                                        value: "areasplinerange",
-                                        icon : "fa-solid fa-plus-minus color-blue"
-                                    },
-                                    {
-                                        label: "Bars / Columns",
-                                        value: "column",
-                                        icon : "fa-solid fa-plus-minus color-blue"
-                                    },
-                                ]} onChange={type => onRangeOptionsChange({ type, enabled: !!type })} />
-                                <p className="small color-muted">
-                                    If information is available, add the error ranges to the chart
-                                </p>
-                            </div> }
-
-                            { !isSurvival && <SecondaryDataEditor state={state} cols={[ ...cols ]} onChange={onSecondaryDataOptionsChange} /> }
-                        </> }
-
-                        { isPie && <SliceEditor state={state} onChange={onChange} /> }
-
-                        { !isSurvival && <>
-                        <div className="row half-gap">
-                                <div className="col col-5">
-                                    <label>Sort {!!state.stratifyBy && state.sortBy.startsWith("y:") && <i className="fa fa-info-circle color-muted" data-tooltip="Sorting by count may produce unexpected results in stratified charts because every group is sorted separately." />}</label>
-                                    <Select
-                                        right
-                                        options={[
-                                            {
-                                                label: xLabel + ": asc",
-                                                icon : "fas fa-sort-amount-down-alt color-blue",
-                                                value: "x:asc",
-                                            },
-                                            {
-                                                label: xLabel + ": desc",
-                                                icon : "fas fa-sort-amount-down color-blue",
-                                                value: "x:desc",
-                                            },
-                                            {
-                                                label: yLabel + ": asc",
-                                                icon : "fas fa-sort-amount-down-alt color-blue",
-                                                value: "y:asc",
-                                                disabled: !isCategory || !!state.stratifyBy
-                                            },
-                                            {
-                                                label: yLabel + ": desc",
-                                                icon : "fas fa-sort-amount-down color-blue",
-                                                value: "y:desc",
-                                                disabled: !isCategory || !!state.stratifyBy
-                                            }
-                                        ].filter(option => !option.disabled)}
-                                        value={ state.sortBy }
-                                        onChange={ sortBy => onChange({ ...state, sortBy })} />
-                                </div>
-                                <div className="col">
-                                    <label>Offset</label>
-                                    <input type="number" min={0} value={ state.offset || 0 } onChange={e => onChange({ ...state, offset: e.target.valueAsNumber })} />
-                                </div>
-                                <div className="col">
-                                    <label>Limit</label>
-                                    <input type="number" min={ 0 } value={ state.limit || 0 } onChange={e => onChange({ ...state, limit: e.target.valueAsNumber })} />
-                                </div>
-                            </div>
-                            <p className="small color-muted">
-                                Use offset, limit, and sort to slice the dataset retrieved from the backend
-                            </p>
-                        </> }
-                        <br />
-                    </div>
-                </Collapse>
+                <DataSection
+                    cols={cols}
+                    state={state}
+                    onChange={onChange}
+                    onRangeOptionsChange={onRangeOptionsChange}
+                    onSecondaryDataOptionsChange={onSecondaryDataOptionsChange}
+                    statusValues={statusValues}
+                />
 
                 <Collapse collapsed header="Filters">
                     <div className="color-muted small mt-1" style={{ padding: "0 0 0 1.5em", margin: "1em 0 0" }}>
@@ -582,6 +297,327 @@ export default function ConfigPanel({
                 <br/>
             </>}
         </div>
+    )
+}
+
+/**
+ * The columns and the shape of the data: X axis, stratifier, survival status,
+ * error ranges, denominator, sorting and paging, and the secondary data
+ */
+function DataSection({
+    cols,
+    state,
+    onChange,
+    onRangeOptionsChange,
+    onSecondaryDataOptionsChange,
+    statusValues
+}: {
+    cols: app.SubscriptionDataColumn[]
+    state: ChartConfigPanelState
+    onChange: (state: ChartConfigPanelState) => void
+    onRangeOptionsChange: (ranges: app.RangeOptions) => void
+    onSecondaryDataOptionsChange: (payload: { column?: string, type?: string }) => void
+    statusValues?: string[] | null
+}) {
+    const { chartType } = state;
+
+    const isBar         = chartType.startsWith("bar")
+    const isPie         = chartType.startsWith("pie") || chartType.startsWith("donut")
+    const isSurvival    = chartType === "survival"
+    const xType         = getXType(cols.find(c => c.name === state.groupBy)!)
+    const isCategory    = xType === "category"
+    const xLabel        = isPie ? "Label" : isBar ? "Y" : "X"
+    const yLabel        = isPie ? "Value" : isBar ? "X" : "Y"
+
+    return (
+        <Collapse collapsed header="Data">
+            <div className="color-muted small mt-1" style={{ padding: "0 0 0 1.5em", margin: "1em 0 0" }}>
+                <i className="fas fa-exclamation-circle" style={{ color: "#D30", width: "1.2em", margin: "0 0.2em 0 -1.5em" }} />
+                Changing these settings may result in new data being fetched.
+                That will create a different chart using different series and
+                some of your visualization settings may have to be re-applied.
+                To avoid that try to configure your <b>Data</b> and <b>Filters</b> settings
+                first.
+            </div>
+            <div style={{ position: "relative" }}>
+                { state.stratifyBy && <div className="dashboard-sidebar-swap-btn-wrap">
+                    { /* Survival charts need the follow-up time on the X axis, so
+                         its column can't trade places with the stratifier */ }
+                    <div
+                        className={ "fas fa-exchange-alt" + (isSurvival ? " disabled" : "") }
+                        aria-disabled={ isSurvival }
+                        onClick={() => {
+                            if (!isSurvival) {
+                                onChange({
+                                    ...state,
+                                    groupBy: state.stratifyBy,
+                                    stratifyBy: state.groupBy,
+                                })
+                            }
+                        }}
+                        data-tooltip={ isSurvival ?
+                            "Survival charts need the follow-up time on the X axis, so it can't be swapped with the stratifier" :
+                            "Swap selected columns" }
+                    />
+                </div> }
+                <div className="pt-1">
+                    <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
+                    <ColumnSelector
+                        cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max" && c.dataType !== "hidden") }
+                        comparator={ isSurvival ? suggestedFirst(isDurationColumn) : undefined }
+                        value={ state.groupBy }
+                        disabled={[
+                            "cnt",
+                            state.stratifyBy,
+                            state.column2,
+                            isSurvival ? state.statusColumn : "",
+                            // Survival time must be a duration (number or numeric label like ">=5")
+                            ...(isSurvival ? cols.filter(c => !["integer", "float", "string"].includes(c.dataType)).map(c => c.name) : [])
+                        ].filter(Boolean)}
+                        onChange={ (groupBy: string) => onChange({ ...state, groupBy, offset: 0, limit: 0, sortBy: "x:asc" }) }
+                    />
+                    <p className="small color-muted"> {
+                        isPie ?
+                            "Select which data column provides the slices of the pie" :
+                        isSurvival ?
+                            "Select the column holding the time to event" :
+                            `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
+                    }</p>
+                </div>
+                { !isPie && <>
+                    <div className="pt-1 pb-1">
+                        <label>Stratifier</label>
+                        <ColumnSelector
+                            cols={ cols.filter(c => c.dataType !== "hidden") }
+                            placeholder="Select Column"
+                            addEmptyOption="start"
+                            value={ state.stratifyBy }
+                            disabled={[
+                                "cnt",
+                                "cnt_min",
+                                "cnt_max",
+                                state.groupBy,
+                                state.column2,
+                                isSurvival ? state.statusColumn : ""
+                            ].filter(Boolean)}
+                            onChange={ (stratifyBy: string) => onChange({
+                                ...state,
+                                stratifyBy,
+                                offset: 0,
+                                limit: 0,
+                                sortBy: "x:asc",
+                                denominator: (state.denominator === "local" || state.denominator === "count") && !stratifyBy ? "" : state.denominator
+                            }) }
+                        />
+                        <p className="small color-muted">
+                            Used to stratify the data into multiple series
+                        </p>
+                    </div>
+                    { isSurvival && <>
+                        <label>Status Column</label>
+                        <ColumnSelector
+                            cols={ cols.filter(c => c.dataType !== "hidden") }
+                            comparator={ suggestedFirst(isStatusColumn) }
+                            placeholder="Select Column"
+                            addEmptyOption="start"
+                            value={ state.statusColumn }
+                            disabled={[
+                                "cnt",
+                                "cnt_min",
+                                "cnt_max",
+                                state.groupBy,
+                                state.stratifyBy,
+                                ...cols.filter(c => c.dataType.startsWith("date")).map(c => c.name)
+                            ].filter(Boolean)}
+                            onChange={ (statusColumn: string) => onChange({ ...state, statusColumn: statusColumn || "", eventValue: "" }) }
+                        />
+                        <p className="small color-muted">
+                            The column that tells whether the event happened for each record
+                        </p>
+                        { !!state.statusColumn && <div className="pt-1">
+                            <label>Event Value</label>
+                            <Select
+                                placeholder={ statusValues ? "Select Value" : "Loading values..." }
+                                disabled={ !statusValues }
+                                value={ state.eventValue }
+                                options={[
+                                    ...(statusValues || []),
+                                    // Keep a saved value even if it is no longer in the data
+                                    ...(state.eventValue && statusValues && !statusValues.includes(state.eventValue) ? [state.eventValue] : [])
+                                ].map(value => ({
+                                    value,
+                                    icon : `${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/icons/cell.png`,
+                                    label: statusValues?.includes(value) ? value : `${value} (not found in the data)`
+                                }))}
+                                onChange={ (eventValue: string) => onChange({ ...state, eventValue }) }
+                            />
+                            <p className="small color-muted">
+                                The value from the status column that means the event happened
+                            </p>
+                            { (statusValues?.length ?? 0) > 2 && <p className="small color-muted">
+                                <i className="fa-solid fa-triangle-exclamation color-orange" /> This column has more than two
+                                values ({ statusValues!.join(", ") }). Status columns are expected to have two: one for the
+                                event and one for no event.
+                            </p> }
+                            <div className="pt-1">
+                                <Checkbox
+                                    name="survivalBands"
+                                    label="Show 95% confidence bands"
+                                    checked={ state.survivalBands }
+                                    onChange={ survivalBands => onChange({ ...state, survivalBands }) }
+                                />
+                                <Checkbox
+                                    name="survivalRiskTable"
+                                    label="Show number at risk"
+                                    checked={ state.survivalRiskTable }
+                                    onChange={ survivalRiskTable => onChange({ ...state, survivalRiskTable }) }
+                                />
+                            </div>
+                        </div> }
+                    </> }
+                    { !isSurvival && <>
+                        <label>Denominator</label>
+                        <Select
+                            options={[
+                                {
+                                    label: <div>
+                                        <div>None</div>
+                                        <div className="small color-muted">
+                                            Render the aggregate counts as found in the<br/>
+                                            {Terminology.subscription.nameSingular.toLowerCase()} without further processing
+                                        </div>
+                                    </div>,
+                                    value: "",
+                                    icon: "fa-solid fa-percent grey-out"
+                                },
+                                {
+                                    label: <div>
+                                        <div>Stratified Count</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the total<br />
+                                            count of every given data group.<br />
+                                            Not available with no stratifier.
+                                        </div>
+                                    </div>,
+                                    value: "count",
+                                    icon: "fa-solid fa-percent color-brand-2",
+                                    disabled: !state.stratifyBy
+                                },
+                                {
+                                    label: <div>
+                                        <div>Stratified Sum</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the sum<br />
+                                            of values in every given data group.<br />
+                                            Not available with no stratifier.
+                                        </div>
+                                    </div>,
+                                    value: "local",
+                                    icon: "fa-solid fa-percent color-brand-2",
+                                    disabled: !state.stratifyBy
+                                },
+                                {
+                                    label: <div>
+                                        <div>Total Count</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the total<br />
+                                            count within the entire dataset.
+                                        </div>
+                                    </div>,
+                                    value: "global",
+                                    icon: "fa-solid fa-percent color-blue"
+                                }
+                            ]}
+                            value={ state.denominator }
+                            onChange={ denominator => onChange({ ...state, denominator })}
+                        />
+                        <p className="small color-muted">
+                            If set, renders the values as percentages of the given denominator
+                        </p>
+                    </> }
+                    { state.ranges && <div className="pt-1">
+                        <label>Confidence Intervals</label>
+                        <Select value={ state.ranges?.type || "" } options={[
+                            {
+                                value: "",
+                                icon : "fa-solid fa-plus-minus color-muted",
+                                label: "None"
+                            },
+                            {
+                                label: "Error Bars",
+                                value: "errorbar",
+                                icon : "fa-solid fa-plus-minus color-blue"
+                            },
+                            {
+                                label: "Area",
+                                value: "areasplinerange",
+                                icon : "fa-solid fa-plus-minus color-blue"
+                            },
+                            {
+                                label: "Bars / Columns",
+                                value: "column",
+                                icon : "fa-solid fa-plus-minus color-blue"
+                            },
+                        ]} onChange={type => onRangeOptionsChange({ type, enabled: !!type })} />
+                        <p className="small color-muted">
+                            If information is available, add the error ranges to the chart
+                        </p>
+                    </div> }
+
+                    { !isSurvival && <SecondaryDataEditor state={state} cols={[ ...cols ]} onChange={onSecondaryDataOptionsChange} /> }
+                </> }
+
+                { isPie && <SliceEditor state={state} onChange={onChange} /> }
+
+                { !isSurvival && <>
+                <div className="row half-gap">
+                        <div className="col col-5">
+                            <label>Sort {!!state.stratifyBy && state.sortBy.startsWith("y:") && <i className="fa fa-info-circle color-muted" data-tooltip="Sorting by count may produce unexpected results in stratified charts because every group is sorted separately." />}</label>
+                            <Select
+                                right
+                                options={[
+                                    {
+                                        label: xLabel + ": asc",
+                                        icon : "fas fa-sort-amount-down-alt color-blue",
+                                        value: "x:asc",
+                                    },
+                                    {
+                                        label: xLabel + ": desc",
+                                        icon : "fas fa-sort-amount-down color-blue",
+                                        value: "x:desc",
+                                    },
+                                    {
+                                        label: yLabel + ": asc",
+                                        icon : "fas fa-sort-amount-down-alt color-blue",
+                                        value: "y:asc",
+                                        disabled: !isCategory || !!state.stratifyBy
+                                    },
+                                    {
+                                        label: yLabel + ": desc",
+                                        icon : "fas fa-sort-amount-down color-blue",
+                                        value: "y:desc",
+                                        disabled: !isCategory || !!state.stratifyBy
+                                    }
+                                ].filter(option => !option.disabled)}
+                                value={ state.sortBy }
+                                onChange={ sortBy => onChange({ ...state, sortBy })} />
+                        </div>
+                        <div className="col">
+                            <label>Offset</label>
+                            <input type="number" min={0} value={ state.offset || 0 } onChange={e => onChange({ ...state, offset: e.target.valueAsNumber })} />
+                        </div>
+                        <div className="col">
+                            <label>Limit</label>
+                            <input type="number" min={ 0 } value={ state.limit || 0 } onChange={e => onChange({ ...state, limit: e.target.valueAsNumber })} />
+                        </div>
+                    </div>
+                    <p className="small color-muted">
+                        Use offset, limit, and sort to slice the dataset retrieved from the backend
+                    </p>
+                </> }
+                <br />
+            </div>
+        </Collapse>
     )
 }
 
