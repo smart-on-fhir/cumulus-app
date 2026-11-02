@@ -144,8 +144,6 @@ export function getViewReducer({
             if (state.data) {
                 const chartOptions = action.payload
 
-                // const chartOptions = stripValue(action.payload, "__DELETED__")
-
                 const options = getDefaultChartOptions(
                     state.chartType as any,
                     Highcharts.merge(state.chartOptions, chartOptions)
@@ -277,7 +275,6 @@ export function getViewReducer({
 
             // @ts-ignore
             if (nextState.data && Object.keys(action.payload).some(key => chartable.includes(key) && action.payload[key] !== state[key])) {
-                // computeChartOptions(state, nextState);
                 const options = getDefaultChartOptions(
                     nextState.chartType as keyof typeof SupportedChartTypes,
                     nextState.chartOptions
@@ -377,7 +374,6 @@ function validateData(data: any, { column, stratifier }: { column: string, strat
         assert(data.data[0].rows.length === data.rowCount, `Invalid data response received: Expected data[0].rows to have length equal to "rowCount".`)
 
         data.data[0].rows.forEach((row: Point, i: number) => {
-            // assert(typeof row[0] === "string" || typeof row[0] === "number", `Invalid data response received: data[0].rows[${i}][0] must be a string or number`)
             assert(typeof row[1] === "number", `Invalid data response received: data[0].rows[${i}][1] must be a number`)
             assert(row.length === 2 || typeof row[2] === "number", `Invalid data response received: data[0].rows[${i}][2] must be a number`)
             assert(row.length === 2 || typeof row[3] === "number", `Invalid data response received: data[0].rows[${i}][3] must be a number`)
@@ -396,13 +392,11 @@ function validateData(data: any, { column, stratifier }: { column: string, strat
 
         data.data.forEach((group: any, g: number) => {
             assert(group && typeof group === "object", `Invalid data response received: data[${g}] is not an object.`)
-            // assert(typeof group.stratifier === "string" || typeof group.stratifier === "number", `Invalid data response received: data[${g}].stratifier is not a string or number.`)
             assert(Array.isArray(group.rows), `Invalid data response received: data[${g}].rows is not an array.`)
             assert(!stratifiers[group.stratifier], `Invalid data response received: Duplicate stratifier "${group.stratifier}".`)
             stratifiers[group.stratifier] = true;
 
             group.rows.forEach((row: Point, i: number) => {
-                // assert(typeof row[0] === "string", `Invalid data response received: data[${g}].rows[${i}][0] must be a string`)
                 assert(typeof row[1] === "number", `Invalid data response received: data[${g}].rows[${i}][1] must be a number`)
                 assert(row.length === 2 || typeof row[2] === "number", `Invalid data response received: data[${g}].rows[${i}][2] must be a number`)
                 assert(row.length === 2 || typeof row[3] === "number", `Invalid data response received: data[${g}].rows[${i}][3] must be a number`)
@@ -551,8 +545,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         pendingSaveProps: null
 
     } as ViewState);
-
-    // console.log(state)
 
     const {
         viewType,
@@ -961,8 +953,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     const printChart           = useCommand(new PrintChart());
     const generateCaption      = useCommand(new GenerateCaption(state.chartOptions, state, c => dispatch({ type: "UPDATE", payload: { caption: c }})))
 
-    // console.log(state.chartOptions)
-
     return (
         <div className={ "dashboard " + (saving || deleteCommand.working ? "grey-out" : "") + (showOptions ? " sidebar-open" : "") }>
             <title>{viewName}</title>
@@ -996,7 +986,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                 viewName,
                                 viewDescription,
                                 chartOptions: state.chartOptions,
-                                // chartOptions: finalChartOptions,
                                 denominator,
                                 column2: column2?.name || "",
                                 column2type,
@@ -1110,11 +1099,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                 copyCommand,
                                 shareCommand,
                                 managePermissionsCmd,
-                                // {
-                                //     label: showOptions ? "Hide Chart Options" : "Show Chart Options",
-                                //     execute: () => dispatch({ type: "TOGGLE_OPTIONS" }),
-                                //     icon: <i className="fas fa-cog" />
-                                // },
                                 "-",
                                 {
                                     label: "Show Chart Data",
@@ -1143,7 +1127,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                     chartType,
                                     viewColumn.name,
                                     viewGroupBy?.name || "no_stratifier",
-                                    // finalChartOptions.annotations?.length || "",
                                     column2?.name || "no_secondary",
                                     column2type || "no_second_type",
                                     state.chartOptions.chart?.options3d?.enabled ?? false,
