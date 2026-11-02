@@ -493,6 +493,9 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     // Extra view properties for the next save, e.g. isDraft
     const saveProps = useRef<Partial<app.View>>({})
 
+    // Resolves the promise of a save started from the Data tab, once it is done
+    const onPendingSaveDone = useRef<(() => void) | null>(null)
+
     // Save
     const { execute: saveChart, loading: saving } = useBackend(async () => {
 
@@ -522,15 +525,17 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         }
     });
 
-    const save = (props: Partial<app.View> = {}) => {
+    const save = (props: Partial<app.View> = {}): Promise<void> => {
         // The screenshot needs the chart, so switch to it and save once it
         // has rendered (see the effect below)
         if (viewType !== "overview") {
-            dispatch({ type: "MERGE", payload: { pendingSaveProps: props, viewType: "overview" }})
-        } else {
-            saveProps.current = props
-            return saveChart()
+            return new Promise(resolve => {
+                onPendingSaveDone.current = resolve
+                dispatch({ type: "MERGE", payload: { pendingSaveProps: props, viewType: "overview" }})
+            })
         }
+        saveProps.current = props
+        return saveChart()
     }
 
     const { statusValues } = useChartData({
@@ -560,7 +565,10 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     useEffect(() => {
         if (viewType === "overview" && chartIsRendered && pendingSaveProps) {
             saveProps.current = pendingSaveProps
-            saveChart();
+            saveChart().then(() => {
+                onPendingSaveDone.current?.()
+                onPendingSaveDone.current = null
+            })
         }
     }, [viewType, chartIsRendered]);
 
