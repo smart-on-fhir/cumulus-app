@@ -21,8 +21,7 @@ export const SURVIVAL_Y_TITLE = "Survival"
  * charts can apply them to the rendered chart only, and this can go.
  */
 export function removeSurvivalOptions(options: Highcharts.Options): Highcharts.Options {
-    // @ts-ignore
-    const xTitle = options.xAxis?.title?.text, yTitle = options.yAxis?.title?.text
+    const xTitle = singleAxis(options.xAxis)?.title?.text, yTitle = singleAxis(options.yAxis)?.title?.text
     const out = merge(options, {
         xAxis: isDurationTitle(xTitle)     ? { title: { text: "" } } : {},
         yAxis: yTitle === SURVIVAL_Y_TITLE ? { title: { text: "" } } : {}
@@ -59,6 +58,24 @@ type SeriesOptions = (
     Highcharts.SeriesColumnOptions |
     Highcharts.SeriesBarOptions
 );
+
+/**
+ * Saved series options, with the properties read from them that only some
+ * series types declare
+ */
+type SavedSeries = Highcharts.SeriesOptionsType & {
+    colorByPoint?: boolean
+    fillOpacity ?: number
+}
+
+/**
+ * The options of an axis, if it is a single one. Charts keep one X and one Y
+ * axis in their options (only the rendered chart can have more, see
+ * withRiskTable), so an array of axes is treated as not set.
+ */
+function singleAxis<T extends object>(axis: T | T[] | undefined): T | undefined {
+    return Array.isArray(axis) ? undefined : axis
+}
 
 export function emToPx(em: number) {
     return Math.round(DEFAULT_FONT_SIZE * em) + "px"
@@ -347,11 +364,9 @@ function getXAxis({
         // For category charts we don't allow highcharts to sort the data.
         // However, for other types we need to sort it ourselves
         if (xType === "linear") {
-            // @ts-ignore
-            arr.sort((a, b) => a - b);
+            arr.sort((a, b) => +a - +b);
         }
         else if (xType === "datetime") {
-            // @ts-ignore
             arr.sort((a, b) => +new Date(a) - +new Date(b));
         }
     }
@@ -419,27 +434,23 @@ function getSeriesAndExceptions({
 
     function addSeries(options: any, secondary = false) {
 
-        const S = serverOptions.series?.find((s: any) => s.id === options.id)
-        // @ts-ignore
+        const S = serverOptions.series?.find((s: any) => s.id === options.id) as SavedSeries | undefined
         const prev = serverOptions.plotOptions?.[options.type || "series"] ?? {}
 
         const themeId = serverOptions.custom?.theme || DEFAULT_COLOR_THEME
 
         const themeColors = COLOR_THEMES.find(t => t.id === themeId)!.colors
 
-        // @ts-ignore
         const colors: string[] = S?.colorByPoint ? themeColors : serverOptions.colors as string[] || themeColors
 
         const color = colors[series.length % colors.length]
 
         const cfg: any = {
-            // @ts-ignore,
             color: S?.colorByPoint ? undefined : color,
             id: options.id,
         }
 
         if ((options.type === "area" || options.type === "areaspline") && color) {
-            // @ts-ignore
             const fillOpacity = S?.fillOpacity ?? prev.fillOpacity ?? 0.75
             cfg.fillColor = {
                 linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
@@ -560,7 +571,7 @@ function getSeriesAndExceptions({
             const denominatorCache = {}
             const name = String(column.label || column.name)
             const id   = "primary-" + name
-            const old  = serverOptions.series?.find(s => s.id === id)
+            const old  = serverOptions.series?.find(s => s.id === id) as SavedSeries | undefined
             const rows = filterOutExceptions({
                 rows: data.data[0].rows,
                 seriesName: name,
@@ -572,7 +583,6 @@ function getSeriesAndExceptions({
             const seriesData = showSurvival ? toSurvivalPoints() : ticksToPoints(rows, denominatorCache);
 
             if (type === "pie" && sortBy.startsWith("x:")) {
-                // @ts-ignore
                 seriesData.sort((a, b) => sortBy === "x:asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name))
             }
 
@@ -583,10 +593,8 @@ function getSeriesAndExceptions({
                 data: seriesData,
                 dataSorting: { enabled: false },
                 colorByPoint: (type === "column" || type === "bar") ?
-                    // @ts-ignore
                     old?.colorByPoint === undefined ?
                         data.data.length === 1 && xType === "category" && seriesData.length <= 12 && serverOptions.custom?.theme :
-                        // @ts-ignore
                         !!old.colorByPoint :
                     type === "pie",
             });
@@ -651,7 +659,7 @@ function computeColors(chartType: string, series: any[], options: any)
 
     const themeColors = COLOR_THEMES.find(t => t.id === themeId)!.colors
     
-    // @ts-ignore Start with the initial colors - from DB or from the theme
+    // Start with the initial colors - from DB or from the theme
     const orig = options.colors || themeColors
 
     // The colors to be used in the current chart
@@ -723,8 +731,7 @@ export function buildChartOptions({
     const isPercent = !!denominator || !!(isSurvival && survivalData)
 
     // Survival charts: default axis titles, unless the user has set their own
-    // @ts-ignore
-    const xTitle = options.xAxis?.title?.text, yTitle = options.yAxis?.title?.text
+    const xTitle = singleAxis(options.xAxis)?.title?.text, yTitle = singleAxis(options.yAxis)?.title?.text
     const survivalXTitle = isSurvival && (!xTitle || isDurationTitle(xTitle)) ? getDurationTitle(column) : undefined
     const survivalYTitle = isSurvival && survivalData && !yTitle ? SURVIVAL_Y_TITLE : undefined
 
@@ -777,8 +784,7 @@ export function buildChartOptions({
         colors: computeColors(type, series, options),
         title: {
             style: {
-                // @ts-ignore
-                fontSize: lengthToEm(options.title?.style?.fontSize ?? "2em") + "em"
+                fontSize: lengthToEm((options.title?.style as Highcharts.CSSObject | undefined)?.fontSize ?? "2em") + "em"
             }
         },
         yAxis: {
@@ -789,15 +795,13 @@ export function buildChartOptions({
             labels: {
                 format: isPercent ? "{text}%" : "{text}",
                 style: {
-                    // @ts-ignore
-                    fontSize: lengthToEm(options.yAxis?.labels?.style?.fontSize ?? "1em") + "em"
+                    fontSize: lengthToEm(singleAxis(options.yAxis)?.labels?.style?.fontSize ?? "1em") + "em"
                 }
             },
             title: {
                 ...(survivalYTitle ? { text: survivalYTitle } : {}),
                 style: {
-                    // @ts-ignore
-                    fontSize: lengthToEm(options.yAxis?.title?.style?.fontSize ?? "1.2em") + "em"
+                    fontSize: lengthToEm(singleAxis(options.yAxis)?.title?.style?.fontSize ?? "1.2em") + "em"
                 }
             }
         },
@@ -864,15 +868,13 @@ export function buildChartOptions({
             })(),
             labels: {
                 style: {
-                    // @ts-ignore
-                    fontSize: lengthToEm(options.xAxis?.labels?.style?.fontSize ?? "1em") + "em"
+                    fontSize: lengthToEm(singleAxis(options.xAxis)?.labels?.style?.fontSize ?? "1em") + "em"
                 }
             },
             title: {
                 ...(survivalXTitle ? { text: survivalXTitle } : {}),
                 style: {
-                    // @ts-ignore
-                    fontSize: lengthToEm(options.xAxis?.title?.style?.fontSize ?? "1em") + "em"
+                    fontSize: lengthToEm(singleAxis(options.xAxis)?.title?.style?.fontSize ?? "1em") + "em"
                 }
             },
         },
@@ -955,7 +957,6 @@ export function buildChartOptions({
     })
     if (inspection?.enabled && result.annotations?.[0]) {
         result.annotations[0].events = {
-            // @ts-ignore
             click: function(e: any) {
                 onInspectionChange(["annotation"], {
                     selectedAnnotationIndex: +(
@@ -967,10 +968,8 @@ export function buildChartOptions({
         }
     }
 
-    // @ts-ignore xAxis and yAxis are single objects here
-    preparePlotLines(result.xAxis?.plotLines || [], "x", inspection, onInspectionChange)
-    // @ts-ignore
-    preparePlotLines(result.yAxis?.plotLines || [], "y", inspection, onInspectionChange)
+    preparePlotLines(singleAxis(result.xAxis)?.plotLines || [], "x", inspection, onInspectionChange)
+    preparePlotLines(singleAxis(result.yAxis)?.plotLines || [], "y", inspection, onInspectionChange)
 
     return result
 }
