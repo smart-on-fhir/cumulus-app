@@ -842,11 +842,12 @@ export default function ConfigPanel({
 
 
 
-function getPieOptions(options: any, onChange: (options: any) => void, has3d = false) {
-    const props: any[] = [];
-
+/**
+ * The outline of columns, bars and slices: edges in 3D charts, borders in 2D
+ */
+function getEdgeOptions(options: any, onChange: (options: any) => void, has3d: boolean): any[] {
     if (has3d) {
-        props.push(
+        return [
             {
                 name    : "Edge Width",
                 type    : "number",
@@ -860,33 +861,39 @@ function getPieOptions(options: any, onChange: (options: any) => void, has3d = f
                 type    : "color",
                 value   : options.edgeColor ?? "#00000088",
                 onChange: (edgeColor: string) => onChange({ edgeColor }),
-            },
-            {
-                name    : "Depth",
-                type    : "number",
-                value   : options.depth ?? 50,
-                onChange: (depth: number) => onChange({ depth })
             }
-        )
-    } else {
-        props.push(
-            {
-                name    : "Border Width",
-                type    : "number",
-                min     : 0,
-                step    : 0.1,
-                value   : options.borderWidth ?? 0.5,
-                onChange: (borderWidth: number) => onChange({ borderWidth })
-            },
-            {
-                name    : "Border Color",
-                type    : "color",
-                value   : options.borderColor ?? "#00000088",
-                onChange: (borderColor: string) => onChange({ borderColor })
-            }
-        )
+        ]
     }
-    
+    return [
+        {
+            name    : "Border Width",
+            type    : "number",
+            min     : 0,
+            step    : 0.1,
+            value   : options.borderWidth ?? 0.5,
+            onChange: (borderWidth: number) => onChange({ borderWidth })
+        },
+        {
+            name    : "Border Color",
+            type    : "color",
+            value   : options.borderColor ?? "#00000088",
+            onChange: (borderColor: string) => onChange({ borderColor })
+        }
+    ]
+}
+
+function getPieOptions(options: any, onChange: (options: any) => void, has3d = false) {
+    const props: any[] = getEdgeOptions(options, onChange, has3d);
+
+    if (has3d) {
+        props.push({
+            name    : "Depth",
+            type    : "number",
+            value   : options.depth ?? 50,
+            onChange: (depth: number) => onChange({ depth })
+        })
+    }
+
     props.push(
         {
             name    : "Dash Style",
@@ -1053,41 +1060,7 @@ function AllSeriesEditor({
     const props: any[] = []
 
     if (hasColumn || hasBar || hasPie) {
-        if (has3d) {
-            props.push(
-                {
-                    name: "Edge Width",
-                    type: "number",
-                    min: 0,
-                    step: 0.1,
-                    value: S.edgeWidth ?? 1,
-                    onChange: (edgeWidth: number) => change({ edgeWidth })
-                },
-                {
-                    name: "Edge Color",
-                    type: "color",
-                    value: S.edgeColor ?? "#00000088",
-                    onChange: (edgeColor: string) => change({ edgeColor }),
-                }
-            )
-        } else {
-            props.push(
-                {
-                    name: "Border Width",
-                    type: "number",
-                    min: 0,
-                    step: 0.1,
-                    value: S.borderWidth ?? 0.5,
-                    onChange: (borderWidth: number) => change({ borderWidth })
-                },
-                {
-                    name: "Border Color",
-                    type: "color",
-                    value: S.borderColor ?? "#00000088",
-                    onChange: (borderColor: string) => change({ borderColor })
-                }
-            )
-        }
+        props.push(...getEdgeOptions(S, change, has3d))
     }
 
     if (hasColumn || hasBar) {

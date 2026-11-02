@@ -396,4 +396,37 @@ describe("editors that change the chart options in place", () => {
     // @ts-ignore
     expect(series.map(s => s.opacity)).toEqual([0.5, 0.5])
   })
+
+  // The names of the properties in a property grid, in order
+  function getPropertyNames(container: HTMLElement) {
+    return [...container.querySelectorAll(".prop-label span")].map(el => el.textContent!.trim())
+  }
+
+  async function getSliceEditorAdvanced(state: ChartConfigPanelState) {
+    renderPanel(state)
+    await userEvent.click(screen.getByText("Data"))
+    const sliceEditor = screen.getByText("Slice Colors").closest(".collapse")!.parentElement!
+    return getPropertyNames(await expand("Advanced", sliceEditor))
+  }
+
+  it("SliceEditor offers borders in 2D, and edges and depth in 3D", async () => {
+    const names2d = await getSliceEditorAdvanced(getPieState())
+    expect(names2d.slice(0, 2)).toEqual(["Border Width", "Border Color"])
+    expect(names2d).not.toContain("Depth")
+
+    const state3d = getPieState()
+    state3d.chartOptions.chart = { type: "pie", options3d: { enabled: true } }
+    document.body.innerHTML = ""
+    const names3d = await getSliceEditorAdvanced(state3d)
+    expect(names3d.slice(0, 3)).toEqual(["Edge Width", "Edge Color", "Depth"])
+  })
+
+  it("AllSeriesEditor offers borders for columns", async () => {
+    const state = structuredClone(mockState)
+    state.chartOptions.series = [{ type: "column", id: "a", data: [1, 2] }]
+    renderPanel(state)
+    await userEvent.click(screen.getByText("Series"))
+    const names = getPropertyNames(await expand(/All Serries Override/))
+    expect(names.slice(0, 2)).toEqual(["Border Width", "Border Color"])
+  })
 })
