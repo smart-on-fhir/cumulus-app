@@ -10,16 +10,30 @@ import { getDurationTitle, isDurationTitle }        from "../columnRoles"
 export const SURVIVAL_Y_TITLE = "Survival"
 
 /**
- * Removes the default survival axis titles (but not ones the user has set).
- * Used when switching from a survival chart to another chart type.
+ * Removes the options that survival charts set themselves: the default axis
+ * titles (but not ones the user has set) and the left steps of the series,
+ * which the user can't change in survival charts. Used when switching from a
+ * survival chart to another chart type.
+ *
+ * TEMPORARY: survival charts write these into the same options that are saved.
+ * Once the saved settings are kept apart from the rendered chart, survival
+ * charts can apply them to the rendered chart only, and this can go.
  */
-export function removeSurvivalTitles(options: Highcharts.Options): Highcharts.Options {
+export function removeSurvivalOptions(options: Highcharts.Options): Highcharts.Options {
     // @ts-ignore
     const xTitle = options.xAxis?.title?.text, yTitle = options.yAxis?.title?.text
-    return merge(options, {
+    const out = merge(options, {
         xAxis: isDurationTitle(xTitle)     ? { title: { text: "" } } : {},
         yAxis: yTitle === SURVIVAL_Y_TITLE ? { title: { text: "" } } : {}
     })
+    // merge() keeps arrays by reference, so the series are copied, not changed
+    if (options.series) {
+        out.series = options.series.map(s => {
+            const { step, ...rest } = s as Highcharts.SeriesLineOptions
+            return rest as Highcharts.SeriesOptionsType
+        })
+    }
+    return out
 }
 import Highcharts                           from "../../../highcharts"
 import { lengthToEm, roundToPrecision }     from "../../../utils"
