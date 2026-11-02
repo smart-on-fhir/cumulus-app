@@ -102,7 +102,7 @@ interface ViewAction
 }
 
 
-function getViewReducer({
+export function getViewReducer({
     onSeriesToggle,
     onInspectionChange
 }: {
