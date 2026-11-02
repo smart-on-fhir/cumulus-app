@@ -216,7 +216,6 @@ export default function ConfigPanel({
 
             {state.inspection.match?.length ?
                 <>
-                    {/* <pre style={{ whiteSpace: "pre-wrap" }}>{ JSON.stringify(state.inspection, null, 4) }</pre> */}
                     <DynamicInspector
                         chartOptions={state.chartOptions}
                         onChange={onChartOptionsChange}
@@ -882,8 +881,6 @@ function getPieOptions(options: any, onChange: (options: any) => void, has3d = f
             {
                 name    : "Depth",
                 type    : "number",
-                // min     : 0,
-                // step    : 0.1,
                 value   : options.depth ?? 50,
                 onChange: (depth: number) => onChange({ depth })
             }
