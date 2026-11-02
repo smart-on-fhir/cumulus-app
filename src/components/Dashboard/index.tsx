@@ -110,75 +110,47 @@ export function getViewReducer({
     onInspectionChange: (inspection: string[], context: any) => void
 }) 
 {
-
+    // Builds the chart from the state's data. The actions differ only in the
+    // options they start from, so each one passes its own.
+    function rebuildChartOptions(state: ViewState, options: Partial<Highcharts.Options>) {
+        return buildChartOptions({
+            options,
+            type            : options.chart!.type as SupportedNativeChartTypes,
+            data            : state.data!,
+            data2           : state.data2,
+            column          : state.viewColumn,
+            groupBy         : state.viewGroupBy,
+            denominator     : state.denominator,
+            column2type     : state.column2type,
+            ranges          : state.ranges,
+            inspection      : state.inspection,
+            sortBy          : state.sortBy,
+            limit           : state.limit,
+            offset          : state.offset,
+            isSurvival      : state.chartType === "survival",
+            survivalData    : state.survivalData,
+            survivalBands   : state.survivalBands,
+            onSeriesToggle,
+            onInspectionChange,
+        })
+    }
 
     return function viewReducer(state: ViewState, action: ViewAction): ViewState
     {
-        function updateChartOptions(currentState: ViewState) {
-            if (currentState.data) {
-                currentState.chartOptions = buildChartOptions({
-                    options         : currentState.chartOptions,
-                    type            : currentState.chartOptions.chart!.type as SupportedNativeChartTypes,
-                    data            : currentState.data,
-                    data2           : currentState.data2,
-                    column          : currentState.viewColumn,
-                    groupBy         : currentState.viewGroupBy,
-                    denominator     : currentState.denominator,
-                    column2type     : currentState.column2type,
-                    ranges          : currentState.ranges,
-                    inspection      : currentState.inspection,
-                    sortBy          : currentState.sortBy,
-                    limit           : currentState.limit,
-                    offset          : currentState.offset,
-                    isSurvival      : currentState.chartType === "survival",
-                    survivalData    : currentState.survivalData,
-                    survivalBands   : currentState.survivalBands,
-                    onSeriesToggle,
-                    onInspectionChange,
-                })
-            }
-            return currentState
-        }
-
         if (action.type === "SET_CHART_OPTIONS") {
             if (state.data) {
-                const chartOptions = action.payload
-
                 const options = getDefaultChartOptions(
                     state.chartType as any,
-                    Highcharts.merge(state.chartOptions, chartOptions)
+                    Highcharts.merge(state.chartOptions, action.payload)
                 )
-
-                return {
-                    ...state,
-                    chartOptions: buildChartOptions({
-                        options,
-                        type            : options.chart!.type as SupportedNativeChartTypes,
-                        data            : state.data,
-                        data2           : state.data2,
-                        column          : state.viewColumn,
-                        groupBy         : state.viewGroupBy,
-                        denominator     : state.denominator,
-                        column2type     : state.column2type,
-                        ranges          : state.ranges,
-                        inspection      : state.inspection,
-                        sortBy          : state.sortBy,
-                        limit           : state.limit,
-                        offset          : state.offset,
-                        isSurvival      : state.chartType === "survival",
-                        survivalData    : state.survivalData,
-                        survivalBands   : state.survivalBands,
-                        onSeriesToggle,
-                        onInspectionChange,
-                    })
-                };
+                return { ...state, chartOptions: rebuildChartOptions(state, options) }
             }
         }
 
         if (action.type === "SET_RANGE_OPTIONS") {
             const out = { ...state, ranges: action.payload }
             if (state.data) {
-                updateChartOptions(out)
+                out.chartOptions = rebuildChartOptions(out, out.chartOptions)
             }
             return out
         }
@@ -186,7 +158,7 @@ export function getViewReducer({
         if (action.type === "SET_SECONDARY_DATA_OPTIONS") {
             const out = { ...state, column2: action.payload.column, column2type: action.payload.type }
             if (state.data) {
-                updateChartOptions(out)
+                out.chartOptions = rebuildChartOptions(out, out.chartOptions)
             }
             return out
         }
@@ -212,27 +184,7 @@ export function getViewReducer({
 
             if (nextState.data) {
                 const options = getDefaultChartOptions(chartType, nextState.chartOptions, true)
-
-                nextState.chartOptions = buildChartOptions({
-                    options,
-                    type            : options.chart!.type as SupportedNativeChartTypes,
-                    data            : nextState.data,
-                    data2           : nextState.data2,
-                    column          : nextState.viewColumn,
-                    groupBy         : nextState.viewGroupBy,
-                    denominator     : nextState.denominator,
-                    column2type     : nextState.column2type,
-                    ranges          : nextState.ranges,
-                    inspection      : nextState.inspection,
-                    sortBy          : nextState.sortBy,
-                    limit           : nextState.limit,
-                    offset          : nextState.offset,
-                    isSurvival      : nextState.chartType === "survival",
-                    survivalData    : nextState.survivalData,
-                    survivalBands   : nextState.survivalBands,
-                    onSeriesToggle,
-                    onInspectionChange,
-                })
+                nextState.chartOptions = rebuildChartOptions(nextState, options)
             }
 
             return nextState;
@@ -279,27 +231,7 @@ export function getViewReducer({
                     nextState.chartType as keyof typeof SupportedChartTypes,
                     nextState.chartOptions
                 );
-
-                nextState.chartOptions = buildChartOptions({
-                    options         : options,
-                    type            : options.chart!.type as SupportedNativeChartTypes,
-                    data            : nextState.data!,
-                    data2           : nextState.data2,
-                    column          : nextState.viewColumn,
-                    groupBy         : nextState.viewGroupBy,
-                    denominator     : nextState.denominator,
-                    column2type     : nextState.column2type,
-                    ranges          : nextState.ranges,
-                    inspection      : nextState.inspection,
-                    sortBy          : nextState.sortBy,
-                    limit           : nextState.limit,
-                    offset          : nextState.offset,
-                    isSurvival      : nextState.chartType === "survival",
-                    survivalData    : nextState.survivalData,
-                    survivalBands   : nextState.survivalBands,
-                    onSeriesToggle,
-                    onInspectionChange,
-                })
+                nextState.chartOptions = rebuildChartOptions(nextState, options)
             }
 
             return nextState;
