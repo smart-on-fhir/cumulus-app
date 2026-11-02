@@ -94,3 +94,57 @@ export function validateData(data: any, { column, stratifier }: { column: string
         })
     }
 }
+
+/**
+ * Converts the filters into the filter parameters of a data request. Filters
+ * joined with "or" go into one comma-separated parameter, and each "and"
+ * starts a new one. Incomplete filters are skipped.
+ */
+export function getFilterParams(filters: app.Filter[]): string[] {
+    const noRightOps = [
+        // "isNull",
+        // "isNotNull", 
+        "isTrue",
+        "isFalse",
+        "isNotTrue",
+        "isNotFalse",
+        "isNotNone",
+        "isNone"
+    ];
+    const filterParams: string[] = []
+    let chain: string[] = [];
+    filters.forEach(filter => {
+        const { left, operator, right, join } = filter
+        
+        // incomplete filter - column not selected yet
+        if (!left) {
+            return
+        }
+
+        // incomplete filter - operator not selected yet
+        if (!operator) {
+            return
+        }
+
+        // incomplete filter - right.value required but empty
+        if (!noRightOps.includes(operator) && (right.value === undefined || right.value === "")) {
+            return;
+        }
+
+        if (join === "and" && chain.length) {
+            filterParams.push(chain.join(","))
+            chain = []
+        }
+
+        const parts: any[] = [left, operator]
+        if (!noRightOps.includes(operator)) {
+            parts.push(right.value)
+        }
+
+        chain.push(parts.join(":"))
+    })
+
+    if (chain.length) filterParams.push(chain.join(","))
+
+    return filterParams
+}

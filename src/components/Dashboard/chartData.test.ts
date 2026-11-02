@@ -1,4 +1,4 @@
-import { hasRanges, isTurbo, validateData } from "./chartData"
+import { getFilterParams, hasRanges, isTurbo, validateData } from "./chartData"
 import { TURBO_THRESHOLD }                   from "./config"
 import { app }                               from "../../types"
 
@@ -119,5 +119,60 @@ describe("validateData", () => {
             expect(() => validateData(getStratifiedData({ male: [[1, 10], [1, 20]] }), expected)).not.toThrow()
             expect(() => validateData(getStratifiedData({ male: [[2, 10], [1, 20]] }), expected)).toThrow(/not sorted/)
         })
+    })
+})
+
+describe("getFilterParams", () => {
+
+    function filter(left: string, operator: string, value?: string | number, join: "and" | "or" = "and"): app.Filter {
+        return { left, operator, negated: false, right: { type: "value", value }, join }
+    }
+
+    it ("returns no parameters without filters", () => {
+        expect(getFilterParams([])).toEqual([])
+    })
+
+    it ("converts a filter to column:operator:value", () => {
+        expect(getFilterParams([filter("age", "gt", 5)])).toEqual(["age:gt:5"])
+    })
+
+    it ("leaves out the value for operators that take none", () => {
+        for (const op of ["isTrue", "isFalse", "isNotTrue", "isNotFalse", "isNotNone", "isNone"]) {
+            expect(getFilterParams([filter("flag", op)])).toEqual([`flag:${op}`])
+        }
+    })
+
+    it ("treats isNull as needing a value (the UI doesn't offer it)", () => {
+        expect(getFilterParams([filter("age", "isNull", "x")])).toEqual(["age:isNull:x"])
+        expect(getFilterParams([filter("age", "isNull")])).toEqual([])
+    })
+
+    it ("sends filters joined with and as separate parameters", () => {
+        expect(getFilterParams([
+            filter("age", "gt", 5),
+            filter("gender", "strEq", "male", "and")
+        ])).toEqual(["age:gt:5", "gender:strEq:male"])
+    })
+
+    it ("combines filters joined with or into one parameter", () => {
+        expect(getFilterParams([
+            filter("age", "gt", 5),
+            filter("age", "lt", 2, "or"),
+            filter("gender", "strEq", "male", "and")
+        ])).toEqual(["age:gt:5,age:lt:2", "gender:strEq:male"])
+    })
+
+    it ("skips incomplete filters", () => {
+        expect(getFilterParams([
+            filter("", "gt", 5),
+            filter("age", "", 5),
+            filter("age", "gt"),
+            filter("age", "gt", ""),
+            filter("age", "gt", 0)
+        ])).toEqual(["age:gt:0"])
+    })
+
+    it ("ignores the join of the first filter", () => {
+        expect(getFilterParams([filter("age", "gt", 5, "or")])).toEqual(["age:gt:5"])
     })
 })

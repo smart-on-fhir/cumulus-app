@@ -13,7 +13,7 @@ import { GraphBreadcrumbs }                      from "./GraphBreadcrumbs"
 import { GraphTitle }                            from "./GraphTitle"
 import { GraphDescription }                      from "./GraphDescription"
 import { GraphToolbar }                          from "./GraphToolbar"
-import { hasRanges, isTurbo, validateData }      from "./chartData"
+import { getFilterParams, hasRanges, isTurbo, validateData } from "./chartData"
 import Tag                                       from "../Tags/Tag"
 import Alert, { AlertError }                     from "../generic/Alert"
 import Loader                                    from "../generic/Loader"
@@ -528,50 +528,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     }
 
     // Convert filters to search parameters
-    const noRightOps = [
-        // "isNull",
-        // "isNotNull", 
-        "isTrue",
-        "isFalse",
-        "isNotTrue",
-        "isNotFalse",
-        "isNotNone",
-        "isNone"
-    ];
-    const filterParams: string[] = []
-    let chain: string[] = [];
-    filters.forEach(filter => {
-        const { left, operator, right, join } = filter
-        
-        // incomplete filter - column not selected yet
-        if (!left) {
-            return
-        }
-
-        // incomplete filter - operator not selected yet
-        if (!operator) {
-            return
-        }
-
-        // incomplete filter - right.value required but empty
-        if (!noRightOps.includes(operator) && (right.value === undefined || right.value === "")) {
-            return;
-        }
-
-        if (join === "and" && chain.length) {
-            filterParams.push(chain.join(","))
-            chain = []
-        }
-
-        const parts: any[] = [left, operator]
-        if (!noRightOps.includes(operator)) {
-            parts.push(right.value)
-        }
-
-        chain.push(parts.join(":"))
-    })
-
-    if (chain.length) filterParams.push(chain.join(","))
+    const filterParams = getFilterParams(filters)
 
     // Variables that control if new data needs to be fetched
     const filter = filterParams.map(encodeURIComponent).join("&filter=")
