@@ -697,8 +697,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
 
     // Convert filters to search parameters
     const noRightOps = [
-        // "isNull",
-        // "isNotNull", 
         "isTrue",
         "isFalse",
         "isNotTrue",
