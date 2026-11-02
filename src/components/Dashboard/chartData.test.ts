@@ -142,11 +142,6 @@ describe("getFilterParams", () => {
         }
     })
 
-    it ("treats isNull as needing a value (the UI doesn't offer it)", () => {
-        expect(getFilterParams([filter("age", "isNull", "x")])).toEqual(["age:isNull:x"])
-        expect(getFilterParams([filter("age", "isNull")])).toEqual([])
-    })
-
     it ("sends filters joined with and as separate parameters", () => {
         expect(getFilterParams([
             filter("age", "gt", 5),

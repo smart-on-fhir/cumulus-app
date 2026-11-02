@@ -195,6 +195,4 @@ export const operators: FilterConfig[] = [
     // Universal Operators -----------------------------------------------------
     { id: "isNone"            , label: "IS NONE"                   , type: ["*"] },
     { id: "isNotNone"         , label: "IS NOT NONE"               , type: ["*"] },
-    // { id: "isNull"            , label: "IS NULL"                   , type: ["*"] },
-    // { id: "isNotNull"         , label: "IS NOT NULL"               , type: ["*"] },
 ];

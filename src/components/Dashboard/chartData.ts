@@ -102,8 +102,6 @@ export function validateData(data: any, { column, stratifier }: { column: string
  */
 export function getFilterParams(filters: app.Filter[]): string[] {
     const noRightOps = [
-        // "isNull",
-        // "isNotNull", 
         "isTrue",
         "isFalse",
         "isNotTrue",
