@@ -1,6 +1,6 @@
-import { app }             from "../../types"
-import { assert }          from "../../utils"
-import { TURBO_THRESHOLD } from "./config"
+import { app }                                 from "../../types"
+import { assert }                              from "../../utils"
+import { NO_VALUE_OPERATORS, TURBO_THRESHOLD } from "./config"
 
 
 export function isTurbo(primaryData: app.ServerResponses.DataResponse, secondaryData?: app.ServerResponses.StratifiedDataResponse | null) {
@@ -101,14 +101,6 @@ export function validateData(data: any, { column, stratifier }: { column: string
  * starts a new one. Incomplete filters are skipped.
  */
 export function getFilterParams(filters: app.Filter[]): string[] {
-    const noRightOps = [
-        "isTrue",
-        "isFalse",
-        "isNotTrue",
-        "isNotFalse",
-        "isNotNone",
-        "isNone"
-    ];
     const filterParams: string[] = []
     let chain: string[] = [];
     filters.forEach(filter => {
@@ -125,7 +117,7 @@ export function getFilterParams(filters: app.Filter[]): string[] {
         }
 
         // incomplete filter - right.value required but empty
-        if (!noRightOps.includes(operator) && (right.value === undefined || right.value === "")) {
+        if (!NO_VALUE_OPERATORS.includes(operator) && (right.value === undefined || right.value === "")) {
             return;
         }
 
@@ -135,7 +127,7 @@ export function getFilterParams(filters: app.Filter[]): string[] {
         }
 
         const parts: any[] = [left, operator]
-        if (!noRightOps.includes(operator)) {
+        if (!NO_VALUE_OPERATORS.includes(operator)) {
             parts.push(right.value)
         }
 
