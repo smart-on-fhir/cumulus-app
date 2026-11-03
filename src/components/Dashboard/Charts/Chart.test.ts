@@ -2,6 +2,7 @@ import {
     buildChartOptions,
     removeSurvivalOptions,
     emToPx,
+    fontSizesToEm,
     filterOutExceptions,
     formatPValue,
     getLogRankSentences,
@@ -258,14 +259,75 @@ describe("Chart", () => {
         })
     })
 
+    describe("fontSizesToEm", () => {
+
+        const old = (): Highcharts.Options => ({
+            chart: { style: { fontSize: "18px" } },
+            title: { style: { fontSize: "20px" } },
+            legend: { itemStyle: { fontSize: "14px" } },
+            xAxis: {
+                labels   : { style: { fontSize: "13px" } },
+                title    : { style: { fontSize: "16px" } },
+                plotLines: [{ value: 1, label: { text: "a", style: { fontSize: "32px" } } }, { value: 2 }]
+            },
+            yAxis: {
+                labels   : { style: { fontSize: "0.85em" } },
+                title    : { text: "y" },
+                plotLines: [{ value: 3, label: { text: "b", style: { fontSize: "8px" } } }]
+            }
+        })
+
+        it ("converts the px sizes of titles, axes and plot line labels", () => {
+            const options: any = fontSizesToEm(old())
+            expect(options.title.style.fontSize).toBe("1.25em")
+            expect(options.xAxis.labels.style.fontSize).toBe("0.81em")
+            expect(options.xAxis.title.style.fontSize).toBe("1em")
+            expect(options.xAxis.plotLines[0].label.style.fontSize).toBe(32 / DEFAULT_FONT_SIZE + "em")
+            expect(options.yAxis.plotLines[0].label.style.fontSize).toBe(8 / DEFAULT_FONT_SIZE + "em")
+        })
+
+        it ("keeps em sizes, unset sizes, and everything else", () => {
+            const options: any = fontSizesToEm(old())
+            expect(options.yAxis.labels.style.fontSize).toBe("0.85em")
+            expect(options.yAxis.title).toEqual({ text: "y" })
+            expect(options.xAxis.plotLines[1]).toEqual({ value: 2 })
+            expect(options.chart.style.fontSize).toBe("18px")
+            expect(options.legend.itemStyle.fontSize).toBe("14px")
+        })
+
+        it ("does not change the options it is given", () => {
+            const options = old()
+            fontSizesToEm(options)
+            expect(options).toEqual(old())
+        })
+
+        it ("passes em sizes through the chart unchanged", () => {
+            const options: any = buildChartOptions({
+                type: "line",
+                options: fontSizesToEm(old()),
+                data: { column: "t", filters: [], totalCount: 1, rowCount: 1, data: [{ rows: [["0", 1]] }] },
+                data2: null,
+                column: { name: "t", label: "T", dataType: "string", description: "" },
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+            })
+            expect(options.title.style.fontSize).toBe("1.25em")
+            expect(options.xAxis.labels.style.fontSize).toBe("0.81em")
+            expect(options.yAxis.labels.style.fontSize).toBe("0.85em")
+            expect(options.yAxis.title.style.fontSize).toBe("1.2em")
+            expect(options.xAxis.plotLines[0].label.style.fontSize).toBe("2em")
+        })
+    })
+
     describe("plot lines", () => {
 
         function build(onInspectionChange: any = vi.fn(), inspection = false) {
             return buildChartOptions({
                 type: "line",
                 options: {
-                    xAxis: { plotLines: [{ value: 1, label: { text: "a", style: { fontSize: "32px" } } }, { value: 2 }] },
-                    yAxis: { plotLines: [{ value: 3, label: { text: "b", style: { fontSize: "8px"  } } }] }
+                    xAxis: { plotLines: [{ value: 1, label: { text: "a" } }, { value: 2 }] },
+                    yAxis: { plotLines: [{ value: 3, label: { text: "b" } }] }
                 },
                 data: { column: "t", filters: [], totalCount: 1, rowCount: 1, data: [{ rows: [["0", 1]] }] },
                 data2: null,
@@ -282,12 +344,6 @@ describe("Chart", () => {
             const options = build()
             expect(options.xAxis.plotLines.map((l: any) => l.id)).toEqual(["x-axis-plot-line-0", "x-axis-plot-line-1"])
             expect(options.yAxis.plotLines.map((l: any) => l.id)).toEqual(["y-axis-plot-line-0"])
-        })
-
-        it ("convert old px label font sizes to em", () => {
-            const options = build()
-            expect(options.xAxis.plotLines[0].label.style.fontSize).toBe(32 / DEFAULT_FONT_SIZE + "em")
-            expect(options.yAxis.plotLines[0].label.style.fontSize).toBe(8 / DEFAULT_FONT_SIZE + "em")
         })
 
         it ("have no click handlers outside inspect mode", () => {

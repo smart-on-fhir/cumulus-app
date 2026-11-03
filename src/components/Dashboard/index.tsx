@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer, useRef } from "react"
 import { useNavigate, Link }                     from "react-router-dom"
 import { Chart }                                 from "highcharts"
-import { buildChartOptions, removeSurvivalOptions } from "./Charts/lib"
+import { buildChartOptions, fontSizesToEm, removeSurvivalOptions } from "./Charts/lib"
 import { withRiskTable }                         from "./Charts/riskTable"
 import ConfigPanel                               from "./ConfigPanel"
 import BaseChart                                 from "./Charts/ChartFN"
@@ -316,7 +316,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         filters: viewSettings.filters || [],
 
         // any custom chart options
-        chartOptions: viewSettings.chartOptions || {},
+        chartOptions: fontSizesToEm(viewSettings.chartOptions || {}),
 
         // the denominator option
         denominator: viewSettings.denominator || "",

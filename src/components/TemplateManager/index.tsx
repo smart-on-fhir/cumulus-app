@@ -263,7 +263,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                         },
                         labels: {
                             style: {
-                                fontSize: "30px"
+                                fontSize: "1.875em" // 30px
                             }
                         }
                     },
@@ -272,7 +272,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                         labels: {
                             padding: 16,
                             style: {
-                                fontSize: "30px"
+                                fontSize: "1.875em" // 30px
                             }
                         }
                     },

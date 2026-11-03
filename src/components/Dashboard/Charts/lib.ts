@@ -81,6 +81,32 @@ export function emToPx(em: number) {
     return Math.round(DEFAULT_FONT_SIZE * em) + "px"
 }
 
+/**
+ * Old charts saved the font sizes of their title, axis labels, axis titles and
+ * plot line labels in px. Converts those to em, which scales with the chart's
+ * font size (chart.style.fontSize stays in px, because it is what the em sizes
+ * are relative to). Saved views are converted once, when they load, so the
+ * editors and the chart see em only. Returns a copy.
+ */
+export function fontSizesToEm(options: Partial<Highcharts.Options>): Partial<Highcharts.Options>
+{
+    const out = structuredClone(options)
+    const styles = [
+        out.title?.style as Highcharts.CSSObject | undefined,
+        ...[singleAxis(out.xAxis), singleAxis(out.yAxis)].flatMap(axis => [
+            axis?.labels?.style,
+            axis?.title?.style,
+            ...(axis?.plotLines || []).map(l => l.label?.style)
+        ])
+    ]
+    styles.forEach(style => {
+        if (style?.fontSize) {
+            style.fontSize = lengthToEm(style.fontSize) + "em"
+        }
+    })
+    return out
+}
+
 export function getChartTitleText(column: app.SubscriptionDataColumn, groupBy?: app.SubscriptionDataColumn | null): string {
     let txt = column.label || column.name
     if (groupBy) {
@@ -784,7 +810,7 @@ export function buildChartOptions({
         colors: computeColors(type, series, options),
         title: {
             style: {
-                fontSize: lengthToEm((options.title?.style as Highcharts.CSSObject | undefined)?.fontSize ?? "2em") + "em"
+                fontSize: (options.title?.style as Highcharts.CSSObject | undefined)?.fontSize ?? "2em"
             }
         },
         yAxis: {
@@ -795,13 +821,13 @@ export function buildChartOptions({
             labels: {
                 format: isPercent ? "{text}%" : "{text}",
                 style: {
-                    fontSize: lengthToEm(singleAxis(options.yAxis)?.labels?.style?.fontSize ?? "1em") + "em"
+                    fontSize: singleAxis(options.yAxis)?.labels?.style?.fontSize ?? "1em"
                 }
             },
             title: {
                 ...(survivalYTitle ? { text: survivalYTitle } : {}),
                 style: {
-                    fontSize: lengthToEm(singleAxis(options.yAxis)?.title?.style?.fontSize ?? "1.2em") + "em"
+                    fontSize: singleAxis(options.yAxis)?.title?.style?.fontSize ?? "1.2em"
                 }
             }
         },
@@ -868,13 +894,13 @@ export function buildChartOptions({
             })(),
             labels: {
                 style: {
-                    fontSize: lengthToEm(singleAxis(options.xAxis)?.labels?.style?.fontSize ?? "1em") + "em"
+                    fontSize: singleAxis(options.xAxis)?.labels?.style?.fontSize ?? "1em"
                 }
             },
             title: {
                 ...(survivalXTitle ? { text: survivalXTitle } : {}),
                 style: {
-                    fontSize: lengthToEm(singleAxis(options.xAxis)?.title?.style?.fontSize ?? "1em") + "em"
+                    fontSize: singleAxis(options.xAxis)?.title?.style?.fontSize ?? "1em"
                 }
             },
         },
@@ -975,9 +1001,8 @@ export function buildChartOptions({
 }
 
 /**
- * Prepares the plot lines of one axis: converts old px label font sizes to em,
- * and gives each line an id, which inspect mode selects it by. In inspect
- * mode, clicking a line reports its id and axis.
+ * Prepares the plot lines of one axis: gives each line an id, which inspect
+ * mode selects it by. In inspect mode, clicking a line reports its id and axis.
  */
 function preparePlotLines(
     plotLines: (Highcharts.XAxisPlotLinesOptions | Highcharts.YAxisPlotLinesOptions)[],
@@ -986,9 +1011,6 @@ function preparePlotLines(
     onInspectionChange: (inspection: string[], context: Partial<app.InspectionContext>) => void
 ) {
     plotLines.forEach((l, i) => {
-        if (l.label?.style?.fontSize) {
-            l.label.style.fontSize = lengthToEm(l.label.style.fontSize) + "em"
-        }
         const id = `${axis}-axis-plot-line-${i}`
         l.id = id
         if (inspection?.enabled) {
