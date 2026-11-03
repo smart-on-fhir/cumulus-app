@@ -565,10 +565,8 @@ function getSeriesAndExceptions({
             const stratifier = String(group.stratifier)
             const id   = (secondary ? "secondary-" : "primary-") + stratifier
             const old  = serverOptions.series?.find(s => s.id === id)
-            const rows = group.rows
-
-            filterOutExceptions({
-                rows,
+            const rows = filterOutExceptions({
+                rows: group.rows,
                 seriesName: old?.name ?? stratifier,
                 column,
                 exceptions,

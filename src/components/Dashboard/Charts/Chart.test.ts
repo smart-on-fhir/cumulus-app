@@ -14,6 +14,7 @@ import {
 } from "./lib"
 import { CUMULUS__NONE, DEFAULT_FONT_SIZE, ReadOnlyPaths } from "../config"
 import { roundToPrecision, strip } from "../../../utils"
+import type { app } from "../../../types"
 
 
 describe("Chart", () => {
@@ -179,6 +180,42 @@ describe("Chart", () => {
         })
         expect(options.series!.map(s => s.id)).toEqual(["primary-1", "primary-true"])
         expect(options.series!.map(s => s.name)).toEqual(["1", "true"])
+    })
+
+    it ("leaves out the rows with invalid dates, with and without a stratifier", () => {
+        // A loose date that only fails the strict check of filterOutExceptions
+        const rows: [string, number][] = [["2020-01-01", 5], ["01/02/2020", 7], ["2020-01-03", 2]]
+        const column: app.SubscriptionDataColumn = { name: "t", label: "T", dataType: "date:YYYY-MM-DD", description: "" }
+        const plain = buildChartOptions({
+            type: "line",
+            data: { column: "t", filters: [], totalCount: 14, rowCount: 3, data: [{ rows }] },
+            data2  : null,
+            column,
+            sortBy : "x:asc",
+            limit  : 0,
+            offset : 0
+        })
+        const stratified = buildChartOptions({
+            type: "line",
+            data: {
+                column    : "t",
+                stratifier: "g",
+                filters   : [],
+                totalCount: 14,
+                rowCount  : 3,
+                counts    : { "2020-01-01": 5, "01/02/2020": 7, "2020-01-03": 2 },
+                data      : [{ stratifier: "a", rows }]
+            },
+            data2  : null,
+            column,
+            groupBy: { name: "g", label: "G", dataType: "string", description: "" },
+            sortBy : "x:asc",
+            limit  : 0,
+            offset : 0
+        })
+        const getY = (options: Highcharts.Options) => (options.series![0] as any).data.map((p: any) => p?.y)
+        expect(getY(plain)).toEqual([5, null, 2])
+        expect(getY(stratified)).toEqual([5, null, 2])
     })
 
     // The saved options are also passed as history state when copying a chart,
