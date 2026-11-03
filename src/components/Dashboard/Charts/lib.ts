@@ -1,6 +1,6 @@
 import moment                               from "moment"
 import { Color, merge, Series }             from "highcharts"
-import { compareDurations }                 from "./duration"
+import { compareDurations, parseDuration }  from "./duration"
 import { getCountsByTime, lifeTable, logRankTest, SurvivalData } from "./kaplanMeier"
 import { getDurationTitle, isDurationTitle }        from "../columnRoles"
 import { getConfidenceBands, getSmallGroupsWarning, getSurvivalDataWarnings, setLeftSteps } from "./survivalSeries"
@@ -324,6 +324,21 @@ function getPoint({
     return point as Highcharts.XrangePointOptionsObject
 }
 
+// Sort comparator for numbers. Non-numeric values go last.
+function compareNumbers(a: number, b: number) {
+    const fa = isFinite(a), fb = isFinite(b)
+    return fa && fb ? a - b : fa ? -1 : fb ? 1 : 0
+}
+
+// Category values can be numbers sent as strings, or ranges like "<1" and
+// ">=5", so they are compared by their numeric value when they have one
+export function compareCategories(a: string, b: string) {
+    if (parseDuration(a) && parseDuration(b)) {
+        return compareDurations(a, b)
+    }
+    return String(a).localeCompare(String(b), undefined, { numeric: true })
+}
+
 // Build a set of unique X-axis ticks. We need that for our custom
 // sort/limit/offset implementation.
 function getXAxis({
@@ -347,17 +362,17 @@ function getXAxis({
 
     // For stratified charts use the counts object
     if (data?.stratifier) {
-        Object.keys((data as app.ServerResponses.StratifiedDataResponse).counts).forEach(key => {
+        Object.entries((data as app.ServerResponses.StratifiedDataResponse).counts).forEach(([key, count]) => {
             if (key !== "null" && key !== CUMULUS__NONE) {
-                ticks.set(key, data[key])
+                ticks.set(key, count)
             }
         })
     }
 
     if (data2) {
-        Object.keys((data2 as app.ServerResponses.StratifiedDataResponse).counts).forEach(key => {
-            if (key !== "null" && key !== CUMULUS__NONE) {
-                ticks.set(key, data2[key])
+        Object.entries(data2.counts).forEach(([key, count]) => {
+            if (key !== "null" && key !== CUMULUS__NONE && !ticks.has(key)) {
+                ticks.set(key, count)
             }
         })
     }
@@ -380,39 +395,41 @@ function getXAxis({
         return arr.sort(compareDurations)
     }
 
-    // At this point we have a set of unique axis labels, but we also need to
-    // sort them if this is a category axis
+    // The ticks are sorted here, and not left in the order of the API, which
+    // may sort numbers as strings. Numeric and date axes place the points by
+    // their value, so their ticks stay in ascending order and the axis is
+    // reversed for descending order (see buildChartOptions). On category axes
+    // the order of the ticks is the order on the chart.
     const [col, dir] = sortBy.split(":")
-    if (col === "y" && xType === "category") {
-        arr.sort((a, b) => {
-            let _a = +ticks.get(a)
-            let _b = +ticks.get(b)
-            if (isNaN(_a) || !isFinite(_a)) return 0
-            if (isNaN(_b) || !isFinite(_b)) return 0
-            return dir === "desc" ? _b - _a : _a - _b
-        })
+    if (xType === "linear") {
+        arr.sort((a, b) => compareNumbers(+a, +b))
+    }
+    else if (xType === "datetime") {
+        arr.sort((a, b) => compareNumbers(+new Date(a), +new Date(b)))
+    }
+    else {
+        arr.sort(compareCategories)
+        if (col === "y") {
+            // Stable, so equal counts stay in the order of their names
+            arr.sort((a, b) => {
+                let _a = +ticks.get(a)
+                let _b = +ticks.get(b)
+                if (isNaN(_a) || !isFinite(_a)) return 0
+                if (isNaN(_b) || !isFinite(_b)) return 0
+                return dir === "desc" ? _b - _a : _a - _b
+            })
+        }
+        else if (dir === "desc") {
+            arr.reverse()
+        }
     }
 
     ticks.clear();
 
-    // If we have a stratified chart, xTicks needs to be sorted as it can
-    // contain entries from different series that are out of order after
-    // being combined in the Set.
-    if (data.stratifier || data2) {
-        // For category charts we don't allow highcharts to sort the data.
-        // However, for other types we need to sort it ourselves
-        if (xType === "linear") {
-            arr.sort((a, b) => +a - +b);
-        }
-        else if (xType === "datetime") {
-            arr.sort((a, b) => +new Date(a) - +new Date(b));
-        }
-    }
-
     if (limit || offset) {
 
         const from = Math.max(offset || 0, 0)
-        if (sortBy === "x:desc") { // reversed!
+        if (xType !== "category" && sortBy === "x:desc") { // reversed axis!
             const end = Math.max(arr.length - from, 0)
             arr = arr.slice(0, end)
             if (limit) {
@@ -618,8 +635,10 @@ function getSeriesAndExceptions({
 
             const seriesData = showSurvival ? toSurvivalPoints() : ticksToPoints(rows, denominatorCache);
 
-            if (type === "pie" && sortBy.startsWith("x:")) {
-                seriesData.sort((a, b) => sortBy === "x:asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name))
+            // Pies have no axis to reverse, so descending numbers and dates
+            // are put in order here (see getXAxis)
+            if (type === "pie" && xType !== "category" && sortBy === "x:desc") {
+                seriesData.reverse()
             }
 
             addSeries({
@@ -892,15 +911,13 @@ export function buildChartOptions({
                     return false;
                 }
 
-                if (col !== 'x') {
-                    return undefined;
-                }
+                // Category ticks are already in order (see getXAxis), but
+                // numeric and date axes place the points by value
+                const reverse = xType !== "category" && col === "x" && dir === "desc"
 
-                if (xType !== 'category') {
-                    return dir === (type === 'bar' ? 'asc' : 'desc');
-                }
-
-                return dir === (type === 'bar' ? 'desc' : 'asc');
+                // Bar charts are inverted, and Highcharts reverses their x
+                // axis by default to put the first value at the top
+                return type === "bar" ? !reverse : reverse
             })(),
             labels: {
                 style: {

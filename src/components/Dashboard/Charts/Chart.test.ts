@@ -238,6 +238,127 @@ describe("Chart", () => {
         }
     })
 
+    describe("sorting", () => {
+        function build({ type = "line", dataType = "string", rows, sortBy = "x:asc", limit = 0, offset = 0, options }: {
+            type    ?: any
+            dataType?: any
+            rows     : [string, number][]
+            sortBy  ?: string
+            limit   ?: number
+            offset  ?: number
+            options ?: Highcharts.Options
+        }) {
+            const result = buildChartOptions({
+                type,
+                options,
+                data   : { column: "x", filters: [], totalCount: rows.length, rowCount: rows.length, data: [{ rows }] },
+                data2  : null,
+                column : { name: "x", label: "X", dataType, description: "" },
+                sortBy,
+                limit,
+                offset
+            })
+            return {
+                names   : (result.series![0] as any).data.map((p: any) => p.name),
+                reversed: (result.xAxis as Highcharts.XAxisOptions).reversed
+            }
+        }
+
+        const rows: [string, number][] = [["b", 2], ["c", 3], ["a", 1]]
+
+        it ("shows categories in ascending order without reversing the axis", () => {
+            expect(build({ rows })).toEqual({ names: ["a", "b", "c"], reversed: false })
+        })
+
+        it ("shows categories in descending order without reversing the axis", () => {
+            expect(build({ rows, sortBy: "x:desc" })).toEqual({ names: ["c", "b", "a"], reversed: false })
+        })
+
+        it ("puts the first category at the top of bar charts", () => {
+            expect(build({ rows, type: "bar" })).toEqual({ names: ["a", "b", "c"], reversed: true })
+        })
+
+        it ("sorts numbers sent as strings by their value", () => {
+            expect(build({ rows: [["10", 1], ["9", 1], ["2", 1]] }).names).toEqual(["2", "9", "10"])
+        })
+
+        it ("sorts ranges by their value", () => {
+            expect(build({ rows: [[">=5", 1], ["2", 1], ["<1", 1], ["1", 1]] }).names).toEqual(["<1", "1", "2", ">=5"])
+        })
+
+        it ("sorts categories by count", () => {
+            expect(build({ rows, sortBy: "y:desc" }).names).toEqual(["c", "b", "a"])
+            expect(build({ rows, sortBy: "y:asc" }).names).toEqual(["a", "b", "c"])
+        })
+
+        it ("ignores a saved reversed axis on category charts", () => {
+            const options = { xAxis: { reversed: true } }
+            expect(build({ rows, sortBy: "y:desc", options }).reversed).toBe(false)
+            expect(build({ rows, options }).reversed).toBe(false)
+        })
+
+        it ("applies limit and offset to categories in the shown order", () => {
+            expect(build({ rows, sortBy: "x:desc", limit: 2 }).names).toEqual(["c", "b"])
+            expect(build({ rows, sortBy: "x:asc", limit: 1, offset: 1 }).names).toEqual(["b"])
+        })
+
+        it ("keeps numbers in ascending order and reverses the axis for descending order", () => {
+            const numbers: [string, number][] = [["10", 1], ["9", 1], ["2", 1]]
+            expect(build({ rows: numbers, dataType: "integer" })).toEqual({ names: ["2", "9", "10"], reversed: false })
+            expect(build({ rows: numbers, dataType: "integer", sortBy: "x:desc" })).toEqual({ names: ["2", "9", "10"], reversed: true })
+            // The first two on the reversed axis
+            expect(build({ rows: numbers, dataType: "integer", sortBy: "x:desc", limit: 2 }).names).toEqual(["9", "10"])
+        })
+
+        it ("puts numbers in descending order in pies", () => {
+            expect(build({ rows: [["10", 1], ["9", 1], ["2", 1]], dataType: "integer", type: "pie", sortBy: "x:desc" }).names).toEqual(["10", "9", "2"])
+        })
+
+        it ("sorts the categories of stratified charts", () => {
+            const result = buildChartOptions({
+                type: "line",
+                data: {
+                    column    : "x",
+                    stratifier: "g",
+                    filters   : [],
+                    totalCount: 3,
+                    rowCount  : 3,
+                    counts    : { "b": 1, "10": 1, "9": 1 },
+                    data      : [{ stratifier: "a", rows: [["b", 1], ["10", 1], ["9", 1]] }]
+                },
+                data2  : null,
+                column : { name: "x", label: "X", dataType: "string", description: "" },
+                groupBy: { name: "g", label: "G", dataType: "string", description: "" },
+                sortBy : "x:asc",
+                limit  : 0,
+                offset : 0
+            })
+            expect((result.series![0] as any).data.map((p: any) => p.name)).toEqual(["9", "10", "b"])
+        })
+
+        it ("sorts the categories of stratified charts by their total count", () => {
+            const result = buildChartOptions({
+                type: "bar",
+                data: {
+                    column    : "x",
+                    stratifier: "g",
+                    filters   : [],
+                    totalCount: 6,
+                    rowCount  : 3,
+                    counts    : { "a": 1, "b": 3, "c": 2 },
+                    data      : [{ stratifier: "s", rows: [["a", 1], ["b", 3], ["c", 2]] }]
+                },
+                data2  : null,
+                column : { name: "x", label: "X", dataType: "string", description: "" },
+                groupBy: { name: "g", label: "G", dataType: "string", description: "" },
+                sortBy : "y:desc",
+                limit  : 0,
+                offset : 0
+            })
+            expect((result.series![0] as any).data.map((p: any) => p.name)).toEqual(["b", "c", "a"])
+        })
+    })
+
     describe("legend click", () => {
 
         function build(onSeriesToggle: (map: Record<string, boolean>) => void, inspection = false) {
