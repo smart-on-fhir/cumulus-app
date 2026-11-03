@@ -240,4 +240,34 @@ describe("Chart View", () => {
             expect(link).toHaveTextContent(baseSubscription.StudyAreas![i].name)
         })
     });
+
+    describe("filters on the stratifier", () => {
+
+        const filter = (left: string): app.Filter => ({
+            left, operator: "strEq", negated: false, join: "and", right: { type: "value", value: "a" }
+        })
+
+        function renderView(settings: Partial<app.ViewSettings>) {
+            const view = { ...baseView, settings: { ...baseView.settings!, groupBy: "string_column", ...settings } }
+            render(<WrappedChartView subscription={ baseSubscription } view={ view } />)
+            return document.body.textContent || ""
+        }
+
+        it ("are warned about", () => {
+            const text = renderView({ filters: [filter("string_column")] })
+            expect(text).toContain("Filters on the stratifier column are not supported")
+            expect(text).toContain("or show incomplete data")
+        })
+
+        it ("are warned about with a Stratified Count denominator", () => {
+            const text = renderView({ filters: [filter("string_column")], denominator: "count" })
+            expect(text).toContain("Filters on the stratifier column are not supported")
+            expect(text).toContain("values greater than 100%")
+        })
+
+        it ("are the only filters warned about", () => {
+            const text = renderView({ filters: [filter("integer_column")] })
+            expect(text).not.toContain("Filters on the stratifier column are not supported")
+        })
+    })
 })

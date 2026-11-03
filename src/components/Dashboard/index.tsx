@@ -743,14 +743,19 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                         
                         { loadingDataError && <AlertError style={{ marginTop: 0 }}><b>Error loading data:</b> { loadingDataError + "" }</AlertError> }
                         
-                        { viewGroupBy?.name && state.denominator === "count" && filters.some(f => f.left === viewGroupBy.name) && (
+                        {/* The counts of a stratified chart come from the rows where the
+                            stratifier is empty, which filters on the stratifier exclude (see #80) */}
+                        { viewGroupBy?.name && filters.some(f => f.left === viewGroupBy.name) && (
                             <Alert color="orange" className="mb-1" icon="fa-solid fa-circle-exclamation">
                                 <div style={{ fontFamily: "sans-serif" }}>
-                                    You have stratified the data by "{ viewGroupBy.name }" and selected a Stratified Count denominator.
-                                    However, you have also applied some filters affecting the "{ viewGroupBy.name }" column. This can make it
-                                    impossible to properly compute a stratified count denominator resulting in values grater than 100% on the Y axis!
+                                    You have stratified the data by "{ viewGroupBy.name }", but you have also applied some filters
+                                    affecting the "{ viewGroupBy.name }" column. Filters on the stratifier column are not supported.
+                                    The chart can end up empty, { state.denominator === "count" ?
+                                        "and the Stratified Count denominator can result in values greater than 100% on the Y axis!" :
+                                        "or show incomplete data."
+                                    }
                                     <p>
-                                        <b>To fix this, use different denominator or remove filters on the "{ viewGroupBy.name }" column.</b>
+                                        <b>To fix this, remove the filters on the "{ viewGroupBy.name }" column, or stratify by another column.</b>
                                     </p>
                                 </div>
                             </Alert>
