@@ -48,6 +48,22 @@ export function removeStaleShadows(chart: Highcharts.Chart) {
     })
 }
 
+/**
+ * What a click in inspect mode selects: a plot line, by the id in its class
+ * (see preparePlotLines in lib.ts), or the first inspector whose selector
+ * matches the clicked element
+ */
+export function getInspectionMatch(element: Element): [string, Partial<app.InspectionContext>] | null {
+    const plotLine = element.matches(".highcharts-plot-line") ?
+        element.getAttribute("class")?.match(/\b([xy])-axis-plot-line-\d+\b/) :
+        null
+    if (plotLine) {
+        return ["plotLine", { selectedPlotLineId: plotLine[0], selectedPlotLineAxis: plotLine[1] as "x" | "y" }]
+    }
+    const tag = Object.entries(INSPECTORS).find(([, selector]) => element.matches(selector))?.[0]
+    return tag ? [tag, {}] : null
+}
+
 export function Chart(props: ChartProps) {
     const {
         loading,
@@ -145,12 +161,9 @@ export function Chart(props: ChartProps) {
 
     const onMouseDown = useCallback((e: MouseEvent) => {
         if (containerRef.current && onInspectionChange) {
-            let element = e.target as SVGElement | HTMLElement | null
-            if (element) {
-                let tag = Object.entries(INSPECTORS).find(([, selector]) => element!.matches(selector))?.[0]
-                if (tag) {
-                    onInspectionChange([tag], {})
-                }
+            const match = e.target instanceof Element ? getInspectionMatch(e.target) : null
+            if (match) {
+                onInspectionChange([match[0]], match[1])
             }
         }
         containerRef.current.focus({ preventScroll: true })

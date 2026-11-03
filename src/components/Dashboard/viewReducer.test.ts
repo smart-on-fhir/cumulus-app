@@ -291,7 +291,8 @@ describe("Dashboard reducer with data", () => {
 
     // The crosshair button and clicks on chart elements send UPDATE with a new
     // inspection object. The rebuild is what adds and removes the click
-    // handlers of the series, plot lines and annotations.
+    // handlers of the series and annotations in the options. (Plot lines are
+    // found by their class instead, see getInspectionMatch in ChartFN.tsx.)
     describe("inspect mode", () => {
 
         const annotations: Highcharts.AnnotationsOptions[] = [{ labels: [{ text: "a", point: { x: 0, y: 0, xAxis: 0, yAxis: 0 }, style: {} }] }]
@@ -302,11 +303,9 @@ describe("Dashboard reducer with data", () => {
 
         it ("adds click handlers and hides the tooltip when turned on", () => {
             const state = getStateWithData()
-            state.chartOptions.xAxis = { plotLines: [{ value: 0 }] }
             state.chartOptions.annotations = annotations
             const next: any = inspect(state, { enabled: true })
             expect(next.chartOptions.plotOptions.series.events.click).toBeTypeOf("function")
-            expect(next.chartOptions.xAxis.plotLines[0].events.click).toBeTypeOf("function")
             expect(next.chartOptions.annotations[0].events.click).toBeTypeOf("function")
             expect(next.chartOptions.tooltip.enabled).toBe(false)
         })

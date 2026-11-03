@@ -994,33 +994,27 @@ export function buildChartOptions({
         }
     }
 
-    preparePlotLines(singleAxis(result.xAxis)?.plotLines || [], "x", inspection, onInspectionChange)
-    preparePlotLines(singleAxis(result.yAxis)?.plotLines || [], "y", inspection, onInspectionChange)
+    preparePlotLines(singleAxis(result.xAxis)?.plotLines || [], "x")
+    preparePlotLines(singleAxis(result.yAxis)?.plotLines || [], "y")
 
     return result
 }
 
 /**
- * Prepares the plot lines of one axis: gives each line an id, which inspect
- * mode selects it by. In inspect mode, clicking a line reports its id and axis.
+ * Gives each plot line of one axis an id, which inspect mode selects it by,
+ * and the same id as a class. In inspect mode, the chart finds a clicked line
+ * by that class (see getInspectionMatch). Highcharts click events would not
+ * do, because Highcharts binds them only when it first draws a line, and a
+ * line drawn outside inspect mode never gets them.
  */
 function preparePlotLines(
     plotLines: (Highcharts.XAxisPlotLinesOptions | Highcharts.YAxisPlotLinesOptions)[],
-    axis: "x" | "y",
-    inspection: app.Inspection | undefined,
-    onInspectionChange: (inspection: string[], context: Partial<app.InspectionContext>) => void
+    axis: "x" | "y"
 ) {
     plotLines.forEach((l, i) => {
         const id = `${axis}-axis-plot-line-${i}`
         l.id = id
-        if (inspection?.enabled) {
-            l.events = {
-                click: () => onInspectionChange(["plotLine"], {
-                    selectedPlotLineId: id,
-                    selectedPlotLineAxis: axis
-                })
-            }
-        }
+        l.className = id
     })
 }
 

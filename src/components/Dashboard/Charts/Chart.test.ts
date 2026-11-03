@@ -346,19 +346,19 @@ describe("Chart", () => {
             expect(options.yAxis.plotLines.map((l: any) => l.id)).toEqual(["y-axis-plot-line-0"])
         })
 
-        it ("have no click handlers outside inspect mode", () => {
+        it ("get their id as a class, which inspect mode finds them by", () => {
             const options = build()
-            expect(options.xAxis.plotLines[0].events).toBeUndefined()
-            expect(options.yAxis.plotLines[0].events).toBeUndefined()
+            expect(options.xAxis.plotLines.map((l: any) => l.className)).toEqual(["x-axis-plot-line-0", "x-axis-plot-line-1"])
+            expect(options.yAxis.plotLines.map((l: any) => l.className)).toEqual(["y-axis-plot-line-0"])
         })
 
-        it ("report their id and axis when clicked in inspect mode", () => {
-            const onInspectionChange = vi.fn()
-            const options = build(onInspectionChange, true)
-            options.xAxis.plotLines[1].events.click()
-            expect(onInspectionChange).toHaveBeenLastCalledWith(["plotLine"], { selectedPlotLineId: "x-axis-plot-line-1", selectedPlotLineAxis: "x" })
-            options.yAxis.plotLines[0].events.click()
-            expect(onInspectionChange).toHaveBeenLastCalledWith(["plotLine"], { selectedPlotLineId: "y-axis-plot-line-0", selectedPlotLineAxis: "y" })
+        // Highcharts binds them only when it first draws a line
+        it ("get no click handlers, in or outside inspect mode", () => {
+            for (const inspection of [false, true]) {
+                const options = build(vi.fn(), inspection)
+                expect(options.xAxis.plotLines[0].events).toBeUndefined()
+                expect(options.yAxis.plotLines[0].events).toBeUndefined()
+            }
         })
     })
 
