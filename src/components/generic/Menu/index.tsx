@@ -130,8 +130,7 @@ export class ContextMenu extends React.Component
                         <span className="menu-item-icon">{ item.icon as any }</span>
                         { item.label as any }
                         {
-                            // @ts-ignore
-                            item.children && this.renderMenu(e, item.children)
+                            "children" in item && item.children && this.renderMenu(e, item.children)
                         }
                     </div>
                 })}
