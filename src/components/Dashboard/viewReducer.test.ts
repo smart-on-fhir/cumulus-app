@@ -289,6 +289,53 @@ describe("Dashboard reducer with data", () => {
         })
     })
 
+    // The crosshair button and clicks on chart elements send UPDATE with a new
+    // inspection object. The rebuild is what adds and removes the click
+    // handlers of the series, plot lines and annotations.
+    describe("inspect mode", () => {
+
+        const annotations: Highcharts.AnnotationsOptions[] = [{ labels: [{ text: "a", point: { x: 0, y: 0, xAxis: 0, yAxis: 0 }, style: {} }] }]
+
+        function inspect(state: ViewState, patch: Partial<app.Inspection>, r = reducer) {
+            return r(state, { type: "UPDATE", payload: { inspection: { ...state.inspection, ...patch } } })
+        }
+
+        it ("adds click handlers and hides the tooltip when turned on", () => {
+            const state = getStateWithData()
+            state.chartOptions.xAxis = { plotLines: [{ value: 0 }] }
+            state.chartOptions.annotations = annotations
+            const next: any = inspect(state, { enabled: true })
+            expect(next.chartOptions.plotOptions.series.events.click).toBeTypeOf("function")
+            expect(next.chartOptions.xAxis.plotLines[0].events.click).toBeTypeOf("function")
+            expect(next.chartOptions.annotations[0].events.click).toBeTypeOf("function")
+            expect(next.chartOptions.tooltip.enabled).toBe(false)
+        })
+
+        it ("removes the series click handler and shows the tooltip when turned off", () => {
+            const next: any = inspect(inspect(getStateWithData(), { enabled: true }), { enabled: false })
+            expect(next.chartOptions.plotOptions.series.events.click).toBeUndefined()
+            expect(next.chartOptions.tooltip.enabled).toBe(true)
+        })
+
+        it ("reports a clicked series", () => {
+            const onInspectionChange = vi.fn()
+            const r = getViewReducer({ onSeriesToggle: () => {}, onInspectionChange })
+            const next: any = inspect(r(getState({ viewColumn: genderColumn }), {
+                type: "UPDATE", payload: { data: getData([["female", 10], ["male", 20]]) }
+            }), { enabled: true }, r)
+            next.chartOptions.plotOptions.series.events.click({ point: { series: { options: { id: "primary-Gender" } } } })
+            expect(onInspectionChange).toHaveBeenCalledWith(["series"], { selectedSeriesId: "primary-Gender" })
+        })
+
+        it ("keeps the click handlers when a click matches an element", () => {
+            const on: any = inspect(getStateWithData(), { enabled: true })
+            const next: any = inspect(on, { match: ["series"], context: { ...on.inspection.context, selectedSeriesId: "primary-Gender" } })
+            expect(next.showOptions).toBe(true)
+            expect(next.inspection.context.selectedSeriesId).toBe("primary-Gender")
+            expect(next.chartOptions.plotOptions.series.events.click).toBeTypeOf("function")
+        })
+    })
+
     describe("default chart options", () => {
 
         // `credits` only appears when getDefaultChartOptions has been applied
