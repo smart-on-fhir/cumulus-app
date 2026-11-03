@@ -55,72 +55,22 @@ export function useChartData({
             survivalData: null,
         }})
 
-        const fetchPrimaryData = async () => fetchChartData({
+        return fetchViewData({
             subscription,
             dataPackage,
-            column    : viewColumnName,
-            stratifier: stratifierName,
-            filters   : filterParams,
-            label     : "Chart Primary Data",
+            viewColumnName,
+            stratifierName,
+            secColumnName,
+            statusColumnName,
+            statusLabel,
+            eventValue,
+            filterParams,
             signal
-        })
-
-        const fetchSecondaryData = async () => {
-            if (!secColumnName) return null
-            return fetchChartData({
-                subscription,
-                dataPackage,
-                column    : viewColumnName,
-                stratifier: secColumnName,
-                filters   : filterParams,
-                label     : "Chart Secondary Data",
-                signal
-            })
-        }
-
-        // Survival charts: the primary query split into events and censored records
-        const fetchSurvivalData = async (): Promise<SurvivalData | null> => {
-            if (!statusColumnName || !eventValue) return null
-            const [events, censored] = await Promise.all([
-                fetchChartData({
-                    subscription,
-                    dataPackage,
-                    column    : viewColumnName,
-                    stratifier: stratifierName,
-                    filters   : [...filterParams, `${statusColumnName}:strEq:${eventValue}`],
-                    label     : "Chart Survival Events",
-                    signal
-                }),
-                fetchChartData({
-                    subscription,
-                    dataPackage,
-                    column    : viewColumnName,
-                    stratifier: stratifierName,
-                    filters   : [
-                        ...filterParams,
-                        `${statusColumnName}:strNotEq:${eventValue}`,
-                        `${statusColumnName}:strNotEq:${CUMULUS__NONE}`
-                    ],
-                    label     : "Chart Survival Censored",
-                    signal
-                })
-            ])
-            return {
-                events,
-                censored,
-                status: { label: statusLabel, eventValue }
-            }
-        }
-
-        return Promise.all([
-            fetchPrimaryData(),
-            fetchSecondaryData(),
-            fetchSurvivalData()
-        ]).then(([
+        }).then(({
             primaryData,
             secondaryData,
             survivalData
-        ]) => {
+        }) => {
             if (signal?.aborted) return
             try {
                 validateData(primaryData, { column: viewColumnName, stratifier: stratifierName, filters: filterParams })
@@ -177,4 +127,103 @@ export function useChartData({
     }, [requestId, statusColumnName])
 
     return { statusValues }
+}
+
+
+/**
+ * Fetches the data of a chart: the primary data, the secondary data if there
+ * is a secondary column, and the survival events and censored records if this
+ * is a survival chart
+ */
+export async function fetchViewData({
+    subscription,
+    dataPackage,
+    viewColumnName,
+    stratifierName,
+    secColumnName,
+    statusColumnName,
+    statusLabel,
+    eventValue,
+    filterParams,
+    signal
+}: {
+    subscription    ?: app.Subscription
+    dataPackage     ?: DataPackage
+    viewColumnName   : string
+    stratifierName  ?: string
+    secColumnName    : string
+    statusColumnName : string
+    statusLabel      : string
+    eventValue       : string
+    filterParams     : string[]
+    signal          ?: AbortSignal
+}): Promise<{
+    primaryData  : app.ServerResponses.DataResponse
+    secondaryData: app.ServerResponses.StratifiedDataResponse | null
+    survivalData : SurvivalData | null
+}>
+{
+    const fetchPrimaryData = async () => fetchChartData({
+        subscription,
+        dataPackage,
+        column    : viewColumnName,
+        stratifier: stratifierName,
+        filters   : filterParams,
+        label     : "Chart Primary Data",
+        signal
+    })
+
+    const fetchSecondaryData = async () => {
+        if (!secColumnName) return null
+        return fetchChartData({
+            subscription,
+            dataPackage,
+            column    : viewColumnName,
+            stratifier: secColumnName,
+            filters   : filterParams,
+            label     : "Chart Secondary Data",
+            signal
+        })
+    }
+
+    // Survival charts: the primary query split into events and censored records
+    const fetchSurvivalData = async (): Promise<SurvivalData | null> => {
+        if (!statusColumnName || !eventValue) return null
+        const [events, censored] = await Promise.all([
+            fetchChartData({
+                subscription,
+                dataPackage,
+                column    : viewColumnName,
+                stratifier: stratifierName,
+                filters   : [...filterParams, `${statusColumnName}:strEq:${eventValue}`],
+                label     : "Chart Survival Events",
+                signal
+            }),
+            fetchChartData({
+                subscription,
+                dataPackage,
+                column    : viewColumnName,
+                stratifier: stratifierName,
+                filters   : [
+                    ...filterParams,
+                    `${statusColumnName}:strNotEq:${eventValue}`,
+                    `${statusColumnName}:strNotEq:${CUMULUS__NONE}`
+                ],
+                label     : "Chart Survival Censored",
+                signal
+            })
+        ])
+        return {
+            events,
+            censored,
+            status: { label: statusLabel, eventValue }
+        }
+    }
+
+    const [primaryData, secondaryData, survivalData] = await Promise.all([
+        fetchPrimaryData(),
+        fetchSecondaryData(),
+        fetchSurvivalData()
+    ])
+    return { primaryData, secondaryData, survivalData }
 }
