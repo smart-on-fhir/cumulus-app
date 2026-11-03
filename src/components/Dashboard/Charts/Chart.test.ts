@@ -292,7 +292,14 @@ describe("Chart", () => {
             expect(options.yAxis.title).toEqual({ text: "y" })
             expect(options.xAxis.plotLines[1]).toEqual({ value: 2 })
             expect(options.chart.style.fontSize).toBe("18px")
-            expect(options.legend.itemStyle.fontSize).toBe("14px")
+        })
+
+        // The title and axes were converted against the default size before,
+        // but the legend was rendered in px
+        it ("converts the px size of the legend against the chart's font size", () => {
+            expect((fontSizesToEm(old()) as any).legend.itemStyle.fontSize).toBe("0.78em") // 14 / 18
+            expect((fontSizesToEm({ legend: { itemStyle: { fontSize: "14px" } } }) as any).legend.itemStyle.fontSize).toBe("0.88em")
+            expect((fontSizesToEm({ legend: { itemStyle: { fontSize: "1.2em" } } }) as any).legend.itemStyle.fontSize).toBe("1.2em")
         })
 
         it ("does not change the options it is given", () => {
@@ -318,6 +325,23 @@ describe("Chart", () => {
             expect(options.yAxis.title.style.fontSize).toBe("1.2em")
             expect(options.xAxis.plotLines[0].label.style.fontSize).toBe("2em")
         })
+    })
+
+    it ("annotations use the chart's font", () => {
+        const options: any = buildChartOptions({
+            type: "line",
+            options: {
+                chart: { style: { fontSize: "18px", fontFamily: "Arial" } },
+                annotations: [{ labels: [{ text: "a", point: { x: 0, y: 0, xAxis: 0, yAxis: 0 }, style: { fontSize: "14px" } }] }]
+            },
+            data: { column: "t", filters: [], totalCount: 1, rowCount: 1, data: [{ rows: [["0", 1]] }] },
+            data2: null,
+            column: { name: "t", label: "T", dataType: "string", description: "" },
+            sortBy: "x:asc",
+            limit : 0,
+            offset: 0
+        })
+        expect(options.annotations[0].labels[0].style).toMatchObject({ fontSize: "1em", fontFamily: "Arial" })
     })
 
     describe("plot lines", () => {

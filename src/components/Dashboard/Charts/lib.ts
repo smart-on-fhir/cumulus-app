@@ -82,15 +82,18 @@ export function emToPx(em: number) {
 }
 
 /**
- * Old charts saved the font sizes of their title, axis labels, axis titles and
- * plot line labels in px. Converts those to em, which scales with the chart's
- * font size (chart.style.fontSize stays in px, because it is what the em sizes
- * are relative to). Saved views are converted once, when they load, so the
- * editors and the chart see em only. Returns a copy.
+ * Old charts saved the font sizes of their title, axis labels, axis titles,
+ * plot line labels and legend in px. Converts those to em, which scales with
+ * the chart's font size (chart.style.fontSize stays in px, because it is what
+ * the em sizes are relative to). Saved views are converted once, when they
+ * load, so the editors and the chart see em only. Returns a copy.
  */
 export function fontSizesToEm(options: Partial<Highcharts.Options>): Partial<Highcharts.Options>
 {
     const out = structuredClone(options)
+
+    // These were converted on every render before, against the default font
+    // size, so that is how they look
     const styles = [
         out.title?.style as Highcharts.CSSObject | undefined,
         ...[singleAxis(out.xAxis), singleAxis(out.yAxis)].flatMap(axis => [
@@ -104,6 +107,15 @@ export function fontSizesToEm(options: Partial<Highcharts.Options>): Partial<Hig
             style.fontSize = lengthToEm(style.fontSize) + "em"
         }
     })
+
+    // The legend kept its px size, so it is converted against the chart's own
+    // font size, to look the same
+    const legend = out.legend?.itemStyle
+    if (legend?.fontSize) {
+        const base = String(out.chart?.style?.fontSize ?? "")
+        legend.fontSize = lengthToEm(legend.fontSize, base.endsWith("px") ? parseFloat(base) : DEFAULT_FONT_SIZE) + "em"
+    }
+
     return out
 }
 
@@ -979,7 +991,8 @@ export function buildChartOptions({
     // getInspectionMatch). Highcharts creates annotations once and doesn't
     // apply later events or classes to them.
     result.annotations?.[0]?.labels?.forEach(l => {
-        l.style!.fontSize   = options.chart?.style?.fontSize
+        // Annotations use the chart's font
+        l.style!.fontSize   = "1em"
         l.style!.fontFamily = options.chart?.style?.fontFamily
         l.useHTML           = false 
     })

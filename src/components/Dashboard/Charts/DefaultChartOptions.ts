@@ -139,7 +139,7 @@ const DefaultChartOptions: Options = {
         useHTML: true,
         maxHeight: 200,
         itemStyle: {
-            fontSize   : "16px"
+            fontSize   : "1em"
         },
         // margin: 0,
         // padding: 0

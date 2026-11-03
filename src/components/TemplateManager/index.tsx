@@ -280,7 +280,7 @@ function useDataLoader(sub: app.Subscription, col: app.SubscriptionDataColumn, p
                         enabled: !!groupBy,
                         useHTML: false,
                         itemStyle: {
-                            fontSize: "30px"
+                            fontSize: "1.875em" // 30px
                         }
                     },
                     plotOptions: {
