@@ -79,32 +79,26 @@ describe("Dashboard reducer without data", () => {
         expect(next.column2type).toBe("spline")
     })
 
-    describe("MERGE", () => {
+    describe("UPDATE", () => {
 
         it ("replaces top-level keys", () => {
-            const next = reducer(getState(), { type: "MERGE", payload: { viewName: "New Name", loadingData: true } })
+            const next = reducer(getState(), { type: "UPDATE", payload: { viewName: "New Name", loadingData: true } })
             expect(next.viewName).toBe("New Name")
             expect(next.loadingData).toBe(true)
         })
 
         it ("replaces nested objects instead of merging them", () => {
-            const next = reducer(getState(), { type: "MERGE", payload: { chartOptions: { title: { text: "New" } } } })
+            const next = reducer(getState(), { type: "UPDATE", payload: { chartOptions: { title: { text: "New" } } } })
             expect(next.chartOptions).toEqual({ title: { text: "New" } })
         })
-    })
 
-    describe("UPDATE", () => {
-
-        it ("deep-merges nested objects", () => {
-            const next = reducer(getState(), { type: "UPDATE", payload: { chartOptions: { title: { text: "New" } } } })
-            expect(next.chartOptions).toEqual({ chart: { type: "column" }, title: { text: "New" } })
-        })
-
-        it ("returns a copy, leaving the previous state unchanged", () => {
+        // The chart redraws when it gets new options, so changing anything
+        // else must not give it new ones
+        it ("returns a copy, leaving the previous state and the chart options unchanged", () => {
             const state = getState()
             const next  = reducer(state, { type: "UPDATE", payload: { viewName: "New Name" } })
             expect(next).not.toBe(state)
-            expect(next.chartOptions).not.toBe(state.chartOptions)
+            expect(next.chartOptions).toBe(state.chartOptions)
             expect(state.viewName).toBe("Test Chart")
         })
 
@@ -238,7 +232,9 @@ describe("Dashboard reducer with data", () => {
                     chartOptions: { title: { text: "New" } }
                 }
                 const state = getStateWithData()
-                const next  = reducer(state, { type: "UPDATE", payload: { [key]: values[key] } })
+                // Chart options are sent whole, e.g. by the series toggle
+                const value = key === "chartOptions" ? { ...state.chartOptions, ...values.chartOptions } : values[key]
+                const next  = reducer(state, { type: "UPDATE", payload: { [key]: value } })
                 expect(next.chartOptions.series).toBe(state.chartOptions.series)
             })
         }

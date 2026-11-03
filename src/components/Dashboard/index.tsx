@@ -102,10 +102,8 @@ export type ViewAction =
     | { type: "SET_CHART_TYPE"            , payload: keyof typeof SupportedChartTypes }
     | { type: "SET_VIEW_TYPE"             , payload: ViewState["viewType"] }
     | { type: "TOGGLE_OPTIONS" }
-    // Deep-merges the payload into the state, and rebuilds the chart if needed
+    // Replaces the top-level keys of the state, and rebuilds the chart if needed
     | { type: "UPDATE"                    , payload: Partial<ViewState> }
-    // Replaces the top-level keys of the state
-    | { type: "MERGE"                     , payload: Partial<ViewState> }
 
 
 export function getViewReducer({
@@ -211,7 +209,7 @@ export function getViewReducer({
         }
 
         if (action.type === "UPDATE") {
-            const nextState = Highcharts.merge(state, action.payload);
+            const nextState = { ...state, ...action.payload };
             
             if (nextState.inspection.enabled && nextState.inspection.match.length) {
                 nextState.showOptions = true
@@ -241,13 +239,6 @@ export function getViewReducer({
             }
 
             return nextState;
-        }
-
-        if (action.type === "MERGE") {
-            return {
-                ...state,
-                ...action.payload
-            };
         }
 
         return state
@@ -468,6 +459,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     function onSeriesToggle(map: Record<string, boolean>) {
         const next = {
             chartOptions: {
+                ...state.chartOptions,
                 series: (state.chartOptions.series || []).map(s => {
                     return { ...s, visible: map[s.id + ""] !== false }
                 })
@@ -515,7 +507,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
             const result = await updateOne("views", view.id, { ...viewToSave, screenShot }).catch(e => alert(e.message));
 
-            dispatch({ type: "MERGE", payload: { isDraft: result ? result.isDraft : false, pendingSaveProps: null }})
+            dispatch({ type: "UPDATE", payload: { isDraft: result ? result.isDraft : false, pendingSaveProps: null }})
         }
 
         // Create
@@ -537,7 +529,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         if (viewType !== "overview") {
             return new Promise(resolve => {
                 onPendingSaveDone.current = resolve
-                dispatch({ type: "MERGE", payload: { pendingSaveProps: props, viewType: "overview" }})
+                dispatch({ type: "UPDATE", payload: { pendingSaveProps: props, viewType: "overview" }})
             })
         }
         saveProps.current = props
@@ -694,6 +686,10 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                             }}
                             onChange={state => {
                                 dispatch({ type: "UPDATE", payload: {
+                                    // Some editors change the chart options in
+                                    // place (see ConfigPanel.test.tsx), and the
+                                    // chart only redraws for new options
+                                    chartOptions   : { ...state.chartOptions },
                                     viewName       : state.viewName,
                                     viewDescription: state.viewDescription,
                                     viewColumn     : cols.find(c => c.name === state.groupBy),
@@ -717,9 +713,9 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                 <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start", minWidth: "26rem", maxWidth: 1200 }}>
                     <div style={{ position: "sticky", top: 2 }}>
                         <GraphBreadcrumbs graph={{ isDraft, name: viewName }} />
-                        <GraphTitle value={state.viewName} onChange={ (viewName: string) => dispatch({ type: "MERGE", payload: { viewName }}) } />
+                        <GraphTitle value={state.viewName} onChange={ (viewName: string) => dispatch({ type: "UPDATE", payload: { viewName }}) } />
                         <hr/>
-                        <GraphDescription value={state.viewDescription} onChange={ viewDescription => dispatch({ type: "MERGE", payload: { viewDescription }}) } />
+                        <GraphDescription value={state.viewDescription} onChange={ viewDescription => dispatch({ type: "UPDATE", payload: { viewDescription }}) } />
                         <GraphToolbar
                             state={state}
                             dispatch={dispatch}
@@ -830,7 +826,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                     // Date.now()
                                 ].join(":")
                             }
-                            callback={() => dispatch({ type: "MERGE", payload: { chartIsRendered: true }})}
+                            callback={() => dispatch({ type: "UPDATE", payload: { chartIsRendered: true }})}
                         /> }
                         <br/>
                         <CaptionEditor html={caption} onChange={caption => dispatch({ type: "UPDATE", payload: { caption }})}/>
