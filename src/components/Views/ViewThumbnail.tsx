@@ -65,7 +65,6 @@ export default function ViewThumbnail({
                 }
             }}
             onContextMenu={function (e) {
-                // @ts-ignore
                 e.nativeEvent.customTarget = link.current;
 
                 let items: any[] = [
@@ -102,7 +101,6 @@ export default function ViewThumbnail({
                     }
                 }
 
-                // @ts-ignore
                 e.nativeEvent.menuItems = items;
             }}
         >

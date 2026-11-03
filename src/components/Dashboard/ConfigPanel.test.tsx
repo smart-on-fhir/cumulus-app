@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import type { SeriesPieOptions } from "highcharts"
 import ConfigPanel, { getChartTypes } from "./ConfigPanel"
 
 
@@ -54,7 +55,6 @@ const mockState: ChartConfigPanelState = {
   eventValue: "",
   survivalBands: false,
   survivalRiskTable: false,
-  annotations: [],
   xCol: { name: "age", label: "Age", dataType: "integer", description: "" },
   tags: [],
   ranges: null,
@@ -84,7 +84,6 @@ it("renders ConfigPanel and expands Chart section", async () => {
     <ConfigPanel
       cols={mockCols}
       state={mockState}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -109,7 +108,6 @@ it("calls onChartTypeChange when chart type is changed", async () => {
     <ConfigPanel
       cols={mockCols}
       state={mockState}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -133,7 +131,6 @@ it("calls onChartOptionsChange when chart title is changed", async () => {
     <ConfigPanel
       cols={mockCols}
       state={mockState}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -155,7 +152,6 @@ it("calls onChartOptionsChange when chart subtitle is changed", async () => {
     <ConfigPanel
       cols={mockCols}
       state={{ ...mockState, chartOptions: { ...mockState.chartOptions, subtitle: { text: "Chart Subtitle" } } }}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -176,7 +172,6 @@ it("suggests the subtitles the chart offers", async () => {
     <ConfigPanel
       cols={mockCols}
       state={{ ...mockState, chartOptions: { ...mockState.chartOptions, custom: { subtitleSuggestions: sentences } } as any }}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -195,7 +190,6 @@ it("renders legend controls and calls onChartOptionsChange when legend is change
     <ConfigPanel
       cols={mockCols}
       state={mockState}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -215,7 +209,6 @@ it("renders tag selector label", () => {
     <ConfigPanel
       cols={mockCols}
       state={mockState}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -234,7 +227,6 @@ it("calls onChange when groupBy column is changed", async () => {
     <ConfigPanel
       cols={mockCols}
       state={mockState}
-      viewType="overview"
       onChange={onChange}
       onChartTypeChange={onChartTypeChange}
       onChartOptionsChange={onChartOptionsChange}
@@ -261,7 +253,6 @@ describe("swapping the X axis and stratifier columns", () => {
       <ConfigPanel
         cols={mockCols}
         state={{ ...mockState, chartType } as any}
-        viewType="overview"
         onChange={onChange}
         onChartTypeChange={onChartTypeChange}
         onChartOptionsChange={onChartOptionsChange}
@@ -303,5 +294,201 @@ describe("chart types", () => {
 
   it("keep survival charts that already exist editable without the flag", () => {
     expect(getChartTypes("survival", false)).toContain("survival")
+  })
+})
+
+// Some editors change the chart options of the state they were given in place.
+// Highcharts.merge copies arrays by reference, so even after merge(state) the
+// series and colors are the Dashboard's own. These tests pin that down, because
+// SliceEditor's changes only reach the chart that way.
+describe("editors that change the chart options in place", () => {
+
+  function getPieState(): ChartConfigPanelState {
+    return {
+      ...structuredClone(mockState),
+      chartType: "pie",
+      stratifyBy: "",
+      chartOptions: {
+        chart : { type: "pie" },
+        colors: ["#111111", "#222222"],
+        series: [{ type: "pie", id: "primary-Gender", data: [{ name: "female", y: 10 }, { name: "male", y: 20 }] }]
+      }
+    }
+  }
+
+  function renderPanel(state: ChartConfigPanelState) {
+    const onChange             = vi.fn()
+    const onChartOptionsChange = vi.fn()
+    render(
+      <ConfigPanel
+        cols={mockCols}
+        state={state}
+        onChange={onChange}
+        onChartTypeChange={vi.fn()}
+        onChartOptionsChange={onChartOptionsChange}
+        onRangeOptionsChange={vi.fn()}
+        onSecondaryDataOptionsChange={vi.fn()}
+      />
+    )
+    return { onChange, onChartOptionsChange }
+  }
+
+  // The input next to a property grid label
+  function getPropertyInput(container: HTMLElement, name: string) {
+    const label = within(container).getByText(name, { selector: ".prop-label span" })
+    return label.closest(".prop-label")!.nextElementSibling!.querySelector("input")!
+  }
+
+  // The content of a collapsed section, after expanding it
+  async function expand(header: string | RegExp, container: HTMLElement = document.body) {
+    const el = within(container).getByText(header)
+    await userEvent.click(el)
+    return el.closest<HTMLElement>(".collapse")!
+  }
+
+  it("SliceEditor changes the series in place and sends the settings", async () => {
+    const state = getPieState()
+    const { onChange } = renderPanel(state)
+    await userEvent.click(screen.getByText("Data"))
+    // The Advanced section next to Slice Colors
+    const sliceEditor = screen.getByText("Slice Colors").closest(".collapse")!.parentElement!
+    const advanced    = await expand("Advanced", sliceEditor)
+    fireEvent.change(getPropertyInput(advanced, "Opacity"), { target: { value: "0.5" } })
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(state.chartOptions.series![0].opacity).toBe(0.5)
+    expect(onChange.mock.calls[0][0].chartOptions.series).toBe(state.chartOptions.series)
+  })
+
+  it("SliceEditor changes the slice colors in place and sends the same state", async () => {
+    const state = getPieState()
+    const { onChange } = renderPanel(state)
+    await userEvent.click(screen.getByText("Data"))
+    const colors = await expand("Slice Colors")
+    const input  = getPropertyInput(colors, "female").parentElement!.querySelector<HTMLInputElement>("input[type=text]")!
+    fireEvent.change(input, { target: { value: "#ff0000" } })
+    expect(onChange).toHaveBeenCalledWith(state)
+    expect(state.chartOptions.colors![0]).toBe("#ff0000")
+  })
+
+  it("Start Angle changes the series in place and sends the same options", async () => {
+    const state = getPieState()
+    const { onChartOptionsChange } = renderPanel(state)
+    await userEvent.click(screen.getByText("Chart"))
+    fireEvent.change(screen.getByLabelText("Start Angle"), { target: { value: "90" } })
+    expect(onChartOptionsChange).toHaveBeenCalledWith(state.chartOptions)
+    expect((state.chartOptions.series![0] as SeriesPieOptions).startAngle).toBe(90)
+  })
+
+  it("AllSeriesEditor changes every series in place and sends the options", async () => {
+    const state = structuredClone(mockState)
+    state.chartOptions.series = [
+      { type: "column", id: "a", data: [1, 2] },
+      { type: "column", id: "b", data: [3, 4] }
+    ]
+    const series = state.chartOptions.series
+    const { onChartOptionsChange } = renderPanel(state)
+    await userEvent.click(screen.getByText("Series"))
+    const override = await expand(/All Serries Override/)
+    fireEvent.change(getPropertyInput(override, "Opacity"), { target: { value: "0.5" } })
+    expect(onChartOptionsChange).toHaveBeenCalledTimes(1)
+    expect(onChartOptionsChange.mock.calls[0][0].series).toBe(series)
+    expect(series.map(s => s.opacity)).toEqual([0.5, 0.5])
+  })
+
+  // The names of the properties in a property grid, in order
+  function getPropertyNames(container: HTMLElement) {
+    return [...container.querySelectorAll(".prop-label span")].map(el => el.textContent!.trim())
+  }
+
+  async function getSliceEditorAdvanced(state: ChartConfigPanelState) {
+    renderPanel(state)
+    await userEvent.click(screen.getByText("Data"))
+    const sliceEditor = screen.getByText("Slice Colors").closest(".collapse")!.parentElement!
+    return getPropertyNames(await expand("Advanced", sliceEditor))
+  }
+
+  it("SliceEditor offers borders in 2D, and edges and depth in 3D", async () => {
+    const names2d = await getSliceEditorAdvanced(getPieState())
+    expect(names2d.slice(0, 2)).toEqual(["Border Width", "Border Color"])
+    expect(names2d).not.toContain("Depth")
+
+    const state3d = getPieState()
+    state3d.chartOptions.chart = { type: "pie", options3d: { enabled: true } }
+    document.body.innerHTML = ""
+    const names3d = await getSliceEditorAdvanced(state3d)
+    expect(names3d.slice(0, 3)).toEqual(["Edge Width", "Edge Color", "Depth"])
+  })
+
+  it("AllSeriesEditor offers borders for columns", async () => {
+    const state = structuredClone(mockState)
+    state.chartOptions.series = [{ type: "column", id: "a", data: [1, 2] }]
+    renderPanel(state)
+    await userEvent.click(screen.getByText("Series"))
+    const names = getPropertyNames(await expand(/All Serries Override/))
+    expect(names.slice(0, 2)).toEqual(["Border Width", "Border Color"])
+  })
+})
+
+describe("axis sections", () => {
+
+  function renderPanel(state: ChartConfigPanelState) {
+    const onChartOptionsChange = vi.fn()
+    render(
+      <ConfigPanel
+        cols={mockCols}
+        state={state}
+        onChange={vi.fn()}
+        onChartTypeChange={vi.fn()}
+        onChartOptionsChange={onChartOptionsChange}
+        onRangeOptionsChange={vi.fn()}
+        onSecondaryDataOptionsChange={vi.fn()}
+      />
+    )
+    return onChartOptionsChange
+  }
+
+  // Expands the section with that header and returns it
+  async function expandSection(header: string) {
+    const el = [...document.querySelectorAll<HTMLElement>(".collapse-header")].find(h => h.textContent!.trim() === header)!
+    await userEvent.click(el)
+    return el.closest<HTMLElement>(".collapse")!
+  }
+
+  const ticks = (section: HTMLElement) => within(section).getByLabelText("Render axis tick marks") as HTMLInputElement
+
+  it("send title changes to their own axis", async () => {
+    const onChartOptionsChange = renderPanel(structuredClone(mockState))
+    fireEvent.change(within(await expandSection("X Axis")).getByDisplayValue("X Axis"), { target: { value: "Age" } })
+    expect(onChartOptionsChange).toHaveBeenLastCalledWith({ xAxis: { title: { text: "Age" } } })
+    fireEvent.change(within(await expandSection("Y Axis")).getByDisplayValue("Y Axis"), { target: { value: "Count" } })
+    expect(onChartOptionsChange).toHaveBeenLastCalledWith({ yAxis: { title: { text: "Count" } } })
+  })
+
+  it("show the X column as the X title placeholder", async () => {
+    renderPanel(structuredClone(mockState))
+    expect(within(await expandSection("X Axis")).getByDisplayValue("X Axis").getAttribute("placeholder")).toBe("Age")
+  })
+
+  it("show tick marks as off when tickWidth is unset or 0, on both axes", async () => {
+    const state = structuredClone(mockState)
+    state.chartOptions.xAxis = { tickWidth: 0 }
+    renderPanel(state)
+    expect(ticks(await expandSection("X Axis")).checked).toBe(false)
+    expect(ticks(await expandSection("Y Axis")).checked).toBe(false)
+  })
+
+  it("show tick marks as on when tickWidth is set, and turn them off", async () => {
+    const state = structuredClone(mockState)
+    state.chartOptions.yAxis = { tickWidth: 1 }
+    const onChartOptionsChange = renderPanel(state)
+    const box = ticks(await expandSection("Y Axis"))
+    expect(box.checked).toBe(true)
+    await userEvent.click(box)
+    expect(onChartOptionsChange).toHaveBeenLastCalledWith({ yAxis: { tickWidth: 0 } })
+  })
+
+  it("swap headers in bar charts, where the Y axis is horizontal", async () => {
+    renderPanel({ ...structuredClone(mockState), chartType: "bar" })
+    expect(within(await expandSection("X Axis")).getByDisplayValue("Y Axis")).toBeTruthy()
   })
 })

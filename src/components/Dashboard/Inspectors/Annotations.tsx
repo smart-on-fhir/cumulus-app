@@ -1,4 +1,4 @@
-import { AnnotationMockPointOptionsObject, AnnotationsLabelsOptions } from "highcharts"
+import { AlignValue, AnnotationMockPointOptionsObject, AnnotationsLabelsOptions, VerticalAlignValue } from "highcharts"
 import moment             from "moment"
 import Checkbox           from "../../generic/Checkbox"
 import { Tabs }           from "../../generic/Tabs";
@@ -65,7 +65,6 @@ function Annotation({
                             onChange({ ...annotation, point })
                         }} onContextMenu={e => {
 
-                            // @ts-ignore
                             e.nativeEvent.menuItems = DATE_BOOKMARKS.map(item => ({
                                 label: <>{ item.date }  -  <b>{ item.name }</b></>,
                                 icon : <i className="fa-regular fa-calendar-check color-blue-dark" />,
@@ -76,7 +75,6 @@ function Annotation({
                                 }
                             }));
 
-                            // @ts-ignore
                             e.nativeEvent.menuItems.unshift({ label: "Well Known Dates" })
                         }}/> :
                         <input type="number" value={x} onChange={e => {
@@ -151,10 +149,8 @@ function Annotation({
                 </div>
                 <div className="col col-3">
                     <select value={ (annotation.verticalAlign || "bottom") + "/" + (annotation.align || "center") } onChange={e => {
-                        const [verticalAlign, align] = e.target.value.split("/")
-                        // @ts-ignore
+                        const [verticalAlign, align] = e.target.value.split("/") as [VerticalAlignValue, AlignValue]
                         annotation.verticalAlign = verticalAlign
-                        // @ts-ignore
                         annotation.align = align
                         onChange(annotation)
                     }}>

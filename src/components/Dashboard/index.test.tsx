@@ -204,7 +204,8 @@ describe("Chart View", () => {
         expect(document.querySelector("#view-description")).toHaveValue(baseView.description);
         
         expect(document.querySelector("text.highcharts-title")).toHaveTextContent("Chart Title")
-        expect((document.querySelector("text.highcharts-title") as SVGTextElement).style).toHaveProperty("fontSize", "20px")
+        // The saved px size is converted to em when the view loads
+        expect((document.querySelector("text.highcharts-title") as SVGTextElement).style).toHaveProperty("fontSize", "1.25em")
         expect((document.querySelector("text.highcharts-title") as SVGTextElement).style).toHaveProperty("fontWeight", "bold")
 
         expect(document.querySelector(".highcharts-xaxis .highcharts-axis-title")).toHaveTextContent("X Axis Title")

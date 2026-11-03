@@ -4,11 +4,18 @@ import { DASH_STYLES } from "../../config"
 import { getSeriesById, getSeriesPlotOptionsById, getSeriesUpdater } from "../lib"
 
 
+// Options that are edited here but are not in the Highcharts pie types
+type PieOptions = SeriesPieOptions & {
+    edgeWidth?: number
+    edgeColor?: string
+    dashStyle?: DashStyleValue
+}
+
 export function getOptions(options : Options, onChange: (o: Partial<Options>) => void, seriesId: string) {
     
-    const series             = getSeriesById(options, seriesId) as SeriesPieOptions
+    const series             = getSeriesById(options, seriesId) as PieOptions
     const seriesTypeOptions  = getSeriesPlotOptionsById(options, seriesId) as typeof series
-    const onSeriesChange     = getSeriesUpdater<SeriesPieOptions>(options, onChange, seriesId)
+    const onSeriesChange     = getSeriesUpdater<PieOptions>(options, onChange, seriesId)
     
     const is3d = !!options.chart?.options3d?.enabled
 
@@ -34,17 +41,13 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
                 type    : "number",
                 min     : 0,
                 step    : 0.1,
-                // @ts-ignore
                 value   : series.edgeWidth ?? seriesTypeOptions.edgeWidth ?? 1,
-                // @ts-ignore
                 onChange: (edgeWidth: number) => onSeriesChange({ edgeWidth })
             },
             {
                 name    : "Edge Color",
                 type    : "color",
-                // @ts-ignore
                 value   : series.edgeColor ?? seriesTypeOptions.edgeColor ?? "#00000088",
-                // @ts-ignore
                 onChange: (edgeColor: string) => onSeriesChange({ edgeColor }),
             },
             {
@@ -80,9 +83,7 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
             name    : "Dash Style",
             type    : "options",
             options : DASH_STYLES,
-            // @ts-ignore
             value   : series.dashStyle ?? seriesTypeOptions.dashStyle ?? "Solid",
-            // @ts-ignore
             onChange: (dashStyle: DashStyleValue) => onSeriesChange({ dashStyle })
         },
         {

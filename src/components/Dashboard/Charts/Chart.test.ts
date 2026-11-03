@@ -2,6 +2,7 @@ import {
     buildChartOptions,
     removeSurvivalOptions,
     emToPx,
+    fontSizesToEm,
     filterOutExceptions,
     formatPValue,
     getLogRankSentences,
@@ -13,6 +14,7 @@ import {
 } from "./lib"
 import { CUMULUS__NONE, DEFAULT_FONT_SIZE, ReadOnlyPaths } from "../config"
 import { roundToPrecision, strip } from "../../../utils"
+import type { app } from "../../../types"
 
 
 describe("Chart", () => {
@@ -180,6 +182,42 @@ describe("Chart", () => {
         expect(options.series!.map(s => s.name)).toEqual(["1", "true"])
     })
 
+    it ("leaves out the rows with invalid dates, with and without a stratifier", () => {
+        // A loose date that only fails the strict check of filterOutExceptions
+        const rows: [string, number][] = [["2020-01-01", 5], ["01/02/2020", 7], ["2020-01-03", 2]]
+        const column: app.SubscriptionDataColumn = { name: "t", label: "T", dataType: "date:YYYY-MM-DD", description: "" }
+        const plain = buildChartOptions({
+            type: "line",
+            data: { column: "t", filters: [], totalCount: 14, rowCount: 3, data: [{ rows }] },
+            data2  : null,
+            column,
+            sortBy : "x:asc",
+            limit  : 0,
+            offset : 0
+        })
+        const stratified = buildChartOptions({
+            type: "line",
+            data: {
+                column    : "t",
+                stratifier: "g",
+                filters   : [],
+                totalCount: 14,
+                rowCount  : 3,
+                counts    : { "2020-01-01": 5, "01/02/2020": 7, "2020-01-03": 2 },
+                data      : [{ stratifier: "a", rows }]
+            },
+            data2  : null,
+            column,
+            groupBy: { name: "g", label: "G", dataType: "string", description: "" },
+            sortBy : "x:asc",
+            limit  : 0,
+            offset : 0
+        })
+        const getY = (options: Highcharts.Options) => (options.series![0] as any).data.map((p: any) => p?.y)
+        expect(getY(plain)).toEqual([5, null, 2])
+        expect(getY(stratified)).toEqual([5, null, 2])
+    })
+
     // The saved options are also passed as history state when copying a chart,
     // which fails with a DataCloneError if they contain functions
     it("saved options can be cloned (no functions)", () => {
@@ -255,6 +293,192 @@ describe("Chart", () => {
             const onSeriesToggle = vi.fn()
             click(build(onSeriesToggle), s)
             expect(onSeriesToggle).toHaveBeenCalledWith({ s: false, "s (range)": false, s2: true })
+        })
+    })
+
+    describe("fontSizesToEm", () => {
+
+        const old = (): Highcharts.Options => ({
+            chart: { style: { fontSize: "18px" } },
+            title: { style: { fontSize: "20px" } },
+            legend: { itemStyle: { fontSize: "14px" } },
+            xAxis: {
+                labels   : { style: { fontSize: "13px" } },
+                title    : { style: { fontSize: "16px" } },
+                plotLines: [{ value: 1, label: { text: "a", style: { fontSize: "32px" } } }, { value: 2 }]
+            },
+            yAxis: {
+                labels   : { style: { fontSize: "0.85em" } },
+                title    : { text: "y" },
+                plotLines: [{ value: 3, label: { text: "b", style: { fontSize: "8px" } } }]
+            }
+        })
+
+        it ("converts the px sizes of titles, axes and plot line labels", () => {
+            const options: any = fontSizesToEm(old())
+            expect(options.title.style.fontSize).toBe("1.25em")
+            expect(options.xAxis.labels.style.fontSize).toBe("0.81em")
+            expect(options.xAxis.title.style.fontSize).toBe("1em")
+            expect(options.xAxis.plotLines[0].label.style.fontSize).toBe(32 / DEFAULT_FONT_SIZE + "em")
+            expect(options.yAxis.plotLines[0].label.style.fontSize).toBe(8 / DEFAULT_FONT_SIZE + "em")
+        })
+
+        it ("keeps em sizes, unset sizes, and everything else", () => {
+            const options: any = fontSizesToEm(old())
+            expect(options.yAxis.labels.style.fontSize).toBe("0.85em")
+            expect(options.yAxis.title).toEqual({ text: "y" })
+            expect(options.xAxis.plotLines[1]).toEqual({ value: 2 })
+            expect(options.chart.style.fontSize).toBe("18px")
+        })
+
+        // The title and axes were converted against the default size before,
+        // but the legend was rendered in px
+        it ("converts the px size of the legend against the chart's font size", () => {
+            expect((fontSizesToEm(old()) as any).legend.itemStyle.fontSize).toBe("0.78em") // 14 / 18
+            expect((fontSizesToEm({ legend: { itemStyle: { fontSize: "14px" } } }) as any).legend.itemStyle.fontSize).toBe("0.88em")
+            expect((fontSizesToEm({ legend: { itemStyle: { fontSize: "1.2em" } } }) as any).legend.itemStyle.fontSize).toBe("1.2em")
+        })
+
+        it ("does not change the options it is given", () => {
+            const options = old()
+            fontSizesToEm(options)
+            expect(options).toEqual(old())
+        })
+
+        it ("passes em sizes through the chart unchanged", () => {
+            const options: any = buildChartOptions({
+                type: "line",
+                options: fontSizesToEm(old()),
+                data: { column: "t", filters: [], totalCount: 1, rowCount: 1, data: [{ rows: [["0", 1]] }] },
+                data2: null,
+                column: { name: "t", label: "T", dataType: "string", description: "" },
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+            })
+            expect(options.title.style.fontSize).toBe("1.25em")
+            expect(options.xAxis.labels.style.fontSize).toBe("0.81em")
+            expect(options.yAxis.labels.style.fontSize).toBe("0.85em")
+            expect(options.yAxis.title.style.fontSize).toBe("1.2em")
+            expect(options.xAxis.plotLines[0].label.style.fontSize).toBe("2em")
+        })
+    })
+
+    it ("annotations use the chart's font", () => {
+        const options: any = buildChartOptions({
+            type: "line",
+            options: {
+                chart: { style: { fontSize: "18px", fontFamily: "Arial" } },
+                annotations: [{ labels: [{ text: "a", point: { x: 0, y: 0, xAxis: 0, yAxis: 0 }, style: { fontSize: "14px" } }] }]
+            },
+            data: { column: "t", filters: [], totalCount: 1, rowCount: 1, data: [{ rows: [["0", 1]] }] },
+            data2: null,
+            column: { name: "t", label: "T", dataType: "string", description: "" },
+            sortBy: "x:asc",
+            limit : 0,
+            offset: 0
+        })
+        expect(options.annotations[0].labels[0].style).toMatchObject({ fontSize: "1em", fontFamily: "Arial" })
+    })
+
+    describe("plot lines", () => {
+
+        function build(onInspectionChange: any = vi.fn(), inspection = false) {
+            return buildChartOptions({
+                type: "line",
+                options: {
+                    xAxis: { plotLines: [{ value: 1, label: { text: "a" } }, { value: 2 }] },
+                    yAxis: { plotLines: [{ value: 3, label: { text: "b" } }] }
+                },
+                data: { column: "t", filters: [], totalCount: 1, rowCount: 1, data: [{ rows: [["0", 1]] }] },
+                data2: null,
+                column: { name: "t", label: "T", dataType: "string", description: "" },
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0,
+                onInspectionChange,
+                inspection: { enabled: inspection } as any
+            }) as any
+        }
+
+        it ("get ids that inspect mode selects them by", () => {
+            const options = build()
+            expect(options.xAxis.plotLines.map((l: any) => l.id)).toEqual(["x-axis-plot-line-0", "x-axis-plot-line-1"])
+            expect(options.yAxis.plotLines.map((l: any) => l.id)).toEqual(["y-axis-plot-line-0"])
+        })
+
+        it ("get their id as a class, which inspect mode finds them by", () => {
+            const options = build()
+            expect(options.xAxis.plotLines.map((l: any) => l.className)).toEqual(["x-axis-plot-line-0", "x-axis-plot-line-1"])
+            expect(options.yAxis.plotLines.map((l: any) => l.className)).toEqual(["y-axis-plot-line-0"])
+        })
+
+        // Highcharts binds them only when it first draws a line
+        it ("get no click handlers, in or outside inspect mode", () => {
+            for (const inspection of [false, true]) {
+                const options = build(vi.fn(), inspection)
+                expect(options.xAxis.plotLines[0].events).toBeUndefined()
+                expect(options.yAxis.plotLines[0].events).toBeUndefined()
+            }
+        })
+    })
+
+    describe("tooltip", () => {
+
+        function tooltip(point: any, { groupBy, denominator, dataType = "string" }: { groupBy?: any, denominator?: any, dataType?: any } = {}) {
+            const options = buildChartOptions({
+                type: "column",
+                data: { column: "t", filters: [], totalCount: 1, rowCount: 1, data: [{ rows: [["0", 1]] }] },
+                data2: null,
+                column: { name: "t", label: "Age", dataType, description: "" },
+                groupBy,
+                denominator,
+                sortBy: "x:asc",
+                limit : 0,
+                offset: 0
+            }) as any
+            const html: string = options.tooltip.formatter.call(
+                { color: "#123456", series: { name: "Series A", index: 0 }, ...point },
+                { chart: { options: { colors: [] } } }
+            )
+            // Just the text of each row
+            return html.split("</tr>").map(row => row.replace(/<[^>]+>/g, "").trim()).filter(Boolean)
+        }
+
+        it ("shows the series, the X value and the count", () => {
+            expect(tooltip({ name: "5 years", y: 1234 })).toEqual(["◉ Series A: Count", "Age:5 years", "Count:1,234"])
+        })
+
+        it ("names the stratifier in the header", () => {
+            const groupBy = { name: "gender", label: "Gender" }
+            expect(tooltip({ name: "5 years", y: 1 }, { groupBy })[0]).toBe("◉ Gender: Series A")
+        })
+
+        it ("shows the X value of linear axes", () => {
+            expect(tooltip({ x: 7, y: 1 }, { dataType: "integer" })[1]).toBe("Age:7")
+        })
+
+        it ("shows the count and the percentage with a denominator", () => {
+            const rows = tooltip({ name: "a", y: 25, custom: { data: { cnt: 50 }, denominator: 200 } }, { denominator: "global" })
+            expect(rows).toEqual(["◉ Series A: Count", "Age:a", "Count:50 (25%)", "Denominator:200"])
+        })
+
+        it ("shows the range of a point", () => {
+            const rows = tooltip({ name: "a", y: 5, custom: { data: { low: 4, high: 6.25 } } })
+            expect(rows).toEqual(["◉ Series A: Count", "Age:a", "Count:5", "Range:4 - 6.25"])
+        })
+
+        it ("shows the range in percent with a denominator", () => {
+            const rows = tooltip(
+                { name: "a", y: 5, custom: { data: { cnt: 10, low: 4, high: 6, lowPct: 2, highPct: 3 }, denominator: 200 } },
+                { denominator: "global" }
+            )
+            expect(rows).toContain("Range:2% - 3%")
+        })
+
+        it ("leaves out the count of error range points", () => {
+            const rows = tooltip({ name: "a", y: 5, custom: { isErrorRange: true, data: { low: 4, high: 6 } } })
+            expect(rows).toEqual(["◉ Series A: Count", "Age:a", "Range:4 - 6"])
         })
     })
 

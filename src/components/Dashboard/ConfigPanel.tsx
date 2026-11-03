@@ -18,10 +18,12 @@ import { AllPlotLines }   from "./Inspectors/AxisPlotLines"
 import { DEFS }           from "./Schema"
 import { AllSeries }      from "./Inspectors/Series"
 import { isDurationColumn, isStatusColumn, suggestedFirst } from "./columnRoles"
+import { getXType }       from "./Charts/lib"
 import {
     DashStyleValue,
     merge,
     Options,
+    PointOptionsObject,
     SeriesOptionsType,
     SeriesPieOptions,
     XAxisOptions,
@@ -109,21 +111,6 @@ function SecondaryDataEditor({
     )
 }
 
-function getXType(column: app.SubscriptionDataColumn): "category" | "linear" | "datetime" {
-    
-    let xType: "category" | "linear" | "datetime" = "category";
-
-    if (column.dataType === "integer" || column.dataType === "float") {
-        xType = "linear"
-    }
-
-    else if (column.dataType.startsWith("date")) {
-        xType = "datetime"
-    }
-
-    return xType;
-}
-
 // ----------------------------------------------------------------------------
 
 export interface ChartConfigPanelState {
@@ -144,7 +131,6 @@ export interface ChartConfigPanelState {
     eventValue     : string
     survivalBands  : boolean
     survivalRiskTable: boolean
-    annotations    : app.Annotation[]
     xCol           : app.SubscriptionDataColumn
     tags           : Pick<app.Tag, "id"|"name"|"description">[]
     ranges         : app.RangeOptions | null
@@ -173,9 +159,7 @@ export default function ConfigPanel({
     statusValues
 } : {
     cols: app.SubscriptionDataColumn[]
-    view?: Partial<app.View>
     state: ChartConfigPanelState
-    viewType: "overview" | "data"
     onChange: (state: ChartConfigPanelState) => void
     onChartTypeChange: (type: string) => void
     onChartOptionsChange: (options: Options) => void
@@ -192,15 +176,7 @@ export default function ConfigPanel({
     const { chartOptions, chartType } = state;
 
     const isBar         = chartType.startsWith("bar")
-    const isColumn      = chartType.startsWith("column")
     const isPie         = chartType.startsWith("pie") || chartType.startsWith("donut")
-    const isStack       = chartType.endsWith("Stack")
-    const isSurvival    = chartType === "survival"
-    const isBarOrColumn = isBar || isColumn
-    const xType         = getXType(cols.find(c => c.name === state.groupBy)!)
-    const isCategory    = xType === "category"
-    const xLabel        = isPie ? "Label" : isBar ? "Y" : "X"
-    const yLabel        = isPie ? "Value" : isBar ? "X" : "Y"
 
     return (
         <div className="color-soft" style={{
@@ -216,7 +192,6 @@ export default function ConfigPanel({
 
             {state.inspection.match?.length ?
                 <>
-                    {/* <pre style={{ whiteSpace: "pre-wrap" }}>{ JSON.stringify(state.inspection, null, 4) }</pre> */}
                     <DynamicInspector
                         chartOptions={state.chartOptions}
                         onChange={onChartOptionsChange}
@@ -230,470 +205,20 @@ export default function ConfigPanel({
 
                 
 
-                <Collapse collapsed header="Chart">
-                    <div className="mt-1">
-                        <label>Chart Type</label>
-                        <Select
-                            value={ state.chartType }
-                            onChange={ onChartTypeChange }
-                            options={getChartTypes(chartType).map(type => ({
-                                value: type,
-                                label: SupportedChartTypes[type as SupportedChartType],
-                                icon: ChartIcons[type as keyof typeof ChartIcons],
-                                disabled: (type.includes("Stack") && !state.stratifyBy) || (
-                                    (type.includes("pie") || type.includes("donut")) && !!state.stratifyBy
-                                )
-                            }))}
-                        />
-                    </div>
-                    <div className="mt-1">
-                        <label>Chart Title</label>
-                        <input
-                            type="text"
-                            value={ chartOptions.title?.text || "" }
-                            onChange={ e => onChartOptionsChange({ title: { text: e.target.value }})}
-                        />
-                        <br/>
-                    </div>
-                    <div className="mt-1">
-                        <label>Chart Subtitle</label>
-                        <input
-                            type="text"
-                            list="chart-subtitle-suggestions"
-                            value={ chartOptions.subtitle?.text || "" }
-                            onChange={ e => onChartOptionsChange({ subtitle: { text: e.target.value }})}
-                        />
-                        { /* Subtitles the chart suggests (see custom.subtitleSuggestions) */ }
-                        <datalist id="chart-subtitle-suggestions">
-                            { (chartOptions.custom?.subtitleSuggestions || []).map((text: string) => <option key={ text } value={ text } />) }
-                        </datalist>
-                        <br/>
-                    </div>
+                <ChartSection
+                    state={state}
+                    onChartTypeChange={onChartTypeChange}
+                    onChartOptionsChange={onChartOptionsChange}
+                />
 
-                    <div className="mt-1">
-                        <label>Color Theme</label>
-                        <Select
-                            value={ state.chartOptions.custom?.theme ?? DEFAULT_COLOR_THEME }
-                            onChange={ (id) => {
-                                const theme = COLOR_THEMES.find(t => t.id === id)
-                                onChartOptionsChange({
-                                    colors: theme!.colors,
-                                    custom: { theme: id }
-                                })
-                            }}
-                            options={COLOR_THEMES.map((theme, i) => ({
-                                value: theme.id,
-                                label: theme.name,
-                                right: <>{ theme.colors.map((c, i) => <div key={i} style={{
-                                    background: c,
-                                    display: "inline-block",
-                                    width: "8px",
-                                    height: "1em",
-                                    margin: "-2px 1px 0",
-                                    boxShadow: "0 0 0 0.5px #0008 inset, 0 0 0 0.5px #FFF8",
-                                    verticalAlign: "middle"
-                                }} />)}</>,
-                                icon: "fas fa-palette color-muted"
-                            }))}
-                        />
-                    </div>
-
-                    { isBarOrColumn && state.stratifyBy && 
-                        <div className="mt-1">
-                            <label>
-                                Group Padding
-                                <input
-                                    type="range"
-                                    min={0}
-                                    max={0.5}
-                                    step={0.01}
-                                    value={
-                                        isColumn ? 
-                                            chartOptions.plotOptions?.column?.groupPadding === undefined ?
-                                                0.2 :
-                                                chartOptions.plotOptions.column.groupPadding :
-                                            chartOptions.plotOptions?.bar?.groupPadding === undefined ?
-                                                0.2 :
-                                                chartOptions.plotOptions.bar.groupPadding
-                                    }
-                                    onChange={e => onChartOptionsChange({
-                                        plotOptions: {
-                                            [isColumn ? "column" : "bar"]: {
-                                                groupPadding: e.target.valueAsNumber
-                                            }
-                                        }
-                                    })}
-                                    style={{ width: "100%", margin: 0 }}
-                                />
-                            </label>
-                            <p className="small color-muted">Padding between each value groups</p>
-                        </div>
-                    }
-                    { isBarOrColumn && !isStack &&
-                        <div className="mt-1">
-                            <label>
-                                Point Padding
-                                <input
-                                    type="range"
-                                    min={0}
-                                    max={0.5}
-                                    step={0.01}
-                                    value={
-                                        isColumn ? 
-                                            chartOptions.plotOptions?.column?.pointPadding === undefined ?
-                                                0.02 :
-                                                chartOptions.plotOptions.column.pointPadding :
-                                            chartOptions.plotOptions?.bar?.pointPadding === undefined ?
-                                                0.02 :
-                                                chartOptions.plotOptions.bar.pointPadding
-                                    }
-                                    onChange={e => onChartOptionsChange({
-                                        plotOptions: {
-                                            [isColumn ? "column" : "bar"]: {
-                                                pointPadding: e.target.valueAsNumber
-                                            }
-                                        }
-                                    })}
-                                    style={{ width: "100%", margin: 0 }}
-                                />
-                            </label>
-                            <p className="small color-muted">Padding between each column or bar</p>
-                        </div>
-                    }
-                    { isPie && <div className="mt-1">
-                        <label>
-                            Start Angle
-                            <input
-                                type="range"
-                                min={0}
-                                max={360}
-                                step={1}
-                                // @ts-ignore
-                                value={ chartOptions.series?.[0]?.startAngle || 0 }
-                                onChange={e => {
-                                    chartOptions.series![0] = merge(chartOptions.series?.[0], { startAngle: e.target.valueAsNumber })
-                                    onChartOptionsChange(chartOptions)
-                                }}
-                                style={{ width: "100%", margin: 0 }}
-                            />
-                        </label>
-                    </div> }
-                    { isPie && <div className="mt-1">
-                        <label>
-                            Selected Slice Offset
-                            <input
-                                type="range"
-                                min={0}
-                                max={30}
-                                step={1}
-                                value={ chartOptions.plotOptions?.pie?.slicedOffset === undefined ? 30 : chartOptions.plotOptions.pie.slicedOffset }
-                                onChange={e => onChartOptionsChange({
-                                    plotOptions: {
-                                        pie: {
-                                            slicedOffset: e.target.valueAsNumber
-                                        }
-                                    }
-                                })}
-                                style={{ width: "100%", margin: 0 }}
-                            />
-                        </label>
-                    </div> }
-                    <div className="mt-1 pb-1">
-                        <Collapse collapsed header="Advanced">
-                            <Chart chart={state.chartOptions.chart} onChange={chart => onChartOptionsChange({ chart })} />
-                        </Collapse>
-                    </div>
-                    <br/>
-                </Collapse>
-
-                <Collapse collapsed header="Data">
-                    <div className="color-muted small mt-1" style={{ padding: "0 0 0 1.5em", margin: "1em 0 0" }}>
-                        <i className="fas fa-exclamation-circle" style={{ color: "#D30", width: "1.2em", margin: "0 0.2em 0 -1.5em" }} />
-                        Changing these settings may result in new data being fetched.
-                        That will create a different chart using different series and
-                        some of your visualization settings may have to be re-applied.
-                        To avoid that try to configure your <b>Data</b> and <b>Filters</b> settings
-                        first.
-                    </div>
-                    <div style={{ position: "relative" }}>
-                        { state.stratifyBy && <div className="dashboard-sidebar-swap-btn-wrap">
-                            { /* Survival charts need the follow-up time on the X axis, so
-                                 its column can't trade places with the stratifier */ }
-                            <div
-                                className={ "fas fa-exchange-alt" + (isSurvival ? " disabled" : "") }
-                                aria-disabled={ isSurvival }
-                                onClick={() => {
-                                    if (!isSurvival) {
-                                        onChange({
-                                            ...state,
-                                            groupBy: state.stratifyBy,
-                                            stratifyBy: state.groupBy,
-                                        })
-                                    }
-                                }}
-                                data-tooltip={ isSurvival ?
-                                    "Survival charts need the follow-up time on the X axis, so it can't be swapped with the stratifier" :
-                                    "Swap selected columns" }
-                            />
-                        </div> }
-                        <div className="pt-1">
-                            <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
-                            <ColumnSelector
-                                cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max" && c.dataType !== "hidden") }
-                                comparator={ isSurvival ? suggestedFirst(isDurationColumn) : undefined }
-                                value={ state.groupBy }
-                                disabled={[
-                                    "cnt",
-                                    state.stratifyBy,
-                                    state.column2,
-                                    isSurvival ? state.statusColumn : "",
-                                    // Survival time must be a duration (number or numeric label like ">=5")
-                                    ...(isSurvival ? cols.filter(c => !["integer", "float", "string"].includes(c.dataType)).map(c => c.name) : [])
-                                ].filter(Boolean)}
-                                onChange={ (groupBy: string) => onChange({ ...state, groupBy, offset: 0, limit: 0, sortBy: "x:asc" }) }
-                            />
-                            <p className="small color-muted"> {
-                                isPie ?
-                                    "Select which data column provides the slices of the pie" :
-                                isSurvival ?
-                                    "Select the column holding the time to event" :
-                                    `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
-                            }</p>
-                        </div>
-                        { !isPie && <>
-                            <div className="pt-1 pb-1">
-                                <label>Stratifier</label>
-                                <ColumnSelector
-                                    cols={ cols.filter(c => c.dataType !== "hidden") }
-                                    placeholder="Select Column"
-                                    addEmptyOption="start"
-                                    value={ state.stratifyBy }
-                                    disabled={[
-                                        "cnt",
-                                        "cnt_min",
-                                        "cnt_max",
-                                        state.groupBy,
-                                        state.column2,
-                                        isSurvival ? state.statusColumn : ""
-                                    ].filter(Boolean)}
-                                    onChange={ (stratifyBy: string) => onChange({
-                                        ...state,
-                                        stratifyBy,
-                                        offset: 0,
-                                        limit: 0,
-                                        sortBy: "x:asc",
-                                        denominator: (state.denominator === "local" || state.denominator === "count") && !stratifyBy ? "" : state.denominator
-                                    }) }
-                                />
-                                <p className="small color-muted">
-                                    Used to stratify the data into multiple series
-                                </p>
-                            </div>
-                            { isSurvival && <>
-                                <label>Status Column</label>
-                                <ColumnSelector
-                                    cols={ cols.filter(c => c.dataType !== "hidden") }
-                                    comparator={ suggestedFirst(isStatusColumn) }
-                                    placeholder="Select Column"
-                                    addEmptyOption="start"
-                                    value={ state.statusColumn }
-                                    disabled={[
-                                        "cnt",
-                                        "cnt_min",
-                                        "cnt_max",
-                                        state.groupBy,
-                                        state.stratifyBy,
-                                        ...cols.filter(c => c.dataType.startsWith("date")).map(c => c.name)
-                                    ].filter(Boolean)}
-                                    onChange={ (statusColumn: string) => onChange({ ...state, statusColumn: statusColumn || "", eventValue: "" }) }
-                                />
-                                <p className="small color-muted">
-                                    The column that tells whether the event happened for each record
-                                </p>
-                                { !!state.statusColumn && <div className="pt-1">
-                                    <label>Event Value</label>
-                                    <Select
-                                        placeholder={ statusValues ? "Select Value" : "Loading values..." }
-                                        disabled={ !statusValues }
-                                        value={ state.eventValue }
-                                        options={[
-                                            ...(statusValues || []),
-                                            // Keep a saved value even if it is no longer in the data
-                                            ...(state.eventValue && statusValues && !statusValues.includes(state.eventValue) ? [state.eventValue] : [])
-                                        ].map(value => ({
-                                            value,
-                                            icon : `${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/icons/cell.png`,
-                                            label: statusValues?.includes(value) ? value : `${value} (not found in the data)`
-                                        }))}
-                                        onChange={ (eventValue: string) => onChange({ ...state, eventValue }) }
-                                    />
-                                    <p className="small color-muted">
-                                        The value from the status column that means the event happened
-                                    </p>
-                                    { (statusValues?.length ?? 0) > 2 && <p className="small color-muted">
-                                        <i className="fa-solid fa-triangle-exclamation color-orange" /> This column has more than two
-                                        values ({ statusValues!.join(", ") }). Status columns are expected to have two: one for the
-                                        event and one for no event.
-                                    </p> }
-                                    <div className="pt-1">
-                                        <Checkbox
-                                            name="survivalBands"
-                                            label="Show 95% confidence bands"
-                                            checked={ state.survivalBands }
-                                            onChange={ survivalBands => onChange({ ...state, survivalBands }) }
-                                        />
-                                        <Checkbox
-                                            name="survivalRiskTable"
-                                            label="Show number at risk"
-                                            checked={ state.survivalRiskTable }
-                                            onChange={ survivalRiskTable => onChange({ ...state, survivalRiskTable }) }
-                                        />
-                                    </div>
-                                </div> }
-                            </> }
-                            { !isSurvival && <>
-                                <label>Denominator</label>
-                                <Select
-                                    options={[
-                                        {
-                                            label: <div>
-                                                <div>None</div>
-                                                <div className="small color-muted">
-                                                    Render the aggregate counts as found in the<br/>
-                                                    {Terminology.subscription.nameSingular.toLowerCase()} without further processing
-                                                </div>
-                                            </div>,
-                                            value: "",
-                                            icon: "fa-solid fa-percent grey-out"
-                                        },
-                                        {
-                                            label: <div>
-                                                <div>Stratified Count</div>
-                                                <div className="small color-muted">
-                                                    Convert counts to percentage of the total<br />
-                                                    count of every given data group.<br />
-                                                    Not available with no stratifier.
-                                                </div>
-                                            </div>,
-                                            value: "count",
-                                            icon: "fa-solid fa-percent color-brand-2",
-                                            disabled: !state.stratifyBy
-                                        },
-                                        {
-                                            label: <div>
-                                                <div>Stratified Sum</div>
-                                                <div className="small color-muted">
-                                                    Convert counts to percentage of the sum<br />
-                                                    of values in every given data group.<br />
-                                                    Not available with no stratifier.
-                                                </div>
-                                            </div>,
-                                            value: "local",
-                                            icon: "fa-solid fa-percent color-brand-2",
-                                            disabled: !state.stratifyBy
-                                        },
-                                        {
-                                            label: <div>
-                                                <div>Total Count</div>
-                                                <div className="small color-muted">
-                                                    Convert counts to percentage of the total<br />
-                                                    count within the entire dataset.
-                                                </div>
-                                            </div>,
-                                            value: "global",
-                                            icon: "fa-solid fa-percent color-blue"
-                                        }
-                                    ]}
-                                    value={ state.denominator }
-                                    onChange={ denominator => onChange({ ...state, denominator })}
-                                />
-                                <p className="small color-muted">
-                                    If set, renders the values as percentages of the given denominator
-                                </p>
-                            </> }
-                            { state.ranges && <div className="pt-1">
-                                <label>Confidence Intervals</label>
-                                <Select value={ state.ranges?.type || "" } options={[
-                                    {
-                                        value: "",
-                                        icon : "fa-solid fa-plus-minus color-muted",
-                                        label: "None"
-                                    },
-                                    {
-                                        label: "Error Bars",
-                                        value: "errorbar",
-                                        icon : "fa-solid fa-plus-minus color-blue"
-                                    },
-                                    {
-                                        label: "Area",
-                                        value: "areasplinerange",
-                                        icon : "fa-solid fa-plus-minus color-blue"
-                                    },
-                                    {
-                                        label: "Bars / Columns",
-                                        value: "column",
-                                        icon : "fa-solid fa-plus-minus color-blue"
-                                    },
-                                ]} onChange={type => onRangeOptionsChange({ type, enabled: !!type })} />
-                                <p className="small color-muted">
-                                    If information is available, add the error ranges to the chart
-                                </p>
-                            </div> }
-
-                            { !isSurvival && <SecondaryDataEditor state={state} cols={[ ...cols ]} onChange={onSecondaryDataOptionsChange} /> }
-                        </> }
-
-                        { isPie && <SliceEditor state={state} onChange={onChange} /> }
-
-                        { !isSurvival && <>
-                        <div className="row half-gap">
-                                <div className="col col-5">
-                                    <label>Sort {!!state.stratifyBy && state.sortBy.startsWith("y:") && <i className="fa fa-info-circle color-muted" data-tooltip="Sorting by count may produce unexpected results in stratified charts because every group is sorted separately." />}</label>
-                                    <Select
-                                        right
-                                        options={[
-                                            {
-                                                label: xLabel + ": asc",
-                                                icon : "fas fa-sort-amount-down-alt color-blue",
-                                                value: "x:asc",
-                                            },
-                                            {
-                                                label: xLabel + ": desc",
-                                                icon : "fas fa-sort-amount-down color-blue",
-                                                value: "x:desc",
-                                            },
-                                            {
-                                                label: yLabel + ": asc",
-                                                icon : "fas fa-sort-amount-down-alt color-blue",
-                                                value: "y:asc",
-                                                disabled: !isCategory || !!state.stratifyBy
-                                            },
-                                            {
-                                                label: yLabel + ": desc",
-                                                icon : "fas fa-sort-amount-down color-blue",
-                                                value: "y:desc",
-                                                disabled: !isCategory || !!state.stratifyBy
-                                            }
-                                        ].filter(option => !option.disabled)}
-                                        value={ state.sortBy }
-                                        onChange={ sortBy => onChange({ ...state, sortBy })} />
-                                </div>
-                                <div className="col">
-                                    <label>Offset</label>
-                                    <input type="number" min={0} value={ state.offset || 0 } onChange={e => onChange({ ...state, offset: e.target.valueAsNumber })} />
-                                </div>
-                                <div className="col">
-                                    <label>Limit</label>
-                                    <input type="number" min={ 0 } value={ state.limit || 0 } onChange={e => onChange({ ...state, limit: e.target.valueAsNumber })} />
-                                </div>
-                            </div>
-                            <p className="small color-muted">
-                                Use offset, limit, and sort to slice the dataset retrieved from the backend
-                            </p>
-                        </> }
-                        <br />
-                    </div>
-                </Collapse>
+                <DataSection
+                    cols={cols}
+                    state={state}
+                    onChange={onChange}
+                    onRangeOptionsChange={onRangeOptionsChange}
+                    onSecondaryDataOptionsChange={onSecondaryDataOptionsChange}
+                    statusValues={statusValues}
+                />
 
                 <Collapse collapsed header="Filters">
                     <div className="color-muted small mt-1" style={{ padding: "0 0 0 1.5em", margin: "1em 0 0" }}>
@@ -715,100 +240,20 @@ export default function ConfigPanel({
 
                 { !isPie && <SeriesEditor state={state} onChange={onChartOptionsChange} /> }
 
-                { !isPie && <Collapse collapsed header={ isBar ? "X Axis" : "Y Axis" }>
-                    <div className="mt-1">
-                        <label>Axis Title</label>
-                        <input
-                            type="text"
-                            // @ts-ignore
-                            value={ chartOptions.yAxis?.title?.text || "" }
-                            onChange={ e => onChartOptionsChange({
-                                yAxis: {
-                                    title: {
-                                        text: e.target.value
-                                    }
-                                }
-                            })}
-                        />
-                    </div>
-                    <div className="mt-1 pb-1">
-                        <Checkbox
-                            name="YTicks"
-                            label="Render axis tick marks"
-                            // @ts-ignore
-                            checked={chartOptions.yAxis?.tickWidth !== 0}
-                            onChange={checked => onChartOptionsChange({
-                                yAxis: {
-                                    tickWidth: checked ? 1 : 0
-                                }
-                            })}
-                        />
-                        <Checkbox
-                            name="YLabels"
-                            label="Render labels"
-                            // @ts-ignore
-                            checked={chartOptions.yAxis?.labels?.enabled !== false}
-                            onChange={checked => onChartOptionsChange({
-                                yAxis: {
-                                    labels: { enabled: checked }
-                                }
-                            })}
-                        />
-                    </div>
-                    <div className="pb-1">
-                        <Collapse collapsed header="Advanced Axis Options">
-                            <AxisEditor axis={state.chartOptions.yAxis as YAxisOptions} onChange={(yAxis: YAxisOptions) => onChartOptionsChange({ yAxis })} />
-                        </Collapse>
-                    </div>
-                </Collapse> }
+                { !isPie && <AxisSection
+                    header={ isBar ? "X Axis" : "Y Axis" }
+                    which="yAxis"
+                    axis={ chartOptions.yAxis as YAxisOptions }
+                    onChange={ onChartOptionsChange }
+                /> }
 
-                { !isPie && <Collapse collapsed header={ isBar ? "Y Axis" : "X Axis" }>
-                    <div className="mt-1">
-                        <label>Axis Title</label>
-                        <input
-                            type="text"
-                            placeholder={state.xCol.label || state.xCol.name || ""}
-                            // @ts-ignore
-                            value={ chartOptions.xAxis?.title?.text || "" }
-                            onChange={ e => onChartOptionsChange({
-                                xAxis: {
-                                    title: {
-                                        text: e.target.value
-                                    }
-                                }
-                            })}
-                        />
-                    </div>
-                    <div className="mt-1 pb-1">
-                        <Checkbox
-                            name="XTicks"
-                            label="Render axis tick marks"
-                            // @ts-ignore
-                            checked={ !!chartOptions.xAxis?.tickWidth }
-                            onChange={checked => onChartOptionsChange({
-                                xAxis: {
-                                    tickWidth: checked ? 1 : 0
-                                }
-                            })}
-                        />
-                        <Checkbox
-                            name="XLabels"
-                            label="Render labels"
-                            // @ts-ignore
-                            checked={chartOptions.xAxis?.labels?.enabled !== false}
-                            onChange={checked => onChartOptionsChange({
-                                xAxis: {
-                                    labels: { enabled: checked }
-                                }
-                            })}
-                        />
-                    </div>
-                    <div className="pb-1">
-                        <Collapse collapsed header="Advanced Axis Options">
-                            <AxisEditor axis={state.chartOptions.xAxis as XAxisOptions} onChange={(xAxis: any) => onChartOptionsChange({ xAxis })} />
-                        </Collapse>
-                    </div>
-                </Collapse> }
+                { !isPie && <AxisSection
+                    header={ isBar ? "Y Axis" : "X Axis" }
+                    which="xAxis"
+                    axis={ chartOptions.xAxis as XAxisOptions }
+                    placeholder={ state.xCol.label || state.xCol.name || "" }
+                    onChange={ onChartOptionsChange }
+                /> }
 
                 { !isPie && <Collapse collapsed header="Plot Lines">
                     <AllPlotLines chartOptions={state.chartOptions} onChange={onChartOptionsChange} />
@@ -856,15 +301,592 @@ export default function ConfigPanel({
     )
 }
 
+/**
+ * The columns and the shape of the data: X axis, stratifier, survival status,
+ * error ranges, denominator, sorting and paging, and the secondary data
+ */
+function DataSection({
+    cols,
+    state,
+    onChange,
+    onRangeOptionsChange,
+    onSecondaryDataOptionsChange,
+    statusValues
+}: {
+    cols: app.SubscriptionDataColumn[]
+    state: ChartConfigPanelState
+    onChange: (state: ChartConfigPanelState) => void
+    onRangeOptionsChange: (ranges: app.RangeOptions) => void
+    onSecondaryDataOptionsChange: (payload: { column?: string, type?: string }) => void
+    statusValues?: string[] | null
+}) {
+    const { chartType } = state;
+
+    const isBar         = chartType.startsWith("bar")
+    const isPie         = chartType.startsWith("pie") || chartType.startsWith("donut")
+    const isSurvival    = chartType === "survival"
+    const xType         = getXType(cols.find(c => c.name === state.groupBy)!)
+    const isCategory    = xType === "category"
+    const xLabel        = isPie ? "Label" : isBar ? "Y" : "X"
+    const yLabel        = isPie ? "Value" : isBar ? "X" : "Y"
+
+    return (
+        <Collapse collapsed header="Data">
+            <div className="color-muted small mt-1" style={{ padding: "0 0 0 1.5em", margin: "1em 0 0" }}>
+                <i className="fas fa-exclamation-circle" style={{ color: "#D30", width: "1.2em", margin: "0 0.2em 0 -1.5em" }} />
+                Changing these settings may result in new data being fetched.
+                That will create a different chart using different series and
+                some of your visualization settings may have to be re-applied.
+                To avoid that try to configure your <b>Data</b> and <b>Filters</b> settings
+                first.
+            </div>
+            <div style={{ position: "relative" }}>
+                { state.stratifyBy && <div className="dashboard-sidebar-swap-btn-wrap">
+                    { /* Survival charts need the follow-up time on the X axis, so
+                         its column can't trade places with the stratifier */ }
+                    <div
+                        className={ "fas fa-exchange-alt" + (isSurvival ? " disabled" : "") }
+                        aria-disabled={ isSurvival }
+                        onClick={() => {
+                            if (!isSurvival) {
+                                onChange({
+                                    ...state,
+                                    groupBy: state.stratifyBy,
+                                    stratifyBy: state.groupBy,
+                                })
+                            }
+                        }}
+                        data-tooltip={ isSurvival ?
+                            "Survival charts need the follow-up time on the X axis, so it can't be swapped with the stratifier" :
+                            "Swap selected columns" }
+                    />
+                </div> }
+                <div className="pt-1">
+                    <label>{ isPie ? "Slices" : isBar ? "Y Axis" : "X Axis" }</label>
+                    <ColumnSelector
+                        cols={ cols.filter(c => c.name !== "cnt" && c.name !== "cnt_min" && c.name !== "cnt_max" && c.dataType !== "hidden") }
+                        comparator={ isSurvival ? suggestedFirst(isDurationColumn) : undefined }
+                        value={ state.groupBy }
+                        disabled={[
+                            "cnt",
+                            state.stratifyBy,
+                            state.column2,
+                            isSurvival ? state.statusColumn : "",
+                            // Survival time must be a duration (number or numeric label like ">=5")
+                            ...(isSurvival ? cols.filter(c => !["integer", "float", "string"].includes(c.dataType)).map(c => c.name) : [])
+                        ].filter(Boolean)}
+                        onChange={ (groupBy: string) => onChange({ ...state, groupBy, offset: 0, limit: 0, sortBy: "x:asc" }) }
+                    />
+                    <p className="small color-muted"> {
+                        isPie ?
+                            "Select which data column provides the slices of the pie" :
+                        isSurvival ?
+                            "Select the column holding the time to event" :
+                            `Select which data column to plot over the ${isBar ? "Y" : "X"} axis`
+                    }</p>
+                </div>
+                { !isPie && <>
+                    <div className="pt-1 pb-1">
+                        <label>Stratifier</label>
+                        <ColumnSelector
+                            cols={ cols.filter(c => c.dataType !== "hidden") }
+                            placeholder="Select Column"
+                            addEmptyOption="start"
+                            value={ state.stratifyBy }
+                            disabled={[
+                                "cnt",
+                                "cnt_min",
+                                "cnt_max",
+                                state.groupBy,
+                                state.column2,
+                                isSurvival ? state.statusColumn : ""
+                            ].filter(Boolean)}
+                            onChange={ (stratifyBy: string) => onChange({
+                                ...state,
+                                stratifyBy,
+                                offset: 0,
+                                limit: 0,
+                                sortBy: "x:asc",
+                                denominator: (state.denominator === "local" || state.denominator === "count") && !stratifyBy ? "" : state.denominator
+                            }) }
+                        />
+                        <p className="small color-muted">
+                            Used to stratify the data into multiple series
+                        </p>
+                    </div>
+                    { isSurvival && <>
+                        <label>Status Column</label>
+                        <ColumnSelector
+                            cols={ cols.filter(c => c.dataType !== "hidden") }
+                            comparator={ suggestedFirst(isStatusColumn) }
+                            placeholder="Select Column"
+                            addEmptyOption="start"
+                            value={ state.statusColumn }
+                            disabled={[
+                                "cnt",
+                                "cnt_min",
+                                "cnt_max",
+                                state.groupBy,
+                                state.stratifyBy,
+                                ...cols.filter(c => c.dataType.startsWith("date")).map(c => c.name)
+                            ].filter(Boolean)}
+                            onChange={ (statusColumn: string) => onChange({ ...state, statusColumn: statusColumn || "", eventValue: "" }) }
+                        />
+                        <p className="small color-muted">
+                            The column that tells whether the event happened for each record
+                        </p>
+                        { !!state.statusColumn && <div className="pt-1">
+                            <label>Event Value</label>
+                            <Select
+                                placeholder={ statusValues ? "Select Value" : "Loading values..." }
+                                disabled={ !statusValues }
+                                value={ state.eventValue }
+                                options={[
+                                    ...(statusValues || []),
+                                    // Keep a saved value even if it is no longer in the data
+                                    ...(state.eventValue && statusValues && !statusValues.includes(state.eventValue) ? [state.eventValue] : [])
+                                ].map(value => ({
+                                    value,
+                                    icon : `${VITE_APP_PREFIX ? "/" + VITE_APP_PREFIX : ""}/icons/cell.png`,
+                                    label: statusValues?.includes(value) ? value : `${value} (not found in the data)`
+                                }))}
+                                onChange={ (eventValue: string) => onChange({ ...state, eventValue }) }
+                            />
+                            <p className="small color-muted">
+                                The value from the status column that means the event happened
+                            </p>
+                            { (statusValues?.length ?? 0) > 2 && <p className="small color-muted">
+                                <i className="fa-solid fa-triangle-exclamation color-orange" /> This column has more than two
+                                values ({ statusValues!.join(", ") }). Status columns are expected to have two: one for the
+                                event and one for no event.
+                            </p> }
+                            <div className="pt-1">
+                                <Checkbox
+                                    name="survivalBands"
+                                    label="Show 95% confidence bands"
+                                    checked={ state.survivalBands }
+                                    onChange={ survivalBands => onChange({ ...state, survivalBands }) }
+                                />
+                                <Checkbox
+                                    name="survivalRiskTable"
+                                    label="Show number at risk"
+                                    checked={ state.survivalRiskTable }
+                                    onChange={ survivalRiskTable => onChange({ ...state, survivalRiskTable }) }
+                                />
+                            </div>
+                        </div> }
+                    </> }
+                    { !isSurvival && <>
+                        <label>Denominator</label>
+                        <Select
+                            options={[
+                                {
+                                    label: <div>
+                                        <div>None</div>
+                                        <div className="small color-muted">
+                                            Render the aggregate counts as found in the<br/>
+                                            {Terminology.subscription.nameSingular.toLowerCase()} without further processing
+                                        </div>
+                                    </div>,
+                                    value: "",
+                                    icon: "fa-solid fa-percent grey-out"
+                                },
+                                {
+                                    label: <div>
+                                        <div>Stratified Count</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the total<br />
+                                            count of every given data group.<br />
+                                            Not available with no stratifier.
+                                        </div>
+                                    </div>,
+                                    value: "count",
+                                    icon: "fa-solid fa-percent color-brand-2",
+                                    disabled: !state.stratifyBy
+                                },
+                                {
+                                    label: <div>
+                                        <div>Stratified Sum</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the sum<br />
+                                            of values in every given data group.<br />
+                                            Not available with no stratifier.
+                                        </div>
+                                    </div>,
+                                    value: "local",
+                                    icon: "fa-solid fa-percent color-brand-2",
+                                    disabled: !state.stratifyBy
+                                },
+                                {
+                                    label: <div>
+                                        <div>Total Count</div>
+                                        <div className="small color-muted">
+                                            Convert counts to percentage of the total<br />
+                                            count within the entire dataset.
+                                        </div>
+                                    </div>,
+                                    value: "global",
+                                    icon: "fa-solid fa-percent color-blue"
+                                }
+                            ]}
+                            value={ state.denominator }
+                            onChange={ denominator => onChange({ ...state, denominator })}
+                        />
+                        <p className="small color-muted">
+                            If set, renders the values as percentages of the given denominator
+                        </p>
+                    </> }
+                    { state.ranges && <div className="pt-1">
+                        <label>Confidence Intervals</label>
+                        <Select value={ state.ranges?.type || "" } options={[
+                            {
+                                value: "",
+                                icon : "fa-solid fa-plus-minus color-muted",
+                                label: "None"
+                            },
+                            {
+                                label: "Error Bars",
+                                value: "errorbar",
+                                icon : "fa-solid fa-plus-minus color-blue"
+                            },
+                            {
+                                label: "Area",
+                                value: "areasplinerange",
+                                icon : "fa-solid fa-plus-minus color-blue"
+                            },
+                            {
+                                label: "Bars / Columns",
+                                value: "column",
+                                icon : "fa-solid fa-plus-minus color-blue"
+                            },
+                        ]} onChange={type => onRangeOptionsChange({ type, enabled: !!type })} />
+                        <p className="small color-muted">
+                            If information is available, add the error ranges to the chart
+                        </p>
+                    </div> }
+
+                    { !isSurvival && <SecondaryDataEditor state={state} cols={[ ...cols ]} onChange={onSecondaryDataOptionsChange} /> }
+                </> }
+
+                { isPie && <SliceEditor state={state} onChange={onChange} /> }
+
+                { !isSurvival && <>
+                <div className="row half-gap">
+                        <div className="col col-5">
+                            <label>Sort {!!state.stratifyBy && state.sortBy.startsWith("y:") && <i className="fa fa-info-circle color-muted" data-tooltip="Sorting by count may produce unexpected results in stratified charts because every group is sorted separately." />}</label>
+                            <Select
+                                right
+                                options={[
+                                    {
+                                        label: xLabel + ": asc",
+                                        icon : "fas fa-sort-amount-down-alt color-blue",
+                                        value: "x:asc",
+                                    },
+                                    {
+                                        label: xLabel + ": desc",
+                                        icon : "fas fa-sort-amount-down color-blue",
+                                        value: "x:desc",
+                                    },
+                                    {
+                                        label: yLabel + ": asc",
+                                        icon : "fas fa-sort-amount-down-alt color-blue",
+                                        value: "y:asc",
+                                        disabled: !isCategory || !!state.stratifyBy
+                                    },
+                                    {
+                                        label: yLabel + ": desc",
+                                        icon : "fas fa-sort-amount-down color-blue",
+                                        value: "y:desc",
+                                        disabled: !isCategory || !!state.stratifyBy
+                                    }
+                                ].filter(option => !option.disabled)}
+                                value={ state.sortBy }
+                                onChange={ sortBy => onChange({ ...state, sortBy })} />
+                        </div>
+                        <div className="col">
+                            <label>Offset</label>
+                            <input type="number" min={0} value={ state.offset || 0 } onChange={e => onChange({ ...state, offset: e.target.valueAsNumber })} />
+                        </div>
+                        <div className="col">
+                            <label>Limit</label>
+                            <input type="number" min={ 0 } value={ state.limit || 0 } onChange={e => onChange({ ...state, limit: e.target.valueAsNumber })} />
+                        </div>
+                    </div>
+                    <p className="small color-muted">
+                        Use offset, limit, and sort to slice the dataset retrieved from the backend
+                    </p>
+                </> }
+                <br />
+            </div>
+        </Collapse>
+    )
+}
+
+/**
+ * The chart type, titles, colors and the spacing of columns, bars and slices
+ */
+function ChartSection({
+    state,
+    onChartTypeChange,
+    onChartOptionsChange
+}: {
+    state: ChartConfigPanelState
+    onChartTypeChange: (type: string) => void
+    onChartOptionsChange: (options: Options) => void
+}) {
+    const { chartOptions, chartType } = state;
+
+    const isBar         = chartType.startsWith("bar")
+    const isColumn      = chartType.startsWith("column")
+    const isPie         = chartType.startsWith("pie") || chartType.startsWith("donut")
+    const isStack       = chartType.endsWith("Stack")
+    const isBarOrColumn = isBar || isColumn
+
+    return (
+        <Collapse collapsed header="Chart">
+            <div className="mt-1">
+                <label>Chart Type</label>
+                <Select
+                    value={ state.chartType }
+                    onChange={ onChartTypeChange }
+                    options={getChartTypes(chartType).map(type => ({
+                        value: type,
+                        label: SupportedChartTypes[type as SupportedChartType],
+                        icon: ChartIcons[type as keyof typeof ChartIcons],
+                        disabled: (type.includes("Stack") && !state.stratifyBy) || (
+                            (type.includes("pie") || type.includes("donut")) && !!state.stratifyBy
+                        )
+                    }))}
+                />
+            </div>
+            <div className="mt-1">
+                <label>Chart Title</label>
+                <input
+                    type="text"
+                    value={ chartOptions.title?.text || "" }
+                    onChange={ e => onChartOptionsChange({ title: { text: e.target.value }})}
+                />
+                <br/>
+            </div>
+            <div className="mt-1">
+                <label>Chart Subtitle</label>
+                <input
+                    type="text"
+                    list="chart-subtitle-suggestions"
+                    value={ chartOptions.subtitle?.text || "" }
+                    onChange={ e => onChartOptionsChange({ subtitle: { text: e.target.value }})}
+                />
+                { /* Subtitles the chart suggests (see custom.subtitleSuggestions) */ }
+                <datalist id="chart-subtitle-suggestions">
+                    { (chartOptions.custom?.subtitleSuggestions || []).map((text: string) => <option key={ text } value={ text } />) }
+                </datalist>
+                <br/>
+            </div>
+
+            <div className="mt-1">
+                <label>Color Theme</label>
+                <Select
+                    value={ state.chartOptions.custom?.theme ?? DEFAULT_COLOR_THEME }
+                    onChange={ (id) => {
+                        const theme = COLOR_THEMES.find(t => t.id === id)
+                        onChartOptionsChange({
+                            colors: theme!.colors,
+                            custom: { theme: id }
+                        })
+                    }}
+                    options={COLOR_THEMES.map((theme, i) => ({
+                        value: theme.id,
+                        label: theme.name,
+                        right: <>{ theme.colors.map((c, i) => <div key={i} style={{
+                            background: c,
+                            display: "inline-block",
+                            width: "8px",
+                            height: "1em",
+                            margin: "-2px 1px 0",
+                            boxShadow: "0 0 0 0.5px #0008 inset, 0 0 0 0.5px #FFF8",
+                            verticalAlign: "middle"
+                        }} />)}</>,
+                        icon: "fas fa-palette color-muted"
+                    }))}
+                />
+            </div>
+
+            { isBarOrColumn && state.stratifyBy && 
+                <div className="mt-1">
+                    <label>
+                        Group Padding
+                        <input
+                            type="range"
+                            min={0}
+                            max={0.5}
+                            step={0.01}
+                            value={
+                                isColumn ? 
+                                    chartOptions.plotOptions?.column?.groupPadding === undefined ?
+                                        0.2 :
+                                        chartOptions.plotOptions.column.groupPadding :
+                                    chartOptions.plotOptions?.bar?.groupPadding === undefined ?
+                                        0.2 :
+                                        chartOptions.plotOptions.bar.groupPadding
+                            }
+                            onChange={e => onChartOptionsChange({
+                                plotOptions: {
+                                    [isColumn ? "column" : "bar"]: {
+                                        groupPadding: e.target.valueAsNumber
+                                    }
+                                }
+                            })}
+                            style={{ width: "100%", margin: 0 }}
+                        />
+                    </label>
+                    <p className="small color-muted">Padding between each value groups</p>
+                </div>
+            }
+            { isBarOrColumn && !isStack &&
+                <div className="mt-1">
+                    <label>
+                        Point Padding
+                        <input
+                            type="range"
+                            min={0}
+                            max={0.5}
+                            step={0.01}
+                            value={
+                                isColumn ? 
+                                    chartOptions.plotOptions?.column?.pointPadding === undefined ?
+                                        0.02 :
+                                        chartOptions.plotOptions.column.pointPadding :
+                                    chartOptions.plotOptions?.bar?.pointPadding === undefined ?
+                                        0.02 :
+                                        chartOptions.plotOptions.bar.pointPadding
+                            }
+                            onChange={e => onChartOptionsChange({
+                                plotOptions: {
+                                    [isColumn ? "column" : "bar"]: {
+                                        pointPadding: e.target.valueAsNumber
+                                    }
+                                }
+                            })}
+                            style={{ width: "100%", margin: 0 }}
+                        />
+                    </label>
+                    <p className="small color-muted">Padding between each column or bar</p>
+                </div>
+            }
+            { isPie && <div className="mt-1">
+                <label>
+                    Start Angle
+                    <input
+                        type="range"
+                        min={0}
+                        max={360}
+                        step={1}
+                        value={ (chartOptions.series?.[0] as SeriesPieOptions | undefined)?.startAngle || 0 }
+                        onChange={e => {
+                            chartOptions.series![0] = merge(chartOptions.series?.[0], { startAngle: e.target.valueAsNumber })
+                            onChartOptionsChange(chartOptions)
+                        }}
+                        style={{ width: "100%", margin: 0 }}
+                    />
+                </label>
+            </div> }
+            { isPie && <div className="mt-1">
+                <label>
+                    Selected Slice Offset
+                    <input
+                        type="range"
+                        min={0}
+                        max={30}
+                        step={1}
+                        value={ chartOptions.plotOptions?.pie?.slicedOffset === undefined ? 30 : chartOptions.plotOptions.pie.slicedOffset }
+                        onChange={e => onChartOptionsChange({
+                            plotOptions: {
+                                pie: {
+                                    slicedOffset: e.target.valueAsNumber
+                                }
+                            }
+                        })}
+                        style={{ width: "100%", margin: 0 }}
+                    />
+                </label>
+            </div> }
+            <div className="mt-1 pb-1">
+                <Collapse collapsed header="Advanced">
+                    <Chart chart={state.chartOptions.chart} onChange={chart => onChartOptionsChange({ chart })} />
+                </Collapse>
+            </div>
+            <br/>
+        </Collapse>
+    )
+}
 
 
 
 
-function getPieOptions(options: any, onChange: (options: any) => void, has3d = false) {
-    const props: any[] = [];
 
+/**
+ * The title, tick marks and labels of one axis. Bar charts swap the axes, so
+ * the caller picks the header.
+ */
+function AxisSection({
+    header,
+    which,
+    axis,
+    placeholder,
+    onChange
+}: {
+    header      : string
+    which       : "xAxis" | "yAxis"
+    axis       ?: XAxisOptions | YAxisOptions
+    placeholder?: string
+    onChange    : (options: Options) => void
+}) {
+    const change = (patch: XAxisOptions | YAxisOptions) => onChange(
+        which === "xAxis" ? { xAxis: patch as XAxisOptions } : { yAxis: patch as YAxisOptions }
+    )
+    const prefix = which === "xAxis" ? "X" : "Y"
+
+    return (
+        <Collapse collapsed header={ header }>
+            <div className="mt-1">
+                <label>Axis Title</label>
+                <input
+                    type="text"
+                    placeholder={ placeholder }
+                    value={ axis?.title?.text || "" }
+                    onChange={ e => change({ title: { text: e.target.value } }) }
+                />
+            </div>
+            <div className="mt-1 pb-1">
+                <Checkbox
+                    name={ prefix + "Ticks" }
+                    label="Render axis tick marks"
+                    // Unset counts as off, like the default tickWidth of 0
+                    checked={ !!axis?.tickWidth }
+                    onChange={ checked => change({ tickWidth: checked ? 1 : 0 }) }
+                />
+                <Checkbox
+                    name={ prefix + "Labels" }
+                    label="Render labels"
+                    checked={ axis?.labels?.enabled !== false }
+                    onChange={ checked => change({ labels: { enabled: checked } }) }
+                />
+            </div>
+            <div className="pb-1">
+                <Collapse collapsed header="Advanced Axis Options">
+                    <AxisEditor axis={ axis } onChange={ change } />
+                </Collapse>
+            </div>
+        </Collapse>
+    )
+}
+
+/**
+ * The outline of columns, bars and slices: edges in 3D charts, borders in 2D
+ */
+function getEdgeOptions(options: any, onChange: (options: any) => void, has3d: boolean): any[] {
     if (has3d) {
-        props.push(
+        return [
             {
                 name    : "Edge Width",
                 type    : "number",
@@ -878,35 +900,39 @@ function getPieOptions(options: any, onChange: (options: any) => void, has3d = f
                 type    : "color",
                 value   : options.edgeColor ?? "#00000088",
                 onChange: (edgeColor: string) => onChange({ edgeColor }),
-            },
-            {
-                name    : "Depth",
-                type    : "number",
-                // min     : 0,
-                // step    : 0.1,
-                value   : options.depth ?? 50,
-                onChange: (depth: number) => onChange({ depth })
             }
-        )
-    } else {
-        props.push(
-            {
-                name    : "Border Width",
-                type    : "number",
-                min     : 0,
-                step    : 0.1,
-                value   : options.borderWidth ?? 0.5,
-                onChange: (borderWidth: number) => onChange({ borderWidth })
-            },
-            {
-                name    : "Border Color",
-                type    : "color",
-                value   : options.borderColor ?? "#00000088",
-                onChange: (borderColor: string) => onChange({ borderColor })
-            }
-        )
+        ]
     }
-    
+    return [
+        {
+            name    : "Border Width",
+            type    : "number",
+            min     : 0,
+            step    : 0.1,
+            value   : options.borderWidth ?? 0.5,
+            onChange: (borderWidth: number) => onChange({ borderWidth })
+        },
+        {
+            name    : "Border Color",
+            type    : "color",
+            value   : options.borderColor ?? "#00000088",
+            onChange: (borderColor: string) => onChange({ borderColor })
+        }
+    ]
+}
+
+function getPieOptions(options: any, onChange: (options: any) => void, has3d = false) {
+    const props: any[] = getEdgeOptions(options, onChange, has3d);
+
+    if (has3d) {
+        props.push({
+            name    : "Depth",
+            type    : "number",
+            value   : options.depth ?? 50,
+            onChange: (depth: number) => onChange({ depth })
+        })
+    }
+
     props.push(
         {
             name    : "Dash Style",
@@ -1073,41 +1099,7 @@ function AllSeriesEditor({
     const props: any[] = []
 
     if (hasColumn || hasBar || hasPie) {
-        if (has3d) {
-            props.push(
-                {
-                    name: "Edge Width",
-                    type: "number",
-                    min: 0,
-                    step: 0.1,
-                    value: S.edgeWidth ?? 1,
-                    onChange: (edgeWidth: number) => change({ edgeWidth })
-                },
-                {
-                    name: "Edge Color",
-                    type: "color",
-                    value: S.edgeColor ?? "#00000088",
-                    onChange: (edgeColor: string) => change({ edgeColor }),
-                }
-            )
-        } else {
-            props.push(
-                {
-                    name: "Border Width",
-                    type: "number",
-                    min: 0,
-                    step: 0.1,
-                    value: S.borderWidth ?? 0.5,
-                    onChange: (borderWidth: number) => change({ borderWidth })
-                },
-                {
-                    name: "Border Color",
-                    type: "color",
-                    value: S.borderColor ?? "#00000088",
-                    onChange: (borderColor: string) => change({ borderColor })
-                }
-            )
-        }
+        props.push(...getEdgeOptions(S, change, has3d))
     }
 
     if (hasColumn || hasBar) {
@@ -1215,13 +1207,12 @@ function SliceEditor({
     state: ChartConfigPanelState,
     onChange: (state: ChartConfigPanelState) => void
 }) {
-    const S = state.chartOptions.series?.[0] || {} as SeriesPieOptions
+    const S = (state.chartOptions.series?.[0] || {}) as SeriesPieOptions
 
     const colors = state.chartOptions.colors!
 
-    // @ts-ignore
     const props = (S.data || []).map((point, i) => ({
-        name: String(point.name ?? "") || "Series " + (i + 1),
+        name: String((point as PointOptionsObject).name ?? "") || "Series " + (i + 1),
         type: "color",
         value: colors[i % colors.length],
         onChange: (color: string) => {

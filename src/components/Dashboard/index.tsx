@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react"
+import { useEffect, useMemo, useReducer, useRef } from "react"
 import { useNavigate, Link }                     from "react-router-dom"
 import { Chart }                                 from "highcharts"
-import { buildChartOptions, removeSurvivalOptions } from "./Charts/lib"
+import { buildChartOptions, fontSizesToEm, removeSurvivalOptions } from "./Charts/lib"
 import { withRiskTable }                         from "./Charts/riskTable"
 import ConfigPanel                               from "./ConfigPanel"
 import BaseChart                                 from "./Charts/ChartFN"
@@ -13,12 +13,14 @@ import { GraphBreadcrumbs }                      from "./GraphBreadcrumbs"
 import { GraphTitle }                            from "./GraphTitle"
 import { GraphDescription }                      from "./GraphDescription"
 import { GraphToolbar }                          from "./GraphToolbar"
+import { hasRanges, isTurbo }                    from "./chartData"
+import { useChartData }                          from "./useChartData"
 import Tag                                       from "../Tags/Tag"
 import Alert, { AlertError }                     from "../generic/Alert"
 import Loader                                    from "../generic/Loader"
 import Grid                                      from "../generic/Grid"
 import { app }                                   from "../../types"
-import { createOne, updateOne, fetchChartData }  from "../../backend"
+import { createOne, updateOne }                  from "../../backend"
 import { useBackend, useCommand }                from "../../hooks"
 import Highcharts                                from "../../highcharts"
 import { useAuth }                               from "../../auth"
@@ -46,11 +48,9 @@ import {
     strip
 } from "../../utils"
 import {
-    CUMULUS__NONE,
     ReadOnlyPaths,
     SupportedChartTypes,
-    SupportedNativeChartTypes,
-    TURBO_THRESHOLD
+    SupportedNativeChartTypes
 } from "./config"
 
 import "./Dashboard.scss"
@@ -67,7 +67,7 @@ export interface ViewState
     viewColumn       : app.SubscriptionDataColumn
     viewGroupBy     ?: app.SubscriptionDataColumn
     filters          : app.Filter[]
-    chartType        : string
+    chartType        : keyof typeof SupportedChartTypes
     chartOptions     : Partial<Highcharts.Options>
     denominator      : app.DenominatorType
     column2         ?: app.SubscriptionDataColumn
@@ -95,14 +95,18 @@ export interface ViewState
     pendingSaveProps : Partial<app.View> | null
 }
 
-interface ViewAction
-{
-    type: string
-    payload?: any
-}
+export type ViewAction =
+    | { type: "SET_CHART_OPTIONS"         , payload: Partial<Highcharts.Options> }
+    | { type: "SET_RANGE_OPTIONS"         , payload: app.RangeOptions }
+    | { type: "SET_SECONDARY_DATA_OPTIONS", payload: { column?: app.SubscriptionDataColumn, type?: ViewState["column2type"] } }
+    | { type: "SET_CHART_TYPE"            , payload: keyof typeof SupportedChartTypes }
+    | { type: "SET_VIEW_TYPE"             , payload: ViewState["viewType"] }
+    | { type: "TOGGLE_OPTIONS" }
+    // Replaces the top-level keys of the state, and rebuilds the chart if needed
+    | { type: "UPDATE"                    , payload: Partial<ViewState> }
 
 
-function getViewReducer({
+export function getViewReducer({
     onSeriesToggle,
     onInspectionChange
 }: {
@@ -110,77 +114,47 @@ function getViewReducer({
     onInspectionChange: (inspection: string[], context: any) => void
 }) 
 {
-
+    // Builds the chart from the state's data. The actions differ only in the
+    // options they start from, so each one passes its own.
+    function rebuildChartOptions(state: ViewState, options: Partial<Highcharts.Options>) {
+        return buildChartOptions({
+            options,
+            type            : options.chart!.type as SupportedNativeChartTypes,
+            data            : state.data!,
+            data2           : state.data2,
+            column          : state.viewColumn,
+            groupBy         : state.viewGroupBy,
+            denominator     : state.denominator,
+            column2type     : state.column2type,
+            ranges          : state.ranges,
+            inspection      : state.inspection,
+            sortBy          : state.sortBy,
+            limit           : state.limit,
+            offset          : state.offset,
+            isSurvival      : state.chartType === "survival",
+            survivalData    : state.survivalData,
+            survivalBands   : state.survivalBands,
+            onSeriesToggle,
+            onInspectionChange,
+        })
+    }
 
     return function viewReducer(state: ViewState, action: ViewAction): ViewState
     {
-        function updateChartOptions(currentState: ViewState) {
-            if (currentState.data) {
-                currentState.chartOptions = buildChartOptions({
-                    options         : currentState.chartOptions,
-                    type            : currentState.chartOptions.chart!.type as SupportedNativeChartTypes,
-                    data            : currentState.data,
-                    data2           : currentState.data2,
-                    column          : currentState.viewColumn,
-                    groupBy         : currentState.viewGroupBy,
-                    denominator     : currentState.denominator,
-                    column2type     : currentState.column2type,
-                    ranges          : currentState.ranges,
-                    inspection      : currentState.inspection,
-                    sortBy          : currentState.sortBy,
-                    limit           : currentState.limit,
-                    offset          : currentState.offset,
-                    isSurvival      : currentState.chartType === "survival",
-                    survivalData    : currentState.survivalData,
-                    survivalBands   : currentState.survivalBands,
-                    onSeriesToggle,
-                    onInspectionChange,
-                })
-            }
-            return currentState
-        }
-
         if (action.type === "SET_CHART_OPTIONS") {
             if (state.data) {
-                const chartOptions = action.payload
-
-                // const chartOptions = stripValue(action.payload, "__DELETED__")
-
                 const options = getDefaultChartOptions(
-                    state.chartType as any,
-                    Highcharts.merge(state.chartOptions, chartOptions)
+                    state.chartType,
+                    Highcharts.merge(state.chartOptions, action.payload)
                 )
-
-                return {
-                    ...state,
-                    chartOptions: buildChartOptions({
-                        options,
-                        type            : options.chart!.type as SupportedNativeChartTypes,
-                        data            : state.data,
-                        data2           : state.data2,
-                        column          : state.viewColumn,
-                        groupBy         : state.viewGroupBy,
-                        denominator     : state.denominator,
-                        column2type     : state.column2type,
-                        ranges          : state.ranges,
-                        inspection      : state.inspection,
-                        sortBy          : state.sortBy,
-                        limit           : state.limit,
-                        offset          : state.offset,
-                        isSurvival      : state.chartType === "survival",
-                        survivalData    : state.survivalData,
-                        survivalBands   : state.survivalBands,
-                        onSeriesToggle,
-                        onInspectionChange,
-                    })
-                };
+                return { ...state, chartOptions: rebuildChartOptions(state, options) }
             }
         }
 
         if (action.type === "SET_RANGE_OPTIONS") {
             const out = { ...state, ranges: action.payload }
             if (state.data) {
-                updateChartOptions(out)
+                out.chartOptions = rebuildChartOptions(out, out.chartOptions)
             }
             return out
         }
@@ -188,7 +162,7 @@ function getViewReducer({
         if (action.type === "SET_SECONDARY_DATA_OPTIONS") {
             const out = { ...state, column2: action.payload.column, column2type: action.payload.type }
             if (state.data) {
-                updateChartOptions(out)
+                out.chartOptions = rebuildChartOptions(out, out.chartOptions)
             }
             return out
         }
@@ -214,27 +188,7 @@ function getViewReducer({
 
             if (nextState.data) {
                 const options = getDefaultChartOptions(chartType, nextState.chartOptions, true)
-
-                nextState.chartOptions = buildChartOptions({
-                    options,
-                    type            : options.chart!.type as SupportedNativeChartTypes,
-                    data            : nextState.data,
-                    data2           : nextState.data2,
-                    column          : nextState.viewColumn,
-                    groupBy         : nextState.viewGroupBy,
-                    denominator     : nextState.denominator,
-                    column2type     : nextState.column2type,
-                    ranges          : nextState.ranges,
-                    inspection      : nextState.inspection,
-                    sortBy          : nextState.sortBy,
-                    limit           : nextState.limit,
-                    offset          : nextState.offset,
-                    isSurvival      : nextState.chartType === "survival",
-                    survivalData    : nextState.survivalData,
-                    survivalBands   : nextState.survivalBands,
-                    onSeriesToggle,
-                    onInspectionChange,
-                })
+                nextState.chartOptions = rebuildChartOptions(nextState, options)
             }
 
             return nextState;
@@ -255,7 +209,7 @@ function getViewReducer({
         }
 
         if (action.type === "UPDATE") {
-            const nextState = Highcharts.merge(state, action.payload);
+            const nextState = { ...state, ...action.payload };
             
             if (nextState.inspection.enabled && nextState.inspection.match.length) {
                 nextState.showOptions = true
@@ -275,142 +229,18 @@ function getViewReducer({
                 "offset"
             ];
 
-            // @ts-ignore
             if (nextState.data && Object.keys(action.payload).some(key => chartable.includes(key) && action.payload[key] !== state[key])) {
-                // computeChartOptions(state, nextState);
                 const options = getDefaultChartOptions(
-                    nextState.chartType as keyof typeof SupportedChartTypes,
+                    nextState.chartType,
                     nextState.chartOptions
                 );
-
-                nextState.chartOptions = buildChartOptions({
-                    options         : options,
-                    type            : options.chart!.type as SupportedNativeChartTypes,
-                    data            : nextState.data!,
-                    data2           : nextState.data2,
-                    column          : nextState.viewColumn,
-                    groupBy         : nextState.viewGroupBy,
-                    denominator     : nextState.denominator,
-                    column2type     : nextState.column2type,
-                    ranges          : nextState.ranges,
-                    inspection      : nextState.inspection,
-                    sortBy          : nextState.sortBy,
-                    limit           : nextState.limit,
-                    offset          : nextState.offset,
-                    isSurvival      : nextState.chartType === "survival",
-                    survivalData    : nextState.survivalData,
-                    survivalBands   : nextState.survivalBands,
-                    onSeriesToggle,
-                    onInspectionChange,
-                })
+                nextState.chartOptions = rebuildChartOptions(nextState, options)
             }
 
             return nextState;
         }
 
-        if (action.type === "MERGE") {
-            return {
-                ...state,
-                ...action.payload
-            };
-        }
-
         return state
-    }
-}
-
-function isTurbo(primaryData: app.ServerResponses.DataResponse, secondaryData?: app.ServerResponses.StratifiedDataResponse | null) {
-    let out = false
-
-    if (!primaryData.stratifier) {
-        out = primaryData.data?.[0]?.rows?.length > TURBO_THRESHOLD
-    } else {
-        out = (primaryData as app.ServerResponses.StratifiedDataResponse).data.some(g => g.rows.length > TURBO_THRESHOLD)
-    }
-
-    if (!out && secondaryData) {
-        out = secondaryData.data.some(g => g.rows.length > TURBO_THRESHOLD)
-    }
-    
-    return out
-}
-
-function hasRanges(data: app.ServerResponses.DataResponse | null, data2: app.ServerResponses.StratifiedDataResponse | null) {
-    return (
-        (data?.data?.some(group => group.rows.some(row => row.length >= 4))) ||
-        (data2?.data?.some(group => group.rows.some(row => row.length >= 4)))
-    );
-}
-
-function validateData(data: any, { column, stratifier }: { column: string, stratifier?: string, filters?: string[] }) {
-
-    type Point = [string | number, number] | [string | number, number, number, number];
-
-    // response data type
-    assert(data && typeof data === "object", `Invalid data response received: type "${typeof data}"`)
-    
-    // column
-    assert(data.column === column, `Invalid data response received: Expected the "column" property to equal "${column}".`)
-
-    // stratifier
-    if (stratifier) {
-        assert(data.stratifier === stratifier, `Invalid data response received: Expected the "stratifier" property to equal "${stratifier}".`)
-    }
-    
-    // totalCount
-    assert(typeof data.totalCount === "number", `Invalid data response received: Expected numeric "totalCount" property.`)
-    
-    // rowCount
-    assert(typeof data.rowCount === "number", `Invalid data response received: Expected numeric "rowCount" property.`)
-
-    // filters
-    assert(Array.isArray(data.filters), `Invalid data response received: Expected "filters" to be array.`)
-
-    // data
-    assert(Array.isArray(data.data), `Invalid data response received: Expected "data" to be array.`)
-
-    // Singular response
-    if (!stratifier) {
-        assert(data.data.length === 1, `Invalid data response received: Expected the "data" array to contain one entry.`)
-        assert(typeof data.data[0] === "object", `Invalid data response received: Expected the "data" array to contain one object.`)
-        assert(Array.isArray(data.data[0].rows), `Invalid data response received: Expected data[0].rows to be array.`)
-        assert(data.data[0].rows.length === data.rowCount, `Invalid data response received: Expected data[0].rows to have length equal to "rowCount".`)
-
-        data.data[0].rows.forEach((row: Point, i: number) => {
-            // assert(typeof row[0] === "string" || typeof row[0] === "number", `Invalid data response received: data[0].rows[${i}][0] must be a string or number`)
-            assert(typeof row[1] === "number", `Invalid data response received: data[0].rows[${i}][1] must be a number`)
-            assert(row.length === 2 || typeof row[2] === "number", `Invalid data response received: data[0].rows[${i}][2] must be a number`)
-            assert(row.length === 2 || typeof row[3] === "number", `Invalid data response received: data[0].rows[${i}][3] must be a number`)
-            if (i > 0 && typeof row[0] === "number") {
-                assert(
-                    row[0] > data.data[0].rows[i-1][0],
-                    `Invalid data response received: Data is not sorted: ${row[0]} > ${data.data[0].rows[i-1][0]}`
-                )
-            }
-        })
-    }
-
-    // Stratified response
-    else {
-        const stratifiers: Record<string, boolean> = {}
-
-        data.data.forEach((group: any, g: number) => {
-            assert(group && typeof group === "object", `Invalid data response received: data[${g}] is not an object.`)
-            // assert(typeof group.stratifier === "string" || typeof group.stratifier === "number", `Invalid data response received: data[${g}].stratifier is not a string or number.`)
-            assert(Array.isArray(group.rows), `Invalid data response received: data[${g}].rows is not an array.`)
-            assert(!stratifiers[group.stratifier], `Invalid data response received: Duplicate stratifier "${group.stratifier}".`)
-            stratifiers[group.stratifier] = true;
-
-            group.rows.forEach((row: Point, i: number) => {
-                // assert(typeof row[0] === "string", `Invalid data response received: data[${g}].rows[${i}][0] must be a string`)
-                assert(typeof row[1] === "number", `Invalid data response received: data[${g}].rows[${i}][1] must be a number`)
-                assert(row.length === 2 || typeof row[2] === "number", `Invalid data response received: data[${g}].rows[${i}][2] must be a number`)
-                assert(row.length === 2 || typeof row[3] === "number", `Invalid data response received: data[${g}].rows[${i}][3] must be a number`)
-                if (i > 0 && typeof row[0] === "number") {
-                    assert(row[0] >= group.rows[i-1][0], `Invalid data response received: data[${g}].rows is not sorted`)
-                }
-            })
-        })
     }
 }
 
@@ -463,7 +293,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         viewDescription: view.description || "",
 
         // Line chart seems to be most universal so begin with it
-        chartType: viewSettings.viewType || "spline",
+        chartType: (viewSettings.viewType || "spline") as keyof typeof SupportedChartTypes,
 
         // If column is not set pick the firs one other than "cnt"
         viewColumn: cols.find(c => c.name === viewSettings.column || "") ||
@@ -476,7 +306,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         filters: viewSettings.filters || [],
 
         // any custom chart options
-        chartOptions: viewSettings.chartOptions || {},
+        chartOptions: fontSizesToEm(viewSettings.chartOptions || {}),
 
         // the denominator option
         denominator: viewSettings.denominator || "",
@@ -512,8 +342,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         dataTabIndex: 0,
 
         tags: (view.Tags || []).map(tag => {
-            // @ts-ignore
-            if (copy) delete tag.ViewsTags
+            if (copy) delete (tag as { ViewsTags?: unknown }).ViewsTags
             return tag
         }),
 
@@ -552,8 +381,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
 
     } as ViewState);
 
-    // console.log(state)
-
     const {
         viewType,
         showOptions,
@@ -590,7 +417,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     const statusColumnName = chartType === "survival" ? statusColumn?.name || "" : ""
     const secColumnName  = column2?.name || ""
     const viewColumnName = viewColumn.name
-    const requestId      = subscription?.id || dataPackage?.id
 
     // The rendered chart only: the saved options keep a single x axis
     const renderedChartOptions = useMemo(() => {
@@ -611,8 +437,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             column : viewColumnName,
             filters,
             viewType: chartType,
-            // @ts-ignore
-            chartOptions: strip(state.chartOptions, ReadOnlyPaths),
+            chartOptions: strip(state.chartOptions, ReadOnlyPaths) as Partial<Highcharts.Options>,
             denominator,
             column2: secColumnName,
             column2type,
@@ -631,6 +456,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     function onSeriesToggle(map: Record<string, boolean>) {
         const next = {
             chartOptions: {
+                ...state.chartOptions,
                 series: (state.chartOptions.series || []).map(s => {
                     return { ...s, visible: map[s.id + ""] !== false }
                 })
@@ -659,18 +485,26 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         
     }
 
+    // Extra view properties for the next save, e.g. isDraft
+    const saveProps = useRef<Partial<app.View>>({})
+
+    // Resolves the promise of a save started from the Data tab, once it is done
+    const onPendingSaveDone = useRef<(() => void) | null>(null)
+
     // Save
     const { execute: saveChart, loading: saving } = useBackend(async () => {
-        
+
+        const viewToSave = { ...runtimeView, ...saveProps.current }
+
         // Update
         if (view.id) {
             if (!canUpdate) {
                 return alert("You don't have permission to update graphs")
             }
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
-            const result = await updateOne("views", view.id, { ...runtimeView, screenShot }).catch(e => alert(e.message));
+            const result = await updateOne("views", view.id, { ...viewToSave, screenShot }).catch(e => alert(e.message));
 
-            dispatch({ type: "MERGE", payload: { isDraft: result ? result.isDraft : false, pendingSaveProps: null }})
+            dispatch({ type: "UPDATE", payload: { isDraft: result ? result.isDraft : false, pendingSaveProps: null }})
         }
 
         // Create
@@ -679,198 +513,38 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                 return alert("You don't have permission to create graphs")
             }
             const screenShot = viewType === "overview" ? await getScreenShot() : undefined;
-            await createOne("views", { ...runtimeView, subscriptionId: subscription ? subscription.id : undefined, packageId: dataPackage?.id, screenShot, }).then(
+            await createOne("views", { ...viewToSave, subscriptionId: subscription ? subscription.id : undefined, packageId: dataPackage?.id, screenShot, }).then(
                 v => defer(() => navigate("/views/" + v.id), "navigate-after-create"),
                 e => alert(e.message)
             );
         }
     });
 
-    const save = (props: Partial<app.View> = {}) => {
+    const save = (props: Partial<app.View> = {}): Promise<void> => {
+        // The screenshot needs the chart, so switch to it and save once it
+        // has rendered (see the effect below)
         if (viewType !== "overview") {
-            dispatch({ type: "MERGE", payload: { pendingSaveProps: Object.assign(runtimeView, props), viewType: "overview" }})
-        } else {
-            Object.assign(runtimeView, props)
-            return saveChart()
-        }
-    }
-
-    // Convert filters to search parameters
-    const noRightOps = [
-        "isTrue",
-        "isFalse",
-        "isNotTrue",
-        "isNotFalse",
-        "isNotNone",
-        "isNone"
-    ];
-    const filterParams: string[] = []
-    let chain: string[] = [];
-    filters.forEach(filter => {
-        const { left, operator, right, join } = filter
-        
-        // incomplete filter - column not selected yet
-        if (!left) {
-            return
-        }
-
-        // incomplete filter - operator not selected yet
-        if (!operator) {
-            return
-        }
-
-        // incomplete filter - right.value required but empty
-        if (!noRightOps.includes(operator) && (right.value === undefined || right.value === "")) {
-            return;
-        }
-
-        if (join === "and" && chain.length) {
-            filterParams.push(chain.join(","))
-            chain = []
-        }
-
-        const parts: any[] = [left, operator]
-        if (!noRightOps.includes(operator)) {
-            parts.push(right.value)
-        }
-
-        chain.push(parts.join(":"))
-    })
-
-    if (chain.length) filterParams.push(chain.join(","))
-
-    // Variables that control if new data needs to be fetched
-    const filter = filterParams.map(encodeURIComponent).join("&filter=")
-
-    const loadData = useCallback((signal?: AbortSignal) => {
-        dispatch({ type: "UPDATE", payload: {
-            loadingData: true,
-            loadingDataError: null,
-            data : null,
-            data2: null,
-            survivalData: null,
-        }})
-
-        const fetchPrimaryData = async () => fetchChartData({
-            subscription,
-            dataPackage,
-            column    : viewColumnName,
-            stratifier: stratifierName,
-            filters   : filterParams,
-            label     : "Chart Primary Data",
-            signal
-        })
-
-        const fetchSecondaryData = async () => {
-            if (!secColumnName) return null
-            return fetchChartData({
-                subscription,
-                dataPackage,
-                column    : viewColumnName,
-                stratifier: secColumnName,
-                filters   : filterParams,
-                label     : "Chart Secondary Data",
-                signal
+            return new Promise(resolve => {
+                onPendingSaveDone.current = resolve
+                dispatch({ type: "UPDATE", payload: { pendingSaveProps: props, viewType: "overview" }})
             })
         }
+        saveProps.current = props
+        return saveChart()
+    }
 
-        // Survival charts: the primary query split into events and censored records
-        const fetchSurvivalData = async (): Promise<SurvivalData | null> => {
-            if (!statusColumnName || !eventValue) return null
-            const [events, censored] = await Promise.all([
-                fetchChartData({
-                    subscription,
-                    dataPackage,
-                    column    : viewColumnName,
-                    stratifier: stratifierName,
-                    filters   : [...filterParams, `${statusColumnName}:strEq:${eventValue}`],
-                    label     : "Chart Survival Events",
-                    signal
-                }),
-                fetchChartData({
-                    subscription,
-                    dataPackage,
-                    column    : viewColumnName,
-                    stratifier: stratifierName,
-                    filters   : [
-                        ...filterParams,
-                        `${statusColumnName}:strNotEq:${eventValue}`,
-                        `${statusColumnName}:strNotEq:${CUMULUS__NONE}`
-                    ],
-                    label     : "Chart Survival Censored",
-                    signal
-                })
-            ])
-            return {
-                events,
-                censored,
-                status: { label: statusColumn?.label || statusColumnName, eventValue }
-            }
-        }
-
-        return Promise.all([
-            fetchPrimaryData(),
-            fetchSecondaryData(),
-            fetchSurvivalData()
-        ]).then(([
-            primaryData,
-            secondaryData,
-            survivalData
-        ]) => {
-            if (signal?.aborted) return
-            try {
-                validateData(primaryData, { column: viewColumnName, stratifier: stratifierName, filters: filterParams })
-                if (secColumnName) {
-                    validateData(secondaryData, { column: viewColumnName, stratifier: secColumnName, filters: filterParams })
-                }
-            } catch (ex) {
-                dispatch({ type: "UPDATE", payload: { loadingDataError: ex }})
-            }
-
-            dispatch({ type: "UPDATE", payload: {
-                data : primaryData,
-                data2: secondaryData,
-                survivalData,
-                loadingData: false
-            }})
-        }).catch(error => {
-            if (signal?.aborted) return
-            dispatch({ type: "UPDATE", payload: {
-                loadingDataError: error,
-                loadingData: false
-            }})
-        })
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [requestId, stratifierName, viewColumnName, filter, secColumnName, statusColumnName, eventValue]);
-
-    useEffect(() => {
-        const controller = new AbortController()
-        loadData(controller.signal)
-        return () => controller.abort()
-    }, [loadData])
-
-    // Survival charts: load the values of the status column, so that the user
-    // can pick the one that means "event"
-    const [statusValues, setStatusValues] = useState<string[] | null>(null)
-    useEffect(() => {
-        setStatusValues(null)
-        if (!statusColumnName) return
-        const controller = new AbortController()
-        fetchChartData({
-            subscription,
-            dataPackage,
-            column: statusColumnName,
-            label : "Survival Status Values",
-            signal: controller.signal
-        }).then((data: app.ServerResponses.DataResponse) => {
-            setStatusValues((data.data[0]?.rows || []).map(row => String(row[0])).filter(v => v !== CUMULUS__NONE))
-        }).catch(() => {
-            if (!controller.signal.aborted) setStatusValues([])
-        })
-        return () => controller.abort()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [requestId, statusColumnName])
+    const { statusValues } = useChartData({
+        subscription,
+        dataPackage,
+        viewColumnName,
+        stratifierName,
+        secColumnName,
+        statusColumnName,
+        statusLabel: statusColumn?.label || statusColumnName,
+        eventValue,
+        filters,
+        dispatch
+    })
 
     useEffect(() => {
         if (copy) {
@@ -885,8 +559,11 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     // Run effect when viewType or chart readiness changes
     useEffect(() => {
         if (viewType === "overview" && chartIsRendered && pendingSaveProps) {
-            Object.assign(runtimeView, pendingSaveProps);
-            saveChart();
+            saveProps.current = pendingSaveProps
+            saveChart().then(() => {
+                onPendingSaveDone.current?.()
+                onPendingSaveDone.current = null
+            })
         }
     }, [viewType, chartIsRendered]);
 
@@ -959,8 +636,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
     const printChart           = useCommand(new PrintChart());
     const generateCaption      = useCommand(new GenerateCaption(state.chartOptions, state, c => dispatch({ type: "UPDATE", payload: { caption: c }})))
 
-    // console.log(state.chartOptions)
-
     return (
         <div className={ "dashboard " + (saving || deleteCommand.working ? "grey-out" : "") + (showOptions ? " sidebar-open" : "") }>
             <title>{viewName}</title>
@@ -971,16 +646,14 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                         <ConfigPanel
                             cols={cols}
                             statusValues={statusValues}
-                            viewType={viewType}
-                            view={view}
-                            onChartTypeChange={ (type: string) => dispatch({ type: "SET_CHART_TYPE", payload: type }) }
+                            onChartTypeChange={ (type: string) => dispatch({ type: "SET_CHART_TYPE", payload: type as keyof typeof SupportedChartTypes }) }
                             onChartOptionsChange={ (payload: Highcharts.Options) => dispatch({ type: "SET_CHART_OPTIONS", payload }) }
                             onRangeOptionsChange={ (payload: app.RangeOptions) => dispatch({ type: "SET_RANGE_OPTIONS", payload }) }
                             onSecondaryDataOptionsChange={ (payload: { column?: string, type?: string }) => dispatch({
                                 type: "SET_SECONDARY_DATA_OPTIONS",
                                 payload: {
                                     column: payload.column ? cols.find(c => c.name === payload.column) : undefined,
-                                    type: payload.type
+                                    type: payload.type as ViewState["column2type"]
                                 }
                             }) }
                             state={{
@@ -989,12 +662,10 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                 filters   : [...filters],
                                 xCol      : viewColumn,
 
-                                // @ts-ignore
                                 chartType,
                                 viewName,
                                 viewDescription,
                                 chartOptions: state.chartOptions,
-                                // chartOptions: finalChartOptions,
                                 denominator,
                                 column2: column2?.name || "",
                                 column2type,
@@ -1012,12 +683,16 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                             }}
                             onChange={state => {
                                 dispatch({ type: "UPDATE", payload: {
+                                    // Some editors change the chart options in
+                                    // place (see ConfigPanel.test.tsx), and the
+                                    // chart only redraws for new options
+                                    chartOptions   : { ...state.chartOptions },
                                     viewName       : state.viewName,
                                     viewDescription: state.viewDescription,
                                     viewColumn     : cols.find(c => c.name === state.groupBy),
                                     viewGroupBy    : cols.find(c => c.name === state.stratifyBy),
                                     filters        : [...state.filters],
-                                    denominator    : state.denominator,
+                                    denominator    : state.denominator as app.DenominatorType,
                                     statusColumn   : cols.find(c => c.name === state.statusColumn),
                                     eventValue     : state.eventValue,
                                     survivalBands  : state.survivalBands,
@@ -1035,9 +710,9 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                 <div className="col" style={{ zIndex: 2, position: "relative", justifySelf: "flex-start", minWidth: "26rem", maxWidth: 1200 }}>
                     <div style={{ position: "sticky", top: 2 }}>
                         <GraphBreadcrumbs graph={{ isDraft, name: viewName }} />
-                        <GraphTitle value={state.viewName} onChange={ (viewName: string) => dispatch({ type: "MERGE", payload: { viewName }}) } />
+                        <GraphTitle value={state.viewName} onChange={ (viewName: string) => dispatch({ type: "UPDATE", payload: { viewName }}) } />
                         <hr/>
-                        <GraphDescription value={state.viewDescription} onChange={ viewDescription => dispatch({ type: "MERGE", payload: { viewDescription }}) } />
+                        <GraphDescription value={state.viewDescription} onChange={ viewDescription => dispatch({ type: "UPDATE", payload: { viewDescription }}) } />
                         <GraphToolbar
                             state={state}
                             dispatch={dispatch}
@@ -1113,11 +788,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                 copyCommand,
                                 shareCommand,
                                 managePermissionsCmd,
-                                // {
-                                //     label: showOptions ? "Hide Chart Options" : "Show Chart Options",
-                                //     execute: () => dispatch({ type: "TOGGLE_OPTIONS" }),
-                                //     icon: <i className="fas fa-cog" />
-                                // },
                                 "-",
                                 {
                                     label: "Show Chart Data",
@@ -1132,9 +802,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                 {
                                     label: "Annotate Selected Points ...",
                                     icon: <i className="fa-regular fa-comment"/>,
-                                    // @ts-ignore
                                     enabled: e => e.context?.chart.getSelectedPoints().length > 0,
-                                    // @ts-ignore
                                     execute: e => annotatePoints(e.context?.chart),
                                     available: !chartType.startsWith("pie") && !chartType.startsWith("donut")
                                 },
@@ -1146,7 +814,6 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                     chartType,
                                     viewColumn.name,
                                     viewGroupBy?.name || "no_stratifier",
-                                    // finalChartOptions.annotations?.length || "",
                                     column2?.name || "no_secondary",
                                     column2type || "no_second_type",
                                     state.chartOptions.chart?.options3d?.enabled ?? false,
@@ -1159,7 +826,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                     // Date.now()
                                 ].join(":")
                             }
-                            callback={() => dispatch({ type: "MERGE", payload: { chartIsRendered: true }})}
+                            callback={() => dispatch({ type: "UPDATE", payload: { chartIsRendered: true }})}
                         /> }
                         <br/>
                         <CaptionEditor html={caption} onChange={caption => dispatch({ type: "UPDATE", payload: { caption }})}/>

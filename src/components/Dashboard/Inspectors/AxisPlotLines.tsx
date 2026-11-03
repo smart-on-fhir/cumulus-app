@@ -177,7 +177,6 @@ export function AxisPlotLine({
                     },
                     onContextMenu: axisType === "datetime" ? (e: MouseEvent) => {
 
-                        // @ts-ignore
                         e.nativeEvent.menuItems = DATE_BOOKMARKS.map(item => ({
                             label: <>{ item.date }  -  <b>{ item.name }</b></>,
                             icon : <i className="fa-regular fa-calendar-check color-blue-dark" />,
@@ -187,7 +186,6 @@ export function AxisPlotLine({
                             }
                         }));
 
-                        // @ts-ignore
                         e.nativeEvent.menuItems.unshift({ label: "Well Known Dates" })
                     } : undefined
                 },

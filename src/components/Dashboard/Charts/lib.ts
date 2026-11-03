@@ -1,8 +1,9 @@
 import moment                               from "moment"
 import { Color, merge, Series }             from "highcharts"
-import { compareDurations, parseDuration }  from "./duration"
+import { compareDurations }                 from "./duration"
 import { getCountsByTime, lifeTable, logRankTest, SurvivalData } from "./kaplanMeier"
 import { getDurationTitle, isDurationTitle }        from "../columnRoles"
+import { getConfidenceBands, getSmallGroupsWarning, getSurvivalDataWarnings, setLeftSteps } from "./survivalSeries"
 
 /**
  * The default Y axis title of survival charts
@@ -20,8 +21,7 @@ export const SURVIVAL_Y_TITLE = "Survival"
  * charts can apply them to the rendered chart only, and this can go.
  */
 export function removeSurvivalOptions(options: Highcharts.Options): Highcharts.Options {
-    // @ts-ignore
-    const xTitle = options.xAxis?.title?.text, yTitle = options.yAxis?.title?.text
+    const xTitle = singleAxis(options.xAxis)?.title?.text, yTitle = singleAxis(options.yAxis)?.title?.text
     const out = merge(options, {
         xAxis: isDurationTitle(xTitle)     ? { title: { text: "" } } : {},
         yAxis: yTitle === SURVIVAL_Y_TITLE ? { title: { text: "" } } : {}
@@ -60,16 +60,63 @@ type SeriesOptions = (
 );
 
 /**
- * Survival charts warn about groups with fewer records than this
+ * Saved series options, with the properties read from them that only some
+ * series types declare
  */
-export const MIN_SURVIVAL_GROUP_SIZE = 10
+type SavedSeries = Highcharts.SeriesOptionsType & {
+    colorByPoint?: boolean
+    fillOpacity ?: number
+}
 
-function escapeHtml(input: string) {
-    return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+/**
+ * The options of an axis, if it is a single one. Charts keep one X and one Y
+ * axis in their options (only the rendered chart can have more, see
+ * withRiskTable), so an array of axes is treated as not set.
+ */
+function singleAxis<T extends object>(axis: T | T[] | undefined): T | undefined {
+    return Array.isArray(axis) ? undefined : axis
 }
 
 export function emToPx(em: number) {
     return Math.round(DEFAULT_FONT_SIZE * em) + "px"
+}
+
+/**
+ * Old charts saved the font sizes of their title, axis labels, axis titles,
+ * plot line labels and legend in px. Converts those to em, which scales with
+ * the chart's font size (chart.style.fontSize stays in px, because it is what
+ * the em sizes are relative to). Saved views are converted once, when they
+ * load, so the editors and the chart see em only. Returns a copy.
+ */
+export function fontSizesToEm(options: Partial<Highcharts.Options>): Partial<Highcharts.Options>
+{
+    const out = structuredClone(options)
+
+    // These were converted on every render before, against the default font
+    // size, so that is how they look
+    const styles = [
+        out.title?.style as Highcharts.CSSObject | undefined,
+        ...[singleAxis(out.xAxis), singleAxis(out.yAxis)].flatMap(axis => [
+            axis?.labels?.style,
+            axis?.title?.style,
+            ...(axis?.plotLines || []).map(l => l.label?.style)
+        ])
+    ]
+    styles.forEach(style => {
+        if (style?.fontSize) {
+            style.fontSize = lengthToEm(style.fontSize) + "em"
+        }
+    })
+
+    // The legend kept its px size, so it is converted against the chart's own
+    // font size, to look the same
+    const legend = out.legend?.itemStyle
+    if (legend?.fontSize) {
+        const base = String(out.chart?.style?.fontSize ?? "")
+        legend.fontSize = lengthToEm(legend.fontSize, base.endsWith("px") ? parseFloat(base) : DEFAULT_FONT_SIZE) + "em"
+    }
+
+    return out
 }
 
 export function getChartTitleText(column: app.SubscriptionDataColumn, groupBy?: app.SubscriptionDataColumn | null): string {
@@ -201,23 +248,6 @@ export function filterOutExceptions({
         return true
     })
 }
-
-// Sort data by Y if so requested by the user. Note that we do not sort in 
-// case of X because it only works for category charts. For linear and date
-// axises we need to use axis.reversed instead.
-// function sortY(rows: any[], sortBy: string, xType: "datetime" | "linear" | "category") {
-//     const [col, dir] = sortBy.split(":")
-//     if (col === "y" && xType === "category") {
-//         rows.sort((a, b) => {
-//             let _a = +a[1]
-//             let _b = +b[1]    
-//             if (isNaN(_a) || !isFinite(_a)) return 0
-//             if (isNaN(_b) || !isFinite(_b)) return 0
-//             return dir === "desc" ? _b - _a : _a - _b
-//         })
-//     }
-//     return rows
-// }
 
 function getPoint({
     row,
@@ -372,15 +402,10 @@ function getXAxis({
         // For category charts we don't allow highcharts to sort the data.
         // However, for other types we need to sort it ourselves
         if (xType === "linear") {
-            // @ts-ignore
-            arr.sort((a, b) => a - b);
+            arr.sort((a, b) => +a - +b);
         }
         else if (xType === "datetime") {
-            // @ts-ignore
             arr.sort((a, b) => +new Date(a) - +new Date(b));
-        }
-        else {
-            // arr.sort((a, b) => a.localeCompare(b, "en-US", { numeric: true }));
         }
     }
 
@@ -442,50 +467,28 @@ function getSeriesAndExceptions({
     let xTicks = getXAxis({ xType, data, data2, limit, offset, sortBy, isSurvival })
 
     if (isSurvival) {
-        const invalid = xTicks.filter(x => parseDuration(x) === null)
-        if (invalid.length) {
-            const examples = invalid.slice(0, 3).map(x => `"${escapeHtml(x + "")}"`).join(", ")
-            exceptions.add(
-                `<b>${escapeHtml(column.label || column.name)}</b> does not look like a duration ` +
-                `(found ${examples}${invalid.length > 3 ? ", ..." : ""}), so this will not be a proper survival chart`
-            )
-        }
-        if (!survivalData) {
-            exceptions.add("Select a Status Column and an Event Value to compute the survival curve. Showing counts for now.")
-        }
-        // Usually means the saved Event Value no longer exists in the data
-        else if (!survivalData.events.rowCount) {
-            const { label, eventValue } = survivalData.status ?? { label: "status", eventValue: "the selected Event Value" }
-            exceptions.add(
-                `No records have <b>${escapeHtml(label)}</b> equal to <b>${escapeHtml(eventValue)}</b>, ` +
-                `so the survival curves cannot drop. Check the Event Value.`
-            )
-        }
+        getSurvivalDataWarnings(xTicks, column, survivalData).forEach(w => exceptions.add(w))
     }
 
     function addSeries(options: any, secondary = false) {
 
-        const S = serverOptions.series?.find((s: any) => s.id === options.id)
-        // @ts-ignore
+        const S = serverOptions.series?.find((s: any) => s.id === options.id) as SavedSeries | undefined
         const prev = serverOptions.plotOptions?.[options.type || "series"] ?? {}
 
         const themeId = serverOptions.custom?.theme || DEFAULT_COLOR_THEME
 
         const themeColors = COLOR_THEMES.find(t => t.id === themeId)!.colors
 
-        // @ts-ignore
         const colors: string[] = S?.colorByPoint ? themeColors : serverOptions.colors as string[] || themeColors
 
         const color = colors[series.length % colors.length]
 
         const cfg: any = {
-            // @ts-ignore,
             color: S?.colorByPoint ? undefined : color,
             id: options.id,
         }
 
         if ((options.type === "area" || options.type === "areaspline") && color) {
-            // @ts-ignore
             const fillOpacity = S?.fillOpacity ?? prev.fillOpacity ?? 0.75
             cfg.fillColor = {
                 linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
@@ -506,22 +509,6 @@ function getSeriesAndExceptions({
                     ]
                 }
             }
-
-            // There is a bug in Highcharts that prevents us from rendering hidden series
-            // having pattern fills
-            // if (options.type.includes("column")) {
-            //     cfg.color = {
-            //         pattern: {
-            //             path: {
-            //                 d: 'M 0 0 L 0 6',
-            //                 strokeWidth: 11.25
-            //             },
-            //             width : 6,
-            //             height: 6,
-            //             patternTransform: 'scale(0.5) rotate(45)'
-            //         }
-            //     }
-            // }
 
             cfg.stacking = column2type?.includes("columnStack") ? "normal" : undefined
         }
@@ -578,10 +565,8 @@ function getSeriesAndExceptions({
             const stratifier = String(group.stratifier)
             const id   = (secondary ? "secondary-" : "primary-") + stratifier
             const old  = serverOptions.series?.find(s => s.id === id)
-            const rows = group.rows
-
-            filterOutExceptions({
-                rows,
+            const rows = filterOutExceptions({
+                rows: group.rows,
                 seriesName: old?.name ?? stratifier,
                 column,
                 exceptions,
@@ -619,13 +604,10 @@ function getSeriesAndExceptions({
 
     if (data.rowCount) {
         if (!data.stratifier) {
-            // if (xType === "category" || xType === "linear") {
-            //     data.data[0].rows.sort((a, b) => String(a[0]).localeCompare(String(b[0]), "en-US", { numeric: true }))
-            // }
             const denominatorCache = {}
             const name = String(column.label || column.name)
             const id   = "primary-" + name
-            const old  = serverOptions.series?.find(s => s.id === id)
+            const old  = serverOptions.series?.find(s => s.id === id) as SavedSeries | undefined
             const rows = filterOutExceptions({
                 rows: data.data[0].rows,
                 seriesName: name,
@@ -637,7 +619,6 @@ function getSeriesAndExceptions({
             const seriesData = showSurvival ? toSurvivalPoints() : ticksToPoints(rows, denominatorCache);
 
             if (type === "pie" && sortBy.startsWith("x:")) {
-                // @ts-ignore
                 seriesData.sort((a, b) => sortBy === "x:asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name))
             }
 
@@ -648,10 +629,8 @@ function getSeriesAndExceptions({
                 data: seriesData,
                 dataSorting: { enabled: false },
                 colorByPoint: (type === "column" || type === "bar") ?
-                    // @ts-ignore
                     old?.colorByPoint === undefined ?
                         data.data.length === 1 && xType === "category" && seriesData.length <= 12 && serverOptions.custom?.theme :
-                        // @ts-ignore
                         !!old.colorByPoint :
                     type === "pie",
             });
@@ -691,70 +670,19 @@ function getSeriesAndExceptions({
         }
     }
 
-    // Survival charts: small groups are shown, but their curves are uncertain
     if (showSurvival) {
-        const small = series
-            .map((s: any) => [s.name, s.data?.find((p: any) => p?.custom?.survival)?.custom.survival.atRisk ?? 0])
-            .filter(([, n]) => n > 0 && n < MIN_SURVIVAL_GROUP_SIZE)
-        if (small.length) {
-            exceptions.add(
-                `Small group${small.length > 1 ? "s" : ""} (fewer than ${MIN_SURVIVAL_GROUP_SIZE}): ` +
-                small.map(([name, n]) => `<b>${escapeHtml(String(name))}</b> (n=${n})`).join(", ") +
-                `. ${small.length > 1 ? "Their curves" : "Its curve"}` +
-                (series.length > 1 ? " and the log-rank p-value are" : small.length > 1 ? " are" : " is") +
-                " less reliable."
-            )
+        const warning = getSmallGroupsWarning(series)
+        if (warning) {
+            exceptions.add(warning)
         }
     }
 
-    // Survival charts: left steps are the only correct way to draw the curves,
-    // even if another step was saved for a series
     if (isSurvival) {
-        series.forEach((s: any) => {
-            if (s.type === "line") {
-                s.step = "left"
-            }
-        })
+        setLeftSteps(series)
     }
 
-    // Survival charts: 95% confidence bands. Added after all the curves, so
-    // that they don't shift the colors of the curves.
     if (showSurvival && survivalBands) {
-        series.slice().forEach((curve: any) => {
-            const id  = curve.id + " (95% CI)"
-            // Saved options win over these defaults (addSeries would let
-            // anything passed here override them)
-            const old: any = serverOptions.series?.find(s => s.id === id)
-            addSeries({
-                type               : "arearange",
-                id,
-                name               : old?.name ?? curve.name + " (95% CI)",
-                linkedTo           : curve.id,
-                // A band follows its curve's color unless the user picked one
-                // for it (the series inspector saves that in custom.color)
-                color              : old?.custom?.color || curve.color,
-                custom             : { ...old?.custom, isConfidenceBand: true },
-                zIndex             : 0,
-                step               : "left",
-                lineWidth          : old?.lineWidth ?? 0.2,
-                fillOpacity        : old?.fillOpacity ?? 0.15,
-                connectNulls       : true,
-                enableMouseTracking: false,
-                marker             : { enabled: false },
-                data: curve.data.map((point: any) => {
-                    const row = point?.custom?.survival
-                    if (!row || row.ciLow === null) {
-                        return null
-                    }
-                    return {
-                        ...(point.x !== undefined ? { x: point.x } : {}),
-                        name: point.name,
-                        low : row.ciLow  * 100,
-                        high: row.ciHigh * 100
-                    }
-                })
-            })
-        })
+        getConfidenceBands(series, serverOptions.series).forEach(band => addSeries(band))
     }
 
     return { series, exceptions }
@@ -767,7 +695,7 @@ function computeColors(chartType: string, series: any[], options: any)
 
     const themeColors = COLOR_THEMES.find(t => t.id === themeId)!.colors
     
-    // @ts-ignore Start with the initial colors - from DB or from the theme
+    // Start with the initial colors - from DB or from the theme
     const orig = options.colors || themeColors
 
     // The colors to be used in the current chart
@@ -839,12 +767,9 @@ export function buildChartOptions({
     const isPercent = !!denominator || !!(isSurvival && survivalData)
 
     // Survival charts: default axis titles, unless the user has set their own
-    // @ts-ignore
-    const xTitle = options.xAxis?.title?.text, yTitle = options.yAxis?.title?.text
+    const xTitle = singleAxis(options.xAxis)?.title?.text, yTitle = singleAxis(options.yAxis)?.title?.text
     const survivalXTitle = isSurvival && (!xTitle || isDurationTitle(xTitle)) ? getDurationTitle(column) : undefined
     const survivalYTitle = isSurvival && survivalData && !yTitle ? SURVIVAL_Y_TITLE : undefined
-
-    // const is3d = !!options.chart?.options3d?.enabled
 
     const { series, exceptions } = getSeriesAndExceptions({
         data,
@@ -895,8 +820,7 @@ export function buildChartOptions({
         colors: computeColors(type, series, options),
         title: {
             style: {
-                // @ts-ignore
-                fontSize: lengthToEm(options.title?.style?.fontSize ?? "2em") + "em"
+                fontSize: (options.title?.style as Highcharts.CSSObject | undefined)?.fontSize ?? "2em"
             }
         },
         yAxis: {
@@ -907,15 +831,13 @@ export function buildChartOptions({
             labels: {
                 format: isPercent ? "{text}%" : "{text}",
                 style: {
-                    // @ts-ignore
-                    fontSize: lengthToEm(options.yAxis?.labels?.style?.fontSize ?? "1em") + "em"
+                    fontSize: singleAxis(options.yAxis)?.labels?.style?.fontSize ?? "1em"
                 }
             },
             title: {
                 ...(survivalYTitle ? { text: survivalYTitle } : {}),
                 style: {
-                    // @ts-ignore
-                    fontSize: lengthToEm(options.yAxis?.title?.style?.fontSize ?? "1.2em") + "em"
+                    fontSize: singleAxis(options.yAxis)?.title?.style?.fontSize ?? "1.2em"
                 }
             }
         },
@@ -927,8 +849,6 @@ export function buildChartOptions({
                     } : undefined
                 },
                 dataLabels: {
-                    // @ts-ignore
-                    // enabled: options.plotOptions?.series?.dataLabels?.enabled ?? (!groupBy && maxPointLength <= 30)
                     enabled: (!groupBy && !denominator && maxPointLength <= 20 && ["bar", "column", "pie"].includes(type)),
                     formatter() {
                         return this.y.toLocaleString('en-US');
@@ -961,104 +881,11 @@ export function buildChartOptions({
                 fontSize  : options.chart?.style?.fontSize   ?? emToPx(1),
                 fontFamily: options.chart?.style?.fontFamily ?? DEFAULT_FONT_FAMILY
             },
-            formatter(ctx): any {
-                const rows = [];
-
-                let x: any
-                if (xType === "datetime") {
-                    x = this.name//moment(this.point.x).format("YYYY-MM-DD")
-                } else if (xType === "linear") {
-                    x = this.x
-                } else {
-                    x = this.name
-                }
-
-                // Bullet ------------------------------------------------------
-                rows.push(`<tr><td colspan="2"><b style="color:${
-                    // @ts-ignore
-                    this.color?.pattern?.color || this.series?.color?.stops?.[0]?.[1] || this.color ||
-                    ctx.chart.options.colors?.[this.series.index % ctx.chart.options.colors.length] || "#888888"
-                };-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
-                
-                // Header ------------------------------------------------------
-                if (groupBy) {
-                    // rows.push(`<tr><td style="text-align:right">X:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
-                    rows.push(`<b>${groupBy.label || groupBy.name}: ${this.series.name}</b><hr/></td></tr>`)
-                } else {
-                    rows.push(`<b>${this.series.name}: ${this.custom?.survival ? "Survival" : "Count"}</b><hr/></td></tr>`)
-                }
-                //     rows.push(`<b>${x}</b><hr/></td></tr>`)
-                // } else {
-                //     rows.push(`<b>${x}</b><hr/></td></tr>`)
-                //     // rows.push(`<b>${this.point.series.name}</b><hr/></td></tr>`)
-                // }
-
-                // rows.push(`<tr><td>${this.point.series.name}</td><td>${groupBy}</td></tr>`)
-
-                // Group -------------------------------------------------------
-                // if (groupBy) {
-                    rows.push(`<tr><td style="text-align:right">${column.label || column.name}:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
-                // }
-
-                // Value -------------------------------------------------------
-                // Survival ----------------------------------------------------
-                const survival = this.custom?.survival
-                if (survival) {
-                    rows.push(
-                        `<tr><td style="text-align:right">Survival:</td><td style="width: 100%"><b>${Math.round(this.y!)}%</b></td></tr>`,
-                        `<tr style="opacity:0.6"><td style="text-align:right">At risk:</td><td><b>${roundToPrecision(survival.atRisk, 3).toLocaleString()}</b></td></tr>`,
-                        `<tr style="opacity:0.6"><td style="text-align:right">Events:</td><td><b>${roundToPrecision(survival.events, 3).toLocaleString()}</b></td></tr>`,
-                        `<tr style="opacity:0.6"><td style="text-align:right">No event:</td><td><b>${roundToPrecision(survival.censored, 3).toLocaleString()}</b></td></tr>`
-                    )
-                    if (survivalBands && survival.ciLow !== null) {
-                        rows.splice(rows.length - 3, 0,
-                            `<tr style="opacity:0.6"><td style="text-align:right">95% CI:</td><td><b>${Math.round(survival.ciLow * 100)}% – ${Math.round(survival.ciHigh * 100)}%</b></td></tr>`
-                        )
-                    }
-                }
-
-                else if (!this.custom?.isErrorRange) {
-                    rows.push(
-                        `<tr><td style="text-align:right">Count:</td>`,
-                        `<td style="width: 100%"><b>${
-                            denominator ?
-                                roundToPrecision(this.custom?.data?.cnt, 3).toLocaleString() + " (" + roundToPrecision(this.y!, 3) + "%)" :
-                                roundToPrecision(this.y!, 3).toLocaleString()
-                        }</b></td></tr>`
-                    )
-                }
-
-                // Range -------------------------------------------------------
-                const { data: { low, high, lowPct, highPct } = {}, denominator: d } = this.custom || {}
-
-                if (high !== undefined && low !== undefined) {
-                    if (denominator && d) {
-                        rows.push(
-                            `<tr style="opacity:0.6"><td style="text-align:right">Range:</td>` +
-                            `<td style="width: 100%"><b>${roundToPrecision(lowPct, 2) + "%"} - ${roundToPrecision(highPct, 2) + "%"}</b></td></tr>`
-                        )
-                    } else {
-                        rows.push(
-                            `<tr style="opacity:0.6"><td style="text-align:right">Range:</td>` +
-                            `<td style="width: 100%"><b>${roundToPrecision(low, 2).toLocaleString()} - ${roundToPrecision(high, 2).toLocaleString()}</b></td></tr>`
-                        )
-                    }
-                }
-
-                // Denominator -------------------------------------------------
-                if (denominator && this.custom?.denominator) {
-                    rows.push(`<tr style="opacity:0.6"><td style="text-align:right">Denominator:</td><td><b>${roundToPrecision(this.custom.denominator, 2).toLocaleString()}</b></td></tr>`)
-                }
-                
-                return `<table>${rows.join("")}</table>`
-            }
+            formatter: getTooltipFormatter({ xType, column, groupBy, denominator, survivalBands })
         },
         xAxis: {
             type: xType,
             crosshair: !inspection?.enabled && type.includes("line"),
-            // reversed: false,//dir === "desc",//type === "bar" || sortBy === "x:desc",
-            // reversed: col === "x" ? (type === "bar" ? true : dir === "asc") : false,
-            // reversed: type === "bar" && dir !== "desc",
             reversed: (() => {
                 // Survival time always runs left to right
                 if (isSurvival) {
@@ -1077,15 +904,13 @@ export function buildChartOptions({
             })(),
             labels: {
                 style: {
-                    // @ts-ignore
-                    fontSize: lengthToEm(options.xAxis?.labels?.style?.fontSize ?? "1em") + "em"
+                    fontSize: singleAxis(options.xAxis)?.labels?.style?.fontSize ?? "1em"
                 }
             },
             title: {
                 ...(survivalXTitle ? { text: survivalXTitle } : {}),
                 style: {
-                    // @ts-ignore
-                    fontSize: lengthToEm(options.xAxis?.title?.style?.fontSize ?? "1em") + "em"
+                    fontSize: singleAxis(options.xAxis)?.title?.style?.fontSize ?? "1em"
                 }
             },
         },
@@ -1095,7 +920,7 @@ export function buildChartOptions({
             subtitleSuggestions: logRankSentences ? [logRankSentences.short, logRankSentences.long] : []
         },
         legend: {
-            // @ts-ignore - a hack to force highcharts to reflow the legend
+            // @ts-expect-error - a hack to force highcharts to reflow the legend
             dirty: Date.now(),
             enabled: options.legend?.enabled ?? series.length <= 30,
             // Survival curves show the size of their group, e.g. "SHH (n=16)".
@@ -1160,65 +985,134 @@ export function buildChartOptions({
     }
 
     // Convert px to em in old chart annotations
-    result.annotations?.[0]?.labels?.forEach((l, i) => {
-        l.style!.fontSize   = options.chart?.style?.fontSize
+    // In inspect mode, the chart finds a clicked annotation by its label (see
+    // getInspectionMatch). Highcharts creates annotations once and doesn't
+    // apply later events or classes to them.
+    result.annotations?.[0]?.labels?.forEach(l => {
+        // Annotations use the chart's font
+        l.style!.fontSize   = "1em"
         l.style!.fontFamily = options.chart?.style?.fontFamily
         l.useHTML           = false 
-        l.className         = `annotation-index-${i}`
-    })
-    if (inspection?.enabled && result.annotations?.[0]) {
-        result.annotations[0].events = {
-            // @ts-ignore
-            click: function(e: any) {
-                onInspectionChange(["annotation"], {
-                    selectedAnnotationIndex: +(
-                        e.target.parentElement?.classList?.value?.match(/\bannotation-index-(\d+)\b/)?.[1] ||
-                        -1
-                    )
-                })
-            }
-        }
-    }
-
-    // @ts-ignore Convert px to em in old chart xAxis plotLines
-    const xAxisPlotLines = (result.xAxis?.plotLines || []) as XAxisPlotLinesOptions[];
-    xAxisPlotLines.forEach((l, i) => {
-        if (l.label?.style?.fontSize) {
-            l.label.style.fontSize = lengthToEm(l.label.style.fontSize) + "em"
-        }
-        l.id = `x-axis-plot-line-${i}`
-        if (inspection?.enabled) {
-            l.events = {
-                click: function() {
-                    onInspectionChange(["plotLine"], {
-                        selectedPlotLineId: this.id,
-                        selectedPlotLineAxis: "x"
-                    })
-                }
-            }
-        }
     })
 
-    // @ts-ignore Convert px to em in old chart yAxis plotLines
-    const yAxisPlotLines = (result.yAxis?.plotLines || []) as YAxisPlotLinesOptions[];
-    yAxisPlotLines.forEach((l, i) => {
-        if (l.label?.style?.fontSize) {
-            l.label.style.fontSize = lengthToEm(l.label.style.fontSize) + "em"
-        }
-        l.id = `y-axis-plot-line-${i}`
-        if (inspection?.enabled) {
-            l.events = {
-                click: function() {
-                    onInspectionChange(["plotLine"], {
-                        selectedPlotLineId: this.id,
-                        selectedPlotLineAxis: "y"
-                    })
-                }
-            }
-        }
-    })
+    preparePlotLines(singleAxis(result.xAxis)?.plotLines || [], "x")
+    preparePlotLines(singleAxis(result.yAxis)?.plotLines || [], "y")
 
     return result
+}
+
+/**
+ * Gives each plot line of one axis an id, which inspect mode selects it by,
+ * and the same id as a class. In inspect mode, the chart finds a clicked line
+ * by that class (see getInspectionMatch). Highcharts click events would not
+ * do, because Highcharts binds them only when it first draws a line, and a
+ * line drawn outside inspect mode never gets them.
+ */
+function preparePlotLines(
+    plotLines: (Highcharts.XAxisPlotLinesOptions | Highcharts.YAxisPlotLinesOptions)[],
+    axis: "x" | "y"
+) {
+    plotLines.forEach((l, i) => {
+        const id = `${axis}-axis-plot-line-${i}`
+        l.id = id
+        l.className = id
+    })
+}
+
+/**
+ * The tooltip of a point: a table with its series, its X value, its count (or
+ * survival estimate) and, when available, its range and denominator
+ */
+function getTooltipFormatter({
+    xType,
+    column,
+    groupBy,
+    denominator,
+    survivalBands
+}: {
+    xType         : "category" | "linear" | "datetime"
+    column        : app.SubscriptionDataColumn
+    groupBy      ?: app.SubscriptionDataColumn
+    denominator  ?: app.DenominatorType
+    survivalBands?: boolean
+}): Highcharts.TooltipFormatterCallbackFunction
+{
+    return function(ctx): any {
+        const rows = [];
+
+        // Category and datetime points carry the formatted value as their name
+        const x = xType === "linear" ? this.x : this.name
+
+        // Bullet ------------------------------------------------------
+        rows.push(`<tr><td colspan="2"><b style="color:${
+            (this.color as Highcharts.PatternObject)?.pattern?.color ||
+            (this.series?.color as Highcharts.GradientColorObject)?.stops?.[0]?.[1] ||
+            this.color ||
+            ctx.chart.options.colors?.[this.series.index % ctx.chart.options.colors.length] || "#888888"
+        };-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
+        
+        // Header ------------------------------------------------------
+        if (groupBy) {
+            rows.push(`<b>${groupBy.label || groupBy.name}: ${this.series.name}</b><hr/></td></tr>`)
+        } else {
+            rows.push(`<b>${this.series.name}: ${this.custom?.survival ? "Survival" : "Count"}</b><hr/></td></tr>`)
+        }
+
+        // Group -------------------------------------------------------
+        rows.push(`<tr><td style="text-align:right">${column.label || column.name}:</td><td style="width: 100%"><b>${x}</b></td></tr>`)
+
+        // Value -------------------------------------------------------
+        // Survival ----------------------------------------------------
+        const survival = this.custom?.survival
+        if (survival) {
+            rows.push(
+                `<tr><td style="text-align:right">Survival:</td><td style="width: 100%"><b>${Math.round(this.y!)}%</b></td></tr>`,
+                `<tr style="opacity:0.6"><td style="text-align:right">At risk:</td><td><b>${roundToPrecision(survival.atRisk, 3).toLocaleString()}</b></td></tr>`,
+                `<tr style="opacity:0.6"><td style="text-align:right">Events:</td><td><b>${roundToPrecision(survival.events, 3).toLocaleString()}</b></td></tr>`,
+                `<tr style="opacity:0.6"><td style="text-align:right">No event:</td><td><b>${roundToPrecision(survival.censored, 3).toLocaleString()}</b></td></tr>`
+            )
+            if (survivalBands && survival.ciLow !== null) {
+                rows.splice(rows.length - 3, 0,
+                    `<tr style="opacity:0.6"><td style="text-align:right">95% CI:</td><td><b>${Math.round(survival.ciLow * 100)}% – ${Math.round(survival.ciHigh * 100)}%</b></td></tr>`
+                )
+            }
+        }
+
+        else if (!this.custom?.isErrorRange) {
+            rows.push(
+                `<tr><td style="text-align:right">Count:</td>`,
+                `<td style="width: 100%"><b>${
+                    denominator ?
+                        roundToPrecision(this.custom?.data?.cnt, 3).toLocaleString() + " (" + roundToPrecision(this.y!, 3) + "%)" :
+                        roundToPrecision(this.y!, 3).toLocaleString()
+                }</b></td></tr>`
+            )
+        }
+
+        // Range -------------------------------------------------------
+        const { data: { low, high, lowPct, highPct } = {}, denominator: d } = this.custom || {}
+
+        if (high !== undefined && low !== undefined) {
+            if (denominator && d) {
+                rows.push(
+                    `<tr style="opacity:0.6"><td style="text-align:right">Range:</td>` +
+                    `<td style="width: 100%"><b>${roundToPrecision(lowPct, 2) + "%"} - ${roundToPrecision(highPct, 2) + "%"}</b></td></tr>`
+                )
+            } else {
+                rows.push(
+                    `<tr style="opacity:0.6"><td style="text-align:right">Range:</td>` +
+                    `<td style="width: 100%"><b>${roundToPrecision(low, 2).toLocaleString()} - ${roundToPrecision(high, 2).toLocaleString()}</b></td></tr>`
+                )
+            }
+        }
+
+        // Denominator -------------------------------------------------
+        if (denominator && this.custom?.denominator) {
+            rows.push(`<tr style="opacity:0.6"><td style="text-align:right">Denominator:</td><td><b>${roundToPrecision(this.custom.denominator, 2).toLocaleString()}</b></td></tr>`)
+        }
+        
+        return `<table>${rows.join("")}</table>`
+    }
 }
 
 /**

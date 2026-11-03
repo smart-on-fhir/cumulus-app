@@ -1,8 +1,8 @@
-import moment         from "moment"
-import { classList }  from "../../utils"
-import ColumnSelector from "./ColumnSelector"
-import { operators }  from "./config"
-import { app }        from "../../types"
+import moment                            from "moment"
+import { classList }                     from "../../utils"
+import ColumnSelector                    from "./ColumnSelector"
+import { NO_VALUE_OPERATORS, operators } from "./config"
+import { app }                           from "../../types"
 import TypeAhead from "../generic/TypeAhead"
 
 
@@ -36,12 +36,10 @@ function Filter({
     const leftColumn   = filter.left ? cols.find(c => c.name === filter.left) : null;
     const leftDataType = leftColumn ? leftColumn.dataType : "";
 
-    const noRightOps = ["isTrue", "isFalse", "isNone", "isNotTrue", "isNotFalse", "isNotNone"];
-
     const types = operators.find(o => o.id === filter.operator)?.type || [];
 
     let rightType = "none"
-    if (filter.left && filter.operator && !noRightOps.includes(filter.operator)) {
+    if (filter.left && filter.operator && !NO_VALUE_OPERATORS.includes(filter.operator)) {
         rightType = types.includes("integer") ?
             "integer" :
             types.includes("float") ?

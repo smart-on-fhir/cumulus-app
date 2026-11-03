@@ -196,3 +196,6 @@ export const operators: FilterConfig[] = [
     { id: "isNone"            , label: "IS NONE"                   , type: ["*"] },
     { id: "isNotNone"         , label: "IS NOT NONE"               , type: ["*"] },
 ];
+
+/** The filter operators that take no value */
+export const NO_VALUE_OPERATORS = ["isTrue", "isFalse", "isNotTrue", "isNotFalse", "isNone", "isNotNone"]

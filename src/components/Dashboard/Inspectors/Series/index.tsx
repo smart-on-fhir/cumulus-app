@@ -83,10 +83,8 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
             name: "Color by Point",
             type: "boolean",
             description: "Automatically assign a color from the current color theme to every data point.",
-            // @ts-ignore
-            value: !!series.colorByPoint,
+            value: "colorByPoint" in series && !!series.colorByPoint,
             disabled: isBool(),
-            // @ts-ignore
             onChange: (colorByPoint: boolean) => {
                 onSeriesChange({ colorByPoint })
                 if (colorByPoint) {
@@ -133,14 +131,12 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
         }
     ] as any[]
 
-    // @ts-ignore
     if (seriesType !== "pie") {
         props.unshift({
             name: "Color",
             type: "color",
             value: color,
-            // @ts-ignore
-            disabled: !!series.colorByPoint || isBool(),
+            disabled: ("colorByPoint" in series && !!series.colorByPoint) || isBool(),
             onChange: (color: string) => {
                 // Confidence bands take their curve's color, unless they have
                 // their own (an empty one follows the curve again)

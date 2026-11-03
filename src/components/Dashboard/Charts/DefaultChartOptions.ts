@@ -139,7 +139,7 @@ const DefaultChartOptions: Options = {
         useHTML: true,
         maxHeight: 200,
         itemStyle: {
-            fontSize   : "16px"
+            fontSize   : "1em"
         },
         // margin: 0,
         // padding: 0
@@ -162,7 +162,6 @@ const DefaultChartOptions: Options = {
         gridLineWidth: 0.5,
         gridLineColor: "#DDDDDD",
         tickColor: "#DDDDDD",
-        // @ts-ignore
         tickLength: 10,
         tickWidth: 0,
         gridZIndex: 0,
@@ -189,7 +188,7 @@ const DefaultChartOptions: Options = {
     plotOptions: {
         series: {
             borderColor     : "rgba(0, 0, 0, 0.5)",
-            // @ts-ignore
+            // @ts-expect-error - not in the Highcharts types
             edgeColor       : "rgba(0, 0, 0, 0.5)",
             borderWidth     : 0.25,
             edgeWidth       : 0.25,
@@ -275,7 +274,7 @@ const DefaultChartOptions: Options = {
             lineWidth: 2,
             states: {
                 normal: {
-                    // @ts-ignore
+                    // @ts-expect-error - not in the Highcharts types
                     lineWidth: 2,
                 },
                 hover: {

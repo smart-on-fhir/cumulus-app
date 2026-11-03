@@ -177,7 +177,6 @@ export function withRiskTable(options: Highcharts.Options): Highcharts.Options
                             })
                         }
                     })
-                    // @ts-ignore
                     options.chart?.events?.render?.call(this, e)
                 }
             }

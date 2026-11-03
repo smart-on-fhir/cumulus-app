@@ -9,7 +9,7 @@ import { app }               from "../../../types"
 interface ChartProps {
     options : Highcharts.Options
     loading?: boolean
-    contextMenuItems?: (MenuItemConfig | string)[]
+    contextMenuItems?: (MenuItemConfig | "-")[]
     visualOverrides: app.VisualOverridesState
     onInspectionChange?: (result: string[], ctx: Partial<app.InspectionContext>) => void
     isDraft?: boolean
@@ -46,6 +46,36 @@ export function removeStaleShadows(chart: Highcharts.Chart) {
             series.graph?.shadow(false)
         }
     })
+}
+
+/**
+ * The annotation labels of a rendered chart, in the order of the annotation
+ * options. Highcharts does not declare them.
+ */
+interface ChartWithAnnotations {
+    annotations?: { labels?: { graphic?: { element: Element } }[] }[]
+}
+
+/**
+ * What a click in inspect mode selects:
+ * - a plot line, by the id in its class (see preparePlotLines in lib.ts)
+ * - an annotation, by the index of its label in the chart
+ * - or the first inspector whose selector matches the clicked element
+ */
+export function getInspectionMatch(element: Element, chart?: ChartWithAnnotations | null): [string, Partial<app.InspectionContext>] | null {
+    const plotLine = element.matches(".highcharts-plot-line") ?
+        element.getAttribute("class")?.match(/\b([xy])-axis-plot-line-\d+\b/) :
+        null
+    if (plotLine) {
+        return ["plotLine", { selectedPlotLineId: plotLine[0], selectedPlotLineAxis: plotLine[1] as "x" | "y" }]
+    }
+    const label = element.closest(".highcharts-annotation-label")
+    if (label) {
+        const index = chart?.annotations?.[0]?.labels?.findIndex(l => l.graphic?.element === label) ?? -1
+        return ["annotation", { selectedAnnotationIndex: index }]
+    }
+    const tag = Object.entries(INSPECTORS).find(([, selector]) => element.matches(selector))?.[0]
+    return tag ? [tag, {}] : null
 }
 
 export function Chart(props: ChartProps) {
@@ -145,12 +175,9 @@ export function Chart(props: ChartProps) {
 
     const onMouseDown = useCallback((e: MouseEvent) => {
         if (containerRef.current && onInspectionChange) {
-            let element = e.target as SVGElement | HTMLElement | null
-            if (element) {
-                let tag = Object.entries(INSPECTORS).find(([, selector]) => element!.matches(selector))?.[0]
-                if (tag) {
-                    onInspectionChange([tag], {})
-                }
+            const match = e.target instanceof Element ? getInspectionMatch(e.target, chartRef.current as ChartWithAnnotations | null) : null
+            if (match) {
+                onInspectionChange([match[0]], match[1])
             }
         }
         containerRef.current.focus({ preventScroll: true })
@@ -170,17 +197,14 @@ export function Chart(props: ChartProps) {
             style={ overrideEnabled ?  { filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)` } : undefined }
             onContextMenu={e => {
 
-                // @ts-ignore
                 let menuItems = [...(e.nativeEvent?.menuItems || [])];
 
                 if (contextMenuItems) {
                     menuItems = menuItems.concat(contextMenuItems)
                 }
 
-                // @ts-ignore
                 e.nativeEvent.menuItems = menuItems
 
-                // @ts-ignore
                 e.nativeEvent.context = { ...e.nativeEvent.context, chart: chartRef.current }
             }}
         />

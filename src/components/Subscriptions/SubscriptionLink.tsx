@@ -75,7 +75,6 @@ export default function SubscriptionLink({
             className="icon-item"
             aria-disabled={ !!request.dataURL && status !== "connected" }
             onContextMenu={e => {
-                // @ts-ignore
                 e.nativeEvent.menuItems = [toggleFavorite]
             }}>
             <div className="icon">
