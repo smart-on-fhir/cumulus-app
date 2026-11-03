@@ -27,6 +27,16 @@ describe("getInspectionMatch", () => {
             .toEqual(["plotLine", { selectedPlotLineId: "y-axis-plot-line-0", selectedPlotLineAxis: "y" }])
     })
 
+    it ("finds an annotation by the index of its label in the chart", () => {
+        const div = document.createElement("div")
+        div.innerHTML = '<svg><g class="highcharts-annotation-label"><text>a</text></g><g class="highcharts-annotation-label"><text>b</text></g></svg>'
+        const [a, b] = div.querySelectorAll("g")
+        const chart = { annotations: [{ labels: [{ graphic: { element: a } }, { graphic: { element: b } }] }] }
+        expect(getInspectionMatch(b.querySelector("text")!, chart)).toEqual(["annotation", { selectedAnnotationIndex: 1 }])
+        expect(getInspectionMatch(a, chart)).toEqual(["annotation", { selectedAnnotationIndex: 0 }])
+        expect(getInspectionMatch(a)).toEqual(["annotation", { selectedAnnotationIndex: -1 }])
+    })
+
     it ("matches other elements by the inspector selectors", () => {
         expect(getInspectionMatch(svg('<text class="highcharts-title"/>', "text"))).toEqual(["title", {}])
         expect(getInspectionMatch(svg('<g class="highcharts-plot-line-label"><text/></g>', "text"))).toEqual(["plotLineLabel", {}])

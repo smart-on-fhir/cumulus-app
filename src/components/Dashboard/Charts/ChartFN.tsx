@@ -49,16 +49,30 @@ export function removeStaleShadows(chart: Highcharts.Chart) {
 }
 
 /**
- * What a click in inspect mode selects: a plot line, by the id in its class
- * (see preparePlotLines in lib.ts), or the first inspector whose selector
- * matches the clicked element
+ * The annotation labels of a rendered chart, in the order of the annotation
+ * options. Highcharts does not declare them.
  */
-export function getInspectionMatch(element: Element): [string, Partial<app.InspectionContext>] | null {
+interface ChartWithAnnotations {
+    annotations?: { labels?: { graphic?: { element: Element } }[] }[]
+}
+
+/**
+ * What a click in inspect mode selects:
+ * - a plot line, by the id in its class (see preparePlotLines in lib.ts)
+ * - an annotation, by the index of its label in the chart
+ * - or the first inspector whose selector matches the clicked element
+ */
+export function getInspectionMatch(element: Element, chart?: ChartWithAnnotations | null): [string, Partial<app.InspectionContext>] | null {
     const plotLine = element.matches(".highcharts-plot-line") ?
         element.getAttribute("class")?.match(/\b([xy])-axis-plot-line-\d+\b/) :
         null
     if (plotLine) {
         return ["plotLine", { selectedPlotLineId: plotLine[0], selectedPlotLineAxis: plotLine[1] as "x" | "y" }]
+    }
+    const label = element.closest(".highcharts-annotation-label")
+    if (label) {
+        const index = chart?.annotations?.[0]?.labels?.findIndex(l => l.graphic?.element === label) ?? -1
+        return ["annotation", { selectedAnnotationIndex: index }]
     }
     const tag = Object.entries(INSPECTORS).find(([, selector]) => element.matches(selector))?.[0]
     return tag ? [tag, {}] : null
@@ -161,7 +175,7 @@ export function Chart(props: ChartProps) {
 
     const onMouseDown = useCallback((e: MouseEvent) => {
         if (containerRef.current && onInspectionChange) {
-            const match = e.target instanceof Element ? getInspectionMatch(e.target) : null
+            const match = e.target instanceof Element ? getInspectionMatch(e.target, chartRef.current as ChartWithAnnotations | null) : null
             if (match) {
                 onInspectionChange([match[0]], match[1])
             }

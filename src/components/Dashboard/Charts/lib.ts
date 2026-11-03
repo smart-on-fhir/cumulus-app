@@ -975,24 +975,14 @@ export function buildChartOptions({
     }
 
     // Convert px to em in old chart annotations
-    result.annotations?.[0]?.labels?.forEach((l, i) => {
+    // In inspect mode, the chart finds a clicked annotation by its label (see
+    // getInspectionMatch). Highcharts creates annotations once and doesn't
+    // apply later events or classes to them.
+    result.annotations?.[0]?.labels?.forEach(l => {
         l.style!.fontSize   = options.chart?.style?.fontSize
         l.style!.fontFamily = options.chart?.style?.fontFamily
         l.useHTML           = false 
-        l.className         = `annotation-index-${i}`
     })
-    if (inspection?.enabled && result.annotations?.[0]) {
-        result.annotations[0].events = {
-            click: function(e: any) {
-                onInspectionChange(["annotation"], {
-                    selectedAnnotationIndex: +(
-                        e.target.parentElement?.classList?.value?.match(/\bannotation-index-(\d+)\b/)?.[1] ||
-                        -1
-                    )
-                })
-            }
-        }
-    }
 
     preparePlotLines(singleAxis(result.xAxis)?.plotLines || [], "x")
     preparePlotLines(singleAxis(result.yAxis)?.plotLines || [], "y")
