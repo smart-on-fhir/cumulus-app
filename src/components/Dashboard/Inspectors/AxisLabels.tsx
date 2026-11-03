@@ -53,7 +53,6 @@ export function getOptions(axis: XAxisOptions | YAxisOptions, onChange: (a: Part
                 "opacity",
                 "fontStyle",
                 "textDecoration",
-                // @ts-ignore
                 "textOutline"
             ])
         }

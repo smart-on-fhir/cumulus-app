@@ -1,7 +1,8 @@
-import { getViewReducer, ViewState } from "."
-import { SURVIVAL_Y_TITLE }          from "./Charts/lib"
-import { SURVIVAL_CAPTION }          from "./Charts/Survival"
-import { app }                       from "../../types"
+import type { SeriesLineOptions, YAxisOptions } from "highcharts"
+import { getViewReducer, ViewState }             from "."
+import { SURVIVAL_Y_TITLE }                      from "./Charts/lib"
+import { SURVIVAL_CAPTION }                      from "./Charts/Survival"
+import { app }                                   from "../../types"
 
 
 // These tests pin down the current behavior of the Dashboard reducer, so that
@@ -147,8 +148,7 @@ describe("Dashboard reducer without data", () => {
             })
             const next = reducer(state, { type: "SET_CHART_TYPE", payload: "line" })
             expect(next.caption).toBe("")
-            // @ts-ignore yAxis is a single object here
-            expect(next.chartOptions.yAxis.title.text).toBe("")
+            expect((next.chartOptions.yAxis as YAxisOptions).title!.text).toBe("")
         })
 
         it ("keeps a custom caption", () => {
@@ -175,8 +175,7 @@ describe("Dashboard reducer with data", () => {
     }
 
     function getPoints(state: ViewState) {
-        // @ts-ignore
-        return state.chartOptions.series![0].data.map((p: any) => [p.name, p.y])
+        return (state.chartOptions.series![0] as SeriesLineOptions).data!.map((p: any) => [p.name, p.y])
     }
 
     it ("loading the data builds the chart", () => {
@@ -243,11 +242,9 @@ describe("Dashboard reducer with data", () => {
         // settings without chartOptions (see ConfigPanel.test.tsx)
         it ("keeps chart options that were changed in place", () => {
             const state = getStateWithData()
-            // @ts-ignore
             state.chartOptions.series![0].opacity = 0.5
             state.chartOptions.colors![0] = "#ff0000"
             const next = reducer(state, { type: "UPDATE", payload: { viewName: "New Name" } })
-            // @ts-ignore
             expect(next.chartOptions.series![0].opacity).toBe(0.5)
             expect(next.chartOptions.colors![0]).toBe("#ff0000")
         })

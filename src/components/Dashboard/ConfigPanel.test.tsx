@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import type { SeriesPieOptions } from "highcharts"
 import ConfigPanel, { getChartTypes } from "./ConfigPanel"
 
 
@@ -354,7 +355,6 @@ describe("editors that change the chart options in place", () => {
     const advanced    = await expand("Advanced", sliceEditor)
     fireEvent.change(getPropertyInput(advanced, "Opacity"), { target: { value: "0.5" } })
     expect(onChange).toHaveBeenCalledTimes(1)
-    // @ts-ignore
     expect(state.chartOptions.series![0].opacity).toBe(0.5)
     expect(onChange.mock.calls[0][0].chartOptions.series).toBe(state.chartOptions.series)
   })
@@ -376,8 +376,7 @@ describe("editors that change the chart options in place", () => {
     await userEvent.click(screen.getByText("Chart"))
     fireEvent.change(screen.getByLabelText("Start Angle"), { target: { value: "90" } })
     expect(onChartOptionsChange).toHaveBeenCalledWith(state.chartOptions)
-    // @ts-ignore
-    expect(state.chartOptions.series![0].startAngle).toBe(90)
+    expect((state.chartOptions.series![0] as SeriesPieOptions).startAngle).toBe(90)
   })
 
   it("AllSeriesEditor changes every series in place and sends the options", async () => {
@@ -393,7 +392,6 @@ describe("editors that change the chart options in place", () => {
     fireEvent.change(getPropertyInput(override, "Opacity"), { target: { value: "0.5" } })
     expect(onChartOptionsChange).toHaveBeenCalledTimes(1)
     expect(onChartOptionsChange.mock.calls[0][0].series).toBe(series)
-    // @ts-ignore
     expect(series.map(s => s.opacity)).toEqual([0.5, 0.5])
   })
 

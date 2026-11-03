@@ -9,7 +9,7 @@ import { app }               from "../../../types"
 interface ChartProps {
     options : Highcharts.Options
     loading?: boolean
-    contextMenuItems?: (MenuItemConfig | string)[]
+    contextMenuItems?: (MenuItemConfig | "-")[]
     visualOverrides: app.VisualOverridesState
     onInspectionChange?: (result: string[], ctx: Partial<app.InspectionContext>) => void
     isDraft?: boolean
@@ -197,17 +197,14 @@ export function Chart(props: ChartProps) {
             style={ overrideEnabled ?  { filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)` } : undefined }
             onContextMenu={e => {
 
-                // @ts-ignore
                 let menuItems = [...(e.nativeEvent?.menuItems || [])];
 
                 if (contextMenuItems) {
                     menuItems = menuItems.concat(contextMenuItems)
                 }
 
-                // @ts-ignore
                 e.nativeEvent.menuItems = menuItems
 
-                // @ts-ignore
                 e.nativeEvent.context = { ...e.nativeEvent.context, chart: chartRef.current }
             }}
         />

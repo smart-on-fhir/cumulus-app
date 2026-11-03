@@ -23,6 +23,7 @@ import {
     DashStyleValue,
     merge,
     Options,
+    PointOptionsObject,
     SeriesOptionsType,
     SeriesPieOptions,
     XAxisOptions,
@@ -780,8 +781,7 @@ function ChartSection({
                         min={0}
                         max={360}
                         step={1}
-                        // @ts-ignore
-                        value={ chartOptions.series?.[0]?.startAngle || 0 }
+                        value={ (chartOptions.series?.[0] as SeriesPieOptions | undefined)?.startAngle || 0 }
                         onChange={e => {
                             chartOptions.series![0] = merge(chartOptions.series?.[0], { startAngle: e.target.valueAsNumber })
                             onChartOptionsChange(chartOptions)
@@ -1207,13 +1207,12 @@ function SliceEditor({
     state: ChartConfigPanelState,
     onChange: (state: ChartConfigPanelState) => void
 }) {
-    const S = state.chartOptions.series?.[0] || {} as SeriesPieOptions
+    const S = (state.chartOptions.series?.[0] || {}) as SeriesPieOptions
 
     const colors = state.chartOptions.colors!
 
-    // @ts-ignore
     const props = (S.data || []).map((point, i) => ({
-        name: String(point.name ?? "") || "Series " + (i + 1),
+        name: String((point as PointOptionsObject).name ?? "") || "Series " + (i + 1),
         type: "color",
         value: colors[i % colors.length],
         onChange: (color: string) => {

@@ -55,7 +55,6 @@ export default function CopyView()
 
     view.name = view.name!.replace(/(\s*\(copy\)\s*)?$/, " (copy)")
     
-    // @ts-ignore
     delete view.id
     view.creatorId = user!.id // change ownership
     view.isDraft = true // Start as draft

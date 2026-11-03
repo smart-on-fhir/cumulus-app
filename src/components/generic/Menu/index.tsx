@@ -16,6 +16,16 @@ export interface MenuItemConfig {
     description ?: string
 }
 
+declare global {
+    // The menu is built by the contextmenu handlers along the way, which add
+    // their items to the native event
+    interface MouseEvent {
+        menuItems   ?: (MenuItemConfig | Command | "-")[]
+        context     ?: Record<string, any>
+        customTarget?: Element
+    }
+}
+
 export class ContextMenu extends React.Component
 {
     target: any = null
@@ -135,8 +145,7 @@ export class ContextMenu extends React.Component
         document.addEventListener("mousedown", this.hideMenu, { capture: true })
 
         document.addEventListener("contextmenu", e => {
-            // @ts-ignore
-            const menuItems: (MenuItemConfig | "-")[] = e.menuItems;
+            const menuItems = e.menuItems;
 
             if (!Array.isArray(menuItems) || !menuItems.length) {
                 return true
@@ -146,7 +155,6 @@ export class ContextMenu extends React.Component
 
             if (this.target) this.target.classList?.remove("focus")
 
-            // @ts-ignore
             this.target = e.customTarget || null
 
             if (this.target) this.target.classList?.add("focus")

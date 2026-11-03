@@ -229,7 +229,6 @@ export function getViewReducer({
                 "offset"
             ];
 
-            // @ts-ignore
             if (nextState.data && Object.keys(action.payload).some(key => chartable.includes(key) && action.payload[key] !== state[key])) {
                 const options = getDefaultChartOptions(
                     nextState.chartType,
@@ -343,8 +342,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         dataTabIndex: 0,
 
         tags: (view.Tags || []).map(tag => {
-            // @ts-ignore
-            if (copy) delete tag.ViewsTags
+            if (copy) delete (tag as { ViewsTags?: unknown }).ViewsTags
             return tag
         }),
 
@@ -439,8 +437,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             column : viewColumnName,
             filters,
             viewType: chartType,
-            // @ts-ignore
-            chartOptions: strip(state.chartOptions, ReadOnlyPaths),
+            chartOptions: strip(state.chartOptions, ReadOnlyPaths) as Partial<Highcharts.Options>,
             denominator,
             column2: secColumnName,
             column2type,
@@ -805,9 +802,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                                 {
                                     label: "Annotate Selected Points ...",
                                     icon: <i className="fa-regular fa-comment"/>,
-                                    // @ts-ignore
                                     enabled: e => e.context?.chart.getSelectedPoints().length > 0,
-                                    // @ts-ignore
                                     execute: e => annotatePoints(e.context?.chart),
                                     available: !chartType.startsWith("pie") && !chartType.startsWith("donut")
                                 },

@@ -922,7 +922,7 @@ export function buildChartOptions({
             subtitleSuggestions: logRankSentences ? [logRankSentences.short, logRankSentences.long] : []
         },
         legend: {
-            // @ts-ignore - a hack to force highcharts to reflow the legend
+            // @ts-expect-error - a hack to force highcharts to reflow the legend
             dirty: Date.now(),
             enabled: options.legend?.enabled ?? series.length <= 30,
             // Survival curves show the size of their group, e.g. "SHH (n=16)".
@@ -1047,8 +1047,9 @@ function getTooltipFormatter({
 
         // Bullet ------------------------------------------------------
         rows.push(`<tr><td colspan="2"><b style="color:${
-            // @ts-ignore
-            this.color?.pattern?.color || this.series?.color?.stops?.[0]?.[1] || this.color ||
+            (this.color as Highcharts.PatternObject)?.pattern?.color ||
+            (this.series?.color as Highcharts.GradientColorObject)?.stops?.[0]?.[1] ||
+            this.color ||
             ctx.chart.options.colors?.[this.series.index % ctx.chart.options.colors.length] || "#888888"
         };-webkit-text-stroke:0.5px rgba(0, 0, 0, 0.5);">◉</b> `)
         

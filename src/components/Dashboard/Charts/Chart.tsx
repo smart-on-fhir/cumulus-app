@@ -10,7 +10,7 @@ import { app }               from "../../../types"
 interface ChartProps {
     options : Highcharts.Options
     loading?: boolean
-    contextMenuItems?: (MenuItemConfig | string)[]
+    contextMenuItems?: (MenuItemConfig | "-")[]
     visualOverrides: app.VisualOverridesState
     onInspectionChange?: (result: string[], ctx: Partial<app.InspectionContext>) => void
     isDraft?: boolean
@@ -98,17 +98,14 @@ export default class Chart extends React.Component<ChartProps>
             { isDraft && <div className="draft-label">DRAFT</div> }
             <div id="chart" className={ "main-chart" + (onInspectionChange ? " inspecting" : "") } tabIndex={0} onContextMenu={e => {
 
-                // @ts-ignore
                 let menuItems = [...(e.nativeEvent?.menuItems || [])];
 
                 if (this.props.contextMenuItems) {
                     menuItems = menuItems.concat(this.props.contextMenuItems)
                 }
 
-                // @ts-ignore
                 e.nativeEvent.menuItems = menuItems
 
-                // @ts-ignore
                 e.nativeEvent.context = { ...e.nativeEvent.context, chart: this.chart }
             }}/>
             <div className="chart-loader"><Loader/></div>
