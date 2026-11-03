@@ -244,41 +244,18 @@ export function getViewReducer({
     }
 }
 
-export interface DashboardProps {
-    /**
-     * The view object that we are editing. If this is an empty object
-     * or a partial which does not have an `id` property, then the
-     * dashboard is in "create mode"
-     */
-    view: Partial<app.View>
-
-    /**
-     * The subscription that this view is (or is going to be)
-     * assigned to.
-     */
-    subscription?: app.Subscription
-
-    dataPackage?: DataPackage
-    
+/**
+ * The state of a Dashboard when it opens the given view, before its data loads
+ */
+export function getInitialViewState({ view, cols, copy }: {
+    view : Partial<app.View>
+    cols : app.SubscriptionDataColumn[]
     copy?: boolean
-}
-
-export default function Dashboard({ view, subscription, dataPackage, copy }: DashboardProps) {
-    const navigate  = useNavigate();
-    const auth      = useAuth();
-    const isOwner   = auth.user && view.creatorId === auth.user.id;
-    const canUpdate = isOwner || requestPermission({ user: auth.user, resource: "Graphs", resource_id: view.id, action: "update" })
-    const canCreate = requestPermission({ user: auth.user, resource: "Graphs", action: "create" })
-
-    assert(subscription || dataPackage, "Either subscription or dataPackage prop must be provided");
-
-    const metadata = subscription ? subscription.metadata! : aggregator.getPackageMetadata(dataPackage!)
-
-    const cols = metadata.cols;
-
+}): ViewState
+{
     const viewSettings = view.settings || {} as Partial<app.ViewSettings>
 
-    const [ state, dispatch ] = useReducer(getViewReducer({ onSeriesToggle, onInspectionChange }), {
+    return {
         
         // Chart or grid view? start with chart
         viewType: "overview",
@@ -379,7 +356,45 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
 
         pendingSaveProps: null
 
-    } as ViewState);
+    } as ViewState
+}
+
+export interface DashboardProps {
+    /**
+     * The view object that we are editing. If this is an empty object
+     * or a partial which does not have an `id` property, then the
+     * dashboard is in "create mode"
+     */
+    view: Partial<app.View>
+
+    /**
+     * The subscription that this view is (or is going to be)
+     * assigned to.
+     */
+    subscription?: app.Subscription
+
+    dataPackage?: DataPackage
+    
+    copy?: boolean
+}
+
+export default function Dashboard({ view, subscription, dataPackage, copy }: DashboardProps) {
+    const navigate  = useNavigate();
+    const auth      = useAuth();
+    const isOwner   = auth.user && view.creatorId === auth.user.id;
+    const canUpdate = isOwner || requestPermission({ user: auth.user, resource: "Graphs", resource_id: view.id, action: "update" })
+    const canCreate = requestPermission({ user: auth.user, resource: "Graphs", action: "create" })
+
+    assert(subscription || dataPackage, "Either subscription or dataPackage prop must be provided");
+
+    const metadata = subscription ? subscription.metadata! : aggregator.getPackageMetadata(dataPackage!)
+
+    const cols = metadata.cols;
+
+    const [ state, dispatch ] = useReducer(
+        getViewReducer({ onSeriesToggle, onInspectionChange }),
+        getInitialViewState({ view, cols, copy })
+    );
 
     const {
         viewType,
