@@ -1042,14 +1042,8 @@ function getTooltipFormatter({
     return function(ctx): any {
         const rows = [];
 
-        let x: any
-        if (xType === "datetime") {
-            x = this.name//moment(this.point.x).format("YYYY-MM-DD")
-        } else if (xType === "linear") {
-            x = this.x
-        } else {
-            x = this.name
-        }
+        // Category and datetime points carry the formatted value as their name
+        const x = xType === "linear" ? this.x : this.name
 
         // Bullet ------------------------------------------------------
         rows.push(`<tr><td colspan="2"><b style="color:${
