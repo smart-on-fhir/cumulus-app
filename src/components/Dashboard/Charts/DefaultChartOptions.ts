@@ -131,6 +131,7 @@ const DefaultChartOptions: Options = {
     title: {
         text: "",
         style: {
+            fontSize: "2em",
             fontWeight: "bold"
         },
     },
@@ -151,6 +152,7 @@ const DefaultChartOptions: Options = {
             skew3d: true,
             margin: 15,
             style: {
+                fontSize: "1.2em",
                 fontWeight: "bold"
             }
         },
@@ -171,7 +173,10 @@ const DefaultChartOptions: Options = {
         // ceiling: denominator ? 100 : undefined,
         labels: {
             enabled: true,
-            format: "{text}"
+            format: "{text}",
+            style: {
+                fontSize: "1em"
+            }
         },
         lineWidth: 0,
         lineColor: "#999999",
@@ -356,6 +361,9 @@ const DefaultChartOptions: Options = {
             padding: 2,
             autoRotation: [-45, -90],
             // staggerLines: 0,
+            style: {
+                fontSize: "1em"
+            },
 
             // style: {
             //     textOverflow: "ellipsis",
@@ -375,6 +383,7 @@ const DefaultChartOptions: Options = {
             skew3d: true,
             margin: 15,
             style: {
+                fontSize: "1em",
                 fontWeight: "bold"
             }
         },

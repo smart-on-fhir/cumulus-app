@@ -13,6 +13,7 @@ import {
     pct,
 } from "./lib"
 import { CUMULUS__NONE, DEFAULT_FONT_SIZE, ReadOnlyPaths } from "../config"
+import { getDefaultChartOptions } from "./DefaultChartOptions"
 import { roundToPrecision, strip } from "../../../utils"
 import type { app } from "../../../types"
 
@@ -518,7 +519,8 @@ describe("Chart", () => {
         it ("passes em sizes through the chart unchanged", () => {
             const options: any = buildChartOptions({
                 type: "line",
-                options: fontSizesToEm(old()),
+                // As in the Dashboard, which also supplies the default sizes
+                options: getDefaultChartOptions("line", fontSizesToEm(old())),
                 data: { column: "t", filters: [], totalCount: 1, rowCount: 1, data: [{ rows: [["0", 1]] }] },
                 data2: null,
                 column: { name: "t", label: "T", dataType: "string", description: "" },

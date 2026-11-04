@@ -843,28 +843,15 @@ export function buildChartOptions({
         },
         ...logRankSubtitle,
         colors: computeColors(type, series, options),
-        title: {
-            style: {
-                fontSize: (options.title?.style as Highcharts.CSSObject | undefined)?.fontSize ?? "2em"
-            }
-        },
         yAxis: {
             allowDecimals: isPercent,
             // Survival is always shown on a full 0-100% axis
             softMin: isSurvival && survivalData ? 0   : undefined,
             softMax: isSurvival && survivalData ? 100 : undefined,
             labels: {
-                format: isPercent ? "{text}%" : "{text}",
-                style: {
-                    fontSize: singleAxis(options.yAxis)?.labels?.style?.fontSize ?? "1em"
-                }
+                format: isPercent ? "{text}%" : "{text}"
             },
-            title: {
-                ...(survivalYTitle ? { text: survivalYTitle } : {}),
-                style: {
-                    fontSize: singleAxis(options.yAxis)?.title?.style?.fontSize ?? "1.2em"
-                }
-            }
+            title: survivalYTitle ? { text: survivalYTitle } : {}
         },
         plotOptions: {
             series: {
@@ -925,17 +912,7 @@ export function buildChartOptions({
                 // axis by default to put the first value at the top
                 return type === "bar" ? !reverse : reverse
             })(),
-            labels: {
-                style: {
-                    fontSize: singleAxis(options.xAxis)?.labels?.style?.fontSize ?? "1em"
-                }
-            },
-            title: {
-                ...(survivalXTitle ? { text: survivalXTitle } : {}),
-                style: {
-                    fontSize: singleAxis(options.xAxis)?.title?.style?.fontSize ?? "1em"
-                }
-            },
+            title: survivalXTitle ? { text: survivalXTitle } : {},
         },
         custom: {
             isSurvival: !!isSurvival,
