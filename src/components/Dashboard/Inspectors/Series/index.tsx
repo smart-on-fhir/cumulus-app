@@ -78,20 +78,11 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
         })
     }
 
+    // Only columns and bars can have their own colors (see buildChartOptions).
+    // Highcharts would draw a line or an area of such series in gray.
+    const colorByPoint = (seriesType === "column" || seriesType === "bar") && "colorByPoint" in series && !!series.colorByPoint
+
     const props = [
-        {
-            name: "Color by Point",
-            type: "boolean",
-            description: "Automatically assign a color from the current color theme to every data point.",
-            value: "colorByPoint" in series && !!series.colorByPoint,
-            disabled: isBool(),
-            onChange: (colorByPoint: boolean) => {
-                onSeriesChange({ colorByPoint })
-                if (colorByPoint) {
-                    onChange({ colors: COLOR_THEMES.find(t => t.id === (options.custom?.theme || DEFAULT_COLOR_THEME))!.colors })
-                }
-            }
-        },
         {
             name: "Visible",
             type: "boolean",
@@ -131,12 +122,28 @@ export function getOptions(options : Options, onChange: (o: Partial<Options>) =>
         }
     ] as any[]
 
+    if (seriesType === "column" || seriesType === "bar") {
+        props.unshift({
+            name: "Color by Point",
+            type: "boolean",
+            description: "Automatically assign a color from the current color theme to every data point.",
+            value: colorByPoint,
+            disabled: isBool(),
+            onChange: (colorByPoint: boolean) => {
+                onSeriesChange({ colorByPoint })
+                if (colorByPoint) {
+                    onChange({ colors: COLOR_THEMES.find(t => t.id === (options.custom?.theme || DEFAULT_COLOR_THEME))!.colors })
+                }
+            }
+        })
+    }
+
     if (seriesType !== "pie") {
         props.unshift({
             name: "Color",
             type: "color",
             value: color,
-            disabled: ("colorByPoint" in series && !!series.colorByPoint) || isBool(),
+            disabled: colorByPoint || isBool(),
             onChange: (color: string) => {
                 // Confidence bands take their curve's color, unless they have
                 // their own (an empty one follows the curve again)
