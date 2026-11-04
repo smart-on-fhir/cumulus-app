@@ -37,7 +37,13 @@ export const ReadOnlyPaths = [
     "custom.isSurvival",
     "custom.subtitleSuggestions",
     "caption",
-    "xAxis.reversed"
+    "xAxis.reversed",
+    "chart.zooming.type",
+    "yAxis.softMin",
+    "yAxis.softMax",
+    "plotOptions.series.dataLabels.enabled",
+    "plotOptions.pie.dataLabels.style.fontSize",
+    "plotOptions.pie.dataLabels.style.fontFamily"
 ];
 
 export const FhirResourceTypes = [

@@ -280,6 +280,10 @@ describe("Chart", () => {
             expect(saved.caption).toBeUndefined()
             // Comes from the sort option
             expect(saved.xAxis?.reversed).toBeUndefined()
+            // Come from the chart type, the data and the chart font
+            expect(saved.chart?.zooming?.type).toBeUndefined()
+            expect(saved.plotOptions?.series?.dataLabels?.enabled).toBeUndefined()
+            expect(saved.plotOptions?.pie?.dataLabels?.style).toEqual({})
         })
     })
 
