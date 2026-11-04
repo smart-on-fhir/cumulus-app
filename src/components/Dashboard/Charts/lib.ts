@@ -492,16 +492,22 @@ function getSeriesAndExceptions({
         const S = serverOptions.series?.find((s: any) => s.id === options.id) as SavedSeries | undefined
         const prev = serverOptions.plotOptions?.[options.type || "series"] ?? {}
 
+        // As in the series below, where the options win over the saved ones
+        const colorByPoint = options.colorByPoint ?? S?.colorByPoint
+
         const themeId = serverOptions.custom?.theme || DEFAULT_COLOR_THEME
 
         const themeColors = COLOR_THEMES.find(t => t.id === themeId)!.colors
 
-        const colors: string[] = S?.colorByPoint ? themeColors : serverOptions.colors as string[] || themeColors
+        // The color at this index in the list that computeColors makes: the
+        // saved colors, continued with the theme. Saving that list must not
+        // change the colors of the series.
+        const colors = colorByPoint ? [] : serverOptions.colors as string[] || []
 
-        const color = colors[series.length % colors.length]
+        const color = colors[series.length] || themeColors[series.length % themeColors.length]
 
         const cfg: any = {
-            color: S?.colorByPoint ? undefined : color,
+            color: colorByPoint ? undefined : color,
             id: options.id,
         }
 

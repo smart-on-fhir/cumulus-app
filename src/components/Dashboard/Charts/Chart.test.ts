@@ -238,6 +238,42 @@ describe("Chart", () => {
         }
     })
 
+    describe("saving", () => {
+        // A stratified line chart with one series per group
+        function build(groups: number, options?: Highcharts.Options) {
+            const counts: Record<string, number> = { "0": groups }
+            return buildChartOptions({
+                type: "line",
+                options,
+                data: {
+                    column    : "x",
+                    stratifier: "g",
+                    filters   : [],
+                    totalCount: groups,
+                    rowCount  : groups,
+                    counts,
+                    data      : Array.from({ length: groups }, (_, i) => ({ stratifier: "g" + i, rows: [["0", 1]] as [string, number][] }))
+                },
+                data2  : null,
+                column : { name: "x", label: "X", dataType: "string", description: "" },
+                groupBy: { name: "g", label: "G", dataType: "string", description: "" },
+                sortBy : "x:asc",
+                limit  : 0,
+                offset : 0
+            })
+        }
+        const save = (options: Highcharts.Options) => JSON.parse(JSON.stringify(strip(options, ReadOnlyPaths)))
+        const seriesColors = (options: Highcharts.Options) => options.series!.map((s: any) => s.color)
+
+        it ("doesn't change the series colors when the chart is saved", () => {
+            // More series than saved colors
+            const first  = build(14, { colors: ["#111111", "#222222"] })
+            const second = build(14, save(first))
+            expect(seriesColors(second)).toEqual(seriesColors(first))
+            expect(seriesColors(first).slice(0, 2)).toEqual(["#111111", "#222222"])
+        })
+    })
+
     describe("sorting", () => {
         function build({ type = "line", dataType = "string", rows, sortBy = "x:asc", limit = 0, offset = 0, options }: {
             type    ?: any
