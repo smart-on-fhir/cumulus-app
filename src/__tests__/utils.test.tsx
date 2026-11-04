@@ -19,7 +19,8 @@ import {
     stripValue,
     highlight,
     Json,
-    strip
+    strip,
+    withoutDefaults
 } from "../utils"
 
 function wait(ms = 0) {
@@ -171,6 +172,19 @@ describe("utils", () => {
         expect(strip({ a: 1, b: [ 1, { c: 2, d: 3 } ]}, ["b"])).toEqual({ a: 1 })
         expect(strip({ a: 1, b: [ 1, { c: 2, d: 3 } ]}, ["b.[].1"])).toEqual({ a: 1, b: [1] })
         expect(strip({ a: 1, b: [ 1, { c: 2, d: 3 } ]}, ["b.[].0"])).toEqual({ a: 1, b: [{ c: 2, d: 3 }] })
+    })
+
+    it("withoutDefaults", () => {
+        expect(withoutDefaults({}, { a: 1 })).toBeUndefined()
+        expect(withoutDefaults({ a: 1 }, { a: 1 })).toBeUndefined()
+        expect(withoutDefaults({ a: 1, b: 2 }, { a: 1 })).toEqual({ b: 2 })
+        expect(withoutDefaults({ a: 2 }, { a: 1 })).toEqual({ a: 2 })
+        expect(withoutDefaults({ a: { b: 1, c: 2 } }, { a: { b: 1 } })).toEqual({ a: { c: 2 } })
+        expect(withoutDefaults({ a: { b: 1 } }, { a: { b: 1 } })).toBeUndefined()
+        expect(withoutDefaults({ a: null }, { a: { b: 1 } })).toEqual({ a: null })
+        // Arrays are compared as a whole
+        expect(withoutDefaults({ a: [1, 2] }, { a: [1, 2] })).toBeUndefined()
+        expect(withoutDefaults({ a: [1, 3] }, { a: [1, 2] })).toEqual({ a: [1, 3] })
     })
 
     it("stripTags", () => {

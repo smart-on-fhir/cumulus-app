@@ -247,6 +247,27 @@ export function strip(
     return out;
 }
 
+/**
+ * Returns the parts of `options` that differ from `defaults`, or undefined if
+ * there are none. Objects are compared key by key and anything else (arrays
+ * included) as a whole, so merging the result over the defaults gives the
+ * options back.
+ */
+export function withoutDefaults(options: any, defaults: any): any {
+    const isObject = (x: any) => !!x && typeof x === "object" && !Array.isArray(x)
+    if (isObject(options) && isObject(defaults)) {
+        const out: Record<string, any> = {}
+        for (const key in options) {
+            const value = key in defaults ? withoutDefaults(options[key], defaults[key]) : options[key]
+            if (value !== undefined) {
+                out[key] = value
+            }
+        }
+        return isEmptyObject(out) ? undefined : out
+    }
+    return JSON.stringify(options) === JSON.stringify(defaults) ? undefined : options
+}
+
 export function stripTags(s: string) {
     return s.replace(/<.*?>/g, "")
 }

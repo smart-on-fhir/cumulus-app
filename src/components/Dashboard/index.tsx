@@ -45,7 +45,8 @@ import {
     humanizeColumnName,
     Json,
     requestPermission,
-    strip
+    strip,
+    withoutDefaults
 } from "../../utils"
 import {
     ReadOnlyPaths,
@@ -440,6 +441,15 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             state.chartOptions
     }, [chartType, survivalRiskTable, state.chartOptions])
 
+    // The defaults are merged in again when the view is loaded, so they are not
+    // saved, and saved views follow later changes to them
+    const savedChartOptions = useMemo(() => {
+        return withoutDefaults(
+            strip(state.chartOptions, ReadOnlyPaths),
+            getDefaultChartOptions(chartType)
+        ) ?? {}
+    }, [chartType, state.chartOptions])
+
     const runtimeView: Partial<app.View> = {
         id         : view.id,
         name       : viewName,
@@ -452,7 +462,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
             column : viewColumnName,
             filters,
             viewType: chartType,
-            chartOptions: strip(state.chartOptions, ReadOnlyPaths) as Partial<Highcharts.Options>,
+            chartOptions: savedChartOptions,
             denominator,
             column2: secColumnName,
             column2type,
