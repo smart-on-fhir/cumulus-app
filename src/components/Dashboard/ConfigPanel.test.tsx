@@ -301,7 +301,7 @@ describe("chart types", () => {
 // Highcharts.merge copies arrays by reference, so even after merge(state) the
 // series and colors are the Dashboard's own. These tests pin that down, because
 // SliceEditor's changes only reach the chart that way.
-describe("editors that change the chart options in place", () => {
+describe("editors that change several options at once", () => {
 
   function getPieState(): ChartConfigPanelState {
     return {
@@ -346,8 +346,10 @@ describe("editors that change the chart options in place", () => {
     return el.closest<HTMLElement>(".collapse")!
   }
 
-  it("SliceEditor changes the series in place and sends the settings", async () => {
+  // The editors send the change, and leave the state (the reducer's) alone
+  it("SliceEditor sends the series with the change", async () => {
     const state = getPieState()
+    const before = structuredClone(state)
     const { onChange } = renderPanel(state)
     await userEvent.click(screen.getByText("Data"))
     // The Advanced section next to Slice Colors
@@ -355,44 +357,46 @@ describe("editors that change the chart options in place", () => {
     const advanced    = await expand("Advanced", sliceEditor)
     fireEvent.change(getPropertyInput(advanced, "Opacity"), { target: { value: "0.5" } })
     expect(onChange).toHaveBeenCalledTimes(1)
-    expect(state.chartOptions.series![0].opacity).toBe(0.5)
-    expect(onChange.mock.calls[0][0].chartOptions.series).toBe(state.chartOptions.series)
+    expect(onChange.mock.calls[0][0].chartOptions.series[0].opacity).toBe(0.5)
+    expect(state).toEqual(before)
   })
 
-  it("SliceEditor changes the slice colors in place and sends the same state", async () => {
+  it("SliceEditor sends the slice colors with the change", async () => {
     const state = getPieState()
+    const before = structuredClone(state)
     const { onChange } = renderPanel(state)
     await userEvent.click(screen.getByText("Data"))
     const colors = await expand("Slice Colors")
     const input  = getPropertyInput(colors, "female").parentElement!.querySelector<HTMLInputElement>("input[type=text]")!
     fireEvent.change(input, { target: { value: "#ff0000" } })
-    expect(onChange).toHaveBeenCalledWith(state)
-    expect(state.chartOptions.colors![0]).toBe("#ff0000")
+    expect(onChange.mock.calls[0][0].chartOptions.colors).toEqual(["#ff0000", "#222222"])
+    expect(state).toEqual(before)
   })
 
-  it("Start Angle changes the series in place and sends the same options", async () => {
+  it("Start Angle sends the series with the change", async () => {
     const state = getPieState()
+    const before = structuredClone(state)
     const { onChartOptionsChange } = renderPanel(state)
     await userEvent.click(screen.getByText("Chart"))
     fireEvent.change(screen.getByLabelText("Start Angle"), { target: { value: "90" } })
-    expect(onChartOptionsChange).toHaveBeenCalledWith(state.chartOptions)
-    expect((state.chartOptions.series![0] as SeriesPieOptions).startAngle).toBe(90)
+    expect((onChartOptionsChange.mock.calls[0][0].series[0] as SeriesPieOptions).startAngle).toBe(90)
+    expect(state).toEqual(before)
   })
 
-  it("AllSeriesEditor changes every series in place and sends the options", async () => {
+  it("AllSeriesEditor sends every series with the change", async () => {
     const state = structuredClone(mockState)
     state.chartOptions.series = [
       { type: "column", id: "a", data: [1, 2] },
       { type: "column", id: "b", data: [3, 4] }
     ]
-    const series = state.chartOptions.series
+    const before = structuredClone(state)
     const { onChartOptionsChange } = renderPanel(state)
     await userEvent.click(screen.getByText("Series"))
     const override = await expand(/All Serries Override/)
     fireEvent.change(getPropertyInput(override, "Opacity"), { target: { value: "0.5" } })
     expect(onChartOptionsChange).toHaveBeenCalledTimes(1)
-    expect(onChartOptionsChange.mock.calls[0][0].series).toBe(series)
-    expect(series.map(s => s.opacity)).toEqual([0.5, 0.5])
+    expect(onChartOptionsChange.mock.calls[0][0].series.map((s: any) => s.opacity)).toEqual([0.5, 0.5])
+    expect(state).toEqual(before)
   })
 
   // The names of the properties in a property grid, in order

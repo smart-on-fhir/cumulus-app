@@ -783,8 +783,9 @@ function ChartSection({
                         step={1}
                         value={ (chartOptions.series?.[0] as SeriesPieOptions | undefined)?.startAngle || 0 }
                         onChange={e => {
-                            chartOptions.series![0] = merge(chartOptions.series?.[0], { startAngle: e.target.valueAsNumber })
-                            onChartOptionsChange(chartOptions)
+                            const series = [...chartOptions.series!]
+                            series[0] = merge(series[0], { startAngle: e.target.valueAsNumber })
+                            onChartOptionsChange({ series })
                         }}
                         style={{ width: "100%", margin: 0 }}
                     />
@@ -1024,12 +1025,7 @@ function SeriesEditor({
                 tabIndex={0}
                 onClick={() => {
                     if (hasInvisible) {
-                        const series = [...state.chartOptions.series!]
-                        series.forEach(s => {
-                            if (s.visible === false) {
-                                s.showInLegend = !force
-                            }
-                        });
+                        const series = state.chartOptions.series!.map(s => s.visible === false ? { ...s, showInLegend: !force } : s)
                         onChange({ series })
                         setForce(!force)
                     }
@@ -1064,9 +1060,7 @@ function AllSeriesEditor({
     onChange: (options: Options) => void
 }) {
     const change = (patch: any) => {
-        const next = merge(state)
-        next.chartOptions.series?.forEach(s => Object.assign(s, patch));
-        onChange(next.chartOptions)
+        onChange({ series: state.chartOptions.series?.map(s => ({ ...s, ...patch })) })
     }
 
     const S: any = state.chartOptions.series?.[0] || {}
@@ -1216,17 +1210,17 @@ function SliceEditor({
         type: "color",
         value: colors[i % colors.length],
         onChange: (color: string) => {
-            state.chartOptions.colors![i] = color
-            onChange(state)
+            const next = [...colors]
+            next[i] = color
+            onChange({ ...state, chartOptions: { ...state.chartOptions, colors: next } })
         }
     }));
 
     const has3d = !!state.chartOptions.chart?.options3d?.enabled
 
     const change = (patch: any) => {
-        const next = merge(state)
-        next.chartOptions.series?.forEach(s => Object.assign(s, patch));
-        onChange(next)
+        const series = state.chartOptions.series?.map(s => ({ ...s, ...patch })) as SeriesOptionsType[]
+        onChange({ ...state, chartOptions: { ...state.chartOptions, series } })
     }
 
     return (
