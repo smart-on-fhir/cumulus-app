@@ -32,7 +32,12 @@ export const ReadOnlyPaths = [
     "xAxis.type",
     "xAxis.crosshair",
     "lang",
-    "noData"
+    "noData",
+    "legend.dirty",
+    "custom.isSurvival",
+    "custom.subtitleSuggestions",
+    "caption",
+    "xAxis.reversed"
 ];
 
 export const FhirResourceTypes = [

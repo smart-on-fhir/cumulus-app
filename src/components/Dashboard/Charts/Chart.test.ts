@@ -272,6 +272,15 @@ describe("Chart", () => {
             expect(seriesColors(second)).toEqual(seriesColors(first))
             expect(seriesColors(first).slice(0, 2)).toEqual(["#111111", "#222222"])
         })
+
+        it ("doesn't save what is computed on every build", () => {
+            const saved = save(build(2, { custom: { theme: "cumulus" } }))
+            expect(saved.custom).toEqual({ theme: "cumulus" })
+            expect(saved.legend?.dirty).toBeUndefined()
+            expect(saved.caption).toBeUndefined()
+            // Comes from the sort option
+            expect(saved.xAxis?.reversed).toBeUndefined()
+        })
     })
 
     describe("sorting", () => {
