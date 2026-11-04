@@ -5,7 +5,7 @@ import { getOptions as getGridLineOptions } from "./AxisGridLines"
 import { getOptions as getTitleOptions }    from "./AxisTitle"
 
 
-export function getOptions(axis: XAxisOptions | YAxisOptions, onChange: (a: Partial<typeof axis>) => void) {
+export function getOptions(axis: XAxisOptions | YAxisOptions, onChange: (a: Partial<typeof axis>) => void, isXAxis = false) {
     return [
         {
             name: "Alternate Grid Color",
@@ -26,12 +26,14 @@ export function getOptions(axis: XAxisOptions | YAxisOptions, onChange: (a: Part
             value: axis.lineWidth ?? 1,
             onChange: (lineWidth?: number) => onChange({ lineWidth: lineWidth ?? 1 })
         },
-        {
+        // The direction of the X axis comes from the sort option (see
+        // buildChartOptions)
+        ...(isXAxis ? [] : [{
             name: "Reversed",
             type: "boolean",
             value: !!axis.reversed,
             onChange: (reversed: boolean) => onChange({ reversed })
-        },
+        }]),
         {
             name: "Start on Tick",
             type: "boolean",
@@ -133,10 +135,12 @@ export function getOptions(axis: XAxisOptions | YAxisOptions, onChange: (a: Part
 
 export default function AxisEditor({
     axis = {} as XAxisOptions,
-    onChange
+    onChange,
+    isXAxis
 }: {
     axis?: XAxisOptions | YAxisOptions,
     onChange: (a: Partial<typeof axis>) => void
+    isXAxis?: boolean
 }) {
-    return <PropertyGrid props={ getOptions(axis, onChange) } />
+    return <PropertyGrid props={ getOptions(axis, onChange, isXAxis) } />
 }

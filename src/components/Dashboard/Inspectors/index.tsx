@@ -78,7 +78,7 @@ function Editor({
                 <div>
                     <h5 className="color-brand-2"><i className="fa-solid fa-crosshairs"/> { dir("x") } Axis</h5>
                     <hr/>
-                    <AxisEditor axis={xAxis} onChange={ a => onChange({ xAxis: a as XAxisOptions }) } />
+                    <AxisEditor axis={xAxis} onChange={ a => onChange({ xAxis: a as XAxisOptions }) } isXAxis />
                 </div>
             )
 

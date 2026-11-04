@@ -874,7 +874,7 @@ function AxisSection({
             </div>
             <div className="pb-1">
                 <Collapse collapsed header="Advanced Axis Options">
-                    <AxisEditor axis={ axis } onChange={ change } />
+                    <AxisEditor axis={ axis } onChange={ change } isXAxis={ which === "xAxis" } />
                 </Collapse>
             </div>
         </Collapse>
