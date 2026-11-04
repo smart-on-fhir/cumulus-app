@@ -399,6 +399,22 @@ describe("editors that change several options at once", () => {
     expect(state).toEqual(before)
   })
 
+  it("AllSeriesEditor leaves error ranges and confidence bands alone", async () => {
+    const state = structuredClone(mockState)
+    state.chartOptions.series = [
+      { type: "column"   , id: "primary-a", data: [1, 2] },
+      { type: "spline"   , id: "secondary-a", linkedTo: "primary-a", data: [3, 4] },
+      { type: "errorbar" , id: "primary-a (range)", linkedTo: "primary-a", showInLegend: false, data: [] },
+      { type: "arearange", id: "band-a", linkedTo: "primary-a", custom: { isConfidenceBand: true }, data: [] }
+    ]
+    const { onChartOptionsChange } = renderPanel(state)
+    await userEvent.click(screen.getByText("Series"))
+    const override = await expand(/All Serries Override/)
+    await userEvent.click(within(override).getByText("Show in Legend", { selector: ".prop-label span" }).closest(".prop-label")!.nextElementSibling!.querySelector("input")!)
+    const series = onChartOptionsChange.mock.calls[0][0].series
+    expect(series.map((s: any) => s.showInLegend)).toEqual([false, false, false, undefined])
+  })
+
   // The names of the properties in a property grid, in order
   function getPropertyNames(container: HTMLElement) {
     return [...container.querySelectorAll(".prop-label span")].map(el => el.textContent!.trim())

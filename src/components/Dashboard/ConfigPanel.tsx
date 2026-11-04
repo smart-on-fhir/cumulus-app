@@ -1059,8 +1059,12 @@ function AllSeriesEditor({
     state: ChartConfigPanelState,
     onChange: (options: Options) => void
 }) {
+    // Error ranges and confidence bands belong to another series, and keep
+    // their own look (and stay out of the legend)
+    const isDerived = (s: NonNullable<Options["series"]>[number]) => String(s.id).endsWith(" (range)") || !!s.custom?.isConfidenceBand
+
     const change = (patch: any) => {
-        onChange({ series: state.chartOptions.series?.map(s => ({ ...s, ...patch })) })
+        onChange({ series: state.chartOptions.series?.map(s => isDerived(s) ? s : { ...s, ...patch }) })
     }
 
     const S: any = state.chartOptions.series?.[0] || {}
@@ -1130,8 +1134,7 @@ function AllSeriesEditor({
         })
     }
 
-    // Confidence intervals never have a legend item of their own
-    const legendSeries = state.chartOptions.series?.filter(s => !String(s.id).endsWith(" (range)"))
+    const legendSeries = state.chartOptions.series?.filter(s => !isDerived(s))
     const allShowInLegendN = legendSeries?.every(s => s.showInLegend === false)
     const allShowInLegendY = legendSeries?.every(s => s.showInLegend !== false )
     props.push({
