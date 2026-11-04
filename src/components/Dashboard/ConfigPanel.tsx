@@ -885,6 +885,16 @@ function AxisSection({
 /**
  * The outline of columns, bars and slices: edges in 3D charts, borders in 2D
  */
+/**
+ * The options in effect for a series: its own, over those of its type and of
+ * all series. Shown by the editors, so that an option the user hasn't set
+ * shows what the chart uses
+ */
+function getEffectiveSeriesOptions(options: Options, series: any = {}): any {
+    const plotOptions: any = options.plotOptions || {}
+    return { ...plotOptions.series, ...plotOptions[series.type ?? options.chart?.type], ...series }
+}
+
 function getEdgeOptions(options: any, onChange: (options: any) => void, has3d: boolean): any[] {
     if (has3d) {
         return [
@@ -1067,7 +1077,7 @@ function AllSeriesEditor({
         onChange({ series: state.chartOptions.series?.map(s => isDerived(s) ? s : { ...s, ...patch }) })
     }
 
-    const S: any = state.chartOptions.series?.[0] || {}
+    const S = getEffectiveSeriesOptions(state.chartOptions, state.chartOptions.series?.[0])
 
     const currentTypes = (state.chartOptions.series || []).reduce((prev, cur) => {
         const { type } = cur as SeriesOptionsType
@@ -1236,7 +1246,7 @@ function SliceEditor({
                 </Collapse>
                 <Collapse collapsed header="Advanced">
                     <div className="pb-1">
-                        <PropertyGrid props={getPieOptions(S, change, has3d)} />
+                        <PropertyGrid props={getPieOptions(getEffectiveSeriesOptions(state.chartOptions, S), change, has3d)} />
                     </div>
                 </Collapse>
             </div>

@@ -415,6 +415,27 @@ describe("editors that change several options at once", () => {
     expect(series.map((s: any) => s.showInLegend)).toEqual([false, false, false, undefined])
   })
 
+  it("AllSeriesEditor and SliceEditor show the values the chart uses", async () => {
+    const state = structuredClone(mockState)
+    state.chartOptions.plotOptions = { series: { borderWidth: 0.25 }, column: { pointPadding: 0.02 } }
+    state.chartOptions.series = [{ type: "column", id: "a", data: [1, 2] }]
+    renderPanel(state)
+    await userEvent.click(screen.getByText("Series"))
+    const override = await expand(/All Serries Override/)
+    expect(getPropertyInput(override, "Border Width").value).toBe("0.25")
+    expect(getPropertyInput(override, "Point Padding").value).toBe("0.02")
+
+    const pie = getPieState()
+    pie.chartOptions.chart = { type: "pie", options3d: { enabled: true } }
+    pie.chartOptions.plotOptions = { series: { edgeWidth: 0.25 } as any, pie: { depth: 30 } }
+    document.body.innerHTML = ""
+    renderPanel(pie)
+    await userEvent.click(screen.getByText("Data"))
+    const advanced = await expand("Advanced", screen.getByText("Slice Colors").closest(".collapse")!.parentElement!)
+    expect(getPropertyInput(advanced, "Edge Width").value).toBe("0.25")
+    expect(getPropertyInput(advanced, "Depth").value).toBe("30")
+  })
+
   // The names of the properties in a property grid, in order
   function getPropertyNames(container: HTMLElement) {
     return [...container.querySelectorAll(".prop-label span")].map(el => el.textContent!.trim())
