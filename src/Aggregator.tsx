@@ -27,6 +27,17 @@ export interface Study {
     // periods: Record<string, StudyPeriod>
 }
 
+export interface StudyMetadata {
+    study_prefix        : string // example: "core"
+    description        ?: string
+    study_owner        ?: string // example: "boston_childrens"
+    study_owner_display?: string // example: "Boston Childrens"
+    tables             ?: Record<string, {
+        description?: string
+        columns     : Record<string, { type: string, distinct_values_count?: number }>
+    }>
+}
+
 export interface StudyPeriod {
     earliest_date: string
     latest_date: string
@@ -223,6 +234,39 @@ class Aggregator
             }
             return prev;
         }, [] as Study[])
+    }
+
+    /**
+     * The aggregator does not describe every study, or every version of one.
+     * Descriptions don't change between versions, so versions without one get
+     * the description of the newest version that has one.
+     */
+    private async getDescription(
+        studyId: string,
+        version: string | undefined,
+        pick: (study: StudyMetadata) => string | undefined
+    ): Promise<string | undefined> {
+        const studies: Record<string, Record<string, StudyMetadata>> = await this.fetch("/api/aggregator/studies")
+        const versions = studies[studyId] || {}
+        const described = Object.keys(versions).filter(v => pick(versions[v])).sort()
+        const match = version && described.includes(version) ? version : described.pop()
+        return match ? pick(versions[match])!.trim() : undefined
+    }
+
+    public getStudyDescription(studyId: string, version?: string) {
+        return this.getDescription(studyId, version, study => study.description)
+    }
+
+    /**
+     * Packages are described by the study table they come from. Flat packages
+     * have one per site, and their names end with "__{site}".
+     */
+    public getPackageDescription(pkg: DataPackage) {
+        const suffix = "__" + pkg.site
+        const name = pkg.type === "flat" && pkg.site && pkg.name.endsWith(suffix) ?
+            pkg.name.slice(0, -suffix.length) :
+            pkg.name
+        return this.getDescription(pkg.study, pkg.version, study => study.tables?.[pkg.study + "__" + name]?.description)
     }
 
     public async getStudyVersions(studyId: string): Promise<string[]> {

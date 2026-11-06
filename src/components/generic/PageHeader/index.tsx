@@ -10,11 +10,15 @@ export default function PageHeader({
     title,
     icon,
     description,
+    markdown = false,
     className = ""
 }: {
     title: ReactNode
     icon?: string
-    description?: string
+    /** null renders nothing, undefined renders "No description available" */
+    description?: string | null
+    /** Render the description as markdown even if it does not look like it */
+    markdown?: boolean
     className?: string
 }) {
     return (
@@ -31,7 +35,7 @@ export default function PageHeader({
                 {/* <hr/> */}
                 <div>
                     { description ?
-                        htmlPattern.test(description) || markdownPattern.test(description) ?
+                        markdown || htmlPattern.test(description) || markdownPattern.test(description) ?
                             <Markdown>{description}</Markdown> :
                             <div className="color-muted">{description}</div> :
                         <div className="color-muted">{ description === null ? null : "No description available" }</div>

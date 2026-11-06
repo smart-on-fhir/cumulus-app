@@ -27,6 +27,9 @@ async function load(studyId: string, version: string) {
     const periods  = (await aggregator.getStudyPeriods(studyId)).filter(p => p.version === version)
     const packages = await aggregator.filterPackages({ study: studyId, version })
 
+    // The page works without a description
+    const description = await aggregator.getStudyDescription(studyId, version).catch(() => undefined)
+
     const sites = periods.map(p => ({
         id  : p.site,
         name: humanizeColumnName(p.site)
@@ -42,6 +45,7 @@ async function load(studyId: string, version: string) {
     return {
         periods,
         packages,//: uniquePackages,
+        description,
         sites,
         transmissions
     }
@@ -57,6 +61,7 @@ export default function ViewStudyVersion() {
     const [sites        , setSites  ] = useState<Site[]>([])
     const [transmissions, setTransmissions] = useState<Transmission[]>([])
     const [packages     , setPackages     ] = useState<DataPackage[]>([])
+    const [description  , setDescription  ] = useState<string>()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const abortController = useMemo(() => new AbortController(), [studyId, version])
@@ -70,6 +75,7 @@ export default function ViewStudyVersion() {
                 setSites(result.sites)
                 setTransmissions(result.transmissions)
                 setPackages(result.packages)
+                setDescription(result.description)
             })
             .catch(setError)
             .finally(() => {
@@ -111,7 +117,8 @@ export default function ViewStudyVersion() {
             <PageHeader
                 title={ <>{ humanizeColumnName(studyId!) } <span className="color-muted">/ {version}</span></> }
                 icon={Terminology.study.icon}
-                description={`Description not available`} />
+                description={description}
+                markdown />
             <div className="row gap-2 wrap">
                 <div className="col col-8 responsive">
                     <h5 className="mt-2">Study Periods</h5>

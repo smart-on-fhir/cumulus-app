@@ -16,9 +16,10 @@ export default function ViewStudy({ studyId }: { studyId?: string }) {
 
     const id = String(studyId || idParam || "")
 
-    const [data   , setData   ] = useState<Data[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error  , setError  ] = useState<Error | string | null>(null)
+    const [data       , setData       ] = useState<Data[]>([])
+    const [description, setDescription] = useState<string>()
+    const [loading    , setLoading    ] = useState(true)
+    const [error      , setError      ] = useState<Error | string | null>(null)
 
     const load = useCallback(() => {
         setLoading(true)
@@ -26,9 +27,14 @@ export default function ViewStudy({ studyId }: { studyId?: string }) {
 
         Promise.all([
             aggregator.getStudyPeriods(id),
-            aggregator.getPackages()
+            aggregator.getPackages(),
+            // The page works without a description
+            aggregator.getStudyDescription(id).catch(() => undefined)
         ])
-            .then(([periods, packages]) => getStudyData(periods, packages))
+            .then(([periods, packages, description]) => {
+                setDescription(description)
+                return getStudyData(periods, packages)
+            })
             .then(setData)
             .catch(setError)
             .finally(() => setLoading(false))
@@ -64,7 +70,8 @@ export default function ViewStudy({ studyId }: { studyId?: string }) {
             <PageHeader
                 title={humanizeColumnName(study.study)}
                 icon={Terminology.study.icon}
-                description={`Description not available`} />
+                description={description}
+                markdown />
 
             <div className="row gap-2 wrap">
                 <div className="col col-8 responsive">

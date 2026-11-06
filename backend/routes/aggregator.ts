@@ -25,6 +25,10 @@ const AGGREGATOR_PATHS = [
     "/study-periods/:site",
     "/study-periods",
 
+    // studies
+    "/studies/:study",
+    "/studies",
+
     "/static/catalog/icd10",
     "/static/catalog/loinc"
 ];
