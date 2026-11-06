@@ -56,6 +56,18 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
     const [showTemplates , setShowTemplates ] = useLocalStorage("showTemplates")
     const [showDrafts    , setShowDrafts    ] = useLocalStorage("showDrafts")
     const [showStratified, setShowStratified] = useLocalStorage("showStratifiedCharts")
+    // null while loading, undefined if the package is not described
+    const [description   , setDescription   ] = useState<string | null>()
+
+    useEffect(() => {
+        let current = true
+        setDescription(null)
+        if (pkg) {
+            // The page works without a description
+            aggregator.getPackageDescription(pkg).then(d => current && setDescription(d), () => {})
+        }
+        return () => { current = false }
+    }, [pkg])
 
     const filter = query.get("filter") || ""
     const filters = filter ? filter.split(",") : []
@@ -81,7 +93,8 @@ export default function DataPackageView({ pkg }: { pkg?: DataPackage }) {
             <PageHeader
                 title={ <>{ humanizedPkgName }<span className="color-muted fw-400"> / { pkg.version }{ pkg.site && " / " + humanizeColumnName(pkg.site) }</span></> }
                 icon={pkg.type === "flat" ? "table" : "deployed_code" }
-                description="Description not available"
+                description={description}
+                markdown
             />
 
             { filters.map((f, i) => {
