@@ -1,4 +1,5 @@
 import { json } from "express";
+import { it } from "vitest"
 import MockServer  from "../../test/MockServer"
 import { auth, createOne, deleteOne, request, updateOne } from "../backend"
 
@@ -15,7 +16,10 @@ describe("request utils", () => {
         await mockServer.stop()
     })
 
-    afterEach(() => mockServer.clear())
+    afterEach(() => {
+        mockServer.clear()
+        vi.restoreAllMocks()
+    })
 
     describe("request", () => {
         it ("uses the body text as error message in case of error", async () => {
@@ -38,6 +42,66 @@ describe("request utils", () => {
             mockServer.mock("/", { body: { x: 5 }})
             const body = await request(mockServer.baseUrl + "/")
             expect(body).toEqual({ x: 5 })
+        })
+
+        it.each([
+            "/api/users?order=createdAt:desc",
+            "/api/users?attributes=email",
+            "/api/views",
+            "/api/requests/123",
+            "/api/permissions/list?resource=Views"
+        ])("bypasses the browser cache for mutable Node data: %s", async path => {
+            const fetchSpy = vi.spyOn(globalThis, "fetch")
+                .mockResolvedValue(new Response("[]", { headers: { "content-type": "application/json" } }))
+
+            await request(path)
+
+            const options = fetchSpy.mock.calls[0][1]!
+            expect(options.cache).toBe("no-store")
+            expect(new Headers(options.headers).has("cache-control")).toBe(false)
+        })
+
+        it.each([
+            "/api/aggregator/data-packages",
+            "/api/aggregator/static/catalog/icd10",
+            "/api/requests/pkg-api?pkg=example",
+            "/api/requests/123/api?column=age",
+            "/api/requests/123/raw-data"
+        ])("preserves caching for aggregator and chart data: %s", async path => {
+            const fetchSpy = vi.spyOn(globalThis, "fetch")
+                .mockResolvedValue(new Response("[]", { headers: { "content-type": "application/json" } }))
+
+            await request(path)
+
+            const options = fetchSpy.mock.calls[0][1]!
+            expect(options.cache).not.toBe("no-store")
+            expect(new Headers(options.headers).get("cache-control")).toBe("max-age=2592000, stale-while-revalidate=86400")
+        })
+
+        it ("preserves explicit cache settings and request headers", async () => {
+            const fetchSpy = vi.spyOn(globalThis, "fetch")
+                .mockResolvedValue(new Response("{}"))
+
+            await request("/api/users", {
+                cache: "reload",
+                headers: new Headers({ "x-example": "value" })
+            })
+
+            const options = fetchSpy.mock.calls[0][1]!
+            expect(options.cache).toBe("reload")
+            expect(new Headers(options.headers).get("x-example")).toBe("value")
+            expect(new Headers(options.headers).has("cache-control")).toBe(false)
+        })
+
+        it ("preserves the existing cache header for mutations", async () => {
+            const fetchSpy = vi.spyOn(globalThis, "fetch")
+                .mockResolvedValue(new Response("{}"))
+
+            await request("/api/users/invite", { method: "POST" })
+
+            const options = fetchSpy.mock.calls[0][1]!
+            expect(options.cache).toBeUndefined()
+            expect(new Headers(options.headers).get("cache-control")).toBe("max-age=2592000, stale-while-revalidate=86400")
         })
     })
 

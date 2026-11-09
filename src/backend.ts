@@ -17,6 +17,18 @@ const pendingRequests = new Map<string, AbortController>()
 
 export async function request<T=any>(path: string, options: RequestOptions = {}): Promise<T> {
 
+    const pathname = path.split(/[?#]/, 1)[0]
+    const nodeApi = pathname.startsWith("/api/") &&
+        !pathname.startsWith("/api/aggregator/") &&
+        !/^\/api\/requests\/(?:pkg-api|[^/]+\/(?:api|raw-data))\/?$/.test(pathname)
+    const isGet = !options.method || options.method.toUpperCase() === "GET"
+    const cache = options.cache ?? (nodeApi && isGet ? "no-store" : undefined)
+    const headers = new Headers(options.headers)
+
+    if (!headers.has("cache-control") && cache !== "no-store" && cache !== "no-cache" && cache !== "reload") {
+        headers.set("cache-control", "max-age=" + 60 * 60 * 24 * 30 + ", stale-while-revalidate=86400")
+    }
+
     if (VITE_APP_PREFIX) {
         path = path.replace(/^\/api\//, "/" + VITE_APP_PREFIX + "/api/");
     }
@@ -34,11 +46,9 @@ export async function request<T=any>(path: string, options: RequestOptions = {})
         mode       : "cors",
         credentials: "same-origin",
         ...options,
+        cache,
         signal: abortController.signal,
-        headers: {
-            "cache-control": "max-age=" + 60 * 60 * 24 * 30 + ", stale-while-revalidate=86400",
-            ...options.headers,
-        }
+        headers
     }).then(async (res) => {
         let type = res.headers.get("Content-Type") + "";
 
