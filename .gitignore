@@ -165,3 +165,8 @@ backend/aggregator-cache
 
 # Playwright MCP snapshots, screenshots and logs
 .playwright-mcp/
+
+# Local agent instructions and notes (not shared)
+/AGENTS.md
+/CLAUDE.md
+/.agent-notes/
