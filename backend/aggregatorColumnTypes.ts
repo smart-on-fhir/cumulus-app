@@ -31,6 +31,8 @@ const KEYWORDS: [RegExp, string][] = [
     [/^(is|has|not|was)(?:\b|_)/i                    , 'boolean'],
 ];
 
+const MAX_VERIFICATION_TOTAL = 1_000_000
+
 /**
  * Strict on purpose. The parsers in DataManager/dataTypes coerce rather than
  * validate (`int("5+")` is 5), which would wave through exactly the values this
@@ -146,7 +148,7 @@ const verified = new Map<string, Promise<Record<string, string>>>()
 /**
  * Applies the name-based guesses that the package's own data confirms. The data
  * is only fetched when some guess actually needs checking. If it can't be
- * loaded, the declared types are used unchanged.
+ * loaded or the package total exceeds the limit, unverified types are unchanged.
  */
 export async function verifyColumnTypes(pkg: DataPackage): Promise<DataPackage> {
     const guesses = guessedOverrides(pkg.columns)
@@ -159,7 +161,11 @@ export async function verifyColumnTypes(pkg: DataPackage): Promise<DataPackage> 
 
     if (!pending) {
         const needsData = Object.values(guesses).some(dataType => dataType !== "string")
-        pending = (needsData ? loadRows(pkg) : Promise.resolve([])).then(rows => confirmedOverrides(guesses, rows))
+        const tooLarge = pkg.total > MAX_VERIFICATION_TOTAL
+        if (needsData && tooLarge) {
+            console.warn(`Skipping column type verification for ${pkg.id}: package total exceeds ${MAX_VERIFICATION_TOTAL}`)
+        }
+        pending = (needsData && !tooLarge ? loadRows(pkg) : Promise.resolve([])).then(rows => confirmedOverrides(guesses, rows))
         verified.set(pkg.id, pending)
     }
 
