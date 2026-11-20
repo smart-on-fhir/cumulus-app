@@ -1,0 +1,464 @@
+.study-summary {
+    .small {
+        font-size: 0.85em;
+    }
+
+    .study-summary-versions {
+        b, a {
+            margin-left: 0.6ch;
+        }
+    }
+
+    .study-summary-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5ex 2ch;
+        margin-top: 0.5em;
+    }
+
+    .coverage-table {
+        // Gaps between the cells. Borders would cover their rounded corners.
+        border-spacing: 2px;
+        // As narrow as the longest label: tables never shrink a column below
+        // its content
+        thead th:first-child {
+            width: 1%;
+            white-space: nowrap;
+        }
+        // The sites share the rest equally, unless a single word in a name
+        // doesn't fit. The cells' content can't widen them (see .coverage-cell-box).
+        thead th:not(:first-child) {
+            width: calc(99% / var(--sites));
+        }
+        th, td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        tbody th {
+            text-align: left;
+            padding-right: 1.5em;
+        }
+
+        // The labels stay in view while the sites scroll. The shadow covers
+        // the gap after them, where the cells would show through.
+        thead th:first-child, tbody th {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background-color: var(--color-window-bg);
+            box-shadow: 2px 0 0 var(--color-window-bg);
+        }
+
+        // An overlay, so the heatmap colors still show under it
+        tbody tr:hover > * {
+            background-image: linear-gradient(
+                rgb(from var(--color-window-fg) r g b / 0.06),
+                rgb(from var(--color-window-fg) r g b / 0.06)
+            );
+        }
+    }
+
+    .coverage-scroll {
+        overflow-x: auto;
+        // A swipe that reaches the end doesn't navigate back or forward
+        overscroll-behavior-x: contain;
+    }
+
+    .coverage-cell {
+        min-width: 6em;
+
+        // &.none, &.undated { color: rgb(from var(--color-window-fg) r g b / 0.3); }
+    }
+
+    // The heatmap colors of both sections (see heatStyle): --age (0 for the
+    // oldest, 1 for the newest) sets the color from orange to green, and
+    // --alpha its strength
+    .heat {
+        background: rgb(
+            from color-mix(in oklch, var(--color-orange) calc((1 - var(--age)) * 100%), var(--color-green))
+            r g b / var(--alpha)
+        );
+    }
+
+    .heat-swatch {
+        display: inline-block;
+        width: 4em;
+        height: 0.8em;
+        border-radius: 3px;
+        vertical-align: -0.05em;
+        // The same color space as the cells, at the strength the section sets.
+        // In the colors rather than opacity, which would fade the outline too.
+        background: linear-gradient(
+            in oklch to right,
+            rgb(from var(--color-orange) r g b / var(--alpha, 0.7)),
+            rgb(from var(--color-green) r g b / var(--alpha, 0.7))
+        );
+        box-shadow: inset 0 0 0 1px #0001;
+    }
+
+    // Shows which cell the tooltip is about. The cells share their corners, so
+    // that the outline looks the same everywhere.
+    .coverage-cell, .time-strip td {
+        border-radius: 3px;
+
+        &:hover {
+            box-shadow: inset 0 0 0 1px rgb(from var(--color-window-fg-hard) r g b / 0.2);
+        }
+    }
+
+    // Cells with a tooltip are for hovering, so they don't show the text cursor
+    td[data-tooltip], th[data-tooltip] {
+        cursor: default;
+    }
+
+    // Dragging pans the scrolling parts (see useDragToPan). Cells with
+    // tooltips would otherwise show the default cursor.
+    [data-pannable], [data-pannable] td, [data-pannable] th { cursor: grab; }
+    [data-panning], [data-panning] td, [data-panning] th { cursor: grabbing; }
+
+    // Says where the data comes from, on hover
+    .study-summary-section > h4[title] {
+        cursor: help;
+    }
+
+    // The count goes left and the date right, unless the cell is too narrow
+    // for both: then they stack, centered. Flex can't tell that it wrapped, so
+    // a container query on the cell's width decides. The widest content seen
+    // so far ("14/14", the failed icon and "Mar 2025") needs about 8.2em; wider
+    // content still wraps.
+    .coverage-cell-box {
+        container-type: inline-size;
+    }
+
+    .coverage-cell-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 0 0.8ch;
+        padding: 0 0.4ch;
+    }
+
+    @container (width < 8.5em) {
+        .coverage-cell-row {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+
+    .coverage-count {
+        font-weight: 300;
+        white-space: nowrap;
+    }
+
+    .coverage-date {
+        font-size: 0.8em;
+        opacity: 0.75;
+        white-space: nowrap;
+    }
+
+    .coverage-error, .coverage-warning {
+        font-size: 0.9em;
+    }
+    .coverage-error   { color: var(--color-red); }
+    .coverage-warning { color: var(--color-orange); }
+
+    // The status icons in the cells (not in the legend)
+    .coverage-count i {
+        margin-left: 0.5ch;
+        opacity: 0.6;
+    }
+
+    .resource-table {
+        td, th {
+            vertical-align: top;
+        }
+        // Lined up with the labels, after the arrows
+        thead th:first-child {
+            padding-left: calc(0.25em + 1.2em);
+        }
+        // Space between the columns
+        th:not(:last-child), td:not(:last-child) {
+            padding-right: 1.5em;
+        }
+        // As narrow as their content. "Broken down by" takes the rest.
+        thead th:not(:last-child) {
+            width: 1%;
+            white-space: nowrap;
+        }
+    }
+
+    // The number of distinct values of a breakdown column
+    .resource-values {
+        font-size: 0.8em;
+    }
+
+    // The containment keeps the line from widening the column: it fills
+    // what the other columns leave
+    .resource-breakdowns {
+        contain: inline-size;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.open {
+            contain: none;
+            white-space: normal;
+
+            > span {
+                display: block;
+            }
+        }
+    }
+
+    // Any cell expands a row; the top four collapse it (see ResourceTable)
+    .resource-row {
+        cursor: pointer;
+
+        &.open > .resource-breakdowns-cell {
+            cursor: auto;
+        }
+    }
+
+    // The arrow before the label shows that the row expands
+    .resource-toggle {
+        all: unset;
+        cursor: pointer;
+
+        i {
+            width: 1.2em;
+            color: rgb(from var(--color-window-fg) r g b / 0.5);
+        }
+        &:focus-visible {
+            outline: auto;
+        }
+    }
+
+    // An expanded row and its package list read as one: no border between
+    // them. The breakdowns span both.
+    .resource-table tr.open {
+        // As short as its content, so the package row below takes the extra
+        // height of the breakdowns. The browser would otherwise share it
+        // between the two, leaving a gap under the label.
+        height: 0;
+
+        > :not(:last-child) {
+            border-bottom-width: 0;
+        }
+        // The breakdowns, which span both rows
+        > :last-child {
+            padding-bottom: 1rem;
+        }
+    }
+    .resource-packages > td {
+        border-top-width: 0;
+        padding-top: 0;
+        padding-bottom: 1rem;
+    }
+
+    // Indented past the arrow, so the icons line up with the label. The names
+    // are cut to fit the first four columns: the containment keeps them from
+    // widening those.
+    .resource-package-list {
+        contain: inline-size;
+        padding-left: 1.2em;
+        line-height: 1.4;
+
+        a {
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        > div {
+            display: flex;
+            align-items: baseline;
+        }
+        i {
+            flex: none;
+            width: calc(1.2em / 1.15);
+            font-size: 1.15em;
+            align-self: center;
+        }
+    }
+
+    // Sized to its content, with the labels fixed while the rest scrolls
+    .dimension-matrix {
+        width: auto;
+        border-spacing: 2px;
+
+        thead th {
+            font-size: 0.85em;
+            text-align: center;
+            vertical-align: bottom;
+            min-width: 4.5em;
+            max-width: 7em;
+        }
+        th:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            text-align: left;
+            padding-right: 1.5em;
+            background-color: var(--color-window-bg);
+            box-shadow: 2px 0 0 var(--color-window-bg);
+        }
+        tbody tr:hover > * {
+            background-image: linear-gradient(
+                rgb(from var(--color-window-fg) r g b / 0.06),
+                rgb(from var(--color-window-fg) r g b / 0.06)
+            );
+        }
+    }
+
+    .dimension-cell {
+        height: 2.1em;
+        text-align: center;
+        vertical-align: middle;
+        border-radius: 3px;
+        background: rgb(from var(--color-window-fg) r g b / 0.03);
+
+        &[data-tooltip]:hover {
+            box-shadow: inset 0 0 0 1px rgb(from var(--color-window-fg-hard) r g b / 0.2);
+        }
+    }
+
+    .dimension-other {
+        font-size: 0.85em;
+        color: rgb(from var(--color-window-fg) r g b / 0.6);
+    }
+
+    // Its size is set by dotSize()
+    .dimension-dot {
+        display: inline-block;
+        width: var(--size);
+        height: var(--size);
+        border-radius: 50%;
+        vertical-align: middle;
+        background: rgb(from var(--color-blue) r g b / 0.55);
+    }
+
+    .dimension-sample {
+        margin-left: 1.2ch;
+        white-space: nowrap;
+    }
+
+    .study-summary-spikes {
+        padding: 0.5em 1em;
+        margin-bottom: 1em;
+        border-left: 4px solid var(--color-orange);
+        background: rgb(from var(--color-orange) r g b / 0.1);
+    }
+
+    // The side tables keep their widths; the years in between fill the rest,
+    // and scroll when they don't fit
+    .time-strip {
+        display: flex;
+        align-items: flex-start;
+
+        table {
+            border-collapse: separate;
+            border-spacing: 2px;
+        }
+
+        .time-strip-side {
+            width: auto;
+            flex: none;
+        }
+
+        // The three tables' rows only line up if all cells, whatever their
+        // font size, are exactly one line tall
+        th, td {
+            height: 1.3rem;
+            line-height: 1.3rem;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        th {
+            font-weight: 400;
+            padding: 0 0.5ch;
+        }
+        thead th {
+            font-size: 0.8em;
+            color: rgb(from var(--color-window-fg) r g b / 0.6);
+        }
+        tbody th {
+            font-weight: 600;
+        }
+    }
+
+    .time-strip-total {
+        font-size: 0.85em;
+        font-weight: 600;
+    }
+
+    // Right-to-left, so the browser starts it scrolled to the latest years and
+    // keeps them in view when the window narrows. The table inside is left to
+    // right as usual.
+    .time-strip-scroll {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-x: auto;
+        direction: rtl;
+        // A swipe that reaches the end doesn't navigate back or forward
+        overscroll-behavior-x: contain;
+
+        > table {
+            direction: ltr;
+        }
+    }
+
+    .time-strip-year {
+        text-align: center;
+    }
+
+    // Years without records; the others are .heat
+    .time-strip-cell {
+        min-width: 1.6em;
+
+        &:not(.heat) {
+            background: rgb(from var(--color-window-fg) r g b / 0.04);
+        }
+    }
+
+    .time-strip-extra {
+        padding: 0 0.8ch;
+        text-align: center;
+        font-size: 0.85em;
+        white-space: nowrap;
+        color: var(--color-orange);
+    }
+}
+
+// Tooltips are rendered in #tooltip-container, which always has a light background
+#tooltip-container .summary-tooltip {
+    line-break: normal;
+
+    .tt-muted  { color: #0008; }
+    .tt-ok     { color: #2a8a3e; }
+    .tt-error   { color: #c62828; font-weight: 600; }
+    .tt-warning { color: #d9730d; font-weight: 600; }
+    .tt-note    { color: #0008; font-size: 0.85em; }
+
+    table {
+        margin-top: 4px;
+        border-collapse: collapse;
+    }
+    td {
+        padding: 1px 0;
+        white-space: nowrap;
+        vertical-align: top;
+        line-height: 1.35;
+        & + td { padding-left: 1.2ch; }
+    }
+
+    // Long package names would push the dates out of the tooltip (at most
+    // 550px wide, about 36em at its 15px font): leave room for the status and
+    // the date
+    .tt-name {
+        max-width: 26em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}

@@ -4,7 +4,7 @@ import { humanizeColumnName } from "./utils"
 import { app }                from "./types"
 
 
-interface Metadata {
+export interface Metadata {
     [site: string]: {
         [study: string]: {
             [pkg: string]: {
@@ -130,6 +130,17 @@ function packageColumnsChanged(local: DataPackage, remote: DataPackage): boolean
 export function humanizePackageId(id: string) {
     const [study, name, version] = id.trim().split("__")
     return `${humanizeColumnName(study)}/${humanizeColumnName(name)}/${version}`
+}
+
+/**
+ * The name of the study table a package comes from. Flat packages have one per
+ * site, and their names end with "__{site}".
+ */
+export function getTableName(pkg: Pick<DataPackage, "name" | "site" | "type">) {
+    const suffix = "__" + pkg.site
+    return pkg.type === "flat" && pkg.site && pkg.name.endsWith(suffix) ?
+        pkg.name.slice(0, -suffix.length) :
+        pkg.name
 }
 
 class Aggregator
@@ -258,15 +269,10 @@ class Aggregator
     }
 
     /**
-     * Packages are described by the study table they come from. Flat packages
-     * have one per site, and their names end with "__{site}".
+     * Packages are described by the study table they come from
      */
     public getPackageDescription(pkg: DataPackage) {
-        const suffix = "__" + pkg.site
-        const name = pkg.type === "flat" && pkg.site && pkg.name.endsWith(suffix) ?
-            pkg.name.slice(0, -suffix.length) :
-            pkg.name
-        return this.getDescription(pkg.study, pkg.version, study => study.tables?.[pkg.study + "__" + name]?.description)
+        return this.getDescription(pkg.study, pkg.version, study => study.tables?.[pkg.study + "__" + getTableName(pkg)]?.description)
     }
 
     public async getStudyVersions(studyId: string): Promise<string[]> {

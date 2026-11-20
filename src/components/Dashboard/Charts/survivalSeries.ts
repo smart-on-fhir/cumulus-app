@@ -1,6 +1,7 @@
 import { parseDuration } from "./duration"
 import { SurvivalData }  from "./kaplanMeier"
 import { app }           from "../../../types"
+import { escapeHtml }    from "../../../utils"
 
 
 // The survival steps of building a chart's series (see getSeriesAndExceptions
@@ -11,10 +12,6 @@ import { app }           from "../../../types"
  * Survival charts warn about groups with fewer records than this
  */
 export const MIN_SURVIVAL_GROUP_SIZE = 10
-
-function escapeHtml(input: string) {
-    return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-}
 
 /**
  * Warnings about the data of a survival chart: an X column that doesn't hold

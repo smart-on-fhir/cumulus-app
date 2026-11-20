@@ -378,6 +378,11 @@ export function roundToPrecision(n: string | number, precision?: number) {
     return n;
 }
 
+/** For text put into HTML strings, e.g. tooltips and chart labels */
+export function escapeHtml(input: string) {
+    return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+}
+
 export function escapeForFileName(input: string): string {
     return input.trim()
         .replace(/[/:*?"<>|\\]+/g, "_")

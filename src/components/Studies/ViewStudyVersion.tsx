@@ -121,7 +121,7 @@ export default function ViewStudyVersion() {
                 markdown />
             <div className="row gap-2 wrap">
                 <div className="col col-8 responsive">
-                    <h5 className="mt-2">Study Periods</h5>
+                    <h5 className="mt-2">Study Periods <Link className="link fw-400 small" to="summary">Summary prototypes →</Link></h5>
                     <hr className="mb-1" />
                     { transmissions.length ? 
                         // @ts-ignore
