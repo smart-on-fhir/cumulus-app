@@ -641,6 +641,8 @@ function DimensionSankey({ packages }: { packages: DataPackage[] }) {
                 nodeWidth  : 12,
                 nodePadding: 8,
                 linkOpacity: 0.3,
+                // Each link fades from its kind of data's color to its dimension's
+                linkColorMode: "gradient",
                 curveFactor: 0.4,
                 dataLabels : {
                     crop    : false,
