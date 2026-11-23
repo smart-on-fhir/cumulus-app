@@ -1,9 +1,19 @@
 import moment                            from "moment"
+import { useEffect, useMemo }            from "react"
 import { classList }                     from "../../utils"
 import ColumnSelector                    from "./ColumnSelector"
 import { NO_VALUE_OPERATORS, operators } from "./config"
 import { app }                           from "../../types"
-import TypeAhead from "../generic/TypeAhead"
+import TypeAhead                         from "../generic/TypeAhead"
+import Autocomplete                      from "../generic/Autocomplete"
+import { AutocompleteValue }             from "../generic/Autocomplete/lib"
+
+
+/** Loads the values of a column, with how many records have each */
+export type ValueLoader = (column: string) => Promise<AutocompleteValue[]>
+
+/** The operators that compare with a whole value, so suggesting values helps */
+const EQUALS_OPERATORS = ["strEq", "strEqCI", "strNotEq"]
 
 
 const emptyFilter: app.Filter = {
@@ -23,7 +33,8 @@ function Filter({
     onChange,
     onRemove,
     down,
-    up
+    up,
+    loadValues
 }: {
     cols    : app.SubscriptionDataColumn[]
     filter  : app.Filter
@@ -31,10 +42,26 @@ function Filter({
     onRemove: () => void
     up     ?: () => void
     down   ?: () => void
+    loadValues?: ValueLoader
 })
 {
     const leftColumn   = filter.left ? cols.find(c => c.name === filter.left) : null;
     const leftDataType = leftColumn ? leftColumn.dataType : "";
+
+    // One loader per column, so that the input knows when the column changed
+    const loadColumnValues = useMemo(
+        () => loadValues && filter.left ? () => loadValues(filter.left) : undefined,
+        [loadValues, filter.left]
+    )
+
+    // Loading the values of a string column can take seconds, so it starts as
+    // soon as the column is picked: picking the operator takes some of that
+    // time. The loader shares the request with the value input.
+    useEffect(() => {
+        if (loadColumnValues && leftDataType === "string") {
+            loadColumnValues().catch(() => {}) // The input reports the error
+        }
+    }, [loadColumnValues, leftDataType])
 
     const types = operators.find(o => o.id === filter.operator)?.type || [];
 
@@ -153,7 +180,16 @@ function Filter({
                 }}
             /></div></div> }
 
-            { rightType === "string" && <div className="row"><div className="col"><input type="text"
+            { rightType === "string" && loadColumnValues && EQUALS_OPERATORS.includes(filter.operator) && <div className="row"><div className="col">
+                <Autocomplete
+                    value={ filter.right.value as string || "" }
+                    onChange={ value => onChange({ ...filter, right: { ...filter.right, value } }) }
+                    loadValues={ loadColumnValues }
+                    placeholder="Enter value"
+                />
+            </div></div> }
+
+            { rightType === "string" && !(loadColumnValues && EQUALS_OPERATORS.includes(filter.operator)) && <div className="row"><div className="col"><input type="text"
                 value={filter.right.value as string || ""}
                 onChange={e => onChange({ ...filter, right: { ...filter.right, value: e.target.value } })}
                 style={ filter.operator.match(/matches/i) ? { fontFamily: "monospace" } : undefined }
@@ -191,11 +227,14 @@ function Filter({
 export default function FilterUI({
     current = [],
     onChange,
-    cols
+    cols,
+    loadValues
 }: {
     cols: app.SubscriptionDataColumn[]
     current: app.Filter[]
     onChange: (current: app.Filter[]) => void
+    /** Suggests values for the "equals" operators, when given */
+    loadValues?: ValueLoader
 })
 {
     function add() {
@@ -258,6 +297,7 @@ export default function FilterUI({
                         onRemove={() => remove(i)}
                         up={ i > 0 ? up.bind(null, i) : undefined }
                         down={ i < current.length - 1 ? down.bind(null, i) : undefined }
+                        loadValues={ loadValues }
                         onChange={filter => {
                             current[i] = { ...filter }
                             onChange(current)

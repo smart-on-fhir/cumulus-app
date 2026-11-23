@@ -2,6 +2,7 @@ import { useState }       from "react"
 import Select             from "../generic/Select"
 import ColumnSelector     from "./ColumnSelector"
 import FilterUI           from "./FilterUI"
+import { ValueLoader }    from "./FilterUI"
 import Collapse           from "../generic/Collapse"
 import Checkbox           from "../generic/Checkbox"
 import { AllAnnotations } from "./Inspectors/Annotations"
@@ -156,7 +157,8 @@ export default function ConfigPanel({
     onChartOptionsChange,
     onRangeOptionsChange,
     onSecondaryDataOptionsChange,
-    statusValues
+    statusValues,
+    loadFilterValues
 } : {
     cols: app.SubscriptionDataColumn[]
     state: ChartConfigPanelState
@@ -171,6 +173,9 @@ export default function ConfigPanel({
      * while loading
      */
     statusValues?: string[] | null
+
+    /** Suggests the values of a column in the filters */
+    loadFilterValues?: ValueLoader
 }) {
 
     const { chartOptions, chartType } = state;
@@ -234,6 +239,7 @@ export default function ConfigPanel({
                             onChange={filters => onChange({ ...state, filters })}
                             current={ state.filters }
                             cols={ cols }
+                            loadValues={ loadFilterValues }
                         />
                     </div>
                 </Collapse>
