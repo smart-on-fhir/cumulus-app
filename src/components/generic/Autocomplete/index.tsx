@@ -20,17 +20,23 @@ const OVERSCAN = 6
  *
  * All the matches can be scrolled through, but only the visible ones are
  * rendered, so that tens of thousands stay fast.
+ *
+ * The counts are hidden by default: a dedicated endpoint for the values may not
+ * return them, so users shouldn't come to expect them yet.
  */
 export default function Autocomplete({
     value = "",
     onChange,
     loadValues,
-    placeholder
+    placeholder,
+    showCounts = false
 }: {
     value      ?: string
     onChange    : (value: string) => void
     loadValues  : () => Promise<AutocompleteValue[]>
     placeholder?: string
+    /** Show how many records have each value */
+    showCounts ?: boolean
 })
 {
     const [values     , setValues     ] = useState<AutocompleteValue[] | null>(null)
@@ -148,7 +154,7 @@ export default function Autocomplete({
                                         onMouseEnter={ () => setHighlighted(i) }
                                     >
                                         <span className="autocomplete-value">{ item.value }</span>
-                                        <span className="autocomplete-count">{ item.count.toLocaleString() }</span>
+                                        { showCounts && <span className="autocomplete-count">{ item.count.toLocaleString() }</span> }
                                     </div>
                                 )
                             }) }
