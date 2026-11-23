@@ -56,12 +56,14 @@ function Filter({
 
     // Loading the values of a string column can take seconds, so it starts as
     // soon as the column is picked: picking the operator takes some of that
-    // time. The loader shares the request with the value input.
+    // time. The loader shares the request with the value input. Saved filters
+    // with other operators never suggest values, so they don't load them.
+    const suggests = !filter.operator || EQUALS_OPERATORS.includes(filter.operator)
     useEffect(() => {
-        if (loadColumnValues && leftDataType === "string") {
+        if (loadColumnValues && leftDataType === "string" && suggests) {
             loadColumnValues().catch(() => {}) // The input reports the error
         }
-    }, [loadColumnValues, leftDataType])
+    }, [loadColumnValues, leftDataType, suggests])
 
     const types = operators.find(o => o.id === filter.operator)?.type || [];
 
