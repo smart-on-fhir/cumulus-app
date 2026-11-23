@@ -20,7 +20,9 @@ import Alert, { AlertError }                     from "../generic/Alert"
 import Loader                                    from "../generic/Loader"
 import Grid                                      from "../generic/Grid"
 import { app }                                   from "../../types"
-import { createOne, updateOne }                  from "../../backend"
+import { createOne, fetchChartData, updateOne }  from "../../backend"
+import { CUMULUS__NONE }                         from "./config"
+import { ValueLoader }                           from "./FilterUI"
 import { useBackend, useCommand }                from "../../hooks"
 import Highcharts                                from "../../highcharts"
 import { useAuth }                               from "../../auth"
@@ -558,6 +560,18 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
         return saveChart()
     }
 
+    // The filters suggest the values of a column, with how many records have
+    // each. The chart-data request for the column alone returns all of them.
+    // It can be slow, so each column is loaded once.
+    const loadFilterValues = useMemo((): ValueLoader => {
+        const cache: Record<string, ReturnType<ValueLoader>> = {}
+        return column => cache[column] ||= fetchChartData({ subscription, dataPackage, column })
+            .then((data: app.ServerResponses.DataResponse) => (data.data[0]?.rows || [])
+                .filter(row => row[0] !== CUMULUS__NONE)
+                .map(row => ({ value: String(row[0]), count: Number(row[1]) || 0 })))
+            .catch(error => { delete cache[column]; throw error })
+    }, [subscription, dataPackage])
+
     const { statusValues } = useChartData({
         subscription,
         dataPackage,
@@ -671,6 +685,7 @@ export default function Dashboard({ view, subscription, dataPackage, copy }: Das
                         <ConfigPanel
                             cols={cols}
                             statusValues={statusValues}
+                            loadFilterValues={loadFilterValues}
                             onChartTypeChange={ (type: string) => dispatch({ type: "SET_CHART_TYPE", payload: type as keyof typeof SupportedChartTypes }) }
                             onChartOptionsChange={ (payload: Highcharts.Options) => dispatch({ type: "SET_CHART_OPTIONS", payload }) }
                             onRangeOptionsChange={ (payload: app.RangeOptions) => dispatch({ type: "SET_RANGE_OPTIONS", payload }) }

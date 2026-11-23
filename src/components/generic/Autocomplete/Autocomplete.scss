@@ -1,0 +1,69 @@
+.autocomplete {
+    position: relative;
+
+    > input {
+        width: 100%;
+    }
+}
+
+.autocomplete-menu {
+    position     : absolute;
+    z-index      : 1000;
+    top          : 100%;
+    left         : 1px;
+    right        : 1px;
+    margin-top   : 1px;
+    padding      : 2px;
+    border-radius: 3px;
+    background   : var(--color-window-bg-hard);
+    box-shadow   : 0 0 0 1px rgb(from var(--color-window-fg-hard) r g b / 0.3), 0px 5px 10px -5px rgba(0, 0, 0, 0.5);
+}
+
+// Scrolls through all the matches; only the visible ones are rendered
+.autocomplete-list {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    // Keeps the scrollbar off the counts
+    scrollbar-gutter: stable;
+}
+
+// Positioned by the component, at a fixed height, so they never wrap
+.autocomplete-option {
+    position     : absolute;
+    left         : 0;
+    right        : 0;
+    display      : flex;
+    align-items  : center;
+    gap          : 1ch;
+    // Room on the right for overlay scrollbars (macOS), which take no space
+    padding      : 0 14px 0 6px;
+    border-radius: 2px;
+    cursor       : default;
+    font-size    : 0.9em;
+    white-space  : nowrap;
+
+    &.highlighted {
+        background: var(--color-highlight);
+    }
+}
+
+.autocomplete-value {
+    flex         : 1 1 auto;
+    min-width    : 0;
+    overflow     : hidden;
+    text-overflow: ellipsis;
+    white-space  : nowrap;
+}
+
+// How many records have the value
+.autocomplete-count {
+    flex     : none;
+    font-size: 0.85em;
+    color    : rgb(from var(--color-window-fg) r g b / 0.5);
+}
+
+.autocomplete-note {
+    padding  : 0.3em 6px;
+    font-size: 0.85em;
+    color    : rgb(from var(--color-window-fg) r g b / 0.6);
+}
